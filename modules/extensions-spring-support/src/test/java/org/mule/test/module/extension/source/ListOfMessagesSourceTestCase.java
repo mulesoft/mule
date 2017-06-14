@@ -13,19 +13,21 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.test.heisenberg.extension.DEARadioSource.MESSAGES_PER_POLL;
+
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.MuleEventContext;
-import org.mule.runtime.core.api.lifecycle.Callable;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.concurrent.Latch;
 import org.mule.test.heisenberg.extension.model.types.DEAOfficerAttributes;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
-import org.junit.Test;
-
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class ListOfMessagesSourceTestCase extends AbstractExtensionFunctionalTestCase implements Callable {
+import org.junit.Test;
+
+public class ListOfMessagesSourceTestCase extends AbstractExtensionFunctionalTestCase implements Processor {
 
   private static AtomicReference<List<Message>> capturedPayload = new AtomicReference<>(null);
   private static Latch latch = new Latch();
@@ -43,12 +45,12 @@ public class ListOfMessagesSourceTestCase extends AbstractExtensionFunctionalTes
   }
 
   @Override
-  public Object onCall(MuleEventContext eventContext) throws Exception {
-    List<Message> payload = (List<Message>) eventContext.getEvent().getMessage().getPayload().getValue();
+  public Event process(Event event) throws MuleException {
+    List<Message> payload = (List<Message>) event.getMessage().getPayload().getValue();
     if (capturedPayload.compareAndSet(null, payload)) {
       latch.release();
     }
-    return payload;
+    return event;
   }
 
   @Test

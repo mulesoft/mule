@@ -36,9 +36,9 @@
     <flow name="SecureUMO">
         <http:listener path="*" config-ref="listenerConfig"/>
         <http:basic-security-filter realm="mule-realm" />
-        <test:component>
+        <test:processor>
             <test:return-data>foo</test:return-data>
-        </test:component>
+        </test:processor>
     </flow>
 
 

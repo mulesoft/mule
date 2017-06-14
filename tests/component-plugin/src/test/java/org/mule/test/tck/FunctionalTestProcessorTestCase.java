@@ -11,7 +11,7 @@ import static org.hamcrest.Matchers.startsWith;
 import static org.mockito.Mockito.mock;
 import static org.mule.functional.api.exception.FunctionalTestException.EXCEPTION_MESSAGE;
 
-import org.mule.functional.api.component.FunctionalTestComponent;
+import org.mule.functional.api.component.FunctionalTestProcessor;
 import org.mule.functional.api.exception.FunctionalTestException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -24,16 +24,16 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class FunctionalTestComponentTestCase extends AbstractMuleTestCase {
+public class FunctionalTestProcessorTestCase extends AbstractMuleTestCase {
 
-  FunctionalTestComponent ftc;
+  FunctionalTestProcessor ftc;
 
   @Rule
   public ExpectedException expected = ExpectedException.none();
 
   @Before
   public void initFunctionaTestComponent() {
-    ftc = new FunctionalTestComponent();
+    ftc = new FunctionalTestProcessor();
     ftc.setFlowConstruct(mock(FlowConstruct.class));
     ftc.setThrowException(true);
   }

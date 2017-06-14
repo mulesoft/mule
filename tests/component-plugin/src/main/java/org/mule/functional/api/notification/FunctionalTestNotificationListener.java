@@ -6,19 +6,21 @@
  */
 package org.mule.functional.api.notification;
 
-import org.mule.functional.api.component.FunctionalTestComponent;
+import org.mule.functional.api.component.FunctionalTestProcessor;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.CustomNotificationListener;
 import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
 
 /**
  * By implementing this listener interface and registering the object with the
  * {@link MuleContext#registerListener(ServerNotificationListener)} You can receive {@link FunctionalTestNotification}s from the
- * {@link FunctionalTestComponent}.
+ * {@link FunctionalTestProcessor}.
  *
- * This Notification contains the current MuleEventContext and reply message. The resource identifier for this event is the
- * service name that received the message. This means you can register to listen to Notifications from a selected
- * {@link FunctionalTestComponent}. i.e. <code>
+ * This Notification contains the current {@link Event}, {@link FlowConstruct} and reply message. The resource identifier for this
+ * event is the service name that received the message. This means you can register to listen to Notifications from a selected
+ * {@link FunctionalTestProcessor}. i.e. <code>
  * muleContext.registerListener(this, "*JmsTestCompoennt");
  * </code>
  *
@@ -29,7 +31,7 @@ import org.mule.runtime.core.api.context.notification.ServerNotificationListener
  * muleContext.registerListener(this");
  * </code>
  *
- * @see FunctionalTestComponent
+ * @see FunctionalTestProcessor
  * @see FunctionalTestNotificationListener
  * @see MuleContext
  */

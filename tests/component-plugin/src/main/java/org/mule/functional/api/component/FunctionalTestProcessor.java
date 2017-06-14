@@ -44,7 +44,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 
 /**
- * <code>FunctionalTestComponent</code> is a service that can be used by functional tests. This service accepts an EventCallback
+ * <code>FunctionalTestProcessor</code> is a service that can be used by functional tests. This service accepts an EventCallback
  * that can be used to assert the state of the current event.
  * <p/>
  * Also, this service fires {@link FunctionalTestNotification} via Mule for every message received. Tests can register with Mule
@@ -53,10 +53,10 @@ import org.slf4j.Logger;
  * @see FunctionalTestNotification
  * @see FunctionalTestNotificationListener
  */
-public class FunctionalTestComponent extends AbstractAnnotatedObject
+public class FunctionalTestProcessor extends AbstractAnnotatedObject
     implements Processor, Lifecycle, MuleContextAware, FlowConstructAware {
 
-  private static final Logger logger = getLogger(FunctionalTestComponent.class);
+  private static final Logger logger = getLogger(FunctionalTestProcessor.class);
 
   public static final int STREAM_SAMPLE_SIZE = 4;
   public static final int STREAM_BUFFER_SIZE = 4096;
@@ -68,7 +68,6 @@ public class FunctionalTestComponent extends AbstractAnnotatedObject
   private String exceptionText = "";
   private boolean enableMessageHistory = true;
   private boolean enableNotifications = true;
-  private boolean doInboundTransform = true;
   private String appendString;
   private long waitTime = 0;
   private boolean logMessageDetails = false;
@@ -231,7 +230,7 @@ public class FunctionalTestComponent extends AbstractAnnotatedObject
       try {
         Thread.sleep(waitTime);
       } catch (InterruptedException e) {
-        logger.info("FunctionalTestComponent waitTime was interrupted");
+        logger.info("FunctionalTestProcessor waitTime was interrupted");
       }
     }
     return replyMessage;
@@ -239,7 +238,7 @@ public class FunctionalTestComponent extends AbstractAnnotatedObject
 
   /**
    * An event callback is called when a message is received by the service. An MuleEvent callback isn't strictly required but it
-   * is usfal for performing assertions on the current message being received. Note that the FunctionalTestComponent should be
+   * is usfal for performing assertions on the current message being received. Note that the FunctionalTestProcessor should be
    * made a singleton when using MuleEvent callbacks
    * <p/>
    * Another option is to register a {@link FunctionalTestNotificationListener} with Mule and this will deleiver a
@@ -255,7 +254,7 @@ public class FunctionalTestComponent extends AbstractAnnotatedObject
 
   /**
    * An event callback is called when a message is received by the service. An MuleEvent callback isn't strictly required but it
-   * is usfal for performing assertions on the current message being received. Note that the FunctionalTestComponent should be
+   * is usfal for performing assertions on the current message being received. Note that the FunctionalTestProcessor should be
    * made a singleton when using MuleEvent callbacks
    * <p/>
    * Another option is to register a {@link FunctionalTestNotificationListener} with Mule and this will deleiver a
@@ -392,14 +391,6 @@ public class FunctionalTestComponent extends AbstractAnnotatedObject
     this.waitTime = waitTime;
   }
 
-  public boolean isDoInboundTransform() {
-    return doInboundTransform;
-  }
-
-  public void setDoInboundTransform(boolean doInboundTransform) {
-    this.doInboundTransform = doInboundTransform;
-  }
-
   public boolean isLogMessageDetails() {
     return logMessageDetails;
   }
@@ -436,7 +427,7 @@ public class FunctionalTestComponent extends AbstractAnnotatedObject
   /**
    * @return the first {@code test:component} from a flow with the provided name.
    */
-  public static FunctionalTestComponent getFromFlow(MuleContext muleContext, String flowName) throws Exception {
+  public static FunctionalTestProcessor getFromFlow(MuleContext muleContext, String flowName) throws Exception {
     final FlowConstruct flowConstruct = muleContext.getRegistry().lookupObject(flowName);
 
     if (flowConstruct != null) {
@@ -444,8 +435,8 @@ public class FunctionalTestComponent extends AbstractAnnotatedObject
         Pipeline flow = (Pipeline) flowConstruct;
         // Retrieve the first component
         for (Processor processor : flow.getMessageProcessors()) {
-          if (processor instanceof FunctionalTestComponent) {
-            return (FunctionalTestComponent) processor;
+          if (processor instanceof FunctionalTestProcessor) {
+            return (FunctionalTestProcessor) processor;
           }
         }
       }

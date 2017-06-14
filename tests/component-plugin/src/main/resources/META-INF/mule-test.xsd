@@ -10,17 +10,17 @@
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
                 schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule.xsd"/>
 
-    <xsd:element name="component" type="testComponentType" substitutionGroup="mule:abstract-component">
+    <xsd:element name="processor" type="testProcessorType" substitutionGroup="mule:abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
-                A component that can be used for testing message flows. It is a configurable component. The return data for the component can be set so that users can simulate a call to a real service. This component can also track invocation history and fire notifications when messages are received.
+                A processor that can be used for testing message flows. It is a configurable component. The return data for the component can be set so that users can simulate a call to a real service. This component can also track invocation history and fire notifications when messages are received.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:complexType name="testComponentType">
+    <xsd:complexType name="testProcessorType">
         <xsd:complexContent>
-            <xsd:extension base="mule:abstractComponentType">
+            <xsd:extension base="mule:abstractMessageProcessorType">
                 <xsd:sequence>
                     <xsd:element name="return-data" minOccurs="0" maxOccurs="1">
                         <xsd:annotation>
@@ -70,13 +70,6 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="doInboundTransform" type="xsd:boolean">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Whether the message will be transformed using the transformer(s) set on the inbound endpoint before it gets processed. The default is true.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
                 <xsd:attribute name="exceptionToThrow" type="mule:substitutableName">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -94,35 +87,35 @@
                 <xsd:attribute name="enableMessageHistory" type="xsd:boolean">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Every message that is received by the test component is stored and can be retrieved. If you do not want this information stored, such as if you are running millions of messages through the component, you can disable this feature to avoid a potential out of memory error.
+                            Every message that is received by the test processor is stored and can be retrieved. If you do not want this information stored, such as if you are running millions of messages through the component, you can disable this feature to avoid a potential out of memory error.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="enableNotifications" type="xsd:boolean">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Whether to fire a {{FunctionalTestNotification}} when a message is received by the component. Test cases can register to receive these notifications and make assertions on the current message.
+                            Whether to fire a {{FunctionalTestNotification}} when a message is received by the processor. Test cases can register to receive these notifications and make assertions on the current message.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="appendString" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            A string value that will be appeneded to every message payload that passes through the component. Note that by setting this property you implicitly select that the message payload will be converted to a string and that a string payload will be returned. The inbound transformer (if any) will get applied first, but if that does not return a string, {{MuleEventContext.getMessageAsString()}} will be called directly after.
+                            A string value that will be appended to every message payload that passes through the processor. Note that by setting this property you implicitly select that the message payload will be converted to a string and that a string payload will be returned.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="waitTime" type="mule:substitutableLong">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The time in milliseconds to wait before returning a result. All processing happens in the component before the wait begins.
+                            The time in milliseconds to wait before returning a result. All processing happens in the processor before the wait begins.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="id" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The name of this component
+                            The name of this processor
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
