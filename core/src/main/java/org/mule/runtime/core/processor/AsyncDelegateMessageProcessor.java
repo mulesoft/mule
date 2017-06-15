@@ -23,6 +23,7 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -46,7 +47,6 @@ import javax.inject.Inject;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import reactor.core.scheduler.Scheduler;
 
 /**
  * Processes {@link Event}'s asynchronously using a {@link ProcessingStrategy} to schedule asynchronous processing of
@@ -65,6 +65,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
   protected MessageProcessorChain delegate;
 
   private Scheduler scheduler;
+  private reactor.core.scheduler.Scheduler reactorScheduler;
   protected String name;
   private MessagingExceptionHandler messagingExceptionHandler;
 
@@ -87,15 +88,22 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
 
   @Override
   public void start() throws MuleException {
-    scheduler = fromExecutorService(schedulerService.ioScheduler(muleContext.getSchedulerBaseConfig().withName(name)));
+    if (schedulerService != null) {
+      scheduler = schedulerService.ioScheduler();
+      reactorScheduler = fromExecutorService(scheduler);
+    }
     super.start();
   }
 
   @Override
   public void stop() throws MuleException {
     super.stop();
-    scheduler.dispose();
+    if (scheduler != null) {
+      scheduler.stop();
+      reactorScheduler.dispose();
+    }
     scheduler = null;
+    reactorScheduler = null;
   }
 
   @Override
@@ -133,9 +141,11 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
     if (!isSynchronousProcessing(flowConstruct) && flowConstruct instanceof Pipeline) {
       // If an async processing strategy is in use then use it to schedule async
       return publisher -> from(publisher).transform(((Pipeline) flowConstruct).getProcessingStrategy().onPipeline(delegate));
-    } else {
+    } else if (reactorScheduler != null) {
       // Otherwise schedule async processing using IO pool.
-      return publisher -> from(publisher).transform(delegate).subscribeOn(scheduler);
+      return publisher -> from(publisher).transform(delegate).subscribeOn(reactorScheduler);
+    } else {
+      return publisher -> from(publisher).transform(delegate);
     }
   }
 

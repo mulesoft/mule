@@ -24,6 +24,7 @@ import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.Pipeline;
@@ -48,7 +49,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import reactor.core.scheduler.Scheduler;
 
 /**
  * <p>
@@ -100,19 +100,6 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
    */
   private List<Processor> routes = new ArrayList<>();
 
-  @Override
-  public void start() throws MuleException {
-    scheduler = fromExecutorService(schedulerService.ioScheduler(muleContext.getSchedulerBaseConfig()));
-    super.start();
-  }
-
-  @Override
-  public void stop() throws MuleException {
-    super.stop();
-    scheduler.dispose();
-    scheduler = null;
-  }
-
   /**
    * Whether or not {@link #initialise()} was already successfully executed
    */
@@ -129,6 +116,8 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
   private AggregationStrategy aggregationStrategy;
 
   private Scheduler scheduler;
+  private reactor.core.scheduler.Scheduler reactorScheduler;
+  private static String SCHEDULER_NAME = "ScatterGatherScheduler";
 
   @Override
   public Event process(Event event) throws MuleException {
@@ -155,9 +144,11 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
     if (!isSynchronousProcessing(flowConstruct) && flowConstruct instanceof Pipeline) {
       // If an async processing strategy is in use then use it to schedule scatter-gather route
       return publisher -> from(publisher).transform(((Pipeline) flowConstruct).getProcessingStrategy().onPipeline(route));
-    } else {
+    } else if (reactorScheduler != null) {
       // Otherwise schedule async processing on an IO thread.
-      return publisher -> from(publisher).subscribeOn(scheduler);
+      return publisher -> from(publisher).transform(route).subscribeOn(reactorScheduler);
+    } else {
+      return publisher -> from(publisher).transform(route);
     }
   }
 
@@ -179,6 +170,26 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
 
     super.initialise();
     initialised = true;
+  }
+
+  @Override
+  public void start() throws MuleException {
+    if (schedulerService != null) {
+      scheduler = schedulerService.ioScheduler();
+      reactorScheduler = fromExecutorService(scheduler);
+    }
+    super.start();
+  }
+
+  @Override
+  public void stop() throws MuleException {
+    super.stop();
+    if (scheduler != null) {
+      scheduler.stop();
+      reactorScheduler.dispose();
+      scheduler = null;
+      reactorScheduler = null;
+    }
   }
 
   /**
