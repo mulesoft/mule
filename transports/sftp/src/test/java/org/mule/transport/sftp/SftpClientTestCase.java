@@ -88,6 +88,72 @@ public class SftpClientTestCase extends AbstractMuleTestCase
     }
 
     @Test
+    public void causedByRetrieveFileSftpException() throws Exception
+    {
+        SftpException expectedCause = new SftpException(1, destDir);
+        SftpClient client = createSftpClientWithExceptionOnRetrieveFile(expectedCause);
+        try
+        {
+            client.retrieveFile("file.txt");
+            fail("IOException expected.");
+        }
+        catch (IOException e)
+        {
+            assertThat(e.getCause(), is(instanceOf(SftpException.class)));
+            assertEquals(e.getCause(), expectedCause);
+        }        
+    }
+
+    @Test
+    public void causedByGetLastModifiedTimeShouldBeAnSftpException() throws Exception
+    {
+        SftpException expectedCause = new SftpException(1, destDir);
+        SftpClient client = createSftpClientWithExceptionOnStat(expectedCause);
+        try
+        {
+            client.getLastModifiedTime("file.txt");
+            fail("IOException expected.");
+        }
+        catch (IOException e)
+        {
+            assertThat(e.getCause(), is(instanceOf(SftpException.class)));
+            assertEquals(e.getCause(), expectedCause);
+        }        
+    }
+
+    public void causedByMkdirShouldBeAnSftpException() throws Exception
+    {
+        SftpException expectedCause = new SftpException(1, destDir);
+        SftpClient client = createSftpClientWithExceptionOnMkdir(expectedCause);
+        try
+        {
+            client.mkdir("dir");
+            fail("IOException expected.");
+        }
+        catch (IOException e)
+        {
+            assertThat(e.getCause(), is(instanceOf(SftpException.class)));
+            assertEquals(e.getCause(), expectedCause);
+        }        
+    }
+
+    public void causedByRmdirShouldBeAnSftpException() throws Exception
+    {
+        SftpException expectedCause = new SftpException(1, destDir);
+        SftpClient client = createSftpClientWithExceptionOnRmdir(expectedCause);
+        try
+        {
+            client.mkdir("dir");
+            fail("IOException expected.");
+        }
+        catch (IOException e)
+        {
+            assertThat(e.getCause(), is(instanceOf(SftpException.class)));
+            assertEquals(e.getCause(), expectedCause);
+        }        
+    }
+
+    @Test
     public void causedBySizeShouldBeAnSftpException() throws Exception
     {
         SftpException expectedCause = new SftpException(1, destDir);
@@ -149,9 +215,34 @@ public class SftpClientTestCase extends AbstractMuleTestCase
         return client;
     }
 
+    private SftpClient createSftpClientWithExceptionOnMkdir(SftpException exceptionToThrow) throws NoSuchFieldException, SftpException, IllegalAccessException
+    {
+        ChannelSftp mockChannel = mock(ChannelSftp.class);
+        doThrow(exceptionToThrow).when(mockChannel).mkdir(anyString());
+
+        return createClient(exceptionToThrow, mockChannel);
+    }
+    
+    private SftpClient createSftpClientWithExceptionOnRmdir(SftpException exceptionToThrow) throws NoSuchFieldException, SftpException, IllegalAccessException
+    {
+        ChannelSftp mockChannel = mock(ChannelSftp.class);
+        doThrow(exceptionToThrow).when(mockChannel).rmdir(anyString());
+
+        return createClient(exceptionToThrow, mockChannel);
+    }
+    
     private SftpClient createSftpClientWithExceptionOnStat(SftpException exceptionToThrow) throws NoSuchFieldException, SftpException, IllegalAccessException
     {
         ChannelSftp mockChannel = mock(ChannelSftp.class);
+        when(mockChannel.stat(anyString())).thenThrow(exceptionToThrow);
+
+        return createClient(exceptionToThrow, mockChannel);
+    }
+    
+    private SftpClient createSftpClientWithExceptionOnRetrieveFile(SftpException exceptionToThrow) throws NoSuchFieldException, SftpException, IllegalAccessException
+    {
+        ChannelSftp mockChannel = mock(ChannelSftp.class);
+        when(mockChannel.get(anyString())).thenThrow(exceptionToThrow);
         when(mockChannel.stat(anyString())).thenThrow(exceptionToThrow);
 
         return createClient(exceptionToThrow, mockChannel);
