@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.config.builders;
 
+import static org.mule.runtime.core.config.i18n.CoreMessages.configurationBuilderSuccess;
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -74,7 +76,7 @@ public abstract class AbstractResourceConfigurationBuilder extends AbstractConfi
 
     super.configure(muleContext);
 
-    logger.info(CoreMessages.configurationBuilderSuccess(this, createConfigResourcesString()).toString());
+    logger.debug(configurationBuilderSuccess(this, createConfigResourcesString()).toString());
   }
 
   protected ConfigResource[] loadConfigResources(String[] configs) throws ConfigurationException {
