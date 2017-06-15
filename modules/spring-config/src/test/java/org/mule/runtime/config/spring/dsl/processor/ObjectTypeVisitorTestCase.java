@@ -18,16 +18,28 @@ import org.junit.Test;
 
 public class ObjectTypeVisitorTestCase {
 
-  private static final ObjectTypeVisitor visitor = new ObjectTypeVisitor(new ComponentModel());
 
   @Test
   public void typeIsInstanceOfGivenClass() {
 
+    ObjectTypeVisitor visitor = new ObjectTypeVisitor(new ComponentModel());
     TypeDefinition typeDefinition = fromType(String.class);
-    typeDefinition.visit(this.visitor);
-    assertTrue(String.class.isAssignableFrom(this.visitor.getType()));
+    typeDefinition.visit(visitor);
+    assertTrue(String.class.isAssignableFrom(visitor.getType()));
 
+  }
+
+  @Test
+  public void typeIsInstanceOfGivenClassFromAttibute() throws ClassNotFoundException {
+    Thread.currentThread().getContextClassLoader().loadClass("org.mule.runtime.core.api.processor.MessageProcessors");
+    ComponentModel componentModel = new ComponentModel();
+    componentModel.setParameter("parentClass", "org.mule.runtime.core.api.processor.MessageProcessors");
+    ObjectTypeVisitor visitor = new ObjectTypeVisitor(componentModel);
+    TypeDefinition typeDefinition = fromConfigurationAttribute("parentClass");
+    typeDefinition.visit(visitor);
+    assertTrue(org.mule.runtime.core.api.processor.MessageProcessors.class.isAssignableFrom(visitor.getType()));
   }
 
 
 }
+
