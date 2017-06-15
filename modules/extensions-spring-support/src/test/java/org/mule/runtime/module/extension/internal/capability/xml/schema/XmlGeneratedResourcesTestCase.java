@@ -10,15 +10,13 @@ import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
 import static java.util.Collections.emptySet;
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.CURRENT_VERSION;
-import static org.mule.runtime.module.extension.internal.capability.xml.schema.SpringSchemaBundleResourceFactory.BUNDLE_MASK;
-import static org.mule.runtime.module.extension.internal.capability.xml.schema.SpringSchemaBundleResourceFactory.GENERATED_FILE_NAME;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockSubTypes;
+
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
@@ -48,7 +46,6 @@ public class XmlGeneratedResourcesTestCase extends AbstractGeneratedResourceFact
   private static final String EXTENSION_VERSION = "version";
   private static final String SCHEMA_LOCATION = "mulesoft.com/extension";
   private static final String UNESCAPED_LOCATION_PREFIX = "http://";
-  private static final String ESCAPED_LOCATION_PREFIX = "http\\://";
   private static final String SCHEMA_NAME = "mule-extension.xsd";
 
   @Mock
@@ -64,7 +61,6 @@ public class XmlGeneratedResourcesTestCase extends AbstractGeneratedResourceFact
 
   private XmlDslModel xmlDslModel;
 
-  private SpringSchemaBundleResourceFactory springSchemaBundleResourceFactory = new SpringSchemaBundleResourceFactory();
   private SchemaXmlResourceFactory schemaXmlResourceFactory = new SchemaXmlResourceFactory();
 
   @Before
@@ -81,9 +77,7 @@ public class XmlGeneratedResourcesTestCase extends AbstractGeneratedResourceFact
     mockSubTypes(extensionModel);
     when(extensionModel.getImportedTypes()).thenReturn(emptySet());
 
-    generator = new AnnotationProcessorResourceGenerator(asList(springSchemaBundleResourceFactory,
-                                                                schemaXmlResourceFactory),
-                                                         processingEnvironment);
+    generator = new AnnotationProcessorResourceGenerator(asList(schemaXmlResourceFactory), processingEnvironment);
 
     when(extensionModel.getName()).thenReturn(EXTENSION_NAME);
     when(extensionModel.getVersion()).thenReturn(EXTENSION_VERSION);
@@ -91,8 +85,7 @@ public class XmlGeneratedResourcesTestCase extends AbstractGeneratedResourceFact
 
   @Override
   protected Class<? extends GeneratedResourceFactory>[] getResourceFactoryTypes() {
-    return new Class[] {SchemaXmlResourceFactory.class,
-        SpringSchemaBundleResourceFactory.class};
+    return new Class[] {SchemaXmlResourceFactory.class};
   }
 
   @Test
@@ -113,19 +106,5 @@ public class XmlGeneratedResourcesTestCase extends AbstractGeneratedResourceFact
   public void generateSchema() throws Exception {
     GeneratedResource resource = schemaXmlResourceFactory.generateResource(extensionModel).get();
     assertThat(isBlank(new String(resource.getContent())), is(false));
-  }
-
-  @Test
-  public void springSchemas() throws Exception {
-    GeneratedResource resource = springSchemaBundleResourceFactory.generateResource(extensionModel).get();
-    assertThat(resource.getPath(), equalTo(GENERATED_FILE_NAME));
-
-    StringBuilder expected = new StringBuilder();
-    expected.append(String.format(BUNDLE_MASK, ESCAPED_LOCATION_PREFIX + SCHEMA_LOCATION, EXTENSION_VERSION, SCHEMA_NAME,
-                                  SCHEMA_NAME));
-    expected.append(String.format(BUNDLE_MASK, ESCAPED_LOCATION_PREFIX + SCHEMA_LOCATION, "current", SCHEMA_NAME, SCHEMA_NAME));
-
-
-    assertThat(new String(resource.getContent()), equalTo(expected.toString()));
   }
 }
