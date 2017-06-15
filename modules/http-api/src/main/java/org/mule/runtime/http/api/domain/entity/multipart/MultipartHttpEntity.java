@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.http.api.domain.entity.multipart;
 
+import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import org.mule.runtime.http.api.domain.entity.HttpEntity;
 
 import java.io.InputStream;
@@ -21,6 +22,7 @@ public class MultipartHttpEntity implements HttpEntity {
   private final Collection<HttpPart> parts;
 
   public MultipartHttpEntity(final Collection<HttpPart> parts) {
+    checkNotNull(parts, "HTTP entity parts cannot be null");
     this.parts = parts;
   }
 
@@ -36,12 +38,12 @@ public class MultipartHttpEntity implements HttpEntity {
 
   @Override
   public InputStream getContent() {
-    throw new UnsupportedOperationException();
+    return null;
   }
 
   @Override
   public byte[] getBytes() {
-    throw new UnsupportedOperationException();
+    return null;
   }
 
   @Override

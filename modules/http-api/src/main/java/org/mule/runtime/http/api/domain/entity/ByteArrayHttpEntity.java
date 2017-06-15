@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.http.api.domain.entity;
 
+import static java.util.Collections.emptyList;
+import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import org.mule.runtime.http.api.domain.entity.multipart.HttpPart;
 
 import java.io.ByteArrayInputStream;
@@ -22,6 +24,7 @@ public class ByteArrayHttpEntity implements HttpEntity {
   private byte[] content;
 
   public ByteArrayHttpEntity(byte[] content) {
+    checkNotNull(content, "HTTP entity content cannot be null.");
     this.content = content;
   }
 
@@ -47,7 +50,7 @@ public class ByteArrayHttpEntity implements HttpEntity {
 
   @Override
   public Collection<HttpPart> getParts() {
-    throw new UnsupportedOperationException();
+    return emptyList();
   }
 
 }
