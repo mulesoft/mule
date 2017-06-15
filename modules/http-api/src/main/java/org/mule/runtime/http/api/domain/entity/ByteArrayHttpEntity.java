@@ -6,6 +6,12 @@
  */
 package org.mule.runtime.http.api.domain.entity;
 
+import org.mule.runtime.http.api.domain.entity.multipart.HttpPart;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.util.Collection;
+
 /**
  * Represents a byte array HTTP body.
  *
@@ -19,7 +25,29 @@ public class ByteArrayHttpEntity implements HttpEntity {
     this.content = content;
   }
 
-  public byte[] getContent() {
+  @Override
+  public boolean isStreaming() {
+    return false;
+  }
+
+  @Override
+  public boolean isComposed() {
+    return false;
+  }
+
+  @Override
+  public InputStream getContent() {
+    return new ByteArrayInputStream(content);
+  }
+
+  @Override
+  public byte[] getBytes() {
     return this.content;
   }
+
+  @Override
+  public Collection<HttpPart> getParts() {
+    throw new UnsupportedOperationException();
+  }
+
 }

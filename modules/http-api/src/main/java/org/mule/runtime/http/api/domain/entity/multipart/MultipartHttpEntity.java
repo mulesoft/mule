@@ -8,6 +8,7 @@ package org.mule.runtime.http.api.domain.entity.multipart;
 
 import org.mule.runtime.http.api.domain.entity.HttpEntity;
 
+import java.io.InputStream;
 import java.util.Collection;
 
 /**
@@ -23,6 +24,27 @@ public class MultipartHttpEntity implements HttpEntity {
     this.parts = parts;
   }
 
+  @Override
+  public boolean isStreaming() {
+    return false;
+  }
+
+  @Override
+  public boolean isComposed() {
+    return true;
+  }
+
+  @Override
+  public InputStream getContent() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public byte[] getBytes() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
   public Collection<HttpPart> getParts() {
     return this.parts;
   }

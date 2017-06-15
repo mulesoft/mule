@@ -67,7 +67,7 @@ public final class DefaultHttpMessageDispatcher implements MessageDispatcher {
 
     try {
       HttpResponse response = client.send(request, 5000, false, null);
-      InputStream content = ((InputStreamHttpEntity) response.getEntity()).getInputStream();
+      InputStream content = response.getEntity().getContent();
       return new DispatchingResponse(content, response.getHeaderValueIgnoreCase(CONTENT_TYPE), toHeadersMap(response));
     } catch (IOException e) {
       throw new DispatchingException("An error occurred while sending the SOAP request");

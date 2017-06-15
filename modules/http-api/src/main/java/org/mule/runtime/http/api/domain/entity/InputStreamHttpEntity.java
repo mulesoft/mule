@@ -6,7 +6,11 @@
  */
 package org.mule.runtime.http.api.domain.entity;
 
+import static java.util.Collections.emptyList;
+import org.mule.runtime.http.api.domain.entity.multipart.HttpPart;
+
 import java.io.InputStream;
+import java.util.Collection;
 
 /**
  * Representation of a stream HTTP body.
@@ -35,7 +39,29 @@ public class InputStreamHttpEntity implements HttpEntity {
     return this.contentLength != null;
   }
 
-  public InputStream getInputStream() {
+  @Override
+  public boolean isStreaming() {
+    return true;
+  }
+
+  @Override
+  public boolean isComposed() {
+    return false;
+  }
+
+  @Override
+  public InputStream getContent() {
     return this.inputStream;
   }
+
+  @Override
+  public byte[] getBytes() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public Collection<HttpPart> getParts() {
+    return emptyList();
+  }
+
 }
