@@ -2,18 +2,11 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
-      xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <tls:context name="globalTlsContext">
-        <tls:trust-store path="tls/trustStore" password="mulepassword"/>
-        <tls:key-store path="tls/clientKeystore" keyPassword="mulepassword" password="mulepassword" />
-    </tls:context>
-
-    <http:request-config name="requestConfig" host="localhost" port="${httpsPort}" protocol="HTTPS" tlsContext-ref="globalTlsContext">
+    <http:request-config name="requestConfig" host="localhost" port="${targetPort}">
         <http:basic-authentication username="johndoe" password="pass" preemptive="false" />
         <http:proxy host="localhost" port="${httpPort}" username="user" password="password" />
     </http:request-config>
