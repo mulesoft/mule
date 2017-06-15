@@ -11,12 +11,18 @@ import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromConfigurationAttribute;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.dsl.api.component.TypeDefinition;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class ObjectTypeVisitorTestCase {
+
+  @Rule
+  public ExpectedException exception = ExpectedException.none();
 
 
   @Test
@@ -30,15 +36,51 @@ public class ObjectTypeVisitorTestCase {
   }
 
   @Test
-  public void typeIsInstanceOfGivenClassFromAttibute() throws ClassNotFoundException {
-    Thread.currentThread().getContextClassLoader().loadClass("org.mule.runtime.core.api.processor.MessageProcessors");
+  public void typeIsInstanceOfGivenClassFromAttribute() throws ClassNotFoundException {
+    Thread.currentThread().getContextClassLoader().loadClass("org.mule.runtime.core.processor.ReferenceProcessor");
     ComponentModel componentModel = new ComponentModel();
-    componentModel.setParameter("parentClass", "org.mule.runtime.core.api.processor.MessageProcessors");
+    componentModel.setParameter("type", "org.mule.runtime.core.processor.ReferenceProcessor");
     ObjectTypeVisitor visitor = new ObjectTypeVisitor(componentModel);
-    TypeDefinition typeDefinition = fromConfigurationAttribute("parentClass");
+    TypeDefinition typeDefinition = fromConfigurationAttribute("type");
     typeDefinition.visit(visitor);
-    assertTrue(org.mule.runtime.core.api.processor.MessageProcessors.class.isAssignableFrom(visitor.getType()));
+    assertTrue(org.mule.runtime.core.processor.ReferenceProcessor.class.isAssignableFrom(visitor.getType()));
   }
+
+  @Test
+  public void typeIsInstanceOfCheckedClassFromAttribute() throws ClassNotFoundException{
+    Thread.currentThread().getContextClassLoader().loadClass("org.mule.runtime.core.processor.ReferenceProcessor");
+    ComponentModel componentModel = new ComponentModel();
+    componentModel.setParameter("type", "org.mule.runtime.core.processor.ReferenceProcessor");
+    ObjectTypeVisitor visitor = new ObjectTypeVisitor(componentModel);
+    TypeDefinition typeDefinition = fromConfigurationAttribute("type").checkingThatIsClassOrInheritsFrom(org.mule.runtime.core.processor.ReferenceProcessor.class);
+    typeDefinition.visit(visitor);
+    assertTrue(org.mule.runtime.core.processor.ReferenceProcessor.class.isAssignableFrom(visitor.getType()));
+  }
+
+  @Test
+  public void typeIsInstanceOfClassInheritedFromCheckedClassFromAttribute() throws ClassNotFoundException{
+    Thread.currentThread().getContextClassLoader().loadClass("org.mule.runtime.core.processor.ReferenceProcessor");
+    ComponentModel componentModel = new ComponentModel();
+    componentModel.setParameter("type", "org.mule.runtime.core.processor.ReferenceProcessor");
+    ObjectTypeVisitor visitor = new ObjectTypeVisitor(componentModel);
+    //Check that ReferenceProcessor inherits from AbstractProcessor
+    TypeDefinition typeDefinition = fromConfigurationAttribute("type").checkingThatIsClassOrInheritsFrom(org.mule.runtime.core.api.processor.AbstractProcessor.class);
+    typeDefinition.visit(visitor);
+    assertTrue(org.mule.runtime.core.api.processor.AbstractProcessor.class.isAssignableFrom(visitor.getType()));
+  }
+
+  @Test
+  public void testFailsIfTypeIsNotOfCheckedClass() throws ClassNotFoundException{
+    exception.expect(MuleRuntimeException.class);
+    exception.expectMessage("is not the same or inherits from");
+    Thread.currentThread().getContextClassLoader().loadClass("org.mule.runtime.core.processor.ReferenceProcessor");
+    ComponentModel componentModel = new ComponentModel();
+    componentModel.setParameter("type", this.getClass().getName());
+    ObjectTypeVisitor visitor = new ObjectTypeVisitor(componentModel);
+    TypeDefinition typeDefinition = fromConfigurationAttribute("type").checkingThatIsClassOrInheritsFrom(org.mule.runtime.core.processor.ReferenceProcessor.class);
+    typeDefinition.visit(visitor);
+  }
+
 
 
 }

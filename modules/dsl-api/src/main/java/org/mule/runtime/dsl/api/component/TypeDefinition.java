@@ -49,7 +49,7 @@ public class TypeDefinition {
    * @param inforcedClass class to be checked as the same or a super class of the type if defined as a config attribute
    * @return {@code TypeDefinition} whith className set.
    */
-  public TypeDefinition checkingThatIsInstanceOf(Class<?> inforcedClass) {
+  public TypeDefinition checkingThatIsClassOrInheritsFrom(Class<?> inforcedClass) {
     this.inforcedClass = inforcedClass;
     return this;
   }

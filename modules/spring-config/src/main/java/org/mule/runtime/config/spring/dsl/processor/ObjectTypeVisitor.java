@@ -67,7 +67,7 @@ public class ObjectTypeVisitor implements TypeDefinitionVisitor {
       type =
           ClassUtils.getClass(Thread.currentThread().getContextClassLoader(), componentModel.getParameters().get(attributeName));
       if (!inforcedClass.isAssignableFrom(type)) {
-        throw new MuleRuntimeException(createStaticMessage("Class definition for type %s on element %s is not an instance of %s",
+        throw new MuleRuntimeException(createStaticMessage("Class definition for type %s on element %s is not the same or inherits from %s",
                                                            componentModel.getParameters().get(attributeName),
                                                            componentModel.getIdentifier(), inforcedClass.getName()));
       }
