@@ -6,6 +6,10 @@
  */
 package org.mule.runtime.core.construct.processor;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Matchers.any;
@@ -33,11 +37,13 @@ import org.mule.runtime.core.api.TransformationService;
 import org.mule.runtime.core.api.context.notification.EnrichedServerNotification;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.context.notification.AsyncMessageNotification;
 import org.mule.runtime.core.context.notification.ErrorHandlerNotification;
 import org.mule.runtime.core.context.notification.PipelineMessageNotification;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
+import org.mule.runtime.core.exception.ErrorHandler;
 import org.mule.runtime.core.exception.ErrorHandlerFactory;
 import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.exception.MessagingException;
@@ -45,7 +51,6 @@ import org.mule.runtime.core.internal.construct.DefaultFlowBuilder.DefaultFlow;
 import org.mule.runtime.core.management.stats.AllStatistics;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
@@ -93,8 +98,11 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
                                                                           .thenReturn(errorType);
     when(muleContext.getErrorTypeLocator()).thenReturn(errorTypeLocator);
     when(muleContext.getErrorTypeRepository().getErrorType(UNKNOWN)).thenReturn(Optional.of(mock(ErrorType.class)));
-    pipeline = new TestPipeline(pipelineName, muleContext);
     when(muleContext.getTransformationService()).thenReturn(new TransformationService(muleContext));
+  }
+
+  public void createTestPipeline(List<Processor> processors, ErrorHandler errorHandler) {
+    pipeline = new TestPipeline(pipelineName, muleContext, null, processors, errorHandler);
     context = DefaultEventContext.create(pipeline, TEST_CONNECTOR_LOCATION);
   }
 
@@ -106,6 +114,8 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
 
   @Test
   public void send() throws Exception {
+    createTestPipeline(emptyList(), null);
+
     pipeline.initialise();
     pipeline.start();
 
@@ -118,10 +128,8 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
 
   @Test
   public void requestResponseException() throws Exception {
-    pipeline.setExceptionListener(new ErrorHandlerFactory().createDefault());
-    List<Processor> processors = new ArrayList<>();
-    processors.add(new ExceptionThrowingMessageProcessor());
-    pipeline.setMessageProcessors(processors);
+    createTestPipeline(singletonList(new ExceptionThrowingMessageProcessor()), new ErrorHandlerFactory().createDefault());
+
     pipeline.initialise();
     pipeline.start();
 
@@ -164,8 +172,9 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
 
     CountDownLatch latch = new CountDownLatch(2);
 
-    public TestPipeline(String name, MuleContext muleContext) {
-      super(name, muleContext);
+    public TestPipeline(String name, MuleContext muleContext, MessageSource messageSource, List<Processor> messageProcessors,
+                        ErrorHandler errorHandler) {
+      super(name, muleContext, messageSource, messageProcessors, ofNullable(errorHandler), empty(), INITIAL_STATE_STARTED);
     }
 
     @Override

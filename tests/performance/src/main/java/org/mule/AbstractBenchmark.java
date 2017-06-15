@@ -6,6 +6,7 @@
  */
 package org.mule;
 
+import static java.util.Collections.emptyList;
 import static java.util.concurrent.TimeUnit.MICROSECONDS;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.construct.Flow.builder;
@@ -13,6 +14,7 @@ import static org.mule.runtime.core.api.util.IOUtils.getResourceAsString;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.openjdk.jmh.annotations.Mode.AverageTime;
 import static org.openjdk.jmh.annotations.Scope.Benchmark;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.config.builders.BasicRuntimeServicesConfigurationBuilder;
@@ -76,7 +78,7 @@ public class AbstractBenchmark {
   }
 
   public Flow createFlow(MuleContext muleContext) {
-    return builder(FLOW_NAME, muleContext).build();
+    return builder(FLOW_NAME, muleContext).messageProcessors(emptyList()).build();
   }
 
   public Event createEvent(Flow flow) {

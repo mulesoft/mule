@@ -23,9 +23,9 @@ import static org.mockito.Mockito.verify;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.processor.strategy.AbstractProcessingStrategy.TRANSACTIONAL_ERROR_MESSAGE;
-import static org.mule.runtime.core.processor.strategy.ReactorStreamProcessingStrategyFactory.DEFAULT_BUFFER_SIZE;
-import static org.mule.runtime.core.processor.strategy.ReactorStreamProcessingStrategyFactory.DEFAULT_SUBSCRIBER_COUNT;
-import static org.mule.runtime.core.processor.strategy.ReactorStreamProcessingStrategyFactory.DEFAULT_WAIT_STRATEGY;
+import static org.mule.runtime.core.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_BUFFER_SIZE;
+import static org.mule.runtime.core.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_SUBSCRIBER_COUNT;
+import static org.mule.runtime.core.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_WAIT_STRATEGY;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.PROACTOR;
 
@@ -33,13 +33,13 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.processor.strategy.ProactorStreamProcessingStrategyFactory.ProactorStreamProcessingStrategy;
-import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
 import org.junit.Test;
-import org.mockito.Mockito;
+
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
@@ -173,7 +173,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
   @Override
   @Description("When the ProactorProcessingStrategy is configured and a transaction is active processing fails with an error")
   public void tx() throws Exception {
-    flow.setMessageProcessors(asList(cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor));
+    flow = flowBuilder.get().messageProcessors(asList(cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor)).build();
     flow.initialise();
     flow.start();
 
@@ -210,15 +210,16 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
     Scheduler blockingSchedulerSpy = spy(blocking);
     Scheduler rejectingSchedulerSpy = spy(new RejectingScheduler(blockingSchedulerSpy));
 
-    flow.setProcessingStrategyFactory((context, prefix) -> new ProactorStreamProcessingStrategy(() -> ringBuffer,
-                                                                                                DEFAULT_BUFFER_SIZE,
-                                                                                                DEFAULT_SUBSCRIBER_COUNT,
-                                                                                                DEFAULT_WAIT_STRATEGY,
-                                                                                                () -> cpuLight,
-                                                                                                () -> rejectingSchedulerSpy,
-                                                                                                () -> cpuIntensive,
-                                                                                                4));
-    flow.setMessageProcessors(singletonList(blockingProcessor));
+    flow = flowBuilder.get().messageProcessors(singletonList(blockingProcessor))
+        .processingStrategyFactory((context, prefix) -> new ProactorStreamProcessingStrategy(() -> ringBuffer,
+                                                                                             DEFAULT_BUFFER_SIZE,
+                                                                                             DEFAULT_SUBSCRIBER_COUNT,
+                                                                                             DEFAULT_WAIT_STRATEGY,
+                                                                                             () -> cpuLight,
+                                                                                             () -> rejectingSchedulerSpy,
+                                                                                             () -> cpuIntensive,
+                                                                                             4))
+        .build();
     flow.initialise();
     flow.start();
     process(flow, testEvent());
@@ -237,15 +238,16 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
     Scheduler cpuIntensiveSchedulerSpy = spy(cpuIntensive);
     Scheduler rejectingSchedulerSpy = spy(new RejectingScheduler(cpuIntensiveSchedulerSpy));
 
-    flow.setProcessingStrategyFactory((context, prefix) -> new ProactorStreamProcessingStrategy(() -> ringBuffer,
-                                                                                                DEFAULT_BUFFER_SIZE,
-                                                                                                DEFAULT_SUBSCRIBER_COUNT,
-                                                                                                DEFAULT_WAIT_STRATEGY,
-                                                                                                () -> cpuLight,
-                                                                                                () -> blocking,
-                                                                                                () -> rejectingSchedulerSpy,
-                                                                                                4));
-    flow.setMessageProcessors(singletonList(cpuIntensiveProcessor));
+    flow = flowBuilder.get().messageProcessors(singletonList(cpuIntensiveProcessor))
+        .processingStrategyFactory((context, prefix) -> new ProactorStreamProcessingStrategy(() -> ringBuffer,
+                                                                                             DEFAULT_BUFFER_SIZE,
+                                                                                             DEFAULT_SUBSCRIBER_COUNT,
+                                                                                             DEFAULT_WAIT_STRATEGY,
+                                                                                             () -> cpuLight,
+                                                                                             () -> blocking,
+                                                                                             () -> rejectingSchedulerSpy,
+                                                                                             4))
+        .build();
     flow.initialise();
     flow.start();
     process(flow, testEvent());
@@ -262,16 +264,16 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
   @Description("If max concurrency is 1, only 1 thread is used for CPU_LITE processors and further requests blocks. When " +
       "maxConcurrency < subscribers processing is done on ring-buffer thread.")
   public void singleCpuLightConcurrentMaxConcurrency1() throws Exception {
-    flow.setProcessingStrategyFactory((context,
-                                       prefix) -> new ProactorStreamProcessingStrategy(() -> ringBuffer,
-                                                                                       DEFAULT_BUFFER_SIZE,
-                                                                                       DEFAULT_SUBSCRIBER_COUNT,
-                                                                                       DEFAULT_WAIT_STRATEGY,
-                                                                                       () -> cpuLight,
-                                                                                       () -> blocking,
-                                                                                       () -> cpuIntensive,
-                                                                                       1));
-    internalConcurrent(true, CPU_LITE, 1);
+    internalConcurrent(flowBuilder.get()
+        .processingStrategyFactory((context, prefix) -> new ProactorStreamProcessingStrategy(() -> ringBuffer,
+                                                                                             DEFAULT_BUFFER_SIZE,
+                                                                                             DEFAULT_SUBSCRIBER_COUNT,
+                                                                                             DEFAULT_WAIT_STRATEGY,
+                                                                                             () -> cpuLight,
+                                                                                             () -> blocking,
+                                                                                             () -> cpuIntensive,
+                                                                                             1)),
+                       true, CPU_LITE, 1);
     assertThat(threads, hasSize(1));
     assertThat(threads.stream().filter(name -> name.startsWith(RING_BUFFER)).count(), equalTo(1l));
     assertThat(threads, not(hasItem(startsWith(CPU_LIGHT))));
@@ -284,16 +286,16 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
   @Description("If max concurrency is 1, only 1 thread is used for BLOCKING processors and further requests blocks. When " +
       "maxConcurrency < subscribers processing is done on ring-buffer thread.")
   public void singleBlockingConcurrentMaxConcurrency1() throws Exception {
-    flow.setProcessingStrategyFactory((context,
-                                       prefix) -> new ProactorStreamProcessingStrategy(() -> ringBuffer,
-                                                                                       DEFAULT_BUFFER_SIZE,
-                                                                                       DEFAULT_SUBSCRIBER_COUNT,
-                                                                                       DEFAULT_WAIT_STRATEGY,
-                                                                                       () -> cpuLight,
-                                                                                       () -> blocking,
-                                                                                       () -> cpuIntensive,
-                                                                                       1));
-    internalConcurrent(true, BLOCKING, 1);
+    internalConcurrent(flowBuilder.get()
+        .processingStrategyFactory((context, prefix) -> new ProactorStreamProcessingStrategy(() -> ringBuffer,
+                                                                                             DEFAULT_BUFFER_SIZE,
+                                                                                             DEFAULT_SUBSCRIBER_COUNT,
+                                                                                             DEFAULT_WAIT_STRATEGY,
+                                                                                             () -> cpuLight,
+                                                                                             () -> blocking,
+                                                                                             () -> cpuIntensive,
+                                                                                             1)),
+                       true, BLOCKING, 1);
     assertThat(threads, hasSize(1));
     assertThat(threads.stream().filter(name -> name.startsWith(RING_BUFFER)).count(), equalTo(1l));
     assertThat(threads, not(hasItem(startsWith(CPU_LIGHT))));
@@ -305,16 +307,16 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
   @Test
   @Description("If max concurrency is 2, only 2 threads are used for BLOCKING processors and further requests blocks.")
   public void singleBlockingConcurrentMaxConcurrency2() throws Exception {
-    flow.setProcessingStrategyFactory((context,
-                                       prefix) -> new ProactorStreamProcessingStrategy(() -> ringBuffer,
-                                                                                       DEFAULT_BUFFER_SIZE,
-                                                                                       DEFAULT_SUBSCRIBER_COUNT,
-                                                                                       DEFAULT_WAIT_STRATEGY,
-                                                                                       () -> cpuLight,
-                                                                                       () -> blocking,
-                                                                                       () -> cpuIntensive,
-                                                                                       2));
-    internalConcurrent(true, BLOCKING, 2);
+    internalConcurrent(flowBuilder.get()
+        .processingStrategyFactory((context, prefix) -> new ProactorStreamProcessingStrategy(() -> ringBuffer,
+                                                                                             DEFAULT_BUFFER_SIZE,
+                                                                                             DEFAULT_SUBSCRIBER_COUNT,
+                                                                                             DEFAULT_WAIT_STRATEGY,
+                                                                                             () -> cpuLight,
+                                                                                             () -> blocking,
+                                                                                             () -> cpuIntensive,
+                                                                                             2)),
+                       true, BLOCKING, 2);
     assertThat(threads, hasSize(2));
     assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), equalTo(2l));
     assertThat(threads, not(hasItem(startsWith(CPU_LIGHT))));

@@ -19,4 +19,9 @@ public interface ProcessingStrategyFactory {
    * @return a new {@link ProcessingStrategy}.
    */
   ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix);
+
+  default Class<? extends ProcessingStrategy> getProcessingStrategyClass() {
+    return ProcessingStrategy.class;
+  }
+
 }

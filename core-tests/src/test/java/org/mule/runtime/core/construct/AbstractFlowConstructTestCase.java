@@ -10,14 +10,14 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STOPPED;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.internal.construct.AbstractFlowConstruct;
 import org.mule.runtime.core.api.util.ObjectUtils;
+import org.mule.runtime.core.internal.construct.AbstractFlowConstruct;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
@@ -28,6 +28,7 @@ public abstract class AbstractFlowConstructTestCase extends AbstractMuleContextT
 
     private Processor listener;
 
+    @Override
     public void setListener(Processor listener) {
       this.listener = listener;
     }
@@ -52,6 +53,8 @@ public abstract class AbstractFlowConstructTestCase extends AbstractMuleContextT
   }
 
   protected abstract AbstractFlowConstruct getFlowConstruct() throws Exception;
+
+  protected abstract AbstractFlowConstruct getStoppedFlowConstruct() throws Exception;
 
   @Test
   public void testStart() throws Exception {
@@ -137,8 +140,7 @@ public abstract class AbstractFlowConstructTestCase extends AbstractMuleContextT
 
   @Test
   public void testInitialStateStopped() throws Exception {
-    AbstractFlowConstruct flow = getFlowConstruct();
-    flow.setInitialState(INITIAL_STATE_STOPPED);
+    AbstractFlowConstruct flow = getStoppedFlowConstruct();
     assertFalse(flow.isStarted());
     assertFalse(flow.isStopped());
 

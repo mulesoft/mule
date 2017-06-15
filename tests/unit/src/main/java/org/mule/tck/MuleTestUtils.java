@@ -6,10 +6,12 @@
  */
 package org.mule.tck;
 
+import static java.util.Collections.emptyList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.construct.Flow.builder;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.DefaultMuleContext;
@@ -50,8 +52,8 @@ public final class MuleTestUtils {
 
   public static Flow getTestFlow(MuleContext context) throws MuleException {
     // Use direct processing strategy given flow used in test event is not used for processing.
-    final Flow flow =
-        builder(APPLE_FLOW, context).processingStrategyFactory(new DirectProcessingStrategyFactory()).build();
+    final Flow flow = builder(APPLE_FLOW, context).messageProcessors(emptyList())
+        .processingStrategyFactory(new DirectProcessingStrategyFactory()).build();
     if (context.getRegistry() != null) {
       context.getRegistry().registerFlowConstruct(flow);
     }
@@ -60,8 +62,8 @@ public final class MuleTestUtils {
   }
 
   /**
-   * Executes callback with a given system property set and replaces the system property with it's original value once done. Useful
-   * for asserting behaviour that is dependent on the presence of a system property.
+   * Executes callback with a given system property set and replaces the system property with it's original value once done.
+   * Useful for asserting behaviour that is dependent on the presence of a system property.
    * 
    * @param propertyName Name of system property to set
    * @param propertyValue Value of system property
@@ -89,8 +91,8 @@ public final class MuleTestUtils {
   }
 
   /**
-   * Executes callback with a given system properties set and replaces the system properties with their original values once done. Useful
-   * for asserting behaviour that is dependent on the presence of a system property.
+   * Executes callback with a given system properties set and replaces the system properties with their original values once done.
+   * Useful for asserting behaviour that is dependent on the presence of a system property.
    *
    * @param properties {@link Map} of property name and property value to be set.
    * @param callback Callback implementing the the test code and assertions to be run with system property set.

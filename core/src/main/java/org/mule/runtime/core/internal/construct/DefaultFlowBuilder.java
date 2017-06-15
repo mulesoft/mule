@@ -7,12 +7,14 @@
 
 package org.mule.runtime.core.internal.construct;
 
+import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
+import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STARTED;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
-import static org.mule.runtime.core.execution.ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate;
 import static org.mule.runtime.core.api.util.ExceptionUtils.updateMessagingExceptionWithError;
+import static org.mule.runtime.core.execution.ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate;
 import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -28,14 +30,15 @@ import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
+import org.mule.runtime.core.api.source.ClusterizableMessageSource;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.interceptor.ProcessingTimeInterceptor;
 import org.mule.runtime.core.internal.construct.processor.FlowConstructStatisticsMessageProcessor;
-import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.processor.strategy.TransactionAwareWorkQueueProcessingStrategyFactory;
 import org.mule.runtime.core.routing.requestreply.AsyncReplyToPropertyRequestReplyReplier;
+import org.mule.runtime.core.source.ClusterizableMessageSourceWrapper;
 
 import java.util.List;
 import java.util.Optional;
@@ -60,6 +63,7 @@ public class DefaultFlowBuilder implements Builder {
   private List<Processor> messageProcessors;
   private MessagingExceptionHandler exceptionListener;
   private ProcessingStrategyFactory processingStrategyFactory;
+  private String initialState = INITIAL_STATE_STARTED;
   private DefaultFlow flow;
 
   /**
@@ -133,6 +137,15 @@ public class DefaultFlowBuilder implements Builder {
     return this;
   }
 
+
+  @Override
+  public Builder initialState(String initialState) {
+    checkImmutable();
+    checkArgument(initialState != null, "initialState cannot be null");
+    this.initialState = initialState;
+    return this;
+  }
+
   /**
    * Builds a flow with the provided configuration.
    *
@@ -142,24 +155,21 @@ public class DefaultFlowBuilder implements Builder {
   public Flow build() {
     checkImmutable();
 
-    flow = new DefaultFlow(name, muleContext);
-    if (messageSource != null) {
-      flow.setMessageSource(messageSource);
-    }
-
-    if (messageProcessors != null) {
-      flow.setMessageProcessors(messageProcessors);
-    }
-
-    if (exceptionListener != null) {
-      flow.setExceptionListener(exceptionListener);
-    }
-
-    if (processingStrategyFactory != null) {
-      flow.setProcessingStrategyFactory(processingStrategyFactory);
-    }
-
+    flow = new DefaultFlow(name, muleContext, resolveMessageSource(messageSource), messageProcessors,
+                           ofNullable(exceptionListener), ofNullable(processingStrategyFactory), initialState);
     return flow;
+  }
+
+  private MessageSource resolveMessageSource(MessageSource source) {
+    if (messageSource != null) {
+      if (messageSource instanceof ClusterizableMessageSource) {
+        return new ClusterizableMessageSourceWrapper(muleContext, (ClusterizableMessageSource) messageSource, flow);
+      } else {
+        return messageSource;
+      }
+    } else {
+      return null;
+    }
   }
 
   protected final void checkImmutable() {
@@ -173,8 +183,10 @@ public class DefaultFlowBuilder implements Builder {
    */
   public static class DefaultFlow extends AbstractPipeline implements Flow {
 
-    protected DefaultFlow(String name, MuleContext muleContext) {
-      super(name, muleContext);
+    protected DefaultFlow(String name, MuleContext muleContext, MessageSource messageSource, List<Processor> messageProcessors,
+                          Optional<MessagingExceptionHandler> exceptionListener,
+                          Optional<ProcessingStrategyFactory> processingStrategyFactory, String initialState) {
+      super(name, muleContext, messageSource, messageProcessors, exceptionListener, processingStrategyFactory, initialState);
     }
 
     @Override
@@ -196,8 +208,8 @@ public class DefaultFlowBuilder implements Builder {
       final Event newEvent = createMuleEventForCurrentFlow(event, event.getReplyToDestination(), event.getReplyToHandler());
       try {
         ExecutionTemplate<Event> executionTemplate =
-            createErrorHandlingExecutionTemplate(muleContext, this, getExceptionListener());
-        Event result = executionTemplate.execute(() -> pipeline.process(newEvent));
+            createErrorHandlingExecutionTemplate(getMuleContext(), this, getExceptionListener());
+        Event result = executionTemplate.execute(() -> getPipeline().process(newEvent));
         newEvent.getContext().success(result);
         return createReturnEventForParentFlowConstruct(result, event);
       } catch (MessagingException e) {
@@ -220,7 +232,7 @@ public class DefaultFlowBuilder implements Builder {
             // Use sink and potentially shared stream in Flow by dispatching incoming event via sink and then using
             // response publisher to operate of the result of flow processing before returning
             try {
-              sink.accept(request);
+              getSink().accept(request);
             } catch (RejectedExecutionException ree) {
               request.getContext()
                   .error(updateMessagingExceptionWithError(new MessagingException(event, ree, this), this, this));
@@ -294,13 +306,6 @@ public class DefaultFlowBuilder implements Builder {
     @Override
     public String getConstructType() {
       return "Flow";
-    }
-
-    @Override
-    protected void configureStatistics() {
-      statistics = new FlowConstructStatistics(getConstructType(), name);
-      statistics.setEnabled(muleContext.getStatistics().isEnabled());
-      muleContext.getStatistics().add(statistics);
     }
 
     @Override

@@ -44,4 +44,9 @@ public class DirectProcessingStrategyFactory implements ProcessingStrategyFactor
     return DIRECT_PROCESSING_STRATEGY_INSTANCE;
   }
 
+  @Override
+  public Class<? extends ProcessingStrategy> getProcessingStrategyClass() {
+    return DIRECT_PROCESSING_STRATEGY_INSTANCE.getClass();
+  }
+
 }

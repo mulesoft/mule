@@ -50,6 +50,11 @@ public class ReactorStreamProcessingStrategyFactory extends AbstractStreamProces
                                                getMaxConcurrency());
   }
 
+  @Override
+  public Class<? extends ProcessingStrategy> getProcessingStrategyClass() {
+    return ReactorStreamProcessingStrategy.class;
+  }
+
   static class ReactorStreamProcessingStrategy extends AbstractStreamProcessingStrategy implements Startable, Stoppable {
 
     private Supplier<Scheduler> cpuLightSchedulerSupplier;

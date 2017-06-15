@@ -6,11 +6,13 @@
  */
 package org.mule.runtime.core.routing.filters;
 
+import static java.util.Collections.emptyList;
 import static org.mule.runtime.core.DefaultEventContext.create;
 import static org.mule.runtime.core.api.construct.Flow.builder;
-import static org.mule.runtime.core.config.i18n.CoreMessages.transformFailedBeforeFilter;
 import static org.mule.runtime.core.api.util.ClassUtils.hash;
+import static org.mule.runtime.core.config.i18n.CoreMessages.transformFailedBeforeFilter;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
+
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
@@ -22,9 +24,9 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.routing.filter.ObjectFilter;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.transformer.simple.ByteArrayToObject;
 import org.mule.runtime.core.api.util.AttributeEvaluator;
 import org.mule.runtime.core.api.util.ClassUtils;
+import org.mule.runtime.core.transformer.simple.ByteArrayToObject;
 
 import java.util.regex.Pattern;
 
@@ -76,7 +78,7 @@ public class RegExFilter implements Filter, ObjectFilter, MuleContextAware, Init
   @Override
   public boolean accept(Message message, Event.Builder builder) {
     // TODO MULE-9341 Remove Filters that are not needed
-    Flow flowConstruct = builder("RegExFilterFlow", muleContext).build();
+    Flow flowConstruct = builder("RegExFilterFlow", muleContext).messageProcessors(emptyList()).build();
     return accept(Event.builder(create(flowConstruct, fromSingleComponent("RegExFilter"))).message(message).flow(flowConstruct)
         .build(), builder);
   }

@@ -21,6 +21,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STOPPED;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -29,9 +30,11 @@ import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.construct.AbstractFlowConstructTestCase;
+import org.mule.runtime.core.internal.construct.DefaultFlowBuilder.DefaultFlow;
 import org.mule.runtime.core.processor.ResponseMessageProcessorAdapter;
 import org.mule.runtime.core.processor.strategy.BlockingProcessingStrategyFactory;
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
@@ -55,6 +58,7 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
   private static final String FLOW_NAME = "test-flow";
 
   private DefaultFlowBuilder.DefaultFlow flow;
+  private DefaultFlowBuilder.DefaultFlow stoppedFlow;
   private SensingNullMessageProcessor sensingMessageProcessor;
   private BiFunction<Processor, Event, Event> triggerFunction;
 
@@ -81,9 +85,6 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
 
     sensingMessageProcessor = getSensingNullMessageProcessor();
 
-    flow = new DefaultFlowBuilder.DefaultFlow(FLOW_NAME, muleContext);
-    flow.setMessageSource(directInboundMessageSource);
-
     List<Processor> processors = new ArrayList<>();
     processors.add(new ResponseMessageProcessorAdapter(new StringAppendTransformer("f")));
     processors.add(new ResponseMessageProcessorAdapter(new StringAppendTransformer("e")));
@@ -93,12 +94,27 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
     processors.add(new StringAppendTransformer("c"));
     processors.add(event -> Event.builder(event).addVariable("thread", currentThread()).build());
     processors.add(sensingMessageProcessor);
-    flow.setMessageProcessors(processors);
+
+    flow = (DefaultFlow) Flow.builder(FLOW_NAME, muleContext)
+        .messageSource(directInboundMessageSource)
+        .messageProcessors(processors)
+        .build();
+
+    stoppedFlow = (DefaultFlow) Flow.builder(FLOW_NAME, muleContext)
+        .messageSource(directInboundMessageSource)
+        .messageProcessors(processors)
+        .initialState(INITIAL_STATE_STOPPED)
+        .build();
   }
 
   @Override
   protected AbstractFlowConstruct getFlowConstruct() throws Exception {
     return flow;
+  }
+
+  @Override
+  protected AbstractFlowConstruct getStoppedFlowConstruct() throws Exception {
+    return stoppedFlow;
   }
 
   @After
@@ -109,6 +125,10 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
 
     if (flow.getLifecycleState().isInitialised()) {
       flow.dispose();
+    }
+
+    if (stoppedFlow.getLifecycleState().isInitialised()) {
+      stoppedFlow.dispose();
     }
   }
 
@@ -154,7 +174,14 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
 
   @Test
   public void restartWithBlockingProcessingStrategy() throws Exception {
-    flow.setProcessingStrategyFactory(new BlockingProcessingStrategyFactory());
+    after();
+
+    flow = (DefaultFlow) Flow.builder(FLOW_NAME, muleContext)
+        .messageSource(flow.getMessageSource())
+        .messageProcessors(flow.getMessageProcessors())
+        .processingStrategyFactory(new BlockingProcessingStrategyFactory())
+        .build();
+
     flow.initialise();
     flow.start();
 
@@ -173,10 +200,16 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
     MessageSource mockMessageSource = mock(MessageSource.class, withSettings().extraInterfaces(Startable.class, Stoppable.class));
     doThrow(new LifecycleException(mock(I18nMessage.class), "Error starting component")).when(((Startable) mockMessageSource))
         .start();
-    flow.setMessageSource(mockMessageSource);
 
+    final List<Processor> processors = new ArrayList<>(flow.getMessageProcessors());
     Processor mockMessageProcessor = spy(new LifecycleTrackerProcessor());
-    flow.getMessageProcessors().add(mockMessageProcessor);
+    processors.add(mockMessageProcessor);
+
+    after();
+
+    flow = (DefaultFlow) Flow.builder(FLOW_NAME, muleContext)
+        .messageSource(mockMessageSource)
+        .messageProcessors(processors).build();
 
     flow.initialise();
     try {

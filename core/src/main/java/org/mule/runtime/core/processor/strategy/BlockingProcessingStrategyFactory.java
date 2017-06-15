@@ -67,4 +67,8 @@ public class BlockingProcessingStrategyFactory implements ProcessingStrategyFact
     return BLOCKING_PROCESSING_STRATEGY_INSTANCE;
   }
 
+  @Override
+  public Class<? extends ProcessingStrategy> getProcessingStrategyClass() {
+    return BLOCKING_PROCESSING_STRATEGY_INSTANCE.getClass();
+  }
 }

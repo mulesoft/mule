@@ -51,6 +51,11 @@ public class WorkQueueStreamProcessingStrategyFactory extends AbstractStreamProc
                                                  getMaxConcurrency());
   }
 
+  @Override
+  public Class<? extends ProcessingStrategy> getProcessingStrategyClass() {
+    return WorkQueueStreamProcessingStrategy.class;
+  }
+
   static class WorkQueueStreamProcessingStrategy
       extends AbstractStreamProcessingStrategyFactory.AbstractStreamProcessingStrategy
       implements Startable, Stoppable {

@@ -10,9 +10,8 @@ import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 
 import javax.inject.Inject;
@@ -38,7 +37,6 @@ public class RegistryLookupValueResolver<T> implements ValueResolver<T> {
    * Construct a new instance and set the {@link #key} that will be used to access the registry
    *
    * @param key a not blank {@link String}
-   * @param muleContext the Mule node
    */
   public RegistryLookupValueResolver(String key) {
     checkArgument(!StringUtils.isBlank(key), "key cannot be null or blank");

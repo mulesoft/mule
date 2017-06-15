@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.routing.requestreply;
 
+import static java.util.Collections.emptyList;
 import static junit.framework.Assert.assertNull;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.junit.Assert.assertEquals;
@@ -32,9 +33,9 @@ import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.ResponseTimeoutException;
 import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.api.util.concurrent.Latch;
 import org.mule.runtime.core.processor.AsyncDelegateMessageProcessor;
 import org.mule.runtime.core.routing.correlation.EventCorrelatorTestCase;
-import org.mule.runtime.core.api.util.concurrent.Latch;
 import org.mule.runtime.core.util.store.MuleObjectStoreManager;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -65,7 +66,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     super.doSetUp();
     muleContext.getRegistry().registerObject(OBJECT_STORE_MANAGER, new MuleObjectStoreManager());
     scheduler = muleContext.getSchedulerService().cpuIntensiveScheduler();
-    flow = builder("flowName", muleContext).build();
+    flow = builder("flowName", muleContext).messageProcessors(emptyList()).build();
     flow.initialise();
     flow.start();
   }

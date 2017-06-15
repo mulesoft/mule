@@ -8,6 +8,7 @@
 package org.mule.runtime.core.processor.chain;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toList;
@@ -57,21 +58,20 @@ import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
+import org.mule.runtime.core.api.util.ObjectUtils;
 import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 import org.mule.runtime.core.processor.ResponseMessageProcessorAdapter;
 import org.mule.runtime.core.processor.strategy.BlockingProcessingStrategyFactory;
-import org.mule.runtime.core.processor.strategy.ProactorStreamProcessingStrategyFactory;
-import org.mule.runtime.core.processor.strategy.ProactorStreamProcessingStrategyTestCase;
-import org.mule.runtime.core.processor.strategy.TransactionAwareWorkQueueProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.DirectProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.ProactorStreamProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.ReactorProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.TransactionAwareWorkQueueProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.WorkQueueProcessingStrategyFactory;
 import org.mule.runtime.core.routing.ChoiceRouter;
 import org.mule.runtime.core.routing.ScatterGatherRouter;
 import org.mule.runtime.core.routing.filters.AcceptAllFilter;
-import org.mule.runtime.core.api.util.ObjectUtils;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -140,7 +140,8 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     when(muleContext.getErrorTypeLocator()).thenReturn(errorTypeLocator);
     when(muleContext.getExceptionContextProviders()).thenReturn(singletonList(exceptionContextProvider));
     when(errorTypeLocator.lookupErrorType((Exception) any())).thenReturn(errorType);
-    flow = builder("flow", muleContext).processingStrategyFactory(processingStrategyFactory).build();
+    flow = builder("flow", muleContext).messageProcessors(emptyList())
+        .processingStrategyFactory(processingStrategyFactory).build();
     flow.initialise();
     flow.start();
   }

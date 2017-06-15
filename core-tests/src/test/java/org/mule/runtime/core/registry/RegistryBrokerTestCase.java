@@ -6,13 +6,15 @@
  */
 package org.mule.runtime.core.registry;
 
+import static java.util.Collections.emptyList;
+import static java.util.Optional.empty;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.registry.RegistryBroker;
 import org.mule.runtime.core.internal.construct.DefaultFlowBuilder;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -68,19 +70,19 @@ public class RegistryBrokerTestCase extends AbstractMuleContextTestCase {
   class LifecycleTrackerFlow extends DefaultFlowBuilder.DefaultFlow {
 
     public LifecycleTrackerFlow(String name, MuleContext muleContext) {
-      super(name, muleContext);
+      super(name, muleContext, null, emptyList(), empty(), empty(), INITIAL_STATE_STARTED);
     }
 
     @Override
     protected void doStart() throws MuleException {
       super.doStart();
-      tracker += name + "-start ";
+      tracker += getName() + "-start ";
     }
 
     @Override
     protected void doStop() throws MuleException {
       super.doStop();
-      tracker += name + "-stop ";
+      tracker += getName() + "-stop ";
     }
   }
 
@@ -93,19 +95,15 @@ public class RegistryBrokerTestCase extends AbstractMuleContextTestCase {
     final CountDownLatch end = new CountDownLatch(N);
     final AtomicInteger errors = new AtomicInteger(0);
     for (int i = 0; i < N; i++) {
-      new Thread(new Runnable() {
-
-        @Override
-        public void run() {
-          try {
-            start.await();
-            broker.addRegistry(new TransientRegistry(muleContext));
-            broker.lookupByType(Object.class);
-          } catch (Exception e) {
-            errors.incrementAndGet();
-          } finally {
-            end.countDown();
-          }
+      new Thread((Runnable) () -> {
+        try {
+          start.await();
+          broker.addRegistry(new TransientRegistry(muleContext));
+          broker.lookupByType(Object.class);
+        } catch (Exception e) {
+          errors.incrementAndGet();
+        } finally {
+          end.countDown();
         }
       }, "thread-eval-" + i).start();
     }

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.processor;
 
+import static java.util.Collections.emptyList;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -17,11 +18,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
-import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Before;
@@ -35,7 +37,7 @@ public class LoggerMessageProcessorTestCase extends AbstractMuleTestCase {
 
   @Before
   public void before() throws RegistrationException {
-    flow = builder("flow", mockContextWithServices()).build();
+    flow = builder("flow", mockContextWithServices()).messageProcessors(emptyList()).build();
   }
 
   @Test

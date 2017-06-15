@@ -49,7 +49,7 @@ public class BlockingProcessingStrategyTestCase extends DirectProcessingStrategy
       + "synchronously in a caller thread and the pipeline will block caller thread until any async processors complete " +
       "before continuing in the caller thread.")
   public void asyncCpuLightConcurrent() throws Exception {
-    internalConcurrent(false, CPU_LITE, 1, asyncProcessor);
+    internalConcurrent(flowBuilder.get(), false, CPU_LITE, 1, asyncProcessor);
     assertSynchronous(2);
   }
 

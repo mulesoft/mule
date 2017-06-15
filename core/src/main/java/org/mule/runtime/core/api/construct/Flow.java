@@ -36,12 +36,6 @@ public interface Flow extends AnnotatedObject, Lifecycle, Pipeline, Processor {
   String INITIAL_STATE_STARTED = "started";
 
   /**
-   * @return initial state of the flow, which can be {@value INITIAL_STATE_STARTED} or {@value INITIAL_STATE_STOPPED}
-   */
-  String getInitialState();
-
-
-  /**
    * Creates a new flow builder
    *
    * @param name name of the flow to be created. Non empty.
@@ -87,10 +81,19 @@ public interface Flow extends AnnotatedObject, Lifecycle, Pipeline, Processor {
     Builder processingStrategyFactory(ProcessingStrategyFactory processingStrategyFactory);
 
     /**
+     * Usually a flow is started automatically ("started"), but this attribute can be used to disable initial startup ("stopped").
+     * 
+     * @param initialState The initial state of the flow. Non null.
+     * @return same builder instance.
+     */
+    Builder initialState(String initialState);
+
+    /**
      * Builds a flow with the provided configuration.
      *
      * @return a new flow instance.
      */
     Flow build();
+
   }
 }

@@ -24,12 +24,13 @@ import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.P
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.processor.strategy.ReactorProcessingStrategyFactory.ReactorProcessingStrategy;
-import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
 import org.junit.Test;
+
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
@@ -70,9 +71,9 @@ public class ReactorProcessingStrategyTestCase extends AbstractProcessingStrateg
   @Test
   @Description("If CPU LIGHT pool has maximum size of 1 only 1 thread is used and further requests block.")
   public void singleCpuLightConcurrentMaxConcurrency1() throws Exception {
-    flow.setProcessingStrategyFactory((context,
-                                       prefix) -> new ReactorProcessingStrategy(() -> new TestScheduler(1, CPU_LIGHT)));
-    internalConcurrent(true, CPU_LITE, 1);
+    internalConcurrent(flowBuilder.get()
+        .processingStrategyFactory((context, prefix) -> new ReactorProcessingStrategy(() -> new TestScheduler(1, CPU_LIGHT))),
+                       true, CPU_LITE, 1);
     assertThat(threads, hasSize(1));
     assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), equalTo(1l));
     assertThat(threads, not(hasItem(startsWith(IO))));
@@ -147,7 +148,7 @@ public class ReactorProcessingStrategyTestCase extends AbstractProcessingStrateg
   @Override
   @Description("When the ReactorProcessingStrategy is configured and a transaction is active processing fails with an error")
   public void tx() throws Exception {
-    flow.setMessageProcessors(asList(cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor));
+    flow = flowBuilder.get().messageProcessors(asList(cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor)).build();
     flow.initialise();
     flow.start();
 
@@ -194,9 +195,9 @@ public class ReactorProcessingStrategyTestCase extends AbstractProcessingStrateg
   @Test
   @Description("If CPU LITE pool is busy OVERLOAD error is thrown")
   public void cpuLightRejectedExecution() throws Exception {
-    flow.setProcessingStrategyFactory((context,
-                                       prefix) -> new ReactorProcessingStrategy(() -> new RejectingScheduler(blocking)));
-    flow.setMessageProcessors(singletonList(blockingProcessor));
+    flow = flowBuilder.get().messageProcessors(singletonList(blockingProcessor))
+        .processingStrategyFactory((context, prefix) -> new ReactorProcessingStrategy(() -> new RejectingScheduler(blocking)))
+        .build();
     flow.initialise();
     flow.start();
     expectRejected();

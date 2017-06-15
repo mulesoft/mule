@@ -52,7 +52,7 @@ public class DirectProcessingStrategyTestCase extends AbstractProcessingStrategy
   @Description("Regardless of processor type, when the DirectProcessingStrategy is configured, the pipeline is executed "
       + "synchronously in a caller thread.")
   public void singleCpuLightConcurrent() throws Exception {
-    super.internalConcurrent(false, CPU_LITE, 1);
+    super.internalConcurrent(flowBuilder.get(), false, CPU_LITE, 1);
     assertSynchronous(2);
   }
 
@@ -116,7 +116,7 @@ public class DirectProcessingStrategyTestCase extends AbstractProcessingStrategy
   @Description("Regardless of processor type, when the DirectProcessingStrategy is configured, the pipeline is executed "
       + "synchronously in a caller thread.")
   public void tx() throws Exception {
-    flow.setMessageProcessors(asList(cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor));
+    flow = flowBuilder.get().messageProcessors(asList(cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor)).build();
     flow.initialise();
     flow.start();
 
@@ -140,7 +140,7 @@ public class DirectProcessingStrategyTestCase extends AbstractProcessingStrategy
   @Description("When using DirectProcessingStrategy continued processing is carried out using async processor thread which can "
       + "cause processing to block if there are concurrent requests and the number of custom async processor threads are reduced")
   public void asyncCpuLightConcurrent() throws Exception {
-    internalConcurrent(true, CPU_LITE, 1, asyncProcessor);
+    internalConcurrent(flowBuilder.get(), true, CPU_LITE, 1, asyncProcessor);
     assertThat(threads.size(), between(2, 3));
     assertThat(threads, not(hasItem(startsWith(CPU_LIGHT))));
     assertThat(threads, not(hasItem(startsWith(IO))));

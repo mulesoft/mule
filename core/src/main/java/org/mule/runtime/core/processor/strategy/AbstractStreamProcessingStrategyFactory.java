@@ -100,6 +100,11 @@ abstract class AbstractStreamProcessingStrategyFactory extends AbstractProcessin
     return waitStrategy;
   }
 
+  @Override
+  public Class<? extends ProcessingStrategy> getProcessingStrategyClass() {
+    return AbstractStreamProcessingStrategy.class;
+  }
+
   /**
    * Abstract {@link ProcessingStrategy} to be used by implementations that de-multiplex incoming messages using a ring-buffer
    * which can then be subscribed to n times.
