@@ -7,19 +7,12 @@
 package org.mule.runtime.soap.api.message.dispatcher;
 
 
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toMap;
-import static org.mule.runtime.http.api.HttpConstants.Method.POST;
-import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
-
+import org.apache.log4j.Logger;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.extension.api.soap.message.DispatchingRequest;
 import org.mule.runtime.extension.api.soap.message.DispatchingResponse;
 import org.mule.runtime.extension.api.soap.message.MessageDispatcher;
-import org.mule.runtime.http.api.HttpService;
 import org.mule.runtime.http.api.client.HttpClient;
-import org.mule.runtime.http.api.client.HttpClientConfiguration;
 import org.mule.runtime.http.api.domain.ParameterMap;
 import org.mule.runtime.http.api.domain.entity.InputStreamHttpEntity;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
@@ -31,7 +24,11 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
-import org.apache.log4j.Logger;
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toMap;
+import static org.mule.runtime.http.api.HttpConstants.Method.POST;
+import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
 
 
 /**
@@ -42,21 +39,10 @@ import org.apache.log4j.Logger;
  */
 public final class DefaultHttpMessageDispatcher implements MessageDispatcher {
 
-  private static final Logger LOGGER = Logger.getLogger(DefaultHttpMessageDispatcher.class);
-
   private final HttpClient client;
 
-  public DefaultHttpMessageDispatcher(HttpService service) {
-    this.client = service.getClientFactory().create(new HttpClientConfiguration.Builder()
-        .setName("wsc-dispatcher")
-        .build());
-    log("Creating http client [" + client + "]");
-  }
-
-  @Override
-  public void initialise() throws InitialisationException {
-    log("Starting client [" + client + "]");
-    client.start();
+  public DefaultHttpMessageDispatcher(HttpClient client) {
+    this.client = client;
   }
 
   /**
@@ -98,18 +84,13 @@ public final class DefaultHttpMessageDispatcher implements MessageDispatcher {
         .collect(toMap(identity(), name -> response.getHeaderValues(name).stream().collect(joining(" "))));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void dispose() {
-    log("Stopping http client [" + client + "]");
-    client.stop();
+    // Do nothing
   }
 
-  private void log(String message) {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug(message);
-    }
+  @Override
+  public void initialise() throws InitialisationException {
+    // Do nothing
   }
 }
