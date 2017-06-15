@@ -77,7 +77,7 @@ public class ObjectTypeVisitorTestCase {
   @Test
   public void testFailsIfTypeIsNotOfCheckedClass() throws ClassNotFoundException {
     exception.expect(MuleRuntimeException.class);
-    exception.expectMessage("is not the same or inherits from");
+    exception.expectMessage("is not the same nor inherits from");
     ComponentModel componentModel = new ComponentModel();
     componentModel.setParameter("type", this.getClass().getName());
     ObjectTypeVisitor visitor = new ObjectTypeVisitor(componentModel);
