@@ -11,6 +11,7 @@ import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_MAX_POOL_WAIT;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_STREAMING_MAX_MEMORY;
 import static org.mule.runtime.core.internal.util.ConcurrencyUtils.withLock;
@@ -95,7 +96,7 @@ public class PoolingByteBufferManager implements ByteBufferManager, Disposable {
    * timeout of 10 seconds. The definition of max memory is that of {@link MemoryManager#getMaxMemory()}
    */
   public PoolingByteBufferManager() {
-    this(new DefaultMemoryManager(), SECONDS.toMillis(10));
+    this(new DefaultMemoryManager(), DEFAULT_MAX_POOL_WAIT);
   }
 
   /**
@@ -133,7 +134,7 @@ public class PoolingByteBufferManager implements ByteBufferManager, Disposable {
     try {
       return pools.getUnchecked(capacity).take();
     } catch (Exception e) {
-      throw new MuleRuntimeException(createStaticMessage("Could not allocate byte buffer"), e);
+      throw new MuleRuntimeException(createStaticMessage("Could not allocate byte buffer. " + e.getMessage()), e);
     }
   }
 

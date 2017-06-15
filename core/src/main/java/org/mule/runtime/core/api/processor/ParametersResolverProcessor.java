@@ -45,7 +45,7 @@ public interface ParametersResolverProcessor {
   /**
    * Container for the parameters and the {@link ExecutionContext} of an operation.
    */
-  public static class ParametersResolverProcessorResult {
+  class ParametersResolverProcessorResult {
 
     private final Map<String, Object> parameters;
     private final ExecutionContext context;

@@ -11,6 +11,7 @@ import static java.lang.Math.toIntExact;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.streaming.exception.StreamingBufferSizeExceededException;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.streaming.bytes.InMemoryCursorStreamConfig;
 
 import java.io.IOException;
@@ -87,7 +88,7 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
                 }
               } else {
                 streamFullyConsumed();
-                buffer.limit(buffer.position());
+                buffer.get().limit(buffer.get().position());
               }
             } catch (IOException e) {
               throw new MuleRuntimeException(createStaticMessage("Could not read stream"), e);
@@ -132,11 +133,12 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
    */
   @Override
   public int consumeForwardData() throws IOException {
-    ByteBuffer readBuffer = buffer.hasRemaining()
-        ? buffer
+    ByteBuffer b = buffer.get();
+    ByteBuffer readBuffer = b.hasRemaining()
+        ? b
         : bufferManager.allocate(bufferSizeIncrement > 0 ? bufferSizeIncrement : STREAM_FINISHED_PROBE);
 
-    final boolean auxBuffer = readBuffer != buffer;
+    final boolean auxBuffer = readBuffer != b;
     final int read;
 
     try {
@@ -144,9 +146,10 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
 
       if (read > 0) {
         if (auxBuffer) {
-          buffer = expandBuffer();
+          b = expandBuffer();
           readBuffer.flip();
-          buffer.put(readBuffer);
+          b.put(readBuffer);
+          buffer = new LazyValue<>(b);
         }
 
         bufferTip += read;
@@ -169,25 +172,27 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
    * @return a new, expanded {@link ByteBuffer}
    */
   private ByteBuffer expandBuffer() {
-    int newSize = buffer.capacity() + bufferSizeIncrement;
+    ByteBuffer b = buffer.get();
+    int newSize = b.capacity() + bufferSizeIncrement;
     if (!canBeExpandedTo(newSize)) {
       throw new StreamingBufferSizeExceededException(maxBufferSize);
     }
 
     ByteBuffer newBuffer = bufferManager.allocate(newSize);
-    buffer.position(0);
-    newBuffer.put(buffer);
-    ByteBuffer oldBuffer = buffer;
-    buffer = newBuffer;
+    b.position(0);
+    newBuffer.put(b);
+    ByteBuffer oldBuffer = b;
+    b = newBuffer;
+    buffer = new LazyValue<>(b);
     deallocate(oldBuffer);
 
-    return buffer;
+    return b;
   }
 
   @Override
   protected boolean canDoSoftCopy() {
     return streamFullyConsumed ||
-        buffer.capacity() >= maxBufferSize ||
+        buffer.get().capacity() >= maxBufferSize ||
         bufferSizeIncrement == 0;
   }
 

@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.lang.String.format;
-import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonMap;
 import static java.util.Optional.of;
@@ -41,24 +40,22 @@ import static org.mule.runtime.module.extension.internal.runtime.operation.Opera
 import static org.mule.tck.junit4.matcher.MetadataKeyMatcher.metadataKeyWithId;
 import static org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver.KeyIds.BOOLEAN;
 import static org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver.KeyIds.STRING;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_BUILDER;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.just;
-
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExecutionType;
-import org.mule.runtime.api.meta.model.OutputModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
+import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
@@ -67,7 +64,6 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.mule.runtime.core.el.DefaultExpressionManager;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.internal.message.InternalMessage;
-import org.mule.runtime.core.internal.streaming.DefaultStreamingManager;
 import org.mule.runtime.core.policy.OperationExecutionFunction;
 import org.mule.runtime.extension.api.model.ImmutableOutputModel;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
@@ -78,6 +74,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvin
 import org.mule.tck.size.SmallTest;
 import org.mule.weave.v2.el.WeaveDefaultExpressionLanguageFactoryService;
 
+import java.io.InputStream;
 import java.util.Map;
 import java.util.Set;
 
@@ -248,7 +245,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     when(context.getRegistry().lookupObject(OBJECT_EXPRESSION_LANGUAGE)).thenReturn(new MVELExpressionLanguage(context));
     when(context.getRegistry().lookupObject(DefaultExpressionLanguageFactoryService.class))
         .thenReturn(new WeaveDefaultExpressionLanguageFactoryService());
-    doReturn(new DefaultExpressionManager(context, new DefaultStreamingManager())).when(context)
+    doReturn(new DefaultExpressionManager(context, streamingManager)).when(context)
         .getExpressionManager();
     FlowConstruct flowConstruct = mock(FlowConstruct.class);
     when(flowConstruct.getName()).thenReturn(flowName);
@@ -317,17 +314,6 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     verify(mockOperationPolicy).process(same(event));
   }
 
-  private void mockMetadataResolution() {
-    OperationModel typedModel = mock(OperationModel.class);
-    OutputModel resolvedOutputModel = mock(OutputModel.class);
-    when(resolvedOutputModel.getType()).thenReturn(TYPE_BUILDER.booleanType().build());
-    when(resolvedOutputModel.hasDynamicType()).thenReturn(true);
-    when(typedModel.getOutput()).thenReturn(resolvedOutputModel);
-    when(typedModel.getOutputAttributes()).thenReturn(resolvedOutputModel);
-    when(contentMock.getType()).thenReturn(TYPE_BUILDER.stringType().build());
-    when(typedModel.getAllParameterModels()).thenReturn(asList(keyParamMock, contentMock));
-  }
-
   @Test
   public void getMetadataKeyIdObjectValue() throws MetadataResolvingException, MuleException, ValueResolvingException {
     setUpValueResolvers();
@@ -363,7 +349,6 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     assertThat(resolveParameters.getContext(), instanceOf(PrecalculatedExecutionContextAdapter.class));
     final PrecalculatedExecutionContextAdapter context =
         (PrecalculatedExecutionContextAdapter) spy(resolveParameters.getContext());
-    resolveParameters = new ParametersResolverProcessorResult(resolveParameters.getParameters(), context);
 
     messageProcessor.process(Event.builder(event)
         .parameters(singletonMap(INTERCEPTION_RESOLVED_CONTEXT, context))
@@ -371,6 +356,19 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
 
     verify(operationExecutor).execute(any(ExecutionContext.class));
     messageProcessor.disposeResolvedParameters(context);
+  }
+
+  @Test
+  public void cursorStreamProvidersAreManaged() throws Exception {
+    CursorStreamProvider provider = mock(CursorStreamProvider.class);
+    final InputStream inputStream = mock(InputStream.class);
+
+    doReturn(provider).when(cursorStreamProviderFactory).of(event, inputStream);
+    doReturn(provider).when(streamingManager).manage(provider, event);
+    when(operationExecutor.execute(any())).thenReturn(just(inputStream));
+
+    messageProcessor.process(event);
+    verify(streamingManager).manage(same(provider), any());
   }
 
   private void assertProcessingType(ExecutionType executionType, ProcessingType expectedProcessingType) {

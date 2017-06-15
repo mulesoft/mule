@@ -10,6 +10,7 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.internal.streaming.bytes.ByteBufferManager;
 import org.mule.runtime.core.internal.streaming.bytes.InMemoryCursorStreamProvider;
+import org.mule.runtime.core.streaming.StreamingManager;
 import org.mule.runtime.core.streaming.bytes.InMemoryCursorStreamConfig;
 
 import java.io.InputStream;
@@ -31,8 +32,10 @@ public class InMemoryCursorStreamProviderFactory extends AbstractCursorStreamPro
    * @param config           the config for the generated providers
    * @param bufferManager    the {@link ByteBufferManager} that will be used to allocate all buffers
    */
-  public InMemoryCursorStreamProviderFactory(ByteBufferManager bufferManager, InMemoryCursorStreamConfig config) {
-    super(bufferManager);
+  public InMemoryCursorStreamProviderFactory(ByteBufferManager bufferManager,
+                                             InMemoryCursorStreamConfig config,
+                                             StreamingManager streamingManager) {
+    super(bufferManager, streamingManager);
     this.config = config;
   }
 

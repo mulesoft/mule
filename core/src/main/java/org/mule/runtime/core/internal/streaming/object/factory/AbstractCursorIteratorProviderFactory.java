@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.core.internal.streaming.object.factory;
 
+import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.streaming.object.CursorIterator;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.internal.streaming.CursorManager;
 import org.mule.runtime.core.internal.streaming.object.iterator.StreamingIterator;
+import org.mule.runtime.core.streaming.StreamingManager;
 import org.mule.runtime.core.streaming.object.CursorIteratorProviderFactory;
 
 import java.util.Iterator;
@@ -25,16 +27,27 @@ import java.util.Iterator;
  */
 public abstract class AbstractCursorIteratorProviderFactory implements CursorIteratorProviderFactory {
 
+  private final StreamingManager streamingManager;
+
+  public AbstractCursorIteratorProviderFactory(StreamingManager streamingManager) {
+    this.streamingManager = streamingManager;
+  }
+
   /**
    * {@inheritDoc}
    */
   @Override
   public final Object of(Event event, Iterator iterator) {
     if (iterator instanceof CursorIterator) {
-      return ((CursorIterator) iterator).getProvider();
+      return streamingManager.manage(((CursorIterator) iterator).getProvider(), event);
     }
 
-    return resolve(iterator, event);
+    Object value = resolve(iterator, event);
+    if (value instanceof CursorProvider) {
+      value = streamingManager.manage((CursorProvider) value, event);
+    }
+
+    return value;
   }
 
   /**

@@ -98,6 +98,7 @@ import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.Difference;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.hamcrest.Matcher;
+import org.mockito.Mockito;
 
 public final class ExtensionsTestUtils {
 
@@ -377,7 +378,8 @@ public final class ExtensionsTestUtils {
 
   public static CursorStreamProviderFactory getDefaultCursorStreamProviderFactory() {
     return new InMemoryCursorStreamProviderFactory(new SimpleByteBufferManager(),
-                                                   InMemoryCursorStreamConfig.getDefault());
+                                                   InMemoryCursorStreamConfig.getDefault(),
+                                                   mock(StreamingManager.class, Mockito.RETURNS_DEEP_STUBS));
   }
 
   public static void assertType(MetadataType metadataType, Class<?> expectedRawType,

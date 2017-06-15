@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.streaming.bytes.factory;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.internal.streaming.bytes.ByteBufferManager;
+import org.mule.runtime.core.streaming.StreamingManager;
 
 import java.io.InputStream;
 
@@ -23,8 +24,8 @@ public class NullCursorStreamProviderFactory extends AbstractCursorStreamProvide
   /**
    * {@inheritDoc}
    */
-  public NullCursorStreamProviderFactory(ByteBufferManager bufferManager) {
-    super(bufferManager);
+  public NullCursorStreamProviderFactory(ByteBufferManager bufferManager, StreamingManager streamingManager) {
+    super(bufferManager, streamingManager);
   }
 
   /**

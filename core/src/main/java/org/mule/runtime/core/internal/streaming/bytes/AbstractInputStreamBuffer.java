@@ -11,6 +11,7 @@ import static java.lang.Math.toIntExact;
 import static java.lang.System.arraycopy;
 import static java.nio.channels.Channels.newChannel;
 import static org.mule.runtime.api.util.Preconditions.checkState;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.internal.streaming.AbstractStreamingBuffer;
 
 import java.io.IOException;
@@ -30,10 +31,10 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
 
   protected final ByteBufferManager bufferManager;
 
-  private InputStream stream;
+  private final InputStream stream;
   private ReadableByteChannel streamChannel;
   private boolean streamFullyConsumed = false;
-  protected ByteBuffer buffer;
+  protected LazyValue<ByteBuffer> buffer;
 
   /**
    * Creates a new instance
@@ -56,23 +57,10 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
    */
   public AbstractInputStreamBuffer(InputStream stream, ReadableByteChannel streamChannel, ByteBufferManager bufferManager,
                                    int bufferSize) {
-    this(stream, streamChannel, bufferManager, bufferManager.allocate(bufferSize));
-  }
-
-  /**
-   * Creates a new instance
-   *
-   * @param stream        The stream being buffered. This is the original data source
-   * @param streamChannel a {@link ReadableByteChannel} used to read from the {@code stream}
-   * @param bufferManager the {@link ByteBufferManager} that will be used to allocate all buffers
-   * @param buffer        the buffer to use
-   */
-  public AbstractInputStreamBuffer(InputStream stream, ReadableByteChannel streamChannel, ByteBufferManager bufferManager,
-                                   ByteBuffer buffer) {
     this.stream = stream;
     this.streamChannel = streamChannel;
     this.bufferManager = bufferManager;
-    this.buffer = buffer;
+    buffer = new LazyValue<>(() -> bufferManager.allocate(bufferSize));
   }
 
   /**
@@ -110,7 +98,7 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
             closeSafely(stream::close);
           }
 
-          deallocate(buffer);
+          buffer.ifComputed(this::deallocate);
         }
       });
     }
@@ -137,7 +125,7 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
   protected void consume(ByteBuffer data) {
     int read = data.remaining();
     if (read > 0) {
-      buffer.put(data);
+      buffer.get().put(data);
     }
   }
 
@@ -145,7 +133,7 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
    * @return the {@link #buffer}
    */
   public ByteBuffer getBuffer() {
-    return buffer;
+    return buffer.get();
   }
 
   protected int consumeStream(ByteBuffer buffer) throws IOException {
@@ -181,15 +169,17 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
 
   private ByteBuffer softCopy(long position, int length) {
     final int offset = toIntExact(position);
-    return ByteBuffer.wrap(buffer.array(), offset, min(length, buffer.limit() - offset)).slice();
+    final ByteBuffer b = buffer.get();
+    return ByteBuffer.wrap(b.array(), offset, min(length, b.limit() - offset)).slice();
   }
 
   private ByteBuffer hardCopy(long position, int length) {
     final int offset = toIntExact(position);
-    length = min(length, buffer.limit() - offset);
+    final ByteBuffer bf = buffer.get();
+    length = min(length, bf.limit() - offset);
 
     byte[] b = new byte[length];
-    arraycopy(buffer.array(), offset, b, 0, length);
+    arraycopy(bf.array(), offset, b, 0, length);
     return ByteBuffer.wrap(b);
   }
 }

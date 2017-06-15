@@ -8,11 +8,11 @@ package org.mule.runtime.core.internal.util.message;
 
 import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
+import static org.mule.runtime.core.api.util.StreamingUtils.streamingContent;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.util.StreamingUtils;
 import org.mule.runtime.core.internal.streaming.object.iterator.StreamingIterator;
 import org.mule.runtime.core.streaming.CursorProviderFactory;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -84,7 +84,7 @@ public final class MessageUtils {
                                   CursorProviderFactory cursorProviderFactory,
                                   Event event) {
     return Message.builder()
-        .payload(StreamingUtils.streamingContent(result.getOutput(), cursorProviderFactory, event))
+        .payload(streamingContent(result.getOutput(), cursorProviderFactory, event))
         .mediaType(mediaType)
         .attributes(result.getAttributes().orElse(NULL_ATTRIBUTES))
         .build();
