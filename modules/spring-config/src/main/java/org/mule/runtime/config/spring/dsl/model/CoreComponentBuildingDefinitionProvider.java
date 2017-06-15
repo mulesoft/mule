@@ -289,6 +289,8 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   private static final String TX_ACTION = "transactionalAction";
   private static final String TX_TYPE = "transactionType";
 
+  private static final Class<?> MESSAGE_PROCESSOR_CLASS = Processor.class;
+
   private Map<String, Integer> regExFlagsMapping = ImmutableMap.<String, Integer>builder()
       .put("CANON_EQ", Integer.valueOf(Pattern.CANON_EQ))
       .put("CASE_INSENSITIVE", Integer.valueOf(Pattern.CASE_INSENSITIVE))
@@ -417,7 +419,9 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     componentBuildingDefinitions
         .add(baseDefinition.copy().withIdentifier(FILTER).withTypeDefinition(fromType(Object.class)).build());
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier(CUSTOM_PROCESSOR)
-        .withTypeDefinition(fromConfigurationAttribute(CLASS_ATTRIBUTE)).asPrototype().build());
+        .withTypeDefinition(fromConfigurationAttribute(CLASS_ATTRIBUTE)
+            .checkingThatIsClassOrInheritsFrom(MESSAGE_PROCESSOR_CLASS))
+        .asPrototype().build());
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier(PROCESSOR_CHAIN)
         .withTypeDefinition(fromType(Processor.class)).withObjectFactoryType(MessageProcessorChainFactoryBean.class)
         .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
