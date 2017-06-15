@@ -2766,7 +2766,8 @@
       ],
       "name": "source",
       "description": "",
-      "modelProperties": {}
+      "modelProperties": {},
+      "kind": "source"
     }
   ],
   "errors": [

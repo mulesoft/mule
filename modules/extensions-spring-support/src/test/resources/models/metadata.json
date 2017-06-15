@@ -5228,7 +5228,8 @@
               },
               "parameterName": "type"
             }
-          }
+          },
+          "kind": "source"
         }
       ],
       "name": "config",
@@ -7644,7 +7645,8 @@
           },
           "parameterName": "Location"
         }
-      }
+      },
+      "kind": "source"
     }
   ],
   "errors": [

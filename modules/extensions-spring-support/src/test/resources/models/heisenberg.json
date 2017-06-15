@@ -4316,7 +4316,8 @@
           ],
           "name": "AsyncListenPayments",
           "description": "",
-          "modelProperties": {}
+          "modelProperties": {},
+          "kind": "source"
         },
         {
           "hasResponse": true,
@@ -5866,7 +5867,8 @@
           ],
           "name": "ListenPayments",
           "description": "",
-          "modelProperties": {}
+          "modelProperties": {},
+          "kind": "source"
         }
       ],
       "name": "config",
@@ -12226,7 +12228,8 @@
       ],
       "name": "dea-radio",
       "description": "",
-      "modelProperties": {}
+      "modelProperties": {},
+      "kind": "source"
     }
   ],
   "errors": [

@@ -2475,6 +2475,7 @@
   "messageSources": [
     {
       "hasResponse": false,
+      "kind": "source",
       "output": {
         "type": {
           "format": "java",
