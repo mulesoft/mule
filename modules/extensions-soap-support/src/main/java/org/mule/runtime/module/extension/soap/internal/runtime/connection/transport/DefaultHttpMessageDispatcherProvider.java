@@ -8,9 +8,9 @@ package org.mule.runtime.module.extension.soap.internal.runtime.connection.trans
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
-import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.client.ExtensionsClient;
@@ -33,7 +33,7 @@ import static org.mule.runtime.api.connection.ConnectionValidationResult.success
  *
  * @since 4.0
  */
-public class DefaultHttpMessageDispatcherProvider implements HttpMessageDispatcherProvider, Initialisable, Disposable {
+public class DefaultHttpMessageDispatcherProvider implements HttpMessageDispatcherProvider, Lifecycle {
 
   @Inject
   private HttpService httpService;
@@ -66,14 +66,23 @@ public class DefaultHttpMessageDispatcherProvider implements HttpMessageDispatch
 
   @Override
   public void dispose() {
-    httpClient.stop();
+    // Do nothing
   }
 
   @Override
   public void initialise() throws InitialisationException {
     httpClient = httpService.getClientFactory().create(new HttpClientConfiguration.Builder()
-        .setName("wsc-dispatcher")
+        .setName("soap-ext-dispatcher")
         .build());
+  }
+
+  @Override
+  public void stop() throws MuleException {
+    httpClient.stop();
+  }
+
+  @Override
+  public void start() throws MuleException {
     httpClient.start();
   }
 }

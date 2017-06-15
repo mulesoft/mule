@@ -39,8 +39,6 @@ import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
  */
 public final class DefaultHttpMessageDispatcher implements MessageDispatcher {
 
-  private static final Logger LOGGER = Logger.getLogger(DefaultHttpMessageDispatcher.class);
-
   private final HttpClient client;
 
   public DefaultHttpMessageDispatcher(HttpClient client) {
@@ -88,11 +86,11 @@ public final class DefaultHttpMessageDispatcher implements MessageDispatcher {
 
   @Override
   public void dispose() {
-
+    // Do nothing
   }
 
   @Override
   public void initialise() throws InitialisationException {
-
+    // Do nothing
   }
 }
