@@ -88,20 +88,17 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
 
   @Override
   public void start() throws MuleException {
-    if (schedulerService != null) {
-      scheduler = schedulerService.ioScheduler();
-      reactorScheduler = fromExecutorService(scheduler);
-    }
+    scheduler = schedulerService.ioScheduler(getLocation() != null
+        ? muleContext.getSchedulerBaseConfig().withName(getLocation().getLocation()) : muleContext.getSchedulerBaseConfig());
+    reactorScheduler = fromExecutorService(scheduler);
     super.start();
   }
 
   @Override
   public void stop() throws MuleException {
     super.stop();
-    if (scheduler != null) {
-      scheduler.stop();
-      reactorScheduler.dispose();
-    }
+    scheduler.stop();
+    reactorScheduler.dispose();
     scheduler = null;
     reactorScheduler = null;
   }

@@ -117,7 +117,6 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
 
   private Scheduler scheduler;
   private reactor.core.scheduler.Scheduler reactorScheduler;
-  private static String SCHEDULER_NAME = "ScatterGatherScheduler";
 
   @Override
   public Event process(Event event) throws MuleException {
@@ -174,22 +173,19 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
 
   @Override
   public void start() throws MuleException {
-    if (schedulerService != null) {
-      scheduler = schedulerService.ioScheduler();
-      reactorScheduler = fromExecutorService(scheduler);
-    }
+    scheduler = schedulerService.ioScheduler(getLocation() != null
+        ? muleContext.getSchedulerBaseConfig().withName(getLocation().getLocation()) : muleContext.getSchedulerBaseConfig());
+    reactorScheduler = fromExecutorService(scheduler);
     super.start();
   }
 
   @Override
   public void stop() throws MuleException {
     super.stop();
-    if (scheduler != null) {
-      scheduler.stop();
-      reactorScheduler.dispose();
-      scheduler = null;
-      reactorScheduler = null;
-    }
+    scheduler.stop();
+    reactorScheduler.dispose();
+    scheduler = null;
+    reactorScheduler = null;
   }
 
   /**
