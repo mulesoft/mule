@@ -15,7 +15,7 @@ public class TypeDefinition {
   private Class<?> type;
   private String attributeName;
   private MapEntryType mapType;
-  private Class<?> parentType;
+  private Class<?> inforcedClass;
 
   private TypeDefinition() {}
 
@@ -46,11 +46,11 @@ public class TypeDefinition {
   }
 
   /**
-   * @param parentType class to be checked as the same or a super class of the type if defined as a config attribute
-   * @return
+   * @param inforcedClass class to be checked as the same or a super class of the type if defined as a config attribute
+   * @return {@code TypeDefinition} whith className set.
    */
-  public TypeDefinition checkingThatIsInstanceOf(Class<?> parentType) {
-    this.parentType = parentType;
+  public TypeDefinition checkingThatIsInstanceOf(Class<?> inforcedClass) {
+    this.inforcedClass = inforcedClass;
     return this;
   }
 
@@ -60,8 +60,8 @@ public class TypeDefinition {
       typeDefinitionVisitor.onType(type);
     } else if (mapType != null) {
       typeDefinitionVisitor.onMapType(mapType);
-    } else if (parentType != null) {
-      typeDefinitionVisitor.onConfigurationAttribute(attributeName, parentType);
+    } else if (inforcedClass != null) {
+      typeDefinitionVisitor.onConfigurationAttribute(attributeName, inforcedClass);
     } else {
       typeDefinitionVisitor.onConfigurationAttribute(attributeName, Object.class);
     }

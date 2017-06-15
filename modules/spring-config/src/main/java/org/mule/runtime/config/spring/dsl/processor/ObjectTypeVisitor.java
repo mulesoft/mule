@@ -62,14 +62,14 @@ public class ObjectTypeVisitor implements TypeDefinitionVisitor {
   }
 
   @Override
-  public void onConfigurationAttribute(String attributeName, Class<?> className) {
+  public void onConfigurationAttribute(String attributeName, Class<?> inforcedClass) {
     try {
       type =
           ClassUtils.getClass(Thread.currentThread().getContextClassLoader(), componentModel.getParameters().get(attributeName));
-      if (!className.isAssignableFrom(type)) {
+      if (!inforcedClass.isAssignableFrom(type)) {
         throw new MuleRuntimeException(createStaticMessage("Class definition for type %s on element %s is not an instance of %s",
                                                            componentModel.getParameters().get(attributeName),
-                                                           componentModel.getIdentifier(), className.getName()));
+                                                           componentModel.getIdentifier(), inforcedClass.getName()));
       }
     } catch (ClassNotFoundException e) {
       throw new MuleRuntimeException(createStaticMessage("Error while trying to locate Class definition for type %s on element %s",

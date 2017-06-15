@@ -26,8 +26,9 @@ public interface TypeDefinitionVisitor {
    *
    * @param attributeName the name of the configuration attribute holding the type definition. Most likely a fully qualified java
    *        class name.
+   * @param inforcedClass the name of the class from which the one defined in the attribute must be an instance of.
    */
-  void onConfigurationAttribute(String attributeName, Class<?> className);
+  void onConfigurationAttribute(String attributeName, Class<?> inforcedClass);
 
   /**
    * Invoked when the {@link TypeDefinition} it's defined to be a map entry.
