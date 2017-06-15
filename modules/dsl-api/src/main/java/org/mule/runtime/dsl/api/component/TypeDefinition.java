@@ -15,6 +15,7 @@ public class TypeDefinition {
   private Class<?> type;
   private String attributeName;
   private MapEntryType mapType;
+  private Class<?> parentType;
 
   private TypeDefinition() {}
 
@@ -44,13 +45,25 @@ public class TypeDefinition {
     return typeDefinition;
   }
 
+  /**
+   * @param parentType class to be checked as the same or a super class of the type if defined as a config attribute
+   * @return
+   */
+  public TypeDefinition checkingThatIsInstanceOf(Class<?> parentType) {
+    this.parentType = parentType;
+    return this;
+  }
+
+
   public void visit(TypeDefinitionVisitor typeDefinitionVisitor) {
     if (type != null) {
       typeDefinitionVisitor.onType(type);
     } else if (mapType != null) {
       typeDefinitionVisitor.onMapType(mapType);
+    } else if (parentType != null) {
+      typeDefinitionVisitor.onConfigurationAttribute(attributeName, parentType);
     } else {
-      typeDefinitionVisitor.onConfigurationAttribute(attributeName);
+      typeDefinitionVisitor.onConfigurationAttribute(attributeName, Object.class);
     }
   }
 

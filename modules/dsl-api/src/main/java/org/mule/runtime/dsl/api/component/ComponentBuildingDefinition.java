@@ -362,7 +362,7 @@ public class ComponentBuildingDefinition {
         }
 
         @Override
-        public void onConfigurationAttribute(String attributeName) {}
+        public void onConfigurationAttribute(String attributeName, Class<?> className) {}
 
         @Override
         public void onMapType(TypeDefinition.MapEntryType mapEntryType) {
