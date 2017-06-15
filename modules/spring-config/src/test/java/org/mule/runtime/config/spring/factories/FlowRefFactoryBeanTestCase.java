@@ -21,9 +21,16 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
@@ -37,7 +44,6 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.processor.chain.SubFlowMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -52,7 +58,7 @@ import org.springframework.context.ApplicationContext;
 public class FlowRefFactoryBeanTestCase extends AbstractMuleContextTestCase {
 
   private static final MockSettings INITIALIZABLE_MESSAGE_PROCESSOR =
-      withSettings().extraInterfaces(Processor.class, Initialisable.class, Disposable.class);
+      withSettings().extraInterfaces(Processor.class, Initialisable.class, Disposable.class, Startable.class, Stoppable.class);
   private static final String STATIC_REFERENCED_FLOW = "staticReferencedFlow";
   private static final String DYNAMIC_REFERENCED_FLOW = "dynamicReferencedFlow";
   private static final String PARSED_DYNAMIC_REFERENCED_FLOW = "parsedDynamicReferencedFlow";
@@ -61,7 +67,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleContextTestCase {
 
   private Event result = testEvent();
   private Flow targetFlow = mock(Flow.class, INITIALIZABLE_MESSAGE_PROCESSOR);
-  private Processor targetSubFlow = mock(SubFlowMessageProcessor.class, INITIALIZABLE_MESSAGE_PROCESSOR);
+  private MessageProcessorChain targetSubFlow = mock(MessageProcessorChain.class, INITIALIZABLE_MESSAGE_PROCESSOR);
   private ApplicationContext applicationContext = mock(ApplicationContext.class);
   private ExtendedExpressionManager expressionManager;
   private MuleContext mockMuleContext;
@@ -74,7 +80,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleContextTestCase {
     mockMuleContext = spy(muleContext);
     doReturn(expressionManager).when(mockMuleContext).getExpressionManager();
     doReturn(true).when(expressionManager).isExpression(anyString());
-    when(((Processor) targetFlow).process(any(Event.class))).thenReturn(result);
+    when(targetFlow.process(any(Event.class))).thenReturn(result);
     when(targetSubFlow.process(any(Event.class))).thenReturn(result);
   }
 
@@ -86,7 +92,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleContextTestCase {
     assertNotSame(targetFlow, getFlowRefProcessor(flowRefFactoryBean));
     assertNotSame(targetFlow, getFlowRefProcessor(flowRefFactoryBean));
 
-    verifyProcess(flowRefFactoryBean, (Processor) targetFlow, 0);
+    verifyProcess(flowRefFactoryBean, targetFlow, 0);
   }
 
   @Test
@@ -97,7 +103,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleContextTestCase {
     assertNotSame(targetFlow, getFlowRefProcessor(flowRefFactoryBean));
     assertNotSame(targetFlow, getFlowRefProcessor(flowRefFactoryBean));
 
-    verifyProcess(flowRefFactoryBean, (Processor) targetFlow, 0);
+    verifyProcess(flowRefFactoryBean, targetFlow, 0);
   }
 
   @Test
@@ -108,7 +114,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleContextTestCase {
     assertThat(targetSubFlow, not(equalTo(getFlowRefProcessor(flowRefFactoryBean))));
     assertThat(targetSubFlow, not(equalTo(getFlowRefProcessor(flowRefFactoryBean))));
 
-    verifyProcess(flowRefFactoryBean, targetSubFlow, 0);
+    verifyProcess(flowRefFactoryBean, targetSubFlow, 1);
   }
 
   @Test
@@ -223,16 +229,24 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleContextTestCase {
 
   private void verifyProcess(FlowRefFactoryBean flowRefFactoryBean, Processor target, int lifecycleRounds)
       throws Exception {
-    assertSame(result.getMessage(), getFlowRefProcessor(flowRefFactoryBean).process(testEvent()).getMessage());
-    assertSame(result.getMessage(), getFlowRefProcessor(flowRefFactoryBean).process(testEvent()).getMessage());
+    Processor flowRefProcessor = getFlowRefProcessor(flowRefFactoryBean);
+    initialiseIfNeeded(flowRefProcessor);
+    startIfNeeded(flowRefProcessor);
+
+    assertSame(result.getMessage(), flowRefProcessor.process(testEvent()).getMessage());
+    assertSame(result.getMessage(), flowRefProcessor.process(testEvent()).getMessage());
 
     verify(applicationContext).getBean(anyString());
 
     verify(target, times(2)).process(any(Event.class));
     verify((Initialisable) target, times(lifecycleRounds)).initialise();
 
-    flowRefFactoryBean.dispose();
-    verify((Disposable) target, times(lifecycleRounds)).dispose();
+    stopIfNeeded(flowRefProcessor);
+    disposeIfNeeded(flowRefProcessor, null);
+    verify(targetSubFlow, times(lifecycleRounds)).initialise();
+    verify(targetSubFlow, times(lifecycleRounds)).start();
+    verify(targetSubFlow, times(lifecycleRounds)).stop();
+    verify(targetSubFlow, times(lifecycleRounds)).dispose();
   }
 
 }

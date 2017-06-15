@@ -143,11 +143,9 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
     if (!isSynchronousProcessing(flowConstruct) && flowConstruct instanceof Pipeline) {
       // If an async processing strategy is in use then use it to schedule scatter-gather route
       return publisher -> from(publisher).transform(((Pipeline) flowConstruct).getProcessingStrategy().onPipeline(route));
-    } else if (reactorScheduler != null) {
+    } else {
       // Otherwise schedule async processing on an IO thread.
       return publisher -> from(publisher).transform(route).subscribeOn(reactorScheduler);
-    } else {
-      return publisher -> from(publisher).transform(route);
     }
   }
 
@@ -182,10 +180,14 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
   @Override
   public void stop() throws MuleException {
     super.stop();
-    scheduler.stop();
-    reactorScheduler.dispose();
-    scheduler = null;
-    reactorScheduler = null;
+    if (scheduler != null) {
+      scheduler.stop();
+      scheduler = null;
+    }
+    if (reactorScheduler != null) {
+      reactorScheduler.dispose();
+      reactorScheduler = null;
+    }
   }
 
   /**

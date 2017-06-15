@@ -97,10 +97,14 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
   @Override
   public void stop() throws MuleException {
     super.stop();
-    scheduler.stop();
-    reactorScheduler.dispose();
-    scheduler = null;
-    reactorScheduler = null;
+    if (scheduler != null) {
+      scheduler.stop();
+      scheduler = null;
+    }
+    if (reactorScheduler != null) {
+      reactorScheduler.dispose();
+      reactorScheduler = null;
+    }
   }
 
   @Override
@@ -138,11 +142,9 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
     if (!isSynchronousProcessing(flowConstruct) && flowConstruct instanceof Pipeline) {
       // If an async processing strategy is in use then use it to schedule async
       return publisher -> from(publisher).transform(((Pipeline) flowConstruct).getProcessingStrategy().onPipeline(delegate));
-    } else if (reactorScheduler != null) {
+    } else {
       // Otherwise schedule async processing using IO pool.
       return publisher -> from(publisher).transform(delegate).subscribeOn(reactorScheduler);
-    } else {
-      return publisher -> from(publisher).transform(delegate);
     }
   }
 
