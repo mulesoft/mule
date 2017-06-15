@@ -1,0 +1,92 @@
+/*
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+
+package org.mule.runtime.config.spring.dsl.processor;
+
+import static org.junit.Assert.assertTrue;
+import static org.mule.runtime.dsl.api.component.TypeDefinition.fromConfigurationAttribute;
+import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
+
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.config.spring.dsl.model.ComponentModel;
+import org.mule.runtime.dsl.api.component.TypeDefinition;
+
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+
+public class ObjectTypeVisitorTestCase {
+
+  @BeforeClass
+  public static void loadClassLoader() throws ClassNotFoundException {
+    Thread.currentThread().getContextClassLoader().loadClass("org.mule.runtime.core.processor.ReferenceProcessor");
+  }
+
+  @Rule
+  public ExpectedException exception = ExpectedException.none();
+
+
+  @Test
+  public void typeIsInstanceOfGivenClass() {
+
+    ObjectTypeVisitor visitor = new ObjectTypeVisitor(new ComponentModel());
+    TypeDefinition typeDefinition = fromType(String.class);
+    typeDefinition.visit(visitor);
+    assertTrue(String.class.isAssignableFrom(visitor.getType()));
+
+  }
+
+  @Test
+  public void typeIsInstanceOfGivenClassFromAttribute() throws ClassNotFoundException {
+    ComponentModel componentModel = new ComponentModel();
+    componentModel.setParameter("type", "org.mule.runtime.core.processor.ReferenceProcessor");
+    ObjectTypeVisitor visitor = new ObjectTypeVisitor(componentModel);
+    TypeDefinition typeDefinition = fromConfigurationAttribute("type");
+    typeDefinition.visit(visitor);
+    assertTrue(org.mule.runtime.core.processor.ReferenceProcessor.class.isAssignableFrom(visitor.getType()));
+  }
+
+  @Test
+  public void typeIsInstanceOfCheckedClassFromAttribute() throws ClassNotFoundException {
+    ComponentModel componentModel = new ComponentModel();
+    componentModel.setParameter("type", "org.mule.runtime.core.processor.ReferenceProcessor");
+    ObjectTypeVisitor visitor = new ObjectTypeVisitor(componentModel);
+    TypeDefinition typeDefinition = fromConfigurationAttribute("type")
+        .checkingThatIsClassOrInheritsFrom(org.mule.runtime.core.processor.ReferenceProcessor.class);
+    typeDefinition.visit(visitor);
+    assertTrue(org.mule.runtime.core.processor.ReferenceProcessor.class.isAssignableFrom(visitor.getType()));
+  }
+
+  @Test
+  public void typeIsInstanceOfClassInheritedFromCheckedClassFromAttribute() throws ClassNotFoundException {
+    ComponentModel componentModel = new ComponentModel();
+    componentModel.setParameter("type", "org.mule.runtime.core.processor.ReferenceProcessor");
+    ObjectTypeVisitor visitor = new ObjectTypeVisitor(componentModel);
+    //Check that ReferenceProcessor inherits from AbstractProcessor
+    TypeDefinition typeDefinition = fromConfigurationAttribute("type")
+        .checkingThatIsClassOrInheritsFrom(org.mule.runtime.core.api.processor.AbstractProcessor.class);
+    typeDefinition.visit(visitor);
+    assertTrue(org.mule.runtime.core.api.processor.AbstractProcessor.class.isAssignableFrom(visitor.getType()));
+  }
+
+  @Test
+  public void testFailsIfTypeIsNotOfCheckedClass() throws ClassNotFoundException {
+    exception.expect(MuleRuntimeException.class);
+    exception.expectMessage("is not the same nor inherits from");
+    ComponentModel componentModel = new ComponentModel();
+    componentModel.setParameter("type", this.getClass().getName());
+    ObjectTypeVisitor visitor = new ObjectTypeVisitor(componentModel);
+    TypeDefinition typeDefinition = fromConfigurationAttribute("type")
+        .checkingThatIsClassOrInheritsFrom(org.mule.runtime.core.processor.ReferenceProcessor.class);
+    typeDefinition.visit(visitor);
+  }
+
+
+
+}
+

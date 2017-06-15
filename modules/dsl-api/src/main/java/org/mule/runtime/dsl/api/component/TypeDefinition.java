@@ -15,6 +15,7 @@ public class TypeDefinition {
   private Class<?> type;
   private String attributeName;
   private MapEntryType mapType;
+  private Class<?> inforcedClass;
 
   private TypeDefinition() {}
 
@@ -44,13 +45,25 @@ public class TypeDefinition {
     return typeDefinition;
   }
 
+  /**
+   * @param inforcedClass class to be checked as the same or a super class of the type if defined as a config attribute
+   * @return {@code TypeDefinition} whith className set.
+   */
+  public TypeDefinition checkingThatIsClassOrInheritsFrom(Class<?> inforcedClass) {
+    this.inforcedClass = inforcedClass;
+    return this;
+  }
+
+
   public void visit(TypeDefinitionVisitor typeDefinitionVisitor) {
     if (type != null) {
       typeDefinitionVisitor.onType(type);
     } else if (mapType != null) {
       typeDefinitionVisitor.onMapType(mapType);
+    } else if (inforcedClass != null) {
+      typeDefinitionVisitor.onConfigurationAttribute(attributeName, inforcedClass);
     } else {
-      typeDefinitionVisitor.onConfigurationAttribute(attributeName);
+      typeDefinitionVisitor.onConfigurationAttribute(attributeName, Object.class);
     }
   }
 
