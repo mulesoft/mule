@@ -10,12 +10,10 @@ import static java.util.Collections.singletonList;
 import static org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.api.rx.Exceptions.UNEXPECTED_EXCEPTION_PREDICATE;
-import static org.mule.runtime.core.api.rx.Exceptions.checkedConsumer;
-import static org.mule.runtime.core.config.i18n.CoreMessages.asyncDoesNotSupportTransactions;
 import static org.mule.runtime.core.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.context.notification.AsyncMessageNotification.PROCESS_ASYNC_COMPLETE;
 import static org.mule.runtime.core.context.notification.AsyncMessageNotification.PROCESS_ASYNC_SCHEDULED;
-import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
+import static org.mule.runtime.core.internal.util.ProcessingStrategyUtils.isSynchronousProcessing;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
@@ -25,16 +23,16 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.context.notification.AsyncMessageNotification;
 import org.mule.runtime.core.exception.MessagingException;
@@ -48,6 +46,7 @@ import javax.inject.Inject;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import reactor.core.scheduler.Scheduler;
 
 /**
  * Processes {@link Event}'s asynchronously using a {@link ProcessingStrategy} to schedule asynchronous processing of
@@ -88,15 +87,15 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
 
   @Override
   public void start() throws MuleException {
-    scheduler = schedulerService.cpuLightScheduler(muleContext.getSchedulerBaseConfig().withName(name));
+    scheduler = fromExecutorService(schedulerService.ioScheduler(muleContext.getSchedulerBaseConfig().withName(name)));
     super.start();
   }
 
   @Override
   public void stop() throws MuleException {
-    scheduler.stop();
-    scheduler = null;
     super.stop();
+    scheduler.dispose();
+    scheduler = null;
   }
 
   @Override
@@ -104,23 +103,15 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
     return processToApply(event, this);
   }
 
-  private void assertNotTransactional(Event event) throws RoutingException {
-    if (isTransactionActive()) {
-      throw new RoutingException(asyncDoesNotSupportTransactions(), delegate);
-    }
-  }
-
   @Override
   public Publisher<Event> apply(Publisher<Event> publisher) {
     return from(publisher)
-        .doOnNext(checkedConsumer(event -> assertNotTransactional(event)))
         .doOnNext(request -> just(request)
             .map(event -> asyncEvent(request))
             .transform(innerPublisher -> from(innerPublisher)
                 .doOnNext(fireAsyncScheduledNotification(flowConstruct))
                 .doOnNext(asyncRequest -> just(asyncRequest)
-                    .publishOn(fromExecutorService(scheduler))
-                    .transform(delegate)
+                    .transform(scheduleAsync(delegate))
                     .doOnNext(event -> fireAsyncCompleteNotification(event, flowConstruct, null))
                     .doOnError(MessagingException.class, e -> fireAsyncCompleteNotification(e.getEvent(), flowConstruct, e))
                     .onErrorResume(MessagingException.class, messagingExceptionHandler)
@@ -136,6 +127,16 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
             .doOnError(UNEXPECTED_EXCEPTION_PREDICATE,
                        exception -> logger.error("Unhandled exception in async processing.", exception))
             .subscribe());
+  }
+
+  private ReactiveProcessor scheduleAsync(Processor delegate) {
+    if (!isSynchronousProcessing(flowConstruct) && flowConstruct instanceof Pipeline) {
+      // If an async processing strategy is in use then use it to schedule async
+      return publisher -> from(publisher).transform(((Pipeline) flowConstruct).getProcessingStrategy().onPipeline(delegate));
+    } else {
+      // Otherwise schedule async processing using IO pool.
+      return publisher -> from(publisher).transform(delegate).subscribeOn(scheduler);
+    }
   }
 
   private Event asyncEvent(Event event) {

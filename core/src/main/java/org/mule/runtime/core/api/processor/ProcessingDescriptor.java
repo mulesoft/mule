@@ -14,6 +14,6 @@ public interface ProcessingDescriptor {
   /**
    * Whether the processing represented by this instance is synchronous or not
    */
-  public boolean isSynchronous();
+  boolean isSynchronous();
 
 }

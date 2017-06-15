@@ -15,21 +15,26 @@ import static org.mule.runtime.core.api.processor.MessageProcessors.processToApp
 import static org.mule.runtime.core.api.rx.Exceptions.checkedConsumer;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
 import static org.mule.runtime.core.config.i18n.CoreMessages.noEndpointsForRouter;
+import static org.mule.runtime.core.internal.util.ProcessingStrategyUtils.isSynchronousProcessing;
 import static org.mule.runtime.core.routing.AbstractRoutingStrategy.validateMessageIsNotConsumable;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.fromIterable;
 import static reactor.core.publisher.Flux.just;
+import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.message.ExceptionPayload;
 import org.mule.runtime.core.api.processor.MessageRouter;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.routing.AggregationContext;
 import org.mule.runtime.core.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.runtime.core.api.routing.RoutePathNotFoundException;
+import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.routing.outbound.MulticastingRouter;
 
@@ -37,10 +42,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import reactor.core.scheduler.Scheduler;
 
 /**
  * <p>
@@ -74,6 +82,9 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
 
   private static final Logger logger = LoggerFactory.getLogger(ScatterGatherRouter.class);
 
+  @Inject
+  private SchedulerService schedulerService;
+
   /**
    * Whether the configured routes will run in parallel (default is true).
    */
@@ -89,6 +100,19 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
    */
   private List<Processor> routes = new ArrayList<>();
 
+  @Override
+  public void start() throws MuleException {
+    scheduler = fromExecutorService(schedulerService.ioScheduler(muleContext.getSchedulerBaseConfig()));
+    super.start();
+  }
+
+  @Override
+  public void stop() throws MuleException {
+    super.stop();
+    scheduler.dispose();
+    scheduler = null;
+  }
+
   /**
    * Whether or not {@link #initialise()} was already successfully executed
    */
@@ -103,6 +127,8 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
    * The aggregation strategy. By default is this instance
    */
   private AggregationStrategy aggregationStrategy;
+
+  private Scheduler scheduler;
 
   @Override
   public Event process(Event event) throws MuleException {
@@ -120,8 +146,19 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
     return from(publisher).doOnNext(checkedConsumer(event -> {
       assertMorethanOneRoute();
       validateMessageIsNotConsumable(event, event.getMessage());
-    })).concatMap(event -> from(fromIterable(routeChains).concatMap(processor -> just(event).transform(processor))).collectList()
+    })).concatMap(event -> from(fromIterable(routeChains).concatMap(processor -> just(event).transform(scheduleRoute(processor))))
+        .collectList()
         .map(checkedFunction(list -> aggregationStrategy.aggregate(new AggregationContext(event, list)))));
+  }
+
+  private ReactiveProcessor scheduleRoute(Processor route) {
+    if (!isSynchronousProcessing(flowConstruct) && flowConstruct instanceof Pipeline) {
+      // If an async processing strategy is in use then use it to schedule scatter-gather route
+      return publisher -> from(publisher).transform(((Pipeline) flowConstruct).getProcessingStrategy().onPipeline(route));
+    } else {
+      // Otherwise schedule async processing on an IO thread.
+      return publisher -> from(publisher).subscribeOn(scheduler);
+    }
   }
 
   @Override
