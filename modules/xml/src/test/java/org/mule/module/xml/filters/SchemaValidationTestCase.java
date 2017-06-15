@@ -14,6 +14,7 @@ import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -21,6 +22,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.mule.util.IOUtils;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
@@ -66,6 +68,19 @@ public class SchemaValidationTestCase extends AbstractMuleTestCase
         filter.initialise();
 
         MuleMessage message = new DefaultMuleMessage(getClass().getResourceAsStream(VALID_XML_FILE), muleContext);
+        assertThat(filter.accept(message), is(true));
+        assertThat(filter.accept(new DefaultMuleMessage(getClass().getResourceAsStream(INVALID_XML_FILE), muleContext)), is(false));
+    }
+
+    @Test
+    public void testValidationDataTypeNotModified() throws Exception
+    {
+        SchemaValidationFilter filter = new SchemaValidationFilter();
+        filter.setSchemaLocations(SIMPLE_SCHEMA);
+        filter.initialise();
+
+        MuleMessage message = new DefaultMuleMessage(null, muleContext);
+        message.setPayload(IOUtils.toString(getClass().getResourceAsStream(VALID_XML_FILE)), DataTypeFactory.XML_STRING);
         assertThat(filter.accept(message), is(true));
         assertThat(message.getDataType().getMimeType(), is("text/xml"));
         assertThat(filter.accept(new DefaultMuleMessage(getClass().getResourceAsStream(INVALID_XML_FILE), muleContext)), is(false));

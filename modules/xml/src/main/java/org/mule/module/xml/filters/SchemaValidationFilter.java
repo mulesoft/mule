@@ -133,7 +133,14 @@ public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter
         {
             if (result != null && result.getNode() != null)
             {
-                message.setPayload(result.getNode(), DataTypeFactory.XML_STRING);
+                if (message.getDataType() != null)
+                {
+                    message.setPayload(result.getNode(), message.getDataType());
+                }
+                else
+                {
+                    message.setPayload(result.getNode());
+                }
             }
         }
         
