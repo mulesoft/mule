@@ -15,11 +15,17 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.dsl.api.component.TypeDefinition;
 
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 public class ObjectTypeVisitorTestCase {
+
+  @BeforeClass
+  public static void loadClassLoader() throws ClassNotFoundException {
+    Thread.currentThread().getContextClassLoader().loadClass("org.mule.runtime.core.processor.ReferenceProcessor");
+  }
 
   @Rule
   public ExpectedException exception = ExpectedException.none();
@@ -37,7 +43,6 @@ public class ObjectTypeVisitorTestCase {
 
   @Test
   public void typeIsInstanceOfGivenClassFromAttribute() throws ClassNotFoundException {
-    Thread.currentThread().getContextClassLoader().loadClass("org.mule.runtime.core.processor.ReferenceProcessor");
     ComponentModel componentModel = new ComponentModel();
     componentModel.setParameter("type", "org.mule.runtime.core.processor.ReferenceProcessor");
     ObjectTypeVisitor visitor = new ObjectTypeVisitor(componentModel);
@@ -48,7 +53,6 @@ public class ObjectTypeVisitorTestCase {
 
   @Test
   public void typeIsInstanceOfCheckedClassFromAttribute() throws ClassNotFoundException {
-    Thread.currentThread().getContextClassLoader().loadClass("org.mule.runtime.core.processor.ReferenceProcessor");
     ComponentModel componentModel = new ComponentModel();
     componentModel.setParameter("type", "org.mule.runtime.core.processor.ReferenceProcessor");
     ObjectTypeVisitor visitor = new ObjectTypeVisitor(componentModel);
@@ -60,7 +64,6 @@ public class ObjectTypeVisitorTestCase {
 
   @Test
   public void typeIsInstanceOfClassInheritedFromCheckedClassFromAttribute() throws ClassNotFoundException {
-    Thread.currentThread().getContextClassLoader().loadClass("org.mule.runtime.core.processor.ReferenceProcessor");
     ComponentModel componentModel = new ComponentModel();
     componentModel.setParameter("type", "org.mule.runtime.core.processor.ReferenceProcessor");
     ObjectTypeVisitor visitor = new ObjectTypeVisitor(componentModel);
@@ -75,7 +78,6 @@ public class ObjectTypeVisitorTestCase {
   public void testFailsIfTypeIsNotOfCheckedClass() throws ClassNotFoundException {
     exception.expect(MuleRuntimeException.class);
     exception.expectMessage("is not the same or inherits from");
-    Thread.currentThread().getContextClassLoader().loadClass("org.mule.runtime.core.processor.ReferenceProcessor");
     ComponentModel componentModel = new ComponentModel();
     componentModel.setParameter("type", this.getClass().getName());
     ObjectTypeVisitor visitor = new ObjectTypeVisitor(componentModel);
