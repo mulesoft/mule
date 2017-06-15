@@ -13,7 +13,6 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
@@ -22,21 +21,17 @@ import static org.mule.runtime.api.meta.model.ExecutionType.BLOCKING;
 import static org.mule.runtime.api.meta.model.ExecutionType.CPU_INTENSIVE;
 import static org.mule.runtime.api.meta.model.ExecutionType.CPU_LITE;
 import static org.mule.runtime.api.meta.model.error.ErrorModelBuilder.newError;
-import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.core.config.MuleManifest.getProductDescription;
 import static org.mule.runtime.core.config.MuleManifest.getProductName;
 import static org.mule.runtime.core.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.core.config.MuleManifest.getVendorName;
-import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.module.extension.internal.resources.MuleExtensionModelProvider.MULE_VERSION;
 import static org.mule.runtime.module.extension.internal.resources.MuleExtensionModelProvider.getExtensionModel;
 import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
-import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
-import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.model.UnionType;
 import org.mule.metadata.api.model.impl.DefaultAnyType;
 import org.mule.metadata.api.model.impl.DefaultArrayType;
@@ -56,7 +51,6 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.operation.RouteModel;
 import org.mule.runtime.api.meta.model.operation.RouterModel;
 import org.mule.runtime.api.meta.model.operation.ScopeModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.store.ObjectStore;
@@ -64,10 +58,8 @@ import org.mule.runtime.core.api.processor.LoggerMessageProcessor;
 import org.mule.runtime.core.api.processor.LoggerMessageProcessor.LogLevel;
 import org.mule.runtime.core.api.source.SchedulingStrategy;
 import org.mule.runtime.core.routing.AggregationStrategy;
-import org.mule.runtime.extension.api.declaration.type.annotation.LayoutTypeAnnotation;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -87,7 +79,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(coreExtensionModel.getVersion(), is(getProductVersion()));
     assertThat(coreExtensionModel.getVendor(), is(getVendorName()));
     assertThat(coreExtensionModel.getCategory(), is(COMMUNITY));
-    assertThat(coreExtensionModel.getMinMuleVersion(), is(new MuleVersion("4.0.0-SNAPSHOT")));
+    assertThat(coreExtensionModel.getMinMuleVersion(), is(new MuleVersion(MULE_VERSION)));
   }
 
   @Test
@@ -96,7 +88,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(coreExtensionModel.getXmlDslModel().getNamespace(), is("http://www.mulesoft.org/schema/mule/core"));
     assertThat(coreExtensionModel.getXmlDslModel().getSchemaLocation(),
                is("http://www.mulesoft.org/schema/mule/core/current/mule.xsd"));
-    assertThat(coreExtensionModel.getXmlDslModel().getSchemaVersion(), is("4.0.0-SNAPSHOT"));
+    assertThat(coreExtensionModel.getXmlDslModel().getSchemaVersion(), is(MULE_VERSION));
     assertThat(coreExtensionModel.getXmlDslModel().getXsdFileName(), is("mule.xsd"));
   }
 
@@ -130,7 +122,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(coreExtensionModel.getExternalLibraryModels(), empty());
     assertThat(coreExtensionModel.getImportedTypes(), empty());
     assertThat(coreExtensionModel.getConfigurationModels(), empty());
-    assertThat(coreExtensionModel.getOperationModels(), hasSize(16));
+    assertThat(coreExtensionModel.getOperationModels(), hasSize(15));
     assertThat(coreExtensionModel.getConnectionProviders(), empty());
 
     assertThat(coreExtensionModel.getErrorModels(),
@@ -195,100 +187,6 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(paramModels.get(2).getType().getAnnotation(TypeIdAnnotation.class).get().getValue(),
                is(LoggerMessageProcessor.class.getName() + "." + LogLevel.class.getSimpleName()));
     assertThat(paramModels.get(2).isRequired(), is(false));
-  }
-
-  @Test
-  public void transform() {
-    final OperationModel transformModel = coreExtensionModel.getOperationModel("transform").get();
-
-    assertThat(transformModel.getErrorModels(),
-               hasItem(newError("TRANSFORMATION", "CORE")
-                   .withParent(newError("TRANSFORMATION", "MULE").withParent(errorMuleAny).build()).build()));
-    assertThat(transformModel.getExecutionType(), is(CPU_INTENSIVE));
-
-    // TODO MULE-11935 a way is needed to determine the return type of the trasformer in the extension model.
-    assertThat(transformModel.getOutput().getType(), instanceOf(DefaultAnyType.class));
-    assertThat(transformModel.getOutput().hasDynamicType(), is(false));
-    assertThat(transformModel.getOutputAttributes().getType(), instanceOf(DefaultObjectType.class));
-    assertThat(transformModel.getOutputAttributes().getType().getAnnotation(TypeIdAnnotation.class).get().getValue(),
-               is(Attributes.class.getName()));
-    assertThat(transformModel.getOutputAttributes().hasDynamicType(), is(false));
-
-    final List<ParameterGroupModel> paramGroupModels = transformModel.getParameterGroupModels();
-
-    assertThat(paramGroupModels, hasSize(2));
-    assertThat(transformModel.getAllParameterModels(), hasSize(3));
-
-    assertThat(paramGroupModels.get(0).getName(), is("Message"));
-    List<ParameterModel> paramModels = paramGroupModels.get(0).getParameterModels();
-    assertThat(paramModels.size(), is(2));
-    ParameterModel setPayload = paramModels.get(0);
-    assertThat(setPayload.getName(), is("setPayload"));
-    assertThat(setPayload.getType(), instanceOf(ObjectType.class));
-    assertThat(getId(setPayload.getType()),
-               is("com.mulesoft.mule.runtime.processor.SetPayloadTransformationTarget"));
-    assertThat(setPayload.getExpressionSupport(), is(NOT_SUPPORTED));
-    assertThat(setPayload.isRequired(), is(false));
-    assertThat(setPayload.getRole(), is(BEHAVIOUR));
-    assertScriptAndResource((ObjectType) setPayload.getType());
-
-    ParameterModel setAttributes = paramModels.get(1);
-    assertThat(setAttributes.getName(), is("setAttributes"));
-    assertThat(setAttributes.getType(), instanceOf(ObjectType.class));
-    assertThat(getId(setAttributes.getType()),
-               is("com.mulesoft.mule.runtime.processor.SetAttributesTransformationTarget"));
-    assertThat(setAttributes.getExpressionSupport(), is(NOT_SUPPORTED));
-    assertThat(setAttributes.isRequired(), is(false));
-    assertThat(setAttributes.getRole(), is(BEHAVIOUR));
-    assertScriptAndResource((ObjectType) setAttributes.getType());
-
-    assertThat(paramGroupModels.get(1).getName(), is("Set Variables"));
-    ParameterModel setVariables = paramGroupModels.get(1).getParameterModels().get(0);
-    assertThat(setVariables.getName(), is("setVariables"));
-    assertThat(setVariables.getType(), is(instanceOf(ArrayType.class)));
-    assertThat(((ArrayType) setVariables.getType()).getType(), instanceOf(ObjectType.class));
-    assertThat(getId(((ArrayType) setVariables.getType()).getType()),
-               is("com.mulesoft.mule.runtime.processor.SetVariableTransformationTarget"));
-    assertThat(setVariables.getExpressionSupport(), is(NOT_SUPPORTED));
-    assertThat(setVariables.isRequired(), is(false));
-    assertThat(setVariables.getRole(), is(BEHAVIOUR));
-
-    ObjectType setVariableType = (ObjectType) ((ArrayType) setVariables.getType()).getType();
-    assertScriptAndResource(setVariableType);
-    Optional<ObjectFieldType> variableName = setVariableType.getFields().stream()
-        .filter(field -> field.getKey().getName().getLocalPart().equals("variableName"))
-        .findFirst();
-
-    if (variableName.isPresent()) {
-      assertThat(variableName.get().getValue(), is(instanceOf(StringType.class)));
-    } else {
-      fail("Missing parameter [variableName] in type: " + getId(setVariableType));
-    }
-
-  }
-
-  private void assertScriptAndResource(ObjectType parameter) {
-    Collection<ObjectFieldType> fields = parameter.getFields();
-    Optional<ObjectFieldType> script = fields.stream()
-        .filter(field -> field.getKey().getName().getLocalPart().equals("script"))
-        .findFirst();
-
-    if (script.isPresent()) {
-      assertThat(script.get().getValue(), is(instanceOf(StringType.class)));
-      assertThat(script.get().getAnnotation(LayoutTypeAnnotation.class).get().isText(), is(true));
-    } else {
-      fail("Missing parameter [script] in type: " + getId(parameter));
-    }
-
-    Optional<ObjectFieldType> resource = fields.stream()
-        .filter(field -> field.getKey().getName().getLocalPart().equals("resource"))
-        .findFirst();
-
-    if (resource.isPresent()) {
-      assertThat(resource.get().getValue(), is(instanceOf(StringType.class)));
-    } else {
-      fail("Missing parameter [resource] in type: " + getId(parameter));
-    }
   }
 
   @Test

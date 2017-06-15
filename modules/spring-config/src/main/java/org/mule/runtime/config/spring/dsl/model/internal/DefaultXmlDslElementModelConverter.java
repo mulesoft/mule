@@ -136,8 +136,8 @@ public class DefaultXmlDslElementModelConverter implements XmlDslElementModelCon
   }
 
   private boolean isEETransform(Element parentNode) {
-    // TODO EE-5398: Update transform namespace to ee
-    return parentNode.getNamespaceURI().equals(CORE_NAMESPACE) && parentNode.getNodeName().equals(TRANSFORM_IDENTIFIER);
+    return parentNode.getNamespaceURI().equals(EE_NAMESPACE)
+        && parentNode.getNodeName().equals(EE_PREFIX + ":" + TRANSFORM_IDENTIFIER);
   }
 
   private Element createElement(DslElementSyntax dsl, Optional<ComponentConfiguration> configuration) {
@@ -188,6 +188,10 @@ public class DefaultXmlDslElementModelConverter implements XmlDslElementModelCon
 
   private Element createElement(DslElementSyntax dsl) {
     return createElement(dsl.getElementName(), dsl.getPrefix(), dsl.getNamespace());
+  }
+
+  private Element createElement(DslElementSyntax dsl, String name) {
+    return createElement(name, dsl.getPrefix(), dsl.getNamespace());
   }
 
   private Element createElement(String name, String prefix, String namespace) {
@@ -242,29 +246,29 @@ public class DefaultXmlDslElementModelConverter implements XmlDslElementModelCon
   }
 
   private Element populateEETransform(DslElementModel<?> elementModel) {
-    Element transform = doc.createElementNS(EE_NAMESPACE, EE_PREFIX + ":" + TRANSFORM_IDENTIFIER);
+    Element transform = createElement(elementModel.getDsl());
     elementModel.getConfiguration().ifPresent(c -> c.getParameters().forEach(transform::setAttribute));
 
     // write set-payload and set-attributes
-    elementModel.findElement(buildFromStringRepresentation("mule:set-payload"))
+    elementModel.findElement(buildFromStringRepresentation("ee:set-payload"))
         .ifPresent(message -> {
-          Element messageElement = doc.createElementNS(EE_NAMESPACE, EE_PREFIX + ":message");
+          Element messageElement = createElement(elementModel.getDsl(), "message");
           transform.appendChild(messageElement);
 
-          elementModel.findElement(buildFromStringRepresentation("mule:set-payload"))
+          elementModel.findElement(buildFromStringRepresentation("ee:set-payload"))
               .ifPresent(setPayload -> setPayload.getConfiguration()
                   .ifPresent(c -> messageElement.appendChild(createTransformTextElement(c))));
 
-          elementModel.findElement(buildFromStringRepresentation("mule:set-attributes"))
+          elementModel.findElement(buildFromStringRepresentation("ee:set-attributes"))
               .ifPresent(setAttributes -> setAttributes.getConfiguration()
                   .ifPresent(c -> messageElement.appendChild(createTransformTextElement(c))));
 
         });
 
     // write set-variable
-    elementModel.findElement(buildFromStringRepresentation("mule:set-variables"))
+    elementModel.findElement(buildFromStringRepresentation("ee:set-variables"))
         .ifPresent(variables -> {
-          Element variablesList = doc.createElementNS(EE_NAMESPACE, EE_PREFIX + ":variables");
+          Element variablesList = createElement(elementModel.getDsl(), "variables");
           transform.appendChild(variablesList);
 
           variables.getContainedElements()

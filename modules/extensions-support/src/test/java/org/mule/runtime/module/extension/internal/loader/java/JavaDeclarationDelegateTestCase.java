@@ -30,6 +30,7 @@ import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NA
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.DEFAULT_CONNECTION_PROVIDER_NAME;
+import static org.mule.runtime.module.extension.internal.resources.MuleExtensionModelProvider.MULE_VERSION;
 import static org.mule.test.heisenberg.extension.HeisenbergConnectionProvider.SAUL_OFFICE_NUMBER;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.AGE;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.EXTENSION_DESCRIPTION;
@@ -164,7 +165,6 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   private static final String GET_MEDICAL_HISTORY = "getMedicalHistory";
   private static final String APPROVE_INVESTMENT = "approve";
   private static final String IGNORED_OPERATION = "ignoredOperation";
-  private static final String EXTENSION_VERSION = "4.0.0-SNAPSHOT";
   private static final String OTHER_HEISENBERG = "OtherHeisenberg";
   private static final String PROCESS_WEAPON = "processWeapon";
   private static final String PROCESS_WEAPON_LIST = "processWeaponList";
@@ -453,7 +453,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
 
     assertThat(extensionDeclaration.getName(), is(expectedName));
     assertThat(extensionDeclaration.getDescription(), is(EXTENSION_DESCRIPTION));
-    assertThat(extensionDeclaration.getVersion(), is(EXTENSION_VERSION));
+    assertThat(extensionDeclaration.getVersion(), is(MULE_VERSION));
   }
 
   private void assertTestModuleOperations(ExtensionDeclaration extensionDeclaration) throws Exception {
