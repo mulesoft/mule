@@ -14,6 +14,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.module.xml.transformer.DelayedResult;
 import org.mule.module.xml.util.MuleResourceResolver;
 import org.mule.module.xml.util.XMLUtils;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.xmlsecurity.XMLSecureFactories;
@@ -132,7 +133,7 @@ public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter
         {
             if (result != null && result.getNode() != null)
             {
-                message.setPayload(result.getNode());
+                message.setPayload(result.getNode(), DataTypeFactory.XML_STRING);
             }
         }
         

@@ -13,6 +13,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleMessage;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -64,7 +65,9 @@ public class SchemaValidationTestCase extends AbstractMuleTestCase
         filter.setSchemaLocations(INCLUDE_SCHEMA);
         filter.initialise();
 
-        assertThat(filter.accept(new DefaultMuleMessage(getClass().getResourceAsStream(VALID_XML_FILE), muleContext)), is(true));
+        MuleMessage message = new DefaultMuleMessage(getClass().getResourceAsStream(VALID_XML_FILE), muleContext);
+        assertThat(filter.accept(message), is(true));
+        assertThat(message.getDataType().getMimeType(), is("text/xml"));
         assertThat(filter.accept(new DefaultMuleMessage(getClass().getResourceAsStream(INVALID_XML_FILE), muleContext)), is(false));
     }
 }
