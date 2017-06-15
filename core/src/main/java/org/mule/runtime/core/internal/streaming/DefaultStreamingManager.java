@@ -61,11 +61,11 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
   }
 
   protected ByteStreamingManager createByteStreamingManager() {
-    return new DefaultByteStreamingManager(bufferManager);
+    return new DefaultByteStreamingManager(bufferManager, this);
   }
 
   protected ObjectStreamingManager createObjectStreamingManager() {
-    return new DefaultObjectStreamingManager();
+    return new DefaultObjectStreamingManager(this);
   }
 
   /**
