@@ -19,6 +19,7 @@ import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsString;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
+import static org.mule.runtime.module.extension.internal.resources.MuleExtensionModelProvider.MULE_VERSION;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
@@ -174,7 +175,7 @@ public class ExtensionModelJsonGeneratorTestCase extends AbstractMuleTestCase {
   public static ExtensionModel loadExtension(Class<?> clazz, ExtensionModelLoader loader) {
     Map<String, Object> params = new HashMap<>();
     params.put(TYPE_PROPERTY_NAME, clazz.getName());
-    params.put(VERSION, "4.0.0-SNAPSHOT");
+    params.put(VERSION, MULE_VERSION);
     // TODO MULE-11797: as this utils is consumed from
     // org.mule.runtime.module.extension.internal.capability.xml.schema.AbstractXmlResourceFactory.generateResource(org.mule.runtime.api.meta.model.ExtensionModel),
     // this util should get dropped once the ticket gets implemented.

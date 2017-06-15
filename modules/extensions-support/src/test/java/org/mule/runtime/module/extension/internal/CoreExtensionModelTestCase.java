@@ -26,6 +26,7 @@ import static org.mule.runtime.core.config.MuleManifest.getProductName;
 import static org.mule.runtime.core.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.core.config.MuleManifest.getVendorName;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.module.extension.internal.resources.MuleExtensionModelProvider.MULE_VERSION;
 import static org.mule.runtime.module.extension.internal.resources.MuleExtensionModelProvider.getExtensionModel;
 import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
@@ -78,7 +79,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(coreExtensionModel.getVersion(), is(getProductVersion()));
     assertThat(coreExtensionModel.getVendor(), is(getVendorName()));
     assertThat(coreExtensionModel.getCategory(), is(COMMUNITY));
-    assertThat(coreExtensionModel.getMinMuleVersion(), is(new MuleVersion("4.0.0-SNAPSHOT")));
+    assertThat(coreExtensionModel.getMinMuleVersion(), is(new MuleVersion(MULE_VERSION)));
   }
 
   @Test
@@ -87,7 +88,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(coreExtensionModel.getXmlDslModel().getNamespace(), is("http://www.mulesoft.org/schema/mule/core"));
     assertThat(coreExtensionModel.getXmlDslModel().getSchemaLocation(),
                is("http://www.mulesoft.org/schema/mule/core/current/mule.xsd"));
-    assertThat(coreExtensionModel.getXmlDslModel().getSchemaVersion(), is("4.0.0-SNAPSHOT"));
+    assertThat(coreExtensionModel.getXmlDslModel().getSchemaVersion(), is(MULE_VERSION));
     assertThat(coreExtensionModel.getXmlDslModel().getXsdFileName(), is("mule.xsd"));
   }
 
