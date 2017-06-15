@@ -444,7 +444,7 @@ public class SftpClient
         }
         catch (SftpException e)
         {
-            throw new IOException(e.getMessage() + ".  Filename is " + fileName);
+            throw new IOException(e.getMessage() + ".  Filename is " + fileName, e);
         }
     }
 
@@ -571,7 +571,7 @@ public class SftpClient
         }
         catch (SftpException e)
         {
-            throw new IOException(e.getMessage());
+            throw new IOException(e.getMessage(), e);
         }
     }
 
@@ -595,7 +595,7 @@ public class SftpClient
         {
             // Don't throw e.getmessage since we only get "2: No such file"..
             throw new IOException("Could not create the directory '" + directoryName + "', caused by: "
-                                  + e.getMessage());
+                                  + e.getMessage(), e);
             // throw new IOException("Could not create the directory '" +
             // directoryName + "' in '" + currentDirectory + "', caused by: " +
             // e.getMessage());
@@ -615,7 +615,7 @@ public class SftpClient
         }
         catch (SftpException e)
         {
-            throw new IOException(e.getMessage());
+            throw new IOException(e.getMessage(), e);
         }
     }
 
