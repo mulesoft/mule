@@ -1918,7 +1918,8 @@
           ],
           "name": "TransactionalSource",
           "description": "",
-          "modelProperties": {}
+          "modelProperties": {},
+          "kind": "source"
         },
         {
           "hasResponse": false,
@@ -2294,7 +2295,8 @@
           ],
           "name": "TransactionalSourceWithTXParameters",
           "description": "",
-          "modelProperties": {}
+          "modelProperties": {},
+          "kind": "source"
         }
       ],
       "name": "config",

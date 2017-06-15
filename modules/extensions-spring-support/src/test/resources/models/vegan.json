@@ -1403,7 +1403,8 @@
           ],
           "name": "PaulMcCartneySource",
           "description": "",
-          "modelProperties": {}
+          "modelProperties": {},
+          "kind": "source"
         },
         {
           "hasResponse": false,
@@ -1966,7 +1967,8 @@
               },
               "parameterName": "key"
             }
-          }
+          },
+          "kind": "source"
         }
       ],
       "name": "apple-config",
@@ -3571,7 +3573,8 @@
           ],
           "name": "PaulMcCartneySource",
           "description": "",
-          "modelProperties": {}
+          "modelProperties": {},
+          "kind": "source"
         }
       ],
       "name": "banana-config",
@@ -4608,7 +4611,8 @@
           ],
           "name": "harvest-peaches",
           "description": "",
-          "modelProperties": {}
+          "modelProperties": {},
+          "kind": "source"
         }
       ],
       "name": "peach-config",

@@ -2235,7 +2235,8 @@
       ],
       "name": "SubtypesSource",
       "description": "",
-      "modelProperties": {}
+      "modelProperties": {},
+      "kind": "source"
     }
   ],
   "errors": [

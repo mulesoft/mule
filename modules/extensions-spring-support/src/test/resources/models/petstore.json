@@ -5240,7 +5240,8 @@
           ],
           "name": "source",
           "description": "",
-          "modelProperties": {}
+          "modelProperties": {},
+          "kind": "source"
         }
       ],
       "name": "config",
@@ -10391,7 +10392,8 @@
       ],
       "name": "pet-source",
       "description": "",
-      "modelProperties": {}
+      "modelProperties": {},
+      "kind": "source"
     }
   ],
   "errors": [
