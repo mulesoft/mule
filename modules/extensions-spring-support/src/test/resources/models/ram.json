@@ -59,7 +59,8 @@
               "isAbstract": false,
               "isFinal": false,
               "implementedInterfaces": [
-                "org.mule.runtime.extension.api.soap.HttpMessageDispatcherProvider"
+                "org.mule.runtime.extension.api.soap.HttpMessageDispatcherProvider",
+                "org.mule.runtime.api.lifecycle.Lifecycle"
               ],
               "parent": "",
               "genericTypes": []
