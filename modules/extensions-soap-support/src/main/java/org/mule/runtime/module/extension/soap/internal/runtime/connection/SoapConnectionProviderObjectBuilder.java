@@ -8,18 +8,17 @@ package org.mule.runtime.module.extension.soap.internal.runtime.connection;
 
 import static java.lang.String.format;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapServiceProviderDeclarer.CUSTOM_TRANSPORT;
+
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
-import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.connection.ErrorTypeHandlerConnectionProviderWrapper;
-import org.mule.runtime.core.internal.connection.PoolingConnectionProviderWrapper;
+import org.mule.runtime.core.internal.connection.ReconnectableConnectionProviderWrapper;
 import org.mule.runtime.extension.api.soap.MessageDispatcherProvider;
 import org.mule.runtime.extension.api.soap.SoapServiceProvider;
 import org.mule.runtime.extension.api.soap.message.MessageDispatcher;
@@ -68,19 +67,16 @@ public final class SoapConnectionProviderObjectBuilder extends ConnectionProvide
   public ConnectionProvider build(ResolverSetResult result) throws MuleException {
     SoapServiceProvider serviceProvider = objectBuilder.build(result);
     MessageDispatcherProvider<? extends MessageDispatcher> transport = getCustomTransport(result);
-    Injector injector = muleContext.getInjector();
-    injector.inject(serviceProvider);
-    injector.inject(transport);
-    ConnectionProvider<ForwardingSoapClient> provider = new ForwardingSoapClientConnectionProvider(serviceProvider, transport);
-    provider = new PoolingConnectionProviderWrapper<>(provider, poolingProfile, disableValidation, retryPolicyTemplate);
+    ConnectionProvider<ForwardingSoapClient> provider =
+        new ForwardingSoapClientConnectionProvider(serviceProvider, transport, muleContext);
+    provider = new ReconnectableConnectionProviderWrapper<>(provider, disableValidation, retryPolicyTemplate);
     provider = new ErrorTypeHandlerConnectionProviderWrapper<>(provider, muleContext, extensionModel, retryPolicyTemplate);
     return provider;
   }
 
-  private MessageDispatcherProvider<? extends MessageDispatcher> getCustomTransport(ResolverSetResult resultSet)
-      throws RegistrationException {
-    MessageDispatcherProvider transportProvider = (MessageDispatcherProvider) resultSet.get(CUSTOM_TRANSPORT);
-    return transportProvider != null ? transportProvider : new DefaultHttpMessageDispatcherProvider();
+  private MessageDispatcherProvider<MessageDispatcher> getCustomTransport(ResolverSetResult resultSet) {
+    MessageDispatcherProvider customTransport = (MessageDispatcherProvider) resultSet.get(CUSTOM_TRANSPORT);
+    return customTransport != null ? customTransport : new DefaultHttpMessageDispatcherProvider();
   }
 
   /**
