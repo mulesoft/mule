@@ -23,9 +23,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONVERTER_R
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLLING_CONTROLLER;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
-import static org.mule.runtime.core.api.registry.ServiceType.EXCEPTION;
-import static org.mule.runtime.core.config.ExceptionHelper.RESOURCE_ROOT;
-import static org.mule.runtime.core.config.ExceptionHelper.getErrorMapping;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -41,16 +38,12 @@ import org.mule.runtime.core.config.ClusterConfiguration;
 import org.mule.runtime.core.config.builders.DefaultsConfigurationBuilder;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.internal.transformer.DynamicDataTypeConversionResolver;
 import org.mule.runtime.core.internal.lifecycle.MuleContextLifecycleManager;
+import org.mule.runtime.core.internal.transformer.DynamicDataTypeConversionResolver;
 import org.mule.runtime.core.registry.MuleRegistryHelper;
 import org.mule.runtime.core.util.store.MuleObjectStoreManager;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 
 import org.junit.After;
 import org.junit.Before;
@@ -104,37 +97,6 @@ public class DefaultMuleContextTestCase extends AbstractMuleTestCase {
       fail("exception expected");
     } catch (Exception e) {
       verify(mockNotificationManager).dispose();
-    }
-  }
-
-  @Test
-  public void testClearExceptionHelperCacheForAppWhenDispose() throws Exception {
-    File file = new File(DefaultMuleContextTestCase.class.getClassLoader()
-        .getResource(RESOURCE_ROOT + EXCEPTION.getPath() + "/" + TEST_PROTOCOL + "-exception-mappings.properties").toURI());
-    createExceptionMappingFile(file, INITIAL_VALUE);
-
-    createMuleContext();
-    String value = getErrorMapping(TEST_PROTOCOL, IllegalArgumentException.class, context);
-    assertThat(value, is(INITIAL_VALUE));
-    context.dispose();
-
-    createExceptionMappingFile(file, VALUE_AFTER_REDEPLOY);
-
-    createMuleContext();
-    context.setExecutionClassLoader(getClass().getClassLoader());
-    value = getErrorMapping(TEST_PROTOCOL, IllegalArgumentException.class, context);
-    assertThat(value, is(VALUE_AFTER_REDEPLOY));
-  }
-
-  private void createExceptionMappingFile(File exceptionMappingFile, String value) throws IOException {
-    FileWriter fileWriter = null;
-    try {
-      fileWriter = new FileWriter(exceptionMappingFile);
-      fileWriter.append("\njava.lang.IllegalArgumentException=" + value);
-    } finally {
-      if (fileWriter != null) {
-        fileWriter.close();
-      }
     }
   }
 

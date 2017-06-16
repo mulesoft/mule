@@ -113,10 +113,13 @@ public class ExceptionHelperTestCase extends AbstractMuleTestCase {
     } catch (Exception e) {
       assertThat(getExceptionStack(e),
                  StringByLineMatcher.matchesLineByLine("foo \\(org.mule.runtime.core.api.DefaultMuleException\\)",
-                                                       "  org.mule.runtime.core.api.exception.ExceptionHelperTestCase.lambda\\$3\\(ExceptionHelperTestCase.java:[0-9]+\\)",
+                                                       "  " + ExceptionHelperTestCase.class.getName()
+                                                           + ".lambda\\$[^\\(]*\\(ExceptionHelperTestCase.java:[0-9]+\\)",
                                                        "  org.apache.commons.collections.CollectionUtils.forAllDo\\(CollectionUtils.java:[0-9]+\\)",
-                                                       "  org.mule.runtime.core.api.exception.ExceptionHelperTestCase.lambda\\$0\\(ExceptionHelperTestCase.java:[0-9]+\\)",
-                                                       "  org.mule.runtime.core.api.exception.ExceptionHelperTestCase.generateStackEntries\\(ExceptionHelperTestCase.java:[0-9]+\\)",
+                                                       "  " + ExceptionHelperTestCase.class.getName()
+                                                           + ".lambda\\$[^\\(]*\\(ExceptionHelperTestCase.java:[0-9]+\\)",
+                                                       "  " + ExceptionHelperTestCase.class.getName()
+                                                           + ".generateStackEntries\\(ExceptionHelperTestCase.java:[0-9]+\\)",
                                                        "  \\(" + (calls + 16) + " more...\\)")); // recursive
     }
   }
@@ -135,15 +138,18 @@ public class ExceptionHelperTestCase extends AbstractMuleTestCase {
     } catch (Exception e) {
       assertThat(getExceptionStack(e),
                  StringByLineMatcher.matchesLineByLine("foo \\(org.mule.runtime.core.api.DefaultMuleException\\)",
-                                                       "  org.mule.runtime.core.api.exception.ExceptionHelperTestCase.lambda\\$4\\(ExceptionHelperTestCase.java:[0-9]+\\)",
+                                                       "  " + ExceptionHelperTestCase.class.getName()
+                                                           + ".lambda\\$[^\\(]*\\(ExceptionHelperTestCase.java:[0-9]+\\)",
                                                        "  org.apache.commons.collections.comparators.ComparableComparator.compare\\(ComparableComparator.java:[0-9]+\\)",
                                                        "  java.util.*", // Collections.sort
                                                        "  java.util.*", // Collections.sort
                                                        "  java.util.*", // Collections.sort
                                                        "  java.util.*", // Collections.sort
                                                        "  java.util.*", // Collections.sort
-                                                       "  org.mule.runtime.core.api.exception.ExceptionHelperTestCase.lambda\\$1\\(ExceptionHelperTestCase.java:[0-9]+\\)",
-                                                       "  org.mule.runtime.core.api.exception.ExceptionHelperTestCase.generateStackEntries\\(ExceptionHelperTestCase.java:[0-9]+\\)",
+                                                       "  " + ExceptionHelperTestCase.class.getName()
+                                                           + ".lambda\\$[^\\(]*\\(ExceptionHelperTestCase.java:[0-9]+\\)",
+                                                       "  " + ExceptionHelperTestCase.class.getName()
+                                                           + ".generateStackEntries\\(ExceptionHelperTestCase.java:[0-9]+\\)",
                                                        "  \\(" + (calls + 16) + " more...\\)")); // recursive
     }
   }
@@ -159,9 +165,12 @@ public class ExceptionHelperTestCase extends AbstractMuleTestCase {
     } catch (Exception e) {
       assertThat(getExceptionStack(e),
                  StringByLineMatcher.matchesLineByLine("foo \\(org.mule.runtime.core.api.DefaultMuleException\\)",
-                                                       "  org.mule.runtime.core.api.exception.ExceptionHelperTestCase.lambda\\$2\\(ExceptionHelperTestCase.java:[0-9]+\\)",
-                                                       "  org.mule.runtime.core.api.exception.ExceptionHelperTestCase.generateStackEntries\\(ExceptionHelperTestCase.java:[0-9]+\\)",
-                                                       "  org.mule.runtime.core.api.exception.ExceptionHelperTestCase.generateStackEntries\\(ExceptionHelperTestCase.java:[0-9]+\\)",
+                                                       "  " + ExceptionHelperTestCase.class.getName()
+                                                           + ".lambda\\$[^\\(]*\\(ExceptionHelperTestCase.java:[0-9]+\\)",
+                                                       "  " + ExceptionHelperTestCase.class.getName()
+                                                           + ".generateStackEntries\\(ExceptionHelperTestCase.java:[0-9]+\\)",
+                                                       "  " + ExceptionHelperTestCase.class.getName()
+                                                           + ".generateStackEntries\\(ExceptionHelperTestCase.java:[0-9]+\\)",
                                                        "  \\(" + (calls + 15) + " more...\\)")); // recursive
     }
   }

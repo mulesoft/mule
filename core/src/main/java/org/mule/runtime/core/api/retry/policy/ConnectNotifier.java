@@ -21,6 +21,7 @@ public class ConnectNotifier implements RetryNotifier {
 
   protected transient final Logger logger = LoggerFactory.getLogger(ConnectNotifier.class);
 
+  @Override
   public void onSuccess(RetryContext context) {
     if (logger.isDebugEnabled()) {
       logger.debug("Successfully connected to " + context.getDescription());
@@ -29,6 +30,7 @@ public class ConnectNotifier implements RetryNotifier {
     fireConnectNotification(ConnectionNotification.CONNECTION_CONNECTED, context.getDescription(), context);
   }
 
+  @Override
   public void onFailure(RetryContext context, Throwable e) {
     fireConnectNotification(ConnectionNotification.CONNECTION_FAILED, context.getDescription(), context);
 
