@@ -6,10 +6,13 @@
  */
 package org.mule.runtime.module.extension.soap.internal.runtime.connection;
 
+import static java.util.Arrays.asList;
+import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.*;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
-import org.mule.runtime.api.connection.PoolingConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
@@ -22,13 +25,8 @@ import org.mule.runtime.http.api.HttpService;
 import org.mule.runtime.soap.api.SoapService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import javax.inject.Inject;
 import java.util.List;
-
-import static java.util.Arrays.asList;
-import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.*;
 
 /**
  * {@link ConnectionProvider} implementation that handles {@link ForwardingSoapClient} connections,
@@ -41,7 +39,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.*;
  *
  * @since 4.0
  */
-public class ForwardingSoapClientConnectionProvider implements PoolingConnectionProvider<ForwardingSoapClient>, Lifecycle {
+public class ForwardingSoapClientConnectionProvider implements ConnectionProvider<ForwardingSoapClient>, Lifecycle {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ForwardingSoapClientConnectionProvider.class);
 

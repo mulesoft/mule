@@ -72,7 +72,7 @@
           "fields": [
             {
               "key": {
-                "name": "configRef"
+                "name": "requesterConfig"
               },
               "model": {
                 "type": "String",
