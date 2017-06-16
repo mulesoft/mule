@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.core.internal.message;
 
+import static java.lang.System.lineSeparator;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
-import static org.apache.commons.lang3.SystemUtils.LINE_SEPARATOR;
 import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.core.PropertyScope.INBOUND;
 import static org.mule.runtime.core.PropertyScope.OUTBOUND;
@@ -382,19 +382,19 @@ public class DefaultMessageBuilder
       StringBuilder buf = new StringBuilder(120);
 
       // format message for multi-line output, single-line is not readable
-      buf.append(LINE_SEPARATOR);
+      buf.append(lineSeparator());
       buf.append(getClass().getName());
-      buf.append(LINE_SEPARATOR);
+      buf.append(lineSeparator());
       buf.append("{");
-      buf.append(LINE_SEPARATOR);
+      buf.append(lineSeparator());
       buf.append("  payload=").append(getPayload().getDataType().getType().getName());
-      buf.append(LINE_SEPARATOR);
+      buf.append(lineSeparator());
       buf.append("  mediaType=").append(getPayload().getDataType().getMediaType());
-      buf.append(LINE_SEPARATOR);
+      buf.append(lineSeparator());
       buf.append("  attributes=").append(getAttributes().getValue().toString());
-      buf.append(LINE_SEPARATOR);
+      buf.append(lineSeparator());
       buf.append("  exceptionPayload=").append(defaultIfNull(exceptionPayload, NOT_SET));
-      buf.append(LINE_SEPARATOR);
+      buf.append(lineSeparator());
 
       if (!getInboundPropertyNames().isEmpty() || !getOutboundPropertyNames().isEmpty()) {
         headersToStringBuilder(this, buf);
@@ -405,18 +405,18 @@ public class DefaultMessageBuilder
     }
 
     public static void headersToStringBuilder(InternalMessage m, StringBuilder buf) {
-      buf.append("  Message properties:").append(LINE_SEPARATOR);
+      buf.append("  Message properties:").append(lineSeparator());
 
       try {
         if (!m.getInboundPropertyNames().isEmpty()) {
           Set<String> inboundNames = new TreeSet(m.getInboundPropertyNames());
-          buf.append("    ").append(INBOUND.toString().toUpperCase()).append(" scoped properties:").append(LINE_SEPARATOR);
+          buf.append("    ").append(INBOUND.toString().toUpperCase()).append(" scoped properties:").append(lineSeparator());
           appendPropertyValues(m, buf, inboundNames, name -> m.getInboundProperty(name));
         }
 
         if (!m.getOutboundPropertyNames().isEmpty()) {
           Set<String> outboundNames = new TreeSet(m.getOutboundPropertyNames());
-          buf.append("    ").append(OUTBOUND.toString().toUpperCase()).append(" scoped properties:").append(LINE_SEPARATOR);
+          buf.append("    ").append(OUTBOUND.toString().toUpperCase()).append(" scoped properties:").append(lineSeparator());
           appendPropertyValues(m, buf, outboundNames, name -> m.getOutboundProperty(name));
         }
       } catch (IllegalArgumentException e) {
@@ -435,7 +435,7 @@ public class DefaultMessageBuilder
         if (name.equals("password") || name.toString().contains("secret") || name.equals("pass")) {
           value = "****";
         }
-        buf.append("    ").append(name).append("=").append(value).append(LINE_SEPARATOR);
+        buf.append("    ").append(name).append("=").append(value).append(lineSeparator());
       }
     }
 

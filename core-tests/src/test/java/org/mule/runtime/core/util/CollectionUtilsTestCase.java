@@ -6,10 +6,11 @@
  */
 package org.mule.runtime.core.util;
 
+import static java.lang.System.lineSeparator;
 import static org.apache.commons.lang3.StringUtils.countMatches;
-import static org.apache.commons.lang3.SystemUtils.LINE_SEPARATOR;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.runtime.core.api.util.CollectionUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -43,7 +44,7 @@ public class CollectionUtilsTestCase extends AbstractMuleTestCase {
     Collection<String> c = Arrays.asList("foo");
 
     assertEquals("[foo]", CollectionUtils.toString(c, false));
-    assertEquals("[" + LINE_SEPARATOR + "foo" + LINE_SEPARATOR + "]", CollectionUtils.toString(c, true));
+    assertEquals("[" + lineSeparator() + "foo" + lineSeparator() + "]", CollectionUtils.toString(c, true));
   }
 
   @Test
@@ -52,8 +53,8 @@ public class CollectionUtilsTestCase extends AbstractMuleTestCase {
 
     assertEquals("[foo, " + this.getClass().getName() + "]", CollectionUtils.toString(c, false));
 
-    assertEquals("[" + LINE_SEPARATOR + "foo" + LINE_SEPARATOR + this.getClass().getName()
-        + LINE_SEPARATOR + "]", CollectionUtils.toString(c, true));
+    assertEquals("[" + lineSeparator() + "foo" + lineSeparator() + this.getClass().getName()
+        + lineSeparator() + "]", CollectionUtils.toString(c, true));
   }
 
   @Test

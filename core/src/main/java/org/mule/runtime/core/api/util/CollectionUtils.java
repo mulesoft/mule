@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.util;
 
-import static org.apache.commons.lang3.SystemUtils.LINE_SEPARATOR;
+import static java.lang.System.lineSeparator;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -60,7 +60,7 @@ public class CollectionUtils {
     buf.append('[');
 
     if (newline) {
-      buf.append(LINE_SEPARATOR);
+      buf.append(lineSeparator());
     }
 
     Iterator items = c.iterator();
@@ -74,7 +74,7 @@ public class CollectionUtils {
       }
 
       if (newline) {
-        buf.append(LINE_SEPARATOR);
+        buf.append(lineSeparator());
       } else {
         buf.append(',').append(' ');
       }
@@ -89,7 +89,7 @@ public class CollectionUtils {
     }
 
     if (newline) {
-      buf.append(LINE_SEPARATOR);
+      buf.append(lineSeparator());
     }
 
     if (tooManyElements) {

@@ -20,7 +20,6 @@ public class DefaultExceptionPayload implements ExceptionPayload {
    */
   private static final long serialVersionUID = -7114836033686599024L;
 
-  private int code = 0;
   private String message = null;
   private Map info = null;
   private Throwable exception;
@@ -30,29 +29,28 @@ public class DefaultExceptionPayload implements ExceptionPayload {
     MuleException muleRoot = ExceptionHelper.getRootMuleException(exception);
     if (muleRoot != null) {
       message = muleRoot.getMessage();
-      code = muleRoot.getExceptionCode();
       info = muleRoot.getInfo();
     } else {
       message = exception.getMessage();
     }
   }
 
+  @Override
   public Throwable getRootException() {
     return ExceptionHelper.getRootException(exception);
   }
 
-  public int getCode() {
-    return code;
-  }
-
+  @Override
   public String getMessage() {
     return message;
   }
 
+  @Override
   public Map getInfo() {
     return info;
   }
 
+  @Override
   public Throwable getException() {
     return exception;
   }
