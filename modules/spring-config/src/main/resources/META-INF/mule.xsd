@@ -4643,7 +4643,7 @@
     <xsd:complexType name="repeatableInMemoryStreamType">
         <xsd:complexContent>
             <xsd:extension base="annotatedType">
-                <xsd:attribute name="initialBufferSize" type="substitutableInt" use="optional" default="256">
+                <xsd:attribute name="initialBufferSize" type="substitutableInt" use="optional" default="512">
                     <xsd:annotation>
                         <xsd:documentation>
                             This is the amount of memory that will be allocated in order to consume the stream and provide random
@@ -4652,7 +4652,7 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="bufferSizeIncrement" type="substitutableInt" use="optional" default="256">
+                <xsd:attribute name="bufferSizeIncrement" type="substitutableInt" use="optional" default="512">
                     <xsd:annotation>
                         <xsd:documentation>
                             This is by how much will be buffer size by expanded if it exceeds its initial size. Setting a value of zero or
