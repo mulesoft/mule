@@ -6,6 +6,13 @@
  */
 package org.mule.runtime.http.api.domain.entity;
 
+import static java.util.Collections.emptyList;
+import org.mule.runtime.http.api.domain.entity.multipart.HttpPart;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.util.Collection;
+
 /**
  * Represents an HTTP empty body.
  *
@@ -13,9 +20,31 @@ package org.mule.runtime.http.api.domain.entity;
  */
 public class EmptyHttpEntity implements HttpEntity {
 
-  private static EmptyHttpEntity instance = new EmptyHttpEntity();
+  private byte[] noBytes = new byte[0];
 
-  public EmptyHttpEntity instance() {
-    return instance;
+  @Override
+  public boolean isStreaming() {
+    return false;
   }
+
+  @Override
+  public boolean isComposed() {
+    return false;
+  }
+
+  @Override
+  public InputStream getContent() {
+    return new ByteArrayInputStream(noBytes);
+  }
+
+  @Override
+  public byte[] getBytes() {
+    return noBytes;
+  }
+
+  @Override
+  public Collection<HttpPart> getParts() {
+    return emptyList();
+  }
+
 }

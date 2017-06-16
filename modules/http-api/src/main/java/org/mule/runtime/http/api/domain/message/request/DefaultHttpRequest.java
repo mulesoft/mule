@@ -88,8 +88,4 @@ class DefaultHttpRequest extends BaseHttpMessage implements HttpRequest {
     return queryParams;
   }
 
-  @Override
-  public InputStreamHttpEntity getInputStreamEntity() {
-    return null;
-  }
 }

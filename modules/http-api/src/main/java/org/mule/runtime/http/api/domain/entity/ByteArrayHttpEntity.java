@@ -6,6 +6,14 @@
  */
 package org.mule.runtime.http.api.domain.entity;
 
+import static java.util.Collections.emptyList;
+import static org.mule.runtime.api.util.Preconditions.checkNotNull;
+import org.mule.runtime.http.api.domain.entity.multipart.HttpPart;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.util.Collection;
+
 /**
  * Represents a byte array HTTP body.
  *
@@ -16,10 +24,33 @@ public class ByteArrayHttpEntity implements HttpEntity {
   private byte[] content;
 
   public ByteArrayHttpEntity(byte[] content) {
+    checkNotNull(content, "HTTP entity content cannot be null.");
     this.content = content;
   }
 
-  public byte[] getContent() {
+  @Override
+  public boolean isStreaming() {
+    return false;
+  }
+
+  @Override
+  public boolean isComposed() {
+    return false;
+  }
+
+  @Override
+  public InputStream getContent() {
+    return new ByteArrayInputStream(content);
+  }
+
+  @Override
+  public byte[] getBytes() {
     return this.content;
   }
+
+  @Override
+  public Collection<HttpPart> getParts() {
+    return emptyList();
+  }
+
 }

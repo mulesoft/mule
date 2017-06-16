@@ -8,7 +8,6 @@ package org.mule.runtime.http.api.domain.message.request;
 
 import org.mule.runtime.http.api.domain.HttpProtocol;
 import org.mule.runtime.http.api.domain.ParameterMap;
-import org.mule.runtime.http.api.domain.entity.InputStreamHttpEntity;
 import org.mule.runtime.http.api.domain.message.HttpMessage;
 
 /**
@@ -50,9 +49,4 @@ public interface HttpRequest extends HttpMessage {
    */
   ParameterMap getQueryParams();
 
-  /**
-   * @return the raw input stream from the body. If there's no body then returns null. After calling this method {@link #getEntity()}
-   *         should not be used.
-   */
-  InputStreamHttpEntity getInputStreamEntity();
 }
