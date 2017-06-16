@@ -6,7 +6,8 @@
  */
 package org.mule.runtime.core.api.util;
 
-import static org.apache.commons.lang3.SystemUtils.LINE_SEPARATOR;
+import static java.lang.System.lineSeparator;
+import static org.mule.runtime.core.api.util.PropertiesUtils.maskedPropertyValue;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -81,7 +82,7 @@ public class MapUtils {
     buf.append('{');
 
     if (newline) {
-      buf.append(LINE_SEPARATOR);
+      buf.append(lineSeparator());
     }
 
     Object[] entries = props.entrySet().toArray();
@@ -91,10 +92,10 @@ public class MapUtils {
       Map.Entry<?, ?> property = (Map.Entry<?, ?>) entries[i];
       buf.append(property.getKey());
       buf.append('=');
-      buf.append(PropertiesUtils.maskedPropertyValue(property));
+      buf.append(maskedPropertyValue(property));
 
       if (newline) {
-        buf.append(LINE_SEPARATOR);
+        buf.append(lineSeparator());
       } else {
         buf.append(',').append(' ');
       }
@@ -104,10 +105,10 @@ public class MapUtils {
     Map.Entry<?, ?> lastProperty = (Map.Entry<?, ?>) entries[i];
     buf.append(lastProperty.getKey().toString());
     buf.append('=');
-    buf.append(PropertiesUtils.maskedPropertyValue(lastProperty));
+    buf.append(maskedPropertyValue(lastProperty));
 
     if (newline) {
-      buf.append(LINE_SEPARATOR);
+      buf.append(lineSeparator());
     }
 
     buf.append('}');

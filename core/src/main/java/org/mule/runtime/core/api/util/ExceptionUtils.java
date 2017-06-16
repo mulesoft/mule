@@ -6,11 +6,11 @@
  */
 package org.mule.runtime.core.api.util;
 
+import static java.lang.System.lineSeparator;
 import static java.util.Arrays.stream;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
-import static org.apache.commons.lang3.SystemUtils.LINE_SEPARATOR;
 import static org.mule.runtime.api.exception.ExceptionHelper.getExceptionsAsList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo.createInfo;
@@ -103,7 +103,7 @@ public class ExceptionUtils {
     StringBuilder builder = new StringBuilder();
 
     for (String frame : org.apache.commons.lang3.exception.ExceptionUtils.getStackFrames(throwable)) {
-      builder.append(frame.replaceAll(":\\s+([\\w\\s]*.*)", "").trim()).append(LINE_SEPARATOR);
+      builder.append(frame.replaceAll(":\\s+([\\w\\s]*.*)", "").trim()).append(lineSeparator());
     }
 
     return builder.toString();

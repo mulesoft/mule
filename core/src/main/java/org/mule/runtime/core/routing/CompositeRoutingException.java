@@ -7,11 +7,12 @@
 
 package org.mule.runtime.core.routing;
 
-import static org.apache.commons.lang3.SystemUtils.LINE_SEPARATOR;
+import static java.lang.System.lineSeparator;
+
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.processor.MessageRouter;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
+import org.mule.runtime.core.api.processor.MessageRouter;
 import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.runtime.core.exception.MessagingException;
 
@@ -70,7 +71,7 @@ public class CompositeRoutingException extends MuleException {
   @Override
   public String getDetailedMessage() {
     StringBuilder builder = new StringBuilder();
-    builder.append(MESSAGE_TITLE).append(LINE_SEPARATOR);
+    builder.append(MESSAGE_TITLE).append(lineSeparator());
 
     for (Entry<Integer, Throwable> entry : getExceptions().entrySet()) {
       String routeSubtitle = String.format("Route %d:", entry.getKey());
@@ -88,7 +89,7 @@ public class CompositeRoutingException extends MuleException {
     StringBuilder builder = new StringBuilder();
     for (Integer route : exceptions.keySet()) {
       Throwable routeException = exceptions.get(route);
-      builder.append(LINE_SEPARATOR + "\t").append(route).append(": ")
+      builder.append(lineSeparator() + "\t").append(route).append(": ")
           .append(routeException.getCause() != null ? routeException.getCause().getMessage() : routeException.getMessage());
     }
 

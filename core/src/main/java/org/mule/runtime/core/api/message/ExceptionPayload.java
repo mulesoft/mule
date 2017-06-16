@@ -19,8 +19,6 @@ import java.util.Map;
 @Deprecated
 public interface ExceptionPayload extends Serializable {
 
-  int getCode();
-
   String getMessage();
 
   Map getInfo();

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.util;
 
-import static org.apache.commons.lang3.SystemUtils.LINE_SEPARATOR;
+import static java.lang.System.lineSeparator;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
@@ -112,8 +112,8 @@ public class ExceptionUtilsTestCase extends AbstractMuleTestCase {
     String withoutMessage = getFullStackTraceWithoutMessages(e);
     String fullStackTrace = getStackTrace(e);
 
-    String[] linesWithoutMessage = withoutMessage.split(LINE_SEPARATOR);
-    String[] lines = fullStackTrace.split(LINE_SEPARATOR);
+    String[] linesWithoutMessage = withoutMessage.split(lineSeparator());
+    String[] lines = fullStackTrace.split(lineSeparator());
 
     assertEquals(lines.length, linesWithoutMessage.length);
 

@@ -6,9 +6,10 @@
  */
 package org.mule.runtime.core.api.util;
 
-import static org.apache.commons.lang3.SystemUtils.LINE_SEPARATOR;
+import static java.lang.System.lineSeparator;
+import static org.mule.runtime.core.config.i18n.CoreMessages.failedToConvertStringUsingEncoding;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.internal.util.ArrayUtils;
 
 import java.io.UnsupportedEncodingException;
@@ -70,7 +71,7 @@ public final class StringMessageUtils {
         while (temp.length() > 0) {
           len = (trimLength <= temp.length() ? trimLength : temp.length());
           String msg = temp.substring(0, len);
-          x = msg.indexOf(LINE_SEPARATOR);
+          x = msg.indexOf(lineSeparator());
 
           if (x > -1) {
             msg = msg.substring(0, x);
@@ -93,13 +94,13 @@ public final class StringMessageUtils {
       }
     }
 
-    buf.append(LINE_SEPARATOR);
+    buf.append(lineSeparator());
     if (c != ' ') {
       buf.append(StringUtils.repeat(c, maxlength));
     }
 
     for (int i = 0; i < messages.size(); i++) {
-      buf.append(LINE_SEPARATOR);
+      buf.append(lineSeparator());
       if (c != ' ') {
         buf.append(c);
       }
@@ -111,7 +112,7 @@ public final class StringMessageUtils {
       try {
         padding = trimLength - messages.get(i).toString().getBytes(osEncoding).length;
       } catch (UnsupportedEncodingException ueex) {
-        throw new MuleRuntimeException(CoreMessages.failedToConvertStringUsingEncoding(osEncoding), ueex);
+        throw new MuleRuntimeException(failedToConvertStringUsingEncoding(osEncoding), ueex);
       }
       if (padding > 0) {
         buf.append(StringUtils.repeat(' ', padding));
@@ -121,7 +122,7 @@ public final class StringMessageUtils {
         buf.append(c);
       }
     }
-    buf.append(LINE_SEPARATOR);
+    buf.append(lineSeparator());
     if (c != ' ') {
       buf.append(StringUtils.repeat(c, maxlength));
     }
