@@ -2747,7 +2747,8 @@
               }
             },
             "annotations": {
-              "visibility": "WRITE_ONLY"
+              "visibility": "WRITE_ONLY",
+              "default": "MILLISECONDS"
             }
           },
           {
