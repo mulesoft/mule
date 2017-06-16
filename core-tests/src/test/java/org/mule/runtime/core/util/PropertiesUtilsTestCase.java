@@ -17,6 +17,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.runtime.core.api.util.PropertiesUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -107,10 +108,9 @@ public class PropertiesUtilsTestCase extends AbstractMuleTestCase {
   @Test
   public void testLoadAllProperties() {
     Properties properties =
-        PropertiesUtils.loadAllProperties("META-INF/org/mule/runtime/core/config/mule-exception-codes.properties",
+        PropertiesUtils.loadAllProperties("META-INF/org/mule/runtime/core/config/test.properties",
                                           this.getClass().getClassLoader());
     assertThat((String) properties.get("java.lang.IllegalArgumentException"), is("104000"));
-    assertThat((String) properties.get("org.mule.runtime.core.api.MuleException"), is("10000"));
   }
 
   @Test

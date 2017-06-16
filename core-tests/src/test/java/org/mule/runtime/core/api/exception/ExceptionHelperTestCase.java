@@ -28,6 +28,7 @@ import static org.mule.runtime.api.exception.ExceptionHelper.getNonMuleException
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootException;
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootMuleException;
 import static org.mule.runtime.api.exception.ExceptionHelper.summarise;
+import static org.mule.runtime.api.exception.MuleException.refreshVerboseExceptions;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.config.i18n.CoreMessages.failedToBuildMessage;
 
@@ -45,14 +46,36 @@ import org.apache.commons.collections.Closure;
 import org.apache.commons.collections.comparators.ComparableComparator;
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
 @SmallTest
 public class ExceptionHelperTestCase extends AbstractMuleTestCase {
 
+  /**
+   * When running this tests alone, this ensures the environment is consistent with how the tests are run altogether.
+   */
+  @BeforeClass
+  public static void beforeClass() {
+    refreshVerboseExceptions();
+  }
+
   @Rule
-  public SystemProperty verbose = new SystemProperty("mule.verbose.exceptions", "true");
+  public SystemProperty verbose = new SystemProperty("mule.verbose.exceptions", "true") {
+
+    @Override
+    public void before() throws Throwable {
+      super.before();
+      refreshVerboseExceptions();
+    }
+
+    @Override
+    public void after() {
+      super.after();
+      refreshVerboseExceptions();
+    }
+  };
 
   @Test
   public void nestedExceptionRetrieval() throws Exception {
