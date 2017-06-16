@@ -87,7 +87,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(coreExtensionModel.getVersion(), is(getProductVersion()));
     assertThat(coreExtensionModel.getVendor(), is(getVendorName()));
     assertThat(coreExtensionModel.getCategory(), is(COMMUNITY));
-    assertThat(coreExtensionModel.getMinMuleVersion(), is(new MuleVersion("4.0.0-SNAPSHOT")));
+    assertThat(coreExtensionModel.getMinMuleVersion(), is(new MuleVersion("4.0.0-BETA-SNAPSHOT")));
   }
 
   @Test
@@ -96,7 +96,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(coreExtensionModel.getXmlDslModel().getNamespace(), is("http://www.mulesoft.org/schema/mule/core"));
     assertThat(coreExtensionModel.getXmlDslModel().getSchemaLocation(),
                is("http://www.mulesoft.org/schema/mule/core/current/mule.xsd"));
-    assertThat(coreExtensionModel.getXmlDslModel().getSchemaVersion(), is("4.0.0-SNAPSHOT"));
+    assertThat(coreExtensionModel.getXmlDslModel().getSchemaVersion(), is("4.0.0-BETA-SNAPSHOT"));
     assertThat(coreExtensionModel.getXmlDslModel().getXsdFileName(), is("mule.xsd"));
   }
 
