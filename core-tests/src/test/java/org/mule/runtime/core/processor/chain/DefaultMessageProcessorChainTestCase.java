@@ -24,16 +24,18 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.construct.Flow.builder;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
 import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.BLOCKING;
 import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.NON_BLOCKING;
-import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static reactor.core.publisher.Flux.from;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
@@ -93,7 +95,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
 
   protected MuleContext muleContext;
 
-  protected boolean synchronous;
   private AtomicInteger nonBlockingProcessorsExecuted = new AtomicInteger(0);
   private ProcessingStrategyFactory processingStrategyFactory;
 
@@ -127,7 +128,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
   @Before
   public void before() throws MuleException {
     nonBlockingProcessorsExecuted.set(0);
-    muleContext = mockContextWithServices();
+    muleContext = spy(super.muleContext);
     ErrorTypeLocator errorTypeLocator = mock(ErrorTypeLocator.class);
     ErrorType errorType = mock(ErrorType.class);
     ExceptionContextProvider exceptionContextProvider = mock(ExceptionContextProvider.class);
@@ -688,8 +689,8 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     scatterGatherRouter.addRoute(getAppendingMP("1"));
     scatterGatherRouter.addRoute(getAppendingMP("2"));
     scatterGatherRouter.addRoute(getAppendingMP("3"));
-    scatterGatherRouter.setMuleContext(muleContext);
-    scatterGatherRouter.initialise();
+    scatterGatherRouter.setFlowConstruct(flow);
+    initialiseIfNeeded(scatterGatherRouter, true, muleContext);
     scatterGatherRouter.start();
 
     Event event = getTestEventUsingFlow("0");

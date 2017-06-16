@@ -10,18 +10,13 @@ import static java.lang.Thread.currentThread;
 import static java.time.Duration.ofMillis;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
@@ -31,11 +26,13 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.core.api.util.concurrent.Latch;
+import org.mule.runtime.core.processor.strategy.BlockingProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.DirectProcessingStrategyFactory;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
@@ -52,6 +49,7 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
   protected Exception exceptionThrown;
   protected Latch latch = new Latch();
   protected Latch asyncEntrylatch = new Latch();
+  private Flow flow;
 
   @Rule
   public ExpectedException expected;
@@ -64,7 +62,11 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
   @Override
   protected void doSetUp() throws Exception {
     super.doSetUp();
-    messageProcessor = createAsyncDelegatMessageProcessor(target);
+    flow = builder("flow", muleContext).build();
+    flow.initialise();
+    flow.start();
+
+    messageProcessor = createAsyncDelegatMessageProcessor(target, flow);
     messageProcessor.start();
   }
 
@@ -72,6 +74,8 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
   protected void doTearDown() throws Exception {
     messageProcessor.stop();
     messageProcessor.dispose();
+    flow.stop();
+    flow.dispose();
     super.doTearDown();
   }
 
@@ -101,14 +105,8 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
     assertCompletionDone(target.sensedEvent.getContext());
     assertCompletionDone(request.getContext());
 
-    // Event is not the same because it gets copied in
-    // AbstractMuleEventWork#run()
-    assertThat(testEvent(), not(sameInstance(target.sensedEvent)));
-    assertThat(testEvent().getMessageAsString(muleContext), equalTo(target.sensedEvent.getMessageAsString(muleContext)));
-
-    assertThat(testEvent(), sameInstance(result));
-    assertThat(exceptionThrown, nullValue());
-    assertThat(target.thread, not(sameInstance(currentThread())));
+    assertTargetEvent(request);
+    assertResponse(result);
   }
 
   @Test
@@ -117,38 +115,62 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
     TransactionCoordination.getInstance().bindTransaction(transaction);
 
     try {
-      assertAsync(messageProcessor, process(messageProcessor, testEvent()));
-      fail("Exception expected");
-    } catch (Exception e) {
-      assertThat(e, instanceOf(RoutingException.class));
-      assertThat(target.sensedEvent, nullValue());
+      Event request = testEvent();
+      Event result = process(messageProcessor, request);
+
+      // Wait until processor in async is executed to allow assertions on sensed event
+      asyncEntrylatch.countDown();
+      assertThat(latch.await(LOCK_TIMEOUT, MILLISECONDS), is(true));
+
+      assertTargetEvent(request);
+      assertResponse(result);
     } finally {
       TransactionCoordination.getInstance().unbindTransaction(transaction);
     }
   }
 
-  protected void assertAsync(Processor processor, Event event) throws MuleException, InterruptedException {
-    Event result = processor.process(event);
+  @Test
+  public void processWithBlockingProcessingStrategy() throws Exception {
+    flow.dispose();
+    flow = builder("flow", muleContext).processingStrategyFactory(new BlockingProcessingStrategyFactory()).build();
+    flow.initialise();
+    flow.start();
+    messageProcessor.setFlowConstruct(flow);
 
-    latch.await(10000, MILLISECONDS);
-    assertNotNull(target.sensedEvent);
-    // Event is not the same because it gets copied in
-    // AbstractMuleEventWork#run()
-    assertNotSame(event, target.sensedEvent);
-    assertEquals(event.getMessageAsString(muleContext), target.sensedEvent.getMessageAsString(muleContext));
-
-    assertNull(result);
-    assertNull(exceptionThrown);
+    process();
   }
 
-  protected AsyncDelegateMessageProcessor createAsyncDelegatMessageProcessor(Processor listener) throws Exception {
-    AsyncDelegateMessageProcessor mp = new AsyncDelegateMessageProcessor(newChain(listener), "thread");
+  @Test
+  public void processWithDirectProcessingStrategy() throws Exception {
+    flow.dispose();
+    flow = builder("flow", muleContext).processingStrategyFactory(new DirectProcessingStrategyFactory()).build();
+    flow.initialise();
+    flow.start();
+    messageProcessor.setFlowConstruct(flow);
 
-    final Flow flowConstruct = builder("flow", muleContext).build();
-    flowConstruct.initialise();
+    process();
+  }
+
+  private void assertTargetEvent(Event request) {
+    // Assert that event is processed in async thread
+    assertNotNull(target.sensedEvent);
+    assertThat(request, not(sameInstance(target.sensedEvent)));
+    assertThat(request.getCorrelationId(), equalTo(target.sensedEvent.getCorrelationId()));
+    assertThat(request.getMessage(), sameInstance(target.sensedEvent.getMessage()));
+    assertThat(target.thread, not(sameInstance(currentThread())));
+  }
+
+  private void assertResponse(Event result) throws MuleException {
+    // Assert that response is echoed by async and no exception is thrown in flow
+    assertThat(testEvent(), sameInstance(result));
+    assertThat(exceptionThrown, nullValue());
+  }
+
+  protected AsyncDelegateMessageProcessor createAsyncDelegatMessageProcessor(Processor listener, FlowConstruct flowConstruct)
+      throws Exception {
+    AsyncDelegateMessageProcessor mp = new AsyncDelegateMessageProcessor(newChain(listener), "thread");
     mp.setFlowConstruct(flowConstruct);
     initialiseIfNeeded(mp, true, muleContext);
-
     return mp;
   }
 
@@ -168,7 +190,7 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
     @Override
     public Event process(Event event) throws MuleException {
       try {
-        asyncEntrylatch.await(LOCK_TIMEOUT, MILLISECONDS);
+        asyncEntrylatch.await();
       } catch (InterruptedException e) {
         throw new RuntimeException(e);
       }
