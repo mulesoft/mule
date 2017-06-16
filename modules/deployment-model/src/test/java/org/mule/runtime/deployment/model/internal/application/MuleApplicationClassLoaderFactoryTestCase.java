@@ -16,7 +16,6 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getAppClassesFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppLibFolder;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
 import static org.mule.runtime.core.api.util.FileUtils.stringToFile;
@@ -53,7 +52,6 @@ public class MuleApplicationClassLoaderFactoryTestCase extends AbstractMuleTestC
   private final MuleApplicationClassLoaderFactory classLoaderFactory =
       new MuleApplicationClassLoaderFactory(nativeLibraryFinderFactory);
   private String previousMuleHome;
-  private URL classesFolderUrl;
   private ApplicationDescriptor descriptor;
 
   @Before
@@ -70,8 +68,6 @@ public class MuleApplicationClassLoaderFactoryTestCase extends AbstractMuleTestC
     when(classLoaderLookupPolicy.getClassLookupStrategy(anyString())).thenReturn(PARENT_FIRST);
     when(parentArtifactClassLoader.getClassLoaderLookupPolicy()).thenReturn(classLoaderLookupPolicy);
     when(parentArtifactClassLoader.getClassLoader()).thenReturn(getClass().getClassLoader());
-
-    classesFolderUrl = getAppClassesFolder(APP_NAME).toURI().toURL();
 
     when(classLoaderLookupPolicy.extend(anyMap())).thenReturn(classLoaderLookupPolicy);
     descriptor = new ApplicationDescriptor(APP_NAME);
@@ -92,7 +88,7 @@ public class MuleApplicationClassLoaderFactoryTestCase extends AbstractMuleTestC
     final MuleApplicationClassLoader artifactClassLoader =
         (MuleApplicationClassLoader) classLoaderFactory.create(APP_ID, parentArtifactClassLoader, descriptor, emptyList());
 
-    verify(nativeLibraryFinderFactory).create(APP_NAME);
+    verify(nativeLibraryFinderFactory).create(APP_NAME, new URL[0]);
     assertThat(artifactClassLoader.getParent(), is(parentArtifactClassLoader.getClassLoader()));
     assertThat(artifactClassLoader.getArtifactId(), is(APP_ID));
   }

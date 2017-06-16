@@ -7,16 +7,19 @@
 
 package org.mule.runtime.deployment.model.internal.nativelib;
 
+import java.net.URL;
+
 /**
  * Creates {@link NativeLibraryFinder} instances
  */
 public interface NativeLibraryFinderFactory {
 
   /**
-   * Creates a ntive library finder for the given application
+   * Creates a native library finder for a given Mule artifact
    *
-   * @param appName name of the application owning the finder
+   * @param name name of the artifact owning the finder
+   * @param urls all the URLs that are contained on the artifact's class loader
    * @return a non null instance
    */
-  NativeLibraryFinder create(String appName);
+  NativeLibraryFinder create(String name, URL[] urls);
 }
