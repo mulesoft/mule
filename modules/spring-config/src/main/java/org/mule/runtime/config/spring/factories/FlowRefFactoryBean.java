@@ -9,6 +9,9 @@ package org.mule.runtime.config.spring.factories;
 import static java.util.Collections.singletonList;
 import static org.mule.runtime.core.DefaultEventContext.child;
 import static org.mule.runtime.core.api.Event.builder;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
@@ -16,7 +19,6 @@ import static reactor.core.publisher.Flux.just;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
@@ -42,13 +44,16 @@ import java.util.concurrent.ConcurrentMap;
 import javax.xml.namespace.QName;
 
 import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 public class FlowRefFactoryBean extends AbstractAnnotatedObject
-    implements FactoryBean<Processor>, ApplicationContextAware, MuleContextAware, Initialisable, Disposable {
+    implements FactoryBean<Processor>, ApplicationContextAware, MuleContextAware, Initialisable {
+
+  private static final Logger LOGGER = getLogger(FlowRefFactoryBean.class);
 
   private abstract class FlowRefMessageProcessor
       implements AnnotatedProcessor, FlowConstructAware {
@@ -126,23 +131,27 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
   }
 
   @Override
-  public void dispose() {
-    for (Processor processor : referenceCache.values()) {
-      if (processor instanceof Disposable) {
-        ((Disposable) processor).dispose();
-      }
-    }
-    referenceCache = null;
-  }
-
-  @Override
   public Processor getObject() throws Exception {
     // TODO remove the call to initialise after MULE-12096 is fixed
     initialise();
     Processor processor =
         referencedMessageProcessor != null ? referencedMessageProcessor : createDynamicReferenceMessageProcessor(refName);
     // Wrap in chain to ensure the flow-ref element always has a path element and lifecycle will be propgated to child sub-flows
-    return new AbstractMessageProcessorChain(singletonList(processor)) {};
+    return new AbstractMessageProcessorChain(singletonList(processor)) {
+
+      @Override
+      public void stop() throws MuleException {
+        super.stop();
+        stopIfNeeded(referenceCache.values());
+      }
+
+      @Override
+      public void dispose() {
+        super.dispose();
+        disposeIfNeeded(referenceCache.values(), LOGGER);
+        referenceCache = null;
+      }
+    };
   }
 
   protected Processor createDynamicReferenceMessageProcessor(String name) throws MuleException {
