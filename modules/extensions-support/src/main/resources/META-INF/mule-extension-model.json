@@ -1,15 +1,15 @@
 {
   "name": "Mule Core",
   "description": "Mule Runtime and Integration Platform: Core components",
-  "version": "4.0.0-SNAPSHOT",
+  "version": "4.0.0-BETA-SNAPSHOT",
   "vendor": "MuleSoft, Inc.",
   "category": "COMMUNITY",
-  "minMuleVersion": "4.0.0-SNAPSHOT",
+  "minMuleVersion": "4.0.0-BETA-SNAPSHOT",
   "xmlDsl": {
     "prefix": "mule",
     "namespace": "http://www.mulesoft.org/schema/mule/core",
     "schemaLocation": "http://www.mulesoft.org/schema/mule/core/current/mule.xsd",
-    "schemaVersion": "4.0.0-SNAPSHOT",
+    "schemaVersion": "4.0.0-BETA-SNAPSHOT",
     "xsdFileName": "mule.xsd"
   },
   "resources": [],
