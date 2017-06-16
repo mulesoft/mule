@@ -12,7 +12,7 @@
         <dependency>
             <groupId>org.mule.connectors</groupId>
             <artifactId>mule-http-connector</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>0.8.0-SNAPSHOT</version>
             <classifier>mule-plugin</classifier>
         </dependency>
         <dependency>
