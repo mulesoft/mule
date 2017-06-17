@@ -119,7 +119,7 @@
 /mule-standalone-${productVersion}/lib/mule/mule-module-extensions-support-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-extensions-soap-support-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-extensions-xml-support-${productVersion}.jar
-/mule-standalone-${productVersion}/lib/mule/mule-module-global-config-4.0.0-SNAPSHOT.jar
+/mule-standalone-${productVersion}/lib/mule/mule-module-global-config-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-launcher-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-logging-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-deployment-${productVersion}.jar
@@ -204,8 +204,8 @@
 /mule-standalone-${productVersion}/lib/opt/maven-repository-metadata-3.3.9.jar
 /mule-standalone-${productVersion}/lib/opt/maven-settings-3.3.9.jar
 /mule-standalone-${productVersion}/lib/opt/maven-settings-builder-3.3.9.jar
-/mule-standalone-${productVersion}/lib/opt/mule-maven-client-api-+
-/mule-standalone-${productVersion}/lib/opt/mule-maven-client-impl-+
+/mule-standalone-${productVersion}/lib/opt/mule-maven-client-api-1.0.0-+
+/mule-standalone-${productVersion}/lib/opt/mule-maven-client-impl-1.0.0-+
 /mule-standalone-${productVersion}/lib/opt/org.everit.json.schema-1.1.0.jar
 /mule-standalone-${productVersion}/lib/opt/org.everit.osgi.bundles.org.json-1.0.0-v20140107.jar
 /mule-standalone-${productVersion}/lib/opt/plexus-cipher-1.4.jar

@@ -186,17 +186,7 @@
         <log4jVersion>2.8.2</log4jVersion>
         <disruptorVersion>3.3.0</disruptorVersion>
         <mockitoVersion>1.10.19</mockitoVersion>
-        <muleDslApiVersion>1.0.0-SNAPSHOT</muleDslApiVersion>
-        <muleExtensionsApiVersion>1.0.0-SNAPSHOT</muleExtensionsApiVersion>
-        <muleExtensionsSoapApiVersion>1.0.0-SNAPSHOT</muleExtensionsSoapApiVersion>
-        <muleHttpPolicyApiVersion>1.0.0-SNAPSHOT</muleHttpPolicyApiVersion>
-        <muleMavenClientApi>1.0.0-SNAPSHOT</muleMavenClientApi>
-        <muleMavenClientImpl>1.0.0-SNAPSHOT</muleMavenClientImpl>
-        <muleMavenClientTest>1.0.0-SNAPSHOT</muleMavenClientTest>
-        <mulePolicyApiVersion>1.0.0-SNAPSHOT</mulePolicyApiVersion>
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
-        <muleApiVersion>1.0.0-SNAPSHOT</muleApiVersion>
-        <muleMetadataModelVersion>1.0.0-SNAPSHOT</muleMetadataModelVersion>
         <muleMvelVersion>2.1.9-MULE-012</muleMvelVersion>
         <mx4jVersion>2.1.1</mx4jVersion>
         <mysqlDriverVersion>5.1.33</mysqlDriverVersion>
@@ -224,6 +214,37 @@
         <xstreamVersion>1.4.9</xstreamVersion>
         <xaPoolVersion>1.5.0</xaPoolVersion>
         <allureJunitVersion>1.4.23.HOTFIX1</allureJunitVersion>
+
+        <!-- Mule Snapshot Dependencies -->
+        <muleDslApiVersion>1.0.0-SNAPSHOT</muleDslApiVersion>
+        <muleExtensionsApiVersion>1.0.0-SNAPSHOT</muleExtensionsApiVersion>
+        <muleHttpPolicyApiVersion>1.0.0-SNAPSHOT</muleHttpPolicyApiVersion>
+        <muleMavenClientApi>1.0.0-SNAPSHOT</muleMavenClientApi>
+        <muleMavenClientImpl>1.0.0-SNAPSHOT</muleMavenClientImpl>
+        <muleMavenClientTest>1.0.0-SNAPSHOT</muleMavenClientTest>
+        <mulePolicyApiVersion>1.0.0-SNAPSHOT</mulePolicyApiVersion>
+        <muleApiVersion>1.0.0-SNAPSHOT</muleApiVersion>
+        <muleMetadataModelVersion>1.0.0-SNAPSHOT</muleMetadataModelVersion>
+        <metadataModelApiVersion>1.0.0-SNAPSHOT</metadataModelApiVersion>
+        <metadataModelApiVersion>${muleMetadataModelVersion}</metadataModelApiVersion>
+
+        <muleHttpConnectorTestVersion>1.0.0-SNAPSHOT</muleHttpConnectorTestVersion>
+        <muleSocketsConnectorTestVersion>1.0.0-SNAPSHOT</muleSocketsConnectorTestVersion>
+        <muleFileConnectorTestVersion>1.0.0-SNAPSHOT</muleFileConnectorTestVersion>
+        <muleJmsConnectorTestVersion>1.0.0-SNAPSHOT</muleJmsConnectorTestVersion>
+
+        <muleFileCommonsTestVersion>1.0.0-SNAPSHOT</muleFileCommonsTestVersion>
+
+        <muleHttpServiceTestVersion>1.0.0-SNAPSHOT</muleHttpServiceTestVersion>
+        <muleSchedulerServiceTestVersion>1.0.0-SNAPSHOT</muleSchedulerServiceTestVersion>
+
+        <!-- Test Extensions -->
+        <muleMetadataExtensionTestVersion>4.0.0-SNAPSHOT</muleMetadataExtensionTestVersion>
+        <muleVeganExtensionTestVersion>4.0.0-SNAPSHOT</muleVeganExtensionTestVersion>
+        <muleHeisenbergExtensionTestVersion>4.0.0-SNAPSHOT</muleHeisenbergExtensionTestVersion>
+        <muleMarvelExtensionTestVersion>4.0.0-SNAPSHOT</muleMarvelExtensionTestVersion>
+        <mulePetstoreExtensionTestVersion>4.0.0-SNAPSHOT</mulePetstoreExtensionTestVersion>
+        <muleSubtypesExtensionTestVersion>4.0.0-SNAPSHOT</muleSubtypesExtensionTestVersion>
 
         <!--Maven plugins versions-->
         <dependency.plugin.version>2.10</dependency.plugin.version>
@@ -254,9 +275,12 @@
         <maven.buildnumber.plugin.version>1.4</maven.buildnumber.plugin.version>
         <maven.surefire.plugin.version>2.19.1</maven.surefire.plugin.version>
         <maven.enforcer.plugin.version>1.4.1</maven.enforcer.plugin.version>
-        <mule.module.maven.plugin.version>1.0-SNAPSHOT</mule.module.maven.plugin.version>
+
+        <mule.module.maven.plugin.version>1.0.0-SNAPSHOT</mule.module.maven.plugin.version>
         <mule.extensions.maven.plugin.version>1.0.0-SNAPSHOT</mule.extensions.maven.plugin.version>
         <mule.app.plugins.maven.plugin.version>1.0.0-SNAPSHOT</mule.app.plugins.maven.plugin.version>
+        <mule.jmh.elasticsearch.maven.plugin.version>1.0.0-SNAPSHOT</mule.jmh.elasticsearch.maven.plugin.version>
+
         <maven.replacer.plugin>1.5.3</maven.replacer.plugin>
 
         <!-- v1.1.0 has an issue with Optional dependencies, whenjbpmVersion resolving the graph it overrides the optionality of a transitive
@@ -325,7 +349,7 @@
                 <artifactId>javax.jms-api</artifactId>
                 <version>${javaxJmsApiVersion}</version>
             </dependency>
-            
+
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-beans</artifactId>
@@ -1149,7 +1173,7 @@
             <dependency>
                 <groupId>org.mule.runtime</groupId>
                 <artifactId>mule-extensions-soap-api</artifactId>
-                <version>${muleExtensionsSoapApiVersion}</version>
+                <version>${muleExtensionsApiVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.mule.runtime</groupId>
@@ -1165,6 +1189,11 @@
                 <groupId>org.mule.runtime</groupId>
                 <artifactId>mule-module-http-policy-api</artifactId>
                 <version>${muleHttpPolicyApiVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mule.runtime</groupId>
+                <artifactId>mule-metadata-model-persistence</artifactId>
+                <version>${metadataModelApiVersion}</version>
             </dependency>
 
             <dependency>
@@ -1752,18 +1781,18 @@
                     <version>${mule.module.maven.plugin.version}</version>
                     <extensions>true</extensions>
                 </plugin>
-                <plugin>
-                    <groupId>org.mule.runtime</groupId>
-                    <artifactId>mule-app-plugins-maven-plugin</artifactId>
-                    <version>${mule.app.plugins.maven.plugin.version}</version>
-                    <extensions>true</extensions>
-                </plugin>
-                <plugin>
-                    <groupId>org.mule.runtime.plugins</groupId>
-                    <artifactId>mule-extensions-maven-plugin</artifactId>
-                    <version>${mule.extensions.maven.plugin.version}</version>
-                    <extensions>true</extensions>
-                </plugin>
+                <!--<plugin>-->
+                    <!--<groupId>org.mule.runtime.plugins</groupId>-->
+                    <!--<artifactId>mule-app-plugins-maven-plugin</artifactId>-->
+                    <!--<version>${mule.app.plugins.maven.plugin.version}</version>-->
+                    <!--<extensions>true</extensions>-->
+                <!--</plugin>-->
+                <!--<plugin>-->
+                    <!--<groupId>org.mule.runtime.plugins</groupId>-->
+                    <!--<artifactId>mule-extensions-maven-plugin</artifactId>-->
+                    <!--<version>${mule.extensions.maven.plugin.version}</version>-->
+                    <!--<extensions>true</extensions>-->
+                <!--</plugin>-->
             </plugins>
         </pluginManagement>
 
