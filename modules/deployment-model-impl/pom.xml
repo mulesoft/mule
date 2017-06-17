@@ -159,7 +159,7 @@
         <dependency>
             <groupId>org.mule.connectors</groupId>
             <artifactId>mule-http-connector</artifactId>
-            <version>0.8.0-SNAPSHOT</version>
+            <version>${muleHttpConnectorTestVersion}</version>
             <classifier>mule-plugin</classifier>
             <scope>test</scope>
         </dependency>

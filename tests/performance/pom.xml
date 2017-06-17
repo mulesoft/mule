@@ -206,7 +206,7 @@
                     <plugin>
                         <groupId>org.mule.jmh</groupId>
                         <artifactId>jmh-elasticsearch-maven-plugin</artifactId>
-                        <version>1.0.0-SNAPSHOT</version>
+                        <version>${mule.jmh.elasticsearch.maven.plugin.version}</version>
                             <executions>
                                 <execution>
                                     <phase>post-integration-test</phase>
