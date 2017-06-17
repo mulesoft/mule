@@ -2020,7 +2020,7 @@
                               "annotations": {
                                 "int": {},
                                 "typeId": "java.lang.Integer",
-                                "default": "256"
+                                "default": "512"
                               }
                             },
                             "annotations": {
@@ -2038,7 +2038,7 @@
                               "annotations": {
                                 "int": {},
                                 "typeId": "java.lang.Integer",
-                                "default": "256"
+                                "default": "512"
                               }
                             },
                             "annotations": {
@@ -2111,7 +2111,7 @@
                               "annotations": {
                                 "int": {},
                                 "typeId": "java.lang.Integer",
-                                "default": "1024"
+                                "default": "512"
                               }
                             },
                             "annotations": {
@@ -3990,7 +3990,7 @@
                               "annotations": {
                                 "int": {},
                                 "typeId": "java.lang.Integer",
-                                "default": "256"
+                                "default": "512"
                               }
                             },
                             "annotations": {
@@ -4008,7 +4008,7 @@
                               "annotations": {
                                 "int": {},
                                 "typeId": "java.lang.Integer",
-                                "default": "256"
+                                "default": "512"
                               }
                             },
                             "annotations": {
@@ -4081,7 +4081,7 @@
                               "annotations": {
                                 "int": {},
                                 "typeId": "java.lang.Integer",
-                                "default": "1024"
+                                "default": "512"
                               }
                             },
                             "annotations": {
@@ -5540,7 +5540,7 @@
                               "annotations": {
                                 "int": {},
                                 "typeId": "java.lang.Integer",
-                                "default": "256"
+                                "default": "512"
                               }
                             },
                             "annotations": {
@@ -5558,7 +5558,7 @@
                               "annotations": {
                                 "int": {},
                                 "typeId": "java.lang.Integer",
-                                "default": "256"
+                                "default": "512"
                               }
                             },
                             "annotations": {
@@ -5631,7 +5631,7 @@
                               "annotations": {
                                 "int": {},
                                 "typeId": "java.lang.Integer",
-                                "default": "1024"
+                                "default": "512"
                               }
                             },
                             "annotations": {
