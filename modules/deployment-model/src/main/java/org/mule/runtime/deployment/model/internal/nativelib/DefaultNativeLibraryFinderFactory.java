@@ -7,7 +7,11 @@
 
 package org.mule.runtime.deployment.model.internal.nativelib;
 
-import org.mule.runtime.container.api.MuleFoldersUtil;
+import static org.mule.metadata.api.utils.MetadataTypeUtils.checkArgument;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getAppTempFolder;
+import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
+
+import java.net.URL;
 
 /**
  * Creates {@link NativeLibraryFinder}
@@ -15,8 +19,11 @@ import org.mule.runtime.container.api.MuleFoldersUtil;
 public class DefaultNativeLibraryFinderFactory implements NativeLibraryFinderFactory {
 
   @Override
-  public NativeLibraryFinder create(String appName) {
-    return new PerAppNativeLibraryFinder(MuleFoldersUtil.getAppLibFolder(appName));
+  public NativeLibraryFinder create(String name, URL[] urls) {
+    checkArgument(!isEmpty(name), "appName cannot be empty");
+    checkArgument(urls != null, "urls cannot be null");
+
+    return new ArtifactCopyNativeLibraryFinder(getAppTempFolder(name), urls);
   }
 
 }

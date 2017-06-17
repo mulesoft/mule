@@ -7,15 +7,14 @@
 
 package org.mule.runtime.deployment.model.internal.nativelib;
 
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import static org.junit.Assert.assertThat;
-import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.deployment.model.internal.nativelib.NativeLibraryFinder;
-import org.mule.runtime.deployment.model.internal.nativelib.DefaultNativeLibraryFinderFactory;
-import org.mule.runtime.deployment.model.internal.nativelib.PerAppNativeLibraryFinder;
-import org.mule.tck.MuleTestUtils;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
+import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+
+import java.net.URL;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -31,22 +30,18 @@ public class DefaultNativeLibraryFinderFactoryTestCase extends AbstractMuleTestC
 
   @Test
   public void createsPerAppNativeLibraryFinderWhenPropertyIsFalse() throws Exception {
-    doCreateNativeLibraryFinderTest(PerAppNativeLibraryFinder.class);
+    doCreateNativeLibraryFinderTest(ArtifactCopyNativeLibraryFinder.class);
   }
 
   private void doCreateNativeLibraryFinderTest(final Class<? extends NativeLibraryFinder> expectedNativeLibraryFinderClass)
       throws Exception {
-    MuleTestUtils.testWithSystemProperty(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY, muleHomeFolder.getRoot().getAbsolutePath(),
-                                         new MuleTestUtils.TestCallback() {
+    testWithSystemProperty(MULE_HOME_DIRECTORY_PROPERTY, muleHomeFolder.getRoot().getAbsolutePath(),
+                           () -> {
+                             NativeLibraryFinder nativeLibraryFinder =
+                                 nativeLibraryFinderFactory.create("testApp", new URL[0]);
 
-                                           @Override
-                                           public void run() throws Exception {
-                                             NativeLibraryFinder nativeLibraryFinder =
-                                                 nativeLibraryFinderFactory.create("testApp");
-
-                                             assertThat(nativeLibraryFinder,
-                                                        instanceOf(expectedNativeLibraryFinderClass));
-                                           }
-                                         });
+                             assertThat(nativeLibraryFinder,
+                                        instanceOf(expectedNativeLibraryFinderClass));
+                           });
   }
 }

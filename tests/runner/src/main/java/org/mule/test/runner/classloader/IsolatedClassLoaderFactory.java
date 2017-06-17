@@ -84,6 +84,8 @@ import org.slf4j.LoggerFactory;
  */
 public class IsolatedClassLoaderFactory {
 
+  private static final String APP_NAME = "app";
+
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());
   private ClassLoaderFilterFactory classLoaderFilterFactory = new ArtifactClassLoaderFilterFactory();
   private PluginLookPolicyFactory pluginLookupPolicyGenerator = new PluginLookPolicyFactory();
@@ -439,8 +441,10 @@ public class IsolatedClassLoaderFactory {
                                                                      ArtifactsUrlClassification artifactsUrlClassification,
                                                                      List<ArtifactClassLoader> pluginsArtifactClassLoaders) {
     logClassLoaderUrls("APP", artifactsUrlClassification.getApplicationUrls());
-    return new MuleApplicationClassLoader("app", new ArtifactDescriptor("app"), parent,
-                                          new DefaultNativeLibraryFinderFactory().create("app"),
+    return new MuleApplicationClassLoader(APP_NAME, new ArtifactDescriptor(APP_NAME), parent,
+                                          new DefaultNativeLibraryFinderFactory()
+                                              .create(APP_NAME, artifactsUrlClassification.getApplicationUrls()
+                                                  .toArray(new URL[pluginsArtifactClassLoaders.size()])),
                                           artifactsUrlClassification.getApplicationUrls(),
                                           childClassLoaderLookupPolicy, pluginsArtifactClassLoaders);
   }
