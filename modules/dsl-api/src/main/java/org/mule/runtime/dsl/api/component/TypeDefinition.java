@@ -9,10 +9,12 @@ package org.mule.runtime.dsl.api.component;
 
 /**
  * Defines the actual {@code Class} for the domain object to be created.
+ * 
+ * @param <T> the actual type of the runtime object to be created.
  */
-public class TypeDefinition {
+public class TypeDefinition<T> {
 
-  private Class<?> type;
+  private Class<T> type;
   private String attributeName;
   private MapEntryType mapType;
   private Class<?> inforcedClass;
@@ -29,8 +31,8 @@ public class TypeDefinition {
    * @param type {@code Class} of the domain model to be created.
    * @return {@code TypeDefinition} created from that type.
    */
-  public static TypeDefinition fromType(Class<?> type) {
-    TypeDefinition typeDefinition = new TypeDefinition();
+  public static <T> TypeDefinition<T> fromType(Class<T> type) {
+    TypeDefinition<T> typeDefinition = new TypeDefinition<>();
     typeDefinition.type = type;
     return typeDefinition;
   }
@@ -39,8 +41,8 @@ public class TypeDefinition {
    * @param configAttributeName name of the configuration attribute that defines the domain object type.
    * @return {@code TypeDefinition} created from that type.
    */
-  public static TypeDefinition fromConfigurationAttribute(String configAttributeName) {
-    TypeDefinition typeDefinition = new TypeDefinition();
+  public static <T> TypeDefinition<T> fromConfigurationAttribute(String configAttributeName) {
+    TypeDefinition<T> typeDefinition = new TypeDefinition<>();
     typeDefinition.attributeName = configAttributeName;
     return typeDefinition;
   }
@@ -49,7 +51,7 @@ public class TypeDefinition {
    * @param inforcedClass class to be checked as the same or a super class of the type if defined as a config attribute
    * @return {@code TypeDefinition} whith className set.
    */
-  public TypeDefinition checkingThatIsClassOrInheritsFrom(Class<?> inforcedClass) {
+  public TypeDefinition<T> checkingThatIsClassOrInheritsFrom(Class<?> inforcedClass) {
     this.inforcedClass = inforcedClass;
     return this;
   }
@@ -67,8 +69,8 @@ public class TypeDefinition {
     }
   }
 
-  public static TypeDefinition fromMapEntryType(Class<?> keyType, Class<?> valueType) {
-    TypeDefinition typeDefinition = new TypeDefinition();
+  public static <T, K, V> TypeDefinition<T> fromMapEntryType(Class<K> keyType, Class<V> valueType) {
+    TypeDefinition<T> typeDefinition = new TypeDefinition<>();
     typeDefinition.mapType = new MapEntryType(keyType, valueType);
     return typeDefinition;
   }

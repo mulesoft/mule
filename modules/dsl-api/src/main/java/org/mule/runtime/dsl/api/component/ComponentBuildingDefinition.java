@@ -12,8 +12,10 @@ import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.concat;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
+
 import org.mule.runtime.api.component.ComponentIdentifier;
 
 import java.util.ArrayList;
@@ -23,14 +25,15 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
 
 /**
  * Defines the mapping between a component configuration and how the object that represents that model in runtime is created.
- *
+ * 
+ * @param <T> the actual type of the runtime object to be created.
+ * 
  * @since 4.0
  */
-public class ComponentBuildingDefinition {
+public class ComponentBuildingDefinition<T> {
 
   public static final String TYPE_CONVERTER_AND_UNKNOWN_TYPE_MESSAGE =
       "Type converter cannot be used with a type definition from a configuration attribute.";
@@ -43,9 +46,7 @@ public class ComponentBuildingDefinition {
   private List<AttributeDefinition> constructorAttributeDefinition = new ArrayList<>();
   private List<SetterAttributeDefinition> setterParameterDefinitions = new ArrayList<>();
   private Set<String> ignoredConfigurationParameters = new HashSet<>();
-  // TODO MULE-9638 Use generics. Generics cannot be used right now because this method colides with the ones defined in
-  // FactoryBeans.
-  private Class<?> objectFactoryType;
+  private Class<? extends ObjectFactory<T>> objectFactoryType;
   private boolean prototype;
   private boolean named = false;
   private ComponentIdentifier componentIdentifier;
@@ -90,7 +91,7 @@ public class ComponentBuildingDefinition {
    * @return the factory for the domain object. For complex object creations it's possible to define an object builder that will
    *         end up creating the domain object.
    */
-  public Class<?> getObjectFactoryType() {
+  public Class<? extends ObjectFactory<T>> getObjectFactoryType() {
     return objectFactoryType;
   }
 
@@ -138,7 +139,7 @@ public class ComponentBuildingDefinition {
    */
   public List<AttributeDefinition> getAttributesDefinitions() {
     return concat(setterParameterDefinitions.stream().map(SetterAttributeDefinition::getAttributeDefinition),
-                  constructorAttributeDefinition.stream()).collect(Collectors.toList());
+                  constructorAttributeDefinition.stream()).collect(toList());
   }
 
   /**
@@ -146,11 +147,11 @@ public class ComponentBuildingDefinition {
    * <p/>
    * TODO MULE-9693 Improve builder so the copy is not required to reuse the namespace value.
    */
-  public static class Builder {
+  public static class Builder<T> {
 
     private String namespace;
     private String identifier;
-    private ComponentBuildingDefinition definition = new ComponentBuildingDefinition();
+    private ComponentBuildingDefinition<T> definition = new ComponentBuildingDefinition<>();
 
     /**
      * Adds a new constructor parameter to be used during the object instantiation.
@@ -158,7 +159,7 @@ public class ComponentBuildingDefinition {
      * @param attributeDefinition the constructor argument definition.
      * @return {@code this} builder
      */
-    public Builder withConstructorParameterDefinition(AttributeDefinition attributeDefinition) {
+    public Builder<T> withConstructorParameterDefinition(AttributeDefinition attributeDefinition) {
       definition.constructorAttributeDefinition.add(attributeDefinition);
       return this;
     }
@@ -170,7 +171,7 @@ public class ComponentBuildingDefinition {
      * @param attributeDefinition the setter parameter definition
      * @return {@code this} builder
      */
-    public Builder withSetterParameterDefinition(String fieldName, AttributeDefinition attributeDefinition) {
+    public Builder<T> withSetterParameterDefinition(String fieldName, AttributeDefinition attributeDefinition) {
       definition.setterParameterDefinitions.add(new SetterAttributeDefinition(fieldName, attributeDefinition));
       return this;
     }
@@ -182,7 +183,7 @@ public class ComponentBuildingDefinition {
      * @param identifier configuration element identifier
      * @return {@code this} builder
      */
-    public Builder withIdentifier(String identifier) {
+    public Builder<T> withIdentifier(String identifier) {
       this.identifier = identifier;
       return this;
     }
@@ -194,7 +195,7 @@ public class ComponentBuildingDefinition {
      * @param namespace configuration element namespace
      * @return {@code this} builder
      */
-    public Builder withNamespace(String namespace) {
+    public Builder<T> withNamespace(String namespace) {
       this.namespace = namespace;
       return this;
     }
@@ -207,7 +208,7 @@ public class ComponentBuildingDefinition {
      * @param typeDefinition the type definition to discover the objecvt type
      * @return {@code this} builder
      */
-    public Builder withTypeDefinition(TypeDefinition typeDefinition) {
+    public Builder<T> withTypeDefinition(TypeDefinition<T> typeDefinition) {
       definition.typeDefinition = typeDefinition;
       return this;
     }
@@ -222,7 +223,7 @@ public class ComponentBuildingDefinition {
      * @return {@code this} builder
      * @return
      */
-    public Builder withTypeConverter(TypeConverter typeConverter) {
+    public Builder<T> withTypeConverter(TypeConverter typeConverter) {
       definition.typeConverter = of(typeConverter);
       return this;
     }
@@ -237,7 +238,7 @@ public class ComponentBuildingDefinition {
      * @return {@code this} builder
      * @return
      */
-    public Builder withKeyTypeConverter(TypeConverter typeConverter) {
+    public Builder<T> withKeyTypeConverter(TypeConverter typeConverter) {
       definition.keyTypeConverter = of(typeConverter);
       return this;
     }
@@ -247,7 +248,7 @@ public class ComponentBuildingDefinition {
      *
      * @return {@code this} builder
      */
-    public Builder asScope() {
+    public Builder<T> asScope() {
       definition.scope = true;
       return this;
     }
@@ -257,7 +258,7 @@ public class ComponentBuildingDefinition {
      * 
      * @return {@code this} builder
      */
-    public Builder asNamed() {
+    public Builder<T> asNamed() {
       definition.named = true;
       return this;
     }
@@ -269,7 +270,7 @@ public class ComponentBuildingDefinition {
      * @param objectFactoryType {@code Class} for the factory to use to create the object
      * @return {@code this} builder
      */
-    public Builder withObjectFactoryType(Class<?> objectFactoryType) {
+    public Builder<T> withObjectFactoryType(Class<? extends ObjectFactory<T>> objectFactoryType) {
       definition.objectFactoryType = objectFactoryType;
       return this;
     }
@@ -282,7 +283,7 @@ public class ComponentBuildingDefinition {
      * @param parameterName the configuration parameter name.
      * @return {@code this} builder.
      */
-    public Builder withIgnoredConfigurationParameter(String parameterName) {
+    public Builder<T> withIgnoredConfigurationParameter(String parameterName) {
       definition.ignoredConfigurationParameters.add(parameterName);
       return this;
     }
@@ -292,8 +293,8 @@ public class ComponentBuildingDefinition {
      *
      * @return a {@code Builder} copy.
      */
-    public Builder copy() {
-      Builder builder = new Builder();
+    public Builder<T> copy() {
+      Builder<T> builder = new Builder<>();
       builder.definition.typeDefinition = this.definition.typeDefinition;
       builder.definition.setterParameterDefinitions = new ArrayList<>(this.definition.setterParameterDefinitions);
       builder.definition.constructorAttributeDefinition = new ArrayList<>(this.definition.constructorAttributeDefinition);
@@ -318,7 +319,7 @@ public class ComponentBuildingDefinition {
      *
      * @return a fully configured {@link ComponentBuildingDefinition}
      */
-    public ComponentBuildingDefinition build() {
+    public ComponentBuildingDefinition<T> build() {
       checkState(definition.typeDefinition != null, "You must specify the type");
       checkState(identifier != null, "You must specify the identifier");
       checkState(namespace != null, "You must specify the namespace");
@@ -347,7 +348,7 @@ public class ComponentBuildingDefinition {
     // it's a reusable component or an instance.
     // Ideally this can be inferred by the language itself. e.g.: Global message processors are always reusable components and do
     // not define entities by them self.
-    public Builder asPrototype() {
+    public Builder<T> asPrototype() {
       definition.prototype = true;
       return this;
     }

@@ -330,7 +330,7 @@ public class ApplicationModel {
     checkState(componentBuildingDefinitionRegistry.isPresent(),
                "ApplicationModel was created without a " + ComponentBuildingDefinitionProvider.class.getName());
     executeOnEveryComponentTree(componentModel -> {
-      Optional<ComponentBuildingDefinition> buildingDefinition =
+      Optional<ComponentBuildingDefinition<?>> buildingDefinition =
           componentBuildingDefinitionRegistry.get().getBuildingDefinition(componentModel.getIdentifier());
       buildingDefinition.ifPresent(definition -> {
         ObjectTypeVisitor typeDefinitionVisitor = new ObjectTypeVisitor(componentModel);
