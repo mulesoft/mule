@@ -7,6 +7,7 @@
 package org.mule.runtime.config.spring.dsl.spring;
 
 import static org.springframework.cglib.proxy.Enhancer.registerStaticCallbacks;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
@@ -54,34 +55,29 @@ public class ObjectFactoryClassRepository {
    * @param objectFactoryType the {@link ObjectFactory} of the component
    * @param createdObjectType the type of object created by the {@code ObjectFactory}
    * @param isLazyInitFunction function that defines if the object created by the component can be created lazily
-   * @param instancePostCreationFunctionOptional function to do custom processing of the created instance by the
-   *        {@code ObjectFactory}. When there's no need for post processing this value must be {@link Optional#empty()}
+   * @param instancePostCreationFunction function to do custom processing of the created instance by the {@code ObjectFactory}.
+   *        When there's no need for post processing this value must be {@link Optional#empty()}
    * @return the {@code FactoryBean} class to be used by spring for the provided configuration.
    */
   public Class<ObjectFactory> getObjectFactoryClass(ComponentBuildingDefinition componentBuildingDefinition,
                                                     Class objectFactoryType,
                                                     Class createdObjectType,
                                                     Supplier<Boolean> isLazyInitFunction,
-                                                    Optional<Consumer<Object>> instancePostCreationFunctionOptional) {
+                                                    Consumer<Object> instancePostCreationFunction) {
     try {
-      if (instancePostCreationFunctionOptional.isPresent()) {
-        return objectFactoryClassCache
-            .get(componentBuildingDefinition,
-                 () -> getObjectFactoryDynamicClass(componentBuildingDefinition, objectFactoryType, createdObjectType,
-                                                    isLazyInitFunction, instancePostCreationFunctionOptional.get()));
-      } else {
-        // instancePostCreationFunctionOptional is used within the intercepted method so we can't use a cache.
-        return getObjectFactoryDynamicClass(componentBuildingDefinition, objectFactoryType, createdObjectType, isLazyInitFunction,
-                                            (object) -> {
-                                            });
-      }
+      return objectFactoryClassCache.get(componentBuildingDefinition,
+                                         () -> getObjectFactoryDynamicClass(componentBuildingDefinition,
+                                                                            objectFactoryType,
+                                                                            createdObjectType, isLazyInitFunction,
+                                                                            instancePostCreationFunction));
     } catch (ExecutionException e) {
       throw new MuleRuntimeException(e);
     }
   }
 
   private Class<ObjectFactory> getObjectFactoryDynamicClass(final ComponentBuildingDefinition componentBuildingDefinition,
-                                                            Class objectFactoryType, final Class createdObjectType,
+                                                            final Class objectFactoryType,
+                                                            final Class createdObjectType,
                                                             final Supplier<Boolean> isLazyInitFunction,
                                                             final Consumer<Object> instancePostCreationFunction) {
     /*
@@ -95,7 +91,7 @@ public class ObjectFactoryClassRepository {
     enhancer.setSuperclass(objectFactoryType);
     enhancer.setCallbackType(MethodInterceptor.class);
     enhancer.setUseCache(false);
-    Class factoryBeanClass = enhancer.createClass();
+    Class<ObjectFactory> factoryBeanClass = enhancer.createClass();
     createdClasses.add(factoryBeanClass);
     registerStaticCallbacks(factoryBeanClass, new Callback[] {
         (MethodInterceptor) (obj, method, args, proxy) -> {

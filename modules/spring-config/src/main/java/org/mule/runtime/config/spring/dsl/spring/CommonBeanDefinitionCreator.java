@@ -7,7 +7,6 @@
 package org.mule.runtime.config.spring.dsl.spring;
 
 import static java.util.Collections.emptyMap;
-import static java.util.Optional.empty;
 import static org.apache.commons.beanutils.BeanUtils.copyProperty;
 import static org.mule.runtime.api.meta.AnnotatedObject.PROPERTY_NAME;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.ANNOTATIONS_ELEMENT_IDENTIFIER;
@@ -27,6 +26,7 @@ import static org.mule.runtime.config.spring.parsers.AbstractMuleBeanDefinitionP
 import static org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader.resolveContextArtifactPluginClassLoaders;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.rootBeanDefinition;
+
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.AnnotatedObject;
@@ -44,7 +44,6 @@ import com.google.common.collect.ImmutableSet;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -178,24 +177,18 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
                                                                              final ComponentBuildingDefinition componentBuildingDefinition) {
     ObjectTypeVisitor objectTypeVisitor = new ObjectTypeVisitor(componentModel);
     componentBuildingDefinition.getTypeDefinition().visit(objectTypeVisitor);
-    BeanDefinitionBuilder beanDefinitionBuilder;
     Class<?> objectFactoryType = componentBuildingDefinition.getObjectFactoryType();
-    Map<String, Object> customProperties = getTransformerCustomProperties(componentModel);
-    Optional<Consumer<Object>> instanceCustomizationFunction = empty();
-    if (!customProperties.isEmpty()) {
-      instanceCustomizationFunction = Optional.of(object -> {
-        injectSpringProperties(customProperties, object);
-      });
-    }
 
-    Class factoryBeanClass = objectFactoryClassRepository.getObjectFactoryClass(componentBuildingDefinition,
-                                                                                objectFactoryType,
-                                                                                objectTypeVisitor.getType(),
-                                                                                () -> componentModel.getBeanDefinition()
-                                                                                    .isLazyInit(),
-                                                                                instanceCustomizationFunction);
-    beanDefinitionBuilder = rootBeanDefinition(factoryBeanClass);
-    return beanDefinitionBuilder;
+    Consumer<Object> instanceCustomizationFunction = object -> {
+      Map<String, Object> customProperties = getTransformerCustomProperties(componentModel);
+      if (!customProperties.isEmpty()) {
+        injectSpringProperties(customProperties, object);
+      }
+    };
+
+    return rootBeanDefinition(objectFactoryClassRepository
+        .getObjectFactoryClass(componentBuildingDefinition, objectFactoryType, objectTypeVisitor.getType(),
+                               () -> componentModel.getBeanDefinition().isLazyInit(), instanceCustomizationFunction));
   }
 
   private void injectSpringProperties(Map<String, Object> customProperties, Object createdInstance) {

@@ -11,6 +11,7 @@ import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROCESSING_STRATEGY_ATTRIBUTE;
 import static org.mule.runtime.config.spring.dsl.spring.CommonBeanDefinitionCreator.areMatchingTypes;
 import static org.mule.runtime.core.internal.util.ProcessingStrategyUtils.parseProcessingStrategy;
+
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.dsl.api.component.AttributeDefinition;
@@ -35,14 +36,14 @@ import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.ManagedMap;
 
 /**
- * Based on the object building definition provided by {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition}
- * and the user configuration defined in {@link org.mule.runtime.config.spring.dsl.model.ComponentModel} it populates all the
- * spring {@link org.springframework.beans.factory.config.BeanDefinition} attributes using the helper class
+ * Based on the object building definition provided by {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition} and
+ * the user configuration defined in {@link org.mule.runtime.config.spring.dsl.model.ComponentModel} it populates all the spring
+ * {@link org.springframework.beans.factory.config.BeanDefinition} attributes using the helper class
  * {@link org.mule.runtime.config.spring.dsl.spring.BeanDefinitionBuilderHelper}.
  *
  * @since 4.0
  */
-class ComponentConfigurationBuilder {
+class ComponentConfigurationBuilder<T> {
 
   private static final Logger logger = LoggerFactory.getLogger(ComponentConfigurationBuilder.class);
 
@@ -51,14 +52,14 @@ class ComponentConfigurationBuilder {
   private final List<ComponentValue> complexParameters;
   private final Map<String, String> simpleParameters;
   private final ComponentModel componentModel;
-  private final ComponentBuildingDefinition componentBuildingDefinition;
+  private final ComponentBuildingDefinition<T> componentBuildingDefinition;
 
-  public ComponentConfigurationBuilder(ComponentModel componentModel, ComponentBuildingDefinition componentBuildingDefinition,
+  public ComponentConfigurationBuilder(ComponentModel componentModel, ComponentBuildingDefinition<T> componentBuildingDefinition,
                                        BeanDefinitionBuilderHelper beanDefinitionBuilderHelper) {
     this.componentModel = componentModel;
     this.componentBuildingDefinition = componentBuildingDefinition;
     this.beanDefinitionBuilderHelper = beanDefinitionBuilderHelper;
-    this.simpleParameters = new HashMap(componentModel.getParameters());
+    this.simpleParameters = new HashMap<>(componentModel.getParameters());
     this.complexParameters = collectComplexParametersWithTypes(componentModel);
   }
 
@@ -247,10 +248,6 @@ class ComponentConfigurationBuilder {
   private class ValueExtractorAttributeDefinitionVisitor implements AttributeDefinitionVisitor {
 
     private Object value;
-
-    private String getStringValue() {
-      return (String) getValue();
-    }
 
     public Object getValue() {
       return value;

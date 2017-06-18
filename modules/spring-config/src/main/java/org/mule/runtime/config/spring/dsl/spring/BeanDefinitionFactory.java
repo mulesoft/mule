@@ -40,6 +40,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_RET
 import static org.mule.runtime.core.component.ComponentAnnotations.ANNOTATION_NAME;
 import static org.mule.runtime.core.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
 import static org.mule.runtime.core.exception.ErrorMapping.ANNOTATION_ERROR_MAPPINGS;
+
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.ErrorType;
@@ -247,7 +248,7 @@ public class BeanDefinitionFactory {
 
 
   private void resolveComponentBeanDefinition(ComponentModel parentComponentModel, ComponentModel componentModel) {
-    Optional<ComponentBuildingDefinition> buildingDefinitionOptional =
+    Optional<ComponentBuildingDefinition<?>> buildingDefinitionOptional =
         componentBuildingDefinitionRegistry.getBuildingDefinition(componentModel.getIdentifier());
     if (buildingDefinitionOptional.isPresent() || customBuildersComponentIdentifiers.contains(componentModel.getIdentifier())) {
       this.componentModelProcessor.processRequest(new CreateBeanDefinitionRequest(parentComponentModel, componentModel,
@@ -263,7 +264,7 @@ public class BeanDefinitionFactory {
   }
 
   private void processComponentWrapper(ComponentModel componentModel) {
-    ComponentBuildingDefinition parentBuildingDefinition =
+    ComponentBuildingDefinition<?> parentBuildingDefinition =
         componentBuildingDefinitionRegistry.getBuildingDefinition(componentModel.getParent().getIdentifier()).get();
     Map<String, WrapperElementType> wrapperIdentifierAndTypeMap = getWrapperIdentifierAndTypeMap(parentBuildingDefinition);
     WrapperElementType wrapperElementType = wrapperIdentifierAndTypeMap.get(componentModel.getIdentifier().getName());
@@ -334,7 +335,7 @@ public class BeanDefinitionFactory {
     if (!parentComponentModelOptional.isPresent()) {
       return false;
     }
-    Optional<ComponentBuildingDefinition> buildingDefinitionOptional =
+    Optional<ComponentBuildingDefinition<?>> buildingDefinitionOptional =
         componentBuildingDefinitionRegistry.getBuildingDefinition(parentComponentModelOptional.get());
     if (!buildingDefinitionOptional.isPresent()) {
       return false;
@@ -344,7 +345,7 @@ public class BeanDefinitionFactory {
     return wrapperIdentifierAndTypeMap.containsKey(componentModel.getName());
   }
 
-  private Map<String, WrapperElementType> getWrapperIdentifierAndTypeMap(ComponentBuildingDefinition buildingDefinition) {
+  private <T> Map<String, WrapperElementType> getWrapperIdentifierAndTypeMap(ComponentBuildingDefinition<T> buildingDefinition) {
     final Map<String, WrapperElementType> wrapperIdentifierAndTypeMap = new HashMap<>();
     AbstractAttributeDefinitionVisitor wrapperIdentifiersCollector = new AbstractAttributeDefinitionVisitor() {
 
@@ -374,7 +375,8 @@ public class BeanDefinitionFactory {
     Consumer<AttributeDefinition> collectWrappersConsumer =
         attributeDefinition -> attributeDefinition.accept(wrapperIdentifiersCollector);
     buildingDefinition.getSetterParameterDefinitions().stream()
-        .map(setterAttributeDefinition -> setterAttributeDefinition.getAttributeDefinition()).forEach(collectWrappersConsumer);
+        .map(setterAttributeDefinition -> setterAttributeDefinition.getAttributeDefinition())
+        .forEach(collectWrappersConsumer);
     buildingDefinition.getConstructorAttributeDefinition().stream().forEach(collectWrappersConsumer);
     return wrapperIdentifierAndTypeMap;
   }

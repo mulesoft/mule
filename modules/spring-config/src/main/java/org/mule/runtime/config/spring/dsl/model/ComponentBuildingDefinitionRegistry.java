@@ -23,14 +23,14 @@ import java.util.Optional;
  */
 public class ComponentBuildingDefinitionRegistry {
 
-  private Map<ComponentIdentifier, ComponentBuildingDefinition> builderDefinitionsMap = new HashMap<>();
+  private Map<ComponentIdentifier, ComponentBuildingDefinition<?>> builderDefinitionsMap = new HashMap<>();
 
   /**
    * Adds a new {@code ComponentBuildingDefinition} to the registry.
    *
    * @param builderDefinition definition to be added in the registry
    */
-  public void register(ComponentBuildingDefinition builderDefinition) {
+  public void register(ComponentBuildingDefinition<?> builderDefinition) {
     builderDefinitionsMap.put(builderDefinition.getComponentIdentifier(), builderDefinition);
   }
 
@@ -40,7 +40,7 @@ public class ComponentBuildingDefinitionRegistry {
    * @param identifier the component identifier
    * @return the definition to build the component
    */
-  public Optional<ComponentBuildingDefinition> getBuildingDefinition(ComponentIdentifier identifier) {
+  public Optional<ComponentBuildingDefinition<?>> getBuildingDefinition(ComponentIdentifier identifier) {
     return Optional.ofNullable(builderDefinitionsMap.get(identifier));
   }
 }
