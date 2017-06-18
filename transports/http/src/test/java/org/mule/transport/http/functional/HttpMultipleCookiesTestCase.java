@@ -146,6 +146,7 @@ public class HttpMultipleCookiesTestCase extends AbstractServiceAndFlowTestCase
         handler.addServlet(new ServletHolder(HelloServlet.class), "/");
 
         server.start();
+        this.server = server;
         // server.join();
         simpleServerLatch.countDown();
         logger.debug("Server started");
@@ -157,9 +158,10 @@ public class HttpMultipleCookiesTestCase extends AbstractServiceAndFlowTestCase
         
         if(server != null && server.isRunning())
         {
-            assertEquals(1, server.getConnectors());            
+            assertEquals(1, server.getConnectors().length);            
             // this test only uses one connector
             server.getConnectors()[0].stop();
+            server.stop();
         }
         
         simpleServerShutdownLatch.countDown();
