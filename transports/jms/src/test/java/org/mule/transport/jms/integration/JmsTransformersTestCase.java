@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.jms.BytesMessage;
+import javax.jms.Connection;
 import javax.jms.MapMessage;
 import javax.jms.ObjectMessage;
 import javax.jms.Session;
@@ -41,6 +42,7 @@ import org.junit.Test;
 
 public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
 {
+	private Connection connection = null;
     private Session session = null;
 
     @Override
@@ -54,7 +56,8 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
     {
         super.doSetUp();
 
-        session = getConnection(false, false).createSession(false, Session.AUTO_ACKNOWLEDGE);
+        connection = getConnection(false, false);
+		session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
     }
 
     @Override
@@ -66,6 +69,13 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
             session.close();
             session = null;
         }
+	    if (connection != null)
+	    {
+	      connection.close();
+	      connection = null;
+	    }
+
+    super.doTearDown();
     }
 
     @Test
