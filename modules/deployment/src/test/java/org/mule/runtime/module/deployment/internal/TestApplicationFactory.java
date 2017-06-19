@@ -6,13 +6,10 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
-import static java.util.Collections.emptyList;
 import static org.mockito.Mockito.mock;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginClassLoaderFactory;
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
 import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoaderFactory;
 import org.mule.runtime.deployment.model.internal.plugin.BundlePluginDependenciesResolver;
 import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
@@ -34,7 +31,6 @@ import org.mule.runtime.module.service.ServiceRepository;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 /**
  * Creates a {@link DefaultApplicationFactory} that returns {@link TestApplicationWrapper} instances in order to simulate errors
@@ -45,18 +41,17 @@ public class TestApplicationFactory extends DefaultApplicationFactory {
   private boolean failOnStopApplication;
   private boolean failOnDisposeApplication;
 
-  public TestApplicationFactory(ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory,
-                                ApplicationDescriptorFactory applicationDescriptorFactory,
-                                ArtifactPluginRepository artifactPluginRepository, DomainRepository domainRepository,
-                                ServiceRepository serviceRepository,
-                                ExtensionModelLoaderRepository extensionModelLoaderRepository,
-                                ClassLoaderRepository classLoaderRepository,
-                                PolicyTemplateClassLoaderBuilderFactory policyTemplateClassLoaderBuilderFactory,
-                                PluginDependenciesResolver pluginDependenciesResolver,
-                                ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader) {
-    super(applicationClassLoaderBuilderFactory, applicationDescriptorFactory, artifactPluginRepository, domainRepository,
+  private TestApplicationFactory(ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory,
+                                 ApplicationDescriptorFactory applicationDescriptorFactory,
+                                 DomainRepository domainRepository,
+                                 ServiceRepository serviceRepository,
+                                 ExtensionModelLoaderRepository extensionModelLoaderRepository,
+                                 ClassLoaderRepository classLoaderRepository,
+                                 PolicyTemplateClassLoaderBuilderFactory policyTemplateClassLoaderBuilderFactory,
+                                 PluginDependenciesResolver pluginDependenciesResolver) {
+    super(applicationClassLoaderBuilderFactory, applicationDescriptorFactory, domainRepository,
           serviceRepository, extensionModelLoaderRepository, classLoaderRepository, policyTemplateClassLoaderBuilderFactory,
-          pluginDependenciesResolver, artifactPluginDescriptorLoader);
+          pluginDependenciesResolver);
   }
 
   public static TestApplicationFactory createTestApplicationFactory(MuleApplicationClassLoaderFactory applicationClassLoaderFactory,
@@ -69,9 +64,8 @@ public class TestApplicationFactory extends DefaultApplicationFactory {
         new ArtifactPluginDescriptorFactory();
     ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader =
         new ArtifactPluginDescriptorLoader(artifactPluginDescriptorFactory);
-    TestEmptyApplicationPluginRepository applicationPluginRepository = new TestEmptyApplicationPluginRepository();
     ApplicationDescriptorFactory applicationDescriptorFactory =
-        new ApplicationDescriptorFactory(artifactPluginDescriptorLoader, applicationPluginRepository, descriptorLoaderRepository);
+        new ApplicationDescriptorFactory(artifactPluginDescriptorLoader, descriptorLoaderRepository);
     final DefaultClassLoaderManager artifactClassLoaderManager = new DefaultClassLoaderManager();
     PluginDependenciesResolver pluginDependenciesResolver = new BundlePluginDependenciesResolver(artifactPluginDescriptorFactory);
 
@@ -81,10 +75,9 @@ public class TestApplicationFactory extends DefaultApplicationFactory {
                                                                                           new ArtifactPluginClassLoaderFactory(moduleRepository)));
 
     return new TestApplicationFactory(applicationClassLoaderBuilderFactory, applicationDescriptorFactory,
-                                      applicationPluginRepository, domainManager, serviceRepository,
+                                      domainManager, serviceRepository,
                                       extensionModelLoaderRepository, artifactClassLoaderManager,
-                                      mock(PolicyTemplateClassLoaderBuilderFactory.class), pluginDependenciesResolver,
-                                      artifactPluginDescriptorLoader);
+                                      mock(PolicyTemplateClassLoaderBuilderFactory.class), pluginDependenciesResolver);
   }
 
   @Override
@@ -106,11 +99,4 @@ public class TestApplicationFactory extends DefaultApplicationFactory {
     this.failOnStopApplication = failOnStopApplication;
   }
 
-
-  private static class TestEmptyApplicationPluginRepository implements ArtifactPluginRepository {
-
-    public List<ArtifactPluginDescriptor> getContainerArtifactPluginDescriptors() {
-      return emptyList();
-    }
-  }
 }

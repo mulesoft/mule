@@ -84,6 +84,18 @@ public class MuleFoldersUtil {
     return new File(getDomainsFolder(), domainName);
   }
 
+  public static File getDomainClassesFolder(String domainName) {
+    return new File(getDomainFolder(domainName), "classes");
+  }
+
+  /**
+   * @param name name of the application to look for
+   * @return the config folder in the deployed domain with the given name
+   */
+  public static File getDomainConfigFolder(String name) {
+    return new File(getDomainFolder(name), getAppConfigFolderPath());
+  }
+
   public static File getDomainLibFolder(String domainName) {
     return new File(getDomainFolder(domainName), LIB_FOLDER);
   }

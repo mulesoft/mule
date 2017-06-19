@@ -90,19 +90,6 @@ public class ArtifactPluginFileBuilder extends AbstractArtifactFileBuilder<Artif
   }
 
   /**
-   * Adds a resource file to the plugin root folder.
-   *
-   * @param resourceFile resource file from a external file or test resource.
-   * @return the same builder instance
-   */
-  public ArtifactPluginFileBuilder containingResource(String resourceFile, String alias) {
-    checkImmutable();
-    checkArgument(!isEmpty(resourceFile), "Resource file cannot be empty");
-    resources.add(new ZipResource(resourceFile, alias));
-    return this;
-  }
-
-  /**
    * Adds a class file to the artifact classes folder.
    *
    * @param classFile class file to include. Non null.

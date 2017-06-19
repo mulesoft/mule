@@ -6,14 +6,24 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
+import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.deployment.model.api.domain.Domain;
-import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginClassLoaderFactory;
+import org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderFactory;
+import org.mule.runtime.deployment.model.internal.plugin.BundlePluginDependenciesResolver;
+import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
-import org.mule.runtime.module.artifact.classloader.DeployableArtifactClassLoaderFactory;
+import org.mule.runtime.module.artifact.classloader.TrackingArtifactClassLoaderFactory;
+import org.mule.runtime.module.deployment.impl.internal.artifact.DefaultClassLoaderManager;
+import org.mule.runtime.module.deployment.impl.internal.artifact.DescriptorLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainFactory;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainManager;
+import org.mule.runtime.module.deployment.impl.internal.domain.DomainClassLoaderBuilderFactory;
+import org.mule.runtime.module.deployment.impl.internal.domain.DomainDescriptorFactory;
 import org.mule.runtime.module.deployment.impl.internal.domain.TestDomainWrapper;
+import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory;
+import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
 import org.mule.runtime.module.service.ServiceRepository;
 
 import java.io.File;
@@ -24,10 +34,38 @@ public class TestDomainFactory extends DefaultDomainFactory {
   private boolean failOnStop;
   private boolean failOnDispose;
 
-  public TestDomainFactory(DeployableArtifactClassLoaderFactory<DomainDescriptor> domainClassLoaderFactory,
-                           ArtifactClassLoader containerClassLoader, ClassLoaderRepository classLoaderRepository,
-                           ServiceRepository serviceRepository) {
-    super(domainClassLoaderFactory, new DefaultDomainManager(), containerClassLoader, classLoaderRepository, serviceRepository);
+  public static TestDomainFactory createDomainFactory(
+                                                      DomainClassLoaderFactory domainClassLoaderFactory,
+                                                      ArtifactClassLoader containerClassLoader,
+                                                      ServiceRepository serviceRepository,
+                                                      ModuleRepository moduleRepository,
+                                                      DescriptorLoaderRepository descriptorLoaderRepository) {
+    ArtifactPluginDescriptorFactory artifactPluginDescriptorFactory =
+        new ArtifactPluginDescriptorFactory();
+    ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader =
+        new ArtifactPluginDescriptorLoader(artifactPluginDescriptorFactory);
+    DomainDescriptorFactory domainDescriptorFactory =
+        new DomainDescriptorFactory(artifactPluginDescriptorLoader, descriptorLoaderRepository);
+    final DefaultClassLoaderManager artifactClassLoaderManager = new DefaultClassLoaderManager();
+    PluginDependenciesResolver pluginDependenciesResolver = new BundlePluginDependenciesResolver(artifactPluginDescriptorFactory);
+
+    DomainClassLoaderBuilderFactory domainClassLoaderBuilderFactory =
+        new DomainClassLoaderBuilderFactory(containerClassLoader, domainClassLoaderFactory,
+                                            new TrackingArtifactClassLoaderFactory<>(artifactClassLoaderManager,
+                                                                                     new ArtifactPluginClassLoaderFactory(moduleRepository)));
+
+    return new TestDomainFactory(artifactClassLoaderManager, serviceRepository, domainDescriptorFactory,
+                                 pluginDependenciesResolver,
+                                 domainClassLoaderBuilderFactory);
+  }
+
+  private TestDomainFactory(ClassLoaderRepository classLoaderRepository,
+                            ServiceRepository serviceRepository, DomainDescriptorFactory domainDescriptorFactory,
+                            PluginDependenciesResolver pluginDependenciesResolver,
+                            DomainClassLoaderBuilderFactory domainClassLoaderBuilderFactory) {
+    super(domainDescriptorFactory, new DefaultDomainManager(),
+          classLoaderRepository, serviceRepository,
+          pluginDependenciesResolver, domainClassLoaderBuilderFactory);
   }
 
   @Override

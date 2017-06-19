@@ -11,6 +11,7 @@ import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
+import static org.mule.runtime.core.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MAVEN;
 import static org.mule.runtime.module.artifact.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_ARTIFACT_ID;
@@ -146,6 +147,6 @@ public class DeployableMavenClassLoaderModelLoader extends AbstractMavenClassLoa
 
   @Override
   public boolean supportsArtifactType(ArtifactType artifactType) {
-    return artifactType.equals(APP) || artifactType.equals(POLICY);
+    return artifactType.equals(APP) || artifactType.equals(DOMAIN) || artifactType.equals(POLICY);
   }
 }

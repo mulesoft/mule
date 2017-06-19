@@ -15,9 +15,9 @@ import static org.mule.runtime.core.api.config.MuleProperties.APP_HOME_DIRECTORY
 import static org.mule.runtime.core.api.config.MuleProperties.APP_NAME_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLASSLOADER_REPOSITORY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLICY_PROVIDER;
-import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.UUID.getUUID;
+import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
@@ -32,6 +32,7 @@ import org.mule.runtime.core.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.config.builders.SimpleConfigurationBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.policy.PolicyProvider;
+import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfiguration;
@@ -68,8 +69,8 @@ public class ArtifactContextBuilder {
   protected static final String MULE_CONTEXT_ARTIFACT_PROPERTIES_CANNOT_BE_NULL =
       "MuleContext artifact properties cannot be null";
   protected static final String INSTALLATION_DIRECTORY_MUST_BE_A_DIRECTORY = "installation directory must be a directory";
-  protected static final String ONLY_APPLICATIONS_ARE_ALLOWED_TO_HAVE_A_PARENT_CONTEXT =
-      "Only applications are allowed to have a parent context";
+  protected static final String ONLY_APPLICATIONS_ARE_ALLOWED_TO_HAVE_A_PARENT_ARTIFACT =
+      "Only applications are allowed to have a parent artifact";
   protected static final String SERVICE_REPOSITORY_CANNOT_BE_NULL = "serviceRepository cannot be null";
   protected static final String EXTENSION_MODEL_LOADER_REPOSITORY_CANNOT_BE_NULL =
       "extensionModelLoaderRepository cannot be null";
@@ -85,7 +86,6 @@ public class ArtifactContextBuilder {
   private String artifactName = getUUID();
   private MuleContextBuilder muleContextBuilder;
   private ClassLoader executionClassLoader;
-  private MuleContext parentContext;
   private File artifactInstallationDirectory;
   private MuleContextListener muleContextListener;
   private String defaultEncoding;
@@ -97,6 +97,7 @@ public class ArtifactContextBuilder {
   private PolicyProvider policyProvider;
   private List<ServiceConfigurator> serviceConfigurators = new ArrayList<>();
   private ExtensionManagerFactory extensionManagerFactory;
+  private DeployableArtifact parentArtifact;
 
   private ArtifactContextBuilder() {}
 
@@ -153,14 +154,14 @@ public class ArtifactContextBuilder {
   }
 
   /**
-   * Allows to define a {@code MuleContext} which resources will be available to the context to be created. This is the mechanism
+   * Allows to define a parent artifact which resources will be available to the context to be created. This is the mechanism
    * using for {@link Domain}s to define shared resources.
    *
-   * @param parentContext {@code MuleContext} that is parent of the one to be created.
+   * @param parentArtifact artifact parent of the one being created.
    * @return the builder
    */
-  public ArtifactContextBuilder setParentContext(MuleContext parentContext) {
-    this.parentContext = parentContext;
+  public ArtifactContextBuilder serParenArtifact(DeployableArtifact parentArtifact) {
+    this.parentArtifact = parentArtifact;
     return this;
   }
 
@@ -324,16 +325,23 @@ public class ArtifactContextBuilder {
   public ArtifactContext build() throws InitialisationException, ConfigurationException {
     checkState(executionClassLoader != null, EXECUTION_CLASSLOADER_WAS_NOT_SET);
     checkState(classLoaderRepository != null, CLASS_LOADER_REPOSITORY_WAS_NOT_SET);
-    checkState(APP.equals(artifactType) || parentContext == null, ONLY_APPLICATIONS_ARE_ALLOWED_TO_HAVE_A_PARENT_CONTEXT);
+    checkState(APP.equals(artifactType) || parentArtifact == null, ONLY_APPLICATIONS_ARE_ALLOWED_TO_HAVE_A_PARENT_ARTIFACT);
     try {
       return withContextClassLoader(executionClassLoader, () -> {
         List<ConfigurationBuilder> builders = new LinkedList<>();
         builders.addAll(additionalBuilders);
         builders.add(new ArtifactBootstrapServiceDiscovererConfigurationBuilder(artifactPlugins));
         if (extensionManagerFactory == null) {
-          extensionManagerFactory =
-              new ArtifactExtensionManagerFactory(artifactPlugins, extensionModelLoaderRepository,
-                                                  new DefaultExtensionManagerFactory());
+          if (parentArtifact == null) {
+            extensionManagerFactory =
+                new ArtifactExtensionManagerFactory(artifactPlugins, extensionModelLoaderRepository,
+                                                    new DefaultExtensionManagerFactory());
+          } else {
+            extensionManagerFactory = new CompositeArtifactExtensionManagerFactory(parentArtifact, extensionModelLoaderRepository,
+                                                                                   artifactPlugins,
+                                                                                   new DefaultExtensionManagerFactory());
+          }
+
         }
         builders.add(new ArtifactExtensionManagerConfigurationBuilder(artifactPlugins,
                                                                       extensionManagerFactory));
@@ -366,8 +374,8 @@ public class ArtifactContextBuilder {
                     .setArtifactType(artifactType)
                     .setEnableLazyInitialization(enableLazyInit)
                     .setServiceConfigurators(serviceConfigurators);
-            if (parentContext != null) {
-              artifactContextConfigurationBuilder.setParentContext(parentContext);
+            if (parentArtifact != null) {
+              artifactContextConfigurationBuilder.setParentContext(parentArtifact.getMuleContext());
             }
             artifactContext
                 .set(artifactConfigurationProcessor.createArtifactContext(artifactContextConfigurationBuilder.build()));

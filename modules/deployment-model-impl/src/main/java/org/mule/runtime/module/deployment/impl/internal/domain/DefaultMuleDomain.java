@@ -13,7 +13,6 @@ import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.newBuilder;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -28,6 +27,7 @@ import org.mule.runtime.deployment.model.api.DeploymentStopException;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder;
@@ -36,8 +36,7 @@ import org.mule.runtime.module.service.ServiceRepository;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.util.List;
 import java.util.Scanner;
 
 import org.slf4j.Logger;
@@ -49,31 +48,21 @@ public class DefaultMuleDomain implements Domain {
 
   private final DomainDescriptor descriptor;
   private final ServiceRepository serviceRepository;
+  private final List<ArtifactPlugin> artifactPlugins;
   private MuleContextListener muleContextListener;
   private ArtifactClassLoader deploymentClassLoader;
   private final ClassLoaderRepository classLoaderRepository;
 
-  private File configResourceFile;
   private ArtifactContext artifactContext;
 
   public DefaultMuleDomain(DomainDescriptor descriptor, ArtifactClassLoader deploymentClassLoader,
-                           ClassLoaderRepository classLoaderRepository, ServiceRepository serviceRepository) {
+                           ClassLoaderRepository classLoaderRepository, ServiceRepository serviceRepository,
+                           List<ArtifactPlugin> artifactPlugins) {
     this.deploymentClassLoader = deploymentClassLoader;
     this.classLoaderRepository = classLoaderRepository;
     this.descriptor = descriptor;
     this.serviceRepository = serviceRepository;
-    refreshClassLoaderAndLoadConfigResourceFile();
-  }
-
-  private void refreshClassLoaderAndLoadConfigResourceFile() {
-    URL resource = deploymentClassLoader.findLocalResource(DOMAIN_CONFIG_FILE_LOCATION);
-    if (resource != null) {
-      try {
-        this.configResourceFile = new File(resource.toURI());
-      } catch (URISyntaxException e) {
-        throw new MuleRuntimeException(e);
-      }
-    }
+    this.artifactPlugins = artifactPlugins;
   }
 
   public void setMuleContextListener(MuleContextListener muleContextListener) {
@@ -107,11 +96,15 @@ public class DefaultMuleDomain implements Domain {
   }
 
   @Override
+  public List<ArtifactPlugin> getArtifactPlugins() {
+    return artifactPlugins;
+  }
+
+  @Override
   public void install() {
     if (logger.isInfoEnabled()) {
       logger.info(miniSplash(String.format("New domain '%s'", getArtifactName())));
     }
-    refreshClassLoaderAndLoadConfigResourceFile();
   }
 
 
@@ -131,20 +124,22 @@ public class DefaultMuleDomain implements Domain {
     }
 
     try {
-      if (this.configResourceFile != null) {
+      ArtifactContextBuilder artifactBuilder = newBuilder().setArtifactName(getArtifactName())
+          .setArtifactPlugins(artifactPlugins)
+          .setExecutionClassloader(deploymentClassLoader.getClassLoader())
+          .setArtifactInstallationDirectory(new File(MuleContainerBootstrapUtils.getMuleDomainsDir(), getArtifactName()))
+          .setArtifactType(DOMAIN)
+          .setEnableLazyInit(lazy).setClassLoaderRepository(classLoaderRepository).setServiceRepository(serviceRepository);
+
+      if (descriptor.getAbsoluteResourcePaths().length > 0) {
         validateConfigurationFileDoNotUsesCoreNamespace();
-
-        ArtifactContextBuilder artifactBuilder = newBuilder().setArtifactName(getArtifactName())
-            .setExecutionClassloader(deploymentClassLoader.getClassLoader())
-            .setArtifactInstallationDirectory(new File(MuleContainerBootstrapUtils.getMuleDomainsDir(), getArtifactName()))
-            .setConfigurationFiles(new String[] {this.configResourceFile.getAbsolutePath()}).setArtifactType(DOMAIN)
-            .setEnableLazyInit(lazy).setClassLoaderRepository(classLoaderRepository).setServiceRepository(serviceRepository);
-
-        if (muleContextListener != null) {
-          artifactBuilder.setMuleContextListener(muleContextListener);
-        }
-        artifactContext = artifactBuilder.build();
+        artifactBuilder.setConfigurationFiles(descriptor.getAbsoluteResourcePaths());
       }
+
+      if (muleContextListener != null) {
+        artifactBuilder.setMuleContextListener(muleContextListener);
+      }
+      artifactContext = artifactBuilder.build();
     } catch (Exception e) {
       // log it here so it ends up in app log, sys log will only log a message without stacktrace
       logger.error(null, getRootCause(e));
@@ -153,19 +148,15 @@ public class DefaultMuleDomain implements Domain {
   }
 
   private void validateConfigurationFileDoNotUsesCoreNamespace() throws FileNotFoundException {
-    Scanner scanner = null;
-    try {
-      scanner = new Scanner(configResourceFile);
-      while (scanner.hasNextLine()) {
-        final String lineFromFile = scanner.nextLine();
-        if (lineFromFile.contains("<mule ")) {
-          throw new MuleRuntimeException(CoreMessages
-              .createStaticMessage("Domain configuration file can not be created using core namespace. Use mule-domain namespace instead."));
+    for (String configResourceFile : descriptor.getAbsoluteResourcePaths()) {
+      try (Scanner scanner = new Scanner(configResourceFile)) {
+        while (scanner.hasNextLine()) {
+          final String lineFromFile = scanner.nextLine();
+          if (lineFromFile.contains("<mule ")) {
+            throw new MuleRuntimeException(CoreMessages
+                .createStaticMessage("Domain configuration file can not be created using core namespace. Use mule-domain namespace instead."));
+          }
         }
-      }
-    } finally {
-      if (scanner != null) {
-        scanner.close();
       }
     }
   }
@@ -237,7 +228,7 @@ public class DefaultMuleDomain implements Domain {
 
   @Override
   public File[] getResourceFiles() {
-    return configResourceFile == null ? new File[0] : new File[] {configResourceFile};
+    return descriptor.getConfigResourcesFile();
   }
 
   @Override

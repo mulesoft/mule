@@ -7,7 +7,9 @@
 package org.mule.test.infrastructure.deployment;
 
 import static org.apache.commons.io.FileUtils.copyDirectory;
+import static org.apache.commons.io.FileUtils.copyFile;
 import static org.apache.commons.io.FileUtils.copyURLToFile;
+import static org.apache.commons.io.FilenameUtils.getBaseName;
 import static org.apache.commons.lang3.StringUtils.removeEnd;
 import static org.apache.commons.lang3.StringUtils.removeEndIgnoreCase;
 import static org.mockito.Matchers.any;
@@ -23,7 +25,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTOR
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_SIMPLE_LOG;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.container.api.MuleCoreExtension;
@@ -412,13 +413,19 @@ public class FakeMuleServer {
   }
 
   /**
-   * Deploys a Domain from a folder
+   * Deploys a Domain artifact file
    *
-   * @param domainFolder folder in which the domain is defined
-   * @param domainName name of the domain to use as domain artifact name
+   * @param domain domain file to deploy
    */
-  public void deployDomainFromFolder(File domainFolder, String domainName) {
-    copyExplodedArtifactFromFolderToDeployFolder(domainFolder, getDomainsDir(), domainName);
+  public void deployDomainFile(File domain) throws IOException {
+    ReentrantLock lock = this.deploymentService.getLock();
+    lock.lock();
+    try {
+      copyFile(domain, new File(getDomainsDir(), domain.getName()));
+    } finally {
+      lock.unlock();
+    }
+    assertDeploymentSuccess(domainDeploymentListener, getBaseName(domain.getName()));
   }
 
   /**

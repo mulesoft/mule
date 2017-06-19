@@ -10,7 +10,6 @@ package org.mule.runtime.module.deployment.impl.internal.policy;
 import static java.io.File.createTempFile;
 import static java.io.File.separator;
 import static java.lang.Thread.currentThread;
-import static java.util.Collections.emptyList;
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
@@ -36,12 +35,10 @@ import static org.mule.runtime.module.deployment.impl.internal.policy.Properties
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.TYPE;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.VERSION;
-
 import org.mule.maven.client.api.MavenClientProvider;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MulePolicyModel.MulePolicyModelBuilder;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.descriptor.BundleDescriptorLoader;
@@ -95,13 +92,8 @@ public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCas
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
 
-  private ArtifactPluginRepository applicationPluginRepository;
-
   @Before
   public void setUp() throws Exception {
-    applicationPluginRepository = mock(ArtifactPluginRepository.class);
-    when(applicationPluginRepository.getContainerArtifactPluginDescriptors()).thenReturn(emptyList());
-
     when(descriptorLoaderRepository.get(FILE_SYSTEM_POLICY_MODEL_LOADER_ID, POLICY, ClassLoaderModelLoader.class))
         .thenReturn(new FileSystemPolicyClassLoaderModelLoader());
     when(descriptorLoaderRepository.get(INVALID_LOADER_ID, POLICY, ClassLoaderModelLoader.class))

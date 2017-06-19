@@ -186,7 +186,7 @@ public class DefaultMuleApplication implements Application {
 
       Domain domain = domainRepository.getDomain(descriptor.getDomain());
       if (domain.getMuleContext() != null) {
-        artifactBuilder.setParentContext(domain.getMuleContext());
+        artifactBuilder.serParenArtifact(domain);
       }
       if (muleContextListener != null) {
         artifactBuilder.setMuleContextListener(muleContextListener);
@@ -368,6 +368,11 @@ public class DefaultMuleApplication implements Application {
   @Override
   public ApplicationPolicyProvider getPolicyManager() {
     return policyManager;
+  }
+
+  @Override
+  public List<ArtifactPlugin> getArtifactPlugins() {
+    return artifactPlugins;
   }
 
   @Override

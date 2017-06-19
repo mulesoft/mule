@@ -90,12 +90,12 @@ public class MuleApplicationClassLoaderTestCase extends AbstractMuleTestCase {
     // Add isolated resources in domain dir
     domainDir = MuleFoldersUtil.getDomainFolder(DOMAIN_NAME);
     assertThat(domainDir.mkdirs(), is(true));
-    FileUtils.stringToFile(new File(domainDir, RESOURCE_JUST_IN_DOMAIN).getAbsolutePath(), "Some text");
+    FileUtils.stringToFile(new File(new File(domainDir, "classes"), RESOURCE_JUST_IN_DOMAIN).getAbsolutePath(), "Some text");
 
     // Create app class loader
     domainCL =
         new MuleSharedDomainClassLoader(new DomainDescriptor(DOMAIN_NAME), currentThread().getContextClassLoader(),
-                                        mock(ClassLoaderLookupPolicy.class), emptyList());
+                                        mock(ClassLoaderLookupPolicy.class), emptyList(), emptyList());
 
     final ApplicationDescriptor applicationDescriptor = new ApplicationDescriptor(APP_NAME);
     ClassLoaderModel classLoaderModel = new ClassLoaderModel.ClassLoaderModelBuilder(applicationDescriptor.getClassLoaderModel())
