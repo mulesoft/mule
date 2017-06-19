@@ -76,14 +76,14 @@ class TransactionAwareProactorStreamProcessingStrategyFactory extends ReactorStr
 
   static class TransactionAwareProactorStreamProcessingStrategy extends ProactorStreamProcessingStrategy {
 
-    private TransactionAwareProactorStreamProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier,
-                                                             int bufferSize,
-                                                             int subscriberCount,
-                                                             String waitStrategy,
-                                                             Supplier<Scheduler> cpuLightSchedulerSupplier,
-                                                             Supplier<Scheduler> blockingSchedulerSupplier,
-                                                             Supplier<Scheduler> cpuIntensiveSchedulerSupplier,
-                                                             int maxConcurrency)
+    TransactionAwareProactorStreamProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier,
+                                                     int bufferSize,
+                                                     int subscriberCount,
+                                                     String waitStrategy,
+                                                     Supplier<Scheduler> cpuLightSchedulerSupplier,
+                                                     Supplier<Scheduler> blockingSchedulerSupplier,
+                                                     Supplier<Scheduler> cpuIntensiveSchedulerSupplier,
+                                                     int maxConcurrency)
 
     {
       super(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier,
