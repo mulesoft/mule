@@ -161,6 +161,10 @@ public abstract class AbstractFlowConstruct extends AbstractAnnotatedObject impl
     return exceptionListener;
   }
 
+  public String getInitialState() {
+    return initialState;
+  }
+
   @Override
   public LifecycleState getLifecycleState() {
     return lifecycleManager.getState();

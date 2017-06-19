@@ -36,6 +36,11 @@ public interface Flow extends AnnotatedObject, Lifecycle, Pipeline, Processor {
   String INITIAL_STATE_STARTED = "started";
 
   /**
+   * @return initial state of the flow, which can be {@value INITIAL_STATE_STARTED} or {@value INITIAL_STATE_STOPPED}
+   */
+  String getInitialState();
+
+  /**
    * Creates a new flow builder
    *
    * @param name name of the flow to be created. Non empty.
