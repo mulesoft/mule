@@ -434,7 +434,7 @@ public class FunctionalTestProcessor extends AbstractAnnotatedObject
       if (flowConstruct instanceof Pipeline) {
         Pipeline flow = (Pipeline) flowConstruct;
         // Retrieve the first component
-        for (Processor processor : flow.getMessageProcessors()) {
+        for (Processor processor : flow.getProcessors()) {
           if (processor instanceof FunctionalTestProcessor) {
             return (FunctionalTestProcessor) processor;
           }

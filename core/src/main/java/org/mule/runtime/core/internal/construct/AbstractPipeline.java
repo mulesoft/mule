@@ -67,8 +67,8 @@ import reactor.core.publisher.Mono;
  */
 public abstract class AbstractPipeline extends AbstractFlowConstruct implements Pipeline {
 
-  private final MessageSource messageSource;
-  private final List<Processor> messageProcessors;
+  private final MessageSource source;
+  private final List<Processor> processors;
   private MessageProcessorChain pipeline;
 
   private final boolean txAwareProcessingStrategy;
@@ -78,12 +78,12 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   private final Cache<String, EventContext> eventContextCache = CacheBuilder.newBuilder().weakValues().build();
   private volatile Sink sink;
 
-  public AbstractPipeline(String name, MuleContext muleContext, MessageSource messageSource, List<Processor> messageProcessors,
+  public AbstractPipeline(String name, MuleContext muleContext, MessageSource source, List<Processor> processors,
                           Optional<MessagingExceptionHandler> exceptionListener,
                           Optional<ProcessingStrategyFactory> processingStrategyFactory, String initialState) {
     super(name, muleContext, exceptionListener, initialState);
-    this.messageSource = messageSource;
-    this.messageProcessors = unmodifiableList(messageProcessors);
+    this.source = source;
+    this.processors = unmodifiableList(processors);
 
     ProcessingStrategyFactory psFactory = processingStrategyFactory.orElseGet(() -> defaultProcessingStrategy());
     this.txAwareProcessingStrategy = (psFactory instanceof TransactionAwareProcessingStrategyFactory);
@@ -140,13 +140,13 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   }
 
   @Override
-  public List<Processor> getMessageProcessors() {
-    return messageProcessors;
+  public List<Processor> getProcessors() {
+    return processors;
   }
 
   @Override
-  public MessageSource getMessageSource() {
-    return messageSource;
+  public MessageSource getSource() {
+    return source;
   }
 
   protected MessageProcessorChain getPipeline() {
@@ -169,8 +169,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
     pipeline = createPipeline();
 
-    if (messageSource != null) {
-      messageSource.setListener(new Processor() {
+    if (source != null) {
+      source.setListener(new Processor() {
 
         @Override
         public Event process(Event event) throws MuleException {
@@ -191,11 +191,11 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
       });
     }
 
-    injectFlowConstructMuleContext(messageSource);
-    injectExceptionHandler(messageSource);
+    injectFlowConstructMuleContext(source);
+    injectExceptionHandler(source);
     injectFlowConstructMuleContext(pipeline);
     injectExceptionHandler(pipeline);
-    initialiseIfInitialisable(messageSource);
+    initialiseIfInitialisable(source);
     initialiseIfInitialisable(pipeline);
 
   }
@@ -209,7 +209,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   }
 
   protected void configureMessageProcessors(MessageProcessorChainBuilder builder) throws MuleException {
-    for (Object processor : getMessageProcessors()) {
+    for (Object processor : getProcessors()) {
       if (processor instanceof Processor) {
         builder.chain((Processor) processor);
       } else if (processor instanceof MessageProcessorBuilder) {
@@ -222,10 +222,10 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   }
 
   protected boolean isRedeliveryPolicyConfigured() {
-    if (getMessageProcessors().isEmpty()) {
+    if (getProcessors().isEmpty()) {
       return false;
     }
-    return getMessageProcessors().get(0) instanceof IdempotentRedeliveryPolicy;
+    return getProcessors().get(0) instanceof IdempotentRedeliveryPolicy;
   }
 
   @Override
@@ -237,12 +237,12 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     canProcessMessage = true;
     if (getMuleContext().isStarted()) {
       try {
-        startIfStartable(messageSource);
+        startIfStartable(source);
       } catch (ConnectException ce) {
         // Let connection exceptions bubble up to trigger the reconnection strategy.
         throw ce;
       } catch (MuleException e) {
-        // If the messageSource couldn't be started we would need to stop the pipeline (if possible) in order to leave
+        // If the source couldn't be started we would need to stop the pipeline (if possible) in order to leave
         // its LifecycleManager also as initialise phase so the flow can be disposed later
         doStop();
         throw e;
@@ -262,7 +262,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   @Override
   protected void doStop() throws MuleException {
     try {
-      stopIfStoppable(messageSource);
+      stopIfStoppable(source);
     } finally {
       canProcessMessage = false;
     }
@@ -277,7 +277,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   @Override
   protected void doDispose() {
     disposeIfDisposable(pipeline);
-    disposeIfDisposable(messageSource);
+    disposeIfDisposable(source);
     super.doDispose();
   }
 

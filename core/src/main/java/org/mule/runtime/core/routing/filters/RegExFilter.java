@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.routing.filters;
 
-import static java.util.Collections.emptyList;
 import static org.mule.runtime.core.DefaultEventContext.create;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.util.ClassUtils.hash;
@@ -78,7 +77,7 @@ public class RegExFilter implements Filter, ObjectFilter, MuleContextAware, Init
   @Override
   public boolean accept(Message message, Event.Builder builder) {
     // TODO MULE-9341 Remove Filters that are not needed
-    Flow flowConstruct = builder("RegExFilterFlow", muleContext).messageProcessors(emptyList()).build();
+    Flow flowConstruct = builder("RegExFilterFlow", muleContext).build();
     return accept(Event.builder(create(flowConstruct, fromSingleComponent("RegExFilter"))).message(message).flow(flowConstruct)
         .build(), builder);
   }

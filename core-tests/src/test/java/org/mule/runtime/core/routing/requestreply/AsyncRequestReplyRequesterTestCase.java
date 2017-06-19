@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.routing.requestreply;
 
-import static java.util.Collections.emptyList;
 import static junit.framework.Assert.assertNull;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.junit.Assert.assertEquals;
@@ -66,7 +65,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     super.doSetUp();
     muleContext.getRegistry().registerObject(OBJECT_STORE_MANAGER, new MuleObjectStoreManager());
     scheduler = muleContext.getSchedulerService().cpuIntensiveScheduler();
-    flow = builder("flowName", muleContext).messageProcessors(emptyList()).build();
+    flow = builder("flowName", muleContext).build();
     flow.initialise();
     flow.start();
   }

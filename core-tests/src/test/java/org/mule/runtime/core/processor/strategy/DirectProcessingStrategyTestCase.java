@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.processor.strategy;
 
-import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -14,7 +13,6 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
-import static org.mule.runtime.core.processor.strategy.DirectProcessingStrategyFactory.DIRECT_PROCESSING_STRATEGY_INSTANCE;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.DIRECT;
 
@@ -37,7 +35,7 @@ public class DirectProcessingStrategyTestCase extends AbstractProcessingStrategy
 
   @Override
   protected ProcessingStrategy createProcessingStrategy(MuleContext muleContext, String schedulersNamePrefix) {
-    return DIRECT_PROCESSING_STRATEGY_INSTANCE;
+    return new DirectProcessingStrategyFactory().create(muleContext, schedulersNamePrefix);
   }
 
   @Override
@@ -116,7 +114,7 @@ public class DirectProcessingStrategyTestCase extends AbstractProcessingStrategy
   @Description("Regardless of processor type, when the DirectProcessingStrategy is configured, the pipeline is executed "
       + "synchronously in a caller thread.")
   public void tx() throws Exception {
-    flow = flowBuilder.get().messageProcessors(asList(cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor)).build();
+    flow = flowBuilder.get().processors(cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor).build();
     flow.initialise();
     flow.start();
 

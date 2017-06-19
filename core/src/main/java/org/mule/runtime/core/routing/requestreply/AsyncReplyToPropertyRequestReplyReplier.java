@@ -20,8 +20,8 @@ public class AsyncReplyToPropertyRequestReplyReplier extends AbstractReplyToProp
   protected boolean shouldProcessEvent(Event event) {
     // Only process ReplyToHandler is running one-way and standard ReplyToHandler is being used.
     MessageExchangePattern mep = REQUEST_RESPONSE;
-    if (flowConstruct instanceof Pipeline && ((Pipeline) flowConstruct).getMessageSource() instanceof LegacyImmutableEndpoint) {
-      mep = ((LegacyImmutableEndpoint) ((Pipeline) flowConstruct).getMessageSource()).getExchangePattern();
+    if (flowConstruct instanceof Pipeline && ((Pipeline) flowConstruct).getSource() instanceof LegacyImmutableEndpoint) {
+      mep = ((LegacyImmutableEndpoint) ((Pipeline) flowConstruct).getSource()).getExchangePattern();
     }
     return !mep.hasResponse() && event.getReplyToHandler() instanceof DefaultReplyToHandler;
   }

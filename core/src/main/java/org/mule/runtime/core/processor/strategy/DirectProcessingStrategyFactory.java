@@ -24,7 +24,7 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
  */
 public class DirectProcessingStrategyFactory implements ProcessingStrategyFactory {
 
-  public static final ProcessingStrategy DIRECT_PROCESSING_STRATEGY_INSTANCE =
+  private static final ProcessingStrategy DIRECT_PROCESSING_STRATEGY_INSTANCE =
       new AbstractProcessingStrategy() {
 
         @Override

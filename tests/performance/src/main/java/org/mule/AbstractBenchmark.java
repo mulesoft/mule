@@ -6,7 +6,6 @@
  */
 package org.mule;
 
-import static java.util.Collections.emptyList;
 import static java.util.concurrent.TimeUnit.MICROSECONDS;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.construct.Flow.builder;
@@ -78,7 +77,7 @@ public class AbstractBenchmark {
   }
 
   public Flow createFlow(MuleContext muleContext) {
-    return builder(FLOW_NAME, muleContext).messageProcessors(emptyList()).build();
+    return builder(FLOW_NAME, muleContext).build();
   }
 
   public Event createEvent(Flow flow) {

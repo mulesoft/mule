@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.processor.strategy;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.not;
@@ -173,7 +171,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
   @Override
   @Description("When the ProactorProcessingStrategy is configured and a transaction is active processing fails with an error")
   public void tx() throws Exception {
-    flow = flowBuilder.get().messageProcessors(asList(cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor)).build();
+    flow = flowBuilder.get().processors(cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor).build();
     flow.initialise();
     flow.start();
 
@@ -210,7 +208,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
     Scheduler blockingSchedulerSpy = spy(blocking);
     Scheduler rejectingSchedulerSpy = spy(new RejectingScheduler(blockingSchedulerSpy));
 
-    flow = flowBuilder.get().messageProcessors(singletonList(blockingProcessor))
+    flow = flowBuilder.get().processors(blockingProcessor)
         .processingStrategyFactory((context, prefix) -> new ProactorStreamProcessingStrategy(() -> ringBuffer,
                                                                                              DEFAULT_BUFFER_SIZE,
                                                                                              DEFAULT_SUBSCRIBER_COUNT,
@@ -238,7 +236,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
     Scheduler cpuIntensiveSchedulerSpy = spy(cpuIntensive);
     Scheduler rejectingSchedulerSpy = spy(new RejectingScheduler(cpuIntensiveSchedulerSpy));
 
-    flow = flowBuilder.get().messageProcessors(singletonList(cpuIntensiveProcessor))
+    flow = flowBuilder.get().processors(cpuIntensiveProcessor)
         .processingStrategyFactory((context, prefix) -> new ProactorStreamProcessingStrategy(() -> ringBuffer,
                                                                                              DEFAULT_BUFFER_SIZE,
                                                                                              DEFAULT_SUBSCRIBER_COUNT,

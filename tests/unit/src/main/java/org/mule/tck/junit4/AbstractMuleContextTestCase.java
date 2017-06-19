@@ -7,7 +7,6 @@
 package org.mule.tck.junit4;
 
 import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.junit.Assert.assertThat;
@@ -45,6 +44,9 @@ import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.serialization.JavaObjectSerializer;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
+import org.mule.runtime.core.api.util.ClassUtils;
+import org.mule.runtime.core.api.util.StringUtils;
+import org.mule.runtime.core.api.util.concurrent.Latch;
 import org.mule.runtime.core.component.DefaultJavaComponent;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.config.builders.DefaultsConfigurationBuilder;
@@ -53,9 +55,6 @@ import org.mule.runtime.core.context.DefaultMuleContextBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.context.notification.MuleContextNotification;
 import org.mule.runtime.core.object.SingletonObjectFactory;
-import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.runtime.core.api.util.StringUtils;
-import org.mule.runtime.core.api.util.concurrent.Latch;
 import org.mule.runtime.http.api.HttpService;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
@@ -406,7 +405,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
     final JavaComponent component = new DefaultJavaComponent(of);
     ((MuleContextAware) component).setMuleContext(muleContext);
 
-    Flow flow = builder(name, muleContext).messageProcessors(singletonList(component)).build();
+    Flow flow = builder(name, muleContext).processors(component).build();
     muleContext.getRegistry().registerFlowConstruct(flow);
     return flow;
   }

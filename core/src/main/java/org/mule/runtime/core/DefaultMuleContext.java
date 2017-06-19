@@ -346,7 +346,7 @@ public class DefaultMuleContext implements MuleContext {
   private void startPipelineMessageSources() throws LifecycleException {
     for (Pipeline pipeline : this.getRegistry().lookupObjects(Pipeline.class)) {
       if (pipeline.getLifecycleState().isStarted()) {
-        MessageSource messageSource = pipeline.getMessageSource();
+        MessageSource messageSource = pipeline.getSource();
         if (messageSource != null && componentInitialStateManager.mustStartMessageSource(messageSource)) {
           startMessageSource(messageSource);
         }

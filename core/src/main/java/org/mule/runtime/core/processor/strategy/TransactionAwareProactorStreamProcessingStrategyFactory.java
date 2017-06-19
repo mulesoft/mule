@@ -32,7 +32,7 @@ import java.util.function.Supplier;
  *
  * @since 4.0
  */
-public class TransactionAwareProactorStreamProcessingStrategyFactory extends ReactorStreamProcessingStrategyFactory
+class TransactionAwareProactorStreamProcessingStrategyFactory extends ReactorStreamProcessingStrategyFactory
     implements TransactionAwareProcessingStrategyFactory {
 
   private static final ReactorProcessingStrategyFactory NOT_CONCURRENT_TX_AWARE_PS_FACTORY =
@@ -76,14 +76,14 @@ public class TransactionAwareProactorStreamProcessingStrategyFactory extends Rea
 
   static class TransactionAwareProactorStreamProcessingStrategy extends ProactorStreamProcessingStrategy {
 
-    public TransactionAwareProactorStreamProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier,
-                                                            int bufferSize,
-                                                            int subscriberCount,
-                                                            String waitStrategy,
-                                                            Supplier<Scheduler> cpuLightSchedulerSupplier,
-                                                            Supplier<Scheduler> blockingSchedulerSupplier,
-                                                            Supplier<Scheduler> cpuIntensiveSchedulerSupplier,
-                                                            int maxConcurrency)
+    private TransactionAwareProactorStreamProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier,
+                                                             int bufferSize,
+                                                             int subscriberCount,
+                                                             String waitStrategy,
+                                                             Supplier<Scheduler> cpuLightSchedulerSupplier,
+                                                             Supplier<Scheduler> blockingSchedulerSupplier,
+                                                             Supplier<Scheduler> cpuIntensiveSchedulerSupplier,
+                                                             int maxConcurrency)
 
     {
       super(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier,

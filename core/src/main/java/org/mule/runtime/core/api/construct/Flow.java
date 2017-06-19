@@ -53,16 +53,23 @@ public interface Flow extends AnnotatedObject, Lifecycle, Pipeline, Processor {
      * @param messageSource message source to use. Non null.
      * @return same builder instance.
      */
-    Builder messageSource(MessageSource messageSource);
-
+    Builder source(MessageSource messageSource);
 
     /**
      * Configures the message processors to execute as part of flow.
      *
-     * @param messageProcessors message processors to execute. Non null.
+     * @param processors message processors to execute. Non null.
      * @return same builder instance.
      */
-    Builder messageProcessors(List<Processor> messageProcessors);
+    Builder processors(List<Processor> processors);
+
+    /**
+     * Configures the message processors to execute as part of flow.
+     *
+     * @param processors message processors to execute.
+     * @return same builder instance.
+     */
+    Builder processors(Processor... processors);
 
     /**
      * Configures the exception listener to manage exceptions thrown on the flow execution.

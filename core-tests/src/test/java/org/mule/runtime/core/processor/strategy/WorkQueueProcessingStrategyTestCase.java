@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.processor.strategy;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -132,7 +130,7 @@ public class WorkQueueProcessingStrategyTestCase extends AbstractProcessingStrat
   @Override
   @Description("When the WorkQueueProcessingStrategy is configured and a transaction is active processing fails with an error")
   public void tx() throws Exception {
-    flow = flowBuilder.get().messageProcessors(asList(cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor)).build();
+    flow = flowBuilder.get().processors(cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor).build();
     flow.initialise();
     flow.start();
 
@@ -188,7 +186,7 @@ public class WorkQueueProcessingStrategyTestCase extends AbstractProcessingStrat
   @Test
   @Description("If IO pool is busy OVERLOAD error is thrown")
   public void rejectedExecution() throws Exception {
-    flow = flowBuilder.get().messageProcessors(singletonList(blockingProcessor))
+    flow = flowBuilder.get().processors(blockingProcessor)
         .processingStrategyFactory((context, prefix) -> new WorkQueueProcessingStrategy(() -> new RejectingScheduler(blocking)))
         .build();
     flow.initialise();

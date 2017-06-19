@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.api.processor;
 
-import static java.util.Collections.emptyList;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -37,7 +36,7 @@ public class LoggerMessageProcessorTestCase extends AbstractMuleTestCase {
 
   @Before
   public void before() throws RegistrationException {
-    flow = builder("flow", mockContextWithServices()).messageProcessors(emptyList()).build();
+    flow = builder("flow", mockContextWithServices()).build();
   }
 
   @Test

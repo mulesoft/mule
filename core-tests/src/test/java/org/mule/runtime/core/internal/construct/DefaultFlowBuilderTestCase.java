@@ -7,7 +7,7 @@
 
 package org.mule.runtime.core.internal.construct;
 
-import static java.util.Collections.emptyList;
+import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
@@ -63,12 +63,12 @@ public class DefaultFlowBuilderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void buildsSimpleFlow() throws Exception {
-    Flow flow = flowBuilder.messageProcessors(emptyList()).build();
+    Flow flow = flowBuilder.build();
 
     assertThat(flow.getName(), equalTo(FLOW_NAME));
     assertThat(flow.getMuleContext(), is(muleContext));
-    assertThat(flow.getMessageProcessors(), is(empty()));
-    assertThat(flow.getMessageSource(), is(nullValue()));
+    assertThat(flow.getProcessors(), is(empty()));
+    assertThat(flow.getSource(), is(nullValue()));
     assertThat(flow.getExceptionListener(), is(nullValue()));
     assertThat(flow.getProcessingStrategy(), sameInstance(processingStrategy));
   }
@@ -87,48 +87,55 @@ public class DefaultFlowBuilderTestCase extends AbstractMuleTestCase {
     when(processingStrategyFactory.create(any(), any())).thenReturn(processingStrategy);
     MessagingExceptionHandler exceptionListener = mock(MessagingExceptionHandler.class);
 
-    Flow flow = flowBuilder.messageProcessors(messageProcessors).messageSource(messageSource)
+    Flow flow = flowBuilder.processors(messageProcessors).source(messageSource)
         .processingStrategyFactory(processingStrategyFactory).messagingExceptionHandler(exceptionListener).build();
 
     assertThat(flow.getName(), equalTo(FLOW_NAME));
     assertThat(flow.getMuleContext(), is(muleContext));
-    assertThat(flow.getMessageProcessors(), contains(processor1, processor2));
-    assertThat(flow.getMessageSource(), is(messageSource));
+    assertThat(flow.getProcessors(), contains(processor1, processor2));
+    assertThat(flow.getSource(), is(messageSource));
     assertThat(flow.getExceptionListener(), is(exceptionListener));
     assertThat(flow.getProcessingStrategy(), sameInstance(processingStrategy));
   }
 
   @Test
   public void cannotBuildFlowTwice() throws Exception {
-    flowBuilder.messageProcessors(emptyList()).build();
+    flowBuilder.build();
     expectedException.expect(IllegalStateException.class);
-    flowBuilder.messageProcessors(emptyList()).build();
+    flowBuilder.build();
   }
 
   @Test
   public void cannotChangeMessageSourceAfterFlowBuilt() throws Exception {
-    flowBuilder.messageProcessors(emptyList()).build();
+    flowBuilder.build();
     expectedException.expect(IllegalStateException.class);
-    flowBuilder.messageProcessors(emptyList()).messageSource(mock(MessageSource.class));
+    flowBuilder.source(mock(MessageSource.class));
   }
 
   @Test
-  public void cannotChangeMessageProcessorsAfterFlowBuilt() throws Exception {
-    flowBuilder.messageProcessors(emptyList()).build();
+  public void cannotChangeMessageProcessorsListAfterFlowBuilt() throws Exception {
+    flowBuilder.build();
     expectedException.expect(IllegalStateException.class);
-    flowBuilder.messageProcessors(new ArrayList<>());
+    flowBuilder.processors(asList(mock(Processor.class)));
+  }
+
+  @Test
+  public void cannotChangeMessageProcessorAfterFlowBuilt() throws Exception {
+    flowBuilder.build();
+    expectedException.expect(IllegalStateException.class);
+    flowBuilder.processors(mock(Processor.class));
   }
 
   @Test
   public void cannotChangeExceptionListenerAfterFlowBuilt() throws Exception {
-    flowBuilder.messageProcessors(emptyList()).build();
+    flowBuilder.build();
     expectedException.expect(IllegalStateException.class);
     flowBuilder.messagingExceptionHandler(mock(MessagingExceptionHandler.class));
   }
 
   @Test
   public void cannotChangeProcessingStrategyFactoryAfterFlowBuilt() throws Exception {
-    flowBuilder.messageProcessors(emptyList()).build();
+    flowBuilder.build();
     expectedException.expect(IllegalStateException.class);
     flowBuilder.processingStrategyFactory(mock(ProcessingStrategyFactory.class));
   }

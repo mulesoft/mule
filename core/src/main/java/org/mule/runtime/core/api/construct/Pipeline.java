@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.construct;
 
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.processor.ProcessingDescriptor;
@@ -22,9 +23,15 @@ import java.util.Map;
  */
 public interface Pipeline extends FlowConstruct, ProcessingDescriptor {
 
-  MessageSource getMessageSource();
+  /**
+   * @return source of messages to use.
+   */
+  MessageSource getSource();
 
-  List<Processor> getMessageProcessors();
+  /**
+   * @return processors to execute on a {@link Message}.
+   */
+  List<Processor> getProcessors();
 
   /**
    * @return the {@link ProcessingStrategy} used on the pipeline.

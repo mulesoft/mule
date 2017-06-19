@@ -38,7 +38,7 @@ import reactor.core.publisher.WorkQueueProcessor;
 /**
  * Abstract {@link ProcessingStrategyFactory} to be used by implementations that de-multiplex incoming messages using a
  * ring-buffer which can then be subscribed to n times.
- * <p/>
+ * <p>
  * Processing strategies created with this factory are not suitable for transactional flows and will fail if used with an active
  * transaction.
  *
@@ -57,7 +57,7 @@ abstract class AbstractStreamProcessingStrategyFactory extends AbstractProcessin
   /**
    * Configure the size of the ring-buffer size used to buffer and de-multiplexes events from multiple source threads. This value
    * must be a power-of two.
-   * <p/>
+   * <p>
    * Ring buffers typically use a power of two because it means that the rollover at the end of the buffer can be achieved using a
    * bit mask rather than having to explicitly compare the head/tail pointer with the end of the buffer.
    *
@@ -113,7 +113,7 @@ abstract class AbstractStreamProcessingStrategyFactory extends AbstractProcessin
    *
    * @since 4.0
    */
-  protected abstract static class AbstractStreamProcessingStrategy extends AbstractProcessingStrategy {
+  abstract static class AbstractStreamProcessingStrategy extends AbstractProcessingStrategy {
 
     final protected Supplier<Scheduler> ringBufferSchedulerSupplier;
     final protected int bufferSize;
@@ -121,9 +121,8 @@ abstract class AbstractStreamProcessingStrategyFactory extends AbstractProcessin
     final protected WaitStrategy waitStrategy;
     final protected int maxConcurrency;
 
-    public AbstractStreamProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier, int bufferSize, int subscribers,
-                                            String waitStrategy,
-                                            int maxConcurrency) {
+    protected AbstractStreamProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier, int bufferSize, int subscribers,
+                                               String waitStrategy, int maxConcurrency) {
       this.subscribers = requireNonNull(subscribers);
       this.waitStrategy = valueOf(waitStrategy);
       this.bufferSize = requireNonNull(bufferSize);

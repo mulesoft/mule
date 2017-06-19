@@ -96,13 +96,13 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
     processors.add(sensingMessageProcessor);
 
     flow = (DefaultFlow) Flow.builder(FLOW_NAME, muleContext)
-        .messageSource(directInboundMessageSource)
-        .messageProcessors(processors)
+        .source(directInboundMessageSource)
+        .processors(processors)
         .build();
 
     stoppedFlow = (DefaultFlow) Flow.builder(FLOW_NAME, muleContext)
-        .messageSource(directInboundMessageSource)
-        .messageProcessors(processors)
+        .source(directInboundMessageSource)
+        .processors(processors)
         .initialState(INITIAL_STATE_STOPPED)
         .build();
   }
@@ -177,8 +177,8 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
     after();
 
     flow = (DefaultFlow) Flow.builder(FLOW_NAME, muleContext)
-        .messageSource(flow.getMessageSource())
-        .messageProcessors(flow.getMessageProcessors())
+        .source(flow.getSource())
+        .processors(flow.getProcessors())
         .processingStrategyFactory(new BlockingProcessingStrategyFactory())
         .build();
 
@@ -201,15 +201,15 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
     doThrow(new LifecycleException(mock(I18nMessage.class), "Error starting component")).when(((Startable) mockMessageSource))
         .start();
 
-    final List<Processor> processors = new ArrayList<>(flow.getMessageProcessors());
+    final List<Processor> processors = new ArrayList<>(flow.getProcessors());
     Processor mockMessageProcessor = spy(new LifecycleTrackerProcessor());
     processors.add(mockMessageProcessor);
 
     after();
 
     flow = (DefaultFlow) Flow.builder(FLOW_NAME, muleContext)
-        .messageSource(mockMessageSource)
-        .messageProcessors(processors).build();
+        .source(mockMessageSource)
+        .processors(processors).build();
 
     flow.initialise();
     try {

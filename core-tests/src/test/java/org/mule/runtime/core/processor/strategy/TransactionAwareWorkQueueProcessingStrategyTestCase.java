@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.processor.strategy;
 
-import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -47,7 +46,7 @@ public class TransactionAwareWorkQueueProcessingStrategyTestCase extends WorkQue
   @Description("Unlike with the MultiReactorProcessingStrategy, the TransactionAwareWorkQueueProcessingStrategy does not fail if a transaction "
       + "is active, but rather executes these events synchronously in the caller thread transparently.")
   public void tx() throws Exception {
-    flow = flowBuilder.get().messageProcessors(asList(cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor)).build();
+    flow = flowBuilder.get().processors(cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor).build();
     flow.initialise();
     flow.start();
 

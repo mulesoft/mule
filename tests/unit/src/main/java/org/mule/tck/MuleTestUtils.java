@@ -6,7 +6,6 @@
  */
 package org.mule.tck;
 
-import static java.util.Collections.emptyList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -52,8 +51,7 @@ public final class MuleTestUtils {
 
   public static Flow getTestFlow(MuleContext context) throws MuleException {
     // Use direct processing strategy given flow used in test event is not used for processing.
-    final Flow flow = builder(APPLE_FLOW, context).messageProcessors(emptyList())
-        .processingStrategyFactory(new DirectProcessingStrategyFactory()).build();
+    final Flow flow = builder(APPLE_FLOW, context).processingStrategyFactory(new DirectProcessingStrategyFactory()).build();
     if (context.getRegistry() != null) {
       context.getRegistry().registerFlowConstruct(flow);
     }

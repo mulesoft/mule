@@ -29,7 +29,7 @@ import java.util.function.Supplier;
  * Creates {@link ReactorStreamProcessingStrategyFactory} instances that implements the reactor pattern by de-multiplexes incoming
  * messages onto a single event-loop using a ring-buffer and then using using the {@link SchedulerService#cpuLightScheduler()} to
  * process events from the ring-buffer.
- * <p/>
+ * <p>
  * This processing strategy is not suitable for transactional flows and will fail if used with an active transaction.
  *
  * @since 4.0
@@ -60,10 +60,9 @@ public class ReactorStreamProcessingStrategyFactory extends AbstractStreamProces
     private Supplier<Scheduler> cpuLightSchedulerSupplier;
     private Scheduler cpuLightScheduler;
 
-    protected ReactorStreamProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier, int bufferSize,
-                                              int subscribers,
-                                              String waitStrategy, Supplier<Scheduler> cpuLightSchedulerSupplier,
-                                              int maxConcurrency) {
+    private ReactorStreamProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier, int bufferSize, int subscribers,
+                                            String waitStrategy, Supplier<Scheduler> cpuLightSchedulerSupplier,
+                                            int maxConcurrency) {
       super(ringBufferSchedulerSupplier, bufferSize, subscribers, waitStrategy, maxConcurrency);
       this.cpuLightSchedulerSupplier = cpuLightSchedulerSupplier;
     }

@@ -8,7 +8,6 @@
 package org.mule.runtime.core.processor.chain;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toList;
@@ -140,8 +139,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     when(muleContext.getErrorTypeLocator()).thenReturn(errorTypeLocator);
     when(muleContext.getExceptionContextProviders()).thenReturn(singletonList(exceptionContextProvider));
     when(errorTypeLocator.lookupErrorType((Exception) any())).thenReturn(errorType);
-    flow = builder("flow", muleContext).messageProcessors(emptyList())
-        .processingStrategyFactory(processingStrategyFactory).build();
+    flow = builder("flow", muleContext).processingStrategyFactory(processingStrategyFactory).build();
     flow.initialise();
     flow.start();
   }

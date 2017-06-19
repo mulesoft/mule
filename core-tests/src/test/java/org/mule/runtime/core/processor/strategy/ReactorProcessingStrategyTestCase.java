@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.processor.strategy;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.not;
@@ -148,7 +146,7 @@ public class ReactorProcessingStrategyTestCase extends AbstractProcessingStrateg
   @Override
   @Description("When the ReactorProcessingStrategy is configured and a transaction is active processing fails with an error")
   public void tx() throws Exception {
-    flow = flowBuilder.get().messageProcessors(asList(cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor)).build();
+    flow = flowBuilder.get().processors(cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor).build();
     flow.initialise();
     flow.start();
 
@@ -195,7 +193,7 @@ public class ReactorProcessingStrategyTestCase extends AbstractProcessingStrateg
   @Test
   @Description("If CPU LITE pool is busy OVERLOAD error is thrown")
   public void cpuLightRejectedExecution() throws Exception {
-    flow = flowBuilder.get().messageProcessors(singletonList(blockingProcessor))
+    flow = flowBuilder.get().processors(blockingProcessor)
         .processingStrategyFactory((context, prefix) -> new ReactorProcessingStrategy(() -> new RejectingScheduler(blocking)))
         .build();
     flow.initialise();

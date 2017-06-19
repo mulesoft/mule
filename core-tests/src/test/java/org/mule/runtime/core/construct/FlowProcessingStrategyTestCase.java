@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.construct;
 
-import static java.util.Collections.emptyList;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
@@ -96,7 +95,7 @@ public class FlowProcessingStrategyTestCase extends AbstractMuleTestCase {
   }
 
   private void createFlow(ProcessingStrategyFactory configProcessingStrategyFactory) {
-    Builder flowBuilder = builder("test", muleContext).messageProcessors(emptyList());
+    Builder flowBuilder = builder("test", muleContext);
     if (configProcessingStrategyFactory != null) {
       flowBuilder = flowBuilder.processingStrategyFactory(configProcessingStrategyFactory);
     }

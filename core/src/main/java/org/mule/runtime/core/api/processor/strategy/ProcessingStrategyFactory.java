@@ -20,6 +20,9 @@ public interface ProcessingStrategyFactory {
    */
   ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix);
 
+  /**
+   * @return a reference to the concrete implememntation of the {@link ProcessingStrategy} this facotry will create.
+   */
   default Class<? extends ProcessingStrategy> getProcessingStrategyClass() {
     return ProcessingStrategy.class;
   }

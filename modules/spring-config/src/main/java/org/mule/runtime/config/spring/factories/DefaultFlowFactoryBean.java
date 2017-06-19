@@ -40,12 +40,12 @@ public class DefaultFlowFactoryBean extends AbstractAnnotatedObject
   @Override
   public Flow getObject() throws Exception {
     Builder flowBuilder = Flow.builder(name, muleContext)
-        .messageProcessors(messageProcessors)
+        .processors(messageProcessors)
         .messagingExceptionHandler(exceptionListener)
         .initialState(initialState);
 
     if (messageSource != null) {
-      flowBuilder.messageSource(messageSource);
+      flowBuilder.source(messageSource);
     }
     if (processingStrategyFactory != null) {
       flowBuilder.processingStrategyFactory(processingStrategyFactory);

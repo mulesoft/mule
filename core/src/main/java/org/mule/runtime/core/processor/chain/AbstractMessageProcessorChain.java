@@ -218,7 +218,7 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
   }
 
   private Function<MessagingException, Publisher<Event>> handleError(EventContext eventContext) {
-    if (flowConstruct instanceof Pipeline && ((Pipeline) flowConstruct).getMessageSource() instanceof LegacyInboundEndpoint) {
+    if (flowConstruct instanceof Pipeline && ((Pipeline) flowConstruct).getSource() instanceof LegacyInboundEndpoint) {
       // TODO MULE-11023 Migrate transaction execution template mechanism to use non-blocking API
       // Don't handle exception in chain as it needs to be handled by HandleExceptionInterceptor.
       return messagingException -> {

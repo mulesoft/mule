@@ -122,7 +122,7 @@ public abstract class AbstractFlowBenchmark extends AbstractBenchmark {
 
 
     source = new TriggerableMessageSource();
-    flow = builder(FLOW_NAME, muleContext).messageProcessors(getMessageProcessors()).messageSource(source)
+    flow = builder(FLOW_NAME, muleContext).processors(getMessageProcessors()).source(source)
         .processingStrategyFactory(factory).build();
     muleContext.getRegistry().registerFlowConstruct(flow);
   }

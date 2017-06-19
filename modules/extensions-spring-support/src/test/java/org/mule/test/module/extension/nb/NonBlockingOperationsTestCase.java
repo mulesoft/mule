@@ -46,7 +46,7 @@ public class NonBlockingOperationsTestCase extends AbstractExtensionFunctionalTe
 
   @Test
   public void failingNonBlockingConnectedOperation() throws Exception {
-    Processor operation = ((Pipeline) getFlowConstruct("fireMissile")).getMessageProcessors().get(1);
+    Processor operation = ((Pipeline) getFlowConstruct("fireMissile")).getProcessors().get(1);
 
     expectedException.expect(instanceOf(MessagingException.class));
     expectedException.expect(new ArgumentMatcher<Object>() {

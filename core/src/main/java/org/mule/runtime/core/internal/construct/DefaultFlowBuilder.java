@@ -7,6 +7,8 @@
 
 package org.mule.runtime.core.internal.construct;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
@@ -19,6 +21,7 @@ import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
@@ -59,11 +62,13 @@ public class DefaultFlowBuilder implements Builder {
 
   private final String name;
   private final MuleContext muleContext;
-  private MessageSource messageSource;
-  private List<Processor> messageProcessors;
+
+  private MessageSource source;
+  private List<Processor> processors = emptyList();
   private MessagingExceptionHandler exceptionListener;
   private ProcessingStrategyFactory processingStrategyFactory;
   private String initialState = INITIAL_STATE_STARTED;
+
   private DefaultFlow flow;
 
   /**
@@ -83,14 +88,14 @@ public class DefaultFlowBuilder implements Builder {
   /**
    * Configures the message source for the flow.
    *
-   * @param messageSource message source to use. Non null.
+   * @param source source of messages to use. Non null.
    * @return same builder instance.
    */
   @Override
-  public Builder messageSource(MessageSource messageSource) {
+  public Builder source(MessageSource source) {
     checkImmutable();
-    checkArgument(messageSource != null, "messageSource cannot be null");
-    this.messageSource = messageSource;
+    checkArgument(source != null, "source cannot be null");
+    this.source = source;
 
     return this;
   }
@@ -98,14 +103,28 @@ public class DefaultFlowBuilder implements Builder {
   /**
    * Configures the message processors to execute as part of flow.
    *
-   * @param messageProcessors message processors to execute. Non null.
+   * @param processors processors to execute on a {@link Message}. Non null.
    * @return same builder instance.
    */
   @Override
-  public Builder messageProcessors(List<Processor> messageProcessors) {
+  public Builder processors(List<Processor> processors) {
     checkImmutable();
-    checkArgument(messageProcessors != null, "messageProcessors cannot be null");
-    this.messageProcessors = messageProcessors;
+    checkArgument(processors != null, "processors cannot be null");
+    this.processors = processors;
+
+    return this;
+  }
+
+  /**
+   * Configures the message processors to execute as part of flow.
+   *
+   * @param processors processors to execute on a {@link Message}.
+   * @return same builder instance.
+   */
+  @Override
+  public Builder processors(Processor... processors) {
+    checkImmutable();
+    this.processors = asList(processors);
 
     return this;
   }
@@ -155,17 +174,17 @@ public class DefaultFlowBuilder implements Builder {
   public Flow build() {
     checkImmutable();
 
-    flow = new DefaultFlow(name, muleContext, resolveMessageSource(messageSource), messageProcessors,
+    flow = new DefaultFlow(name, muleContext, resolveSource(source), processors,
                            ofNullable(exceptionListener), ofNullable(processingStrategyFactory), initialState);
     return flow;
   }
 
-  private MessageSource resolveMessageSource(MessageSource source) {
-    if (messageSource != null) {
-      if (messageSource instanceof ClusterizableMessageSource) {
-        return new ClusterizableMessageSourceWrapper(muleContext, (ClusterizableMessageSource) messageSource, flow);
+  private MessageSource resolveSource(MessageSource source) {
+    if (source != null) {
+      if (source instanceof ClusterizableMessageSource) {
+        return new ClusterizableMessageSourceWrapper(muleContext, (ClusterizableMessageSource) source, flow);
       } else {
-        return messageSource;
+        return source;
       }
     } else {
       return null;
@@ -183,10 +202,10 @@ public class DefaultFlowBuilder implements Builder {
    */
   public static class DefaultFlow extends AbstractPipeline implements Flow {
 
-    protected DefaultFlow(String name, MuleContext muleContext, MessageSource messageSource, List<Processor> messageProcessors,
+    protected DefaultFlow(String name, MuleContext muleContext, MessageSource source, List<Processor> processors,
                           Optional<MessagingExceptionHandler> exceptionListener,
                           Optional<ProcessingStrategyFactory> processingStrategyFactory, String initialState) {
-      super(name, muleContext, messageSource, messageProcessors, exceptionListener, processingStrategyFactory, initialState);
+      super(name, muleContext, source, processors, exceptionListener, processingStrategyFactory, initialState);
     }
 
     @Override

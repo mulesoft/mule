@@ -8,7 +8,6 @@ package org.mule.runtime.core.processor;
 
 import static java.lang.Thread.currentThread;
 import static java.time.Duration.ofMillis;
-import static java.util.Collections.emptyList;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -63,7 +62,7 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
   @Override
   protected void doSetUp() throws Exception {
     super.doSetUp();
-    flow = builder("flow", muleContext).messageProcessors(emptyList()).build();
+    flow = builder("flow", muleContext).build();
     flow.initialise();
     flow.start();
 
@@ -133,8 +132,7 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
   @Test
   public void processWithBlockingProcessingStrategy() throws Exception {
     flow.dispose();
-    flow = builder("flow", muleContext).messageProcessors(emptyList())
-        .processingStrategyFactory(new BlockingProcessingStrategyFactory()).build();
+    flow = builder("flow", muleContext).processingStrategyFactory(new BlockingProcessingStrategyFactory()).build();
     flow.initialise();
     flow.start();
     messageProcessor.setFlowConstruct(flow);
@@ -145,8 +143,7 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
   @Test
   public void processWithDirectProcessingStrategy() throws Exception {
     flow.dispose();
-    flow = builder("flow", muleContext).messageProcessors(emptyList())
-        .processingStrategyFactory(new DirectProcessingStrategyFactory()).build();
+    flow = builder("flow", muleContext).processingStrategyFactory(new DirectProcessingStrategyFactory()).build();
     flow.initialise();
     flow.start();
     messageProcessor.setFlowConstruct(flow);
