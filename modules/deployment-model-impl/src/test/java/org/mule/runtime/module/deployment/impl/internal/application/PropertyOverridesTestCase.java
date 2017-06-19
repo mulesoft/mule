@@ -6,15 +6,11 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.application;
 
-import static java.util.Collections.emptyList;
 import static org.apache.commons.io.IOUtils.copy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ServiceRegistryDescriptorLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
@@ -26,7 +22,6 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -45,14 +40,6 @@ public class PropertyOverridesTestCase extends AbstractMuleTestCase {
     setSystemProperty("-Omule.mmc", "evenCooler");
   }
 
-  private ArtifactPluginRepository applicationPluginRepository;
-
-  @Before
-  public void setUp() throws Exception {
-    applicationPluginRepository = mock(ArtifactPluginRepository.class);
-    when(applicationPluginRepository.getContainerArtifactPluginDescriptors()).thenReturn(emptyList());
-  }
-
   @Test
   public void testOverrides() throws Exception {
     File tempProps = File.createTempFile("property", "overrides");
@@ -64,7 +51,6 @@ public class PropertyOverridesTestCase extends AbstractMuleTestCase {
     ApplicationDescriptor descriptor = new ApplicationDescriptor("app");
     ApplicationDescriptorFactory applicationDescriptorFactory =
         new ApplicationDescriptorFactory(new ArtifactPluginDescriptorLoader(new ArtifactPluginDescriptorFactory()),
-                                         applicationPluginRepository,
                                          new ServiceRegistryDescriptorLoaderRepository(new SpiServiceRegistry()));
     applicationDescriptorFactory.setApplicationProperties(descriptor, tempProps);
     Map<String, String> appProps = descriptor.getAppProperties();

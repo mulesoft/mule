@@ -6,84 +6,97 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.domain;
 
+import static java.util.Collections.emptyList;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyList;
 import static org.mockito.Mockito.mock;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
-import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.DEFAULT_DEPLOY_PROPERTIES_RESOURCE;
-import static org.mule.runtime.deployment.model.api.domain.Domain.DEFAULT_DOMAIN_NAME;
-import static org.mule.runtime.module.deployment.impl.internal.application.PropertiesDescriptorParser.PROPERTY_REDEPLOYMENT_ENABLED;
-import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.MULE_DOMAIN_FOLDER;
+import static org.mockito.Mockito.when;
+import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.deployment.model.api.domain.Domain;
+import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
+import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader;
 import org.mule.runtime.deployment.model.internal.domain.AbstractDomainTestCase;
-import org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderFactory;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderManager;
+import org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderBuilder;
+import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
 import org.mule.runtime.module.service.ServiceRepository;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 
 import org.junit.Before;
 import org.junit.Test;
 
 public class DefaultDomainFactoryTestCase extends AbstractDomainTestCase {
 
-  private final ArtifactClassLoaderManager artifactClassLoaderManager = mock(ArtifactClassLoaderManager.class);
   private final ServiceRepository serviceRepository = mock(ServiceRepository.class);
+  private final DomainDescriptorFactory domainDescriptorFactory = mock(DomainDescriptorFactory.class);
+  private final PluginDependenciesResolver pluginDependenciesResolver = mock(PluginDependenciesResolver.class);
+  private final DomainClassLoaderBuilderFactory domainClassLoaderBuilderFactory = mock(DomainClassLoaderBuilderFactory.class);
   private final DefaultDomainFactory domainFactory = new DefaultDomainFactory(
-                                                                              new DomainClassLoaderFactory(getClass()
-                                                                                  .getClassLoader()),
-                                                                              new DefaultDomainManager(), containerClassLoader,
+                                                                              domainDescriptorFactory, new DefaultDomainManager(),
                                                                               null,
-                                                                              serviceRepository);
+                                                                              serviceRepository,
+                                                                              pluginDependenciesResolver,
+                                                                              domainClassLoaderBuilderFactory);
 
   public DefaultDomainFactoryTestCase() throws IOException {}
 
   @Before
   public void setUp() throws Exception {
     domainFactory.setMuleContextListenerFactory(artifactName -> mock(MuleContextListener.class));
+
+    when(pluginDependenciesResolver.resolve(anyList())).thenReturn(emptyList());
   }
 
   @Test
   public void createDefaultDomain() throws IOException {
-    createDomainDir(MULE_DOMAIN_FOLDER, DEFAULT_DOMAIN_NAME);
+    final MuleApplicationClassLoader domainArtifactClassLoader = mock(MuleApplicationClassLoader.class);
+    when(domainArtifactClassLoader.getArtifactId()).thenReturn(DEFAULT_DOMAIN_NAME);
 
-    createAndVerifyDomain(DEFAULT_DOMAIN_NAME, true);
+    DomainClassLoaderBuilder domainClassLoaderBuilderMock = mock(DomainClassLoaderBuilder.class);
+    when(domainClassLoaderBuilderMock.setArtifactDescriptor(any())).thenReturn(domainClassLoaderBuilderMock);
+    when(domainClassLoaderBuilderMock.setArtifactId(any())).thenReturn(domainClassLoaderBuilderMock);
+    when(domainClassLoaderBuilderMock.addArtifactPluginDescriptors(new ArtifactPluginDescriptor[0]))
+        .thenReturn(domainClassLoaderBuilderMock);
+    when(domainClassLoaderBuilderMock.build()).thenReturn(domainArtifactClassLoader);
+    when(domainClassLoaderBuilderFactory.createArtifactClassLoaderBuilder()).thenReturn(domainClassLoaderBuilderMock);
+
+    Domain domain = domainFactory.createArtifact(new File(DEFAULT_DOMAIN_NAME));
+    assertThat(domain.getArtifactName(), is(DEFAULT_DOMAIN_NAME));
+    assertThat(domain.getDescriptor(), instanceOf(EmptyDomainDescriptor.class));
+    assertThat(domain.getArtifactClassLoader(), is(domainArtifactClassLoader));
   }
 
   @Test
   public void createCustomDomain() throws IOException {
     String domainName = "custom-domain";
-    createDomainDir(MULE_DOMAIN_FOLDER, domainName);
 
-    createAndVerifyDomain(DEFAULT_DOMAIN_NAME, true);
+    final DomainDescriptor descriptor = new DomainDescriptor(domainName);
+    when(domainDescriptorFactory.create(any())).thenReturn(descriptor);
+
+    final MuleApplicationClassLoader domainArtifactClassLoader = mock(MuleApplicationClassLoader.class);
+    when(domainArtifactClassLoader.getArtifactId()).thenReturn(domainName);
+
+    DomainClassLoaderBuilder domainClassLoaderBuilderMock = mock(DomainClassLoaderBuilder.class);
+    when(domainClassLoaderBuilderMock.setArtifactDescriptor(any()))
+        .thenReturn(domainClassLoaderBuilderMock);
+    when(domainClassLoaderBuilderMock.setArtifactId(any())).thenReturn(domainClassLoaderBuilderMock);
+    when(domainClassLoaderBuilderMock
+        .addArtifactPluginDescriptors(descriptor.getPlugins().toArray(new ArtifactPluginDescriptor[0])))
+            .thenReturn(domainClassLoaderBuilderMock);
+    when(domainClassLoaderBuilderMock.build()).thenReturn(domainArtifactClassLoader);
+    when(domainClassLoaderBuilderFactory.createArtifactClassLoaderBuilder()).thenReturn(domainClassLoaderBuilderMock);
+
+    Domain domain = domainFactory.createArtifact(new File(domainName));
+
+    assertThat(domain.getArtifactName(), is(domainName));
+    assertThat(domain.getDescriptor(), is(descriptor));
+    assertThat(domain.getArtifactClassLoader(), is(domainArtifactClassLoader));
   }
 
-  @Test
-  public void createCustomDomainWithProperties() throws IOException {
-    String domainName = "custom-domain-with-props";
-    createDomainDir(MULE_DOMAIN_FOLDER, domainName);
-    createDeployPropertiesFile(domainName);
-
-    createAndVerifyDomain(domainName, false);
-  }
-
-  private void createAndVerifyDomain(String name, boolean redeployment)
-      throws IOException {
-    Domain domain = domainFactory.createArtifact(new File(name));
-    assertThat(domain.getArtifactName(), is(name));
-    assertThat(domain.getDescriptor().getName(), is(name));
-    assertThat(domain.getDescriptor().isRedeploymentEnabled(), is(redeployment));
-  }
-
-  private void createDeployPropertiesFile(String domainName) throws FileNotFoundException, UnsupportedEncodingException {
-    File properties = new File(getDomainFolder(domainName), DEFAULT_DEPLOY_PROPERTIES_RESOURCE);
-    PrintWriter writer = new PrintWriter(properties, "UTF8");
-    writer.println(PROPERTY_REDEPLOYMENT_ENABLED + "=false");
-    writer.close();
-  }
 }

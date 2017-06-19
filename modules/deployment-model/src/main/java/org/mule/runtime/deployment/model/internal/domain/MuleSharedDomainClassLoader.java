@@ -6,14 +6,14 @@
  */
 package org.mule.runtime.deployment.model.internal.domain;
 
-import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainClassesFolder;
 import static org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderFactory.getDomainId;
-
+import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.getMuleConfDir;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.classloader.MuleArtifactClassLoader;
+import org.mule.runtime.module.artifact.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
-import org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -23,22 +23,24 @@ import java.util.List;
 /**
  * Defines a {@link MuleArtifactClassLoader} for a domain artifact.
  */
-public class MuleSharedDomainClassLoader extends MuleArtifactClassLoader implements ArtifactClassLoader {
+public class MuleSharedDomainClassLoader extends MuleDeployableArtifactClassLoader implements ArtifactClassLoader {
 
   static {
     registerAsParallelCapable();
   }
 
   public MuleSharedDomainClassLoader(ArtifactDescriptor artifactDescriptor, ClassLoader parent,
-                                     ClassLoaderLookupPolicy lookupPolicy, List<URL> urls) {
-    super(getDomainId(artifactDescriptor.getName()), artifactDescriptor, urls.toArray(new URL[0]), parent, lookupPolicy);
+                                     ClassLoaderLookupPolicy lookupPolicy, List<URL> urls,
+                                     List<ArtifactClassLoader> artifactPluginClassLoaders) {
+    super(getDomainId(artifactDescriptor.getName()), artifactDescriptor, urls.toArray(new URL[0]), parent, lookupPolicy,
+          artifactPluginClassLoaders);
   }
 
   @Override
   public URL findResource(String name) {
     URL resource = super.findResource(name);
     if (resource == null) {
-      File file = new File(getDomainFolder(getArtifactDescriptor().getName()) + File.separator + name);
+      File file = new File(getDomainClassesFolder(getArtifactDescriptor().getName()) + File.separator + name);
       if (file.exists()) {
         try {
           resource = file.toURI().toURL();
@@ -52,7 +54,7 @@ public class MuleSharedDomainClassLoader extends MuleArtifactClassLoader impleme
 
   @Override
   protected String[] getLocalResourceLocations() {
-    return new String[] {getDomainFolder(getArtifactDescriptor().getName()).getAbsolutePath(),
-        MuleContainerBootstrapUtils.getMuleConfDir().getAbsolutePath()};
+    return new String[] {getDomainClassesFolder(getArtifactDescriptor().getName()).getAbsolutePath(),
+        getMuleConfDir().getAbsolutePath()};
   }
 }

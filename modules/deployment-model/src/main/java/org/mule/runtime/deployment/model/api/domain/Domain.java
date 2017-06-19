@@ -10,8 +10,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.application.Application;
 
-import java.io.File;
-
 /**
  * A domain is a deployable Artifact that contains shared resources for {@link Application}
  * <p/>
@@ -19,21 +17,6 @@ import java.io.File;
  * resources such as connectors or other mule components.
  */
 public interface Domain extends DeployableArtifact<DomainDescriptor> {
-
-  /**
-   * Domain configuration file name
-   */
-  String DOMAIN_CONFIG_FILE = "mule-domain-config.xml";
-
-  /**
-   * Domain configuration file location within domain package
-   */
-  String DOMAIN_CONFIG_FILE_LOCATION = "mule" + File.separator + "mule-domain-config.xml";
-
-  /**
-   * Name of the default domain
-   */
-  String DEFAULT_DOMAIN_NAME = "default";
 
   /**
    * @return true if this domain has shared mule components, false if it doesn't

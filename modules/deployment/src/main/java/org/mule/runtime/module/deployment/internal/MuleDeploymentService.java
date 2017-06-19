@@ -12,7 +12,6 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.module.deployment.internal.ArtifactDeploymentTemplate.NOP_ARTIFACT_DEPLOYMENT_TEMPLATE;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
-
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
@@ -26,7 +25,6 @@ import org.mule.runtime.module.deployment.api.StartupListener;
 import org.mule.runtime.module.deployment.impl.internal.application.DefaultApplicationFactory;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainFactory;
-import org.mule.runtime.module.deployment.impl.internal.domain.DomainFactory;
 import org.mule.runtime.module.deployment.internal.util.DebuggableReentrantLock;
 import org.mule.runtime.module.deployment.internal.util.ObservableList;
 import org.mule.runtime.module.service.ServiceManager;
@@ -261,7 +259,7 @@ public class MuleDeploymentService implements DeploymentService {
     domainDeploymentListener.removeDeploymentListener(listener);
   }
 
-  public void setDomainFactory(DomainFactory domainFactory) {
+  public void setDomainFactory(ArtifactFactory<Domain> domainFactory) {
     this.domainDeployer.setArtifactFactory(domainFactory);
   }
 

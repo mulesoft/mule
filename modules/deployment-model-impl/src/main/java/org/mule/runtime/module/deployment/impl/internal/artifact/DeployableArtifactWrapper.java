@@ -15,10 +15,12 @@ import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.DeploymentStartException;
 import org.mule.runtime.deployment.model.api.InstallException;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Decorates the target deployer to properly switch out context classloader for deployment one where applicable. E.g. init() phase
@@ -60,6 +62,11 @@ public class DeployableArtifactWrapper<T extends DeployableArtifact<D>, D extend
   @Override
   public MetadataService getMetadataService() {
     return getDelegate().getMetadataService();
+  }
+
+  @Override
+  public List<ArtifactPlugin> getArtifactPlugins() {
+    return delegate.getArtifactPlugins();
   }
 
   public void init() {

@@ -129,6 +129,20 @@ public abstract class AbstractArtifactFileBuilder<T extends AbstractArtifactFile
   }
 
   /**
+   * Adds a resource file to the plugin root folder.
+   *
+   * @param resourceFile resource file from a external file or test resource.
+   * @return the same builder instance
+   */
+  public T containingResource(String resourceFile, String alias) {
+    checkImmutable();
+    checkArgument(!isEmpty(resourceFile), "Resource file cannot be empty");
+    resources.add(new ZipResource(resourceFile, alias));
+
+    return getThis();
+  }
+
+  /**
    * Indicates that the generated artifact file must be a corrupted ZIP.
    *
    * @return the same builder instance

@@ -18,6 +18,8 @@ import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassL
 import static org.mule.runtime.module.deployment.impl.internal.policy.DefaultPolicyTemplateFactory.createPolicyTemplateCreationErrorMessage;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
+import org.mule.runtime.deployment.model.api.domain.Domain;
+import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplate;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
 import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
@@ -96,6 +98,11 @@ public class DefaultPolicyTemplateFactoryTestCase extends AbstractMuleTestCase {
     Application application = mock(Application.class);
     when(application.getRegionClassLoader()).thenReturn(regionClassLoader);
     when(application.getDescriptor()).thenReturn(appDescriptor);
+
+    final Domain domain = mock(Domain.class);
+    when(domain.getDescriptor()).thenReturn(new DomainDescriptor("testDomain"));
+    when(application.getDomain()).thenReturn(domain);
+
     return application;
   }
 

@@ -7,12 +7,10 @@
 
 package org.mule.runtime.module.deployment.impl.internal.application;
 
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
 import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
-import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
-import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateClassLoaderBuilderFactory;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainRepository;
+import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateClassLoaderBuilderFactory;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils;
 import org.mule.runtime.module.service.ServiceRepository;
@@ -28,16 +26,15 @@ public class TemporaryApplicationFactory extends DefaultApplicationFactory {
 
   public TemporaryApplicationFactory(ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory,
                                      ApplicationDescriptorFactory applicationDescriptorFactory,
-                                     ArtifactPluginRepository artifactPluginRepository, DomainRepository domainRepository,
+                                     DomainRepository domainRepository,
                                      ServiceRepository serviceRepository,
                                      ExtensionModelLoaderRepository extensionModelLoaderRepository,
                                      ClassLoaderRepository classLoaderRepository,
                                      PolicyTemplateClassLoaderBuilderFactory policyTemplateClassLoaderBuilderFactory,
-                                     PluginDependenciesResolver pluginDependenciesResolver,
-                                     ArtifactPluginDescriptorLoader pluginDescriptorLoader) {
-    super(applicationClassLoaderBuilderFactory, applicationDescriptorFactory, artifactPluginRepository, domainRepository,
+                                     PluginDependenciesResolver pluginDependenciesResolver) {
+    super(applicationClassLoaderBuilderFactory, applicationDescriptorFactory, domainRepository,
           serviceRepository, extensionModelLoaderRepository, classLoaderRepository, policyTemplateClassLoaderBuilderFactory,
-          pluginDependenciesResolver, pluginDescriptorLoader);
+          pluginDependenciesResolver);
   }
 
   @Override

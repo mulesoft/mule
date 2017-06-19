@@ -10,9 +10,11 @@ package org.mule.runtime.deployment.model.api;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.module.artifact.Artifact;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * An Artifact is an abstract representation of a deployable unit within the mule container.
@@ -72,4 +74,9 @@ public interface DeployableArtifact<D extends DeployableArtifactDescriptor> exte
    * @see MetadataService
    */
   MetadataService getMetadataService();
+
+  /**
+   * @return the plugins that are owned by the deployable artifact. Non null
+   */
+  List<ArtifactPlugin> getArtifactPlugins();
 }

@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.module.deployment.impl.internal.policy;
+package org.mule.runtime.module.deployment.impl.internal.artifact;
 
 import static java.util.Collections.emptyList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -18,6 +18,7 @@ import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.deployment.model.api.application.Application;
+import org.mule.runtime.module.deployment.impl.internal.policy.CompositeArtifactExtensionManager;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -26,7 +27,7 @@ import org.mule.tck.size.SmallTest;
 import org.junit.Test;
 
 @SmallTest
-public class PolicyTemplateExtensionManagerFactoryTestCase extends AbstractMuleTestCase {
+public class CompositeArtifactExtensionManagerFactoryTestCase extends AbstractMuleTestCase {
 
   @Test
   public void createsCompositeExtensionManager() throws Exception {
@@ -38,10 +39,10 @@ public class PolicyTemplateExtensionManagerFactoryTestCase extends AbstractMuleT
     ExtensionModelLoaderRepository extensionModelLoaderRepository = mock(ExtensionModelLoaderRepository.class);
 
     ExtensionManagerFactory extensionManagerFactory = mock(ExtensionManagerFactory.class);
-    PolicyTemplateExtensionManagerFactory factory = new PolicyTemplateExtensionManagerFactory(application,
-                                                                                              extensionModelLoaderRepository,
-                                                                                              emptyList(),
-                                                                                              extensionManagerFactory);
+    CompositeArtifactExtensionManagerFactory factory = new CompositeArtifactExtensionManagerFactory(application,
+                                                                                                    extensionModelLoaderRepository,
+                                                                                                    emptyList(),
+                                                                                                    extensionManagerFactory);
 
     ExtensionManager policyExtensionManager = mock(ExtensionManager.class);
     MuleContext muleContext = mock(DefaultMuleContext.class);

@@ -6,12 +6,24 @@
  */
 package org.mule.runtime.deployment.model.api.domain;
 
+import static org.mule.runtime.container.api.MuleFoldersUtil.getAppConfigFolderPath;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
+
+import com.google.common.collect.ImmutableList;
+
+import java.nio.file.Paths;
+import java.util.List;
 
 /**
  * Represents the description of a domain.
  */
 public class DomainDescriptor extends DeployableArtifactDescriptor {
+
+  public static final String DEFAULT_DOMAIN_NAME = "default";
+  public static final String DEFAULT_CONFIGURATION_RESOURCE = "mule-domain-config.xml";
+  public static final String DEFAULT_CONFIGURATION_RESOURCE_LOCATION =
+      Paths.get("mule", DEFAULT_CONFIGURATION_RESOURCE).toString();
+  public static final String MULE_DOMAIN_JSON_LOCATION = Paths.get("META-INF", "mule-artifact", "mule-domain.json").toString();
 
   /**
    * Creates a new domain descriptor
@@ -20,5 +32,10 @@ public class DomainDescriptor extends DeployableArtifactDescriptor {
    */
   public DomainDescriptor(String name) {
     super(name);
+  }
+
+  @Override
+  protected List<String> getDefaultConfigResources() {
+    return ImmutableList.<String>builder().add(getAppConfigFolderPath() + DEFAULT_CONFIGURATION_RESOURCE).build();
   }
 }

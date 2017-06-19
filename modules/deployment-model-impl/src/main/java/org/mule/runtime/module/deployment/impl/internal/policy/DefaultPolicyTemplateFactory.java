@@ -27,6 +27,7 @@ import org.mule.runtime.module.deployment.impl.internal.plugin.DefaultArtifactPl
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -56,8 +57,10 @@ public class DefaultPolicyTemplateFactory implements PolicyTemplateFactory {
   @Override
   public PolicyTemplate createArtifact(Application application, PolicyTemplateDescriptor descriptor) {
     MuleDeployableArtifactClassLoader policyClassLoader;
+    Set<ArtifactPlugin> plugins = new HashSet<>(application.getArtifactPlugins());
+    plugins.addAll(application.getDomain().getArtifactPlugins());
     List<ArtifactPluginDescriptor> artifactPluginDescriptors =
-        getArtifactPluginDescriptors(application.getDescriptor().getPlugins(), descriptor);
+        getArtifactPluginDescriptors(plugins, descriptor);
     List<ArtifactPluginDescriptor> resolveArtifactPluginDescriptors =
         pluginDependenciesResolver.resolve(artifactPluginDescriptors);
     try {
@@ -78,33 +81,33 @@ public class DefaultPolicyTemplateFactory implements PolicyTemplateFactory {
     return policy;
   }
 
-  private List<ArtifactPluginDescriptor> getArtifactPluginDescriptors(Set<ArtifactPluginDescriptor> appPlugins,
+  private List<ArtifactPluginDescriptor> getArtifactPluginDescriptors(Set<ArtifactPlugin> appPlugins,
                                                                       PolicyTemplateDescriptor descriptor) {
     List<ArtifactPluginDescriptor> artifactPluginDescriptors = new ArrayList<>();
     for (ArtifactPluginDescriptor policyPluginDescriptor : descriptor.getPlugins()) {
-      Optional<ArtifactPluginDescriptor> appPluginDescriptor =
+      Optional<ArtifactPlugin> appPluginDescriptor =
           findPlugin(appPlugins, policyPluginDescriptor.getBundleDescriptor());
 
       if (!appPluginDescriptor.isPresent()) {
         artifactPluginDescriptors.add(policyPluginDescriptor);
-      } else if (!isCompatibleVersion(appPluginDescriptor.get().getBundleDescriptor().getVersion(),
+      } else if (!isCompatibleVersion(appPluginDescriptor.get().getDescriptor().getBundleDescriptor().getVersion(),
                                       policyPluginDescriptor.getBundleDescriptor().getVersion())) {
         throw new IllegalStateException(
                                         format("Incompatible version of plugin '%s' found. Policy requires version'%s' but application provides version'%s'",
                                                policyPluginDescriptor.getName(),
                                                policyPluginDescriptor.getBundleDescriptor().getVersion(),
-                                               appPluginDescriptor.get().getBundleDescriptor().getVersion()));
+                                               appPluginDescriptor.get().getDescriptor().getBundleDescriptor().getVersion()));
       }
     }
 
     return artifactPluginDescriptors;
   }
 
-  private Optional<ArtifactPluginDescriptor> findPlugin(Set<ArtifactPluginDescriptor> appPlugins,
-                                                        BundleDescriptor bundleDescriptor) {
-    for (ArtifactPluginDescriptor appPlugin : appPlugins) {
-      if (appPlugin.getBundleDescriptor().getArtifactId().equals(bundleDescriptor.getArtifactId())
-          && appPlugin.getBundleDescriptor().getGroupId().equals(bundleDescriptor.getGroupId())) {
+  private Optional<ArtifactPlugin> findPlugin(Set<ArtifactPlugin> appPlugins,
+                                              BundleDescriptor bundleDescriptor) {
+    for (ArtifactPlugin appPlugin : appPlugins) {
+      if (appPlugin.getDescriptor().getBundleDescriptor().getArtifactId().equals(bundleDescriptor.getArtifactId())
+          && appPlugin.getDescriptor().getBundleDescriptor().getGroupId().equals(bundleDescriptor.getGroupId())) {
         return of(appPlugin);
       }
     }

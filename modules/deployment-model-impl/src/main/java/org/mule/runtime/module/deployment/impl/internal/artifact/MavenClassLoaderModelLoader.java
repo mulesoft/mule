@@ -83,11 +83,11 @@ public class MavenClassLoaderModelLoader implements ClassLoaderModelLoader {
 
       if (deployableMavenClassLoaderModelLoader.supportsArtifactType(artifactType)) {
         return deployableMavenClassLoaderModelLoader.load(artifactFile, attributes, artifactType);
-      }
-      if (pluginMavenClassLoaderModelLoader.supportsArtifactType(artifactType)) {
+      } else if (pluginMavenClassLoaderModelLoader.supportsArtifactType(artifactType)) {
         return pluginMavenClassLoaderModelLoader.load(artifactFile, attributes, artifactType);
+      } else {
+        throw new IllegalStateException(format("Artifact type %s not supported", artifactType));
       }
-      throw new IllegalStateException(format("Artifact type %s not supported", artifactType));
     } finally {
       lock.unlock(stamp);
     }

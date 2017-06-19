@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
-import static java.io.File.separator;
 import static java.lang.System.currentTimeMillis;
 import static java.lang.System.getProperty;
 import static java.lang.System.setProperty;
@@ -40,7 +39,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -57,9 +55,7 @@ import static org.mockito.Mockito.verify;
 import static org.mule.functional.services.TestServicesUtils.buildExpressionLanguageServiceFile;
 import static org.mule.functional.services.TestServicesUtils.buildSchedulerServiceFile;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.container.api.MuleFoldersUtil.CONTAINER_APP_PLUGINS;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppConfigFolderPath;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getContainerAppPluginsFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
@@ -67,17 +63,17 @@ import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPO
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.config.bootstrap.ClassLoaderRegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
+import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.PROPERTY_DOMAIN;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.DESTROYED;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STOPPED;
-import static org.mule.runtime.deployment.model.api.domain.Domain.DEFAULT_DOMAIN_NAME;
-import static org.mule.runtime.deployment.model.api.domain.Domain.DOMAIN_CONFIG_FILE;
-import static org.mule.runtime.deployment.model.api.domain.Domain.DOMAIN_CONFIG_FILE_LOCATION;
+import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
+import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_CONFIGURATION_RESOURCE_LOCATION;
+import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.EXTENSION_BUNDLE_TYPE;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.EXPORTED_PACKAGES;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.EXPORTED_RESOURCES;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MAVEN;
 import static org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader.RESOURCE_XML;
-import static org.mule.runtime.module.deployment.impl.internal.application.PropertiesDescriptorParser.PROPERTY_DOMAIN;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.ARTIFACT_ID;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.CLASSIFIER;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.GROUP_ID;
@@ -93,7 +89,6 @@ import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.
 import static org.mule.runtime.module.deployment.internal.TestApplicationFactory.createTestApplicationFactory;
 import static org.mule.runtime.module.service.ServiceDescriptorFactory.SERVICE_PROVIDER_CLASS_NAME;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
-
 import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MulePluginModel.MulePluginModelBuilder;
@@ -256,7 +251,10 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
   @BeforeClass
   public static void beforeClass() throws URISyntaxException {
-    barUtils1_0JarFile = new JarCompiler().compiling(getResourceFile("/org/bar1/BarUtils.java")).compile("bar-1.0.jar");
+    barUtils1_0JarFile =
+        new JarFileBuilder("barUtils1",
+                           new JarCompiler().compiling(getResourceFile("/org/bar1/BarUtils.java")).compile("bar-1.0.jar"))
+                               .getArtifactFile();
 
     barUtils2_0JarFile = new JarCompiler().compiling(getResourceFile("/org/bar2/BarUtils.java")).compile("bar-2.0.jar");
 
@@ -329,11 +327,9 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
       new ArtifactPluginFileBuilder("appResourcePlugin").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo.resource")
           .containingClass(resourceConsumerClassFile, "org/foo/resource/ResourceConsumer.class");
 
-  private final ArtifactPluginFileBuilder helloExtensionV1Plugin =
-      createHelloExtensionV1PluginFileBuilder();
+  private final ArtifactPluginFileBuilder helloExtensionV1Plugin = createHelloExtensionV1PluginFileBuilder();
 
-  private final ArtifactPluginFileBuilder helloExtensionV2Plugin =
-      createHelloExtensionV2PluginFileBuilder();
+  private final ArtifactPluginFileBuilder helloExtensionV2Plugin = createHelloExtensionV2PluginFileBuilder();
 
   private final ArtifactPluginFileBuilder simpleExtensionPlugin =
       new ArtifactPluginFileBuilder("simpleExtensionPlugin")
@@ -404,6 +400,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   private final DomainFileBuilder invalidDomainBundleFileBuilder =
       new DomainFileBuilder("invalid-domain-bundle").definedBy("incomplete-domain-config.xml").containing(emptyAppFileBuilder);
   private final DomainFileBuilder dummyDomainBundleFileBuilder = new DomainFileBuilder("dummy-domain-bundle")
+      .definedBy("empty-domain-config.xml")
       .containing(new ApplicationFileBuilder(dummyAppDescriptorFileBuilder).deployedWith(PROPERTY_DOMAIN, "dummy-domain-bundle"));
   private final DomainFileBuilder dummyDomainFileBuilder =
       new DomainFileBuilder("dummy-domain").definedBy("empty-domain-config.xml");
@@ -446,8 +443,6 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   protected File muleHome;
   protected File appsDir;
   protected File domainsDir;
-  protected File containerAppPluginsDir;
-  protected File tmpAppsDir;
   protected ServiceManager serviceManager;
   protected ExtensionModelLoaderManager extensionModelLoaderManager;
   protected MuleDeploymentService deploymentService;
@@ -482,10 +477,6 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     muleHome = new File(new File(tmpDir, "mule_home"), getClass().getSimpleName() + currentTimeMillis());
     appsDir = new File(muleHome, "apps");
     appsDir.mkdirs();
-    containerAppPluginsDir = new File(muleHome, CONTAINER_APP_PLUGINS);
-    containerAppPluginsDir.mkdirs();
-    tmpAppsDir = new File(muleHome, "tmp");
-    tmpAppsDir.mkdirs();
     domainsDir = new File(muleHome, "domains");
     domainsDir.mkdirs();
     setProperty(MULE_HOME_DIRECTORY_PROPERTY, muleHome.getCanonicalPath());
@@ -1047,7 +1038,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     // change shared config name to use a wrong name
     File domainConfigFile =
         new File(domainsDir + "/" + sharedBundleDomainFileBuilder.getDeployedPath(),
-                 Paths.get("mule", DOMAIN_CONFIG_FILE).toString());
+                 Paths.get("mule", DEFAULT_CONFIGURATION_RESOURCE).toString());
     String correctDomainConfigContent = IOUtils.toString(new FileInputStream(domainConfigFile));
     String wrongDomainFileContext = correctDomainConfigContent.replace("test-shared-config", "test-shared-config-wrong");
     copyInputStreamToFile(new ByteArrayInputStream(wrongDomainFileContext.getBytes()), domainConfigFile);
@@ -1570,70 +1561,6 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void deploysAppZipWithContainerPluginBroken() throws Exception {
-    ArtifactPluginFileBuilder echoPluginBroken = new ArtifactPluginFileBuilder("echoPlugin")
-        .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo").dependingOn(new JarFileBuilder("echoTest", echoTestJarFile))
-        .corrupted();
-
-    installContainerPlugin(echoPluginBroken);
-
-    final ApplicationFileBuilder applicationFileBuilder =
-        new ApplicationFileBuilder("my-app.jar", emptyAppFileBuilder).dependingOn(echoPluginWithLib1);
-    addPackedAppFromBuilder(applicationFileBuilder);
-
-    startDeployment();
-
-    assertDeploymentFailure(applicationDeploymentListener, applicationFileBuilder.getId());
-  }
-
-  @Test
-  public void deploysAppZipWithPluginAlreadyInContainerPlugins() throws Exception {
-    installContainerPlugin(echoPlugin);
-    // Just an non-zip file to validate that it is only looking for zip files
-    copyFileToContainerPluginFolder(echoPlugin.getArtifactFile(), "invalidPlugin.tar");
-
-    final ApplicationFileBuilder applicationFileBuilder =
-        new ApplicationFileBuilder("my-app.jar", emptyAppFileBuilder).dependingOn(echoPlugin);
-    addPackedAppFromBuilder(applicationFileBuilder);
-
-    startDeployment();
-
-    assertDeploymentFailure(applicationDeploymentListener, applicationFileBuilder.getId());
-  }
-
-  @Ignore("MULE-9657 - Decide what to do with container plugins")
-  @Test
-  public void deploysAppZipWithPluginShouldIncludedBundledPluginsFromContainer() throws Exception {
-    installContainerPlugin(echoPlugin);
-
-    final ApplicationFileBuilder applicationFileBuilder =
-        new ApplicationFileBuilder("dummyWithEchoPlugin").definedBy("app-with-echo-plugin-config.xml");
-    addPackedAppFromBuilder(applicationFileBuilder);
-
-    startDeployment();
-
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
-    assertAppsDir(NONE, new String[] {applicationFileBuilder.getId()}, true);
-    assertContainerAppPluginExplodedDir(new String[] {echoPlugin.getDeployedPath()});
-  }
-
-  @Ignore("MULE-9657 - Decide what to do with container plugins")
-  @Test
-  public void deploysAppZipWithPluginShouldIncludedBundledPluginsExpandedFromContainer() throws Exception {
-    installContainerPluginExpanded(echoPlugin);
-
-    final ApplicationFileBuilder applicationFileBuilder =
-        new ApplicationFileBuilder("dummyWithEchoPlugin").definedBy("app-with-echo-plugin-config.xml");
-    addPackedAppFromBuilder(applicationFileBuilder);
-
-    startDeployment();
-
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
-    assertAppsDir(NONE, new String[] {applicationFileBuilder.getId()}, true);
-    assertContainerAppPluginExplodedDir(new String[] {echoPlugin.getDeployedPath()});
-  }
-
-  @Test
   public void deploysAppWithPluginSharedLibrary() throws Exception {
     addPackedAppFromBuilder(sharedLibPluginAppFileBuilder);
 
@@ -1973,11 +1900,12 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     final String domainId = "shared-lib";
     final ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("shared-lib-precedence-app")
         .definedBy("app-shared-lib-precedence-config.xml")
-        .dependingOnSharedLibrary(new JarFileBuilder("bar-utils2", barUtils2_0JarFile))
+        .dependingOnSharedLibrary(new JarFileBuilder("barUtils2", barUtils2_0JarFile))
         .containingClass(pluginEcho1TestClassFile, "org/foo/Plugin1Echo.class")
         .deployedWith(PROPERTY_DOMAIN, domainId);
     final DomainFileBuilder domainFileBuilder =
-        new DomainFileBuilder(domainId).dependingOn(new JarFileBuilder("barUtils1_0", barUtils1_0JarFile))
+        new DomainFileBuilder(domainId).dependingOnSharedLibrary(new JarFileBuilder("barUtils1", barUtils1_0JarFile))
+            .definedBy("empty-domain-config.xml")
             .containing(applicationFileBuilder);
 
     addPackedDomainFromBuilder(domainFileBuilder);
@@ -1994,11 +1922,12 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     final String domainId = "shared-lib";
     final ApplicationFileBuilder applicationFileBuilder =
         new ApplicationFileBuilder("shared-lib-precedence-app").definedBy("app-shared-lib-precedence-config.xml")
-            .dependingOn(new JarFileBuilder("barUtils2_0", barUtils2_0JarFile))
+            .dependingOnSharedLibrary(new JarFileBuilder("barUtils2_0", barUtils2_0JarFile))
             .containingClass(pluginEcho1TestClassFile, "org/foo/Plugin1Echo.class")
             .deployedWith(PROPERTY_DOMAIN, domainId);
     final DomainFileBuilder domainFileBuilder =
-        new DomainFileBuilder(domainId).usingLibrary(barUtils1_0JarFile.getAbsolutePath())
+        new DomainFileBuilder(domainId).dependingOnSharedLibrary(new JarFileBuilder("barUtils1_0", barUtils1_0JarFile))
+            .definedBy("empty-domain-config.xml")
             .containing(applicationFileBuilder);
 
     addPackedDomainFromBuilder(domainFileBuilder);
@@ -2017,11 +1946,14 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
         new ArtifactPluginFileBuilder("echoPlugin1").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo")
             .containingClass(pluginEcho1TestClassFile, "org/foo/Plugin1Echo.class")
             .dependingOn(new JarFileBuilder("barUtils2_0", barUtils2_0JarFile));
+
     final ApplicationFileBuilder applicationFileBuilder =
         new ApplicationFileBuilder("shared-lib-precedence-app").definedBy("app-shared-lib-precedence-config.xml")
             .dependingOn(pluginFileBuilder).deployedWith(PROPERTY_DOMAIN, domainId);
+
     final DomainFileBuilder domainFileBuilder =
-        new DomainFileBuilder(domainId).usingLibrary(barUtils1_0JarFile.getAbsolutePath())
+        new DomainFileBuilder(domainId).dependingOnSharedLibrary(new JarFileBuilder("barUtils1.0", barUtils1_0JarFile))
+            .definedBy("empty-domain-config.xml")
             .containing(applicationFileBuilder);
 
     addPackedDomainFromBuilder(domainFileBuilder);
@@ -2270,7 +2202,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     final Domain domain = findADomain(dummyDomainBundleFileBuilder.getId());
     assertNotNull(domain);
-    assertNull(domain.getMuleContext());
+    assertNotNull(domain.getMuleContext());
 
     assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
     assertAppsDir(NONE, new String[] {dummyAppDescriptorFileBuilder.getId()}, true);
@@ -2383,48 +2315,48 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   public void redeploysDomainZipDeployedOnStartup() throws Exception {
     startDeployment();
 
-    addPackedDomainFromBuilder(emptyAppFileBuilder);
-    File dummyDomainFile = new File(domainsDir, emptyAppFileBuilder.getZipPath());
+    addPackedDomainFromBuilder(emptyDomainFileBuilder);
+    File dummyDomainFile = new File(domainsDir, emptyDomainFileBuilder.getZipPath());
     long firstFileTimestamp = dummyDomainFile.lastModified();
 
-    assertDeploymentSuccess(domainDeploymentListener, emptyAppFileBuilder.getId());
+    assertDeploymentSuccess(domainDeploymentListener, emptyDomainFileBuilder.getId());
 
-    assertDomainDir(NONE, new String[] {DEFAULT_DOMAIN_NAME, emptyAppFileBuilder.getId()}, true);
+    assertDomainDir(NONE, new String[] {DEFAULT_DOMAIN_NAME, emptyDomainFileBuilder.getId()}, true);
     assertEquals("Domain has not been properly registered with Mule", 2, deploymentService.getDomains().size());
 
     reset(domainDeploymentListener);
 
-    addPackedDomainFromBuilder(emptyAppFileBuilder);
+    addPackedDomainFromBuilder(emptyDomainFileBuilder);
     alterTimestampIfNeeded(dummyDomainFile, firstFileTimestamp);
 
-    assertUndeploymentSuccess(domainDeploymentListener, emptyAppFileBuilder.getId());
-    assertDeploymentSuccess(domainDeploymentListener, emptyAppFileBuilder.getId());
+    assertUndeploymentSuccess(domainDeploymentListener, emptyDomainFileBuilder.getId());
+    assertDeploymentSuccess(domainDeploymentListener, emptyDomainFileBuilder.getId());
     assertEquals("Domain has not been properly registered with Mule", 2, deploymentService.getDomains().size());
-    assertDomainDir(NONE, new String[] {DEFAULT_DOMAIN_NAME, emptyAppFileBuilder.getId()}, true);
+    assertDomainDir(NONE, new String[] {DEFAULT_DOMAIN_NAME, emptyDomainFileBuilder.getId()}, true);
   }
 
   @Test
   public void redeployedDomainsAreDifferent() throws Exception {
     startDeployment();
 
-    addPackedDomainFromBuilder(emptyAppFileBuilder);
-    File dummyDomainFile = new File(domainsDir, emptyAppFileBuilder.getZipPath());
+    addPackedDomainFromBuilder(emptyDomainFileBuilder);
+    File dummyDomainFile = new File(domainsDir, emptyDomainFileBuilder.getZipPath());
     long firstFileTimestamp = dummyDomainFile.lastModified();
 
-    assertDeploymentSuccess(domainDeploymentListener, emptyAppFileBuilder.getId());
+    assertDeploymentSuccess(domainDeploymentListener, emptyDomainFileBuilder.getId());
 
     assertEquals("Domain has not been properly registered with Mule", 2, deploymentService.getDomains().size());
-    Domain firstDomain = findADomain(emptyAppFileBuilder.getId());
+    Domain firstDomain = findADomain(emptyDomainFileBuilder.getId());
 
     reset(domainDeploymentListener);
 
-    addPackedDomainFromBuilder(emptyAppFileBuilder);
+    addPackedDomainFromBuilder(emptyDomainFileBuilder);
     alterTimestampIfNeeded(dummyDomainFile, firstFileTimestamp);
 
-    assertUndeploymentSuccess(domainDeploymentListener, emptyAppFileBuilder.getId());
-    assertDeploymentSuccess(domainDeploymentListener, emptyAppFileBuilder.getId());
+    assertUndeploymentSuccess(domainDeploymentListener, emptyDomainFileBuilder.getId());
+    assertDeploymentSuccess(domainDeploymentListener, emptyDomainFileBuilder.getId());
     assertEquals("Domain has not been properly registered with Mule", 2, deploymentService.getDomains().size());
-    Domain secondDomain = findADomain(emptyAppFileBuilder.getId());
+    Domain secondDomain = findADomain(emptyDomainFileBuilder.getId());
 
     assertNotSame(firstDomain, secondDomain);
   }
@@ -2476,6 +2408,162 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     assertDeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId());
     assertEquals("Domain has not been properly registered with Mule", 2, deploymentService.getDomains().size());
     assertDomainDir(NONE, new String[] {DEFAULT_DOMAIN_NAME, dummyDomainFileBuilder.getId()}, true);
+  }
+
+  @Test
+  public void deploysAppUsingDomainPlugin() throws Exception {
+    ApplicationFileBuilder echoPluginAppFileBuilder =
+        new ApplicationFileBuilder("dummyWithEchoPlugin").definedBy("app-with-echo-plugin-config.xml")
+            .deployedWith(PROPERTY_DOMAIN, "dummy-domain-bundle");
+
+    DomainFileBuilder domainFileBuilder = new DomainFileBuilder("dummy-domain-bundle")
+        .definedBy("empty-domain-config.xml")
+        .dependingOn(echoPlugin)
+        .containing(echoPluginAppFileBuilder);
+
+    addPackedDomainFromBuilder(domainFileBuilder);
+
+    startDeployment();
+
+    assertDeploymentSuccess(domainDeploymentListener, domainFileBuilder.getId());
+    assertDeploymentSuccess(applicationDeploymentListener, echoPluginAppFileBuilder.getId());
+
+    executeApplicationFlow("main");
+  }
+
+  @Test
+  public void deploysAppUsingDomainExtension() throws Exception {
+    installEchoService();
+    installFooService();
+
+    ApplicationFileBuilder applicationFileBuilder =
+        new ApplicationFileBuilder("appWithHelloExtension").definedBy(APP_WITH_EXTENSION_PLUGIN_CONFIG)
+            .deployedWith(PROPERTY_DOMAIN, "dummy-domain-bundle");
+
+    DomainFileBuilder domainFileBuilder = new DomainFileBuilder("dummy-domain-bundle")
+        .definedBy("empty-domain-config.xml")
+        .dependingOn(helloExtensionV1Plugin)
+        .containing(applicationFileBuilder);
+
+    addPackedDomainFromBuilder(domainFileBuilder);
+
+    startDeployment();
+
+    assertDeploymentSuccess(domainDeploymentListener, domainFileBuilder.getId());
+    assertDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+
+    executeApplicationFlow("main");
+  }
+
+  @Test
+  public void failsToDeployAppWithDomainPluginVersionMismatch() throws Exception {
+    installEchoService();
+    installFooService();
+
+    ApplicationFileBuilder applicationFileBuilder =
+        new ApplicationFileBuilder("dummyWithHelloExtension").definedBy(APP_WITH_EXTENSION_PLUGIN_CONFIG)
+            .deployedWith(PROPERTY_DOMAIN, "dummy-domain-bundle")
+            .dependingOn(helloExtensionV2Plugin);
+
+    DomainFileBuilder domainFileBuilder = new DomainFileBuilder("dummy-domain-bundle")
+        .definedBy("empty-domain-config.xml")
+        .dependingOn(helloExtensionV1Plugin)
+        .containing(applicationFileBuilder);
+
+    addPackedDomainFromBuilder(domainFileBuilder);
+
+    startDeployment();
+
+    assertDeploymentSuccess(domainDeploymentListener, domainFileBuilder.getId());
+    assertDeploymentFailure(applicationDeploymentListener, applicationFileBuilder.getId());
+  }
+
+  @Test
+  public void appliesApplicationPolicyUsingDomainPlugin() throws Exception {
+    installEchoService();
+    installFooService();
+
+    policyManager.registerPolicyTemplate(policyIncludingPluginFileBuilder.getArtifactFile());
+
+    ApplicationFileBuilder applicationFileBuilder =
+        new ApplicationFileBuilder("dummyWithHelloExtension").definedBy(APP_WITH_EXTENSION_PLUGIN_CONFIG)
+            .deployedWith(PROPERTY_DOMAIN, "dummy-domain-bundle");
+
+    DomainFileBuilder domainFileBuilder = new DomainFileBuilder("dummy-domain-bundle")
+        .definedBy("empty-domain-config.xml")
+        .dependingOn(helloExtensionV1Plugin)
+        .containing(applicationFileBuilder);
+
+    addPackedDomainFromBuilder(domainFileBuilder);
+
+    startDeployment();
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+
+    policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder.getId(),
+                            new PolicyParametrization(FOO_POLICY_ID, s -> true, 1, emptyMap(),
+                                                      getResourceFile("/appPluginPolicy.xml")));
+
+    executeApplicationFlow("main");
+    assertThat(invocationCount, equalTo(1));
+  }
+
+  @Test
+  public void appliesApplicationPolicyDuplicatingDomainPlugin() throws Exception {
+    installEchoService();
+    installFooService();
+
+    policyManager.registerPolicyTemplate(policyIncludingPluginFileBuilder.getArtifactFile());
+
+    ApplicationFileBuilder applicationFileBuilder =
+        new ApplicationFileBuilder("dummyWithHelloExtension").definedBy(APP_WITH_EXTENSION_PLUGIN_CONFIG)
+            .deployedWith(PROPERTY_DOMAIN, "dummy-domain-bundle");
+
+    DomainFileBuilder domainFileBuilder = new DomainFileBuilder("dummy-domain-bundle")
+        .definedBy("empty-domain-config.xml")
+        .dependingOn(helloExtensionV1Plugin)
+        .containing(applicationFileBuilder);
+
+    addPackedDomainFromBuilder(domainFileBuilder);
+
+    startDeployment();
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+
+    policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder.getId(),
+                            new PolicyParametrization(FOO_POLICY_ID, s -> true, 1, emptyMap(),
+                                                      getResourceFile("/appPluginPolicy.xml")));
+
+    executeApplicationFlow("main");
+    assertThat(invocationCount, equalTo(1));
+  }
+
+  @Test
+  public void failsToApplyApplicationPolicyWithDomainPluginVersionMismatch() throws Exception {
+    installEchoService();
+    installFooService();
+
+    policyManager.registerPolicyTemplate(policyIncludingHelloPluginV2FileBuilder.getArtifactFile());
+
+    ApplicationFileBuilder applicationFileBuilder =
+        new ApplicationFileBuilder("dummyWithHelloExtension").definedBy(APP_WITH_EXTENSION_PLUGIN_CONFIG)
+            .deployedWith(PROPERTY_DOMAIN, "dummy-domain-bundle");
+
+    DomainFileBuilder domainFileBuilder = new DomainFileBuilder("dummy-domain-bundle")
+        .definedBy("empty-domain-config.xml")
+        .dependingOn(helloExtensionV1Plugin)
+        .containing(applicationFileBuilder);
+
+    addPackedDomainFromBuilder(domainFileBuilder);
+
+    startDeployment();
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+
+    try {
+      policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingHelloPluginV2FileBuilder.getId(),
+                              new PolicyParametrization(FOO_POLICY_ID, s -> true, 1, emptyMap(),
+                                                        getResourceFile("/appPluginPolicy.xml")));
+      fail("Policy application should have failed");
+    } catch (PolicyRegistrationException expected) {
+    }
   }
 
   protected void alterTimestampIfNeeded(File file, long firstTimestamp) {
@@ -2575,7 +2663,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     addExplodedDomainFromBuilder(emptyDomainFileBuilder);
     assertDeploymentSuccess(domainDeploymentListener, emptyDomainFileBuilder.getId());
 
-    addExplodedDomainFromBuilder(emptyAppFileBuilder, "empty2-domain");
+    addExplodedDomainFromBuilder(emptyDomainFileBuilder, "empty2-domain");
     assertDeploymentSuccess(domainDeploymentListener, "empty2-domain");
 
     // After three update cycles should have only one deployment failure notification for the broken app
@@ -2635,12 +2723,12 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
   @Test
   public void undeploysStoppedDomain() throws Exception {
-    addPackedDomainFromBuilder(emptyAppFileBuilder);
+    addPackedDomainFromBuilder(emptyDomainFileBuilder);
 
     startDeployment();
 
-    assertDeploymentSuccess(domainDeploymentListener, emptyAppFileBuilder.getId());
-    final Domain domain = findADomain(emptyAppFileBuilder.getId());
+    assertDeploymentSuccess(domainDeploymentListener, emptyDomainFileBuilder.getId());
+    final Domain domain = findADomain(emptyDomainFileBuilder.getId());
     domain.stop();
 
     deploymentService.undeploy(domain);
@@ -2648,15 +2736,15 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
   @Test
   public void undeploysDomainRemovingAnchorFile() throws Exception {
-    addPackedDomainFromBuilder(emptyAppFileBuilder);
+    addPackedDomainFromBuilder(emptyDomainFileBuilder);
 
     startDeployment();
 
-    assertDeploymentSuccess(domainDeploymentListener, emptyAppFileBuilder.getId());
+    assertDeploymentSuccess(domainDeploymentListener, emptyDomainFileBuilder.getId());
 
-    assertTrue("Unable to remove anchor file", removeDomainAnchorFile(emptyAppFileBuilder.getId()));
+    assertTrue("Unable to remove anchor file", removeDomainAnchorFile(emptyDomainFileBuilder.getId()));
 
-    assertUndeploymentSuccess(domainDeploymentListener, emptyAppFileBuilder.getId());
+    assertUndeploymentSuccess(domainDeploymentListener, emptyDomainFileBuilder.getId());
   }
 
   @Test
@@ -2698,8 +2786,9 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     addPackedDomainFromBuilder(emptyDomainFileBuilder);
 
     TestDomainFactory testDomainFactory =
-        new TestDomainFactory(new DomainClassLoaderFactory(getClass().getClassLoader()),
-                              containerClassLoader, artifactClassLoaderManager, serviceManager);
+        TestDomainFactory.createDomainFactory(new DomainClassLoaderFactory(containerClassLoader.getClassLoader()),
+                                              containerClassLoader, serviceManager, moduleRepository,
+                                              createDescriptorLoaderRepository());
     testDomainFactory.setMuleContextListenerFactory(new DeploymentMuleContextListenerFactory(domainDeploymentListener));
     testDomainFactory.setFailOnStopApplication();
 
@@ -2720,8 +2809,9 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     addPackedDomainFromBuilder(emptyDomainFileBuilder);
 
     TestDomainFactory testDomainFactory =
-        new TestDomainFactory(new DomainClassLoaderFactory(getClass().getClassLoader()),
-                              containerClassLoader, artifactClassLoaderManager, serviceManager);
+        TestDomainFactory.createDomainFactory(new DomainClassLoaderFactory(containerClassLoader.getClassLoader()),
+                                              containerClassLoader, serviceManager, moduleRepository,
+                                              createDescriptorLoaderRepository());
     testDomainFactory.setMuleContextListenerFactory(new DeploymentMuleContextListenerFactory(domainDeploymentListener));
     testDomainFactory.setFailOnDisposeApplication();
     deploymentService.setDomainFactory(testDomainFactory);
@@ -2785,9 +2875,9 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     assertDeploymentFailure(domainDeploymentListener, incompleteDomainFileBuilder.getId());
 
     // Deploys another app to confirm that DeploymentService has execute the updater thread
-    addPackedDomainFromBuilder(emptyAppFileBuilder);
+    addPackedDomainFromBuilder(emptyDomainFileBuilder);
 
-    assertDeploymentSuccess(domainDeploymentListener, emptyAppFileBuilder.getId());
+    assertDeploymentSuccess(domainDeploymentListener, emptyDomainFileBuilder.getId());
 
     // Check that the failed application folder is still there
     assertDomainFolderIsMaintained(incompleteDomainFileBuilder.getId());
@@ -2805,11 +2895,11 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     assertDeploymentFailure(domainDeploymentListener, incompleteDomainFileBuilder.getId());
 
     // Deploys another app to confirm that DeploymentService has execute the updater thread
-    addPackedDomainFromBuilder(emptyAppFileBuilder);
+    addPackedDomainFromBuilder(emptyDomainFileBuilder);
 
-    assertDeploymentSuccess(domainDeploymentListener, emptyAppFileBuilder.getId());
+    assertDeploymentSuccess(domainDeploymentListener, emptyDomainFileBuilder.getId());
 
-    // Deploys another app to confirm that DeploymentService has execute the updater thread
+    // Deploys another domain to confirm that DeploymentService has execute the updater thread
     addPackedDomainFromBuilder(emptyDomainFileBuilder, incompleteDomainFileBuilder.getZipPath());
     assertDeploymentSuccess(domainDeploymentListener, incompleteDomainFileBuilder.getId());
 
@@ -2967,9 +3057,9 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     assertDeploymentFailure(domainDeploymentListener, incompleteDomainFileBuilder.getId());
 
     // Deploys another app to confirm that DeploymentService has execute the updater thread
-    addPackedDomainFromBuilder(emptyAppFileBuilder);
+    addPackedDomainFromBuilder(emptyDomainFileBuilder);
 
-    assertDeploymentSuccess(domainDeploymentListener, emptyAppFileBuilder.getId());
+    assertDeploymentSuccess(domainDeploymentListener, emptyDomainFileBuilder.getId());
 
     // Redeploys a fixed version for incompleteDomain
     addExplodedDomainFromBuilder(emptyDomainFileBuilder, incompleteDomainFileBuilder.getId());
@@ -2977,26 +3067,6 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     assertDeploymentSuccess(domainDeploymentListener, incompleteDomainFileBuilder.getId());
     assertEquals("Failed domain still appears as zombie after a successful redeploy", 0,
                  deploymentService.getZombieDomains().size());
-  }
-
-  /**
-   * Copies the artifact file (zip) of the applicationPluginFileBuilder to the container application plugins directory so the
-   * given plugin would be treated as container application plugin.
-   *
-   * @param artifactPluginFileBuilder
-   * @throws Exception
-   */
-  private void installContainerPlugin(ArtifactPluginFileBuilder artifactPluginFileBuilder) throws Exception {
-    copyFileToContainerPluginFolder(artifactPluginFileBuilder.getArtifactFile(), artifactPluginFileBuilder.getId() + ".jar");
-  }
-
-  private void installContainerPluginExpanded(ArtifactPluginFileBuilder artifactPluginFileBuilder) throws Exception {
-    final File pluginFolderExpanded = new File(getContainerAppPluginsFolder(), separator + artifactPluginFileBuilder.getId());
-    FileUtils.unzip(artifactPluginFileBuilder.getArtifactFile(), pluginFolderExpanded);
-  }
-
-  private void copyFileToContainerPluginFolder(File sourceFile, String targetFileName) throws IOException {
-    copyFile(sourceFile, new File(containerAppPluginsDir, targetFileName));
   }
 
   private Action createUndeployDummyDomainAction() {
@@ -3414,17 +3484,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   private ApplicationFileBuilder createExtensionApplicationWithServices(String appConfigFile,
                                                                         ArtifactPluginFileBuilder... plugins)
       throws Exception {
-    final ServiceFileBuilder echoService =
-        new ServiceFileBuilder("echoService").configuredWith(SERVICE_PROVIDER_CLASS_NAME, "org.mule.echo.EchoServiceProvider")
-            .usingLibrary(defaulServiceEchoJarFile.getAbsolutePath());
-    File installedService = new File(services, echoService.getArtifactFile().getName());
-    copyFile(echoService.getArtifactFile(), installedService);
-
-    final ServiceFileBuilder fooService = new ServiceFileBuilder("fooService")
-        .configuredWith(SERVICE_PROVIDER_CLASS_NAME, "org.mule.service.foo.FooServiceProvider")
-        .usingLibrary(defaultFooServiceJarFile.getAbsolutePath());
-    installedService = new File(services, fooService.getArtifactFile().getName());
-    copyFile(fooService.getArtifactFile(), installedService);
+    installEchoService();
+    installFooService();
 
     ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("appWithExtensionPlugin")
         .definedBy(appConfigFile);
@@ -3434,6 +3495,22 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     }
 
     return applicationFileBuilder;
+  }
+
+  private void installFooService() throws IOException {
+    installService("fooService", "org.mule.service.foo.FooServiceProvider", defaultFooServiceJarFile);
+  }
+
+  private void installEchoService() throws IOException {
+    installService("echoService", "org.mule.echo.EchoServiceProvider", defaulServiceEchoJarFile);
+  }
+
+  private void installService(String serviceName, String serviceProviderClassName, File serviceJarFile) throws IOException {
+    final ServiceFileBuilder echoService =
+        new ServiceFileBuilder(serviceName).configuredWith(SERVICE_PROVIDER_CLASS_NAME, serviceProviderClassName)
+            .usingLibrary(serviceJarFile.getAbsolutePath());
+    File installedService = new File(services, echoService.getArtifactFile().getName());
+    copyFile(echoService.getArtifactFile(), installedService);
   }
 
   private void doSynchronizedDomainDeploymentActionTest(final Action deploymentAction, final Action assertAction)
@@ -3528,14 +3605,14 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     reset(domainDeploymentListener);
 
-    File originalConfigFile = new File(domainsDir + "/incompleteDomain", DOMAIN_CONFIG_FILE_LOCATION);
+    File originalConfigFile = new File(domainsDir + "/incompleteDomain", DEFAULT_CONFIGURATION_RESOURCE_LOCATION);
     URL url = getClass().getResource("/empty-domain-config.xml");
     File newConfigFile = new File(url.toURI());
     copyFile(newConfigFile, originalConfigFile);
     assertDeploymentSuccess(domainDeploymentListener, "incompleteDomain");
 
-    addPackedDomainFromBuilder(emptyAppFileBuilder);
-    assertDeploymentSuccess(domainDeploymentListener, emptyAppFileBuilder.getId());
+    addPackedDomainFromBuilder(emptyDomainFileBuilder);
+    assertDeploymentSuccess(domainDeploymentListener, emptyDomainFileBuilder.getId());
 
     // Check that the failed application folder is still there
     assertDomainFolderIsMaintained("incompleteDomain");
@@ -3833,7 +3910,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
                                  new DomainClassLoaderFactory(getClass().getClassLoader())
                                      .create("domain/" + DEFAULT_DOMAIN_NAME, containerClassLoader,
                                              new DomainDescriptor(DEFAULT_DOMAIN_NAME), emptyList()),
-                                 artifactClassLoaderManager, serviceManager);
+                                 artifactClassLoaderManager, serviceManager, emptyList());
   }
 
   /**
@@ -3847,17 +3924,6 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
   private void assertAppsDir(String[] expectedZips, String[] expectedApps, boolean performValidation) {
     assertArtifactDir(appsDir, expectedZips, expectedApps, performValidation);
-  }
-
-  /**
-   * Asserts that the core application plugins are expanded and match the number of expected plugins to be expanded
-   *
-   * @param expectedPlugins
-   */
-  private void assertContainerAppPluginExplodedDir(String[] expectedPlugins) {
-    final String[] actualArtifactPlugins = containerAppPluginsDir.list(DIRECTORY);
-    assertTrue("Invalid Mule core application plugins exploded",
-               isEqualCollection(asList(expectedPlugins), asList(actualArtifactPlugins)));
   }
 
   private void assertDomainDir(String[] expectedZips, String[] expectedDomains, boolean performValidation) {
@@ -4180,7 +4246,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
         .addProperty(EXPORTED_RESOURCES,
                      asList("/", "META-INF/mule-hello.xsd", "META-INF/spring.handlers", "META-INF/spring.schemas"))
         .setId(MAVEN);
-    return new ArtifactPluginFileBuilder("helloExtensionPlugin")
+    return new ArtifactPluginFileBuilder("helloExtensionPlugin-2.0")
         .dependingOn(new JarFileBuilder("helloExtensionV2", helloExtensionV2JarFile))
         .describedBy((mulePluginModelBuilder.build()));
   }
@@ -4189,11 +4255,11 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModelBuilder()
         .setMinMuleVersion(MIN_MULE_VERSION).setName("helloExtensionPlugin")
         .withBundleDescriptorLoader(createBundleDescriptorLoader("helloExtensionPlugin", MULE_EXTENSION_CLASSIFIER,
-                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID));
+                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "1.0"));
     mulePluginModelBuilder.withClassLoaderModelDescriber().setId(MAVEN)
         .addProperty(EXPORTED_RESOURCES,
                      asList("/", "META-INF/mule-hello.xsd", "META-INF/spring.handlers", "META-INF/spring.schemas"));
-    return new ArtifactPluginFileBuilder("helloExtensionPlugin")
+    return new ArtifactPluginFileBuilder("helloExtensionPlugin-1.0")
         .dependingOn(new JarFileBuilder("helloExtensionV1", helloExtensionV1JarFile))
         .describedBy((mulePluginModelBuilder.build()));
   }

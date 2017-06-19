@@ -15,14 +15,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.domain.Domain;
+import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
 import org.mule.runtime.deployment.model.internal.application.ApplicationClassLoaderBuilder;
 import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader;
 import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
@@ -31,12 +30,10 @@ import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainRepository;
-import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateClassLoaderBuilderFactory;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.service.ServiceRepository;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.junit4.rule.SystemPropertyTemporaryFolder;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -46,7 +43,6 @@ import java.util.List;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.junit.rules.TemporaryFolder;
 
 public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
 
@@ -58,24 +54,19 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
   private final ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory =
       mock(ApplicationClassLoaderBuilderFactory.class);
   private final DomainRepository domainRepository = mock(DomainRepository.class);
-  private final ArtifactPluginRepository applicationPluginRepository = mock(ArtifactPluginRepository.class);
   private final ApplicationDescriptorFactory applicationDescriptorFactory = mock(ApplicationDescriptorFactory.class);
   private final ServiceRepository serviceRepository = mock(ServiceRepository.class);
   private final ExtensionModelLoaderRepository extensionModelLoaderRepository = mock(ExtensionModelLoaderRepository.class);
   private final ClassLoaderRepository classLoaderRepository = mock(ClassLoaderRepository.class);
   private final PluginDependenciesResolver pluginDependenciesResolver = mock(PluginDependenciesResolver.class);
-  private final ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader = mock(ArtifactPluginDescriptorLoader.class);
   private final PolicyTemplateClassLoaderBuilderFactory policyTemplateClassLoaderBuilderFactory =
       mock(PolicyTemplateClassLoaderBuilderFactory.class);
   private final DefaultApplicationFactory applicationFactory =
       new DefaultApplicationFactory(applicationClassLoaderBuilderFactory, applicationDescriptorFactory,
-                                    applicationPluginRepository, domainRepository, serviceRepository,
+                                    domainRepository, serviceRepository,
                                     extensionModelLoaderRepository,
-                                    classLoaderRepository, policyTemplateClassLoaderBuilderFactory, pluginDependenciesResolver,
-                                    artifactPluginDescriptorLoader);
+                                    classLoaderRepository, policyTemplateClassLoaderBuilderFactory, pluginDependenciesResolver);
 
-  @Rule
-  public TemporaryFolder muleHome = new SystemPropertyTemporaryFolder(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY);
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
 
@@ -90,8 +81,6 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
     final ArtifactPluginDescriptor coreArtifactPluginDescriptor = mock(ArtifactPluginDescriptor.class);
     List<ArtifactPluginDescriptor> containerArtifactPluginDescriptors = new LinkedList<>();
     containerArtifactPluginDescriptors.add(coreArtifactPluginDescriptor);
-    when(applicationPluginRepository.getContainerArtifactPluginDescriptors())
-        .thenReturn(containerArtifactPluginDescriptors);
 
     final ArtifactPlugin appPlugin = mock(ArtifactPlugin.class);
     final ArtifactClassLoader artifactClassLoader = mock(ArtifactClassLoader.class);
@@ -151,6 +140,7 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
     when(domainArtifactClassLoader.getClassLoaderLookupPolicy()).thenReturn(domainLookupPolicy);
     when(domainRepository.getDomain(name)).thenReturn(domain);
     when(domain.getArtifactClassLoader()).thenReturn(domainArtifactClassLoader);
+    when(domain.getDescriptor()).thenReturn(new DomainDescriptor(name));
 
     return domain;
   }

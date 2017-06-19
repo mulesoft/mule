@@ -27,6 +27,7 @@ import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplate;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder;
+import org.mule.runtime.module.deployment.impl.internal.artifact.CompositeArtifactExtensionManagerFactory;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManagerFactory;
 import org.mule.runtime.module.service.ServiceRepository;
@@ -84,9 +85,9 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
             .setServiceRepository(serviceRepository)
             .setClassLoaderRepository(classLoaderRepository)
             .setArtifactPlugins(artifactPlugins)
-            .setExtensionManagerFactory(new PolicyTemplateExtensionManagerFactory(application, extensionModelLoaderRepository,
-                                                                                  artifactPlugins,
-                                                                                  new DefaultExtensionManagerFactory()));
+            .setExtensionManagerFactory(new CompositeArtifactExtensionManagerFactory(application, extensionModelLoaderRepository,
+                                                                                     artifactPlugins,
+                                                                                     new DefaultExtensionManagerFactory()));
 
     artifactBuilder.withServiceConfigurator(customizationService -> customizationService
         .overrideDefaultServiceImpl(MuleProperties.OBJECT_POLICY_MANAGER_STATE_HANDLER,
