@@ -60,9 +60,8 @@ public class ReactorStreamProcessingStrategyFactory extends AbstractStreamProces
     private Supplier<Scheduler> cpuLightSchedulerSupplier;
     private Scheduler cpuLightScheduler;
 
-    private ReactorStreamProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier, int bufferSize, int subscribers,
-                                            String waitStrategy, Supplier<Scheduler> cpuLightSchedulerSupplier,
-                                            int maxConcurrency) {
+    ReactorStreamProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier, int bufferSize, int subscribers,
+                                    String waitStrategy, Supplier<Scheduler> cpuLightSchedulerSupplier, int maxConcurrency) {
       super(ringBufferSchedulerSupplier, bufferSize, subscribers, waitStrategy, maxConcurrency);
       this.cpuLightSchedulerSupplier = cpuLightSchedulerSupplier;
     }
