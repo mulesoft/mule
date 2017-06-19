@@ -73,13 +73,9 @@ public class MessageFilterTestCase extends AbstractReactiveProcessorTestCase {
     SensingNullMessageProcessor out = getSensingNullMessageProcessor();
     mp.setMuleContext(muleContext);
     mp.setListener(out);
-
     Event inEvent = eventBuilder().message(of(TEST_MESSAGE)).build();
-
-    Event resultEvent = process(mp, inEvent);
-
+    process(mp, inEvent);
     assertNull(out.event);
-    assertSame(inEvent, resultEvent);
     assertNotNull(unaccepted.event);
   }
 }

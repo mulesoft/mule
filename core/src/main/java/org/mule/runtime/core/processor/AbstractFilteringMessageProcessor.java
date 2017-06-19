@@ -6,6 +6,10 @@
  */
 package org.mule.runtime.core.processor;
 
+import static java.lang.Boolean.getBoolean;
+import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
+import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
+import static reactor.core.publisher.Flux.empty;
 import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
@@ -26,6 +30,9 @@ import org.reactivestreams.Publisher;
  * {@link Processor} chain. The default behaviour when the filter is not accepted is to return the request event.
  */
 public abstract class AbstractFilteringMessageProcessor extends AbstractInterceptingMessageProcessor {
+
+  public static final String FILTER_ON_UNACCEPTED_NOT_STOP_PARENT_FLOW =
+      SYSTEM_PROPERTY_PREFIX + "filterOnUnacceptedNotStopParentFlow";
 
   /**
    * Throw a FilterUnacceptedException when a message is rejected by the filter?
@@ -85,7 +92,12 @@ public abstract class AbstractFilteringMessageProcessor extends AbstractIntercep
           if (accept(event, builder)) {
             return just(event).transform(applyNext());
           } else {
-            return just(event).transform(unacceptedMessageProcessor);
+            if (shouldNotFilterStopParentFlow()) {
+              return just(event).transform(unacceptedMessageProcessor);
+            }
+            just(event).transform(unacceptedMessageProcessor).subscribe(requestUnbounded());
+            event.getContext().success();
+            return empty();
           }
         } catch (Exception ex) {
           return error(filterFailureException(builder.build(), ex));
@@ -98,7 +110,11 @@ public abstract class AbstractFilteringMessageProcessor extends AbstractIntercep
 
   protected Event handleUnaccepted(Event event) throws MuleException {
     if (unacceptedMessageProcessor != null) {
-      return unacceptedMessageProcessor.process(event);
+      Event result = unacceptedMessageProcessor.process(event);
+      if (shouldNotFilterStopParentFlow()) {
+        return result;
+      }
+      return null;
     } else if (isThrowOnUnaccepted()) {
       throw filterUnacceptedException(event);
     } else {
@@ -132,4 +148,9 @@ public abstract class AbstractFilteringMessageProcessor extends AbstractIntercep
   public void setThrowOnUnaccepted(boolean throwOnUnaccepted) {
     this.throwOnUnaccepted = throwOnUnaccepted;
   }
+
+  private boolean shouldNotFilterStopParentFlow() {
+    return getBoolean(FILTER_ON_UNACCEPTED_NOT_STOP_PARENT_FLOW);
+  }
+
 }
