@@ -17,7 +17,6 @@ import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.CONFIGUR
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.DESCRIPTION_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.DOC_DESCRIPTION_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.ERROR_MAPPING_IDENTIFIER;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.GLOBAL_PROPERTY_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.INTERCEPTOR_STACK_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_DOMAIN_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_EE_DOMAIN_IDENTIFIER;
@@ -106,10 +105,6 @@ public class BeanDefinitionFactory {
           .add(ANNOTATIONS_ELEMENT_IDENTIFIER)
           .add(DOC_DESCRIPTION_IDENTIFIER)
           .add(SPRING_PROPERTY_PLACEHOLDER_IDENTIFIER)
-          .add(GLOBAL_PROPERTY_IDENTIFIER)
-          .add(SECURITY_MANAGER_IDENTIFIER)
-          // TODO MULE-9638: Uncomment this code when task is finished
-          // .add(GLOBAL_PROPERTY_IDENTIFIER)
           .build();
 
   /**
@@ -193,9 +188,12 @@ public class BeanDefinitionFactory {
     }
     resolveComponentBeanDefinition(parentComponentModel, componentModel);
     componentDefinitionModelProcessor.accept(componentModel, registry);
+
     // TODO MULE-9638: Once we migrate all core definitions we need to define a mechanism for customizing
     // how core constructs are processed.
     processMuleConfiguration(componentModel, registry);
+    processMuleSecurityManager(componentModel, registry);
+
     componentBuildingDefinitionRegistry.getBuildingDefinition(componentModel.getIdentifier())
         .ifPresent(componentBuildingDefinition -> {
           if ((componentModel.getType() != null) && AnnotatedObject.class.isAssignableFrom(componentModel.getType())) {
@@ -261,6 +259,17 @@ public class BeanDefinitionFactory {
     }
   }
 
+  private void processMuleSecurityManager(ComponentModel componentModel, BeanDefinitionRegistry registry) {
+    if (componentModel.getIdentifier().equals(SECURITY_MANAGER_IDENTIFIER)) {
+      componentModel.getInnerComponents().stream().forEach(childComponentModel -> {
+        if (childComponentModel.getNameAttribute().equals("password-encryption-strategy")
+            || childComponentModel.getNameAttribute().equals("secret-key-encryption-strategy")) {
+          registry.registerBeanDefinition(childComponentModel.getNameAttribute(), childComponentModel.getBeanDefinition());
+        }
+      });
+    }
+  }
+
 
   private void resolveComponentBeanDefinition(ComponentModel parentComponentModel, ComponentModel componentModel) {
     Optional<ComponentBuildingDefinition<?>> buildingDefinitionOptional =
@@ -314,6 +323,7 @@ public class BeanDefinitionFactory {
     MapEntryBeanDefinitionCreator mapEntryBeanDefinitionCreator = new MapEntryBeanDefinitionCreator();
     MapBeanDefinitionCreator mapBeanDefinitionCreator = new MapBeanDefinitionCreator();
     CommonBeanDefinitionCreator commonComponentModelProcessor = new CommonBeanDefinitionCreator(objectFactoryClassRepository);
+
     propertiesMapBeanDefinitionCreator.setNext(interceptorStackBeanDefinitionCreator);
     interceptorStackBeanDefinitionCreator.setNext(exceptionStrategyRefBeanDefinitionCreator);
     exceptionStrategyRefBeanDefinitionCreator.setNext(filterReferenceBeanDefinitionCreator);

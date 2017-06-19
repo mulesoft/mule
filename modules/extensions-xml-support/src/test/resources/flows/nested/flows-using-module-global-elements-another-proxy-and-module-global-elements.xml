@@ -5,8 +5,8 @@
       xmlns:module-global-element="http://www.mulesoft.org/schema/mule/module-global-element"
       xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/module-global-element http://www.mulesoft.org/schema/mule/module-global-element/module-global-element.xsd
-       http://www.mulesoft.org/schema/mule/module-global-element-another-proxy http://www.mulesoft.org/schema/mule/module-global-element-another-proxy/module-global-element-another-proxy.xsd">
+       http://www.mulesoft.org/schema/mule/module-global-element http://www.mulesoft.org/schema/mule/module-global-element/current/mule-module-global-element.xsd
+       http://www.mulesoft.org/schema/mule/module-global-element-another-proxy http://www.mulesoft.org/schema/mule/module-global-element-another-proxy/current/mule-module-global-element-another-proxy.xsd">
 
     <module-global-element-another-proxy:config name="nested-config" someUserConfig="nestedUser" somePassConfig="nestedPassword" port="${httpPort}"/>
     <module-global-element:config name="direct-config" someUserConfig="directUser" somePassConfig="directPassword" port="${httpPort}"/>

@@ -4,7 +4,7 @@
       xmlns:module-global-element="http://www.mulesoft.org/schema/mule/module-global-element"
       xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/module-global-element http://www.mulesoft.org/schema/mule/module-global-element/module-global-element.xsd">
+       http://www.mulesoft.org/schema/mule/module-global-element http://www.mulesoft.org/schema/mule/module-global-element/current/mule-module-global-element.xsd">
 
     <module-global-element:config name="la-plata-config-using-literals" someUserConfig="userLP" somePassConfig="passLP" port="${httpPort}" protocolConfig="HTTP"/>
     <module-global-element:config name="gonnet-config-using-expressions" someUserConfig="#['userGonnet']" somePassConfig="#['passGonnet']" port="#['${httpPort}']" protocolConfig="HTTP"/>

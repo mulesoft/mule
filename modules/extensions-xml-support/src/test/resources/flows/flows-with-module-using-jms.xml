@@ -4,7 +4,7 @@
       xmlns:module-using-jms="http://www.mulesoft.org/schema/mule/module-using-jms"
       xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/module-using-jms http://www.mulesoft.org/schema/mule/module-using-jms/module-using-jms.xsd">
+       http://www.mulesoft.org/schema/mule/module-using-jms http://www.mulesoft.org/schema/mule/module-using-jms/current/mule-module-using-jms.xsd">
 
     <module-using-jms:config name="aConfigName"/>
 

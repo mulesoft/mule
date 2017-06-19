@@ -113,6 +113,7 @@ import org.mule.runtime.core.api.model.resolvers.ArrayEntryPointResolver;
 import org.mule.runtime.core.api.model.resolvers.CallableEntryPointResolver;
 import org.mule.runtime.core.api.model.resolvers.DefaultEntryPointResolverSet;
 import org.mule.runtime.core.api.model.resolvers.ExplicitMethodEntryPointResolver;
+import org.mule.runtime.core.api.model.resolvers.LegacyEntryPointResolverSet;
 import org.mule.runtime.core.api.model.resolvers.MethodHeaderPropertyEntryPointResolver;
 import org.mule.runtime.core.api.model.resolvers.NoArgumentsEntryPointResolver;
 import org.mule.runtime.core.api.model.resolvers.ReflectionEntryPointResolver;
@@ -126,6 +127,8 @@ import org.mule.runtime.core.api.retry.policy.ConnectNotifier;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.security.EncryptionStrategy;
+import org.mule.runtime.core.api.security.SecurityManager;
+import org.mule.runtime.core.api.security.SecurityProvider;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.source.polling.PeriodicScheduler;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
@@ -157,14 +160,6 @@ import org.mule.runtime.core.expression.transformers.ExpressionArgument;
 import org.mule.runtime.core.expression.transformers.ExpressionTransformer;
 import org.mule.runtime.core.interceptor.LoggingInterceptor;
 import org.mule.runtime.core.interceptor.TimerInterceptor;
-import org.mule.runtime.core.internal.enricher.MessageEnricher;
-import org.mule.runtime.core.internal.transformer.codec.XmlEntityDecoder;
-import org.mule.runtime.core.internal.transformer.codec.XmlEntityEncoder;
-import org.mule.runtime.core.internal.transformer.compression.GZipCompressTransformer;
-import org.mule.runtime.core.internal.transformer.compression.GZipUncompressTransformer;
-import org.mule.runtime.core.internal.transformer.encryption.AbstractEncryptionTransformer;
-import org.mule.runtime.core.internal.transformer.encryption.DecryptionTransformer;
-import org.mule.runtime.core.internal.transformer.encryption.EncryptionTransformer;
 import org.mule.runtime.core.internal.enricher.MessageEnricher;
 import org.mule.runtime.core.internal.transformer.codec.XmlEntityDecoder;
 import org.mule.runtime.core.internal.transformer.codec.XmlEntityEncoder;
@@ -219,6 +214,7 @@ import org.mule.runtime.core.routing.filters.logic.NotFilter;
 import org.mule.runtime.core.routing.filters.logic.OrFilter;
 import org.mule.runtime.core.routing.outbound.MulticastingRouter;
 import org.mule.runtime.core.routing.requestreply.SimpleAsyncRequestReplyRequester;
+import org.mule.runtime.core.security.MuleSecurityManagerConfigurator;
 import org.mule.runtime.core.security.PasswordBasedEncryptionStrategy;
 import org.mule.runtime.core.security.SecretKeyEncryptionStrategy;
 import org.mule.runtime.core.source.StartableCompositeMessageSource;
@@ -428,6 +424,12 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withIdentifier("copy-properties")
         .withTypeDefinition(fromType(CopyPropertiesProcessor.class))
         .withSetterParameterDefinition("propertyName", fromSimpleParameter("propertyName").build())
+        .build());
+
+    componentBuildingDefinitions.add(baseDefinition.copy()
+        .withIdentifier("global-property")
+        .withTypeDefinition(fromType(String.class))
+        .withConstructorParameterDefinition(fromSimpleParameter("value").build())
         .build());
 
     componentBuildingDefinitions
@@ -662,6 +664,10 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("expressionLanguage", fromChildConfiguration(MVELExpressionLanguage.class).build())
         .build());
 
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("custom-processing-strategy")
+        .withTypeDefinition(fromConfigurationAttribute("class"))
+        .build());
+
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("notifications")
         .withTypeDefinition(fromType(ServerNotificationManagerConfigurator.class))
         .withSetterParameterDefinition("notificationDynamic", fromSimpleParameter("dynamic").build())
@@ -713,6 +719,14 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withObjectFactoryType(EncryptionSecurityFilterObjectFactory.class)
         .withConstructorParameterDefinition(fromSimpleReferenceParameter("strategy-ref").build())
         .withIgnoredConfigurationParameter(NAME)
+        .build());
+
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("security-manager")
+        .withTypeDefinition(fromType(SecurityManager.class)).withObjectFactoryType(MuleSecurityManagerConfigurator.class)
+        .withSetterParameterDefinition("muleContext", fromReferenceObject(MuleContext.class).build())
+        .withSetterParameterDefinition("name", fromSimpleParameter("name").build())
+        .withSetterParameterDefinition("providers", fromChildCollectionConfiguration(SecurityProvider.class).build())
+        .withSetterParameterDefinition("encryptionStrategies", fromChildCollectionConfiguration(EncryptionStrategy.class).build())
         .build());
 
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("custom-security-provider")
@@ -835,6 +849,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("global-functions")
         .withTypeDefinition(fromType(MVELGlobalFunctionsConfig.class))
         .withSetterParameterDefinition("file", fromSimpleParameter("file").build())
+        .withSetterParameterDefinition("inlineScript", fromTextContent().build())
         .build());
 
     componentBuildingDefinitions.addAll(getTransformersBuildingDefinitions());
@@ -1532,6 +1547,12 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .copy()
         .withIdentifier("entry-point-resolver-set")
         .withTypeDefinition(fromType(DefaultEntryPointResolverSet.class))
+        .withSetterParameterDefinition("entryPointResolvers", fromChildCollectionConfiguration(EntryPointResolver.class).build())
+        .build());
+    buildingDefinitions.add(baseDefinition
+        .copy()
+        .withIdentifier("legacy-entry-point-resolver-set")
+        .withTypeDefinition(fromType(LegacyEntryPointResolverSet.class))
         .withSetterParameterDefinition("entryPointResolvers", fromChildCollectionConfiguration(EntryPointResolver.class).build())
         .build());
     buildingDefinitions.add(baseDefinition

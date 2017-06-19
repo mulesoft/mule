@@ -4,13 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.spring.security.config;
+package org.mule.runtime.core.security;
 
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
+
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.security.EncryptionStrategy;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.security.SecurityProvider;
-import org.mule.runtime.core.security.DefaultMuleSecurityManager;
 import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
 
 import java.util.ArrayList;
@@ -30,6 +31,7 @@ import javax.inject.Inject;
 public class MuleSecurityManagerConfigurator extends AbstractAnnotatedObjectFactory<SecurityManager> {
 
   private List<SecurityProvider> providers = new ArrayList<>();
+  private List<EncryptionStrategy> encryptionStrategies = new ArrayList<>();
   private MuleContext muleContext;
   private String name = OBJECT_SECURITY_MANAGER;
 
@@ -46,6 +48,10 @@ public class MuleSecurityManagerConfigurator extends AbstractAnnotatedObjectFact
     this.providers = providers;
   }
 
+  public void setEncryptionStrategies(List<EncryptionStrategy> encryptionStrategies) {
+    this.encryptionStrategies = encryptionStrategies;
+  }
+
   @Override
   public SecurityManager doGetObject() throws Exception {
     List<SecurityManager> securityManagers = new ArrayList<>();
@@ -55,11 +61,16 @@ public class MuleSecurityManagerConfigurator extends AbstractAnnotatedObjectFact
       factorySecurityManager = new DefaultMuleSecurityManager();
       securityManagers.add(factorySecurityManager);
     }
-    providers.stream().forEach(provider -> {
-      securityManagers.stream().forEach(securityManager -> {
+
+    securityManagers.stream().forEach(securityManager -> {
+      providers.stream().forEach(provider -> {
         securityManager.addProvider(provider);
       });
+      encryptionStrategies.stream().forEach(encryptionStrategy -> {
+        securityManager.addEncryptionStrategy(encryptionStrategy);
+      });
     });
+
     return factorySecurityManager;
   }
 }

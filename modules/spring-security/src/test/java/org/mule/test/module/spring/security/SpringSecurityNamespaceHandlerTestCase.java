@@ -11,6 +11,7 @@ import static org.junit.Assert.assertTrue;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
+import org.mule.runtime.config.spring.CustomSecurityProviderDelegate;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.security.SecurityProvider;
 import org.mule.runtime.module.spring.security.SpringProviderAdapter;
@@ -31,7 +32,9 @@ public class SpringSecurityNamespaceHandlerTestCase extends MuleArtifactFunction
 
   @Test
   public void testProvider() {
-    knownProperties(getProvider("memory-dao"));
+    SecurityProvider provider = getProvider("memory-dao");
+    assertNotNull(provider);
+    assertTrue(provider instanceof SpringProviderAdapter);
   }
 
   protected SecurityProvider getProvider(String providerName) {
@@ -46,15 +49,14 @@ public class SpringSecurityNamespaceHandlerTestCase extends MuleArtifactFunction
       SecurityProvider provider = providers.next();
       LOGGER.debug(provider.getName());
     }
-    knownProperties(getProvider("customProvider"));
+
+    knownProperties(getProvider("willAlsoOverwriteName"));
     knownProperties(getProvider("willOverwriteName"));
   }
 
   protected void knownProperties(SecurityProvider provider) {
     assertNotNull(provider);
-    assertTrue(provider instanceof SpringProviderAdapter);
-    SpringProviderAdapter adapter = (SpringProviderAdapter) provider;
-    assertNotNull(adapter.getDelegate());
+    assertTrue(provider instanceof CustomSecurityProviderDelegate);
   }
 
 }

@@ -4,7 +4,7 @@
       xmlns:module-multiple-global-elements="http://www.mulesoft.org/schema/mule/module-multiple-global-elements"
       xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/module-multiple-global-elements http://www.mulesoft.org/schema/mule/module-multiple-global-elements/module-multiple-global-elements.xsd">
+       http://www.mulesoft.org/schema/mule/module-multiple-global-elements http://www.mulesoft.org/schema/mule/module-multiple-global-elements/current/mule-module-multiple-global-elements.xsd">
 
     <module-multiple-global-elements:config name="configPatternA" workingDir="${workingDir}" filenamePattern="sub*A"/>
     <module-multiple-global-elements:config name="configPatternB" workingDir="${workingDir}" filenamePattern="sub*B"/>

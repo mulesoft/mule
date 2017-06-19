@@ -52,8 +52,10 @@ public class MVELExpressionLanguageObjectFactory extends AbstractAnnotatedObject
     MVELExpressionLanguage result = new MVELExpressionLanguage(muleContext);
 
     result.setAutoResolveVariables(autoResolveVariables);
+
     if (globalFunctions != null) {
       result.setGlobalFunctionsFile(globalFunctions.getFile());
+      result.setGlobalFunctionsString(globalFunctions.getInlineScript());
     }
 
     if (aliases != null) {

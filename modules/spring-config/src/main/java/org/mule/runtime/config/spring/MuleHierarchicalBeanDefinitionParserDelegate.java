@@ -192,9 +192,8 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
           if (!element.getLocalName().equals(MULE_ROOT_ELEMENT) && !element.getLocalName().equals(MULE_DOMAIN_ROOT_ELEMENT)
               && !element.getLocalName().equals(POLICY_ROOT_ELEMENT)) {
             if (handler == null) {
-              throw new MuleRuntimeException(createStaticMessage(
-                                                                 getMissingModuleOrExtensionMessage(componentModel.getIdentifier()
-                                                                     .toString())));
+              String elementName = componentModel != null ? componentModel.getIdentifier().toString() : element.getNodeName();
+              throw new MuleRuntimeException(createStaticMessage(getMissingModuleOrExtensionMessage(elementName.toString())));
             }
 
             ParserContext parserContext = new ParserContext(getReaderContext(), this, parent);

@@ -102,7 +102,7 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
     // TODO(fernandezlautaro): MULE-11024 once implemented, remove the extensionSchemaFactory.isPresent() from the `if` statement
     if (extensionSchemaFactory.isPresent()) {
       Optional<ExtensionModel> extensionModel = extensions.stream()
-          .filter(em -> systemId.startsWith(em.getXmlDslModel().getNamespace()))
+          .filter(em -> systemId.equals(em.getXmlDslModel().getSchemaLocation()))
           .findAny();
       if (extensionModel.isPresent()) {
         InputStream schema = getSchemaFromExtension(extensionModel.get());

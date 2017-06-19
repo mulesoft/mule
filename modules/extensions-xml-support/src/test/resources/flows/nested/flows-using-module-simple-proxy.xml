@@ -4,7 +4,7 @@
       xmlns:module-simple-proxy="http://www.mulesoft.org/schema/mule/module-simple-proxy"
       xsi:schemaLocation="
       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-      http://www.mulesoft.org/schema/mule/module-simple-proxy http://www.mulesoft.org/schema/mule/module-simple-proxy/module-simple-proxy.xsd">
+      http://www.mulesoft.org/schema/mule/module-simple-proxy http://www.mulesoft.org/schema/mule/module-simple-proxy/current/mule-module-simple-proxy.xsd">
 
     <flow name="testSetPayloadHardcodedFlow">
         <module-simple-proxy:set-payload-hardcoded-value />

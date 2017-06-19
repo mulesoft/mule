@@ -13,7 +13,16 @@ package org.mule.runtime.core.el.mvel.configuration;
  */
 public class MVELGlobalFunctionsConfig {
 
+  String inlineScript;
   String file;
+
+  public String getInlineScript() {
+    return inlineScript;
+  }
+
+  public void setInlineScript(String inlineScript) {
+    this.inlineScript = inlineScript;
+  }
 
   public String getFile() {
     return file;

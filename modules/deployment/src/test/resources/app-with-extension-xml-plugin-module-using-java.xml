@@ -3,7 +3,7 @@
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:module-using-java="http://www.mulesoft.org/schema/mule/module-using-java"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-      http://www.mulesoft.org/schema/mule/module-using-java http://www.mulesoft.org/schema/mule/module-using-java/current/module-using-java.xsd">
+      http://www.mulesoft.org/schema/mule/module-using-java http://www.mulesoft.org/schema/mule/module-using-java/current/mule-module-using-java.xsd">
 
     <flow name="main">
         <module-using-java:execute-java-class/>
