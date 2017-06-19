@@ -95,7 +95,7 @@
                 <!-- Runtime Dependencies-->
                 <exclusion>
                     <groupId>org.apache.cxf</groupId>
-                    <artifactId>cxf-rt-core</artifactId>
+                    <artifactId>cxf-core</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>org.apache.cxf</groupId>
@@ -116,6 +116,10 @@
                 <exclusion>
                     <groupId>org.apache.cxf</groupId>
                     <artifactId>cxf-rt-ws-security</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.santuario</groupId>
+                    <artifactId>xmlsec</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>org.opensaml</groupId>
