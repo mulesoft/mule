@@ -19,7 +19,13 @@
 /mule-standalone-${productVersion}/apps/default
 /mule-standalone-${productVersion}/apps/default/mule
 /mule-standalone-${productVersion}/apps/default/mule/mule-config.xml
-
+/mule-standalone-${productVersion}/apps/default/META-INF/maven
+/mule-standalone-${productVersion}/apps/default/META-INF/maven/org.mule
+/mule-standalone-${productVersion}/apps/default/META-INF/maven/org.mule/default
+/mule-standalone-${productVersion}/apps/default/META-INF/maven/org.mule/default/pom.xml
+/mule-standalone-${productVersion}/apps/default/META-INF
+/mule-standalone-${productVersion}/apps/default/META-INF/mule-artifact
+/mule-standalone-${productVersion}/apps/default/META-INF/mule-artifact/mule-application.json
 
 #
 # /bin
