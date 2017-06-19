@@ -26,7 +26,7 @@ public interface ImplicitConnectionProviderFactory {
    * and {@code configurationModel}
    *
    * @param configName the name of the configuration that will own the returned {@link ConnectionProvider}
-   * @oaram extensionModel the {@link ExtensionModel} which owns the {@code configurationModel}
+   * @param extensionModel the {@link ExtensionModel} which owns the {@code configurationModel}
    * @param configurationModel the model that represents the selected config
    * @param event the {@link Event} that will be used to evaluate any default parameters that requires resolving an expression
    * @param muleContext the Mule node.
