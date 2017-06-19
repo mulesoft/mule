@@ -43,7 +43,7 @@ public class ReactorProcessingStrategyFactory extends AbstractProcessingStrategy
   }
 
   @Override
-  public Class<? extends ProcessingStrategy> getProcessingStrategyClass() {
+  public Class<? extends ProcessingStrategy> getProcessingStrategyType() {
     return ReactorProcessingStrategy.class;
   }
 

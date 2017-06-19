@@ -52,7 +52,7 @@ public class WorkQueueStreamProcessingStrategyFactory extends AbstractStreamProc
   }
 
   @Override
-  public Class<? extends ProcessingStrategy> getProcessingStrategyClass() {
+  public Class<? extends ProcessingStrategy> getProcessingStrategyType() {
     return WorkQueueStreamProcessingStrategy.class;
   }
 

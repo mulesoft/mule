@@ -41,7 +41,7 @@ public class TransactionAwareWorkQueueProcessingStrategyFactory extends WorkQueu
   }
 
   @Override
-  public Class<? extends ProcessingStrategy> getProcessingStrategyClass() {
+  public Class<? extends ProcessingStrategy> getProcessingStrategyType() {
     return TransactionAwareWorkQueueProcessingStrategy.class;
   }
 

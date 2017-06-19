@@ -66,9 +66,9 @@ class TransactionAwareProactorStreamProcessingStrategyFactory extends ReactorStr
   }
 
   @Override
-  public Class<? extends ProcessingStrategy> getProcessingStrategyClass() {
+  public Class<? extends ProcessingStrategy> getProcessingStrategyType() {
     if (getMaxConcurrency() == 1) {
-      return NOT_CONCURRENT_TX_AWARE_PS_FACTORY.getProcessingStrategyClass();
+      return NOT_CONCURRENT_TX_AWARE_PS_FACTORY.getProcessingStrategyType();
     } else {
       return TransactionAwareProactorStreamProcessingStrategy.class;
     }

@@ -44,7 +44,7 @@ public class WorkQueueProcessingStrategyFactory extends AbstractProcessingStrate
   }
 
   @Override
-  public Class<? extends ProcessingStrategy> getProcessingStrategyClass() {
+  public Class<? extends ProcessingStrategy> getProcessingStrategyType() {
     return WorkQueueProcessingStrategy.class;
   }
 

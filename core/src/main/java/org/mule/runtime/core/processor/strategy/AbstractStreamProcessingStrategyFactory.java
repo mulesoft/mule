@@ -101,7 +101,7 @@ abstract class AbstractStreamProcessingStrategyFactory extends AbstractProcessin
   }
 
   @Override
-  public Class<? extends ProcessingStrategy> getProcessingStrategyClass() {
+  public Class<? extends ProcessingStrategy> getProcessingStrategyType() {
     return AbstractStreamProcessingStrategy.class;
   }
 
