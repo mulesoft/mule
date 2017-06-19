@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.core.api.construct;
 
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.processor.ProcessingDescriptor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.source.MessageSource;
 
 import java.util.List;
@@ -23,16 +23,19 @@ import java.util.Map;
  */
 public interface Pipeline extends FlowConstruct, ProcessingDescriptor {
 
-  void setMessageSource(MessageSource messageSource);
+  /**
+   * @return source of messages to use.
+   */
+  MessageSource getSource();
 
-  MessageSource getMessageSource();
+  /**
+   * @return processors to execute on a {@link Message}.
+   */
+  List<Processor> getProcessors();
 
-  void setMessageProcessors(List<Processor> messageProcessors);
-
-  List<Processor> getMessageProcessors();
-
-  void setProcessingStrategyFactory(ProcessingStrategyFactory processingStrategyFactory);
-
+  /**
+   * @return the {@link ProcessingStrategy} used on the pipeline.
+   */
   ProcessingStrategy getProcessingStrategy();
 
   /**
@@ -44,9 +47,4 @@ public interface Pipeline extends FlowConstruct, ProcessingDescriptor {
    * @return map of event context keyed by their id as obtained from {@link EventContext#getId()}
    */
   Map<String, EventContext> getSerializationEventContextCache();
-
-  /**
-   * @return the factory used to create the {@link ProcessingStrategy} used on the pipeline.
-   */
-  ProcessingStrategyFactory getProcessingStrategyFactory();
 }

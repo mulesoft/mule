@@ -51,7 +51,7 @@ public class OperationErrorHandlingTestCase extends AbstractExtensionFunctionalT
 
   @Test
   public void heisenbergThrowsMessagingExceptionWithEventAndFailingProcessorPopulated() throws Exception {
-    Processor operation = ((Pipeline) getFlowConstruct("cureCancer")).getMessageProcessors().get(0);
+    Processor operation = ((Pipeline) getFlowConstruct("cureCancer")).getProcessors().get(0);
     // Use good old try/catch because ExpectedError and ExpectedException rules don't like each other and it doesn't make sense to
     // put this test method elsewhere.
     try {

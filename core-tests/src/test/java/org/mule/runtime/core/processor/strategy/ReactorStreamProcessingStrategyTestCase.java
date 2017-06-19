@@ -14,9 +14,9 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
-import static org.mule.runtime.core.processor.strategy.ReactorStreamProcessingStrategyFactory.DEFAULT_BUFFER_SIZE;
-import static org.mule.runtime.core.processor.strategy.ReactorStreamProcessingStrategyFactory.DEFAULT_SUBSCRIBER_COUNT;
-import static org.mule.runtime.core.processor.strategy.ReactorStreamProcessingStrategyFactory.DEFAULT_WAIT_STRATEGY;
+import static org.mule.runtime.core.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_BUFFER_SIZE;
+import static org.mule.runtime.core.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_SUBSCRIBER_COUNT;
+import static org.mule.runtime.core.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_WAIT_STRATEGY;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.REACTOR;
 
@@ -25,6 +25,7 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.processor.strategy.ReactorStreamProcessingStrategyFactory.ReactorStreamProcessingStrategy;
 
 import org.junit.Test;
+
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
@@ -52,14 +53,14 @@ public class ReactorStreamProcessingStrategyTestCase extends ReactorProcessingSt
   @Description("If max concurrency is 1, only 1 thread is used for BLOCKING processors and further requests blocks. When " +
       "maxConcurrency < subscribers processing is done on ring-buffer thread.")
   public void singleCpuLightConcurrentMaxConcurrency1() throws Exception {
-    flow.setProcessingStrategyFactory((context,
-                                       prefix) -> new ReactorStreamProcessingStrategy(() -> ringBuffer,
-                                                                                      DEFAULT_BUFFER_SIZE,
-                                                                                      DEFAULT_SUBSCRIBER_COUNT,
-                                                                                      DEFAULT_WAIT_STRATEGY,
-                                                                                      () -> cpuLight,
-                                                                                      1));
-    internalConcurrent(true, CPU_LITE, 1);
+    internalConcurrent(flowBuilder.get()
+        .processingStrategyFactory((context, prefix) -> new ReactorStreamProcessingStrategy(() -> ringBuffer,
+                                                                                            DEFAULT_BUFFER_SIZE,
+                                                                                            DEFAULT_SUBSCRIBER_COUNT,
+                                                                                            DEFAULT_WAIT_STRATEGY,
+                                                                                            () -> cpuLight,
+                                                                                            1)),
+                       true, CPU_LITE, 1);
     assertThat(threads, hasSize(1));
     assertThat(threads.stream().filter(name -> name.startsWith(RING_BUFFER)).count(), equalTo(1l));
     assertThat(threads, not(hasItem(startsWith(CPU_LIGHT))));
@@ -71,14 +72,14 @@ public class ReactorStreamProcessingStrategyTestCase extends ReactorProcessingSt
   @Test
   @Description("If max concurrency is 2, only 2 threads are used for BLOCKING processors and further requests blocks.")
   public void singleCpuLightConcurrentMaxConcurrency2() throws Exception {
-    flow.setProcessingStrategyFactory((context,
-                                       prefix) -> new ReactorStreamProcessingStrategy(() -> ringBuffer,
-                                                                                      DEFAULT_BUFFER_SIZE,
-                                                                                      DEFAULT_SUBSCRIBER_COUNT,
-                                                                                      DEFAULT_WAIT_STRATEGY,
-                                                                                      () -> cpuLight,
-                                                                                      2));
-    internalConcurrent(true, CPU_LITE, 2);
+    internalConcurrent(flowBuilder.get()
+        .processingStrategyFactory((context, prefix) -> new ReactorStreamProcessingStrategy(() -> ringBuffer,
+                                                                                            DEFAULT_BUFFER_SIZE,
+                                                                                            DEFAULT_SUBSCRIBER_COUNT,
+                                                                                            DEFAULT_WAIT_STRATEGY,
+                                                                                            () -> cpuLight,
+                                                                                            2)),
+                       true, CPU_LITE, 2);
     assertThat(threads, hasSize(2));
     assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), equalTo(2l));
     assertThat(threads, not(hasItem(startsWith(IO))));

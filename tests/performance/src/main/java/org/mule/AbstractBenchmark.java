@@ -13,6 +13,7 @@ import static org.mule.runtime.core.api.util.IOUtils.getResourceAsString;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.openjdk.jmh.annotations.Mode.AverageTime;
 import static org.openjdk.jmh.annotations.Scope.Benchmark;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.config.builders.BasicRuntimeServicesConfigurationBuilder;

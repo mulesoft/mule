@@ -119,7 +119,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
   @Before
   public void before() throws MuleException {
-    flow = builder("flow", muleContext).messageProcessors(singletonList(processor)).build();
+    flow = builder("flow", muleContext).processors(processor).build();
   }
 
   @After

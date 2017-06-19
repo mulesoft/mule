@@ -42,6 +42,11 @@ public class ReactorProcessingStrategyFactory extends AbstractProcessingStrategy
             .withMaxConcurrentTasks(getMaxConcurrency())));
   }
 
+  @Override
+  public Class<? extends ProcessingStrategy> getProcessingStrategyType() {
+    return ReactorProcessingStrategy.class;
+  }
+
   static class ReactorProcessingStrategy extends AbstractProcessingStrategy implements Startable, Stoppable {
 
     private final Supplier<Scheduler> cpuLightSchedulerSupplier;

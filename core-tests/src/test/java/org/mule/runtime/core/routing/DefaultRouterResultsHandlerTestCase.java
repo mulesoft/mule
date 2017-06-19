@@ -23,6 +23,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultEventContext;
@@ -34,7 +35,6 @@ import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.routing.RouterResultsHandler;
 import org.mule.runtime.core.internal.construct.DefaultFlowBuilder;
 import org.mule.runtime.core.internal.message.InternalMessage;
-import org.mule.runtime.core.processor.strategy.BlockingProcessingStrategyFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.ArrayList;
@@ -54,7 +54,6 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
 
   @Before
   public void setupMocks() throws Exception {
-    when(flow.getProcessingStrategyFactory()).thenReturn(new BlockingProcessingStrategyFactory());
     when(flow.getMuleContext()).thenReturn(muleContext);
 
     when(muleContext.getConfiguration()).thenReturn(mock(MuleConfiguration.class));

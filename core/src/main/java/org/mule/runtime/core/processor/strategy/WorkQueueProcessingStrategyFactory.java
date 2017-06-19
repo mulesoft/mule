@@ -43,6 +43,11 @@ public class WorkQueueProcessingStrategyFactory extends AbstractProcessingStrate
             .withMaxConcurrentTasks(getMaxConcurrency())));
   }
 
+  @Override
+  public Class<? extends ProcessingStrategy> getProcessingStrategyType() {
+    return WorkQueueProcessingStrategy.class;
+  }
+
   static class WorkQueueProcessingStrategy extends AbstractProcessingStrategy implements Startable, Stoppable {
 
     private final Supplier<Scheduler> ioSchedulerSupplier;

@@ -10,13 +10,17 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.construct.Flow.Builder;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.processor.strategy.TransactionAwareWorkQueueProcessingStrategyFactory;
@@ -43,27 +47,30 @@ public class FlowProcessingStrategyTestCase extends AbstractMuleTestCase {
   @Before
   public void before() throws RegistrationException {
     when(muleContext.getConfiguration()).thenReturn(configuration);
-    createFlow();
+    createFlow(null);
   }
 
   @Test
   public void fixedProcessingStrategyIsHonoured() throws Exception {
     ProcessingStrategyFactory processingStrategyFactory = mock(ProcessingStrategyFactory.class);
-    createFlow();
-    flow.setProcessingStrategyFactory(processingStrategyFactory);
+    ProcessingStrategy processingStrategy = mock(ProcessingStrategy.class);
+    when(processingStrategyFactory.create(any(), any())).thenReturn(processingStrategy);
+    createFlow(processingStrategyFactory);
     flow.initialise();
 
-    assertThat(flow.getProcessingStrategyFactory(), is(sameInstance(processingStrategyFactory)));
+    assertThat(flow.getProcessingStrategy(), is(sameInstance(processingStrategy)));
   }
 
   @Test
   public void defaultProcessingStrategyInConfigIsHonoured() throws Exception {
+    ProcessingStrategy processingStrategy = mock(ProcessingStrategy.class);
     ProcessingStrategyFactory processingStrategyFactory = mock(ProcessingStrategyFactory.class);
+    when(processingStrategyFactory.create(any(), any())).thenReturn(processingStrategy);
     when(configuration.getDefaultProcessingStrategyFactory()).thenReturn(processingStrategyFactory);
 
-    createFlow();
+    createFlow(null);
     flow.initialise();
-    assertThat(flow.getProcessingStrategyFactory(), is(sameInstance(processingStrategyFactory)));
+    assertThat(flow.getProcessingStrategy(), is(sameInstance(processingStrategy)));
   }
 
   @Test
@@ -72,20 +79,27 @@ public class FlowProcessingStrategyTestCase extends AbstractMuleTestCase {
     when(configuration.getDefaultProcessingStrategyFactory()).thenReturn(configProcessingStrategyFactory);
 
     ProcessingStrategyFactory processingStrategyFactory = mock(ProcessingStrategyFactory.class);
-    createFlow();
-    flow.setProcessingStrategyFactory(processingStrategyFactory);
+    ProcessingStrategy processingStrategy = mock(ProcessingStrategy.class);
+    when(processingStrategyFactory.create(any(), any())).thenReturn(processingStrategy);
+    createFlow(processingStrategyFactory);
     flow.initialise();
 
-    assertThat(flow.getProcessingStrategyFactory(), is(sameInstance(processingStrategyFactory)));
+    assertThat(flow.getProcessingStrategy(), is(sameInstance(processingStrategy)));
   }
 
   @Test
   public void createDefaultProcessingStrategyIfNoneSpecified() throws Exception {
     flow.initialise();
-    assertThat(flow.getProcessingStrategyFactory(), is(instanceOf(TransactionAwareWorkQueueProcessingStrategyFactory.class)));
+    assertThat(flow.getProcessingStrategy(),
+               is(instanceOf(new TransactionAwareWorkQueueProcessingStrategyFactory().getProcessingStrategyType())));
   }
 
-  private void createFlow() {
-    flow = builder("test", muleContext).build();
+  private void createFlow(ProcessingStrategyFactory configProcessingStrategyFactory) {
+    Builder flowBuilder = builder("test", muleContext);
+    if (configProcessingStrategyFactory != null) {
+      flowBuilder = flowBuilder.processingStrategyFactory(configProcessingStrategyFactory);
+    }
+
+    flow = flowBuilder.build();
   }
 }

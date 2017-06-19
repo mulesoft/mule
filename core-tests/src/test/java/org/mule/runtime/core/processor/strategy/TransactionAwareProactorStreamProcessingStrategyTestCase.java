@@ -7,7 +7,6 @@
 package org.mule.runtime.core.processor.strategy;
 
 import static java.lang.Integer.MAX_VALUE;
-import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -19,6 +18,7 @@ import static org.mule.runtime.core.processor.strategy.AbstractStreamProcessingS
 import static org.mule.runtime.core.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_WAIT_STRATEGY;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.DEFAULT;
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
@@ -54,7 +54,7 @@ public class TransactionAwareProactorStreamProcessingStrategyTestCase extends Pr
   @Description("Unlike with the MultiReactorProcessingStrategy, the TransactionAwareWorkQueueProcessingStrategy does not fail if a transaction "
       + "is active, but rather executes these events synchronously in the caller thread transparently.")
   public void tx() throws Exception {
-    flow.setMessageProcessors(asList(cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor));
+    flow = flowBuilder.get().processors(cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor).build();
     flow.initialise();
     flow.start();
 

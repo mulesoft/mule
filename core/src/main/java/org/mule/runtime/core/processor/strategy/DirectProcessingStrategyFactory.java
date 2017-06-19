@@ -24,7 +24,7 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
  */
 public class DirectProcessingStrategyFactory implements ProcessingStrategyFactory {
 
-  public static final ProcessingStrategy DIRECT_PROCESSING_STRATEGY_INSTANCE =
+  private static final ProcessingStrategy DIRECT_PROCESSING_STRATEGY_INSTANCE =
       new AbstractProcessingStrategy() {
 
         @Override
@@ -42,6 +42,11 @@ public class DirectProcessingStrategyFactory implements ProcessingStrategyFactor
   @Override
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
     return DIRECT_PROCESSING_STRATEGY_INSTANCE;
+  }
+
+  @Override
+  public Class<? extends ProcessingStrategy> getProcessingStrategyType() {
+    return DIRECT_PROCESSING_STRATEGY_INSTANCE.getClass();
   }
 
 }

@@ -43,10 +43,13 @@ import org.slf4j.Logger;
  */
 public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProcessingStrategyFactory {
 
+  private static final ReactorProcessingStrategyFactory NOT_CONCURRENT_TX_AWARE_PS_FACTORY =
+      new ReactorProcessingStrategyFactory();
+
   @Override
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
     if (getMaxConcurrency() == 1) {
-      return new ReactorProcessingStrategyFactory().create(muleContext, schedulersNamePrefix);
+      return NOT_CONCURRENT_TX_AWARE_PS_FACTORY.create(muleContext, schedulersNamePrefix);
     } else {
       return new ProactorStreamProcessingStrategy(() -> muleContext.getSchedulerService()
           .customScheduler(muleContext.getSchedulerBaseConfig()
@@ -64,6 +67,15 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
                                                       .cpuIntensiveScheduler(muleContext.getSchedulerBaseConfig()
                                                           .withName(schedulersNamePrefix + "." + CPU_INTENSIVE.name())),
                                                   getMaxConcurrency());
+    }
+  }
+
+  @Override
+  public Class<? extends ProcessingStrategy> getProcessingStrategyType() {
+    if (getMaxConcurrency() == 1) {
+      return NOT_CONCURRENT_TX_AWARE_PS_FACTORY.getProcessingStrategyType();
+    } else {
+      return ProactorStreamProcessingStrategy.class;
     }
   }
 

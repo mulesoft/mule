@@ -15,6 +15,7 @@ import static org.junit.Assert.assertSame;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.DefaultMuleException;

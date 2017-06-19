@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.interceptor;
 
-import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.api.message.Message.of;
@@ -14,6 +13,7 @@ import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
@@ -49,7 +49,7 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase {
   @Test
   public void testSingleInterceptor() throws Exception {
     Flow flow = createUninitializedFlow();
-    TestComponent component = (TestComponent) flow.getMessageProcessors().get(0);
+    TestComponent component = (TestComponent) flow.getProcessors().get(0);
 
     List<Interceptor> interceptors = new ArrayList<>();
     interceptors.add(new TestInterceptor(INTERCEPTOR_ONE));
@@ -66,7 +66,7 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase {
   @Test
   public void testMultipleInterceptor() throws Exception {
     Flow flow = createUninitializedFlow();
-    TestComponent component = (TestComponent) flow.getMessageProcessors().get(0);
+    TestComponent component = (TestComponent) flow.getProcessors().get(0);
 
     List<Interceptor> interceptors = new ArrayList<>();
     interceptors.add(new TestInterceptor(INTERCEPTOR_ONE));
@@ -86,7 +86,7 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase {
   @Test
   public void testSingleInterceptorStack() throws Exception {
     Flow flow = createUninitializedFlow();
-    TestComponent component = (TestComponent) flow.getMessageProcessors().get(0);
+    TestComponent component = (TestComponent) flow.getProcessors().get(0);
 
     List<Interceptor> interceptors = new ArrayList<>();
     List<Interceptor> stackInterceptors = new ArrayList<>();
@@ -106,7 +106,7 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase {
   @Test
   public void testMultipleInterceptorStack() throws Exception {
     Flow flow = createUninitializedFlow();
-    TestComponent component = (TestComponent) flow.getMessageProcessors().get(0);
+    TestComponent component = (TestComponent) flow.getProcessors().get(0);
 
     List<Interceptor> interceptors = new ArrayList<>();
     interceptors.add(new TestInterceptor(INTERCEPTOR_ONE));
@@ -128,7 +128,7 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase {
   @Test
   public void testMultipleInterceptorStack2() throws Exception {
     Flow flow = createUninitializedFlow();
-    TestComponent component = (TestComponent) flow.getMessageProcessors().get(0);
+    TestComponent component = (TestComponent) flow.getProcessors().get(0);
 
     List<Interceptor> interceptors = new ArrayList<>();
     interceptors.add(new TestInterceptor(INTERCEPTOR_ONE));
@@ -193,7 +193,7 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase {
 
   protected Flow createUninitializedFlow() throws Exception {
     TestComponent component = new TestComponent();
-    flow = builder("name", muleContext).messageProcessors(singletonList(component)).build();
+    flow = builder("name", muleContext).processors(component).build();
     return flow;
   }
 

@@ -6,13 +6,16 @@
  */
 package org.mule.runtime.core.internal.construct;
 
-import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STARTED;
+import static java.lang.String.format;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STOPPED;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.api.util.ClassUtils.getSimpleName;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
@@ -28,12 +31,11 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.internal.lifecycle.EmptyLifecycleCallback;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
-import org.mule.runtime.core.api.util.ClassUtils;
 
 import java.beans.ExceptionListener;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,28 +61,28 @@ public abstract class AbstractFlowConstruct extends AbstractAnnotatedObject impl
   protected static final Logger LOGGER = LoggerFactory.getLogger(AbstractFlowConstruct.class);
 
   private final FlowConstructLifecycleManager lifecycleManager;
-  protected String name;
-  protected MessagingExceptionHandler exceptionListener;
-  protected final MuleContext muleContext;
-  protected FlowConstructStatistics statistics;
+  private final String name;
+  private final MessagingExceptionHandler exceptionListener;
+  private final MuleContext muleContext;
+  private volatile FlowConstructStatistics statistics;
 
   /**
    * Determines the initial state of this flow when the mule starts. Can be 'stopped' or 'started' (default)
    */
-  protected String initialState = INITIAL_STATE_STARTED;
+  private final String initialState;
 
-  public AbstractFlowConstruct(String name, MuleContext muleContext) {
+  public AbstractFlowConstruct(String name, MuleContext muleContext, Optional<MessagingExceptionHandler> exceptionListener,
+                               String initialState) {
     this.muleContext = muleContext;
     this.name = name;
+    this.exceptionListener = exceptionListener.orElse(muleContext.getDefaultErrorHandler());
+    this.initialState = initialState;
     this.lifecycleManager = new FlowConstructLifecycleManager(this, muleContext);
   }
 
   @Override
   public final void initialise() throws InitialisationException {
     try {
-      if (exceptionListener == null) {
-        this.exceptionListener = muleContext.getDefaultErrorHandler();
-      }
       lifecycleManager.fireInitialisePhase((phaseName, object) -> {
         injectFlowConstructMuleContext(exceptionListener);
         initialiseIfInitialisable(exceptionListener);
@@ -159,18 +161,6 @@ public abstract class AbstractFlowConstruct extends AbstractAnnotatedObject impl
     return exceptionListener;
   }
 
-  public void setExceptionListener(MessagingExceptionHandler exceptionListener) {
-    this.exceptionListener = exceptionListener;
-  }
-
-  public String getInitialState() {
-    return initialState;
-  }
-
-  public void setInitialState(String initialState) {
-    this.initialState = initialState;
-  }
-
   @Override
   public LifecycleState getLifecycleState() {
     return lifecycleManager.getState();
@@ -206,6 +196,7 @@ public abstract class AbstractFlowConstruct extends AbstractAnnotatedObject impl
 
   protected void doDispose() {
     muleContext.getStatistics().remove(statistics);
+    statistics = null;
   }
 
   /**
@@ -216,9 +207,8 @@ public abstract class AbstractFlowConstruct extends AbstractAnnotatedObject impl
   protected void validateConstruct() throws FlowConstructInvalidException {
     if (exceptionListener instanceof MessagingExceptionHandlerAcceptor) {
       if (!((MessagingExceptionHandlerAcceptor) exceptionListener).acceptsAll()) {
-        throw new FlowConstructInvalidException(CoreMessages
-            .createStaticMessage("Flow exception listener contains an exception strategy that doesn't handle all request,"
-                + " Perhaps there's an exception strategy with a when attribute set but it's not part of a catch exception strategy"),
+        throw new FlowConstructInvalidException(createStaticMessage("Flow exception listener contains an exception strategy that doesn't handle all request,"
+            + " Perhaps there's an exception strategy with a when attribute set but it's not part of a catch exception strategy"),
                                                 this);
       }
     }
@@ -251,7 +241,7 @@ public abstract class AbstractFlowConstruct extends AbstractAnnotatedObject impl
 
   @Override
   public String toString() {
-    return String.format("%s{%s}", ClassUtils.getSimpleName(this.getClass()), getName());
+    return format("%s{%s}", getSimpleName(this.getClass()), getName());
   }
 
   protected void initialiseIfInitialisable(Object candidate) throws InitialisationException {

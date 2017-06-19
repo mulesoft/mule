@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.component;
 
-import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
@@ -14,6 +13,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
+
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.object.ObjectFactory;
@@ -85,7 +85,7 @@ public class DefaultJavaComponentTestCase extends AbstractComponentTestCase {
   public void testServicePropagatedLifecycle() throws Exception {
 
     LifecycleTrackerComponent component = new LifecycleTrackerComponent();
-    final Flow flow = builder("test", muleContext).messageProcessors(singletonList(component)).build();
+    final Flow flow = builder("test", muleContext).processors(component).build();
     flow.initialise();
     assertTrue(component.getTracker().contains("initialise"));
   }

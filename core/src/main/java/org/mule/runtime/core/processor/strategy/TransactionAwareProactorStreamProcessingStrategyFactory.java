@@ -9,8 +9,8 @@ package org.mule.runtime.core.processor.strategy;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
-import static org.mule.runtime.core.processor.strategy.BlockingProcessingStrategyFactory.BLOCKING_PROCESSING_STRATEGY_INSTANCE;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
+import static org.mule.runtime.core.processor.strategy.BlockingProcessingStrategyFactory.BLOCKING_PROCESSING_STRATEGY_INSTANCE;
 
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.Event;
@@ -32,13 +32,16 @@ import java.util.function.Supplier;
  *
  * @since 4.0
  */
-public class TransactionAwareProactorStreamProcessingStrategyFactory extends ReactorStreamProcessingStrategyFactory
+class TransactionAwareProactorStreamProcessingStrategyFactory extends ReactorStreamProcessingStrategyFactory
     implements TransactionAwareProcessingStrategyFactory {
+
+  private static final ReactorProcessingStrategyFactory NOT_CONCURRENT_TX_AWARE_PS_FACTORY =
+      new ReactorProcessingStrategyFactory();
 
   @Override
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
     if (getMaxConcurrency() == 1) {
-      return new ReactorProcessingStrategyFactory().create(muleContext, schedulersNamePrefix);
+      return NOT_CONCURRENT_TX_AWARE_PS_FACTORY.create(muleContext, schedulersNamePrefix);
     } else {
       return new TransactionAwareProactorStreamProcessingStrategy(() -> muleContext.getSchedulerService()
           .customScheduler(muleContext.getSchedulerBaseConfig()
@@ -62,16 +65,25 @@ public class TransactionAwareProactorStreamProcessingStrategyFactory extends Rea
     }
   }
 
+  @Override
+  public Class<? extends ProcessingStrategy> getProcessingStrategyType() {
+    if (getMaxConcurrency() == 1) {
+      return NOT_CONCURRENT_TX_AWARE_PS_FACTORY.getProcessingStrategyType();
+    } else {
+      return TransactionAwareProactorStreamProcessingStrategy.class;
+    }
+  }
+
   static class TransactionAwareProactorStreamProcessingStrategy extends ProactorStreamProcessingStrategy {
 
-    public TransactionAwareProactorStreamProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier,
-                                                            int bufferSize,
-                                                            int subscriberCount,
-                                                            String waitStrategy,
-                                                            Supplier<Scheduler> cpuLightSchedulerSupplier,
-                                                            Supplier<Scheduler> blockingSchedulerSupplier,
-                                                            Supplier<Scheduler> cpuIntensiveSchedulerSupplier,
-                                                            int maxConcurrency)
+    TransactionAwareProactorStreamProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier,
+                                                     int bufferSize,
+                                                     int subscriberCount,
+                                                     String waitStrategy,
+                                                     Supplier<Scheduler> cpuLightSchedulerSupplier,
+                                                     Supplier<Scheduler> blockingSchedulerSupplier,
+                                                     Supplier<Scheduler> cpuIntensiveSchedulerSupplier,
+                                                     int maxConcurrency)
 
     {
       super(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier,

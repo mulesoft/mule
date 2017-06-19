@@ -7,20 +7,26 @@
 
 package org.mule.runtime.core.internal.construct;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.rules.ExpectedException.none;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.construct.Flow.Builder;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -40,8 +46,9 @@ public class DefaultFlowBuilderTestCase extends AbstractMuleTestCase {
   public static final String FLOW_NAME = "flowName";
 
   private MuleContext muleContext = mock(MuleContext.class);
-  private DefaultFlowBuilder flowBuilder = new DefaultFlowBuilder(FLOW_NAME, muleContext);
+  private Builder flowBuilder = new DefaultFlowBuilder(FLOW_NAME, muleContext);
   private ProcessingStrategyFactory defaultProcessingStrategyFactory = mock(ProcessingStrategyFactory.class);
+  private ProcessingStrategy processingStrategy = mock(ProcessingStrategy.class);
 
   @Rule
   public ExpectedException expectedException = none();
@@ -51,6 +58,7 @@ public class DefaultFlowBuilderTestCase extends AbstractMuleTestCase {
     MuleConfiguration muleConfiguration = mock(MuleConfiguration.class);
     when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
     when(muleConfiguration.getDefaultProcessingStrategyFactory()).thenReturn(defaultProcessingStrategyFactory);
+    when(defaultProcessingStrategyFactory.create(any(), any())).thenReturn(processingStrategy);
   }
 
   @Test
@@ -59,10 +67,10 @@ public class DefaultFlowBuilderTestCase extends AbstractMuleTestCase {
 
     assertThat(flow.getName(), equalTo(FLOW_NAME));
     assertThat(flow.getMuleContext(), is(muleContext));
-    assertThat(flow.getMessageProcessors(), is(empty()));
-    assertThat(flow.getMessageSource(), is(nullValue()));
+    assertThat(flow.getProcessors(), is(empty()));
+    assertThat(flow.getSource(), is(nullValue()));
     assertThat(flow.getExceptionListener(), is(nullValue()));
-    assertThat(flow.getProcessingStrategyFactory(), is(defaultProcessingStrategyFactory));
+    assertThat(flow.getProcessingStrategy(), sameInstance(processingStrategy));
   }
 
   @Test
@@ -75,17 +83,19 @@ public class DefaultFlowBuilderTestCase extends AbstractMuleTestCase {
 
     MessageSource messageSource = mock(MessageSource.class);
     ProcessingStrategyFactory processingStrategyFactory = mock(ProcessingStrategyFactory.class);
+    ProcessingStrategy processingStrategy = mock(ProcessingStrategy.class);
+    when(processingStrategyFactory.create(any(), any())).thenReturn(processingStrategy);
     MessagingExceptionHandler exceptionListener = mock(MessagingExceptionHandler.class);
 
-    Flow flow = flowBuilder.messageProcessors(messageProcessors).messageSource(messageSource)
+    Flow flow = flowBuilder.processors(messageProcessors).source(messageSource)
         .processingStrategyFactory(processingStrategyFactory).messagingExceptionHandler(exceptionListener).build();
 
     assertThat(flow.getName(), equalTo(FLOW_NAME));
     assertThat(flow.getMuleContext(), is(muleContext));
-    assertThat(flow.getMessageProcessors(), contains(processor1, processor2));
-    assertThat(flow.getMessageSource(), is(messageSource));
+    assertThat(flow.getProcessors(), contains(processor1, processor2));
+    assertThat(flow.getSource(), is(messageSource));
     assertThat(flow.getExceptionListener(), is(exceptionListener));
-    assertThat(flow.getProcessingStrategyFactory(), is(processingStrategyFactory));
+    assertThat(flow.getProcessingStrategy(), sameInstance(processingStrategy));
   }
 
   @Test
@@ -99,14 +109,21 @@ public class DefaultFlowBuilderTestCase extends AbstractMuleTestCase {
   public void cannotChangeMessageSourceAfterFlowBuilt() throws Exception {
     flowBuilder.build();
     expectedException.expect(IllegalStateException.class);
-    flowBuilder.messageSource(mock(MessageSource.class));
+    flowBuilder.source(mock(MessageSource.class));
   }
 
   @Test
-  public void cannotChangeMessageProcessorsAfterFlowBuilt() throws Exception {
+  public void cannotChangeMessageProcessorsListAfterFlowBuilt() throws Exception {
     flowBuilder.build();
     expectedException.expect(IllegalStateException.class);
-    flowBuilder.messageProcessors(new ArrayList<>());
+    flowBuilder.processors(asList(mock(Processor.class)));
+  }
+
+  @Test
+  public void cannotChangeMessageProcessorAfterFlowBuilt() throws Exception {
+    flowBuilder.build();
+    expectedException.expect(IllegalStateException.class);
+    flowBuilder.processors(mock(Processor.class));
   }
 
   @Test

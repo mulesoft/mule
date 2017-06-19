@@ -6,14 +6,17 @@
  */
 package org.mule.runtime.core.util.queue;
 
+import static java.util.Collections.emptyList;
+import static java.util.Optional.empty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_QUEUE_MANAGER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.util.queue.QueueConfiguration;
 import org.mule.runtime.core.api.util.queue.QueueManager;
@@ -103,7 +106,7 @@ public class QueueManagerLifecycleOrderTestCase extends AbstractMuleTestCase {
   private class RecordingFlow extends DefaultFlowBuilder.DefaultFlow {
 
     public RecordingFlow(String name, MuleContext muleContext) {
-      super(name, muleContext);
+      super(name, muleContext, null, emptyList(), empty(), empty(), INITIAL_STATE_STARTED);
     }
 
     @Override
@@ -121,8 +124,8 @@ public class QueueManagerLifecycleOrderTestCase extends AbstractMuleTestCase {
 
     @Override
     protected void doConfigure(MuleContext muleContext) throws Exception {
-      muleContext.getRegistry().registerObject(MuleProperties.OBJECT_QUEUE_MANAGER, rtqm);
-      muleContext.getRegistry().registerObject(MuleProperties.OBJECT_SECURITY_MANAGER, new DefaultMuleSecurityManager());
+      muleContext.getRegistry().registerObject(OBJECT_QUEUE_MANAGER, rtqm);
+      muleContext.getRegistry().registerObject(OBJECT_SECURITY_MANAGER, new DefaultMuleSecurityManager());
 
     }
   }

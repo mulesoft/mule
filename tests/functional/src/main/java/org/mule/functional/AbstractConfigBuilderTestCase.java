@@ -62,7 +62,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
   public void testPoolingConfig() {
     // test per-descriptor overrides
     Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("appleComponent2");
-    PoolingProfile pp = ((PooledJavaComponent) flow.getMessageProcessors().get(0)).getPoolingProfile();
+    PoolingProfile pp = ((PooledJavaComponent) flow.getProcessors().get(0)).getPoolingProfile();
 
     assertEquals(9, pp.getMaxActive());
     assertEquals(6, pp.getMaxIdle());

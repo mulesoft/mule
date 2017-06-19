@@ -18,8 +18,8 @@ public class ReplyToPropertyRequestReplyReplier extends AbstractReplyToPropertyR
   @Override
   protected boolean shouldProcessEvent(Event event) {
     MessageExchangePattern mep = REQUEST_RESPONSE;
-    if (flowConstruct instanceof Pipeline && ((Pipeline) flowConstruct).getMessageSource() instanceof LegacyImmutableEndpoint) {
-      mep = ((LegacyImmutableEndpoint) ((Pipeline) flowConstruct).getMessageSource()).getExchangePattern();
+    if (flowConstruct instanceof Pipeline && ((Pipeline) flowConstruct).getSource() instanceof LegacyImmutableEndpoint) {
+      mep = ((LegacyImmutableEndpoint) ((Pipeline) flowConstruct).getSource()).getExchangePattern();
     }
     return mep.hasResponse();
   }

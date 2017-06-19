@@ -40,6 +40,11 @@ public class TransactionAwareWorkQueueProcessingStrategyFactory extends WorkQueu
             .withMaxConcurrentTasks(getMaxConcurrency())));
   }
 
+  @Override
+  public Class<? extends ProcessingStrategy> getProcessingStrategyType() {
+    return TransactionAwareWorkQueueProcessingStrategy.class;
+  }
+
   static class TransactionAwareWorkQueueProcessingStrategy extends WorkQueueProcessingStrategy {
 
     protected TransactionAwareWorkQueueProcessingStrategy(Supplier<Scheduler> ioSchedulerSupplier) {

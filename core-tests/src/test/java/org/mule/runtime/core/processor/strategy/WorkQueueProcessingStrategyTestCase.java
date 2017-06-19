@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.processor.strategy;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -28,12 +26,13 @@ import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.P
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.processor.strategy.WorkQueueProcessingStrategyFactory.WorkQueueProcessingStrategy;
-import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
 import org.junit.Test;
+
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
@@ -131,7 +130,7 @@ public class WorkQueueProcessingStrategyTestCase extends AbstractProcessingStrat
   @Override
   @Description("When the WorkQueueProcessingStrategy is configured and a transaction is active processing fails with an error")
   public void tx() throws Exception {
-    flow.setMessageProcessors(asList(cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor));
+    flow = flowBuilder.get().processors(cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor).build();
     flow.initialise();
     flow.start();
 
@@ -187,9 +186,9 @@ public class WorkQueueProcessingStrategyTestCase extends AbstractProcessingStrat
   @Test
   @Description("If IO pool is busy OVERLOAD error is thrown")
   public void rejectedExecution() throws Exception {
-    flow.setProcessingStrategyFactory((context,
-                                       prefix) -> new WorkQueueProcessingStrategy(() -> new RejectingScheduler(blocking)));
-    flow.setMessageProcessors(singletonList(blockingProcessor));
+    flow = flowBuilder.get().processors(blockingProcessor)
+        .processingStrategyFactory((context, prefix) -> new WorkQueueProcessingStrategy(() -> new RejectingScheduler(blocking)))
+        .build();
     flow.initialise();
     flow.start();
     expectRejected();
@@ -199,9 +198,9 @@ public class WorkQueueProcessingStrategyTestCase extends AbstractProcessingStrat
   @Test
   @Description("If IO pool has maximum size of 1 only 1 thread is used for CPU_LIGHT processor and further requests block.")
   public void singleCpuLightConcurrentMaxConcurrency1() throws Exception {
-    flow.setProcessingStrategyFactory((context,
-                                       prefix) -> new WorkQueueProcessingStrategy(() -> new TestScheduler(1, IO)));
-    internalConcurrent(true, CPU_LITE, 1);
+    internalConcurrent(flowBuilder.get()
+        .processingStrategyFactory((context, prefix) -> new WorkQueueProcessingStrategy(() -> new TestScheduler(1, IO))), true,
+                       CPU_LITE, 1);
     assertThat(threads, hasSize(1));
     assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), equalTo(1l));
     assertThat(threads, not(hasItem(startsWith(CPU_LIGHT))));
@@ -212,9 +211,9 @@ public class WorkQueueProcessingStrategyTestCase extends AbstractProcessingStrat
   @Test
   @Description("If IO pool has maximum size of 1 only 1 thread is used  for BLOCKING processor and further requests block.")
   public void singleBlockingConcurrentMaxConcurrency1() throws Exception {
-    flow.setProcessingStrategyFactory((context,
-                                       prefix) -> new WorkQueueProcessingStrategy(() -> new TestScheduler(1, IO)));
-    internalConcurrent(true, BLOCKING, 1);
+    internalConcurrent(flowBuilder.get()
+        .processingStrategyFactory((context, prefix) -> new WorkQueueProcessingStrategy(() -> new TestScheduler(1, IO))), true,
+                       BLOCKING, 1);
     assertThat(threads, hasSize(1));
     assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), equalTo(1l));
     assertThat(threads, not(hasItem(startsWith(CPU_LIGHT))));

@@ -124,7 +124,7 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
     if (flowConstruct instanceof Pipeline) {
       Pipeline flow = (Pipeline) flowConstruct;
       // Retrieve the first component
-      for (Processor processor : flow.getMessageProcessors()) {
+      for (Processor processor : flow.getProcessors()) {
         if (processor instanceof Component) {
           return getComponentObject(((Component) processor));
         }

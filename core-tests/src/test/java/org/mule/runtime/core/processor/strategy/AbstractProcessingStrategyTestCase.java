@@ -8,7 +8,6 @@ package org.mule.runtime.core.processor.strategy;
 
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
 import static java.util.Collections.synchronizedSet;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.allOf;
@@ -34,6 +33,7 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.construct.Flow.Builder;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.processor.Processor;
@@ -63,6 +63,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
@@ -83,6 +84,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
   private static final int STREAM_ITERATIONS = 2000;
   private static final int CONCURRENT_TEST_CONCURRENCY = 8;
 
+  protected Supplier<Builder> flowBuilder;
   protected Flow flow;
   protected Set<String> threads = synchronizedSet(new HashSet<>());
   protected Processor cpuLightProcessor = new ThreadTrackingProcessor() {
@@ -160,11 +162,10 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
     ringBuffer = new TestScheduler(1, RING_BUFFER);
     asyncExecutor = muleContext.getRegistry().lookupObject(SchedulerService.class).ioScheduler();
 
-    flow = builder("test", muleContext)
+    flowBuilder = () -> builder("test", muleContext)
         .processingStrategyFactory((muleContext, prefix) -> createProcessingStrategy(muleContext, prefix))
         // Avoid logging of errors by using a null exception handler.
-        .messagingExceptionHandler((exception, event) -> event)
-        .build();
+        .messagingExceptionHandler((exception, event) -> event);
   }
 
   @Override
@@ -193,7 +194,8 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
 
   @Test
   public void singleCpuLight() throws Exception {
-    flow.setMessageProcessors(singletonList(cpuLightProcessor));
+    flow = flowBuilder.get().processors(cpuLightProcessor).build();
+
     flow.initialise();
     flow.start();
     process(flow, testEvent());
@@ -201,22 +203,22 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
 
   @Test
   public void singleCpuLightConcurrent() throws Exception {
-    internalConcurrent(false, CPU_LITE, 1);
+    internalConcurrent(flowBuilder.get(), false, CPU_LITE, 1);
   }
 
   @Test
   public void singleBlockingConcurrent() throws Exception {
-    internalConcurrent(false, BLOCKING, 1);
+    internalConcurrent(flowBuilder.get(), false, BLOCKING, 1);
   }
 
-  protected void internalConcurrent(boolean blocks, ProcessingType processingType, int invocations,
+  protected void internalConcurrent(Builder flowBuilder, boolean blocks, ProcessingType processingType, int invocations,
                                     Processor... processorsBeforeLatch)
       throws MuleException, InterruptedException {
     MultipleInvocationLatchedProcessor latchedProcessor = new MultipleInvocationLatchedProcessor(processingType, invocations);
 
     List<Processor> processors = new ArrayList<>(asList(processorsBeforeLatch));
     processors.add(latchedProcessor);
-    flow.setMessageProcessors(processors);
+    flow = flowBuilder.processors(processors).build();
     flow.initialise();
     flow.start();
 
@@ -245,7 +247,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
 
   @Test
   public void multipleCpuLight() throws Exception {
-    flow.setMessageProcessors(asList(cpuLightProcessor, cpuLightProcessor, cpuLightProcessor));
+    flow = flowBuilder.get().processors(cpuLightProcessor, cpuLightProcessor, cpuLightProcessor).build();
     flow.initialise();
     flow.start();
 
@@ -254,7 +256,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
 
   @Test
   public void singleBlocking() throws Exception {
-    flow.setMessageProcessors(singletonList(blockingProcessor));
+    flow = flowBuilder.get().processors(blockingProcessor).build();
     flow.initialise();
     flow.start();
 
@@ -263,7 +265,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
 
   @Test
   public void multipleBlocking() throws Exception {
-    flow.setMessageProcessors(asList(blockingProcessor, blockingProcessor, blockingProcessor));
+    flow = flowBuilder.get().processors(blockingProcessor, blockingProcessor, blockingProcessor).build();
     flow.initialise();
     flow.start();
 
@@ -272,7 +274,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
 
   @Test
   public void singleCpuIntensive() throws Exception {
-    flow.setMessageProcessors(singletonList(cpuIntensiveProcessor));
+    flow = flowBuilder.get().processors(cpuIntensiveProcessor).build();
     flow.initialise();
     flow.start();
 
@@ -281,7 +283,8 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
 
   @Test
   public void multipleCpuIntensive() throws Exception {
-    flow.setMessageProcessors(asList(cpuIntensiveProcessor, cpuIntensiveProcessor, cpuIntensiveProcessor));
+    flow =
+        flowBuilder.get().processors(cpuIntensiveProcessor, cpuIntensiveProcessor, cpuIntensiveProcessor).build();
     flow.initialise();
     flow.start();
 
@@ -290,7 +293,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
 
   @Test
   public void mix() throws Exception {
-    flow.setMessageProcessors(asList(cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor));
+    flow = flowBuilder.get().processors(cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor).build();
     flow.initialise();
     flow.start();
 
@@ -299,8 +302,9 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
 
   @Test
   public void mix2() throws Exception {
-    flow.setMessageProcessors(asList(cpuLightProcessor, cpuLightProcessor, blockingProcessor, blockingProcessor,
-                                     cpuLightProcessor, cpuIntensiveProcessor, cpuIntensiveProcessor, cpuLightProcessor));
+    flow = flowBuilder.get().processors(cpuLightProcessor, cpuLightProcessor, blockingProcessor, blockingProcessor,
+                                        cpuLightProcessor, cpuIntensiveProcessor, cpuIntensiveProcessor, cpuLightProcessor)
+        .build();
     flow.initialise();
     flow.start();
 
@@ -309,7 +313,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
 
   @Test
   public void asyncCpuLight() throws Exception {
-    flow.setMessageProcessors(asList(asyncProcessor, cpuLightProcessor));
+    flow = flowBuilder.get().processors(asyncProcessor, cpuLightProcessor).build();
     flow.initialise();
     flow.start();
 
@@ -318,12 +322,12 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
 
   @Test
   public void asyncCpuLightConcurrent() throws Exception {
-    internalConcurrent(false, CPU_LITE, 1, asyncProcessor);
+    internalConcurrent(flowBuilder.get(), false, CPU_LITE, 1, asyncProcessor);
   }
 
   @Test
   public void stream() throws Exception {
-    flow.setMessageProcessors(asList(cpuLightProcessor));
+    flow = flowBuilder.get().processors(cpuLightProcessor).build();
     flow.initialise();
     flow.start();
 
@@ -344,7 +348,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
 
   @Test
   public void concurrentStream() throws Exception {
-    flow.setMessageProcessors(asList(cpuLightProcessor));
+    flow = flowBuilder.get().processors(cpuLightProcessor).build();
     flow.initialise();
     flow.start();
 
@@ -373,7 +377,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
 
   @Test
   public void errorsStream() throws Exception {
-    flow.setMessageProcessors(asList(failingProcessor));
+    flow = flowBuilder.get().processors(failingProcessor).build();
     flow.initialise();
     flow.start();
 
@@ -398,7 +402,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
 
   @Test
   public void errorSuccessStream() throws Exception {
-    flow.setMessageProcessors(asList(errorSuccessProcessor));
+    flow = flowBuilder.get().processors(errorSuccessProcessor).build();
     flow.initialise();
     flow.start();
 

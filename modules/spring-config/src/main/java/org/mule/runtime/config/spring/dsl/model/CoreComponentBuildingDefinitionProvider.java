@@ -12,8 +12,8 @@ import static java.lang.String.format;
 import static java.lang.String.valueOf;
 import static java.util.Arrays.asList;
 import static java.util.Optional.ofNullable;
-import static org.apache.commons.lang3.StringUtils.split;
 import static org.apache.commons.lang3.ArrayUtils.addAll;
+import static org.apache.commons.lang3.StringUtils.split;
 import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_MAX_POOL_ACTIVE;
 import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_MAX_POOL_IDLE;
 import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_MAX_POOL_WAIT;
@@ -83,6 +83,7 @@ import org.mule.runtime.config.spring.dsl.spring.ExcludeDefaultObjectMethods;
 import org.mule.runtime.config.spring.dsl.spring.PooledComponentObjectFactory;
 import org.mule.runtime.config.spring.factories.AsyncMessageProcessorsFactoryBean;
 import org.mule.runtime.config.spring.factories.ChoiceRouterFactoryBean;
+import org.mule.runtime.config.spring.factories.DefaultFlowFactoryBean;
 import org.mule.runtime.config.spring.factories.FlowRefFactoryBean;
 import org.mule.runtime.config.spring.factories.MessageProcessorChainFactoryBean;
 import org.mule.runtime.config.spring.factories.MessageProcessorFilterPairFactoryBean;
@@ -101,6 +102,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.component.LifecycleAdapterFactory;
 import org.mule.runtime.core.api.config.ConfigurationExtension;
 import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.interceptor.Interceptor;
 import org.mule.runtime.core.api.model.EntryPointResolver;
@@ -118,11 +120,15 @@ import org.mule.runtime.core.api.processor.LoggerMessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.RetryNotifier;
+import org.mule.runtime.core.api.retry.policy.ConnectNotifier;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.security.EncryptionStrategy;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.source.polling.PeriodicScheduler;
+import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
+import org.mule.runtime.core.api.transaction.TransactionType;
+import org.mule.runtime.core.api.transaction.xa.XaTransactionFactory;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.component.DefaultJavaComponent;
@@ -133,7 +139,6 @@ import org.mule.runtime.core.component.simple.NullComponent;
 import org.mule.runtime.core.component.simple.StaticComponent;
 import org.mule.runtime.core.context.notification.ListenerSubscriptionPair;
 import org.mule.runtime.core.el.ExpressionLanguageComponent;
-import org.mule.runtime.core.internal.enricher.MessageEnricher;
 import org.mule.runtime.core.exception.ErrorHandler;
 import org.mule.runtime.core.exception.OnErrorContinueHandler;
 import org.mule.runtime.core.exception.OnErrorPropagateHandler;
@@ -145,7 +150,14 @@ import org.mule.runtime.core.expression.transformers.ExpressionArgument;
 import org.mule.runtime.core.expression.transformers.ExpressionTransformer;
 import org.mule.runtime.core.interceptor.LoggingInterceptor;
 import org.mule.runtime.core.interceptor.TimerInterceptor;
-import org.mule.runtime.core.internal.construct.DefaultFlowBuilder;
+import org.mule.runtime.core.internal.enricher.MessageEnricher;
+import org.mule.runtime.core.internal.transformer.codec.XmlEntityDecoder;
+import org.mule.runtime.core.internal.transformer.codec.XmlEntityEncoder;
+import org.mule.runtime.core.internal.transformer.compression.GZipCompressTransformer;
+import org.mule.runtime.core.internal.transformer.compression.GZipUncompressTransformer;
+import org.mule.runtime.core.internal.transformer.encryption.AbstractEncryptionTransformer;
+import org.mule.runtime.core.internal.transformer.encryption.DecryptionTransformer;
+import org.mule.runtime.core.internal.transformer.encryption.EncryptionTransformer;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToString;
 import org.mule.runtime.core.object.PrototypeObjectFactory;
@@ -162,7 +174,6 @@ import org.mule.runtime.core.processor.simple.AddPropertyProcessor;
 import org.mule.runtime.core.processor.simple.RemoveFlowVariableProcessor;
 import org.mule.runtime.core.processor.simple.RemovePropertyProcessor;
 import org.mule.runtime.core.processor.simple.SetPayloadMessageProcessor;
-import org.mule.runtime.core.api.retry.policy.ConnectNotifier;
 import org.mule.runtime.core.routing.AggregationStrategy;
 import org.mule.runtime.core.routing.ChoiceRouter;
 import org.mule.runtime.core.routing.FirstSuccessful;
@@ -199,19 +210,9 @@ import org.mule.runtime.core.source.scheduler.schedule.CronScheduler;
 import org.mule.runtime.core.source.scheduler.schedule.FixedFrequencyScheduler;
 import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.streaming.object.CursorIteratorProviderFactory;
-import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
-import org.mule.runtime.core.api.transaction.TransactionType;
-import org.mule.runtime.core.api.transaction.xa.XaTransactionFactory;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.runtime.core.transformer.codec.Base64Decoder;
 import org.mule.runtime.core.transformer.codec.Base64Encoder;
-import org.mule.runtime.core.internal.transformer.codec.XmlEntityDecoder;
-import org.mule.runtime.core.internal.transformer.codec.XmlEntityEncoder;
-import org.mule.runtime.core.internal.transformer.compression.GZipCompressTransformer;
-import org.mule.runtime.core.internal.transformer.compression.GZipUncompressTransformer;
-import org.mule.runtime.core.internal.transformer.encryption.AbstractEncryptionTransformer;
-import org.mule.runtime.core.internal.transformer.encryption.DecryptionTransformer;
-import org.mule.runtime.core.internal.transformer.encryption.EncryptionTransformer;
 import org.mule.runtime.core.transformer.simple.AutoTransformer;
 import org.mule.runtime.core.transformer.simple.BeanToMap;
 import org.mule.runtime.core.transformer.simple.ByteArrayToHexString;
@@ -442,9 +443,10 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
             .withConstructorParameterDefinition(fromSimpleParameter("throwOnUnaccepted").withDefaultValue(false).build())
             .withConstructorParameterDefinition(fromSimpleReferenceParameter("onUnaccepted").build()).asPrototype().build());
     componentBuildingDefinitions
-        .add(baseDefinition.copy().withIdentifier(FLOW).withTypeDefinition(fromType(DefaultFlowBuilder.DefaultFlow.class))
-            .withConstructorParameterDefinition(fromSimpleParameter(NAME).build())
-            .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
+        .add(baseDefinition.copy().withIdentifier(FLOW).withTypeDefinition(fromType(Flow.class))
+            .withObjectFactoryType(DefaultFlowFactoryBean.class)
+            .withSetterParameterDefinition(NAME, fromSimpleParameter(NAME).build())
+            .withSetterParameterDefinition("muleContext", fromReferenceObject(MuleContext.class).build())
             .withSetterParameterDefinition("initialState", fromSimpleParameter("initialState").build())
             .withSetterParameterDefinition("messageSource", fromChildConfiguration(MessageSource.class).build())
             .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
