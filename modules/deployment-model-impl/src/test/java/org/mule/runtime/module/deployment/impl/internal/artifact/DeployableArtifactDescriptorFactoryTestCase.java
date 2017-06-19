@@ -12,6 +12,7 @@ import static org.apache.commons.io.FileUtils.toFile;
 import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
@@ -119,7 +120,7 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
   @Test
   public void readsRuntimeLibs() throws Exception {
     DeployableFileBuilder artifactFileBuilder = (DeployableFileBuilder) createArtifactFileBuilder()
-        .dependingOn(new JarFileBuilder("runtime", getResourceFile("/test-jar-with-resources.jar")));
+        .dependingOn(new JarFileBuilder("runtime", echoTestJarFile));
     unzip(artifactFileBuilder.getArtifactFile(), getArtifactFolder());
 
     D desc = createArtifactDescriptor();
@@ -127,6 +128,7 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
     assertThat(desc.getClassLoaderModel().getUrls().length, equalTo(2));
     assertThat(toFile(desc.getClassLoaderModel().getUrls()[0]).getPath(),
                equalTo(getArtifactClassesFolder().toString()));
+    assertThat(desc.getClassLoaderModel().getExportedPackages(), is(empty()));
     assertThat(toFile(desc.getClassLoaderModel().getUrls()[1]).getPath(),
                endsWith(getArtifactRootFolder() + "test/repository/org/mule/test/runtime/1.0.0/runtime-1.0.0.jar"));
   }
