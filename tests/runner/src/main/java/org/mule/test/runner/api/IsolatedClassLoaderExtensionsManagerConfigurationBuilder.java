@@ -16,20 +16,19 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.core.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManagerFactory;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerFactory;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link org.mule.runtime.core.api.config.ConfigurationBuilder} that creates an
@@ -124,7 +123,7 @@ public class IsolatedClassLoaderExtensionsManagerConfigurationBuilder extends Ab
                   .debug("Discarding plugin with artifactName '{}' as it doesn't have an ExtensionModelLoaderDescriptor defined");
             }
           } else {
-            LOGGER.debug("Discarding plugin with artifactName '{}' due to it doesn't have an mule-plugin.json", artifactName);
+            LOGGER.debug("Discarding plugin with artifactName '{}' as it doesn't have an mule-plugin.json", artifactName);
           }
         });
 
