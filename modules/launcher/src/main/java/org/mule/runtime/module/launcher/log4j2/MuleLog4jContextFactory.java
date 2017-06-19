@@ -6,12 +6,20 @@
  */
 package org.mule.runtime.module.launcher.log4j2;
 
+import static java.util.concurrent.Executors.newCachedThreadPool;
 import org.mule.runtime.api.lifecycle.Disposable;
 
 import org.apache.commons.lang3.StringUtils;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.logging.log4j.core.config.xml.XmlConfigurationFactory;
 import org.apache.logging.log4j.core.impl.Log4jContextFactory;
 import org.apache.logging.log4j.core.selector.ContextSelector;
+import org.apache.logging.log4j.core.util.Cancellable;
+import org.apache.logging.log4j.core.util.ShutdownCallbackRegistry;
 
 /**
  * Implementation of {@link org.apache.logging.log4j.spi.LoggerContextFactory} which acts as the bootstrap for mule's logging
@@ -31,10 +39,12 @@ import org.apache.logging.log4j.core.selector.ContextSelector;
  * configurations. This is so because those configuration factories depend on versions of the jackson libraries which would cause
  * conflict with the ones in mule. TODO: Upgrade the jackson libraries bundled with mule so that this restriction can be lifted
  * off
+ * <p/>
+ * This class also implements {@link ShutdownCallbackRegistry} to avoid default behaviour which is
  *
  * @since 3.6.0
  */
-public class MuleLog4jContextFactory extends Log4jContextFactory implements Disposable {
+public class MuleLog4jContextFactory extends Log4jContextFactory implements Disposable, ShutdownCallbackRegistry {
 
   private static final String LOG_CONFIGURATION_FACTORY_PROPERTY = "log4j.configurationFactory";
   private static final String DEFAULT_LOG_CONFIGURATION_FACTORY = XmlConfigurationFactory.class.getName();
@@ -55,7 +65,7 @@ public class MuleLog4jContextFactory extends Log4jContextFactory implements Disp
    * @param contextSelector a {@link ContextSelector}
    */
   public MuleLog4jContextFactory(ContextSelector contextSelector) {
-    super(contextSelector);
+    super(contextSelector, new MuleShutdownCallbackRegistry());
     initialise();
   }
 
@@ -78,5 +88,46 @@ public class MuleLog4jContextFactory extends Log4jContextFactory implements Disp
   @Override
   public void dispose() {
     ((ArtifactAwareContextSelector) getSelector()).dispose();
+    MuleShutdownCallbackRegistry shutdownCallbackRegistry = (MuleShutdownCallbackRegistry) getShutdownCallbackRegistry();
+    shutdownCallbackRegistry.dispose();
   }
+
+  private static class MuleShutdownCallbackRegistry implements ShutdownCallbackRegistry, Disposable {
+
+    private ExecutorService executorService =
+        newCachedThreadPool(runnable -> new Thread(runnable, "[MuleRuntime].log4j.shudownhook"));
+
+    private List<Runnable> hooks = new ArrayList<>();
+
+    @Override
+    public Cancellable addShutdownCallback(Runnable callback) {
+      hooks.add(callback);
+      return new Cancellable() {
+
+        @Override
+        public void cancel() {
+          hooks.remove(callback);
+        }
+
+        @Override
+        public void run() {
+          callback.run();
+        }
+      };
+    }
+
+    @Override
+    public void dispose() {
+      for (Runnable hook : hooks) {
+        executorService.submit(hook);
+      }
+      try {
+        executorService.awaitTermination(1000, TimeUnit.MILLISECONDS);
+      } catch (InterruptedException e) {
+        // Nothing to do, not even log since we are shutting down the logger
+      }
+      executorService.shutdownNow();
+    }
+  }
+
 }

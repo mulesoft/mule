@@ -10,33 +10,25 @@ package org.mule.runtime.module.embedded;
 import static com.mashape.unirest.http.Unirest.post;
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
-import static java.lang.Thread.currentThread;
 import static java.lang.Thread.sleep;
 import static java.nio.file.Files.delete;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static org.apache.commons.io.FileUtils.toFile;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigurationBuilder;
-import static org.mule.maven.client.api.model.RemoteRepository.newRemoteRepositoryBuilder;
 import static org.mule.runtime.api.deployment.management.ComponentInitialStateManager.DISABLE_SCHEDULER_SOURCES_PROPERTY;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppsFolder;
 import static org.mule.runtime.core.api.util.UUID.getUUID;
-import static org.mule.runtime.module.embedded.api.EmbeddedContainer.builder;
+import static org.mule.runtime.module.embedded.api.Product.MULE;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 import static org.mule.test.allure.AllureConstants.DeploymentTypeFeature.DEPLOYMENT_TYPE;
 import static org.mule.test.allure.AllureConstants.DeploymentTypeFeature.DeploymentTypeStory.EMBEDDED;
 import static org.mule.test.allure.AllureConstants.EmbeddedApiFeature.EMBEDDED_API;
 import static org.mule.test.allure.AllureConstants.EmbeddedApiFeature.EmbeddedApiStory.CONFIGURATION;
-import static org.slf4j.LoggerFactory.getLogger;
-import org.mule.runtime.module.embedded.api.ApplicationConfiguration;
+import org.mule.runtime.module.embedded.api.ArtifactConfiguration;
 import org.mule.runtime.module.embedded.api.DeploymentConfiguration;
-import org.mule.runtime.module.embedded.api.EmbeddedContainer;
-import org.mule.runtime.module.embedded.internal.classloading.FilteringClassLoader;
-import org.mule.runtime.module.embedded.internal.classloading.JdkOnlyClassLoaderFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.FreePortFinder;
 
@@ -47,42 +39,34 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import net.lingala.zip4j.core.ZipFile;
-import net.lingala.zip4j.model.ZipParameters;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.slf4j.Logger;
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
 @Features({EMBEDDED_API, DEPLOYMENT_TYPE})
 @Stories({CONFIGURATION, EMBEDDED})
-public class EmbeddedContainerTestCase extends AbstractMuleTestCase {
+public class ApplicationConfigurationTestCase extends AbstractMuleTestCase {
 
   private static final String LOGGING_FILE = "app.log";
-  private static final Logger LOGGER = getLogger(EmbeddedContainerTestCase.class);
 
-  @ClassRule
-  public static TemporaryFolder localRepositoryFolder = new TemporaryFolder();
-  @Rule
-  public TemporaryFolder containerFolder = new TemporaryFolder();
+  private static EmbeddedTestHelper embeddedTestHelper = new EmbeddedTestHelper();
+
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
   @Description("Embedded runs an application depending on a connector")
   @Test
   public void applicationWithConnector() throws Exception {
-    doWithinApplication(getFolderForApplication("http-echo"), port -> {
+    doWithinApplication(embeddedTestHelper.getFolderForApplication("http-echo"), port -> {
       try {
         String httpBody = "test-message";
         HttpResponse<String> response = post(format("http://localhost:%s/", port)).body(httpBody).asString();
@@ -96,22 +80,16 @@ public class EmbeddedContainerTestCase extends AbstractMuleTestCase {
   @Description("Embedded runs an application using test dependencies and deploying a jar file")
   @Test
   public void applicationWithTestDependency() throws Exception {
-    doWithinApplication(getPackagedApplication(getFolderForApplication("http-test-dependency")), port -> {
-      try {
-        String httpBody = "org.mobicents.xcap.client.impl.XcapClientImpl";
-        HttpResponse<String> response = post(format("http://localhost:%s/", port)).body(httpBody).asString();
-        assertThat(response.getBody(), is(httpBody));
-      } catch (UnirestException e) {
-        throw new RuntimeException(e);
-      }
-    }, true, emptyMap(), empty());
-  }
-
-  private File getPackagedApplication(File applicationFolder) throws Exception {
-    File compressedFile = temporaryFolder.newFile(applicationFolder.getName());
-    ZipFile zipFile = new ZipFile(compressedFile.getAbsolutePath() + ".jar");
-    zipFile.addFolder(applicationFolder, new ZipParameters());
-    return zipFile.getFile();
+    doWithinApplication(embeddedTestHelper
+        .getPackagedApplication(embeddedTestHelper.getFolderForApplication("http-test-dependency")), port -> {
+          try {
+            String httpBody = "org.mobicents.xcap.client.impl.XcapClientImpl";
+            HttpResponse<String> response = post(format("http://localhost:%s/", port)).body(httpBody).asString();
+            assertThat(response.getBody(), is(httpBody));
+          } catch (UnirestException e) {
+            throw new RuntimeException(e);
+          }
+        }, true, emptyMap(), empty());
   }
 
   @Description("Embedded runs an application with scheduler not started by using the " + DISABLE_SCHEDULER_SOURCES_PROPERTY
@@ -125,7 +103,7 @@ public class EmbeddedContainerTestCase extends AbstractMuleTestCase {
     applicationProperties.put(DISABLE_SCHEDULER_SOURCES_PROPERTY, "true");
 
     // start and stops the application, the scheduler within it should have been run if started
-    doWithinApplication(getFolderForApplication("scheduler-stopped"), port -> {
+    doWithinApplication(embeddedTestHelper.getFolderForApplication("scheduler-stopped"), port -> {
       waitForPollToBeExecuted();
     }, applicationProperties);
 
@@ -143,7 +121,7 @@ public class EmbeddedContainerTestCase extends AbstractMuleTestCase {
 
     // start and stops the application, the scheduler within it should have been run if started
     testWithSystemProperty(DISABLE_SCHEDULER_SOURCES_PROPERTY, "true", () -> {
-      doWithinApplication(getFolderForApplication("scheduler-stopped"), port -> {
+      doWithinApplication(embeddedTestHelper.getFolderForApplication("scheduler-stopped"), port -> {
         waitForPollToBeExecuted();
       }, applicationProperties);
     });
@@ -154,7 +132,7 @@ public class EmbeddedContainerTestCase extends AbstractMuleTestCase {
   @Description("Embedded runs an application using a custom log4j configuration file")
   @Test
   public void applicationWithCustomLogger() throws Exception {
-    doWithinApplication(getFolderForApplication("http-echo"), port -> {
+    doWithinApplication(embeddedTestHelper.getFolderForApplication("http-echo"), port -> {
       try {
         String httpBody = "test-message";
         HttpResponse<String> response = post(format("http://localhost:%s/", port)).body(httpBody).asString();
@@ -186,58 +164,36 @@ public class EmbeddedContainerTestCase extends AbstractMuleTestCase {
     doWithinApplication(applicationFolder, portConsumer, false, applicationProperties, empty());
   }
 
-
-
-  private File getFolderForApplication(String applicationFolderName) {
-    return toFile(getClass().getClassLoader().getResource(applicationFolderName));
-  }
-
   private void doWithinApplication(File applicationFolder, Consumer<Integer> portConsumer, boolean enableTestDependencies,
                                    Map<String, String> applicationProperties, Optional<URI> log4JConfigurationFileOptional)
       throws URISyntaxException, IOException {
-    ClassLoader contextClassLoader = currentThread().getContextClassLoader();
-    try {
-      // Sets a classloader with the JDK only to ensure that dependencies are read form the embedded container classloader
-      FilteringClassLoader jdkOnlyClassLoader = JdkOnlyClassLoaderFactory.create();
-      currentThread().setContextClassLoader(jdkOnlyClassLoader);
 
-      Map<String, String> customizedApplicationProperties = new HashMap<>(applicationProperties);
-      Integer httpListenerPort = new FreePortFinder(6000, 9000).find();
-      customizedApplicationProperties.put("httpPort", valueOf(httpListenerPort));
+    Map<String, String> customizedApplicationProperties = new HashMap<>(applicationProperties);
+    Integer httpListenerPort = new FreePortFinder(6000, 9000).find();
+    customizedApplicationProperties.put("httpPort", valueOf(httpListenerPort));
 
-      File localRepositoryLocation = localRepositoryFolder.getRoot();
-      LOGGER.info("Using folder as local repository: " + localRepositoryLocation.getAbsolutePath());
+    embeddedTestHelper.recreateContainerFolder();
+    embeddedTestHelper.testWithDefaultSettings(embeddedContainerBuilder -> {
+      try {
+        embeddedContainerBuilder.withLog4jConfigurationFile(log4JConfigurationFileOptional
+            .orElse(getClass().getClassLoader().getResource("log4j2-default.xml").toURI()))
+            .withProduct(MULE)
+            .build();
 
-      EmbeddedContainer embeddedContainer = builder()
-          .withMuleVersion(System.getProperty("mule.version"))
-          .withContainerBaseFolder(containerFolder.newFolder().toURI().toURL())
-          .withMavenConfiguration(newMavenConfigurationBuilder()
-              .withLocalMavenRepositoryLocation(localRepositoryLocation)
-              .withRemoteRepository(newRemoteRepositoryBuilder().withId("mulesoft-public")
-                  .withUrl(new URL("https://repository.mulesoft.org/nexus/content/repositories/public"))
-                  .build())
-              .build())
-          .withLog4jConfigurationFile(log4JConfigurationFileOptional
-              .orElse(getClass().getClassLoader().getResource("log4j2-default.xml").toURI()))
-          .withApplicationConfiguration(ApplicationConfiguration.builder()
-              .withApplicationLocation(applicationFolder)
-              .withDeploymentConfiguration(DeploymentConfiguration.builder()
-                  .withTestDependenciesEnabled(enableTestDependencies)
-                  .withArtifactProperties(customizedApplicationProperties)
-                  .build())
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+    }, () -> {
+      ArtifactConfiguration applicationConfiguration = ArtifactConfiguration.builder()
+          .withArtifactLocation(applicationFolder)
+          .withDeploymentConfiguration(DeploymentConfiguration.builder()
+              .withTestDependenciesEnabled(enableTestDependencies)
+              .withArtifactProperties(customizedApplicationProperties)
               .build())
           .build();
-
-      embeddedContainer.start();
+      embeddedTestHelper.getContainer().getDeploymentService().deployApplication(applicationConfiguration);
       assertThat(new File(getAppsFolder(), applicationFolder.getName().replace(".jar", "")).exists(), is(true));
-      try {
-        portConsumer.accept(httpListenerPort);
-      } finally {
-        embeddedContainer.stop();
-      }
-    } finally {
-      currentThread().setContextClassLoader(contextClassLoader);
-    }
+    });
   }
 
   @Override

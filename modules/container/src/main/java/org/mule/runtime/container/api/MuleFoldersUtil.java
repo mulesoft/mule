@@ -30,6 +30,8 @@ public class MuleFoldersUtil {
   public static final String CLASSES_FOLDER = "classes";
   public static final String DOMAINS_FOLDER = "domains";
   public static final String CONTAINER_APP_PLUGINS = "plugins";
+  public static final String SERVER_PLUGINS = "server-plugins";
+  public static final String CONF = "conf";
   public static final String USER_FOLDER = "user";
   public static final String SERVICES_FOLDER = "services";
 
@@ -74,6 +76,20 @@ public class MuleFoldersUtil {
   public static File getServiceFolder(String name) {
     checkArgument(!StringUtils.isEmpty(name), "name cannot be empty");
     return new File(getServicesFolder(), name);
+  }
+
+  /**
+   * @return a {@link File} pointing to the folder where server plugins are located.
+   */
+  public static File getServerPluginsFolder() {
+    return new File(getMuleBaseFolder(), SERVER_PLUGINS);
+  }
+
+  /**
+   * @return a {@link File} pointing to the folder where the server configuration is located.
+   */
+  public static File getConfFolder() {
+    return new File(getMuleBaseFolder(), CONF);
   }
 
   public static File getDomainsFolder() {

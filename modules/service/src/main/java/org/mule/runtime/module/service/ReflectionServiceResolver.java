@@ -7,12 +7,14 @@
 
 package org.mule.runtime.module.service;
 
+import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.service.ServiceDefinition;
 import org.mule.runtime.api.service.ServiceProvider;
+import org.mule.runtime.core.api.util.Pair;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -49,11 +51,12 @@ public class ReflectionServiceResolver implements ServiceResolver {
   }
 
   @Override
-  public List<Service> resolveServices(List<ServiceProvider> serviceProviders) throws ServiceResolutionError {
+  public List<Pair<ArtifactClassLoader, Service>> resolveServices(List<Pair<ArtifactClassLoader, ServiceProvider>> serviceProviders)
+      throws ServiceResolutionError {
     List<DependencyAwareServiceProvider> dependencyAwareServiceProviders =
         createDependencyAwareServiceProviders(serviceProviders);
 
-    Map<Class<? extends Service>, ServiceDefinition> registeredServices = new LinkedHashMap<>();
+    Map<Class<? extends Service>, Pair<ArtifactClassLoader, ServiceDefinition>> registeredServices = new LinkedHashMap<>();
     List<DependencyAwareServiceProvider> unresolvedServiceProviders = new LinkedList<>(dependencyAwareServiceProviders);
     List<DependencyAwareServiceProvider> resolvedServiceProviders = new LinkedList<>();
 
@@ -65,11 +68,13 @@ public class ReflectionServiceResolver implements ServiceResolver {
       List<DependencyAwareServiceProvider> pendingUnresolvedServices = new LinkedList<>();
 
       for (DependencyAwareServiceProvider dependencyAwareServiceProvider : unresolvedServiceProviders) {
-        if (isResolvedService(dependencyAwareServiceProvider, registeredServices.values())) {
-          serviceProviderResolutionHelper.injectInstance(dependencyAwareServiceProvider.serviceProvider,
-                                                         registeredServices.values());
+        List<ServiceDefinition> serviceDefinitions =
+            registeredServices.values().stream().map(pair -> pair.getSecond()).collect(toList());
+        if (isResolvedService(dependencyAwareServiceProvider, serviceDefinitions)) {
+          serviceProviderResolutionHelper.injectInstance(dependencyAwareServiceProvider.serviceProvider, serviceDefinitions);
           for (ServiceDefinition serviceDefinition : dependencyAwareServiceProvider.providedServices()) {
-            registeredServices.put(serviceDefinition.getServiceClass(), serviceDefinition);
+            registeredServices.put(serviceDefinition.getServiceClass(),
+                                   new Pair<>(dependencyAwareServiceProvider.getArtifactClassLoader(), serviceDefinition));
           }
 
           resolvedServiceProviders.add(dependencyAwareServiceProvider);
@@ -93,18 +98,22 @@ public class ReflectionServiceResolver implements ServiceResolver {
       throw new ServiceResolutionError("Unable to resolve core service dependencies. Missing some of: " + dependencies);
     }
 
-    return registeredServices.values().stream().map(s -> s.getService()).collect(toList());
+    List<Pair<ArtifactClassLoader, Service>> servicePairs = new ArrayList<>();
+    for (Pair<ArtifactClassLoader, ServiceDefinition> pair : registeredServices.values()) {
+      servicePairs.add(new Pair<>(pair.getFirst(), pair.getSecond().getService()));
+    }
+    return servicePairs;
   }
 
-  private List<DependencyAwareServiceProvider> createDependencyAwareServiceProviders(List<ServiceProvider> serviceProviders) {
+  private List<DependencyAwareServiceProvider> createDependencyAwareServiceProviders(List<Pair<ArtifactClassLoader, ServiceProvider>> serviceProviders) {
     final List<DependencyAwareServiceProvider> result = new ArrayList<>(serviceProviders.size());
 
-    for (ServiceProvider serviceProvider : serviceProviders) {
-      result.add(new DependencyAwareServiceProvider(serviceProvider,
-                                                    serviceProviderResolutionHelper.findServiceDependencies(serviceProvider)));
+    for (Pair<ArtifactClassLoader, ServiceProvider> pair : serviceProviders) {
+      result.add(new DependencyAwareServiceProvider(pair.getFirst(), pair.getSecond(),
+                                                    serviceProviderResolutionHelper.findServiceDependencies(pair.getSecond())));
     }
 
-    result.sort((ServiceProvider p1, ServiceProvider p2) -> p1.getClass().getName().compareTo(p2.getClass().getName()));
+    result.sort(comparing(p -> p.getClass().getName()));
 
     return result;
   }
@@ -144,8 +153,11 @@ public class ReflectionServiceResolver implements ServiceResolver {
 
     private final ServiceProvider serviceProvider;
     private final List<Class<? extends Service>> dependencies;
+    private final ArtifactClassLoader artifactClassLoader;
 
-    DependencyAwareServiceProvider(ServiceProvider serviceProvider, List<Class<? extends Service>> dependencies) {
+    DependencyAwareServiceProvider(ArtifactClassLoader artifactClassLoader, ServiceProvider serviceProvider,
+                                   List<Class<? extends Service>> dependencies) {
+      this.artifactClassLoader = artifactClassLoader;
       this.serviceProvider = serviceProvider;
       this.dependencies = dependencies;
     }
@@ -157,6 +169,10 @@ public class ReflectionServiceResolver implements ServiceResolver {
 
     List<Class<? extends Service>> getDependencies() {
       return dependencies;
+    }
+
+    public ArtifactClassLoader getArtifactClassLoader() {
+      return artifactClassLoader;
     }
   }
 }

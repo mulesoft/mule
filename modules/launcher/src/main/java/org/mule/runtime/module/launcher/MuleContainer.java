@@ -7,7 +7,6 @@
 package org.mule.runtime.module.launcher;
 
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
-
 import org.mule.runtime.api.exception.ExceptionHelper;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -15,10 +14,11 @@ import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.core.config.StartupContext;
-import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.util.StringMessageUtils;
 import org.mule.runtime.core.api.util.SystemUtils;
+import org.mule.runtime.core.config.StartupContext;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.net.MuleArtifactUrlStreamHandler;
 import org.mule.runtime.module.artifact.classloader.net.MuleUrlStreamHandlerFactory;
 import org.mule.runtime.module.deployment.api.DeploymentService;
@@ -30,6 +30,7 @@ import org.mule.runtime.module.launcher.coreextension.DefaultMuleCoreExtensionMa
 import org.mule.runtime.module.launcher.coreextension.MuleCoreExtensionManagerServer;
 import org.mule.runtime.module.launcher.coreextension.ReflectionMuleCoreExtensionDependencyResolver;
 import org.mule.runtime.module.launcher.log4j2.MuleLog4jContextFactory;
+import org.mule.runtime.module.reboot.MuleContainerBootstrap;
 import org.mule.runtime.module.repository.api.RepositoryService;
 import org.mule.runtime.module.repository.internal.RepositoryServiceFactory;
 import org.mule.runtime.module.service.ServiceManager;
@@ -74,10 +75,14 @@ public class MuleContainer {
   private final ToolingService toolingService;
   private final MuleCoreExtensionManagerServer coreExtensionManager;
   private MuleArtifactResourcesRegistry artifactResourcesRegistry = new MuleArtifactResourcesRegistry.Builder().build();
+  private static MuleLog4jContextFactory log4jContextFactory;
 
   static {
     if (System.getProperty(MuleProperties.MULE_SIMPLE_LOG) == null) {
-      LogManager.setFactory(new MuleLog4jContextFactory());
+      // We need to set this property so log4j uses the same context factory everywhere
+      System.setProperty("log4j2.loggerContextFactory", MuleLog4jContextFactory.class.getName());
+      log4jContextFactory = new MuleLog4jContextFactory();
+      LogManager.setFactory(log4jContextFactory);
     }
 
     logger = LoggerFactory.getLogger(MuleContainer.class);
@@ -113,6 +118,8 @@ public class MuleContainer {
                                                                           new ClasspathMuleCoreExtensionDiscoverer(artifactResourcesRegistry
                                                                               .getContainerClassLoader()),
                                                                           new ReflectionMuleCoreExtensionDependencyResolver());
+
+    artifactResourcesRegistry.getContainerClassLoader().dispose();
   }
 
   public MuleContainer(DeploymentService deploymentService, RepositoryService repositoryService, ToolingService toolingService,
@@ -247,6 +254,8 @@ public class MuleContainer {
   }
 
   public void stop() throws MuleException {
+    MuleContainerBootstrap.dispose();
+
     coreExtensionManager.stop();
 
     if (deploymentService != null) {
@@ -264,6 +273,10 @@ public class MuleContainer {
     coreExtensionManager.dispose();
     if (LogManager.getFactory() instanceof MuleLog4jContextFactory) {
       ((MuleLog4jContextFactory) LogManager.getFactory()).dispose();
+    }
+
+    if (log4jContextFactory != null) {
+      log4jContextFactory.dispose();
     }
   }
 
@@ -317,6 +330,20 @@ public class MuleContainer {
         logger.warn("Error stopping mule container", e);
       }
     }
+  }
+
+  /**
+   * @return {@link DeploymentService} of the runtime.
+   */
+  public DeploymentService getDeploymentService() {
+    return deploymentService;
+  }
+
+  /**
+   * @return {@link ArtifactClassLoader} of the runtime.
+   */
+  public ArtifactClassLoader getContainerClassLoader() {
+    return artifactResourcesRegistry.getContainerClassLoader();
   }
 }
 

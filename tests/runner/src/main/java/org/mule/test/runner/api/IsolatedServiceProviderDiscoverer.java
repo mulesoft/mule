@@ -14,6 +14,7 @@ import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.service.ServiceProvider;
 import org.mule.runtime.core.api.util.ClassUtils;
+import org.mule.runtime.core.api.util.Pair;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.service.ServiceProviderDiscoverer;
 import org.mule.runtime.module.service.ServiceResolutionError;
@@ -44,8 +45,8 @@ public class IsolatedServiceProviderDiscoverer implements ServiceProviderDiscove
   }
 
   @Override
-  public List<ServiceProvider> discover() throws ServiceResolutionError {
-    List<ServiceProvider> serviceProviders = new LinkedList<>();
+  public List<Pair<ArtifactClassLoader, ServiceProvider>> discover() throws ServiceResolutionError {
+    List<Pair<ArtifactClassLoader, ServiceProvider>> serviceProviders = new LinkedList<>();
     for (Object serviceArtifactClassLoader : serviceArtifactClassLoaders) {
       try {
         final ServiceProvider serviceProvider;
@@ -56,7 +57,8 @@ public class IsolatedServiceProviderDiscoverer implements ServiceProviderDiscove
 
         serviceProvider = instantiateServiceProvider(classLoader,
                                                      artifactName);
-        serviceProviders.add(serviceProvider);
+        // TODO MULE-12254 - Remove null which is needed in order to avoid class cast exceptions
+        serviceProviders.add(new Pair(null, serviceProvider));
       } catch (Exception e) {
         throw new IllegalStateException("Couldn't discover service from class loader: " + serviceArtifactClassLoader, e);
       }
