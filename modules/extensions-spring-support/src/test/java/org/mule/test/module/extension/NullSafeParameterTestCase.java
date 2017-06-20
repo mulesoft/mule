@@ -13,9 +13,11 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.junit.Assert.assertThat;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.test.vegan.extension.BananaConfig;
 import org.mule.test.vegan.extension.FarmedFood;
 import org.mule.test.vegan.extension.HealthyFood;
+import org.mule.test.vegan.extension.RottenFood;
 import org.mule.test.vegan.extension.VeganPolicy;
 
 import java.util.List;
@@ -95,5 +97,21 @@ public class NullSafeParameterTestCase extends AbstractExtensionFunctionalTestCa
     Object nullSafeMap = payload.getValue();
     assertThat(nullSafeMap, is(instanceOf(List.class)));
     assertThat(((List<?>) nullSafeMap), is(empty()));
+  }
+
+  @Test
+  public void nullSafeOnGroupAndPojo() throws Exception {
+    TypedValue<Object> payload = flowRunner("nullSafeOnGroupAndPojo").run().getMessage().getPayload();
+    Object listOfNullsafes = payload.getValue();
+    assertThat(listOfNullsafes, is(instanceOf(List.class)));
+    assertThat(((List<?>) listOfNullsafes).get(0), is(instanceOf(RottenFood.class)));
+    assertThat(((List<?>) listOfNullsafes).get(1), is(instanceOf(RottenFood.class)));
+  }
+
+  @Test
+  public void nullSafeOnSourceGroupAndPojo() throws Exception {
+    Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("nullSafeOnSourceGroupAndPojo");
+    flow.start();
+    assertThat(flow.getLifecycleState().isStarted(), is(true));
   }
 }

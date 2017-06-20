@@ -135,7 +135,7 @@ public class MuleExtensionUtils {
    * @return Whether the given parameter is null safe
    */
   public static boolean isNullSafe(ParameterModel parameterModel) {
-    return parameterModel.getModelProperties().stream().anyMatch(p -> p instanceof NullSafeModelProperty);
+    return parameterModel.getModelProperty(NullSafeModelProperty.class).isPresent();
   }
 
   /**

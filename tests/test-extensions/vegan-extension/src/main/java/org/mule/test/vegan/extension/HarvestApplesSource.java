@@ -6,6 +6,7 @@
  */
 package org.mule.test.vegan.extension;
 
+import static java.lang.String.format;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
@@ -13,6 +14,7 @@ import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.ConfigOverride;
+import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
@@ -52,8 +54,22 @@ public class HarvestApplesSource extends Source<Apple, HarvestApplesAttributes> 
   @Optional
   private String flowName;
 
+  @ParameterGroup(name = "As Group Inline", showInDsl = true)
+  private GroupedFood inlineGroupedFood;
+
+  @Parameter
+  @Optional
+  @NullSafe
+  private GroupedFood pojoGroupedFood;
+
   @Override
   public void onStart(SourceCallback<Apple, HarvestApplesAttributes> sourceCallback) throws MuleException {
+    if (inlineGroupedFood.getFood() == null || pojoGroupedFood.getFood() == null) {
+      throw new IllegalArgumentException(
+                                         format("Got a null in food groups: %s", inlineGroupedFood.getFood(),
+                                                pojoGroupedFood.getFood()));
+    }
+
     sourceCallback.handle(Result.<Apple, HarvestApplesAttributes>builder()
         .output(null).attributes(null).build());
   }

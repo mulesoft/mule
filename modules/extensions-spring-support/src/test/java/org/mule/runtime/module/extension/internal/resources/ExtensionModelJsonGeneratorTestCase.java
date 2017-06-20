@@ -10,7 +10,6 @@ import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
@@ -60,6 +59,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.skyscreamer.jsonassert.JSONAssert;
 
 @SmallTest
 @RunWith(Parameterized.class)
@@ -168,7 +168,13 @@ public class ExtensionModelJsonGeneratorTestCase extends AbstractMuleTestCase {
     if (!json.equals(expectedJson)) {
       System.out.println(json);
     }
-    assertThat(json, is(equalTo(expectedJson)));
+    JSONAssert.assertEquals(expectedJson, json, true);
+  }
+
+  @Test
+  public void load() throws Exception {
+    ExtensionModel result = generator.deserialize(expectedJson);
+    assertThat(result, is(extensionUnderTest));
   }
 
   public static ExtensionModel loadExtension(Class<?> clazz, ExtensionModelLoader loader) {

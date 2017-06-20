@@ -8,9 +8,12 @@ package org.mule.test.vegan.extension;
 
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.param.Content;
+import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.tck.testmodels.fruit.Fruit;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -25,12 +28,16 @@ public class VeganFidelityOperation {
     throw new IllegalArgumentException("I SHALL NEVER EAT " + food.toString());
   }
 
-  public List<Map<String, String>> tryToEatThisListOfMaps(@Optional(
-      defaultValue = "#[mel:new java.util.ArrayList()]") @Content List<Map<String, String>> foods) {
+  public List<Map<String, String>> tryToEatThisListOfMaps(@Optional @NullSafe @Content List<Map<String, String>> foods) {
     if (foods != null) {
       return foods;
     }
     throw new IllegalArgumentException("I CAN'T EAT THAT TYPE, IS IMPOSSIBLE!");
+  }
+
+  public List<FarmedFood> consumingGroupedFood(@ParameterGroup(name = "As Group") GroupedFood groupedFood,
+                                               @Optional @NullSafe GroupedFood pojoGroupedFood) {
+    return Arrays.asList(groupedFood.getFood(), pojoGroupedFood.getFood());
   }
 
 }
