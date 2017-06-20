@@ -7,37 +7,32 @@
 package org.mule.runtime.module.embedded.impl;
 
 import static java.lang.System.setProperty;
-import static org.apache.commons.io.FileUtils.copyDirectory;
 import static org.apache.commons.io.FileUtils.copyFile;
 import static org.apache.commons.io.FileUtils.toFile;
+import static org.apache.commons.io.FilenameUtils.getName;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getAppsFolder;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getConfFolder;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainsFolder;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getServerPluginsFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
-import static org.mule.runtime.core.api.util.FileUtils.deleteTree;
 import static org.mule.runtime.module.deployment.impl.internal.application.DeployableMavenClassLoaderModelLoader.ADD_TEST_DEPENDENCIES_KEY;
 import static org.mule.runtime.module.embedded.impl.SerializationUtils.deserialize;
-import static org.mule.runtime.module.embedded.internal.MavenUtils.createModelFromPom;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.container.api.MuleFoldersUtil;
-import org.mule.runtime.deployment.model.api.application.Application;
-import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
-import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.deployment.impl.internal.MuleArtifactResourcesRegistry;
-import org.mule.runtime.module.embedded.api.ApplicationConfiguration;
+import org.mule.runtime.module.embedded.api.ArtifactConfiguration;
 import org.mule.runtime.module.embedded.api.ContainerInfo;
+import org.mule.runtime.module.launcher.MuleContainer;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Map;
 
 import net.lingala.zip4j.core.ZipFile;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.logging.log4j.LogManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Controller class for the runtime. It spin ups a new container instance using a temporary folder and dynamically loading the
@@ -49,17 +44,13 @@ import org.slf4j.LoggerFactory;
  */
 public class EmbeddedController {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(EmbeddedController.class);
-  private ApplicationConfiguration applicationConfiguration;
   private ContainerInfo containerInfo;
-  private Application application;
   private ArtifactClassLoader containerClassLoader;
-  private MuleArtifactResourcesRegistry artifactResourcesRegistry;
+  private MuleContainer muleContainer;
 
-  public EmbeddedController(byte[] serializedContainerInfo, byte[] serializedAppConfiguration)
+  public EmbeddedController(byte[] serializedContainerInfo)
       throws IOException, ClassNotFoundException {
     containerInfo = deserialize(serializedContainerInfo);
-    applicationConfiguration = deserialize(serializedAppConfiguration);
   }
 
   /**
@@ -67,65 +58,46 @@ public class EmbeddedController {
    */
   public void start() throws Exception {
     setUpEnvironment();
-    createApplication();
-
-    application.init();
-    application.start();
   }
 
-  private void createApplication()
-      throws Exception {
-
-    for (Map.Entry<String, String> applicationPropertiesEntry : applicationConfiguration.getDeploymentConfiguration()
-        .getArtifactProperties().entrySet()) {
-      setProperty(applicationPropertiesEntry.getKey(), applicationPropertiesEntry.getValue());
-    }
-
-    // this is used to signal that we are running in embedded mode.
-    // Class loader model loader will not use try to use the container repository.
-    setProperty("mule.mode.embedded", "true");
-    if (applicationConfiguration.getDeploymentConfiguration().enableTestDependencies()) {
-      setProperty(ADD_TEST_DEPENDENCIES_KEY, "true");
-    }
-
-    File applicationLocation = applicationConfiguration.getApplicationLocation();
-    File appsFolder = new File(MuleFoldersUtil.getAppsFolder().getAbsolutePath());
-    File deploymentApplicationLocation = new File(appsFolder, applicationLocation.getName().replace(".jar", ""));
-    if (applicationLocation.getName().endsWith(".jar")) {
-      new ZipFile(applicationLocation).extractAll(appsFolder.getAbsolutePath());
-    } else {
-      copyDirectory(applicationLocation, deploymentApplicationLocation);
-    }
-
-    File containerFolder = new File(containerInfo.getContainerBaseFolder().getPath());
-    File servicesFolder = new File(containerFolder, "services");
-    for (URL url : containerInfo.getServices()) {
-      File originalFile = toFile(url);
-      File destinationFile = new File(servicesFolder, FilenameUtils.getName(originalFile.getPath()));
-      copyFile(originalFile, destinationFile);
-    }
-
-    artifactResourcesRegistry = new MuleArtifactResourcesRegistry.Builder().build();
-    containerClassLoader = this.artifactResourcesRegistry.getContainerClassLoader();
-
-    executeWithinContainerClassLoader(() -> {
+  public void deployApplication(byte[] serializedArtifactConfiguration) throws IOException, ClassNotFoundException {
+    ArtifactConfiguration artifactConfiguration = deserialize(serializedArtifactConfiguration);
+    withSystemProperties(artifactConfiguration.getDeploymentConfiguration().getArtifactProperties(), () -> {
       try {
-        try {
-          artifactResourcesRegistry.getServiceManager().start();
-          artifactResourcesRegistry.getExtensionModelLoaderManager().start();
-        } catch (MuleException e) {
-          throw new IllegalStateException(e);
+        if (artifactConfiguration.getDeploymentConfiguration().enableTestDependencies()) {
+          setProperty(ADD_TEST_DEPENDENCIES_KEY, "true");
         }
-
-        ApplicationDescriptor applicationDescriptor =
-            artifactResourcesRegistry.getApplicationDescriptorFactory().create(deploymentApplicationLocation);
-        artifactResourcesRegistry.getDomainFactory().createArtifact(createDefaultDomainDir());
-
-        this.application = artifactResourcesRegistry.getApplicationFactory().createAppFrom(applicationDescriptor);
+        muleContainer.getDeploymentService().deploy(artifactConfiguration.getApplicationLocation().toURI());
       } catch (IOException e) {
         throw new RuntimeException(e);
+      } finally {
+        setProperty(ADD_TEST_DEPENDENCIES_KEY, "false");
       }
     });
+  }
+
+  public void undeployApplication(byte[] serializedApplicationName) throws IOException, ClassNotFoundException {
+    String applicationName = deserialize(serializedApplicationName);
+    muleContainer.getDeploymentService().undeploy(applicationName);
+  }
+
+  // TODO MULE-10392: To be removed once we have methods to deploy with properties
+  private void withSystemProperties(Map<String, String> systemProperties, Runnable runnable) {
+    Map<String, String> previousPropertyValues = new HashMap<>();
+    systemProperties.entrySet().stream().forEach(entry -> {
+      String previousValue = System.getProperty(entry.getKey());
+      if (previousValue != null) {
+        previousPropertyValues.put(entry.getKey(), entry.getValue());
+      }
+      setProperty(entry.getKey(), entry.getValue());
+    });
+    try {
+      runnable.run();
+    } catch (Exception e) {
+      previousPropertyValues.entrySet().stream().forEach(entry -> {
+        setProperty(entry.getKey(), entry.getValue());
+      });
+    }
   }
 
   public void executeWithinContainerClassLoader(ContainerTask task) {
@@ -145,36 +117,53 @@ public class EmbeddedController {
    */
   public void stop() {
     executeWithinContainerClassLoader(() -> {
-      deleteTree(new File(containerInfo.getContainerBaseFolder().getPath()));
-      try {
-        application.stop();
-      } catch (Exception e) {
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug("failure stopping application", e);
-        }
-      }
-      try {
-        application.dispose();
-      } catch (Exception e) {
-        LOGGER.debug("failure disposing application", e);
-      }
+      muleContainer.stop();
+      muleContainer.getContainerClassLoader().dispose();
     });
-    artifactResourcesRegistry = null;
   }
 
-  private void setUpEnvironment() {
+  private void setUpEnvironment() throws IOException {
+    // Disable log4j2 JMX MBeans since it will fail when trying to recreate the container
+    setProperty("log4j2.disable.jmx", "true");
+
     setProperty(MULE_HOME_DIRECTORY_PROPERTY, containerInfo.getContainerBaseFolder().getPath());
     getDomainsFolder().mkdirs();
+    getDomainFolder("default").mkdirs();
     getServicesFolder().mkdirs();
-  }
+    getServerPluginsFolder().mkdirs();
+    getConfFolder().mkdirs();
+    getAppsFolder().mkdirs();
 
-  private File createDefaultDomainDir() {
-    File containerFolder = new File(containerInfo.getContainerBaseFolder().getPath());
-    File defaultDomainFolder = new File(new File(containerFolder, "domains"), "default");
-    if (!defaultDomainFolder.mkdirs()) {
-      throw new RuntimeException("Could not create default domain directory in " + defaultDomainFolder.getAbsolutePath());
+    // this is used to signal that we are running in embedded mode.
+    // Class loader model loader will not use try to use the container repository.
+    setProperty("mule.mode.embedded", "true");
+
+    for (URL url : containerInfo.getServices()) {
+      File originalFile = toFile(url);
+      File destinationFile = new File(getServicesFolder(), getName(originalFile.getPath()));
+      copyFile(originalFile, destinationFile);
     }
-    return defaultDomainFolder;
+    containerInfo.getServerPlugins().stream().forEach(serverPluginUrl -> {
+      File originalFile = toFile(serverPluginUrl);
+      File destinationFile = new File(getServerPluginsFolder(), getName(originalFile.getPath()).replace(".zip", ""));
+      try {
+        ZipFile zipFile = new ZipFile(originalFile);
+        zipFile.extractAll(destinationFile.getAbsolutePath());
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+    });
+
+    muleContainer = new MuleContainer(new String[0]);
+    containerClassLoader = muleContainer.getContainerClassLoader();
+    executeWithinContainerClassLoader(() -> {
+      try {
+        // Do not register shutdown hook since it will try to kill the JVM
+        muleContainer.start(false);
+      } catch (MuleException e) {
+        throw new IllegalStateException(e);
+      }
+    });
   }
 
   /**

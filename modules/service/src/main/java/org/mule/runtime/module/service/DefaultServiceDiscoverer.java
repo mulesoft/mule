@@ -11,6 +11,8 @@ package org.mule.runtime.module.service;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.service.ServiceProvider;
+import org.mule.runtime.core.api.util.Pair;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 
 import java.util.List;
 
@@ -36,8 +38,8 @@ public class DefaultServiceDiscoverer implements ServiceDiscoverer {
   }
 
   @Override
-  public List<Service> discoverServices() throws ServiceResolutionError {
-    final List<ServiceProvider> serviceProviders = serviceProviderDiscoverer.discover();
+  public List<Pair<ArtifactClassLoader, Service>> discoverServices() throws ServiceResolutionError {
+    final List<Pair<ArtifactClassLoader, ServiceProvider>> serviceProviders = serviceProviderDiscoverer.discover();
     return serviceResolver.resolveServices(serviceProviders);
   }
 }

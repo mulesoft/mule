@@ -21,34 +21,38 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.service.ServiceDefinition;
 import org.mule.runtime.api.service.ServiceProvider;
-import org.mule.runtime.module.service.ReflectionServiceResolver;
-import org.mule.runtime.module.service.ServiceProviderResolutionHelper;
-import org.mule.runtime.module.service.ServiceResolutionError;
+import org.mule.runtime.core.api.util.Pair;
+import org.mule.runtime.module.artifact.Artifact;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.junit.Test;
+import java.util.stream.Collectors;
 
 public class ReflectionServiceResolverTestCase extends AbstractMuleTestCase {
 
   private final FooService fooService = mock(FooService.class);
   private final BarService barService = mock(BarService.class);
-  private final ServiceProvider fooServiceProvider = createFooServiceProvider(fooService);
-  private final ServiceProvider barServiceProvider = createBarServiceProvider(barService);
+  private final ArtifactClassLoader fooServiceClassLoader = mock(ArtifactClassLoader.class);
+  private final ArtifactClassLoader barServiceClassLoader = mock(ArtifactClassLoader.class);
+  private final Pair<ArtifactClassLoader, ServiceProvider> fooServiceProvider = createFooServiceProvider(fooService);
+  private final Pair<ArtifactClassLoader, ServiceProvider> barServiceProvider = createBarServiceProvider(barService);
 
   @Test
   public void resolvesIndependentServices() throws Exception {
-    final List<ServiceProvider> serviceProviders = new ArrayList<>();
+    final List<Pair<ArtifactClassLoader, ServiceProvider>> serviceProviders = new ArrayList<>();
     serviceProviders.add(fooServiceProvider);
     serviceProviders.add(barServiceProvider);
 
     final ReflectionServiceResolver dependencyResolver =
         new ReflectionServiceResolver(mock(ServiceProviderResolutionHelper.class, RETURNS_DEEP_STUBS));
 
-    final List<Service> services = dependencyResolver.resolveServices(serviceProviders);
+    final List<Pair<ArtifactClassLoader, Service>> servicesPairs = dependencyResolver.resolveServices(serviceProviders);
 
+    List<Service> services = servicesPairs.stream().map(Pair::getSecond).collect(Collectors.toList());
     assertThat(services.size(), equalTo(2));
     assertThat(services, hasItem(fooService));
     assertThat(services, hasItem(barService));
@@ -56,7 +60,7 @@ public class ReflectionServiceResolverTestCase extends AbstractMuleTestCase {
 
   @Test
   public void resolvesServiceOrderedDependency() throws Exception {
-    final List<ServiceProvider> serviceProviders = new ArrayList<>();
+    final List<Pair<ArtifactClassLoader, ServiceProvider>> serviceProviders = new ArrayList<>();
     serviceProviders.add(barServiceProvider);
     serviceProviders.add(fooServiceProvider);
 
@@ -65,62 +69,65 @@ public class ReflectionServiceResolverTestCase extends AbstractMuleTestCase {
 
   @Test
   public void resolvesServiceDisorderedDependency() throws Exception {
-    final List<ServiceProvider> serviceProviders = new ArrayList<>();
+    final List<Pair<ArtifactClassLoader, ServiceProvider>> serviceProviders = new ArrayList<>();
     serviceProviders.add(fooServiceProvider);
     serviceProviders.add(barServiceProvider);
 
     doServiceDependencyTest(fooService, fooServiceProvider, barService, serviceProviders);
   }
 
-  private void doServiceDependencyTest(FooService fooService, ServiceProvider fooServiceProvider, BarService barService,
-                                       List<ServiceProvider> serviceProviders)
+  private void doServiceDependencyTest(FooService fooService, Pair<ArtifactClassLoader, ServiceProvider> fooServiceProviderPair,
+                                       BarService barService,
+                                       List<Pair<ArtifactClassLoader, ServiceProvider>> serviceProviders)
       throws ServiceResolutionError {
     final ServiceProviderResolutionHelper providerResolutionHelper =
         mock(ServiceProviderResolutionHelper.class, RETURNS_DEEP_STUBS);
-    when(providerResolutionHelper.findServiceDependencies(fooServiceProvider))
+    when(providerResolutionHelper.findServiceDependencies(fooServiceProviderPair.getSecond()))
         .thenReturn(singletonList(BarService.class));
     final ReflectionServiceResolver dependencyResolver = new ReflectionServiceResolver(providerResolutionHelper);
 
-    final List<Service> services = dependencyResolver.resolveServices(serviceProviders);
+    final List<Pair<ArtifactClassLoader, Service>> servicePairs = dependencyResolver.resolveServices(serviceProviders);
+
+    List<Service> services = servicePairs.stream().map(Pair::getSecond).collect(Collectors.toList());
 
     assertThat(services.size(), equalTo(2));
     assertThat(services.get(0), is(barService));
     assertThat(services.get(1), is(fooService));
 
-    verify(providerResolutionHelper).injectInstance(same(fooServiceProvider), anyCollection());
+    verify(providerResolutionHelper).injectInstance(same(fooServiceProviderPair.getSecond()), anyCollection());
   }
 
   @Test(expected = ServiceResolutionError.class)
   public void detectsUnresolvableServiceDependency() throws Exception {
     FooService fooService = mock(FooService.class);
-    ServiceProvider fooServiceProvider = createFooServiceProvider(fooService);
+    Pair<ArtifactClassLoader, ServiceProvider> fooServiceProviderPair = createFooServiceProvider(fooService);
 
-    final List<ServiceProvider> serviceProviders = new ArrayList<>();
-    serviceProviders.add(fooServiceProvider);
+    final List<Pair<ArtifactClassLoader, ServiceProvider>> serviceProviders = new ArrayList<>();
+    serviceProviders.add(fooServiceProviderPair);
 
     final ServiceProviderResolutionHelper providerResolutionHelper =
         mock(ServiceProviderResolutionHelper.class, RETURNS_DEEP_STUBS);
-    when(providerResolutionHelper.findServiceDependencies(fooServiceProvider))
+    when(providerResolutionHelper.findServiceDependencies(fooServiceProviderPair.getSecond()))
         .thenReturn(singletonList(BarService.class));
     final ReflectionServiceResolver dependencyResolver = new ReflectionServiceResolver(providerResolutionHelper);
 
     dependencyResolver.resolveServices(serviceProviders);
   }
 
-  private ServiceProvider createBarServiceProvider(BarService barService) {
+  private Pair<ArtifactClassLoader, ServiceProvider> createBarServiceProvider(BarService barService) {
     ServiceProvider barServiceProvider = mock(ServiceProvider.class);
     final List<ServiceDefinition> barServices = new ArrayList<>();
     barServices.add(new ServiceDefinition(BarService.class, barService));
     when(barServiceProvider.providedServices()).thenReturn(barServices);
-    return barServiceProvider;
+    return new Pair<>(barServiceClassLoader, barServiceProvider);
   }
 
-  private ServiceProvider createFooServiceProvider(FooService fooService) {
+  private Pair<ArtifactClassLoader, ServiceProvider> createFooServiceProvider(FooService fooService) {
     ServiceProvider fooServiceProvider = mock(ServiceProvider.class);
     final List<ServiceDefinition> fooServices = new ArrayList<>();
     fooServices.add(new ServiceDefinition(FooService.class, fooService));
     when(fooServiceProvider.providedServices()).thenReturn(fooServices);
-    return fooServiceProvider;
+    return new Pair<>(fooServiceClassLoader, fooServiceProvider);
   }
 
   public interface FooService extends Service {

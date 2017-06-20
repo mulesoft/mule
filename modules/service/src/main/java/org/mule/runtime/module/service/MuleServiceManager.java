@@ -19,6 +19,8 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.core.api.lifecycle.StartException;
+import org.mule.runtime.core.api.util.Pair;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -34,7 +36,7 @@ public class MuleServiceManager implements ServiceManager {
   private static final Logger logger = getLogger(MuleServiceManager.class);
 
   private final ServiceDiscoverer serviceDiscoverer;
-  private List<Service> registeredServices = new ArrayList<>();
+  private List<Pair<ArtifactClassLoader, Service>> registeredServices = new ArrayList<>();
   private List<Service> wrappedServices;
 
   /**
@@ -64,10 +66,10 @@ public class MuleServiceManager implements ServiceManager {
     }
   }
 
-  private List<Service> wrapServices(List<Service> registeredServices) {
+  private List<Service> wrapServices(List<Pair<ArtifactClassLoader, Service>> registeredServices) {
     final List<Service> result = new ArrayList<>(registeredServices.size());
-    for (Service registeredService : registeredServices) {
-      final Service serviceProxy = createLifecycleFilterServiceProxy(registeredService);
+    for (Pair<ArtifactClassLoader, Service> pair : registeredServices) {
+      final Service serviceProxy = createLifecycleFilterServiceProxy(pair.getSecond());
       result.add(serviceProxy);
     }
 
@@ -75,7 +77,8 @@ public class MuleServiceManager implements ServiceManager {
   }
 
   private void startServices() throws MuleException {
-    for (Service service : registeredServices) {
+    for (Pair<ArtifactClassLoader, Service> pair : registeredServices) {
+      Service service = pair.getSecond();
       if (service instanceof Startable) {
         ClassLoader originalContextClassLoader = currentThread().getContextClassLoader();
         try {
@@ -91,14 +94,18 @@ public class MuleServiceManager implements ServiceManager {
   @Override
   public void stop() throws MuleException {
     for (int i = registeredServices.size() - 1; i >= 0; i--) {
-      Service service = registeredServices.get(i);
-
+      Service service = registeredServices.get(i).getSecond();
       if (service instanceof Stoppable) {
         try {
           ((Stoppable) service).stop();
         } catch (Exception e) {
           logger.warn("Service {s} was not stopped properly: {s}", service.getName(), e.getMessage());
         }
+      }
+      try {
+        registeredServices.get(i).getFirst().dispose();
+      } catch (Exception e) {
+        logger.warn("Service {s} class loader was not stopped properly: {s}", service.getName(), e.getMessage());
       }
     }
   }

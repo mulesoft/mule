@@ -8,6 +8,8 @@
 package org.mule.runtime.module.service;
 
 import org.mule.runtime.api.service.Service;
+import org.mule.runtime.core.api.util.Pair;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 
 import java.util.List;
 
@@ -22,5 +24,5 @@ public interface ServiceDiscoverer {
    * @return a non null list of {@link Service} availables in the container.
    * @throws ServiceResolutionError when a {@link Service} cannot be properly resolved during the discovery process.
    */
-  List<Service> discoverServices() throws ServiceResolutionError;
+  List<Pair<ArtifactClassLoader, Service>> discoverServices() throws ServiceResolutionError;
 }

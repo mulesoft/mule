@@ -24,6 +24,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTOR
 import static org.mule.runtime.module.service.ServiceDescriptorFactory.SERVICE_PROVIDER_CLASS_NAME;
 import org.mule.runtime.api.service.ServiceDefinition;
 import org.mule.runtime.api.service.ServiceProvider;
+import org.mule.runtime.core.api.util.Pair;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.service.builder.ServiceFileBuilder;
@@ -32,6 +33,7 @@ import org.mule.tck.junit4.rule.SystemPropertyTemporaryFolder;
 
 import java.io.File;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -57,7 +59,7 @@ public class FileSystemServiceProviderDiscovererTestCase extends AbstractMuleTes
     final FileSystemServiceProviderDiscoverer serviceProviderDiscoverer =
         new FileSystemServiceProviderDiscoverer(containerClassLoader, serviceClassLoaderFactory);
 
-    final List<ServiceProvider> discover = serviceProviderDiscoverer.discover();
+    final List<Pair<ArtifactClassLoader, ServiceProvider>> discover = serviceProviderDiscoverer.discover();
 
     assertThat(discover, is(empty()));
   }
@@ -75,7 +77,9 @@ public class FileSystemServiceProviderDiscovererTestCase extends AbstractMuleTes
     final FileSystemServiceProviderDiscoverer serviceProviderDiscoverer =
         new FileSystemServiceProviderDiscoverer(containerClassLoader, serviceClassLoaderFactory);
 
-    final List<ServiceProvider> serviceProviders = serviceProviderDiscoverer.discover();
+    final List<Pair<ArtifactClassLoader, ServiceProvider>> serviceProvidersPairs = serviceProviderDiscoverer.discover();
+
+    List<ServiceProvider> serviceProviders = serviceProvidersPairs.stream().map(Pair::getSecond).collect(Collectors.toList());
 
     assertThat(serviceProviders.size(), equalTo(2));
     assertThat(serviceProviders, hasItem(instanceOf(FooServiceProvider.class)));

@@ -17,6 +17,8 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.core.api.util.Pair;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.lang.reflect.Proxy;
@@ -31,9 +33,9 @@ public class MuleServiceManagerTestCase extends AbstractMuleTestCase {
   @Test
   public void registerServices() throws Exception {
     final ServiceDiscoverer serviceDiscoverer = mock(ServiceDiscoverer.class);
-    final List<Service> services = new ArrayList<>();
-    Service service1 = mock(Service.class);
-    Service service2 = mock(Service.class);
+    final List<Pair<ArtifactClassLoader, Service>> services = new ArrayList<>();
+    Pair<ArtifactClassLoader, Service> service1 = new Pair(mock(ArtifactClassLoader.class), mock(Service.class));
+    Pair<ArtifactClassLoader, Service> service2 = new Pair(mock(ArtifactClassLoader.class), mock(Service.class));
     services.add(service1);
     services.add(service2);
     when(serviceDiscoverer.discoverServices()).thenReturn(services);
@@ -42,16 +44,16 @@ public class MuleServiceManagerTestCase extends AbstractMuleTestCase {
     muleServiceManager.start();
 
     assertThat(muleServiceManager.getServices().size(), equalTo(2));
-    assertThat(muleServiceManager.getServices().get(0), equalTo(service1));
-    assertThat(muleServiceManager.getServices().get(1), equalTo(service2));
+    assertThat(muleServiceManager.getServices().get(0), equalTo(service1.getSecond()));
+    assertThat(muleServiceManager.getServices().get(1), equalTo(service2.getSecond()));
   }
 
   @Test
   public void startServices() throws Exception {
     final ServiceDiscoverer serviceDiscoverer = mock(ServiceDiscoverer.class);
-    final List<Service> services = new ArrayList<>();
-    StartableService service1 = mock(StartableService.class);
-    StartableService service2 = mock(StartableService.class);
+    final List<Pair<ArtifactClassLoader, Service>> services = new ArrayList<>();
+    Pair<ArtifactClassLoader, Service> service1 = new Pair(mock(ArtifactClassLoader.class), mock(StartableService.class));
+    Pair<ArtifactClassLoader, Service> service2 = new Pair(mock(ArtifactClassLoader.class), mock(StartableService.class));
     services.add(service1);
     services.add(service2);
     when(serviceDiscoverer.discoverServices()).thenReturn(services);
@@ -59,40 +61,40 @@ public class MuleServiceManagerTestCase extends AbstractMuleTestCase {
     final MuleServiceManager muleServiceManager = new MuleServiceManager(serviceDiscoverer);
     muleServiceManager.start();
 
-    InOrder inOrder = inOrder(service1, service2);
-    inOrder.verify(service1).start();
-    inOrder.verify(service2).start();
+    InOrder inOrder = inOrder(service1.getSecond(), service2.getSecond());
+    inOrder.verify((StartableService) service1.getSecond()).start();
+    inOrder.verify((StartableService) service2.getSecond()).start();
   }
 
   @Test
   public void stopsServices() throws Exception {
     final ServiceDiscoverer serviceDiscoverer = mock(ServiceDiscoverer.class);
-    final List<Service> services = new ArrayList<>();
-    StoppableService service1 = mock(StoppableService.class);
-    StoppableService service2 = mock(StoppableService.class);
-    services.add(service1);
-    services.add(service2);
+    final List<Pair<ArtifactClassLoader, Service>> services = new ArrayList<>();
+    Pair<ArtifactClassLoader, Service> service1Pairs = new Pair(mock(ArtifactClassLoader.class), mock(StoppableService.class));
+    Pair<ArtifactClassLoader, Service> service2Pairs = new Pair(mock(ArtifactClassLoader.class), mock(StoppableService.class));
+    services.add(service1Pairs);
+    services.add(service2Pairs);
     when(serviceDiscoverer.discoverServices()).thenReturn(services);
 
     final MuleServiceManager muleServiceManager = new MuleServiceManager(serviceDiscoverer);
     muleServiceManager.start();
     muleServiceManager.stop();
 
-    InOrder inOrder = inOrder(service1, service2);
-    inOrder.verify(service2).stop();
-    inOrder.verify(service1).stop();
+    InOrder inOrder = inOrder(service1Pairs.getSecond(), service2Pairs.getSecond());
+    inOrder.verify((StoppableService) service2Pairs.getSecond()).stop();
+    inOrder.verify((StoppableService) service1Pairs.getSecond()).stop();
   }
 
   @Test
   public void ignoresServiceStopError() throws Exception {
     final ServiceDiscoverer serviceDiscoverer = mock(ServiceDiscoverer.class);
-    final List<Service> services = new ArrayList<>();
+    final List<Pair<ArtifactClassLoader, Service>> services = new ArrayList<>();
     StoppableService service1 = mock(StoppableService.class);
     doThrow(new RuntimeException()).when(service1).stop();
     StoppableService service2 = mock(StoppableService.class);
     doThrow(new RuntimeException()).when(service2).stop();
-    services.add(service1);
-    services.add(service2);
+    services.add(new Pair<>(mock(ArtifactClassLoader.class), service1));
+    services.add(new Pair<>(mock(ArtifactClassLoader.class), service2));
     when(serviceDiscoverer.discoverServices()).thenReturn(services);
 
     final MuleServiceManager muleServiceManager = new MuleServiceManager(serviceDiscoverer);
@@ -107,9 +109,9 @@ public class MuleServiceManagerTestCase extends AbstractMuleTestCase {
   @Test
   public void wrapsServices() throws Exception {
     final ServiceDiscoverer serviceDiscoverer = mock(ServiceDiscoverer.class);
-    final List<Service> services = new ArrayList<>();
+    final List<Pair<ArtifactClassLoader, Service>> services = new ArrayList<>();
     StoppableService service1 = mock(StoppableService.class);
-    services.add(service1);
+    services.add(new Pair<>(mock(ArtifactClassLoader.class), service1));
     when(serviceDiscoverer.discoverServices()).thenReturn(services);
 
     final MuleServiceManager muleServiceManager = new MuleServiceManager(serviceDiscoverer);

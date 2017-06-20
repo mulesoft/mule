@@ -19,6 +19,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.service.ServiceProvider;
 import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.core.api.util.ClassUtils;
+import org.mule.runtime.core.api.util.Pair;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
 
@@ -52,7 +53,7 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
   }
 
   @Override
-  public List<ServiceProvider> discover() throws ServiceResolutionError {
+  public List<Pair<ArtifactClassLoader, ServiceProvider>> discover() throws ServiceResolutionError {
     final ServiceDescriptorFactory serviceDescriptorFactory = new ServiceDescriptorFactory();
 
     final List<ServiceDescriptor> serviceDescriptors = new LinkedList<>();
@@ -72,10 +73,10 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
     return createServiceProviders(serviceDescriptors, serviceClassLoaderFactory);
   }
 
-  private List<ServiceProvider> createServiceProviders(List<ServiceDescriptor> serviceDescriptors,
-                                                       ArtifactClassLoaderFactory<ServiceDescriptor> serviceClassLoaderFactory)
+  private List<Pair<ArtifactClassLoader, ServiceProvider>> createServiceProviders(List<ServiceDescriptor> serviceDescriptors,
+                                                                                  ArtifactClassLoaderFactory<ServiceDescriptor> serviceClassLoaderFactory)
       throws ServiceResolutionError {
-    List<ServiceProvider> serviceProviders = new LinkedList<>();
+    List<Pair<ArtifactClassLoader, ServiceProvider>> serviceProviders = new LinkedList<>();
     for (ServiceDescriptor serviceDescriptor : serviceDescriptors) {
       final ArtifactClassLoader serviceClassLoader =
           serviceClassLoaderFactory.create(getServiceArtifactId(serviceDescriptor), serviceDescriptor,
@@ -83,7 +84,7 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
       final ServiceProvider serviceProvider =
           instantiateServiceProvider(serviceClassLoader.getClassLoader(), serviceDescriptor.getServiceProviderClassName());
 
-      serviceProviders.add(serviceProvider);
+      serviceProviders.add(new Pair<>(serviceClassLoader, serviceProvider));
     }
     return serviceProviders;
   }

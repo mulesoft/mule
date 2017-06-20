@@ -125,4 +125,8 @@ public class MuleContainerBootstrap {
     }
     return new BasicParser().parse(options, args, true);
   }
+
+  public static void dispose() {
+    // Do nothing
+  }
 }

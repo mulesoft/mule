@@ -9,9 +9,14 @@ package org.mule.runtime.module.deployment.internal;
 import static java.lang.System.getProperties;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.apache.commons.io.FileUtils.copyDirectory;
+import static org.apache.commons.io.FileUtils.toFile;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getAppsFolder;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.module.deployment.internal.ArtifactDeploymentTemplate.NOP_ARTIFACT_DEPLOYMENT_TEMPLATE;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
+
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
@@ -29,7 +34,9 @@ import org.mule.runtime.module.deployment.internal.util.DebuggableReentrantLock;
 import org.mule.runtime.module.deployment.internal.util.ObservableList;
 import org.mule.runtime.module.service.ServiceManager;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -198,7 +205,26 @@ public class MuleDeploymentService implements DeploymentService {
 
   @Override
   public void deploy(URI appArchiveUri) throws IOException {
-    executeSynchronized(() -> applicationDeployer.deployPackagedArtifact(appArchiveUri));
+    executeSynchronized(() -> {
+      try {
+        File appLocation = toFile(appArchiveUri.toURL());
+        String fileName = appLocation.getName();
+        if (fileName.endsWith(".jar")) {
+          applicationDeployer.deployPackagedArtifact(appArchiveUri);
+        } else {
+          if (!appLocation.getParent().equals(getAppsFolder())) {
+            try {
+              copyDirectory(appLocation, new File(getAppsFolder(), fileName));
+            } catch (IOException e) {
+              throw new MuleRuntimeException(e);
+            }
+          }
+          applicationDeployer.deployExplodedArtifact(fileName);
+        }
+      } catch (MalformedURLException e) {
+        throw new MuleRuntimeException(e);
+      }
+    });
   }
 
   @Override

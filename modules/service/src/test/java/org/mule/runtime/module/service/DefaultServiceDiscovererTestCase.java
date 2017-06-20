@@ -13,6 +13,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.service.ServiceProvider;
+import org.mule.runtime.core.api.util.Pair;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.ArrayList;
@@ -29,12 +31,12 @@ public class DefaultServiceDiscovererTestCase extends AbstractMuleTestCase {
 
   @Test
   public void discoversServices() throws Exception {
-    final List<ServiceProvider> serviceProviders = new ArrayList<>();
+    final List<Pair<ArtifactClassLoader, ServiceProvider>> serviceProviders = new ArrayList<>();
     when(serviceProviderDiscoverer.discover()).thenReturn(serviceProviders);
-    final List<Service> expectedServices = new ArrayList<>();
+    final List<Pair<ArtifactClassLoader, Service>> expectedServices = new ArrayList<>();
     when(serviceResolver.resolveServices(serviceProviders)).thenReturn(expectedServices);
 
-    final List<Service> services = serviceDiscoverer.discoverServices();
+    final List<Pair<ArtifactClassLoader, Service>> services = serviceDiscoverer.discoverServices();
 
     assertThat(services, is(expectedServices));
   }
@@ -48,7 +50,7 @@ public class DefaultServiceDiscovererTestCase extends AbstractMuleTestCase {
 
   @Test(expected = ServiceResolutionError.class)
   public void propagatesServiceResolutionErrors() throws Exception {
-    final List<ServiceProvider> serviceProviders = new ArrayList<>();
+    final List<Pair<ArtifactClassLoader, ServiceProvider>> serviceProviders = new ArrayList<>();
     when(serviceProviderDiscoverer.discover()).thenReturn(serviceProviders);
     when(serviceResolver.resolveServices(serviceProviders)).thenThrow(new ServiceResolutionError("Error"));
 
