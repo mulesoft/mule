@@ -10,6 +10,8 @@ import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
@@ -168,6 +170,12 @@ public class ExtensionModelJsonGeneratorTestCase extends AbstractMuleTestCase {
       System.out.println(json);
     }
     JSONAssert.assertEquals(expectedJson, json, true);
+  }
+
+  @Test
+  public void load() throws Exception {
+    ExtensionModel result = generator.deserialize(expectedJson);
+    assertThat(result, is(extensionUnderTest));
   }
 
   public static ExtensionModel loadExtension(Class<?> clazz, ExtensionModelLoader loader) {
