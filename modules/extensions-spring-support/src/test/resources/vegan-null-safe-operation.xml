@@ -7,6 +7,12 @@
 
 
     <vegan:banana-config name="banana"/>
+    <vegan:apple-config name="apple">
+        <vegan:cook-book>
+            <vegan:vegan-cook-book/>
+        </vegan:cook-book>
+    </vegan:apple-config>
+
     <vegan:healthy-food name="topLevelFood"/>
 
     <flow name="policy">
@@ -31,6 +37,15 @@
 
     <flow name="nullSafeOnList">
         <vegan:register-vegan-products/>
+    </flow>
+
+    <flow name="nullSafeOnGroupAndPojo">
+        <vegan:consuming-grouped-food/>
+    </flow>
+
+    <flow name="nullSafeOnSourceGroupAndPojo" initialState="stopped">
+        <vegan:harvest-apples config-ref="apple"/>
+        <logger/>
     </flow>
 
 </mule>
