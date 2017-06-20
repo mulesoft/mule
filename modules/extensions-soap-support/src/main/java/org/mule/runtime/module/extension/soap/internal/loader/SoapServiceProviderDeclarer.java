@@ -8,9 +8,13 @@ package org.mule.runtime.module.extension.soap.internal.loader;
 
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.POOLING;
+import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.TRANSPORT;
+import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.TRANSPORT_GROUP;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclarer;
+import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
@@ -42,8 +46,7 @@ import java.util.List;
  */
 public class SoapServiceProviderDeclarer {
 
-  public static final String TRANSPORT_GROUP = "Transport Configuration";
-  public static final String CUSTOM_TRANSPORT = "customTransport";
+  public static final String TRANSPORT_PARAM = TRANSPORT.toLowerCase();
 
   private final ParameterModelsLoaderDelegate parametersLoader;
   private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
@@ -73,9 +76,10 @@ public class SoapServiceProviderDeclarer {
     parametersLoader.declare(providerDeclarer, provider.getParameters(), context);
     if (hasCustomTransports) {
       providerDeclarer.onParameterGroup(TRANSPORT_GROUP)
-          .withRequiredParameter(CUSTOM_TRANSPORT)
+          .withRequiredParameter(TRANSPORT_PARAM)
+          .withDisplayModel(DisplayModel.builder().displayName(TRANSPORT_GROUP).build())
           .ofType(typeLoader.load(MessageDispatcherProvider.class))
-          .withLayout(LayoutModel.builder().order(1).build())
+          .withLayout(LayoutModel.builder().order(1).tabName(TRANSPORT).build())
           .withExpressionSupport(NOT_SUPPORTED);
     }
   }

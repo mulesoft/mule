@@ -664,7 +664,8 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 2
+                    "order": 2,
+                    "tabName": "Transport"
                   },
                   "name": "transportHeaders",
                   "displayModel": {
@@ -926,9 +927,13 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 1
+                    "order": 1,
+                    "tabName": "Transport"
                   },
-                  "name": "customTransport",
+                  "name": "transport",
+                  "displayModel": {
+                    "displayName": "Transport Configuration"
+                  },
                   "description": "",
                   "modelProperties": {}
                 }
@@ -1888,7 +1893,8 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 2
+                "order": 2,
+                "tabName": "Transport"
               },
               "name": "transportHeaders",
               "displayModel": {

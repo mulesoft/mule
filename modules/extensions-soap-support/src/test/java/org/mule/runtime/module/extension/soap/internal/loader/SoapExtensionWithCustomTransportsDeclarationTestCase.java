@@ -18,6 +18,7 @@ import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.VERSION;
+
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -29,12 +30,10 @@ import org.mule.runtime.module.extension.soap.internal.runtime.connection.transp
 import org.mule.test.ram.DefaultPortalGunDispatcherProvider;
 import org.mule.test.ram.MiniverseDispatcherProvider;
 import org.mule.test.ram.RickAndMortyExtension;
-
+import org.junit.Test;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.junit.Test;
 
 public class SoapExtensionWithCustomTransportsDeclarationTestCase extends AbstractSoapExtensionDeclarationTestCase {
 
@@ -58,7 +57,7 @@ public class SoapExtensionWithCustomTransportsDeclarationTestCase extends Abstra
                              new ParameterProber("wsdlUrl", StringType.class),
                              new ParameterProber("port", StringType.class),
                              new ParameterProber("service", StringType.class),
-                             new ParameterProber("customTransport", ObjectType.class));
+                             new ParameterProber("transport", ObjectType.class));
   }
 
   private void assertSubtypes(ExtensionModel model) {

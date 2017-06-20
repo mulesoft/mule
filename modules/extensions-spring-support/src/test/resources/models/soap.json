@@ -584,7 +584,8 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 2
+                    "order": 2,
+                    "tabName": "Transport"
                   },
                   "name": "transportHeaders",
                   "displayModel": {
@@ -2585,7 +2586,8 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 2
+                "order": 2,
+                "tabName": "Transport"
               },
               "name": "transportHeaders",
               "displayModel": {

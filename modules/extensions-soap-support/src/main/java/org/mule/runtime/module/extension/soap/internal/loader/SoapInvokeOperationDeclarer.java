@@ -10,6 +10,7 @@ import static org.mule.metadata.java.api.JavaTypeLoader.JAVA;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.PRIMARY_CONTENT;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
@@ -34,7 +35,6 @@ import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescripto
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectivityModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.NullSafeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.OperationExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
@@ -48,9 +48,7 @@ import org.mule.runtime.module.extension.soap.internal.metadata.WebServiceTypeKe
 import org.mule.runtime.module.extension.soap.internal.runtime.connection.ForwardingSoapClient;
 import org.mule.runtime.module.extension.soap.internal.runtime.operation.SoapOperationExecutorFactory;
 import org.mule.runtime.soap.api.message.SoapMultipartPayload;
-
 import com.google.common.collect.ImmutableMap;
-
 import java.io.InputStream;
 import java.util.Map;
 import java.util.Set;
@@ -65,7 +63,8 @@ public class SoapInvokeOperationDeclarer {
 
   public static final String MESSAGE_GROUP = "Message";
   private static final String KEYS_GROUP = "Web Service Configuration";
-  private static final String TRANSPORT_GROUP = "Transport Configuration";
+  static final String TRANSPORT = "Transport";
+  static final String TRANSPORT_GROUP = TRANSPORT + " Configuration";
   static final String OPERATION_DESCRIPTION = "invokes Web Service operations";
   static final String OPERATION_NAME = "invoke";
 
@@ -174,7 +173,7 @@ public class SoapInvokeOperationDeclarer {
             .with(new TypeIdAnnotation(Map.class.getName()))
             .build())
         .withDsl(ParameterDslConfiguration.getDefaultInstance())
-        .withLayout(LayoutModel.builder().order(2).build())
+        .withLayout(LayoutModel.builder().order(2).tabName(TRANSPORT).build())
         .withDisplayModel(DisplayModel.builder()
             .displayName(HEADERS_DISPLAY_NAME)
             .summary("The headers to set in the transport configuration.")
