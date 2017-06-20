@@ -38,8 +38,7 @@ public class ReactorProcessingStrategyFactory extends AbstractProcessingStrategy
   @Override
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
     return new ReactorProcessingStrategy(() -> muleContext.getSchedulerService()
-        .cpuLightScheduler(muleContext.getSchedulerBaseConfig().withName(schedulersNamePrefix + "." + CPU_LITE.name())
-            .withMaxConcurrentTasks(getMaxConcurrency())));
+        .cpuLightScheduler(createSchedulerConfig(muleContext, schedulersNamePrefix, CPU_LITE)));
   }
 
   @Override

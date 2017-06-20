@@ -6,19 +6,20 @@
  */
 package org.mule.runtime.core.processor.strategy;
 
-import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
+import static java.lang.Integer.MAX_VALUE;
+
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory;
+import org.mule.runtime.core.api.scheduler.SchedulerConfig;
 
 /**
- * Creates ring-buffer based processing strategy instances. These processing strategy de-multiplex incoming messages using a
- * ring-buffer which can then be subscribed to n times.
- * <p>
- * This processing strategy is not suitable for transactional flows and will fail if used with an active transaction.
+ * Abstract {@link AsyncProcessingStrategyFactory} implementation that supports the configuration of maximum concurrency.
  *
  * @since 4.0
  */
-public abstract class AbstractProcessingStrategyFactory implements ProcessingStrategyFactory {
+public abstract class AbstractProcessingStrategyFactory implements AsyncProcessingStrategyFactory {
 
-  private static int DEFAULT_MAX_CONCURRENCY = Integer.MAX_VALUE;
   private int maxConcurrency = DEFAULT_MAX_CONCURRENCY;
 
   /**
@@ -27,6 +28,7 @@ public abstract class AbstractProcessingStrategyFactory implements ProcessingStr
    *
    * @param maxConcurrency the maximum concurrency
    */
+  @Override
   public void setMaxConcurrency(int maxConcurrency) {
     if (maxConcurrency < 1) {
       throw new IllegalArgumentException("maxConcurrency must be at least 1");
@@ -40,8 +42,18 @@ public abstract class AbstractProcessingStrategyFactory implements ProcessingStr
    * 
    * @return the maximum concurrency
    */
-  public int getMaxConcurrency() {
+  protected int getMaxConcurrency() {
     return maxConcurrency;
+  }
+
+  protected SchedulerConfig createSchedulerConfig(MuleContext muleContext, String schedulersNamePrefix,
+                                                  ReactiveProcessor.ProcessingType processingType) {
+    SchedulerConfig schedulerConfig =
+        muleContext.getSchedulerBaseConfig().withName(schedulersNamePrefix + "." + processingType.name());
+    if (getMaxConcurrency() != MAX_VALUE) {
+      schedulerConfig = schedulerConfig.withMaxConcurrentTasks(getMaxConcurrency());
+    }
+    return schedulerConfig;
   }
 
 }

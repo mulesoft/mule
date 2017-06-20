@@ -39,8 +39,7 @@ public class WorkQueueProcessingStrategyFactory extends AbstractProcessingStrate
   @Override
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
     return new WorkQueueProcessingStrategy(() -> muleContext.getSchedulerService()
-        .ioScheduler(muleContext.getSchedulerBaseConfig().withName(schedulersNamePrefix + "." + BLOCKING.name())
-            .withMaxConcurrentTasks(getMaxConcurrency())));
+        .ioScheduler(createSchedulerConfig(muleContext, schedulersNamePrefix, BLOCKING)));
   }
 
   @Override

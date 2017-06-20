@@ -15,6 +15,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STARTED;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
+import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static org.mule.runtime.core.api.util.ExceptionUtils.updateMessagingExceptionWithError;
 import static org.mule.runtime.core.execution.ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate;
 import static reactor.core.publisher.Flux.from;
@@ -68,6 +69,7 @@ public class DefaultFlowBuilder implements Builder {
   private MessagingExceptionHandler exceptionListener;
   private ProcessingStrategyFactory processingStrategyFactory;
   private String initialState = INITIAL_STATE_STARTED;
+  private int maxConcurrency = DEFAULT_MAX_CONCURRENCY;
 
   private DefaultFlow flow;
 
@@ -165,6 +167,14 @@ public class DefaultFlowBuilder implements Builder {
     return this;
   }
 
+  @Override
+  public Builder maxConcurrency(int maxConcurrency) {
+    checkImmutable();
+    checkArgument(maxConcurrency > 0, "maxConcurrency cannot be less than 1");
+    this.maxConcurrency = maxConcurrency;
+    return this;
+  }
+
   /**
    * Builds a flow with the provided configuration.
    *
@@ -175,7 +185,7 @@ public class DefaultFlowBuilder implements Builder {
     checkImmutable();
 
     flow = new DefaultFlow(name, muleContext, resolveSource(source), processors,
-                           ofNullable(exceptionListener), ofNullable(processingStrategyFactory), initialState);
+                           ofNullable(exceptionListener), ofNullable(processingStrategyFactory), initialState, maxConcurrency);
     return flow;
   }
 
@@ -204,8 +214,9 @@ public class DefaultFlowBuilder implements Builder {
 
     protected DefaultFlow(String name, MuleContext muleContext, MessageSource source, List<Processor> processors,
                           Optional<MessagingExceptionHandler> exceptionListener,
-                          Optional<ProcessingStrategyFactory> processingStrategyFactory, String initialState) {
-      super(name, muleContext, source, processors, exceptionListener, processingStrategyFactory, initialState);
+                          Optional<ProcessingStrategyFactory> processingStrategyFactory, String initialState,
+                          int maxConcurrency) {
+      super(name, muleContext, source, processors, exceptionListener, processingStrategyFactory, initialState, maxConcurrency);
     }
 
     @Override

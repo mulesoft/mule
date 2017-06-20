@@ -454,6 +454,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
                                            fromChildConfiguration(MessagingExceptionHandler.class).build())
             .withSetterParameterDefinition(PROCESSING_STRATEGY_FACTORY_ATTRIBUTE,
                                            fromSimpleReferenceParameter(PROCESSING_STRATEGY_ATTRIBUTE).build())
+            .withSetterParameterDefinition("maxConcurrency", fromSimpleParameter("maxConcurrency").build())
             .build());
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier(FLOW_REF)
         .withTypeDefinition(fromType(AnnotatedProcessor.class))

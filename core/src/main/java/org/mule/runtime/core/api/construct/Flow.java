@@ -101,6 +101,18 @@ public interface Flow extends AnnotatedObject, Lifecycle, Pipeline, Processor {
     Builder initialState(String initialState);
 
     /**
+     * Configures the maximum permitted concurrency of the {@link Flow}. This value determines the maximum level of
+     * parallelism that the Flow can use to optimize for performance when processing messages. Note that this does not impact in
+     * any way the number of threads that a {@link MessageSource} may use to invoke a {@link Flow} and so if a direct or blocking
+     * {@link ProcessingStrategy} is used where processing occurs in source threads it is actually the source that defines maximum
+     * concurrency.
+     * 
+     * @param maxConcurrency
+     * @return
+     */
+    Builder maxConcurrency(int maxConcurrency);
+
+    /**
      * Builds a flow with the provided configuration.
      *
      * @return a new flow instance.
