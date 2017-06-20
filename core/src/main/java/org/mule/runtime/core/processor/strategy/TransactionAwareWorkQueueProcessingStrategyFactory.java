@@ -6,8 +6,10 @@
  */
 package org.mule.runtime.core.processor.strategy;
 
+import static java.lang.Integer.MAX_VALUE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.processor.strategy.BlockingProcessingStrategyFactory.BLOCKING_PROCESSING_STRATEGY_INSTANCE;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.slf4j.helpers.NOPLogger.NOP_LOGGER;
@@ -20,6 +22,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.api.scheduler.SchedulerConfig;
 import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
 
 import java.util.concurrent.ExecutorService;
@@ -35,9 +38,13 @@ public class TransactionAwareWorkQueueProcessingStrategyFactory extends WorkQueu
 
   @Override
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
+    SchedulerConfig schedulerConfig = muleContext.getSchedulerBaseConfig().withName(schedulersNamePrefix + "." + BLOCKING.name());
+    if (getMaxConcurrency() != MAX_VALUE) {
+      schedulerConfig = schedulerConfig.withMaxConcurrentTasks(getMaxConcurrency());
+    }
+    SchedulerConfig finalSchedulerConfig = schedulerConfig;
     return new TransactionAwareWorkQueueProcessingStrategy(() -> muleContext.getSchedulerService()
-        .ioScheduler(muleContext.getSchedulerBaseConfig().withName(schedulersNamePrefix + "." + BLOCKING.name())
-            .withMaxConcurrentTasks(getMaxConcurrency())));
+        .ioScheduler(finalSchedulerConfig));
   }
 
   @Override

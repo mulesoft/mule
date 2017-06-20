@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.processor.strategy;
 
+import static java.lang.Integer.MAX_VALUE;
 import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
@@ -22,6 +23,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.api.scheduler.SchedulerConfig;
 
 import java.util.function.Supplier;
 
@@ -38,9 +40,12 @@ public class WorkQueueProcessingStrategyFactory extends AbstractProcessingStrate
 
   @Override
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
-    return new WorkQueueProcessingStrategy(() -> muleContext.getSchedulerService()
-        .ioScheduler(muleContext.getSchedulerBaseConfig().withName(schedulersNamePrefix + "." + BLOCKING.name())
-            .withMaxConcurrentTasks(getMaxConcurrency())));
+    SchedulerConfig schedulerConfig = muleContext.getSchedulerBaseConfig().withName(schedulersNamePrefix + "." + BLOCKING.name());
+    if (getMaxConcurrency() != MAX_VALUE) {
+      schedulerConfig = schedulerConfig.withMaxConcurrentTasks(getMaxConcurrency());
+    }
+    SchedulerConfig finalSchedulerConfig = schedulerConfig;
+    return new WorkQueueProcessingStrategy(() -> muleContext.getSchedulerService().ioScheduler(finalSchedulerConfig));
   }
 
   @Override
