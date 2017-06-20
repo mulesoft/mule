@@ -55,14 +55,6 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.junit4.rule.SystemPropertyTemporaryFolder;
 import org.mule.tck.util.CompilerUtils;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.util.Set;
-
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -71,6 +63,12 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.util.Set;
 
 public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
 
@@ -323,7 +321,7 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
             bundleDependency.getDescriptor().getClassifier().get().equals(MULE_PLUGIN_CLASSIFIER) &&
             bundleDependency.getDescriptor().getArtifactId().equals("mule-sockets-connector") &&
             bundleDependency.getDescriptor().getGroupId().equals("org.mule.connectors") &&
-            bundleDependency.getDescriptor().getVersion().equals("1.0.0-SNAPSHOT");
+            bundleDependency.getDescriptor().getVersion().equals("0.8.0-SNAPSHOT");
       }
     };
   }
@@ -356,7 +354,7 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
             bundleDependency.getDescriptor().getClassifier().get().equals(MULE_PLUGIN_CLASSIFIER) &&
             bundleDependency.getDescriptor().getArtifactId().equals(artifactId) &&
             bundleDependency.getDescriptor().getGroupId().equals("org.mule.connectors") &&
-            bundleDependency.getDescriptor().getVersion().equals("1.0.0-SNAPSHOT");
+            bundleDependency.getDescriptor().getVersion().equals("0.8.0-SNAPSHOT");
       }
     };
   }
