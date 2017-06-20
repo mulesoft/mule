@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.soap.internal.runtime.connection;
 
 import static java.lang.String.format;
-import static org.mule.runtime.module.extension.soap.internal.loader.SoapServiceProviderDeclarer.CUSTOM_TRANSPORT;
+import static org.mule.runtime.module.extension.soap.internal.loader.SoapServiceProviderDeclarer.TRANSPORT_PARAM;
 
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -75,7 +75,7 @@ public final class SoapConnectionProviderObjectBuilder extends ConnectionProvide
   }
 
   private MessageDispatcherProvider<MessageDispatcher> getCustomTransport(ResolverSetResult resultSet) {
-    MessageDispatcherProvider customTransport = (MessageDispatcherProvider) resultSet.get(CUSTOM_TRANSPORT);
+    MessageDispatcherProvider customTransport = (MessageDispatcherProvider) resultSet.get(TRANSPORT_PARAM);
     return customTransport != null ? customTransport : new DefaultHttpMessageDispatcherProvider();
   }
 

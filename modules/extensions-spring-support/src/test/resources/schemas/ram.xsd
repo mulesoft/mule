@@ -77,7 +77,7 @@
                     <xs:sequence minOccurs="0" maxOccurs="1">
                         <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
                         <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:pooling-profile"></xs:element>
-                        <xs:element minOccurs="0" maxOccurs="1" name="custom-transport">
+                        <xs:element minOccurs="0" maxOccurs="1" name="transport">
                             <xs:complexType>
                                 <xs:choice minOccurs="1" maxOccurs="1">
                                     <xs:element xmlns:ram="http://www.mulesoft.org/schema/mule/ram" minOccurs="1" maxOccurs="1" ref="ram:abstract-message-dispatcher-provider"></xs:element>
@@ -89,7 +89,7 @@
                     <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString" use="required" name="wsdlUrl"></xs:attribute>
                     <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString" use="required" name="service"></xs:attribute>
                     <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString" use="required" name="port"></xs:attribute>
-                    <xs:attribute type="xs:string" use="optional" name="customTransport"></xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" name="transport"></xs:attribute>
                     <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:substitutableBoolean" use="optional" name="disableValidation">
                         <xs:annotation>
                             <xs:documentation>Disables connection validation</xs:documentation>
