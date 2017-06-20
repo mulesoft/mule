@@ -40,7 +40,7 @@
         <http:listener path="*" config-ref="listenerConfig"/>
         <http:basic-security-filter realm="mule-realm"/>
         <async>
-            <component class="org.mule.runtime.core.component.simple.EchoComponent"/>
+            <logger/>
         </async>
     </flow>
     

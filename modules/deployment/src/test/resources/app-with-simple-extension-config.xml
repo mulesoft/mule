@@ -13,6 +13,6 @@
         </scheduler>
         <set-payload value=""/>
         <simple:print-message/>
-        <echo-component/>
+        <logger/>
     </flow>
 </mule>

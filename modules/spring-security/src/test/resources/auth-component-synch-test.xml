@@ -26,7 +26,7 @@
                 <mule:encryption-security-filter strategy-ref="PBE"/>
             </mule:inbound-endpoint>
             <mule:component>
-                <mule:spring-object bean="echoComponent"/>
+                <mule:spring-object bean="testComponent"/>
             </mule:component>
         </mule:flow>
 

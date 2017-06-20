@@ -25,7 +25,7 @@
         <mule-ss:delegate-security-provider name="memory-dao" delegate-ref="authenticationManager"/>
     </mule-ss:security-manager>
 
-    <spring:bean name="echoComponent" class="org.mule.runtime.core.component.simple.EchoComponent"/>
+    <spring:bean name="testComponent" class="org.mule.test.module.spring.security.TestComponent"/>
 
     <!-- this sets the same provider three times, once through spring-security's provider and twice
          through a custom provider.  in normal use it should be set just once, through

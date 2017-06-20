@@ -2179,69 +2179,6 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:complexType name="defaultComponentType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractComponentType"/>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="echo-component" type="defaultComponentType" substitutionGroup="abstract-component">
-        <xsd:annotation>
-            <xsd:documentation>
-                Logs the message and returns the payload as the result.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
-    <xsd:element name="log-component" type="defaultComponentType" substitutionGroup="abstract-component">
-        <xsd:annotation>
-            <xsd:documentation>
-                Logs the message content (or content length if it is a large message).
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
-    <xsd:element name="null-component" type="defaultComponentType" substitutionGroup="abstract-component">
-        <xsd:annotation>
-            <xsd:documentation>
-                Throws an exception if it receives a message.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
-    <xsd:element name="static-component" type="staticComponentType" substitutionGroup="abstract-component">
-        <xsd:annotation>
-            <xsd:documentation>
-                A service that will return static data as a result.  The data returned can be read from a file or can be embedded directly in the XML.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
-    <xsd:complexType name="staticComponentType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractComponentType">
-                <xsd:sequence>
-                    <xsd:element name="return-data" minOccurs="0" maxOccurs="1">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                Defines the data to return from the service once it has been invoked. The return data can be located in a file, which you specify using the {{file}} attribute (specify a resource on the classpath or on disk), or the return data can be embedded directly in the XML.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                        <xsd:complexType mixed="true">
-                            <xsd:attribute name="file" type="xsd:string">
-                                <xsd:annotation>
-                                    <xsd:documentation>
-                                        The location of a file to load. The file can point to a resource on the classpath or on disk.
-                                    </xsd:documentation>
-                                </xsd:annotation>
-                            </xsd:attribute>
-                        </xsd:complexType>
-                    </xsd:element>
-                </xsd:sequence>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
     <!--==============================================================-->
     <!--   Transactions                                               -->
     <!--==============================================================-->
