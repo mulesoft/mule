@@ -12,6 +12,8 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.config.spring.dsl.processor.AbstractAttributeDefinitionVisitor;
@@ -20,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -70,7 +73,6 @@ public class MinimalApplicationModelGenerator {
   public ApplicationModel getMinimalModel(Location location) {
     ComponentModel requestedComponentModel = findRequiredComponentModel(location);
     final Set<String> otherRequiredGlobalComponents = resolveComponentDependencies(requestedComponentModel);
-    otherRequiredGlobalComponents.add(location.getGlobalElementName());
     Set<String> allRequiredComponentModels = findComponentModelsDependencies(otherRequiredGlobalComponents);
     Iterator<ComponentModel> iterator = applicationModel.getRootComponentModel().getInnerComponents().iterator();
     while (iterator.hasNext()) {
@@ -101,7 +103,7 @@ public class MinimalApplicationModelGenerator {
     LinkedHashMap<ComponentModel, List<ComponentModel>> componentModelDependencies = new LinkedHashMap<>();
     applicationModel.executeOnEveryMuleComponentTree(componentModel -> {
       if (componentModel.getNameAttribute() != null && componentModel.isEnabled()) {
-        List<ComponentModel> dependencies = resolveComponentModelDependencies(null, componentModel).stream()
+        List<ComponentModel> dependencies = resolveComponentModelDependencies(componentModel).stream()
             .map(componentModelName -> applicationModel.findTopLevelNamedComponent(componentModelName).get()).collect(toList());
         componentModelDependencies.put(componentModel, dependencies);
       }
@@ -129,11 +131,8 @@ public class MinimalApplicationModelGenerator {
     sortedComponentModel.add(componentModel);
   }
 
-  private Set<String> resolveComponentModelDependencies(String name, ComponentModel componentModel) {
+  private Set<String> resolveComponentModelDependencies(ComponentModel componentModel) {
     final Set<String> otherRequiredGlobalComponents = resolveComponentDependencies(componentModel);
-    if (name != null) {
-      otherRequiredGlobalComponents.add(name);
-    }
     return findComponentModelsDependencies(otherRequiredGlobalComponents);
   }
 
@@ -171,7 +170,7 @@ public class MinimalApplicationModelGenerator {
 
   private Set<String> findComponentModelsDependencies(Set<String> componentModelNames) {
     Set<String> componentsToSearchDependencies = componentModelNames;
-    Set<String> foundDependencies = new HashSet<>();
+    Set<String> foundDependencies = new LinkedHashSet<>();
     Set<String> alreadySearchedDependencies = new HashSet<>();
     do {
       componentsToSearchDependencies.addAll(foundDependencies);
@@ -216,18 +215,28 @@ public class MinimalApplicationModelGenerator {
 
     for (String parametersReferencingDependency : parametersReferencingDependencies) {
       if (requestedComponentModel.getParameters().containsKey(parametersReferencingDependency)) {
-        String dependencyName = requestedComponentModel.getParameters().get(parametersReferencingDependency);
-        if (applicationModel.findTopLevelNamedElement(dependencyName).isPresent()) {
-          otherDependencies.add(dependencyName);
-        } else {
-          if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(String.format("Ignoring dependency %s because it does not exists", dependencyName));
-          }
-        }
+        appendDependency(otherDependencies, requestedComponentModel, parametersReferencingDependency);
+      } else if (isFlowRef(requestedComponentModel.getIdentifier())) {
+        appendDependency(otherDependencies, requestedComponentModel, "name");
       }
     }
     return otherDependencies;
   }
 
+  private void appendDependency(Set<String> otherDependencies, ComponentModel requestedComponentModel,
+                                String parametersReferencingDependency) {
+    String name = requestedComponentModel.getParameters().get(parametersReferencingDependency);
+    if (applicationModel.findTopLevelNamedElement(name).isPresent()) {
+      otherDependencies.add(name);
+    } else {
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug(String.format("Ignoring dependency %s because it does not exists", name));
+      }
+    }
+  }
+
+  private boolean isFlowRef(ComponentIdentifier componentIdentifier) {
+    return componentIdentifier.getNamespace().equals(CORE_PREFIX) && componentIdentifier.getName().equals("flow-ref");
+  }
 
 }

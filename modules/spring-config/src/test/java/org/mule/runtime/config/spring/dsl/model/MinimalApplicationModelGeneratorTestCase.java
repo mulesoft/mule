@@ -8,9 +8,7 @@ package org.mule.runtime.config.spring.dsl.model;
 
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
-import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -96,15 +94,16 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
     assertThat(minimalModel.findTopLevelNamedComponent("flowTwo").isPresent(), is(true));
     assertThat(minimalModel.findTopLevelNamedComponent("flowTwo").get().isEnabled(), is(true));
     assertThat(minimalModel.findTopLevelNamedComponent("flowOne").isPresent(), is(true));
-    assertThat(minimalModel.findTopLevelNamedComponent("flowOne").get().isEnabled(), is(false));
+    assertThat(minimalModel.findTopLevelNamedComponent("flowOne").get().isEnabled(), is(true));
     assertThat(minimalModel.findTopLevelNamedComponent("flowWithSource").isPresent(), is(true));
     assertThat(minimalModel.findTopLevelNamedComponent("flowWithSource").get().isEnabled(), is(false));
 
     List<ComponentModel> componentModelList = generator.resolveComponentModelDependencies();
-    assertThat(componentModelList, hasSize(2));
+    assertThat(componentModelList, hasSize(3));
 
-    assertThat(componentModelList.get(0).getNameAttribute(), equalTo("flowOne"));
+    assertThat(componentModelList.get(0).getIdentifier().getName(), equalTo("flow-ref"));
     assertThat(componentModelList.get(1).getNameAttribute(), equalTo("flowTwo"));
+    assertThat(componentModelList.get(2).getNameAttribute(), equalTo("flowOne"));
   }
 
   @Test
@@ -126,15 +125,16 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
     assertThat(minimalModel.findTopLevelNamedComponent("flowTwo").isPresent(), is(true));
     assertThat(minimalModel.findTopLevelNamedComponent("flowTwo").get().isEnabled(), is(true));
     assertThat(minimalModel.findTopLevelNamedComponent("flowOne").isPresent(), is(true));
-    assertThat(minimalModel.findTopLevelNamedComponent("flowOne").get().isEnabled(), is(false));
+    assertThat(minimalModel.findTopLevelNamedComponent("flowOne").get().isEnabled(), is(true));
     assertThat(minimalModel.findTopLevelNamedComponent("flowWithSource").isPresent(), is(true));
     assertThat(minimalModel.findTopLevelNamedComponent("flowWithSource").get().isEnabled(), is(false));
 
     List<ComponentModel> componentModelList = generator.resolveComponentModelDependencies();
-    assertThat(componentModelList, hasSize(2));
+    assertThat(componentModelList, hasSize(3));
 
     assertThat(componentModelList.get(0).getNameAttribute(), equalTo("flowOne"));
-    assertThat(componentModelList.get(1).getNameAttribute(), equalTo("flowTwo"));
+    assertThat(componentModelList.get(1).getIdentifier().getName(), equalTo("flow-ref"));
+    assertThat(componentModelList.get(2).getNameAttribute(), equalTo("flowTwo"));
 
     assertThat(minimalModel.findTopLevelNamedComponent("flowTwo").get().getConfigFileName().get(),
                is(firstConfigFile));
@@ -150,10 +150,7 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
     assertThat(minimalModel.findTopLevelNamedComponent("flowB").isPresent(), is(true));
 
     List<ComponentModel> componentModelList = generator.resolveComponentModelDependencies();
-    assertThat(componentModelList, hasSize(2));
-
-    assertThat(componentModelList, containsInAnyOrder(hasProperty("nameAttribute", equalTo("flowB")),
-                                                      hasProperty("nameAttribute", equalTo("flowA"))));
+    assertThat(componentModelList, hasSize(4));
   }
 
   @Test
