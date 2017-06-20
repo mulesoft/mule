@@ -103,11 +103,29 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
    */
   public ResolverSet getParametersAsResolverSet(ParameterizedModel model, MuleContext muleContext) throws ConfigurationException {
 
-    List<ParameterGroupModel> inlineGroups = getInlineGroups(model);
+    List<ParameterGroupModel> inlineGroups = getInlineGroups(model.getParameterGroupModels());
     ResolverSet resolverSet =
         getParametersAsResolverSet(model, getFlatParameters(inlineGroups, model.getAllParameterModels()), muleContext);
     for (ParameterGroupModel group : inlineGroups) {
 
+      getInlineGroupResolver(group, resolverSet, muleContext);
+    }
+    return resolverSet;
+  }
+
+  /**
+   * Constructs a {@link ResolverSet} from the parameters groups, using {@link #toValueResolver(Object, Set)} to process the values.
+   *
+   * @return a {@link ResolverSet}
+   */
+  public ResolverSet getParametersAsResolverSet(MuleContext muleContext, ParameterizedModel model,
+                                                List<ParameterGroupModel> groups)
+      throws ConfigurationException {
+
+    List<ParameterGroupModel> inlineGroups = getInlineGroups(groups);
+    List<ParameterModel> allParameters = groups.stream().flatMap(g -> g.getParameterModels().stream()).collect(toList());
+    ResolverSet resolverSet = getParametersAsResolverSet(model, getFlatParameters(inlineGroups, allParameters), muleContext);
+    for (ParameterGroupModel group : inlineGroups) {
       getInlineGroupResolver(group, resolverSet, muleContext);
     }
     return resolverSet;
@@ -121,11 +139,10 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
   public ResolverSet getParametersAsHashedResolverSet(ParameterizedModel model, MuleContext muleContext)
       throws ConfigurationException {
 
-    List<ParameterGroupModel> inlineGroups = getInlineGroups(model);
+    List<ParameterGroupModel> inlineGroups = getInlineGroups(model.getParameterGroupModels());
     ResolverSet resolverSet =
         getParametersAsHashedResolverSet(model, getFlatParameters(inlineGroups, model.getAllParameterModels()), muleContext);
     for (ParameterGroupModel group : inlineGroups) {
-
       getInlineGroupResolver(group, resolverSet, muleContext);
     }
     return resolverSet;
@@ -207,8 +224,8 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
     return resolverSet;
   }
 
-  private List<ParameterGroupModel> getInlineGroups(ParameterizedModel model) {
-    return model.getParameterGroupModels().stream()
+  private List<ParameterGroupModel> getInlineGroups(List<ParameterGroupModel> groups) {
+    return groups.stream()
         .filter(ParameterGroupModel::isShowInDsl)
         .collect(toList());
   }

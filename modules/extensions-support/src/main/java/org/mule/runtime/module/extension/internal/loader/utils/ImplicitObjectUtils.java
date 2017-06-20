@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.utils;
 
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.getExpressionBasedValueResolver;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isNullSafe;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;

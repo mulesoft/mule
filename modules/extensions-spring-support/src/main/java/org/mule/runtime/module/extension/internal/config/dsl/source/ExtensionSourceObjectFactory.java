@@ -97,9 +97,7 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
   }
 
   private ResolverSet getNonCallbackParameters() throws ConfigurationException {
-    return parametersResolver.getParametersAsResolverSet(sourceModel, sourceModel.getParameterGroupModels().stream()
-        .flatMap(g -> g.getParameterModels().stream())
-        .collect(toList()), muleContext);
+    return parametersResolver.getParametersAsResolverSet(muleContext, sourceModel, sourceModel.getParameterGroupModels());
   }
 
   private ResolverSet getCallbackParameters(Optional<SourceCallbackModel> callbackModel) throws ConfigurationException {

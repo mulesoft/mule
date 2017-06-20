@@ -45,6 +45,7 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
+import org.mule.runtime.extension.api.property.DefaultImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.loader.java.contributor.ParameterDeclarerContributor;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
@@ -322,6 +323,10 @@ public final class ParameterModelsLoaderDelegate {
       });
 
       parameter.withModelProperty(new NullSafeModelProperty(nullSafeType));
+      if (hasDefaultOverride) {
+        parameter.withModelProperty(new DefaultImplementingTypeModelProperty(nullSafeType));
+
+      }
     }
   }
 
