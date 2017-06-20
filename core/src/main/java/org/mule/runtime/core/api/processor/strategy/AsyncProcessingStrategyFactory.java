@@ -19,8 +19,8 @@ public interface AsyncProcessingStrategyFactory extends ProcessingStrategyFactor
   int DEFAULT_MAX_CONCURRENCY = MAX_VALUE;
 
   /**
-   * Configures the maximum concurrency permitted. This will typically be used to limit the number of concurrent blocking tasks
-   * using the IO pool, but will also limit the number of CPU_LIGHT threads in used concurrently.
+   * Configures the maximum concurrency permitted. This will typically be used to limit the number of concurrent blocking tasks in
+   * execution using the IO pool, but will also limit the number of CPU_LIGHT threads in used concurrently.
    *
    * @param maxConcurrency the maximum concurrency
    */

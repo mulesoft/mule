@@ -78,7 +78,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   private volatile boolean canProcessMessage = false;
   private final Cache<String, EventContext> eventContextCache = CacheBuilder.newBuilder().weakValues().build();
   private volatile Sink sink;
-  private int maxConcurrency;
+  private final int maxConcurrency;
 
   public AbstractPipeline(String name, MuleContext muleContext, MessageSource source, List<Processor> processors,
                           Optional<MessagingExceptionHandler> exceptionListener,
