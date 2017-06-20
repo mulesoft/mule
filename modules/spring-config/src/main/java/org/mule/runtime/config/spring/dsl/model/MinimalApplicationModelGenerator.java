@@ -73,6 +73,10 @@ public class MinimalApplicationModelGenerator {
   public ApplicationModel getMinimalModel(Location location) {
     ComponentModel requestedComponentModel = findRequiredComponentModel(location);
     final Set<String> otherRequiredGlobalComponents = resolveComponentDependencies(requestedComponentModel);
+    String requestComponentModelName = requestedComponentModel.getNameAttribute();
+    if (requestComponentModelName != null && applicationModel.findTopLevelNamedElement(requestComponentModelName).isPresent()) {
+      otherRequiredGlobalComponents.add(requestedComponentModel.getNameAttribute());
+    }
     Set<String> allRequiredComponentModels = findComponentModelsDependencies(otherRequiredGlobalComponents);
     Iterator<ComponentModel> iterator = applicationModel.getRootComponentModel().getInnerComponents().iterator();
     while (iterator.hasNext()) {
