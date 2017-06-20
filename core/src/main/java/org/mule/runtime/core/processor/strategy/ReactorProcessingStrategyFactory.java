@@ -6,9 +6,7 @@
  */
 package org.mule.runtime.core.processor.strategy;
 
-import static java.lang.Integer.MAX_VALUE;
 import static java.util.Objects.requireNonNull;
-import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
 import static reactor.core.publisher.Flux.from;
@@ -23,7 +21,6 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.api.scheduler.SchedulerConfig;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 
 import java.util.function.Supplier;
@@ -40,12 +37,8 @@ public class ReactorProcessingStrategyFactory extends AbstractProcessingStrategy
 
   @Override
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
-    SchedulerConfig schedulerConfig = muleContext.getSchedulerBaseConfig().withName(schedulersNamePrefix + "." + CPU_LITE.name());
-    if (getMaxConcurrency() != MAX_VALUE) {
-      schedulerConfig = schedulerConfig.withMaxConcurrentTasks(getMaxConcurrency());
-    }
-    SchedulerConfig finalSchedulerConfig = schedulerConfig;
-    return new ReactorProcessingStrategy(() -> muleContext.getSchedulerService().cpuLightScheduler(finalSchedulerConfig));
+    return new ReactorProcessingStrategy(() -> muleContext.getSchedulerService()
+        .cpuLightScheduler(createSchedulerConfig(muleContext, schedulersNamePrefix, CPU_LITE)));
   }
 
   @Override
