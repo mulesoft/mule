@@ -172,4 +172,41 @@ public class SchedulerConfig {
   public Supplier<Long> getShutdownTimeoutMillis() {
     return shutdownTimeoutMillis;
   }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    SchedulerConfig that = (SchedulerConfig) o;
+
+    if (maxConcurrentTasks != null ? !maxConcurrentTasks.equals(that.maxConcurrentTasks) : that.maxConcurrentTasks != null) {
+      return false;
+    }
+    if (schedulerPrefix != null ? !schedulerPrefix.equals(that.schedulerPrefix) : that.schedulerPrefix != null) {
+      return false;
+    }
+    if (schedulerName != null ? !schedulerName.equals(that.schedulerName) : that.schedulerName != null) {
+      return false;
+    }
+    if (waitAllowed != null ? !waitAllowed.equals(that.waitAllowed) : that.waitAllowed != null) {
+      return false;
+    }
+    return shutdownTimeoutMillis != null ? shutdownTimeoutMillis.equals(that.shutdownTimeoutMillis)
+        : that.shutdownTimeoutMillis == null;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = maxConcurrentTasks != null ? maxConcurrentTasks.hashCode() : 0;
+    result = 31 * result + (schedulerPrefix != null ? schedulerPrefix.hashCode() : 0);
+    result = 31 * result + (schedulerName != null ? schedulerName.hashCode() : 0);
+    result = 31 * result + (waitAllowed != null ? waitAllowed.hashCode() : 0);
+    result = 31 * result + (shutdownTimeoutMillis != null ? shutdownTimeoutMillis.hashCode() : 0);
+    return result;
+  }
 }

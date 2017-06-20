@@ -2018,6 +2018,16 @@
                         </xsd:union>
                     </xsd:simpleType>
                 </xsd:attribute>
+                <xsd:attribute name="maxConcurrency">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The maximum concurrency. This value determines the maximum level of parallelism that the Flow can use to optimize for performance when processing messages.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                    <xsd:simpleType>
+                        <xsd:restriction base="substitutableInt"/>
+                    </xsd:simpleType>
+                </xsd:attribute>
            </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

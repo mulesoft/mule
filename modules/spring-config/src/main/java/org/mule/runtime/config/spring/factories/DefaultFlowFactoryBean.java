@@ -36,6 +36,7 @@ public class DefaultFlowFactoryBean extends AbstractAnnotatedObject
   private List<Processor> messageProcessors;
   private MessagingExceptionHandler exceptionListener;
   private ProcessingStrategyFactory processingStrategyFactory;
+  private Integer maxConcurrency;
 
   @Override
   public Flow getObject() throws Exception {
@@ -49,6 +50,9 @@ public class DefaultFlowFactoryBean extends AbstractAnnotatedObject
     }
     if (processingStrategyFactory != null) {
       flowBuilder.processingStrategyFactory(processingStrategyFactory);
+    }
+    if (maxConcurrency != null) {
+      flowBuilder.maxConcurrency(maxConcurrency.intValue());
     }
 
     final DefaultFlow build = (DefaultFlow) flowBuilder.build();
@@ -136,5 +140,9 @@ public class DefaultFlowFactoryBean extends AbstractAnnotatedObject
 
   public void setProcessingStrategyFactory(ProcessingStrategyFactory processingStrategyFactory) {
     this.processingStrategyFactory = processingStrategyFactory;
+  }
+
+  public void setMaxConcurrency(Integer maxConcurrency) {
+    this.maxConcurrency = maxConcurrency;
   }
 }

@@ -14,6 +14,8 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.junit.rules.ExpectedException.none;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -22,6 +24,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STOPPED;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
+import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -47,7 +51,9 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 import org.junit.After;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -61,6 +67,9 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
   private DefaultFlowBuilder.DefaultFlow stoppedFlow;
   private SensingNullMessageProcessor sensingMessageProcessor;
   private BiFunction<Processor, Event, Event> triggerFunction;
+
+  @Rule
+  public ExpectedException expectedException = none();
 
   public DefaultFlowTestCase(BiFunction<Processor, Event, Event> triggerFunction) {
     this.triggerFunction = triggerFunction;
@@ -223,6 +232,48 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
 
     verify((Startable) mockMessageSource, times(1)).start();
     verify((Stoppable) mockMessageSource, times(1)).stop();
+  }
+
+  @Test
+  public void defaultMaxConcurrency() throws Exception {
+    flow.initialise();
+    flow.start();
+    assertThat(flow.getMaxConcurrency(), equalTo(DEFAULT_MAX_CONCURRENCY));
+    verify(muleContext.getSchedulerService())
+        .ioScheduler(eq(muleContext.getSchedulerBaseConfig().withMaxConcurrentTasks(DEFAULT_MAX_CONCURRENCY)
+            .withName(flow.getName() + "." + BLOCKING.name())));
+  }
+
+  @Test
+  public void customMaxConcurrency() throws Exception {
+    int customMaxConcurrency = 1;
+    Flow customFlow = Flow.builder(FLOW_NAME, muleContext)
+        .source(directInboundMessageSource)
+        .processors(getSensingNullMessageProcessor())
+        .maxConcurrency(customMaxConcurrency)
+        .build();
+    try {
+      customFlow.initialise();
+      customFlow.start();
+      assertThat(customFlow.getMaxConcurrency(), equalTo(customMaxConcurrency));
+      verify(muleContext.getSchedulerService())
+          .ioScheduler(eq(muleContext.getSchedulerBaseConfig().withMaxConcurrentTasks(customMaxConcurrency)
+              .withName(flow.getName() + "." + BLOCKING.name())));
+      customFlow.stop();
+
+    } finally {
+      customFlow.dispose();
+    }
+  }
+
+  @Test
+  public void illegalCustomMaxConcurrency() throws Exception {
+    expectedException.expect(IllegalArgumentException.class);
+    Flow.builder(FLOW_NAME, muleContext)
+        .source(directInboundMessageSource)
+        .processors(getSensingNullMessageProcessor())
+        .maxConcurrency(0)
+        .build();
   }
 
 }

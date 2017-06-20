@@ -36,6 +36,7 @@ import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
+import org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.source.MessageSource;
@@ -77,15 +78,21 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   private volatile boolean canProcessMessage = false;
   private final Cache<String, EventContext> eventContextCache = CacheBuilder.newBuilder().weakValues().build();
   private volatile Sink sink;
+  private int maxConcurrency;
 
   public AbstractPipeline(String name, MuleContext muleContext, MessageSource source, List<Processor> processors,
                           Optional<MessagingExceptionHandler> exceptionListener,
-                          Optional<ProcessingStrategyFactory> processingStrategyFactory, String initialState) {
+                          Optional<ProcessingStrategyFactory> processingStrategyFactory, String initialState,
+                          int maxConcurrency) {
     super(name, muleContext, exceptionListener, initialState);
     this.source = source;
     this.processors = unmodifiableList(processors);
+    this.maxConcurrency = maxConcurrency;
 
     ProcessingStrategyFactory psFactory = processingStrategyFactory.orElseGet(() -> defaultProcessingStrategy());
+    if (psFactory instanceof AsyncProcessingStrategyFactory) {
+      ((AsyncProcessingStrategyFactory) psFactory).setMaxConcurrency(maxConcurrency);
+    }
     this.txAwareProcessingStrategy = (psFactory instanceof TransactionAwareProcessingStrategyFactory);
     processingStrategy = psFactory.create(muleContext, getName());
   }
@@ -301,6 +308,11 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   @Override
   public Map<String, EventContext> getSerializationEventContextCache() {
     return eventContextCache.asMap();
+  }
+
+  @Override
+  public int getMaxConcurrency() {
+    return maxConcurrency;
   }
 
   private class ProcessEndProcessor extends AbstractAnnotatedObject implements Processor, InternalMessageProcessor {
