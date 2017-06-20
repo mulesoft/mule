@@ -15,6 +15,7 @@
 
     <modules>
         <module>embedded-impl</module>
+        <module>embedded-impl-bom</module>
         <module>embedded-test</module>
         <module>embedded-distribution</module>
     </modules>
