@@ -95,7 +95,7 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
     if (inputSource == null) {
       inputSource = springEntityResolver.resolveEntity(publicId, systemId);
     }
-    if (inputSource == null && ! extensions.isEmpty()) {
+    if (inputSource == null && !extensions.isEmpty()) {
       throw new MuleRuntimeException(createStaticMessage("Could not get %s schema", systemId));
     }
     return inputSource;
