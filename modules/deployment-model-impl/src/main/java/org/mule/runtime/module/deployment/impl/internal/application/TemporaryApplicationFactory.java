@@ -10,6 +10,7 @@ package org.mule.runtime.module.deployment.impl.internal.application;
 import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainRepository;
+import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateClassLoaderBuilderFactory;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils;
@@ -31,10 +32,11 @@ public class TemporaryApplicationFactory extends DefaultApplicationFactory {
                                      ExtensionModelLoaderRepository extensionModelLoaderRepository,
                                      ClassLoaderRepository classLoaderRepository,
                                      PolicyTemplateClassLoaderBuilderFactory policyTemplateClassLoaderBuilderFactory,
-                                     PluginDependenciesResolver pluginDependenciesResolver) {
+                                     PluginDependenciesResolver pluginDependenciesResolver,
+                                     ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader) {
     super(applicationClassLoaderBuilderFactory, applicationDescriptorFactory, domainRepository,
           serviceRepository, extensionModelLoaderRepository, classLoaderRepository, policyTemplateClassLoaderBuilderFactory,
-          pluginDependenciesResolver);
+          pluginDependenciesResolver, artifactPluginDescriptorLoader);
   }
 
   @Override

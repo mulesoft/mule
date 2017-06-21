@@ -164,7 +164,8 @@ public class MuleArtifactResourcesRegistry {
                                                        domainManager, serviceManager,
                                                        extensionModelLoaderManager,
                                                        artifactClassLoaderManager, policyTemplateClassLoaderBuilderFactory,
-                                                       pluginDependenciesResolver);
+                                                       pluginDependenciesResolver,
+                                                       artifactPluginDescriptorLoader);
     temporaryApplicationFactory = new TemporaryApplicationFactory(applicationClassLoaderBuilderFactory,
                                                                   new TemporaryApplicationDescriptorFactory(artifactPluginDescriptorLoader,
                                                                                                             descriptorLoaderRepository),
@@ -172,7 +173,7 @@ public class MuleArtifactResourcesRegistry {
                                                                   extensionModelLoaderManager,
                                                                   artifactClassLoaderManager,
                                                                   policyTemplateClassLoaderBuilderFactory,
-                                                                  pluginDependenciesResolver);
+                                                                  pluginDependenciesResolver, artifactPluginDescriptorLoader);
 
   }
 
