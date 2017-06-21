@@ -9,24 +9,32 @@ package org.mule.runtime.module.embedded;
 import static java.lang.Thread.currentThread;
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigurationBuilder;
-import static org.mule.maven.client.api.model.RemoteRepository.newRemoteRepositoryBuilder;
 import static org.mule.runtime.module.embedded.api.EmbeddedContainer.builder;
 import static org.slf4j.LoggerFactory.getLogger;
+import org.mule.maven.client.api.model.MavenConfiguration;
+import org.mule.maven.client.api.model.RemoteRepository;
+import org.mule.maven.client.internal.AetherResolutionContext;
+import org.mule.maven.client.internal.DefaultLocalRepositorySupplierFactory;
+import org.mule.maven.client.internal.DefaultSettingsSupplierFactory;
+import org.mule.maven.client.internal.MavenEnvironmentVariables;
 import org.mule.runtime.module.embedded.api.ContainerConfiguration;
 import org.mule.runtime.module.embedded.api.EmbeddedContainer;
 import org.mule.runtime.module.embedded.internal.classloading.FilteringClassLoader;
 import org.mule.runtime.module.embedded.internal.classloading.JdkOnlyClassLoaderFactory;
 
+import org.eclipse.aether.repository.Authentication;
+import org.eclipse.aether.repository.AuthenticationSelector;
+import org.junit.rules.TemporaryFolder;
+import org.slf4j.Logger;
+
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.model.ZipParameters;
-import org.junit.rules.TemporaryFolder;
-import org.slf4j.Logger;
 
 /**
  * Helper class for running embedded tests.
@@ -35,8 +43,10 @@ import org.slf4j.Logger;
  */
 public class EmbeddedTestHelper {
 
+  private static final String MULESOFT_PUBLIC_REPOSITORY = "https://repository.mulesoft.org/nexus/content/repositories/public/";
+  private static final String MULESOFT_PRIVATE_REPOSITORY = "https://repository.mulesoft.org/nexus/content/repositories/private/";
   private static final Logger LOGGER = getLogger(EmbeddedTestHelper.class);
-  private File localRepositoryFolder;
+
   private final TemporaryFolder temporaryFolder;
   private File containerFolder;
   private EmbeddedContainer container;
@@ -46,7 +56,6 @@ public class EmbeddedTestHelper {
       temporaryFolder = new TemporaryFolder();
       temporaryFolder.create();
       this.containerFolder = temporaryFolder.newFolder();
-      this.localRepositoryFolder = temporaryFolder.newFolder();
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -90,19 +99,12 @@ public class EmbeddedTestHelper {
     test(() -> {
       EmbeddedContainer.EmbeddedContainerBuilder embeddedContainerBuilder;
       try {
-        LOGGER.info("Using folder as local repository: " + localRepositoryFolder.getAbsolutePath());
-
         embeddedContainerBuilder = builder()
             .withMuleVersion(System.getProperty("mule.version"))
             .withContainerConfiguration(ContainerConfiguration.builder().withContainerFolder(containerFolder).build())
-            .withMavenConfiguration(newMavenConfigurationBuilder()
-                .withLocalMavenRepositoryLocation(localRepositoryFolder)
-                .withRemoteRepository(newRemoteRepositoryBuilder().withId("mulesoft-public")
-                    .withUrl(new URL("https://repository.mulesoft.org/nexus/content/repositories/public"))
-                    .build())
-                .build());
+            .withMavenConfiguration(createDefaultMavenConfiguration());
         embeddedContainerConfigurer.accept(embeddedContainerBuilder);
-      } catch (MalformedURLException e) {
+      } catch (Exception e) {
         throw new RuntimeException(e);
       }
 
@@ -128,10 +130,6 @@ public class EmbeddedTestHelper {
     return containerFolder;
   }
 
-  public File getLocalRepositoryFolder() {
-    return localRepositoryFolder;
-  }
-
   public void dispose() {
     temporaryFolder.delete();
   }
@@ -149,5 +147,45 @@ public class EmbeddedTestHelper {
 
   public EmbeddedContainer getContainer() {
     return container;
+  }
+
+  /**
+   * Creates a default maven configuration.
+   *
+   * @return a new maven configuration based on the user environment.
+   */
+  public static MavenConfiguration createDefaultMavenConfiguration() throws IOException {
+    MavenConfiguration mavenConfiguration = createDefaultMavenConfigurationBuilder().build();
+    LOGGER.info("Using MavenConfiguration {}", mavenConfiguration);
+    return mavenConfiguration;
+  }
+
+  /**
+   * Creates a maven config builder with the default settings.
+   *
+   * @return a new maven configuration builder based on the user environment.
+   */
+  public static MavenConfiguration.MavenConfigurationBuilder createDefaultMavenConfigurationBuilder() throws IOException {
+    MavenConfiguration.MavenConfigurationBuilder mavenConfigurationBuilder =
+        newMavenConfigurationBuilder().withForcePolicyUpdateNever(true);
+
+    final File localMavenRepository = new DefaultLocalRepositorySupplierFactory().environmentMavenRepositorySupplier().get();
+    mavenConfigurationBuilder.withLocalMavenRepositoryLocation(localMavenRepository);
+
+    final DefaultSettingsSupplierFactory settingsSupplierFactory =
+        new DefaultSettingsSupplierFactory(new MavenEnvironmentVariables());
+
+    mavenConfigurationBuilder.withRemoteRepository(RemoteRepository.newRemoteRepositoryBuilder()
+        .withId("mulesoft-public")
+        .withUrl(new URL(MULESOFT_PUBLIC_REPOSITORY))
+        .build());
+    mavenConfigurationBuilder.withRemoteRepository(RemoteRepository.newRemoteRepositoryBuilder()
+        .withId("mulesoft-private")
+        .withUrl(new URL(MULESOFT_PRIVATE_REPOSITORY))
+        .build());
+
+    settingsSupplierFactory.environmentUserSettingsSupplier().ifPresent(mavenConfigurationBuilder::withUserSettingsLocation);
+    settingsSupplierFactory.environmentGlobalSettingsSupplier().ifPresent(mavenConfigurationBuilder::withGlobalSettingsLocation);
+    return mavenConfigurationBuilder;
   }
 }
