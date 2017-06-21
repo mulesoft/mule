@@ -8,25 +8,21 @@ package org.mule.runtime.module.embedded;
 
 import static java.lang.Thread.currentThread;
 import static org.apache.commons.io.FileUtils.toFile;
-import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigurationBuilder;
-import static org.mule.maven.client.api.model.RemoteRepository.newRemoteRepositoryBuilder;
+import static org.mule.maven.client.test.MavenTestHelper.createDefaultMavenConfiguration;
 import static org.mule.runtime.module.embedded.api.EmbeddedContainer.builder;
-import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.module.embedded.api.ContainerConfiguration;
 import org.mule.runtime.module.embedded.api.EmbeddedContainer;
 import org.mule.runtime.module.embedded.internal.classloading.FilteringClassLoader;
 import org.mule.runtime.module.embedded.internal.classloading.JdkOnlyClassLoaderFactory;
 
+import org.junit.rules.TemporaryFolder;
+
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.function.Consumer;
 
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.model.ZipParameters;
-import org.junit.rules.TemporaryFolder;
-import org.slf4j.Logger;
 
 /**
  * Helper class for running embedded tests.
@@ -35,8 +31,6 @@ import org.slf4j.Logger;
  */
 public class EmbeddedTestHelper {
 
-  private static final Logger LOGGER = getLogger(EmbeddedTestHelper.class);
-  private File localRepositoryFolder;
   private final TemporaryFolder temporaryFolder;
   private File containerFolder;
   private EmbeddedContainer container;
@@ -46,7 +40,6 @@ public class EmbeddedTestHelper {
       temporaryFolder = new TemporaryFolder();
       temporaryFolder.create();
       this.containerFolder = temporaryFolder.newFolder();
-      this.localRepositoryFolder = temporaryFolder.newFolder();
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -90,19 +83,12 @@ public class EmbeddedTestHelper {
     test(() -> {
       EmbeddedContainer.EmbeddedContainerBuilder embeddedContainerBuilder;
       try {
-        LOGGER.info("Using folder as local repository: " + localRepositoryFolder.getAbsolutePath());
-
         embeddedContainerBuilder = builder()
             .withMuleVersion(System.getProperty("mule.version"))
             .withContainerConfiguration(ContainerConfiguration.builder().withContainerFolder(containerFolder).build())
-            .withMavenConfiguration(newMavenConfigurationBuilder()
-                .withLocalMavenRepositoryLocation(localRepositoryFolder)
-                .withRemoteRepository(newRemoteRepositoryBuilder().withId("mulesoft-public")
-                    .withUrl(new URL("https://repository.mulesoft.org/nexus/content/repositories/public"))
-                    .build())
-                .build());
+            .withMavenConfiguration(createDefaultMavenConfiguration());
         embeddedContainerConfigurer.accept(embeddedContainerBuilder);
-      } catch (MalformedURLException e) {
+      } catch (Exception e) {
         throw new RuntimeException(e);
       }
 
@@ -128,10 +114,6 @@ public class EmbeddedTestHelper {
     return containerFolder;
   }
 
-  public File getLocalRepositoryFolder() {
-    return localRepositoryFolder;
-  }
-
   public void dispose() {
     temporaryFolder.delete();
   }
@@ -150,4 +132,5 @@ public class EmbeddedTestHelper {
   public EmbeddedContainer getContainer() {
     return container;
   }
+
 }
