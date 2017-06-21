@@ -620,7 +620,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(paramModel.getName(), is("schedulingStrategy"));
     assertThat(paramModel.getExpressionSupport(), is(NOT_SUPPORTED));
     assertThat(paramModel.getType(), instanceOf(DefaultObjectType.class));
-    assertThat(paramModel.isRequired(), is(false));
+    assertThat(paramModel.isRequired(), is(true));
     assertThat(paramModel.getType().getAnnotation(TypeIdAnnotation.class).get().getValue(),
                is(SchedulingStrategy.class.getName()));
   }
