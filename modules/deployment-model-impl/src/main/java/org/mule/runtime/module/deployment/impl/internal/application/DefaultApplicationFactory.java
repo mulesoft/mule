@@ -166,7 +166,7 @@ public class DefaultApplicationFactory implements ArtifactFactory<Application> {
                                                                       ApplicationDescriptor descriptor) {
     List<ArtifactPluginDescriptor> artifactPluginDescriptors = new ArrayList<>();
 
-    for (ArtifactPluginDescriptor appPluginDescriptor : createArtifactPluginDescriptors(descriptor)) {
+    for (ArtifactPluginDescriptor appPluginDescriptor : getArtifactPluginDescriptors(descriptor)) {
       Optional<ArtifactPluginDescriptor> domainPluginDescriptor =
           findPlugin(domainPlugins, appPluginDescriptor.getBundleDescriptor());
 
@@ -184,19 +184,24 @@ public class DefaultApplicationFactory implements ArtifactFactory<Application> {
     return artifactPluginDescriptors;
   }
 
-  private Set<ArtifactPluginDescriptor> createArtifactPluginDescriptors(ApplicationDescriptor descriptor) {
-    Set<ArtifactPluginDescriptor> pluginDescriptors = new HashSet<>();
-    for (BundleDependency bundleDependency : descriptor.getClassLoaderModel().getDependencies()) {
-      if (bundleDependency.getDescriptor().isPlugin()) {
-        File pluginZip = new File(bundleDependency.getBundleUri());
-        try {
-          pluginDescriptors.add(artifactPluginDescriptorLoader.load(pluginZip));
-        } catch (IOException e) {
-          throw new IllegalStateException("Cannot create plugin descriptor: " + pluginZip.getAbsolutePath(), e);
+  private Set<ArtifactPluginDescriptor> getArtifactPluginDescriptors(ApplicationDescriptor descriptor) {
+    if (descriptor.getPlugins().isEmpty()) {
+      Set<ArtifactPluginDescriptor> pluginDescriptors = new HashSet<>();
+
+      for (BundleDependency bundleDependency : descriptor.getClassLoaderModel().getDependencies()) {
+        if (bundleDependency.getDescriptor().isPlugin()) {
+          File pluginZip = new File(bundleDependency.getBundleUri());
+          try {
+            pluginDescriptors.add(artifactPluginDescriptorLoader.load(pluginZip));
+          } catch (IOException e) {
+            throw new IllegalStateException("Cannot create plugin descriptor: " + pluginZip.getAbsolutePath(), e);
+          }
         }
       }
+      return pluginDescriptors;
+    } else {
+      return descriptor.getPlugins();
     }
-    return pluginDescriptors;
   }
 
   private Optional<ArtifactPluginDescriptor> findPlugin(Set<ArtifactPluginDescriptor> appPlugins,
