@@ -30,6 +30,7 @@ import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainRepository;
+import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateClassLoaderBuilderFactory;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.service.ServiceRepository;
@@ -61,11 +62,13 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
   private final PluginDependenciesResolver pluginDependenciesResolver = mock(PluginDependenciesResolver.class);
   private final PolicyTemplateClassLoaderBuilderFactory policyTemplateClassLoaderBuilderFactory =
       mock(PolicyTemplateClassLoaderBuilderFactory.class);
+  private final ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader = mock(ArtifactPluginDescriptorLoader.class);
   private final DefaultApplicationFactory applicationFactory =
       new DefaultApplicationFactory(applicationClassLoaderBuilderFactory, applicationDescriptorFactory,
                                     domainRepository, serviceRepository,
                                     extensionModelLoaderRepository,
-                                    classLoaderRepository, policyTemplateClassLoaderBuilderFactory, pluginDependenciesResolver);
+                                    classLoaderRepository, policyTemplateClassLoaderBuilderFactory, pluginDependenciesResolver,
+                                    artifactPluginDescriptorLoader);
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
