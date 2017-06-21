@@ -118,7 +118,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
       return CPU_LITE_ASYNC;
     }
   };
-  protected Processor annotatedAsyncProcessor = new AnnotatedAyncProcessor();
+  protected Processor annotatedAsyncProcessor = new AnnotatedAsyncProcessor();
 
   protected Processor failingProcessor = new ThreadTrackingProcessor() {
 
@@ -609,7 +609,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
     };
   }
 
-  class AnnotatedAyncProcessor extends AbstractAnnotatedObject implements AnnotatedProcessor
+  class AnnotatedAsyncProcessor extends AbstractAnnotatedObject implements AnnotatedProcessor
   {
 
     @Override
