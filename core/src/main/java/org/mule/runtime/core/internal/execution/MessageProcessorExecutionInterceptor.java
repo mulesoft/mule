@@ -15,7 +15,7 @@ import org.mule.runtime.core.api.processor.Processor;
 /**
  * Intercepts a MessageProcessor execution.
  */
-interface MessageProcessorExecutionInterceptor extends MuleContextAware, FlowConstructAware {
+public interface MessageProcessorExecutionInterceptor extends MuleContextAware, FlowConstructAware {
 
   Event execute(Processor messageProcessor, Event event) throws MessagingException;
 }

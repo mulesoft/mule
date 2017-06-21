@@ -24,17 +24,17 @@ import org.mule.runtime.core.exception.MessagingException;
 /**
  * Intercepts MessageProcessor execution to fire before and after notifications
  */
-class MessageProcessorNotificationExecutionInterceptor implements MessageProcessorExecutionInterceptor {
+public class MessageProcessorNotificationExecutionInterceptor implements MessageProcessorExecutionInterceptor {
 
   private MessageProcessorExecutionInterceptor next;
   private MuleContext muleContext;
   private FlowConstruct flowConstruct;
 
-  MessageProcessorNotificationExecutionInterceptor(MessageProcessorExecutionInterceptor next) {
+  public MessageProcessorNotificationExecutionInterceptor(MessageProcessorExecutionInterceptor next) {
     this.next = next;
   }
 
-  MessageProcessorNotificationExecutionInterceptor() {
+  public MessageProcessorNotificationExecutionInterceptor() {
 
   }
 

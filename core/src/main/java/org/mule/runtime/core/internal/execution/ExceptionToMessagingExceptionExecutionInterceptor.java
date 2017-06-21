@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Replace any exception thrown with a MessagingException
  */
-class ExceptionToMessagingExceptionExecutionInterceptor implements MessageProcessorExecutionInterceptor {
+public class ExceptionToMessagingExceptionExecutionInterceptor implements MessageProcessorExecutionInterceptor {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ExceptionToMessagingExceptionExecutionInterceptor.class);
   private MuleContext muleContext;

@@ -4,11 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.context.notification;
+package org.mule.runtime.core.api.context.notification;
 
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.context.notification.SynchronousServerEvent;
-import org.mule.runtime.core.api.context.notification.ServerNotification;
 
 /**
  * <code>FlowConstructNotification</code> is fired when an event such as the flow construct starting occurs. The payload of this

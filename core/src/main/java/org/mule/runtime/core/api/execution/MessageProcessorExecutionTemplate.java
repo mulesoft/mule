@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.execution;
+package org.mule.runtime.core.api.execution;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
@@ -13,6 +13,9 @@ import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.internal.execution.ExceptionToMessagingExceptionExecutionInterceptor;
+import org.mule.runtime.core.internal.execution.MessageProcessorExecutionInterceptor;
+import org.mule.runtime.core.internal.execution.MessageProcessorNotificationExecutionInterceptor;
 
 /**
  * Template for executing a MessageProcessor.

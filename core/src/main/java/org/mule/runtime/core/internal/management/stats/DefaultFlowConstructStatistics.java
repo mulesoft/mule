@@ -74,6 +74,11 @@ public class DefaultFlowConstructStatistics extends AbstractFlowConstructStatist
   }
 
   @Override
+  public long getAverageProcessingTime() {
+    return flowStatistics.getAverageExecutionTime();
+  }
+
+  @Override
   public long getProcessedEvents() {
     return flowStatistics.getExecutedEvents();
   }

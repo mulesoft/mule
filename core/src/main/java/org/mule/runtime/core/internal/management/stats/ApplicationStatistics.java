@@ -23,6 +23,19 @@ public class ApplicationStatistics extends DefaultFlowConstructStatistics {
   }
 
   @Override
+  public long getAverageProcessingTime() {
+    long totalTime = 0;
+    long totalEvents = 0;
+    for (FlowConstructStatistics stats : parent.getServiceStatistics()) {
+      if (!(stats instanceof ApplicationStatistics)) {
+        totalEvents += stats.getProcessedEvents();
+        totalTime += stats.getTotalProcessingTime();
+      }
+    }
+    return totalEvents == 0 ? 0 : totalTime / totalEvents;
+  }
+
+  @Override
   public long getProcessedEvents() {
     long total = 0;
     for (FlowConstructStatistics stats : parent.getServiceStatistics()) {

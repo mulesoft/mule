@@ -42,9 +42,8 @@ public interface FlowConstructStatistics extends Statistics {
    */
   void addFlowExecutionBranchTime(long time, long total);
 
-  /**
-   * @return the number of processed events
-   */
+  long getAverageProcessingTime();
+
   long getProcessedEvents();
 
   /**
