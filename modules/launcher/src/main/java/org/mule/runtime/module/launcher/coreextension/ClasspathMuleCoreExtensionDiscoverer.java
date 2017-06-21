@@ -6,8 +6,10 @@
  */
 package org.mule.runtime.module.launcher.coreextension;
 
+import static java.lang.String.format;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.PropertiesUtils.loadProperties;
+
 import org.mule.runtime.container.api.MuleCoreExtension;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.util.ClassUtils;
@@ -48,7 +50,7 @@ public class ClasspathMuleCoreExtensionDiscoverer implements MuleCoreExtensionDi
   public List<MuleCoreExtension> discover() throws DefaultMuleException {
     List<MuleCoreExtension> result = new LinkedList<>();
 
-    Enumeration<?> e = ClassUtils.getResources(CORE_EXTENSION_RESOURCE_NAME, getClass());
+    Enumeration<?> e = ClassUtils.getResources(CORE_EXTENSION_RESOURCE_NAME, getClass().getClassLoader());
     List<Properties> extensions = new LinkedList<Properties>();
 
     // load ALL of the extension files first
@@ -72,8 +74,10 @@ public class ClasspathMuleCoreExtensionDiscoverer implements MuleCoreExtensionDi
           MuleCoreExtension extension = (MuleCoreExtension) ClassUtils.instantiateClass(extClass);
           extension.setContainerClassLoader(containerClassLoader);
           result.add(extension);
-        } catch (Exception ex) {
-          throw new DefaultMuleException("Error starting Mule core extension " + extName, ex);
+        } catch (Throwable t) {
+          throw new DefaultMuleException(format("Error starting Mule core extension '%s'. Extension class is %s", extName,
+                                                extClass),
+                                         t);
         }
       }
     }
