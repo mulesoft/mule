@@ -88,7 +88,7 @@
         <dependency>
             <groupId>org.mule.connectors</groupId>
             <artifactId>mule-sockets-connector</artifactId>
-            <version>${muleSocketsConnectorTestVersion}</version>
+            <version>1.0.0-SNAPSHOT</version>
             <classifier>mule-plugin</classifier>
             <scope>test</scope>
         </dependency>
@@ -104,7 +104,7 @@
         <dependency>
             <groupId>org.mule.services</groupId>
             <artifactId>mule-service-http</artifactId>
-            <version>${muleHttpServiceTestVersion}</version>
+            <version>1.0.0-BETA-SNAPSHOT</version>
             <classifier>mule-service</classifier>
             <scope>provided</scope>
         </dependency>
@@ -112,7 +112,7 @@
         <dependency>
             <groupId>org.mule.services</groupId>
             <artifactId>mule-service-scheduler</artifactId>
-            <version>${muleSchedulerServiceTestVersion}</version>
+            <version>1.0.0-BETA-SNAPSHOT</version>
             <classifier>mule-service</classifier>
             <scope>provided</scope>
         </dependency>
@@ -120,7 +120,7 @@
         <dependency>
             <groupId>org.mule.connectors</groupId>
             <artifactId>mule-http-connector</artifactId>
-            <version>${muleHttpConnectorTestVersion}</version>
+            <version>0.8.0-SNAPSHOT</version>
             <classifier>mule-plugin</classifier>
             <scope>test</scope>
         </dependency>
@@ -128,7 +128,7 @@
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-file-extension-common</artifactId>
-            <version>${muleFileCommonsTestVersion}</version>
+            <version>0.8.0-SNAPSHOT</version>
             <classifier>mule-plugin</classifier>
             <scope>test</scope>
         </dependency>
@@ -136,7 +136,7 @@
         <dependency>
             <groupId>org.mule.connectors</groupId>
             <artifactId>mule-file-connector</artifactId>
-            <version>${muleFileConnectorTestVersion}</version>
+            <version>0.8.0-SNAPSHOT</version>
             <classifier>mule-plugin</classifier>
             <scope>test</scope>
         </dependency>
@@ -144,7 +144,7 @@
         <dependency>
             <groupId>org.mule.connectors</groupId>
             <artifactId>mule-jms-connector</artifactId>
-            <version>${muleJmsConnectorTestVersion}</version>
+            <version>0.8.0-SNAPSHOT</version>
             <classifier>mule-plugin</classifier>
             <scope>test</scope>
         </dependency>
