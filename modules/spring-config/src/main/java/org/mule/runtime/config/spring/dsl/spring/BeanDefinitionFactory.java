@@ -262,8 +262,9 @@ public class BeanDefinitionFactory {
   private void processMuleSecurityManager(ComponentModel componentModel, BeanDefinitionRegistry registry) {
     if (componentModel.getIdentifier().equals(SECURITY_MANAGER_IDENTIFIER)) {
       componentModel.getInnerComponents().stream().forEach(childComponentModel -> {
-        if (childComponentModel.getNameAttribute().equals("password-encryption-strategy")
-            || childComponentModel.getNameAttribute().equals("secret-key-encryption-strategy")) {
+        String identifier = childComponentModel.getIdentifier().getName();
+        if (identifier.equals("password-encryption-strategy")
+            || identifier.equals("secret-key-encryption-strategy")) {
           registry.registerBeanDefinition(childComponentModel.getNameAttribute(), childComponentModel.getBeanDefinition());
         }
       });
