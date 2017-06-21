@@ -8,9 +8,10 @@ package org.mule.runtime.config.spring;
 
 import static java.lang.String.format;
 import static java.util.Optional.empty;
-import static java.util.Optional.of;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
 import org.mule.runtime.api.dsl.DslResolvingContext;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
@@ -93,7 +94,9 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
     if (inputSource == null) {
       inputSource = springEntityResolver.resolveEntity(publicId, systemId);
     }
-
+    if (inputSource == null && ! extensions.isEmpty()) {
+      throw new MuleRuntimeException(createStaticMessage("Could not get %s schema", systemId));
+    }
     return inputSource;
   }
 
