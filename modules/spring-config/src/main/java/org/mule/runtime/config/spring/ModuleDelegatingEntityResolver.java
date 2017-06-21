@@ -8,6 +8,7 @@ package org.mule.runtime.config.spring;
 
 import static java.lang.String.format;
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
 import org.mule.runtime.api.dsl.DslResolvingContext;
