@@ -123,7 +123,7 @@ public class IsolatedClassLoaderExtensionsManagerConfigurationBuilder extends Ab
                   .debug("Discarding plugin with artifactName '{}' as it doesn't have an ExtensionModelLoaderDescriptor defined");
             }
           } else {
-            LOGGER.debug("Discarding plugin with artifactName '{}' as it doesn't have an mule-plugin.json", artifactName);
+            LOGGER.debug("Discarding plugin with artifactName '{}' as it doesn't have a mule-plugin.json", artifactName);
           }
         });
 
