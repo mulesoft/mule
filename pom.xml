@@ -193,6 +193,7 @@
         <muleHttpPolicyApiVersion>1.0.0-SNAPSHOT</muleHttpPolicyApiVersion>
         <muleMavenClientApi>1.0.0-SNAPSHOT</muleMavenClientApi>
         <muleMavenClientImpl>1.0.0-SNAPSHOT</muleMavenClientImpl>
+        <muleMavenClientTest>1.0.0-SNAPSHOT</muleMavenClientTest>
         <mulePolicyApiVersion>1.0.0-SNAPSHOT</mulePolicyApiVersion>
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
         <muleApiVersion>1.0.0-SNAPSHOT</muleApiVersion>

@@ -49,6 +49,11 @@
         </dependency>
         <dependency>
             <groupId>org.mule</groupId>
+            <artifactId>mule-maven-client-test</artifactId>
+            <version>${muleMavenClientTest}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule</groupId>
             <artifactId>mule-maven-client-impl</artifactId>
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
