@@ -66,6 +66,7 @@ import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFacto
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
+import org.mule.runtime.extension.api.util.ExtensionModelUtils;
 import org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty;
 import org.mule.runtime.extension.internal.property.QNameModelProperty;
 import org.mule.runtime.extension.internal.util.ParameterModelComparator;
@@ -709,7 +710,7 @@ public final class SchemaBuilder {
         registerParameters(complexType.getComplexContent().getExtension(), groupParameters);
     addParameterToSequence(parameterElements, groupSequence);
 
-    BigInteger minOccurs = groupParameters.stream().anyMatch(ParameterModel::isRequired) ? ONE : ZERO;
+    BigInteger minOccurs = ExtensionModelUtils.isRequired(group) ? ONE : ZERO;
     TopLevelElement groupElement = createTopLevelElement(groupDsl.getElementName(), minOccurs, MAX_ONE);
     groupElement.setComplexType(complexType);
 

@@ -124,7 +124,7 @@ public class DefaultXmlDslElementModelConverter implements XmlDslElementModelCon
             });
           }
 
-          if (!configured.get() && innerDsl.supportsChildDeclaration()) {
+          if (!configured.get() && innerDsl.supportsChildDeclaration() && inner.isExplicitInDsl()) {
             Element childElement = createElement(innerDsl, inner.getConfiguration());
             writeApplicationElement(childElement, inner, element);
           }

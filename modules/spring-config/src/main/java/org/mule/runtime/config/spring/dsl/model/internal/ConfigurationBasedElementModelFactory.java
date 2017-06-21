@@ -29,7 +29,10 @@ import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyT
 import static org.mule.runtime.extension.api.declaration.type.TypeUtils.isContent;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getDefaultValue;
+import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isInfrastructure;
+import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isRequired;
+import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isText;
 import static org.mule.runtime.extension.internal.dsl.syntax.DslSyntaxUtils.isFlattened;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.EE_PREFIX;
@@ -61,7 +64,6 @@ import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
-import org.mule.runtime.extension.api.util.ExtensionModelUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -442,8 +444,12 @@ class ConfigurationBasedElementModelFactory {
                               DslElementModel.Builder parent, ParameterGroupModel group) {
     elementDsl.getChild(group.getName())
         .ifPresent(groupDsl -> {
-          ComponentConfiguration groupComponent = getIdentifier(groupDsl).map(innerComponents::get).orElse(null);
+          Optional<ComponentIdentifier> identifier = getIdentifier(groupDsl);
+          if (!identifier.isPresent()) {
+            return;
+          }
 
+          ComponentConfiguration groupComponent = identifier.map(innerComponents::get).orElse(null);
           if (groupComponent != null) {
             DslElementModel.Builder<ParameterGroupModel> groupElementBuilder = DslElementModel.<ParameterGroupModel>builder()
                 .withModel(group)
@@ -455,8 +461,50 @@ class ConfigurationBasedElementModelFactory {
                 .forEach(p -> addElementParameter(groupInnerComponents, parameters, groupDsl, groupElementBuilder, p));
 
             parent.containing(groupElementBuilder.build());
+
+          } else if (shoulBuildDefaultGroup(group)) {
+            builDefaultInlineGroupElement(parent, group, groupDsl, identifier.get());
           }
         });
+  }
+
+  private void builDefaultInlineGroupElement(DslElementModel.Builder parent, ParameterGroupModel group, DslElementSyntax groupDsl,
+                                             ComponentIdentifier identifier) {
+    ComponentConfiguration.Builder groupConfigBuilder = ComponentConfiguration.builder().withIdentifier(identifier);
+    DslElementModel.Builder<ParameterGroupModel> groupElementBuilder = DslElementModel.<ParameterGroupModel>builder()
+        .withModel(group)
+        .isExplicitInDsl(false)
+        .withDsl(groupDsl);
+
+    group.getParameterModels()
+        .forEach(paramModel -> groupDsl.getContainedElement(paramModel.getName())
+            .ifPresent(paramDsl -> getDefaultValue(paramModel)
+                .ifPresent(defaultValue -> {
+                  DslElementModel.Builder<ParameterModel> paramElementBuilder = DslElementModel.<ParameterModel>builder()
+                      .withModel(paramModel)
+                      .withDsl(paramDsl)
+                      .isExplicitInDsl(false)
+                      .withValue(defaultValue);
+
+                  if (isContent(paramModel) || isText(paramModel)) {
+                    getIdentifier(paramDsl)
+                        .ifPresent(tagId -> groupConfigBuilder.withNestedComponent(ComponentConfiguration.builder()
+                            .withIdentifier(tagId)
+                            .withValue(defaultValue)
+                            .build()));
+                  } else {
+                    groupConfigBuilder.withParameter(paramDsl.getAttributeName(), defaultValue);
+                  }
+
+                  groupElementBuilder.containing(paramElementBuilder.build());
+                })));
+
+    groupElementBuilder.withConfig(groupConfigBuilder.build());
+    parent.containing(groupElementBuilder.build());
+  }
+
+  private boolean shoulBuildDefaultGroup(ParameterGroupModel group) {
+    return !isRequired(group) && group.getParameterModels().stream().anyMatch(p -> getDefaultValue(p).isPresent());
   }
 
   private void addElementParameter(Map<ComponentIdentifier, ComponentConfiguration> innerComponents,
@@ -486,7 +534,7 @@ class ConfigurationBasedElementModelFactory {
             DslElementModel.Builder<ParameterModel> paramElementBuilder = DslElementModel.<ParameterModel>builder()
                 .withModel(paramModel).withDsl(paramDsl);
 
-            if (paramComponent != null && !ExtensionModelUtils.isContent(paramModel)) {
+            if (paramComponent != null && !isContent(paramModel)) {
 
               paramElementBuilder.withConfig(paramComponent);
               paramModel.getType().accept(new MetadataTypeVisitor() {
