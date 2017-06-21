@@ -99,40 +99,40 @@
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-metadata-extension</artifactId>
-            <version>4.0.0-BETA-SNAPSHOT</version>
+            <version>${muleMetadataExtensionTestVersion}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-vegan-extension</artifactId>
-            <version>4.0.0-BETA-SNAPSHOT</version>
+            <version>${muleVeganExtensionTestVersion}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-heisenberg-extension</artifactId>
-            <version>4.0.0-BETA-SNAPSHOT</version>
+            <version>${muleHeisenbergExtensionTestVersion}</version>
             <classifier>mule-plugin</classifier>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-marvel-extension</artifactId>
-            <version>4.0.0-BETA-SNAPSHOT</version>
+            <version>${muleMarvelExtensionTestVersion}</version>
             <classifier>mule-plugin</classifier>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-subtypes-extension</artifactId>
-            <version>4.0.0-BETA-SNAPSHOT</version>
+            <version>${muleSubtypesExtensionTestVersion}</version>
             <classifier>mule-plugin</classifier>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-petstore-extension</artifactId>
-            <version>4.0.0-BETA-SNAPSHOT</version>
+            <version>${mulePetstoreExtensionTestVersion}</version>
             <classifier>mule-plugin</classifier>
             <scope>test</scope>
         </dependency>
