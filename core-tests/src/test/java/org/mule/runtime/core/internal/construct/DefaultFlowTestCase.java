@@ -239,9 +239,10 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
     flow.initialise();
     flow.start();
     assertThat(flow.getMaxConcurrency(), equalTo(DEFAULT_MAX_CONCURRENCY));
+    // When max concurrency is default Integer.MAX_VALUE then the Scheduler is created with no withMaxConcurrentTasks
+    // configuration.
     verify(muleContext.getSchedulerService())
-        .ioScheduler(eq(muleContext.getSchedulerBaseConfig().withMaxConcurrentTasks(DEFAULT_MAX_CONCURRENCY)
-            .withName(flow.getName() + "." + BLOCKING.name())));
+        .ioScheduler(eq(muleContext.getSchedulerBaseConfig().withName(flow.getName() + "." + BLOCKING.name())));
   }
 
   @Test
