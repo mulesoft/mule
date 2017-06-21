@@ -775,13 +775,19 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
     attributes.values().stream()
         .filter(a -> !a.getName().equals(NAME_ATTRIBUTE_NAME) && !a.getName().equals(CONFIG_ATTRIBUTE_NAME))
         .filter(a -> !a.isValueFromSchema())
-        .forEach(a -> model.getParameterGroupModels().stream()
-            .filter(group -> group.getParameter(a.getName()).isPresent())
-            .findFirst()
-            .ifPresent(group -> builder
-                .withParameterGroup(newParameterGroup(group.getName())
-                    .withParameter(a.getName(), ParameterSimpleValue.of(a.getValue()))
-                    .getDeclaration())));
+        .forEach(a -> {
+          Optional<ParameterGroupModel> groupModel = model.getParameterGroupModels().stream()
+              .filter(group -> group.getParameter(a.getName()).isPresent())
+              .findFirst();
+
+          if (groupModel.isPresent()) {
+            builder.withParameterGroup(newParameterGroup(groupModel.get().getName())
+                .withParameter(a.getName(), ParameterSimpleValue.of(a.getValue()))
+                .getDeclaration());
+          } else {
+            builder.withCustomParameter(a.getName(), a.getValue());
+          }
+        });
   }
 
   private void copyChildren(ConfigLine config, ParameterizedBuilder<String, ParameterValue, ?> builder) {
