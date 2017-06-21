@@ -31,8 +31,9 @@ import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.processor.strategy.WorkQueueProcessingStrategyFactory.WorkQueueProcessingStrategy;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
-import org.junit.Test;
+import java.util.concurrent.atomic.AtomicReference;
 
+import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
@@ -219,6 +220,16 @@ public class WorkQueueProcessingStrategyTestCase extends AbstractProcessingStrat
     assertThat(threads, not(hasItem(startsWith(CPU_LIGHT))));
     assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
     assertThat(threads, not(hasItem(startsWith(CUSTOM))));
+  }
+
+  @Test
+  @Description("Notifications are invoked on IO thread")
+  public void asyncProcessorNotificationExecutionThreads() throws Exception {
+    AtomicReference<Thread> beforeThread = new AtomicReference<>();
+    AtomicReference<Thread> afterThread = new AtomicReference<>();
+    testAsyncCpuLightNotificationThreads(beforeThread, afterThread);
+    assertThat(beforeThread.get().getName(), startsWith(IO));
+    assertThat(afterThread.get().getName(), startsWith(IO));
   }
 
 }
