@@ -34,6 +34,17 @@ import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.test.runner.classification.PatternExclusionsDependencyFilter;
 import org.mule.test.runner.classification.PatternInclusionsDependencyFilter;
 
+import org.apache.commons.io.filefilter.WildcardFileFilter;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.DefaultArtifact;
+import org.eclipse.aether.graph.Dependency;
+import org.eclipse.aether.graph.DependencyFilter;
+import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.resolution.ArtifactDescriptorException;
+import org.eclipse.aether.resolution.ArtifactResolutionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -50,17 +61,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
-
-import org.apache.commons.io.filefilter.WildcardFileFilter;
-import org.eclipse.aether.artifact.Artifact;
-import org.eclipse.aether.artifact.DefaultArtifact;
-import org.eclipse.aether.graph.Dependency;
-import org.eclipse.aether.graph.DependencyFilter;
-import org.eclipse.aether.repository.RemoteRepository;
-import org.eclipse.aether.resolution.ArtifactDescriptorException;
-import org.eclipse.aether.resolution.ArtifactResolutionException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Creates the {@link ArtifactUrlClassification} based on the Maven dependencies declared by the rootArtifact using Eclipse
@@ -805,6 +805,10 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
           if (PLUGIN.equals(rootArtifactType) && toTransform.getScope().equals(COMPILE)) {
             // TODO MULE-11332 Review other manifestations of this bug and add unit tests
             return toTransform.setScope(PROVIDED);
+          }
+          Artifact artifact = toTransform.getArtifact();
+          if (context.getSharedPluginLibCoordinates().contains(artifact.getGroupId() + ":" + artifact.getArtifactId())) {
+            return toTransform.setScope(COMPILE);
           }
           return toTransform;
         })
