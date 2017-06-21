@@ -9,12 +9,14 @@ package org.mule.test.runner.api;
 
 import static java.util.Collections.emptySet;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.test.runner.api.MulePluginBasedLoaderFinder.META_INF_MULE_PLUGIN;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.core.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManagerFactory;
@@ -103,24 +105,29 @@ public class IsolatedClassLoaderExtensionsManagerConfigurationBuilder extends Ab
         String artifactName = (String) pluginClassLoader.getClass().getMethod("getArtifactId").invoke(pluginClassLoader);
         ClassLoader classLoader =
             (ClassLoader) pluginClassLoader.getClass().getMethod("getClassLoader").invoke(pluginClassLoader);
-        Method findResource = classLoader.getClass().getMethod("findResource", String.class);
-        URL json = ((URL) findResource.invoke(classLoader, META_INF_MULE_PLUGIN));
-        if (json == null) {
-          json = ((URL) findResource.invoke(classLoader, META_INF_MULE_ARTIFACT_MULE_PLUGIN));
-        }
-        if (json != null) {
-          LOGGER.debug("Discovered extension '{}'", artifactName);
-          MulePluginBasedLoaderFinder finder = new MulePluginBasedLoaderFinder(json.openStream());
-          if (finder.isExtensionModelLoaderDescriptorDefined()) {
-            ExtensionModel extension =
-                finder.getLoader().loadExtensionModel(classLoader, getDefault(emptySet()), finder.getParams());
-            extensionModels.add(extension);
-          } else {
-            LOGGER.debug("Discarding plugin with artifactName '{}' as it doesn't have an ExtensionModelLoaderDescriptor defined");
+        withContextClassLoader(classLoader, (CheckedRunnable) () -> {
+          Method findResource = classLoader.getClass().getMethod("findResource", String.class);
+          URL json = ((URL) findResource.invoke(classLoader, META_INF_MULE_PLUGIN));
+          if (json == null) {
+            json = ((URL) findResource.invoke(classLoader, META_INF_MULE_ARTIFACT_MULE_PLUGIN));
           }
-        } else {
-          LOGGER.debug("Discarding plugin with artifactName '{}' due to it doesn't have an mule-plugin.json", artifactName);
-        }
+          if (json != null) {
+            LOGGER.debug("Discovered extension '{}'", artifactName);
+            MulePluginBasedLoaderFinder finder = new MulePluginBasedLoaderFinder(json.openStream());
+            if (finder.isExtensionModelLoaderDescriptorDefined()) {
+              ExtensionModel extension =
+                  finder.getLoader().loadExtensionModel(classLoader, getDefault(emptySet()), finder.getParams());
+              extensionModels.add(extension);
+            } else {
+              LOGGER
+                  .debug("Discarding plugin with artifactName '{}' as it doesn't have an ExtensionModelLoaderDescriptor defined",
+                         artifactName);
+            }
+          } else {
+            LOGGER.debug("Discarding plugin with artifactName '{}' as it doesn't have a mule-plugin.json", artifactName);
+          }
+        });
+
       }
     } catch (Exception e) {
       throw new RuntimeException("Error while loading extension models", e);
