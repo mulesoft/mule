@@ -27,6 +27,7 @@ import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROCESSI
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROCESSING_STRATEGY_FACTORY_ATTRIBUTE;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROTOTYPE_OBJECT_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SINGLETON_OBJECT_ELEMENT;
+import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STARTED;
 import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildCollectionConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
@@ -447,7 +448,8 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
             .withObjectFactoryType(DefaultFlowFactoryBean.class)
             .withSetterParameterDefinition(NAME, fromSimpleParameter(NAME).build())
             .withSetterParameterDefinition("muleContext", fromReferenceObject(MuleContext.class).build())
-            .withSetterParameterDefinition("initialState", fromSimpleParameter("initialState").build())
+            .withSetterParameterDefinition("initialState",
+                                           fromSimpleParameter("initialState").withDefaultValue(INITIAL_STATE_STARTED).build())
             .withSetterParameterDefinition("messageSource", fromChildConfiguration(MessageSource.class).build())
             .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
             .withSetterParameterDefinition(EXCEPTION_LISTENER_ATTRIBUTE,
