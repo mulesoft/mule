@@ -14,6 +14,8 @@ import static org.junit.Assert.assertThat;
 import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_SERVICE;
 import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.MULTI_MAP;
 
+import org.mule.runtime.api.util.MultiMap;
+
 import org.junit.Test;
 
 import ru.yandex.qatools.allure.annotations.Features;
@@ -21,20 +23,20 @@ import ru.yandex.qatools.allure.annotations.Stories;
 
 @Features(HTTP_SERVICE)
 @Stories(MULTI_MAP)
-public class CaseInsensitiveParameterMapTestCase extends ParameterMapTestCase {
+public class CaseInsensitiveMultiMapTestCase extends MultiMapTestCase {
 
   @Override
-  protected ParameterMap getParameterMap() {
-    return new CaseInsensitiveParameterMap(new ParameterMap());
+  protected MultiMap<String, String> getMultiMap() {
+    return new CaseInsensitiveMultiMap(new MultiMap<>());
   }
 
   @Test
   public void takesParamMapEntries() {
-    ParameterMap sensitiveParameterMap = new ParameterMap();
-    sensitiveParameterMap.put(KEY_1, VALUE_1);
-    sensitiveParameterMap.put(KEY_2, VALUE_1);
-    sensitiveParameterMap.put(KEY_2, VALUE_2);
-    CaseInsensitiveParameterMap insensitiveParameterMap = new CaseInsensitiveParameterMap(sensitiveParameterMap);
+    MultiMap<String, String> sensitiveMultiMap = new MultiMap<>();
+    sensitiveMultiMap.put(KEY_1, VALUE_1);
+    sensitiveMultiMap.put(KEY_2, VALUE_1);
+    sensitiveMultiMap.put(KEY_2, VALUE_2);
+    CaseInsensitiveMultiMap insensitiveParameterMap = new CaseInsensitiveMultiMap(sensitiveMultiMap);
 
     assertThat(insensitiveParameterMap.get(KEY_1), is(VALUE_1));
     assertThat(insensitiveParameterMap.get(KEY_1.toLowerCase()), is(VALUE_1));
@@ -49,19 +51,19 @@ public class CaseInsensitiveParameterMapTestCase extends ParameterMapTestCase {
 
   @Test
   public void putAndGetCase() {
-    assertThat(parameterMap.put("kEy", VALUE_1), nullValue());
-    assertThat(parameterMap.get("KeY"), is(VALUE_1));
-    assertThat(parameterMap.get("kEy"), is(VALUE_1));
-    assertThat(parameterMap.getAll("key"), is(asList(VALUE_1)));
-    assertThat(parameterMap.getAll("KEY"), is(asList(VALUE_1)));
+    assertThat(multiMap.put("kEy", VALUE_1), nullValue());
+    assertThat(multiMap.get("KeY"), is(VALUE_1));
+    assertThat(multiMap.get("kEy"), is(VALUE_1));
+    assertThat(multiMap.getAll("key"), is(asList(VALUE_1)));
+    assertThat(multiMap.getAll("KEY"), is(asList(VALUE_1)));
   }
 
   @Test
   public void aggregatesSameCaseKeys() {
-    assertThat(parameterMap.put("kEy", VALUE_1), nullValue());
-    assertThat(parameterMap.put("KeY", VALUE_2), is(VALUE_1));
-    assertThat(parameterMap.get("key"), is(VALUE_2));
-    assertThat(parameterMap.getAll("KEY"), is(asList(VALUE_1, VALUE_2)));
+    assertThat(multiMap.put("kEy", VALUE_1), nullValue());
+    assertThat(multiMap.put("KeY", VALUE_2), is(VALUE_1));
+    assertThat(multiMap.get("key"), is(VALUE_2));
+    assertThat(multiMap.getAll("KEY"), is(asList(VALUE_1, VALUE_2)));
   }
 
 }

@@ -7,7 +7,7 @@
 package org.mule.runtime.http.api.domain.message.request;
 
 import org.mule.runtime.http.api.domain.HttpProtocol;
-import org.mule.runtime.http.api.domain.ParameterMap;
+import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.http.api.domain.message.HttpMessage;
 
 /**
@@ -47,6 +47,6 @@ public interface HttpRequest extends HttpMessage {
   /**
    * @return the query parameters
    */
-  ParameterMap getQueryParams();
+  MultiMap<String, String> getQueryParams();
 
 }

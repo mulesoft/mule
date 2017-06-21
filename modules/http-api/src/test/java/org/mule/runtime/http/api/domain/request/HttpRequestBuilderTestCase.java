@@ -16,7 +16,7 @@ import static org.mule.runtime.http.api.HttpConstants.Method.POST;
 import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_SERVICE;
 import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.REQUEST_BUILDER;
 
-import org.mule.runtime.http.api.domain.ParameterMap;
+import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.runtime.http.api.domain.entity.EmptyHttpEntity;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
@@ -61,7 +61,7 @@ public class HttpRequestBuilderTestCase {
 
   @Test
   public void complexResponse() {
-    ParameterMap paramMap = new ParameterMap();
+    MultiMap<String, String> paramMap = new MultiMap<>();
 
     paramMap.put(name, value);
     HttpRequest request = builder.setEntity(new ByteArrayHttpEntity("test".getBytes()))
@@ -77,7 +77,7 @@ public class HttpRequestBuilderTestCase {
     assertThat(request.getEntity(), is(instanceOf(ByteArrayHttpEntity.class)));
     assertThat(request.getHeaderNames(), hasItems(name));
     assertThat(request.getHeaderValues(name), hasItems(value, value.toUpperCase()));
-    ParameterMap requestQueryParams = request.getQueryParams();
+    MultiMap<String, String> requestQueryParams = request.getQueryParams();
     assertThat(requestQueryParams.keySet(), hasItems(name));
     assertThat(requestQueryParams.getAll(name), hasItems(value));
   }
@@ -88,12 +88,12 @@ public class HttpRequestBuilderTestCase {
     assertThat(builder.build().getHeaderNames(), empty());
 
     String otherValue = "otherValue";
-    ParameterMap parameterMap = new ParameterMap();
-    parameterMap.put(name, value);
-    parameterMap.put(name, otherValue);
+    MultiMap<String, String> multiMap = new MultiMap<>();
+    multiMap.put(name, value);
+    multiMap.put(name, otherValue);
 
     // add multiple valued header through parameter map and individually
-    builder.setHeaders(parameterMap);
+    builder.setHeaders(multiMap);
     builder.addHeader(name, value);
     assertThat(builder.getHeaderValues(name), hasItems(value, otherValue, value));
     assertThat(builder.build().getHeaderValues(name), hasItems(value, otherValue, value));

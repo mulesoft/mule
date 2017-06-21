@@ -10,7 +10,7 @@ import static java.net.URLEncoder.encode;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.http.api.domain.ParameterMap;
+import org.mule.runtime.api.util.MultiMap;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -63,14 +63,14 @@ public final class HttpEncoderDecoderUtils {
   }
 
   /**
-   * Converts a query-string from a request url into a {@link ParameterMap}.
+   * Converts a query-string from a request url into a {@link MultiMap}.
    * <p>
    * This is the inverse of {@link #encodeQueryString(Map)}.
    * 
    * @param queryString the query string to parse
    * @return a map representation of the {@code queryString}
    */
-  public static ParameterMap decodeQueryString(String queryString) {
+  public static MultiMap<String, String> decodeQueryString(String queryString) {
     return decodeUrlEncodedBody(queryString, UTF_8);
   }
 
@@ -87,7 +87,7 @@ public final class HttpEncoderDecoderUtils {
   }
 
   /**
-   * Converts an url-encoded body into a {@link ParameterMap} with a given encoding.
+   * Converts an url-encoded body into a {@link MultiMap} with a given encoding.
    * <p>
    * This is the inverse of {@link #encodeString(String, Charset)}.
    * 
@@ -95,8 +95,8 @@ public final class HttpEncoderDecoderUtils {
    * @param encoding {@link URLDecoder#decode(String, String)}.
    * @return a map representation of the {@code queryString}
    */
-  public static ParameterMap decodeUrlEncodedBody(String queryString, Charset encoding) {
-    ParameterMap queryParams = new ParameterMap();
+  public static MultiMap<String, String> decodeUrlEncodedBody(String queryString, Charset encoding) {
+    MultiMap<String, String> queryParams = new MultiMap<>();
     if (queryString != null && queryString.trim().length() > 0) {
       String[] pairs = queryString.split("&");
       for (String pair : pairs) {
@@ -120,8 +120,8 @@ public final class HttpEncoderDecoderUtils {
    * @param requestPath request path
    * @return a map with the uri params present in the request path with the values decoded.
    */
-  public static ParameterMap decodeUriParams(String pathWithUriParams, String requestPath) {
-    ParameterMap uriParams = new ParameterMap();
+  public static MultiMap<String, String> decodeUriParams(String pathWithUriParams, String requestPath) {
+    MultiMap<String, String> uriParams = new MultiMap<>();
     if (pathWithUriParams.contains("{")) {
       final String[] requestPathParts = requestPath.split("/");
       final String[] listenerPathParts = pathWithUriParams.split("/");
@@ -139,7 +139,7 @@ public final class HttpEncoderDecoderUtils {
     return uriParams;
   }
 
-  private static void addParam(ParameterMap queryParams, String name, String value, Charset encoding) {
+  private static void addParam(MultiMap<String, String> queryParams, String name, String value, Charset encoding) {
     queryParams.put(decode(name, encoding), decode(value, encoding));
   }
 

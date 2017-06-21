@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.http.api.domain.message.response;
 
-import org.mule.runtime.http.api.domain.ParameterMap;
+import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.http.api.domain.entity.HttpEntity;
 import org.mule.runtime.http.api.domain.message.BaseHttpMessage;
 
@@ -19,9 +19,9 @@ class DefaultHttpResponse extends BaseHttpMessage implements HttpResponse {
 
   private final HttpEntity body;
   private ResponseStatus responseStatus = new ResponseStatus();
-  private ParameterMap headers = new ParameterMap();
+  private MultiMap<String, String> headers = new MultiMap<>();
 
-  DefaultHttpResponse(ResponseStatus responseStatus, ParameterMap headers, HttpEntity body) {
+  DefaultHttpResponse(ResponseStatus responseStatus, MultiMap<String, String> headers, HttpEntity body) {
     this.responseStatus = responseStatus;
     this.headers = headers;
     this.body = body;

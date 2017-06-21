@@ -9,8 +9,8 @@ package org.mule.runtime.http.api.domain.message;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 
-import org.mule.runtime.http.api.domain.CaseInsensitiveParameterMap;
-import org.mule.runtime.http.api.domain.ParameterMap;
+import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
+import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.http.api.domain.entity.EmptyHttpEntity;
 import org.mule.runtime.http.api.domain.entity.HttpEntity;
 
@@ -26,7 +26,7 @@ import java.util.Optional;
  */
 public abstract class HttpMessageBuilder<B extends HttpMessageBuilder, M extends HttpMessage> {
 
-  protected ParameterMap headers = new CaseInsensitiveParameterMap();
+  protected MultiMap<String, String> headers = new CaseInsensitiveMultiMap();
   protected HttpEntity entity = new EmptyHttpEntity();
 
   /**
