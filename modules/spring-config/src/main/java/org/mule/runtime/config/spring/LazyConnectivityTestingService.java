@@ -16,6 +16,8 @@ import org.mule.runtime.config.spring.dsl.model.NoSuchComponentModelException;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.core.api.exception.ObjectNotFoundException;
 
+import java.util.List;
+
 /**
  * {@link ConnectivityTestingService} implementation that initialises the required
  * components before doing test connectivity.
@@ -42,20 +44,25 @@ public class LazyConnectivityTestingService implements ConnectivityTestingServic
       if (e.getCause() instanceof NoSuchComponentModelException) {
         throw new ObjectNotFoundException(location.toString());
       }
-      return getCausalChain(e).stream()
+      List<Throwable> causalChain = getCausalChain(e);
+      return causalChain.stream()
           .filter(exception -> exception.getClass().equals(ConnectionException.class)
               && ((ConnectionException) exception).getErrorType().isPresent())
           .map(exception -> failure(exception.getMessage(), ((ConnectionException) exception).getErrorType().get(),
                                     (Exception) exception))
           .findFirst()
-          .orElse(unknownFailureResponse(e));
+          .orElse(unknownFailureResponse(lastMessage(causalChain), e));
     } catch (Exception e) {
-      return unknownFailureResponse(e);
+      return unknownFailureResponse(e.getMessage(), e);
     }
     return connectivityTestingService.testConnection(location);
   }
 
-  private ConnectionValidationResult unknownFailureResponse(Exception e) {
-    return failure(e.getMessage(), e);
+  private ConnectionValidationResult unknownFailureResponse(String message, Exception e) {
+    return failure(message, e);
+  }
+
+  private String lastMessage(List<Throwable> causalChain) {
+    return causalChain.get(causalChain.size() - 1).getMessage();
   }
 }
