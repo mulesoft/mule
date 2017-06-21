@@ -91,7 +91,7 @@ public class DefaultXmlDslElementModelConverter implements XmlDslElementModelCon
     DslElementSyntax dsl = elementModel.getDsl();
     Element componentRoot = createElement(dsl, elementModel.getConfiguration());
     if (isEETransform(componentRoot)) {
-      return populateEETransform(elementModel);
+      return createEETransformElement(elementModel);
     }
     writeApplicationElement(componentRoot, elementModel, componentRoot);
 
@@ -109,6 +109,12 @@ public class DefaultXmlDslElementModelConverter implements XmlDslElementModelCon
 
     if (elementModel.getContainedElements().isEmpty() && elementModel.getValue().isPresent()) {
       setTextContentElement(element, elementModel, parentNode);
+      return;
+    }
+
+    if (isEETransform(element)) {
+      Element transformElement = createEETransformElement(elementModel);
+      parentNode.appendChild(transformElement);
       return;
     }
 
@@ -241,7 +247,7 @@ public class DefaultXmlDslElementModelConverter implements XmlDslElementModelCon
             }));
   }
 
-  private Element populateEETransform(DslElementModel<?> elementModel) {
+  private Element createEETransformElement(DslElementModel<?> elementModel) {
     Element transform = doc.createElementNS(EE_NAMESPACE, EE_PREFIX + ":" + TRANSFORM_IDENTIFIER);
     elementModel.getConfiguration().ifPresent(c -> c.getParameters().forEach(transform::setAttribute));
 
