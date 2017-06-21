@@ -145,7 +145,6 @@ public class EmbeddedController {
    */
   public void stop() {
     executeWithinContainerClassLoader(() -> {
-      deleteTree(new File(containerInfo.getContainerBaseFolder().getPath()));
       try {
         application.stop();
       } catch (Exception e) {
@@ -157,6 +156,11 @@ public class EmbeddedController {
         application.dispose();
       } catch (Exception e) {
         LOGGER.debug("failure disposing application", e);
+      }
+      try {
+        deleteTree(new File(containerInfo.getContainerBaseFolder().getPath()));
+      } catch (Exception e) {
+        LOGGER.debug("failure deleting container directory " + containerInfo.getContainerBaseFolder().getPath(), e);
       }
     });
     artifactResourcesRegistry = null;
