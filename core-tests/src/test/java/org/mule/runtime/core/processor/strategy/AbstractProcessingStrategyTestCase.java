@@ -426,8 +426,8 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
   @Test
   public abstract void tx() throws Exception;
 
-  protected void testAsyncCpuLightNotificationThreads(AtomicReference<Thread> beforeThread, AtomicReference<Thread> afterThread) throws Exception
-  {
+  protected void testAsyncCpuLightNotificationThreads(AtomicReference<Thread> beforeThread, AtomicReference<Thread> afterThread)
+      throws Exception {
     muleContext.getNotificationManager().addInterfaceToType(MessageProcessorNotificationListener.class,
                                                             MessageProcessorNotification.class);
     muleContext.getNotificationManager().addListener((MessageProcessorNotificationListener) notification -> {
@@ -609,8 +609,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
     };
   }
 
-  class AnnotatedAsyncProcessor extends AbstractAnnotatedObject implements AnnotatedProcessor
-  {
+  class AnnotatedAsyncProcessor extends AbstractAnnotatedObject implements AnnotatedProcessor {
 
     @Override
     public Event process(Event event) throws MuleException {
@@ -628,8 +627,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
     }
 
     @Override
-    public ProcessingType getProcessingType()
-    {
+    public ProcessingType getProcessingType() {
       return asyncProcessor.getProcessingType();
     }
   }
