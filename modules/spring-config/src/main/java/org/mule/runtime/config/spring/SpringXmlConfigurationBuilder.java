@@ -8,7 +8,7 @@ package org.mule.runtime.config.spring;
 
 import static java.util.Collections.emptyMap;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader.resolveContextArtifactPluginClassLoaders;
 
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
@@ -19,9 +19,9 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.ParentMuleContextAwareConfigurationBuilder;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
-import org.mule.runtime.core.config.ConfigResource;
-import org.mule.runtime.core.config.bootstrap.ArtifactType;
-import org.mule.runtime.core.config.builders.AbstractResourceConfigurationBuilder;
+import org.mule.runtime.core.api.config.ConfigResource;
+import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
+import org.mule.runtime.core.api.config.builders.AbstractResourceConfigurationBuilder;
 
 import java.util.ArrayList;
 import java.util.List;

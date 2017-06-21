@@ -14,7 +14,7 @@ import static org.mule.runtime.core.api.processor.MessageProcessors.newExplicitC
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedConsumer;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
-import static org.mule.runtime.core.config.i18n.CoreMessages.noEndpointsForRouter;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.noEndpointsForRouter;
 import static org.mule.runtime.core.internal.util.ProcessingStrategyUtils.isSynchronousProcessing;
 import static org.mule.runtime.core.routing.AbstractRoutingStrategy.validateMessageIsNotConsumable;
 import static reactor.core.publisher.Flux.from;

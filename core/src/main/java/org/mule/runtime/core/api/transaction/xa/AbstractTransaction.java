@@ -10,8 +10,8 @@ import static java.lang.System.identityHashCode;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.api.tx.TransactionException;
-import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.context.notification.TransactionNotification;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.context.notification.TransactionNotification;
 import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 

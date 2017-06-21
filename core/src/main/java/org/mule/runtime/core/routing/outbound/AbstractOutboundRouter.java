@@ -7,7 +7,7 @@
 package org.mule.runtime.core.routing.outbound;
 
 import static java.util.Collections.emptyList;
-import static org.mule.runtime.core.execution.MessageProcessorExecutionTemplate.createNotificationExecutionTemplate;
+import static org.mule.runtime.core.internal.execution.MessageProcessorExecutionTemplate.createNotificationExecutionTemplate;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -31,11 +31,11 @@ import org.mule.runtime.core.api.routing.OutboundRouter;
 import org.mule.runtime.core.api.routing.RouterResultsHandler;
 import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
-import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.execution.MessageProcessorExecutionTemplate;
-import org.mule.runtime.core.execution.TransactionalExecutionTemplate;
-import org.mule.runtime.core.management.stats.RouterStatistics;
+import org.mule.runtime.core.internal.execution.MessageProcessorExecutionTemplate;
+import org.mule.runtime.core.api.execution.TransactionalExecutionTemplate;
+import org.mule.runtime.core.api.management.stats.RouterStatistics;
 import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.routing.DefaultRouterResultsHandler;
 import org.mule.runtime.core.api.util.StringMessageUtils;

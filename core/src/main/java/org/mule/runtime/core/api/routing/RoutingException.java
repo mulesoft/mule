@@ -8,7 +8,7 @@ package org.mule.runtime.core.api.routing;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.api.i18n.I18nMessage;
 
 /**

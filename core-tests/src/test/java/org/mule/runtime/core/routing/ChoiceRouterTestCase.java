@@ -14,7 +14,7 @@ import static org.mule.runtime.api.message.Message.of;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.management.stats.RouterStatistics;
+import org.mule.runtime.core.api.management.stats.RouterStatistics;
 import org.mule.runtime.core.routing.filters.EqualsFilter;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 import org.mule.tck.testmodels.mule.TestMessageProcessor;

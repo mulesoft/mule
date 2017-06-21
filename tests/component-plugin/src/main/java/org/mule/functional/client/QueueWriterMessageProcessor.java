@@ -18,7 +18,7 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.session.DefaultMuleSession;
+import org.mule.runtime.core.api.session.DefaultMuleSession;
 import org.mule.runtime.core.api.util.AttributeEvaluator;
 
 /**

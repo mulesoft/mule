@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.util;
 
-import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;

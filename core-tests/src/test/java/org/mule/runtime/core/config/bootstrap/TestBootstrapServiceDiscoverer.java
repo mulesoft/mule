@@ -7,6 +7,10 @@
 
 package org.mule.runtime.core.config.bootstrap;
 
+import org.mule.runtime.core.api.config.bootstrap.BootstrapService;
+import org.mule.runtime.core.api.config.bootstrap.BootstrapServiceDiscoverer;
+import org.mule.runtime.core.api.config.bootstrap.PropertiesBootstrapService;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;

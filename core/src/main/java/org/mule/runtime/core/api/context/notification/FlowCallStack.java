@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.context.notification;
 
-import org.mule.runtime.core.config.DefaultMuleConfiguration;
+import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 
 import java.io.Serializable;
 import java.util.List;

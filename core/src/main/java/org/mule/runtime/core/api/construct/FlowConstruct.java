@@ -10,9 +10,9 @@ import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.LifecycleStateEnabled;
+import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 
 /**
  * A uniquely identified {@link FlowConstruct} that once implemented and configured defines a construct through which messages are

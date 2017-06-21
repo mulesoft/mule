@@ -10,7 +10,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.lifecycle.InitialisationCallback;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.object.ObjectFactory;
-import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
 
 import java.util.Hashtable;
 import java.util.Map;

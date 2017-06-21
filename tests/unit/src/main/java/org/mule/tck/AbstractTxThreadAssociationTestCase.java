@@ -17,7 +17,7 @@ import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionManagerFactory;
-import org.mule.runtime.core.execution.TransactionalExecutionTemplate;
+import org.mule.runtime.core.api.execution.TransactionalExecutionTemplate;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.xa.XaTransaction;

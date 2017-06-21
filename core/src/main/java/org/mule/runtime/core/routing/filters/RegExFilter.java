@@ -8,8 +8,8 @@ package org.mule.runtime.core.routing.filters;
 
 import static org.mule.runtime.core.DefaultEventContext.create;
 import static org.mule.runtime.core.api.construct.Flow.builder;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.transformFailedBeforeFilter;
 import static org.mule.runtime.core.api.util.ClassUtils.hash;
-import static org.mule.runtime.core.config.i18n.CoreMessages.transformFailedBeforeFilter;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 
 import org.mule.runtime.api.lifecycle.Initialisable;

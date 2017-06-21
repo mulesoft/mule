@@ -7,14 +7,14 @@
 
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
-import static org.mule.runtime.core.config.bootstrap.ClassLoaderRegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
+import static org.mule.runtime.core.internal.config.bootstrap.ClassLoaderRegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.config.bootstrap.BootstrapService;
-import org.mule.runtime.core.config.bootstrap.BootstrapServiceDiscoverer;
-import org.mule.runtime.core.config.bootstrap.PropertiesBootstrapService;
-import org.mule.runtime.core.config.bootstrap.PropertiesBootstrapServiceDiscoverer;
-import org.mule.runtime.core.config.builders.AbstractConfigurationBuilder;
+import org.mule.runtime.core.api.config.bootstrap.BootstrapService;
+import org.mule.runtime.core.api.config.bootstrap.BootstrapServiceDiscoverer;
+import org.mule.runtime.core.api.config.bootstrap.PropertiesBootstrapService;
+import org.mule.runtime.core.api.config.bootstrap.PropertiesBootstrapServiceDiscoverer;
+import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.api.util.PropertiesUtils;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 

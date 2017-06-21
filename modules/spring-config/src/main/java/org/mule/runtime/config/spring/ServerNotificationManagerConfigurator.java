@@ -14,8 +14,8 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
-import org.mule.runtime.core.context.notification.ListenerSubscriptionPair;
-import org.mule.runtime.core.context.notification.ServerNotificationManager;
+import org.mule.runtime.core.api.context.notification.ListenerSubscriptionPair;
+import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 
 import java.util.ArrayList;
 import java.util.Collection;

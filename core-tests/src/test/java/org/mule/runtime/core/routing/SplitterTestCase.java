@@ -23,7 +23,7 @@ import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.routing.outbound.IteratorMessageSequence;
-import org.mule.runtime.core.session.DefaultMuleSession;
+import org.mule.runtime.core.api.session.DefaultMuleSession;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.Serializable;

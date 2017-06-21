@@ -6,7 +6,7 @@
  */
 package org.mule.test.heisenberg.extension.model.types;
 
-import org.mule.runtime.core.message.BaseAttributes;
+import org.mule.runtime.core.api.message.BaseAttributes;
 
 public class DEAOfficerAttributes extends BaseAttributes {
 

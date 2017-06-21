@@ -8,7 +8,7 @@ package org.mule.runtime.core.api;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
-import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
 
 import java.util.HashMap;
 import java.util.Map;

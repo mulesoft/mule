@@ -7,7 +7,7 @@
 package org.mule.runtime.module.artifact.classloader;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
 
 import java.io.File;
 import java.net.MalformedURLException;

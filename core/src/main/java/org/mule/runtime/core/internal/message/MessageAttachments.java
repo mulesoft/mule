@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.message;
 
-import org.mule.runtime.core.message.DefaultMultiPartPayload;
+import org.mule.runtime.core.api.message.DefaultMultiPartPayload;
 
 import java.util.Set;
 

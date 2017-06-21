@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.expression;
 
-import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
 
 /**
  * Is thrown explicitly when an expression is Malformed or invalid. Malformed means the syntax is not correct, but an expression

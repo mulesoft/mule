@@ -13,7 +13,7 @@ import static java.util.Optional.of;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.config.bootstrap.ArtifactType;
+import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 
 import java.util.List;
 import java.util.Map;

@@ -10,7 +10,7 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.management.stats.ComponentStatistics;
+import org.mule.runtime.core.api.management.stats.ComponentStatistics;
 
 /**
  * A <code>Component</code> component processes a {@link Event} by invoking the component instance that has been configured,

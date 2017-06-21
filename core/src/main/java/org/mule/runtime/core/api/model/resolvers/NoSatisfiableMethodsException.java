@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api.model.resolvers;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
 
 /**
  * <code>NoSatisfiableMethodsException</code> is thrown by EntryPointResolvers when the service passed has no methods that meet

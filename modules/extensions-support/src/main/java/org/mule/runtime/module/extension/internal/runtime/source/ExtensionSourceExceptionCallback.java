@@ -10,9 +10,9 @@ import static org.mule.runtime.core.api.util.ExceptionUtils.createErrorEvent;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.execution.ExceptionCallback;
-import org.mule.runtime.core.execution.MessageProcessContext;
-import org.mule.runtime.core.execution.ResponseCompletionCallback;
+import org.mule.runtime.core.internal.execution.ExceptionCallback;
+import org.mule.runtime.core.api.execution.MessageProcessContext;
+import org.mule.runtime.core.internal.execution.ResponseCompletionCallback;
 
 import java.util.function.Consumer;
 

@@ -7,7 +7,7 @@
 package org.mule.runtime.core.internal.registry;
 
 import org.mule.runtime.core.api.registry.InjectProcessor;
-import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.internal.util.annotation.AnnotationMetaData;
 import org.mule.runtime.core.internal.util.annotation.AnnotationUtils;
 

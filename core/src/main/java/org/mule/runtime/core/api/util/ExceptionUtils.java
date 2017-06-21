@@ -40,7 +40,7 @@ import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.exception.TypedException;
 import org.mule.runtime.core.exception.WrapperErrorMessageAwareException;
-import org.mule.runtime.core.message.ErrorBuilder;
+import org.mule.runtime.core.api.message.ErrorBuilder;
 
 import java.util.List;
 import java.util.ListIterator;

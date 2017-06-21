@@ -8,7 +8,7 @@ package org.mule.functional.junit4;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.Assert.fail;
-import static org.mule.runtime.core.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
+import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
 
 import org.mule.functional.api.component.FlowAssert;
 import org.mule.runtime.api.lifecycle.Disposable;

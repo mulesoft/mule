@@ -10,7 +10,7 @@ import static org.mule.runtime.core.api.Event.getCurrentEvent;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.message.OutputHandler;
+import org.mule.runtime.core.api.message.OutputHandler;
 import org.mule.runtime.core.transformer.simple.SerializableToByteArray;
 
 import java.io.ByteArrayInputStream;
@@ -19,7 +19,7 @@ import java.nio.charset.Charset;
 
 /**
  * <code>ObjectToInputStream</code> converts Serializable objects to an InputStream but treats <code>java.lang.String</code>,
- * <code>byte[]</code> and <code>org.mule.runtime.core.message.OutputHandler</code> differently by using their byte[] content
+ * <code>byte[]</code> and <code>org.mule.runtime.core.api.message.OutputHandler</code> differently by using their byte[] content
  * rather thqn Serializing them.
  */
 public class ObjectToInputStream extends SerializableToByteArray {

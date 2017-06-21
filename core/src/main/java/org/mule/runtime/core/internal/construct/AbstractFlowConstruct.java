@@ -29,10 +29,11 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
+import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.lifecycle.EmptyLifecycleCallback;
-import org.mule.runtime.core.management.stats.FlowConstructStatistics;
+import org.mule.runtime.core.internal.management.stats.DefaultFlowConstructStatistics;
 
 import java.beans.ExceptionListener;
 import java.util.Optional;
@@ -185,7 +186,7 @@ public abstract class AbstractFlowConstruct extends AbstractAnnotatedObject impl
   }
 
   protected void configureStatistics() {
-    statistics = new FlowConstructStatistics(getConstructType(), name);
+    statistics = new DefaultFlowConstructStatistics(getConstructType(), name);
     statistics.setEnabled(muleContext.getStatistics().isEnabled());
     muleContext.getStatistics().add(statistics);
   }

@@ -9,7 +9,7 @@ package org.mule.runtime.core.api.util.monitor;
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.mule.runtime.core.config.i18n.CoreMessages.propertyHasInvalidValue;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.propertyHasInvalidValue;
 
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.scheduler.Scheduler;

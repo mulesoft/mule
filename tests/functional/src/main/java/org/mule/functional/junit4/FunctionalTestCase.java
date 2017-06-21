@@ -8,7 +8,7 @@ package org.mule.functional.junit4;
 
 import static java.util.Collections.emptyMap;
 import static org.junit.Assert.fail;
-import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 
 import org.mule.functional.api.component.FlowAssert;
 import org.mule.runtime.api.i18n.I18nMessageFactory;

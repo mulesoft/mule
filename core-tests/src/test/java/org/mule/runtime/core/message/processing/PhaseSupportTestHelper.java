@@ -9,8 +9,8 @@ package org.mule.runtime.core.message.processing;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
-import org.mule.runtime.core.execution.MessageProcessPhase;
-import org.mule.runtime.core.execution.MessageProcessTemplate;
+import org.mule.runtime.core.internal.execution.MessageProcessPhase;
+import org.mule.runtime.core.api.execution.MessageProcessTemplate;
 
 import org.mockito.Mockito;
 

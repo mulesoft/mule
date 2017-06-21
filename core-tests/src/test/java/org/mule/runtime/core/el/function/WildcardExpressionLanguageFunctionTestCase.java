@@ -26,7 +26,7 @@ import org.mule.runtime.core.api.TransformationService;
 import org.mule.runtime.core.api.el.ExpressionExecutor;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
+import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.el.context.MessageContext;
 import org.mule.runtime.core.el.mvel.MVELExpressionExecutor;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguageContext;

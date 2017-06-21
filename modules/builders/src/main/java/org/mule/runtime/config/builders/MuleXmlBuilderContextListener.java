@@ -18,9 +18,9 @@ import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.MuleContextFactory;
-import org.mule.runtime.core.config.DefaultMuleConfiguration;
-import org.mule.runtime.core.context.DefaultMuleContextBuilder;
-import org.mule.runtime.core.context.DefaultMuleContextFactory;
+import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
+import org.mule.runtime.core.api.context.DefaultMuleContextBuilder;
+import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
 
 import java.io.File;
 

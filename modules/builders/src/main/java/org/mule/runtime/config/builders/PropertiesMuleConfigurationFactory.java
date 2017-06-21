@@ -11,7 +11,7 @@ import static org.apache.commons.io.FilenameUtils.getFullPath;
 import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_ARTIFACT_PROPERTIES_RESOURCE;
 import org.mule.runtime.core.api.config.MuleConfiguration;
-import org.mule.runtime.core.config.DefaultMuleConfiguration;
+import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.util.ClassUtils;
 
 import java.io.IOException;

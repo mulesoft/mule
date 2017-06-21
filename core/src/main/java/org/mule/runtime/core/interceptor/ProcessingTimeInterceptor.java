@@ -10,7 +10,7 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.processor.InternalMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.management.stats.ProcessingTime;
+import org.mule.runtime.core.api.management.stats.ProcessingTime;
 
 /**
  * Calculate and record the processing time for a message processing chain

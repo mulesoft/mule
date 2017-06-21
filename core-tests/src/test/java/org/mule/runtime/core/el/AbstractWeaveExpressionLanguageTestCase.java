@@ -13,7 +13,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.config.builders.DefaultsConfigurationBuilder;
+import org.mule.runtime.core.api.config.builders.DefaultsConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 

@@ -14,7 +14,7 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
-import org.mule.runtime.core.context.notification.FlowConstructNotification;
+import org.mule.runtime.core.internal.context.notification.FlowConstructNotification;
 import org.mule.runtime.core.api.lifecycle.SimpleLifecycleManager;
 
 import org.slf4j.Logger;

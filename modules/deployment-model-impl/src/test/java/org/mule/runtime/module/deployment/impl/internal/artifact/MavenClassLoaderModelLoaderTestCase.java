@@ -17,7 +17,7 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.Assert.fail;
 import static org.junit.rules.ExpectedException.none;
-import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperties;
 import org.mule.runtime.globalconfig.api.GlobalConfigLoader;
 import org.mule.tck.junit4.rule.SystemProperty;

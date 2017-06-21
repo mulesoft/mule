@@ -21,7 +21,7 @@ import org.mule.runtime.api.service.Service;
 import org.mule.runtime.container.api.ServiceInvocationHandler;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.registry.IllegalDependencyInjectionException;
-import org.mule.runtime.core.config.Preferred;
+import org.mule.runtime.core.internal.config.preferred.Preferred;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 

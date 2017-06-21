@@ -20,9 +20,10 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
-import org.mule.runtime.core.internal.lifecycle.DefaultLifecycleManager;
-import org.mule.runtime.core.management.stats.FlowConstructStatistics;
+import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.util.UUID;
+import org.mule.runtime.core.internal.lifecycle.DefaultLifecycleManager;
+import org.mule.runtime.core.internal.management.stats.DefaultFlowConstructStatistics;
 
 import java.util.Optional;
 
@@ -37,7 +38,7 @@ public class DefaultPolicyInstance implements PolicyInstance, FlowConstruct, Mul
   private PolicyChain operationPolicyChain;
   private PolicyChain sourcePolicyChain;
 
-  private FlowConstructStatistics flowConstructStatistics = new FlowConstructStatistics("policy", getName());
+  private FlowConstructStatistics flowConstructStatistics = new DefaultFlowConstructStatistics("policy", getName());
   private String name = "proxy-policy-" + UUID.getUUID();
   private MuleContext muleContext;
   private DefaultLifecycleManager lifecycleStateManager = new DefaultLifecycleManager(this.name, this);

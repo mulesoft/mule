@@ -23,7 +23,7 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.object.ObjectFactory;
 import org.mule.runtime.core.api.registry.ServiceException;
-import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.object.SingletonObjectFactory;
 import org.mule.runtime.core.transformer.TransformerTemplate;
 

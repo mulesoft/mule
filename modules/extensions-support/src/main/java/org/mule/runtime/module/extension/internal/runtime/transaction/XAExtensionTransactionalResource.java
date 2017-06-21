@@ -10,7 +10,7 @@ import static javax.transaction.xa.XAResource.TMSUCCESS;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.api.tx.TransactionException;
-import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.transaction.xa.IllegalTransactionStateException;
 import org.mule.runtime.api.tx.MuleXaObject;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;

@@ -7,7 +7,7 @@
 package org.mule.runtime.core.security;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
 
 import java.security.GeneralSecurityException;
 import java.security.spec.AlgorithmParameterSpec;

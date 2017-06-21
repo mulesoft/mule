@@ -12,7 +12,7 @@ import static org.mule.runtime.api.exception.ExceptionHelper.getRootMuleExceptio
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.Event.getVariableValueOrNull;
 import static org.mule.runtime.core.api.util.StringUtils.DASH;
-import static org.mule.runtime.core.context.notification.MuleContextNotification.CONTEXT_STARTED;
+import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_STARTED;
 import static org.mule.runtime.core.routing.UntilSuccessful.DEFAULT_PROCESS_ATTEMPT_COUNT_PROPERTY_VALUE;
 import static org.mule.runtime.core.routing.UntilSuccessful.PROCESS_ATTEMPT_COUNT_PROPERTY_NAME;
 
@@ -31,12 +31,12 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
-import org.mule.runtime.core.context.notification.MuleContextNotification;
-import org.mule.runtime.core.context.notification.NotificationException;
+import org.mule.runtime.core.api.context.notification.MuleContextNotification;
+import org.mule.runtime.core.api.context.notification.NotificationException;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
 import org.mule.runtime.core.internal.message.InternalMessage;
-import org.mule.runtime.core.message.ErrorBuilder;
+import org.mule.runtime.core.api.message.ErrorBuilder;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 
 import java.io.Serializable;

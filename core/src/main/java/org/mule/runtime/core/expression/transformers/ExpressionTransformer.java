@@ -9,7 +9,7 @@ package org.mule.runtime.core.expression.transformers;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
 
 import java.nio.charset.Charset;
 import java.util.Iterator;

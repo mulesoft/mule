@@ -22,7 +22,7 @@ import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
-import org.mule.runtime.core.session.DefaultMuleSession;
+import org.mule.runtime.core.api.session.DefaultMuleSession;
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 

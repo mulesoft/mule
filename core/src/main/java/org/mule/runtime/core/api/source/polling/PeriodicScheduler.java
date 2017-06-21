@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.source.polling;
 
-import static org.mule.runtime.core.config.i18n.CoreMessages.objectIsNull;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.source.SchedulingStrategy;

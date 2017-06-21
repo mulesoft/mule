@@ -8,8 +8,8 @@ package org.mule.runtime.core.api.retry.policy;
 
 import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.retry.RetryNotifier;
-import org.mule.runtime.core.config.ExceptionHelper;
-import org.mule.runtime.core.context.notification.ConnectionNotification;
+import org.mule.runtime.core.internal.config.ExceptionHelper;
+import org.mule.runtime.core.api.context.notification.ConnectionNotification;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

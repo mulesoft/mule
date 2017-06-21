@@ -11,7 +11,7 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.queue.QueueProvider;
 import org.mule.runtime.core.util.queue.QueueStore;
 import org.mule.runtime.core.util.queue.QueueStoreCacheListener;

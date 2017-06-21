@@ -32,16 +32,16 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ExceptionUtils.getRootCauseException;
-import static org.mule.runtime.core.config.i18n.CoreMessages.invalidJdk;
-import static org.mule.runtime.core.config.i18n.CoreMessages.objectIsNull;
-import static org.mule.runtime.core.context.notification.MuleContextNotification.CONTEXT_DISPOSED;
-import static org.mule.runtime.core.context.notification.MuleContextNotification.CONTEXT_DISPOSING;
-import static org.mule.runtime.core.context.notification.MuleContextNotification.CONTEXT_INITIALISED;
-import static org.mule.runtime.core.context.notification.MuleContextNotification.CONTEXT_INITIALISING;
-import static org.mule.runtime.core.context.notification.MuleContextNotification.CONTEXT_STARTED;
-import static org.mule.runtime.core.context.notification.MuleContextNotification.CONTEXT_STARTING;
-import static org.mule.runtime.core.context.notification.MuleContextNotification.CONTEXT_STOPPED;
-import static org.mule.runtime.core.context.notification.MuleContextNotification.CONTEXT_STOPPING;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.invalidJdk;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
+import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_DISPOSED;
+import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_DISPOSING;
+import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_INITIALISED;
+import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_INITIALISING;
+import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_STARTED;
+import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_STARTING;
+import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_STOPPED;
+import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_STOPPING;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.core.internal.util.JdkVersionUtils.getSupportedJdks;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -70,6 +70,7 @@ import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.connector.ConnectException;
 import org.mule.runtime.core.api.connector.SchedulerController;
 import org.mule.runtime.core.api.construct.Pipeline;
+import org.mule.runtime.core.api.context.notification.CustomNotification;
 import org.mule.runtime.core.api.context.notification.FlowTraceManager;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
@@ -97,14 +98,14 @@ import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.core.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.util.queue.Queue;
 import org.mule.runtime.core.api.util.queue.QueueManager;
-import org.mule.runtime.core.config.ClusterConfiguration;
-import org.mule.runtime.core.config.NullClusterConfiguration;
-import org.mule.runtime.core.config.bootstrap.ArtifactType;
-import org.mule.runtime.core.config.bootstrap.BootstrapServiceDiscoverer;
-import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.context.notification.MuleContextNotification;
-import org.mule.runtime.core.context.notification.NotificationException;
-import org.mule.runtime.core.context.notification.ServerNotificationManager;
+import org.mule.runtime.core.internal.config.ClusterConfiguration;
+import org.mule.runtime.core.internal.config.NullClusterConfiguration;
+import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
+import org.mule.runtime.core.api.config.bootstrap.BootstrapServiceDiscoverer;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.context.notification.MuleContextNotification;
+import org.mule.runtime.core.api.context.notification.NotificationException;
+import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.exception.ErrorHandlerFactory;
 import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.exception.ErrorTypeRepository;
@@ -119,8 +120,8 @@ import org.mule.runtime.core.internal.util.splash.ApplicationStartupSplashScreen
 import org.mule.runtime.core.internal.util.splash.ServerShutdownSplashScreen;
 import org.mule.runtime.core.internal.util.splash.ServerStartupSplashScreen;
 import org.mule.runtime.core.internal.util.splash.SplashScreen;
-import org.mule.runtime.core.management.stats.AllStatistics;
-import org.mule.runtime.core.management.stats.ProcessingTimeWatcher;
+import org.mule.runtime.core.api.management.stats.AllStatistics;
+import org.mule.runtime.core.api.management.stats.ProcessingTimeWatcher;
 import org.mule.runtime.core.registry.DefaultRegistryBroker;
 import org.mule.runtime.core.registry.MuleRegistryHelper;
 
@@ -530,9 +531,9 @@ public class DefaultMuleContext implements MuleContext {
    * {@link org.mule.runtime.core.api.context.notification.CustomNotificationListener} notificationManager.
    *
    * @param notification the notification to fire. This must be of type
-   *        {@link org.mule.runtime.core.context.notification.CustomNotification} otherwise an exception will be thrown.
+   *        {@link CustomNotification} otherwise an exception will be thrown.
    * @throws UnsupportedOperationException if the notification fired is not a
-   *         {@link org.mule.runtime.core.context.notification.CustomNotification}
+   *         {@link CustomNotification}
    */
   @Override
   public void fireNotification(ServerNotification notification) {

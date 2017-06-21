@@ -8,7 +8,7 @@ package org.mule.runtime.core.el.context;
 
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
 
-import org.mule.runtime.core.config.MuleManifest;
+import org.mule.runtime.core.api.config.MuleManifest;
 
 import java.net.UnknownHostException;
 

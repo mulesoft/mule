@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.core.api.security;
 
-import static org.mule.runtime.core.config.i18n.CoreMessages.authFailedForUser;
-import static org.mule.runtime.core.config.i18n.CoreMessages.authSetButNoContext;
-import static org.mule.runtime.core.config.i18n.CoreMessages.authorizationDeniedOnEndpoint;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.authFailedForUser;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.authSetButNoContext;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.authorizationDeniedOnEndpoint;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.security.ServerSecurityException;
 import org.mule.runtime.core.api.Event;

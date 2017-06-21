@@ -15,7 +15,7 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.message.ErrorBuilder;
+import org.mule.runtime.core.api.message.ErrorBuilder;
 
 import java.util.Map;
 import java.util.Optional;

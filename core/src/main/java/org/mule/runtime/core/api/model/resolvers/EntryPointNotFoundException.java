@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api.model.resolvers;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
 
 /**
  * Tis exception gets thrown by the {@link org.mule.runtime.core.api.model.resolvers.DefaultEntryPointResolverSet} if after trying all

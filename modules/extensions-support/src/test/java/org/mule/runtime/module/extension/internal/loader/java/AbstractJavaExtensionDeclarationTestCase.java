@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.loader.java;
 import static java.util.Collections.emptySet;
 import static org.apache.commons.collections.CollectionUtils.find;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
-import static org.mule.runtime.core.config.MuleManifest.getProductVersion;
+import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import javafx.util.Pair;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;

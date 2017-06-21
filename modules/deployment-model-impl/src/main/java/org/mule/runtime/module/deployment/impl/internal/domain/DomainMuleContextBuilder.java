@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.domain;
 
-import static org.mule.runtime.core.config.bootstrap.ArtifactType.DOMAIN;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
@@ -17,16 +17,16 @@ import org.mule.runtime.core.api.context.notification.ExceptionNotificationListe
 import org.mule.runtime.core.api.context.notification.ManagementNotificationListener;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
 import org.mule.runtime.core.api.context.notification.SecurityNotificationListener;
-import org.mule.runtime.core.config.DefaultMuleConfiguration;
-import org.mule.runtime.core.context.DefaultMuleContextBuilder;
-import org.mule.runtime.core.context.notification.ClusterNodeNotification;
-import org.mule.runtime.core.context.notification.ConnectionNotification;
-import org.mule.runtime.core.context.notification.CustomNotification;
-import org.mule.runtime.core.context.notification.ExceptionNotification;
-import org.mule.runtime.core.context.notification.ManagementNotification;
-import org.mule.runtime.core.context.notification.MuleContextNotification;
-import org.mule.runtime.core.context.notification.SecurityNotification;
-import org.mule.runtime.core.context.notification.ServerNotificationManager;
+import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
+import org.mule.runtime.core.api.context.DefaultMuleContextBuilder;
+import org.mule.runtime.core.api.context.notification.ClusterNodeNotification;
+import org.mule.runtime.core.api.context.notification.ConnectionNotification;
+import org.mule.runtime.core.api.context.notification.CustomNotification;
+import org.mule.runtime.core.api.context.notification.ExceptionNotification;
+import org.mule.runtime.core.api.context.notification.ManagementNotification;
+import org.mule.runtime.core.api.context.notification.MuleContextNotification;
+import org.mule.runtime.core.api.context.notification.SecurityNotification;
+import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 
 /**
  * Builder for domain MuleContext instance.

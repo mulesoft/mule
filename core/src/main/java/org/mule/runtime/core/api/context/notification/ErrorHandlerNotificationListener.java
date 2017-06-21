@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.api.context.notification;
 
-import org.mule.runtime.core.context.notification.ErrorHandlerNotification;
-
 public interface ErrorHandlerNotificationListener<T extends ErrorHandlerNotification>
     extends ServerNotificationListener<ErrorHandlerNotification> {
 }

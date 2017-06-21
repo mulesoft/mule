@@ -12,10 +12,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.execution.MessageProcessContext;
-import org.mule.runtime.core.execution.PhaseResultNotifier;
-import org.mule.runtime.core.execution.ValidationPhase;
-import org.mule.runtime.core.execution.ValidationPhaseTemplate;
+import org.mule.runtime.core.api.execution.MessageProcessContext;
+import org.mule.runtime.core.internal.execution.PhaseResultNotifier;
+import org.mule.runtime.core.internal.execution.ValidationPhase;
+import org.mule.runtime.core.api.execution.ValidationPhaseTemplate;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 

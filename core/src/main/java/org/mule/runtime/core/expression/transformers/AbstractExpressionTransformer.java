@@ -8,7 +8,7 @@ package org.mule.runtime.core.expression.transformers;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 
 import java.util.ArrayList;

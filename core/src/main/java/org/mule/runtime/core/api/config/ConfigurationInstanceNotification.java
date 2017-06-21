@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.config;
 
-import org.mule.runtime.core.context.notification.CustomNotification;
+import org.mule.runtime.core.api.context.notification.CustomNotification;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 
 /**

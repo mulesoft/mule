@@ -12,7 +12,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.message.GroupCorrelation;
+import org.mule.runtime.core.api.message.GroupCorrelation;
 
 import java.util.Map;
 import java.util.Optional;
