@@ -143,7 +143,7 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
         .transform(next)
         .onErrorMap(MessagingException.class, updateMessagingException(processor)));
 
-    // #2 Apply processing strategy. This is done hear to ensure notifications and interceptors do not execute on async processor
+    // #2 Apply processing strategy. This is done here to ensure notifications and interceptors do not execute on async processor
     // threads which may be limited to avoid deadlocks.
     // Use anonymous ReactiveProcessor to apply processing strategy to processor + previous interceptors
     // while using the processing type of the processor itself.
