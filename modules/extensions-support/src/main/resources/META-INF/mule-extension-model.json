@@ -2893,7 +2893,7 @@
                 "type": "@ref:org.mule.runtime.core.api.source.SchedulingStrategy"
               },
               "hasDynamicType": false,
-              "required": false,
+              "required": true,
               "isConfigOverride": false,
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
