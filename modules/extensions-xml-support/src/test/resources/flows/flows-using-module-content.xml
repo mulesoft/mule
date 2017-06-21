@@ -4,7 +4,7 @@
       xmlns:module-content="http://www.mulesoft.org/schema/mule/module-content"
       xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core     http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-      http://www.mulesoft.org/schema/mule/module-content http://www.mulesoft.org/schema/mule/module-content/module-content.xsd">
+      http://www.mulesoft.org/schema/mule/module-content http://www.mulesoft.org/schema/mule/module-content/current/mule-module-content.xsd">
 
     <flow name="testSetPayloadUsingContent">
         <module-content:set-payload-using-content-parameter>

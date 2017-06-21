@@ -7,13 +7,12 @@
 package org.mule.runtime.config.spring.parsers.specific;
 
 import org.mule.runtime.config.spring.ElementValidator;
-import org.mule.runtime.config.spring.parsers.PreProcessor;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 /**
- * A {@link PreProcessor} that validates that no mule element is used inside a &lt;spring:beans&gt; element.
+ * A {@link ElementValidator} that validates that no mule element is used inside a &lt;spring:beans&gt; element.
  *
  * This is for security and consistency reasons. A way of enforcing that XSD is not cheated
  *

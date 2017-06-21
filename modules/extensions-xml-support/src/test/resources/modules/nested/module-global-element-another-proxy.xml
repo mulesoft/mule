@@ -7,7 +7,7 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="
            http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd
-            http://www.mulesoft.org/schema/mule/module-global-element-proxy http://www.mulesoft.org/schema/mule/module-global-element-proxy/module-global-element-proxy.xsd">
+            http://www.mulesoft.org/schema/mule/module-global-element-proxy http://www.mulesoft.org/schema/mule/module-global-element-proxy/current/mule-module-global-element-proxy.xsd">
 
     <property name="someUserConfig" type="string" defaultValue="some-username"/>
     <property name="somePassConfig" type="string" defaultValue="some-password"/>

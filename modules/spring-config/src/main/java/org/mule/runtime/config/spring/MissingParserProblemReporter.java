@@ -38,12 +38,16 @@ public class MissingParserProblemReporter extends FailFastProblemReporter {
       String element = ((Element) problem.getLocation().getSource()).getLocalName();
       String namespace = ((Element) problem.getLocation().getSource()).getNamespaceURI();
       String message = "The element '" + element + "' does not have an associated Bean Definition Parser."
-          + "  Is the module or extension associated with " + namespace + " present on the classpath?";
+          + "  " + getMissingModuleOrExtensionMessage(namespace);
       return new Problem(message, problem.getLocation(), problem.getParseState(), problem.getRootCause());
     } catch (Exception e) {
       // fall back to previous message
       return problem;
     }
+  }
+
+  public static String getMissingModuleOrExtensionMessage(String elementName) {
+    return "Is the module or extension associated with " + elementName + " present on the classpath?";
   }
 
 }

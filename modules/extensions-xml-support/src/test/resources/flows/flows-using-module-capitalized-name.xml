@@ -4,7 +4,7 @@
       xmlns:capitalizedededede="http://www.mulesoft.org/schema/mule/capitalized"
       xsi:schemaLocation="
       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-      http://www.mulesoft.org/schema/mule/capitalized http://www.mulesoft.org/schema/mule/capitalized/current/capitalized.xsd">
+      http://www.mulesoft.org/schema/mule/capitalized http://www.mulesoft.org/schema/mule/capitalized/current/mule-capitalizedwithspacesinthename.xsd">
 
     <capitalizedededede:config name="a-name" a-property="a value"/>
 

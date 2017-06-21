@@ -4,7 +4,7 @@
       xmlns:module-global-element-proxy="http://www.mulesoft.org/schema/mule/module-global-element-proxy"
       xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/module-global-element-proxy http://www.mulesoft.org/schema/mule/module-global-element-proxy/module-global-element-proxy.xsd">
+       http://www.mulesoft.org/schema/mule/module-global-element-proxy http://www.mulesoft.org/schema/mule/module-global-element-proxy/current/mule-module-global-element-proxy.xsd">
 
     <module-global-element-proxy:config name="la-plata-config" someUserConfig="userLP" somePassConfig="passLP" port="${httpPort}"/>
     <module-global-element-proxy:config name="gonnet-config" someUserConfig="userGonnet" somePassConfig="passGonnet" port="${httpPort}"/>

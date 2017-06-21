@@ -4,7 +4,7 @@
       xmlns:modulejson="http://www.mulesoft.org/schema/mule/module-json-custom-types"
       xsi:schemaLocation="
       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-      http://www.mulesoft.org/schema/mule/module-json-custom-types http://www.mulesoft.org/schema/mule/module-json-custom-types/current/module-json-custom-types.xsd">
+      http://www.mulesoft.org/schema/mule/module-json-custom-types http://www.mulesoft.org/schema/mule/module-json-custom-types/current/mule-module-json-custom-types.xsd">
 
 
     <flow name="testIsJsonType1FromPayloadFlow">

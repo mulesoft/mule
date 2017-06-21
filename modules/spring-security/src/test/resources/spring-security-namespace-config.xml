@@ -37,7 +37,7 @@
     </spring:bean>
 
     <security-manager>
-        <custom-security-provider name="willNotOverwriteName" provider-ref="explicitCreation1"/>
+        <custom-security-provider name="willAlsoOverwriteName" provider-ref="explicitCreation1"/>
     </security-manager>
 
     <spring:bean id="explicitCreation2" class="org.mule.runtime.module.spring.security.SpringProviderAdapter">

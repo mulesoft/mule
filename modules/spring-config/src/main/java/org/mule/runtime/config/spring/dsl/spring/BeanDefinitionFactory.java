@@ -24,6 +24,7 @@ import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_IDE
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_PROPERTIES_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_PROPERTY_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.NAME_ATTRIBUTE;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SECURITY_MANAGER_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SPRING_ENTRY_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SPRING_LIST_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SPRING_MAP_IDENTIFIER;
@@ -37,6 +38,7 @@ import static org.mule.runtime.config.spring.dsl.spring.WrapperElementType.COLLE
 import static org.mule.runtime.config.spring.dsl.spring.WrapperElementType.MAP;
 import static org.mule.runtime.config.spring.dsl.spring.WrapperElementType.SINGLE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 import static org.mule.runtime.core.component.ComponentAnnotations.ANNOTATION_NAME;
 import static org.mule.runtime.core.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
 import static org.mule.runtime.core.exception.ErrorMapping.ANNOTATION_ERROR_MAPPINGS;
@@ -50,6 +52,7 @@ import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.processor.AbstractAttributeDefinitionVisitor;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
+import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.exception.ErrorMapping;
 import org.mule.runtime.core.exception.ErrorTypeMatcher;
 import org.mule.runtime.core.exception.ErrorTypeRepository;
@@ -102,8 +105,6 @@ public class BeanDefinitionFactory {
           .add(ANNOTATIONS_ELEMENT_IDENTIFIER)
           .add(DOC_DESCRIPTION_IDENTIFIER)
           .add(SPRING_PROPERTY_PLACEHOLDER_IDENTIFIER)
-          // TODO MULE-9638: Uncomment this code when task is finished
-          // .add(GLOBAL_PROPERTY_IDENTIFIER)
           .build();
 
   /**
@@ -187,9 +188,12 @@ public class BeanDefinitionFactory {
     }
     resolveComponentBeanDefinition(parentComponentModel, componentModel);
     componentDefinitionModelProcessor.accept(componentModel, registry);
+
     // TODO MULE-9638: Once we migrate all core definitions we need to define a mechanism for customizing
     // how core constructs are processed.
     processMuleConfiguration(componentModel, registry);
+    processMuleSecurityManager(componentModel, registry);
+
     componentBuildingDefinitionRegistry.getBuildingDefinition(componentModel.getIdentifier())
         .ifPresent(componentBuildingDefinition -> {
           if ((componentModel.getType() != null) && AnnotatedObject.class.isAssignableFrom(componentModel.getType())) {
@@ -235,14 +239,34 @@ public class BeanDefinitionFactory {
   private void processMuleConfiguration(ComponentModel componentModel, BeanDefinitionRegistry registry) {
     if (componentModel.getIdentifier().equals(CONFIGURATION_IDENTIFIER)) {
       AtomicReference<BeanDefinition> defaultRetryPolicyTemplate = new AtomicReference<>();
+      AtomicReference<BeanDefinition> expressionLanguage = new AtomicReference<>();
+
       componentModel.getInnerComponents().stream().forEach(childComponentModel -> {
         if (areMatchingTypes(RetryPolicyTemplate.class, childComponentModel.getType())) {
           defaultRetryPolicyTemplate.set(childComponentModel.getBeanDefinition());
         }
+        if (areMatchingTypes(MVELExpressionLanguage.class, childComponentModel.getType())) {
+          expressionLanguage.set(childComponentModel.getBeanDefinition());
+        }
       });
+
       if (defaultRetryPolicyTemplate.get() != null) {
         registry.registerBeanDefinition(OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE, defaultRetryPolicyTemplate.get());
       }
+      if (expressionLanguage.get() != null) {
+        registry.registerBeanDefinition(OBJECT_EXPRESSION_LANGUAGE, expressionLanguage.get());
+      }
+    }
+  }
+
+  private void processMuleSecurityManager(ComponentModel componentModel, BeanDefinitionRegistry registry) {
+    if (componentModel.getIdentifier().equals(SECURITY_MANAGER_IDENTIFIER)) {
+      componentModel.getInnerComponents().stream().forEach(childComponentModel -> {
+        if (childComponentModel.getNameAttribute().equals("password-encryption-strategy")
+            || childComponentModel.getNameAttribute().equals("secret-key-encryption-strategy")) {
+          registry.registerBeanDefinition(childComponentModel.getNameAttribute(), childComponentModel.getBeanDefinition());
+        }
+      });
     }
   }
 
@@ -299,9 +323,9 @@ public class BeanDefinitionFactory {
     MapEntryBeanDefinitionCreator mapEntryBeanDefinitionCreator = new MapEntryBeanDefinitionCreator();
     MapBeanDefinitionCreator mapBeanDefinitionCreator = new MapBeanDefinitionCreator();
     CommonBeanDefinitionCreator commonComponentModelProcessor = new CommonBeanDefinitionCreator(objectFactoryClassRepository);
+
     propertiesMapBeanDefinitionCreator.setNext(interceptorStackBeanDefinitionCreator);
     interceptorStackBeanDefinitionCreator.setNext(exceptionStrategyRefBeanDefinitionCreator);
-    exceptionStrategyRefBeanDefinitionCreator.setNext(exceptionStrategyRefBeanDefinitionCreator);
     exceptionStrategyRefBeanDefinitionCreator.setNext(filterReferenceBeanDefinitionCreator);
     filterReferenceBeanDefinitionCreator.setNext(referenceBeanDefinitionCreator);
     referenceBeanDefinitionCreator.setNext(simpleTypeBeanDefinitionCreator);

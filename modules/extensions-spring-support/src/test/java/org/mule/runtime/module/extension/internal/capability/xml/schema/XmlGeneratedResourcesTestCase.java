@@ -15,9 +15,9 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.CURRENT_VERSION;
 import static org.mule.runtime.module.extension.internal.capability.xml.schema.SpringSchemaBundleResourceFactory.BUNDLE_MASK;
 import static org.mule.runtime.module.extension.internal.capability.xml.schema.SpringSchemaBundleResourceFactory.GENERATED_FILE_NAME;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.CURRENT_VERSION;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockSubTypes;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
@@ -26,7 +26,6 @@ import org.mule.runtime.extension.api.dsl.syntax.resources.spi.DslResourceFactor
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.ResourcesGenerator;
 import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
-import org.mule.runtime.module.extension.internal.config.ExtensionNamespaceHandler;
 import org.mule.runtime.module.extension.internal.resources.AbstractGeneratedResourceFactoryTestCase;
 import org.mule.runtime.module.extension.internal.resources.AnnotationProcessorResourceGenerator;
 import org.mule.tck.size.SmallTest;
@@ -65,7 +64,6 @@ public class XmlGeneratedResourcesTestCase extends AbstractGeneratedResourceFact
 
   private XmlDslModel xmlDslModel;
 
-  private SpringHandlerBundleResourceFactory springHandlerFactory = new SpringHandlerBundleResourceFactory();
   private SpringSchemaBundleResourceFactory springSchemaBundleResourceFactory = new SpringSchemaBundleResourceFactory();
   private SchemaXmlResourceFactory schemaXmlResourceFactory = new SchemaXmlResourceFactory();
 
@@ -83,7 +81,7 @@ public class XmlGeneratedResourcesTestCase extends AbstractGeneratedResourceFact
     mockSubTypes(extensionModel);
     when(extensionModel.getImportedTypes()).thenReturn(emptySet());
 
-    generator = new AnnotationProcessorResourceGenerator(asList(springHandlerFactory, springSchemaBundleResourceFactory,
+    generator = new AnnotationProcessorResourceGenerator(asList(springSchemaBundleResourceFactory,
                                                                 schemaXmlResourceFactory),
                                                          processingEnvironment);
 
@@ -93,7 +91,7 @@ public class XmlGeneratedResourcesTestCase extends AbstractGeneratedResourceFact
 
   @Override
   protected Class<? extends GeneratedResourceFactory>[] getResourceFactoryTypes() {
-    return new Class[] {SpringHandlerBundleResourceFactory.class, SchemaXmlResourceFactory.class,
+    return new Class[] {SchemaXmlResourceFactory.class,
         SpringSchemaBundleResourceFactory.class};
   }
 
@@ -115,16 +113,6 @@ public class XmlGeneratedResourcesTestCase extends AbstractGeneratedResourceFact
   public void generateSchema() throws Exception {
     GeneratedResource resource = schemaXmlResourceFactory.generateResource(extensionModel).get();
     assertThat(isBlank(new String(resource.getContent())), is(false));
-  }
-
-  @Test
-  public void springHandlers() throws Exception {
-    GeneratedResource resource = springHandlerFactory.generateResource(extensionModel).get();
-
-    assertThat(SpringHandlerBundleResourceFactory.GENERATED_FILE_NAME, equalTo(resource.getPath()));
-    assertThat(new String(resource.getContent()),
-               equalTo(String.format(SpringHandlerBundleResourceFactory.BUNDLE_MASK, ESCAPED_LOCATION_PREFIX + SCHEMA_LOCATION,
-                                     ExtensionNamespaceHandler.class.getName())));
   }
 
   @Test
