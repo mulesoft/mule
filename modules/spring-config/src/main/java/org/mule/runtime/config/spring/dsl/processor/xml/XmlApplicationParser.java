@@ -69,7 +69,8 @@ public class XmlApplicationParser {
     this(discoverNamespaceInfoProviders(serviceRegistry, pluginsClassLoaders));
   }
 
-  private static List<XmlNamespaceInfoProvider> discoverNamespaceInfoProviders(ServiceRegistry serviceRegistry, List<ClassLoader> pluginsClassLoaders) {
+  private static List<XmlNamespaceInfoProvider> discoverNamespaceInfoProviders(ServiceRegistry serviceRegistry,
+                                                                               List<ClassLoader> pluginsClassLoaders) {
     final Builder<XmlNamespaceInfoProvider> namespaceInfoProvidersBuilder = ImmutableList.builder();
     namespaceInfoProvidersBuilder
         .addAll(serviceRegistry.lookupProviders(XmlNamespaceInfoProvider.class, XmlNamespaceInfoProvider.class.getClassLoader()));
