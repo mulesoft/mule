@@ -11,7 +11,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.serialization.SerializationException;
+import org.mule.runtime.api.serialization.SerializationException;
 import org.mule.runtime.core.routing.correlation.CollectionCorrelatorCallback;
 import org.mule.runtime.core.routing.correlation.CorrelationSequenceComparator;
 import org.mule.runtime.core.routing.correlation.EventCorrelatorCallback;

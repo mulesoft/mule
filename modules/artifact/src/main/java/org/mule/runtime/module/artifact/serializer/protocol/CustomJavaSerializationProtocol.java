@@ -5,16 +5,18 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.module.artifact.serializer;
+package org.mule.runtime.module.artifact.serializer.protocol;
 
 import static java.lang.String.format;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
-import org.mule.runtime.core.api.serialization.AbstractSerializationProtocol;
-import org.mule.runtime.core.api.serialization.SerializationException;
+import org.mule.runtime.core.internal.serialization.AbstractSerializationProtocol;
+import org.mule.runtime.api.serialization.SerializationException;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
+import org.mule.runtime.module.artifact.serializer.ArtifactClassLoaderObjectInputStream;
+import org.mule.runtime.module.artifact.serializer.ArtifactClassLoaderObjectOutputStream;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

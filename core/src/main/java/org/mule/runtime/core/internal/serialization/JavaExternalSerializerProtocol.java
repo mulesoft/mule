@@ -11,9 +11,8 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
-import org.mule.runtime.core.api.serialization.AbstractSerializationProtocol;
-import org.mule.runtime.core.api.serialization.SerializationException;
-import org.mule.runtime.core.api.serialization.SerializationProtocol;
+import org.mule.runtime.api.serialization.SerializationException;
+import org.mule.runtime.api.serialization.SerializationProtocol;
 import org.mule.runtime.core.internal.util.SerializationUtils;
 
 import java.io.IOException;

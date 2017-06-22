@@ -23,7 +23,7 @@ import org.mule.runtime.api.store.ObjectDoesNotExistException;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.ObjectStoreNotAvailableException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.serialization.ObjectSerializer;
+import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.store.ExpirableObjectStore;
 import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.api.util.UUID;
