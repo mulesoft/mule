@@ -54,6 +54,30 @@ public class XmlConfigurationDocumentLoaderTestCase extends AbstractMuleTestCase
   }
 
   @Test
+  public void testMalformedXmlWithWrongMuleSchemaLocationAndNoExtensionsRaisesException() {
+    try {
+      getDocument("mule-wrong-mule-schema-location.xml");
+      fail("Should not have reach here as the document is malformed and an exception should have been thrown using the default constructor");
+    } catch (MuleRuntimeException e) {
+      // We want to be sure that the line and column are properly picked up
+      assertThat(e.getMessage(),
+                 StringContains.containsString("Cannot find the declaration of element \'mule\'"));
+    }
+  }
+
+  @Test
+  public void testMalformedXmlWithWrongSchemaLocationAndNoExtensionsRaisesException() {
+    try {
+      getDocument("mule-wrong-schema-location.xml");
+      fail("Should not have reach here as the document is malformed and an exception should have been thrown using the default constructor");
+    } catch (MuleRuntimeException e) {
+      // We want to be sure that the line and column are properly picked up
+      assertThat(e.getMessage(),
+                 StringContains.containsString("Cannot find the declaration of element \'mule\'"));
+    }
+  }
+
+  @Test
   public void testMalformedXmlDefaultConstructor() throws XPathExpressionException {
     try {
       getDocument("mule-config-malformed.xml");
@@ -97,7 +121,6 @@ public class XmlConfigurationDocumentLoaderTestCase extends AbstractMuleTestCase
     final InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(filename);
     return xmlConfigurationDocumentLoader.loadDocument(filename, inputStream);
   }
-
   /**
    * Custom implementation to count errors for the current XSD validation for testing purposes only
    */
