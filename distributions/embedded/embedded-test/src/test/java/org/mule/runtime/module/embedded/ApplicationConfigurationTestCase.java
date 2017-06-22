@@ -58,7 +58,7 @@ public class ApplicationConfigurationTestCase extends AbstractMuleTestCase {
 
   private static final String LOGGING_FILE = "app.log";
 
-  private static EmbeddedTestHelper embeddedTestHelper = new EmbeddedTestHelper();
+  private static EmbeddedTestHelper embeddedTestHelper = new EmbeddedTestHelper(false);
 
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
