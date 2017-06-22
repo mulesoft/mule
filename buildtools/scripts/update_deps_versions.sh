@@ -34,27 +34,41 @@ VERSION_CONNECTORS_MODULES=$2
 VERSION_TO_MULE=$3
 
 # Properties with Deps Version (1.0.x) in the root pom.xml
+propertiesDeps=("muleEmbeddedApiVersion")
+
+updatePropertiesVersion "$VERSION_TO_DEPS" distributions/pom.xml propertiesDeps[@]
+
+
+# Properties with Deps Version (1.0.x) in the root pom.xml
 propertiesDeps=("mule.module.maven.plugin.version"
                 "mule.extensions.maven.plugin.version"
                 "mule.app.plugins.maven.plugin.version")
 
 updatePropertiesVersion "$VERSION_TO_DEPS" pom.xml propertiesDeps[@]
 
+
+# Properties with 0.8.x in the root pom.xml
+propertiesDeps=("muleHttpServiceTestVersion"
+                "muleSchedulerServiceTestVersion")
+
+# Using Snapshot as a workaround because the extensions have the mule artifacts as
+# deps. So there is a circular dependency.
+VERSION_TO_DEPS_AUX=1.0.0-BETA-SNAPSHOT
+updatePropertiesVersion "$VERSION_TO_DEPS" pom.xml propertiesDeps[@]
+
+
 # Properties with 0.8.x in the root pom.xml
 propertiesDeps=("muleHttpConnectorTestVersion"
                 "muleSocketsConnectorTestVersion"
                 "muleFileConnectorTestVersion"
                 "muleJmsConnectorTestVersion"
-                "muleHttpServiceTestVersion"
-                "muleSchedulerServiceTestVersion"
                 "muleFileCommonsTestVersion")
 
-updatePropertiesVersion "$VERSION_CONNECTORS_MODULES" pom.xml propertiesDeps[@]
+# Using Snapshot as a workaround because the extensions have the mule artifacts as
+# deps. So there is a circular dependency.
+VERSION_CONNECTORS_MODULES_AUX=0.8.0-SNAPSHOT
+updatePropertiesVersion "$VERSION_CONNECTORS_MODULES_AUX" pom.xml propertiesDeps[@]
 
-# Properties with Deps Version (1.0.x) in the root pom.xml
-propertiesDeps=("muleEmbeddedApiVersion")
-
-updatePropertiesVersion "$VERSION_TO_DEPS" distributions/pom.xml propertiesDeps[@]
 
 propertiesDeps=("muleMetadataExtensionTestVersion"
                 "muleVeganExtensionTestVersion"

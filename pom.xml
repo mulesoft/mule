@@ -223,24 +223,23 @@
         <!-- Mule Snapshot Dependencies -->
         <muleDslApiVersion>1.0.0-BETA-SNAPSHOT</muleDslApiVersion>
         <muleExtensionsApiVersion>1.0.0-BETA-SNAPSHOT</muleExtensionsApiVersion>
-        <muleExtensionsSoapApiVersion>1.0.0-BETA-SNAPSHOT</muleExtensionsSoapApiVersion>
         <muleHttpPolicyApiVersion>1.0.0-BETA-SNAPSHOT</muleHttpPolicyApiVersion>
         <muleMavenClientApi>1.0.0-BETA-SNAPSHOT</muleMavenClientApi>
         <muleMavenClientImpl>1.0.0-BETA-SNAPSHOT</muleMavenClientImpl>
         <mulePolicyApiVersion>1.0.0-BETA-SNAPSHOT</mulePolicyApiVersion>
         <muleApiVersion>1.0.0-BETA-SNAPSHOT</muleApiVersion>
         <muleMetadataModelVersion>1.0.0-BETA-SNAPSHOT</muleMetadataModelVersion>
-        <metadataModelApiVersion>1.0.0-BETA-SNAPSHOT</metadataModelApiVersion>
+        <metadataModelApiVersion>${muleMetadataModelVersion}</metadataModelApiVersion>
 
         <muleHttpConnectorTestVersion>0.8.0-SNAPSHOT</muleHttpConnectorTestVersion>
         <muleSocketsConnectorTestVersion>0.8.0-SNAPSHOT</muleSocketsConnectorTestVersion>
         <muleFileConnectorTestVersion>0.8.0-SNAPSHOT</muleFileConnectorTestVersion>
         <muleJmsConnectorTestVersion>0.8.0-SNAPSHOT</muleJmsConnectorTestVersion>
 
-        <muleHttpServiceTestVersion>1.0.0-BETA-SNAPSHOT</muleHttpServiceTestVersion>
-        <muleSchedulerServiceTestVersion>1.0.0-BETA-SNAPSHOT</muleSchedulerServiceTestVersion>
-
         <muleFileCommonsTestVersion>0.8.0-SNAPSHOT</muleFileCommonsTestVersion>
+
+        <muleHttpServiceTestVersion>1.0.0-SNAPSHOT</muleHttpServiceTestVersion>
+        <muleSchedulerServiceTestVersion>1.0.0-SNAPSHOT</muleSchedulerServiceTestVersion>
 
         <!-- Test Extensions -->
         <muleMetadataExtensionTestVersion>4.0.0-BETA-SNAPSHOT</muleMetadataExtensionTestVersion>
@@ -1233,7 +1232,7 @@
             <dependency>
                 <groupId>org.mule.runtime</groupId>
                 <artifactId>mule-extensions-soap-api</artifactId>
-                <version>${muleExtensionsSoapApiVersion}</version>
+                <version>${muleExtensionsApiVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.mule.runtime</groupId>
@@ -1836,18 +1835,18 @@
                     <version>${mule.module.maven.plugin.version}</version>
                     <extensions>true</extensions>
                 </plugin>
-                <plugin>
-                    <groupId>org.mule.runtime.plugins</groupId>
-                    <artifactId>mule-app-plugins-maven-plugin</artifactId>
-                    <version>${mule.app.plugins.maven.plugin.version}</version>
-                    <extensions>true</extensions>
-                </plugin>
-                <plugin>
-                    <groupId>org.mule.runtime.plugins</groupId>
-                    <artifactId>mule-extensions-maven-plugin</artifactId>
-                    <version>${mule.extensions.maven.plugin.version}</version>
-                    <extensions>true</extensions>
-                </plugin>
+                <!--<plugin>-->
+                    <!--<groupId>org.mule.runtime.plugins</groupId>-->
+                    <!--<artifactId>mule-app-plugins-maven-plugin</artifactId>-->
+                    <!--<version>${mule.app.plugins.maven.plugin.version}</version>-->
+                    <!--<extensions>true</extensions>-->
+                <!--</plugin>-->
+                <!--<plugin>-->
+                    <!--<groupId>org.mule.runtime.plugins</groupId>-->
+                    <!--<artifactId>mule-extensions-maven-plugin</artifactId>-->
+                    <!--<version>${mule.extensions.maven.plugin.version}</version>-->
+                    <!--<extensions>true</extensions>-->
+                <!--</plugin>-->
             </plugins>
         </pluginManagement>
 
