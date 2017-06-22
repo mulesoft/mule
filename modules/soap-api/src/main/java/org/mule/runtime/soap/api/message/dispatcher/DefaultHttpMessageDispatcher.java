@@ -7,13 +7,17 @@
 package org.mule.runtime.soap.api.message.dispatcher;
 
 
-import org.apache.log4j.Logger;
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toMap;
+import static org.mule.runtime.http.api.HttpConstants.Method.POST;
+import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.extension.api.soap.message.DispatchingRequest;
 import org.mule.runtime.extension.api.soap.message.DispatchingResponse;
 import org.mule.runtime.extension.api.soap.message.MessageDispatcher;
 import org.mule.runtime.http.api.client.HttpClient;
-import org.mule.runtime.http.api.domain.ParameterMap;
+import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.http.api.domain.entity.InputStreamHttpEntity;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
@@ -23,12 +27,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
-
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toMap;
-import static org.mule.runtime.http.api.HttpConstants.Method.POST;
-import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
 
 
 /**
@@ -52,7 +50,7 @@ public final class DefaultHttpMessageDispatcher implements MessageDispatcher {
    */
   @Override
   public DispatchingResponse dispatch(DispatchingRequest context) {
-    ParameterMap parameters = new ParameterMap();
+    MultiMap<String, String> parameters = new MultiMap<>();
     context.getHeaders().forEach(parameters::put);
 
     // It's important that content type is bundled with the headers

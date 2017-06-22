@@ -9,22 +9,25 @@ package org.mule.runtime.http.api.domain;
 
 import static java.util.stream.Collectors.toCollection;
 import org.mule.runtime.api.util.CaseInsensitiveMapWrapper;
+import org.mule.runtime.api.util.MultiMap;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 
 /**
- * {@link ParameterMap} where the key's case is not taken into account when looking for it, adding or aggregating it.
+ * {@link MultiMap} where the key's case is not taken into account when looking for it, adding or aggregating it.
  *
  * @since 4.0
  */
-public class CaseInsensitiveParameterMap extends ParameterMap {
+public class CaseInsensitiveMultiMap extends MultiMap<String, String> {
 
-  public CaseInsensitiveParameterMap() {
-    this(new ParameterMap());
+  private static final long serialVersionUID = -7231875232585176671L;
+
+  public CaseInsensitiveMultiMap() {
+    this(new MultiMap<>());
   }
 
-  public CaseInsensitiveParameterMap(ParameterMap paramsMap) {
+  public CaseInsensitiveMultiMap(MultiMap<String, String> paramsMap) {
     this.paramsMap = new CaseInsensitiveMapWrapper<>(new LinkedHashMap());
     for (String key : paramsMap.keySet()) {
       this.paramsMap.put(key, paramsMap.getAll(key).stream().collect(toCollection(LinkedList::new)));

@@ -10,7 +10,7 @@ import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import static org.mule.runtime.http.api.HttpConstants.Method.GET;
 
 import org.mule.runtime.http.api.HttpConstants.Method;
-import org.mule.runtime.http.api.domain.ParameterMap;
+import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.http.api.domain.message.HttpMessageBuilder;
 
 /**
@@ -25,7 +25,7 @@ public final class HttpRequestBuilder extends HttpMessageBuilder<HttpRequestBuil
   private String path;
   private String uri;
   private String method = GET.name();
-  private ParameterMap queryParams = new ParameterMap();
+  private MultiMap<String, String> queryParams = new MultiMap<>();
 
   HttpRequestBuilder() {}
 
@@ -63,10 +63,10 @@ public final class HttpRequestBuilder extends HttpMessageBuilder<HttpRequestBuil
   }
 
   /**
-   * @param headersMap a {@link ParameterMap} representing the HTTP headers of the {@link HttpRequest} desired. Non null.
+   * @param headersMap a {@link MultiMap} representing the HTTP headers of the {@link HttpRequest} desired. Non null.
    * @return this builder
    */
-  public HttpRequestBuilder setHeaders(ParameterMap headersMap) {
+  public HttpRequestBuilder setHeaders(MultiMap<String, String> headersMap) {
     headersMap.keySet().forEach(
                                 key -> headersMap.getAll(key).forEach(
                                                                       value -> this.headers.put(key, value)));
@@ -74,10 +74,10 @@ public final class HttpRequestBuilder extends HttpMessageBuilder<HttpRequestBuil
   }
 
   /**
-   * @param queryParams a {@link ParameterMap} representing the HTTP query params of the {@link HttpRequest} desired. Non null.
+   * @param queryParams a {@link MultiMap} representing the HTTP query params of the {@link HttpRequest} desired. Non null.
    * @return this builder
    */
-  public HttpRequestBuilder setQueryParams(ParameterMap queryParams) {
+  public HttpRequestBuilder setQueryParams(MultiMap<String, String> queryParams) {
     this.queryParams = queryParams;
     return this;
   }
@@ -88,7 +88,7 @@ public final class HttpRequestBuilder extends HttpMessageBuilder<HttpRequestBuil
   @Override
   public HttpRequest build() {
     checkNotNull(uri, "URI must be specified to create an HTTP request");
-    return new DefaultHttpRequest(uri, path, method, headers.toImmutableParameterMap(), queryParams.toImmutableParameterMap(),
+    return new DefaultHttpRequest(uri, path, method, headers.toImmutableMultiMap(), queryParams.toImmutableMultiMap(),
                                   entity);
 
   }

@@ -43,7 +43,7 @@ public final class HttpResponseBuilder extends HttpMessageBuilder<HttpResponseBu
    */
   @Override
   public HttpResponse build() {
-    return new DefaultHttpResponse(responseStatus, headers.toImmutableParameterMap(), entity);
+    return new DefaultHttpResponse(responseStatus, headers.toImmutableMultiMap(), entity);
   }
 
 }
