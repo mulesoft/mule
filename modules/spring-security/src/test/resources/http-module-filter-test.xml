@@ -34,13 +34,13 @@
     <flow name="authenticate">
         <http:listener config-ref="listenerConfig" path="authenticate"/>
         <http:basic-security-filter realm="mule-realm"/>
-        <component class="org.mule.runtime.core.component.simple.EchoComponent"/>
+        <logger/>
     </flow>
 
     <flow name="authorize">
         <http:listener config-ref="listenerConfig" path="authorize"/>
         <http:basic-security-filter realm="mule-realm"/>
         <mule-ss:authorization-filter requiredAuthorities="ROLE_ADMIN"/>
-        <component class="org.mule.runtime.core.component.simple.EchoComponent"/>
+        <logger/>
     </flow>
 </mule>

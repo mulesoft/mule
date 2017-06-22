@@ -14,6 +14,6 @@
             </scheduling-strategy>
         </scheduler>
         <set-payload value="${pluginDefinedProperty}"/>
-        <echo-component/>
+        <logger/>
     </flow>
 </mule>

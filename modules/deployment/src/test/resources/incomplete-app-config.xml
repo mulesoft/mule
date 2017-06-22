@@ -8,6 +8,6 @@
     <flow name="main">
         <http:listener path="*" config-ref="listenerConfig"/>
 
-        <echo-component/>
+        <logger/>
     </flow>
 </mule>
