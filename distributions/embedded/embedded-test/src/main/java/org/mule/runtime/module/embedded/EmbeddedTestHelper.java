@@ -8,8 +8,10 @@ package org.mule.runtime.module.embedded;
 
 import static java.lang.Thread.currentThread;
 import static org.apache.commons.io.FileUtils.toFile;
-import static org.mule.maven.client.test.MavenTestHelper.createDefaultMavenConfiguration;
+import static org.mule.maven.client.test.MavenTestHelper.createDefaultCommunityMavenConfiguration;
+import static org.mule.maven.client.test.MavenTestHelper.createDefaultEnterpriseMavenConfiguration;
 import static org.mule.runtime.module.embedded.api.EmbeddedContainer.builder;
+import org.mule.maven.client.api.model.MavenConfiguration;
 import org.mule.runtime.module.embedded.api.ContainerConfiguration;
 import org.mule.runtime.module.embedded.api.EmbeddedContainer;
 import org.mule.runtime.module.embedded.internal.classloading.FilteringClassLoader;
@@ -32,14 +34,16 @@ import net.lingala.zip4j.model.ZipParameters;
 public class EmbeddedTestHelper {
 
   private final TemporaryFolder temporaryFolder;
+  private final boolean enterprise;
   private File containerFolder;
   private EmbeddedContainer container;
 
-  public EmbeddedTestHelper() {
+  public EmbeddedTestHelper(boolean enterprise) {
     try {
       temporaryFolder = new TemporaryFolder();
       temporaryFolder.create();
       this.containerFolder = temporaryFolder.newFolder();
+      this.enterprise = enterprise;
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -83,10 +87,12 @@ public class EmbeddedTestHelper {
     test(() -> {
       EmbeddedContainer.EmbeddedContainerBuilder embeddedContainerBuilder;
       try {
+        MavenConfiguration mavenConfiguration =
+            enterprise ? createDefaultEnterpriseMavenConfiguration() : createDefaultCommunityMavenConfiguration();
         embeddedContainerBuilder = builder()
             .withMuleVersion(System.getProperty("mule.version"))
             .withContainerConfiguration(ContainerConfiguration.builder().withContainerFolder(containerFolder).build())
-            .withMavenConfiguration(createDefaultMavenConfiguration());
+            .withMavenConfiguration(mavenConfiguration);
         embeddedContainerConfigurer.accept(embeddedContainerBuilder);
       } catch (Exception e) {
         throw new RuntimeException(e);
