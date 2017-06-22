@@ -78,7 +78,7 @@ public class ExtensionModelDiscoverer {
           }
           discoverExtensionThroughManifest(extensions, artifactClassloader, manifest);
         } else {
-          LOGGER.warn("Extension [" + artifactName + "] could not being discovered");
+          LOGGER.warn("Extension [" + artifactName + "] could not be discovered");
         }
       }
     });
