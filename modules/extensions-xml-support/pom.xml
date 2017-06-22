@@ -16,6 +16,9 @@
     </description>
 
     <properties>
+        <activemq.version>5.14.5</activemq.version>
+        <javaxJmsApiVersion>2.0.1</javaxJmsApiVersion>
+
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 
@@ -148,6 +151,35 @@
             <classifier>mule-plugin</classifier>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>javax.jms</groupId>
+            <artifactId>javax.jms-api</artifactId>
+            <version>${javaxJmsApiVersion}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- ActiveMQ Dependencies-->
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-client</artifactId>
+            <version>${activemq.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Used for in memory broker -->
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-broker</artifactId>
+            <version>${activemq.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Used by ActiveMQ if persistent=true -->
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-kahadb-store</artifactId>
+            <version>${activemq.version}</version>
+            <scope>test</scope>
+        </dependency>
+
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-servlet_3.0_spec</artifactId>

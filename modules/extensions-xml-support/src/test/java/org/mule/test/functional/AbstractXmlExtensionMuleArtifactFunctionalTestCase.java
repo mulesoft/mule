@@ -17,6 +17,7 @@ import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
+import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -31,6 +32,8 @@ import java.util.Set;
  *
  * @since 4.0
  */
+@ArtifactClassLoaderRunnerConfig(sharedRuntimeLibs = {"org.apache.activemq:activemq-client",
+    "org.apache.activemq:activemq-broker", "org.apache.activemq:activemq-kahadb-store", "javax.jms:javax.jms-api"})
 public abstract class AbstractXmlExtensionMuleArtifactFunctionalTestCase extends MuleArtifactFunctionalTestCase {
 
   /**
