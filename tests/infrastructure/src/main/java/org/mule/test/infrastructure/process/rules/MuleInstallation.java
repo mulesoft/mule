@@ -8,7 +8,6 @@ package org.mule.test.infrastructure.process.rules;
 
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.System.getProperty;
-import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.apache.commons.io.FileUtils.moveDirectory;
 import static org.apache.commons.lang.StringUtils.isEmpty;
@@ -95,9 +94,9 @@ public class MuleInstallation extends ExternalResource {
         logger.info("Deleting Mule Installation");
         File logs = new File(muleHome, "logs");
         moveDirectory(logs, dest);
-        deleteDirectory(muleHome);
+        deleteQuietly(muleHome);
       } catch (IOException e) {
-        throw new RuntimeException("Couldn't delete directory [" + muleHome + "], delete it manually.", e);
+        logger.warn("Couldn't delete directory [" + muleHome + "], delete it manually. Root exception: " + e.getMessage());
       }
     }
   }
