@@ -11,7 +11,6 @@ import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
@@ -22,7 +21,6 @@ import static org.mule.runtime.module.extension.internal.manager.DefaultConfigur
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplicitConfigurationProviderName;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
@@ -37,8 +35,6 @@ import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.time.Time;
 import org.mule.runtime.core.api.util.StringUtils;
-import org.mule.runtime.extension.api.manifest.ExtensionManifest;
-import org.mule.runtime.extension.api.persistence.manifest.ExtensionManifestXmlSerializer;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.api.util.ExtensionModelUtils;
@@ -46,16 +42,12 @@ import org.mule.runtime.module.extension.internal.config.ExtensionConfig;
 import org.mule.runtime.module.extension.internal.runtime.config.DefaultImplicitConfigurationProviderFactory;
 import org.mule.runtime.module.extension.internal.runtime.config.ImplicitConfigurationProviderFactory;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -252,19 +244,6 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
     Time freq = getConfigurationExpirationFrequency();
     return newBuilder(extensionRegistry, muleContext).runEvery(freq.getTime(), freq.getUnit())
         .onExpired((key, object) -> disposeConfiguration(key, object)).build();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public ExtensionManifest parseExtensionManifestXml(URL manifestUrl) {
-    try (InputStream manifestStream = manifestUrl.openStream()) {
-      return new ExtensionManifestXmlSerializer().deserialize(IOUtils.toString(manifestStream));
-    } catch (IOException e) {
-      throw new MuleRuntimeException(createStaticMessage("Could not read extension manifest on plugin " + manifestUrl.toString()),
-                                     e);
-    }
   }
 
   private void disposeConfiguration(String key, ConfigurationInstance configuration) {
