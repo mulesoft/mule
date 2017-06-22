@@ -88,7 +88,7 @@ public final class HttpRequestBuilder extends HttpMessageBuilder<HttpRequestBuil
   @Override
   public HttpRequest build() {
     checkNotNull(uri, "URI must be specified to create an HTTP request");
-    return new DefaultHttpRequest(uri, path, method, headers.toImmutableParameterMap(), queryParams.toImmutableParameterMap(),
+    return new DefaultHttpRequest(uri, path, method, headers.toImmutableMultiMap(), queryParams.toImmutableMultiMap(),
                                   entity);
 
   }

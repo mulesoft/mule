@@ -13,11 +13,10 @@ import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_SERVICE;
 import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.MULTI_MAP;
-
 import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.api.util.MultiMapTestCase;
 
 import org.junit.Test;
-
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
@@ -36,17 +35,17 @@ public class CaseInsensitiveMultiMapTestCase extends MultiMapTestCase {
     sensitiveMultiMap.put(KEY_1, VALUE_1);
     sensitiveMultiMap.put(KEY_2, VALUE_1);
     sensitiveMultiMap.put(KEY_2, VALUE_2);
-    CaseInsensitiveMultiMap insensitiveParameterMap = new CaseInsensitiveMultiMap(sensitiveMultiMap);
+    CaseInsensitiveMultiMap insensitiveMultiMap = new CaseInsensitiveMultiMap(sensitiveMultiMap);
 
-    assertThat(insensitiveParameterMap.get(KEY_1), is(VALUE_1));
-    assertThat(insensitiveParameterMap.get(KEY_1.toLowerCase()), is(VALUE_1));
-    assertThat(insensitiveParameterMap.get(KEY_2), is(VALUE_2));
-    assertThat(insensitiveParameterMap.get(KEY_2.toLowerCase()), is(VALUE_2));
+    assertThat(insensitiveMultiMap.get(KEY_1), is(VALUE_1));
+    assertThat(insensitiveMultiMap.get(KEY_1.toLowerCase()), is(VALUE_1));
+    assertThat(insensitiveMultiMap.get(KEY_2), is(VALUE_2));
+    assertThat(insensitiveMultiMap.get(KEY_2.toLowerCase()), is(VALUE_2));
 
-    assertThat(insensitiveParameterMap.getAll(KEY_1), is(asList(VALUE_1)));
-    assertThat(insensitiveParameterMap.getAll(KEY_1.toLowerCase()), is(asList(VALUE_1)));
-    assertThat(insensitiveParameterMap.getAll(KEY_2), is(asList(VALUE_1, VALUE_2)));
-    assertThat(insensitiveParameterMap.getAll(KEY_2.toLowerCase()), is(asList(VALUE_1, VALUE_2)));
+    assertThat(insensitiveMultiMap.getAll(KEY_1), is(asList(VALUE_1)));
+    assertThat(insensitiveMultiMap.getAll(KEY_1.toLowerCase()), is(asList(VALUE_1)));
+    assertThat(insensitiveMultiMap.getAll(KEY_2), is(asList(VALUE_1, VALUE_2)));
+    assertThat(insensitiveMultiMap.getAll(KEY_2.toLowerCase()), is(asList(VALUE_1, VALUE_2)));
   }
 
   @Test
