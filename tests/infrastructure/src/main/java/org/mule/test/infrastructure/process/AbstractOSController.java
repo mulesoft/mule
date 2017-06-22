@@ -11,6 +11,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.StringJoiner;
 import java.util.regex.Pattern;
 
 import org.apache.commons.exec.CommandLine;
@@ -18,7 +19,6 @@ import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.commons.exec.PumpStreamHandler;
-import org.apache.commons.exec.util.StringUtils;
 import org.slf4j.Logger;
 
 public abstract class AbstractOSController {
@@ -87,7 +87,12 @@ public abstract class AbstractOSController {
 
   protected int doExecution(DefaultExecutor executor, CommandLine commandLine, Map<Object, Object> env) {
     try {
-      logger.info("Executing: " + StringUtils.toString(commandLine.toStrings(), " "));
+      final StringJoiner paramsJoiner = new StringJoiner(" ");
+      for (String cmdArg : commandLine.toStrings()) {
+        paramsJoiner.add(cmdArg.replaceAll("(?<=\\.password=)(.*)", "****"));
+      }
+
+      logger.info("Executing: " + paramsJoiner.toString());
       return executor.execute(commandLine, env);
     } catch (ExecuteException e) {
       return e.getExitValue();
