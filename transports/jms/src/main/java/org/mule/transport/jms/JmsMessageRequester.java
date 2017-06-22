@@ -94,6 +94,7 @@ public class JmsMessageRequester extends AbstractMessageRequester
                             txId.equals(tx.getId())) {
                             connector.closeQuietly(finalSession);
                         }
+                        getEndpoint().getMuleContext().unregisterListener(this);
                     }
                 }, tx.getId());
 
