@@ -11882,7 +11882,7 @@
                       "isAbstract": false,
                       "isFinal": false,
                       "implementedInterfaces": [],
-                      "parent": "org.mule.runtime.core.message.BaseAttributes",
+                      "parent": "org.mule.runtime.core.api.message.BaseAttributes",
                       "genericTypes": []
                     },
                     "typeAlias": {

@@ -7917,7 +7917,7 @@
           "implementedInterfaces": [
             "org.mule.test.metadata.extension.model.attribute.AbstractOutputAttributes"
           ],
-          "parent": "org.mule.runtime.core.message.BaseAttributes",
+          "parent": "org.mule.runtime.core.api.message.BaseAttributes",
           "genericTypes": []
         },
         "xmlHints": {
@@ -7971,7 +7971,7 @@
           "implementedInterfaces": [
             "org.mule.test.metadata.extension.model.attribute.AbstractOutputAttributes"
           ],
-          "parent": "org.mule.runtime.core.message.BaseAttributes",
+          "parent": "org.mule.runtime.core.api.message.BaseAttributes",
           "genericTypes": []
         },
         "xmlHints": {
