@@ -69,8 +69,7 @@ public class WorkQueueProcessingStrategyFactory extends AbstractProcessingStrate
     @Override
     public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
       if (processor.getProcessingType() == CPU_LITE_ASYNC) {
-        return publisher -> from(publisher)
-            .flatMap(event -> just(event).transform(processor).publishOn(fromExecutorService(decorateScheduler(ioScheduler))));
+        return publisher -> from(publisher).transform(processor).publishOn(fromExecutorService(decorateScheduler(ioScheduler)));
       } else {
         return super.onProcessor(processor);
       }

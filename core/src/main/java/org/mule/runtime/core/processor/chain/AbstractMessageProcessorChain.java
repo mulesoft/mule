@@ -143,7 +143,12 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
         .transform(next)
         .onErrorMap(MessagingException.class, updateMessagingException(processor)));
 
-    // #2 Apply processing strategy. This is done here to ensure notifications and interceptors do not execute on async processor
+    // #2 Update ThreadLocal event before processor execution once on processor thread.
+    interceptors.add((processor, next) -> stream -> from(stream)
+        .doOnNext(event -> setCurrentEvent(event))
+        .transform(next));
+
+    // #3 Apply processing strategy. This is done here to ensure notifications and interceptors do not execute on async processor
     // threads which may be limited to avoid deadlocks.
     // Use anonymous ReactiveProcessor to apply processing strategy to processor + previous interceptors
     // while using the processing type of the processor itself.
@@ -163,20 +168,19 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
           }));
     }
 
-    // #3 Fire MessageProcessor notifications before and after processor execution.
+    // #4 Update ThreadLocal event after processor execution once back on flow thread.
+    interceptors.add((processor, next) -> stream -> from(stream)
+        .transform(next)
+        .doOnNext(result -> setCurrentEvent(result)));
+
+    // #5 Fire MessageProcessor notifications before and after processor execution.
     interceptors.add((processor, next) -> stream -> from(stream)
         .doOnNext(preNotification(processor))
         .transform(next)
         .doOnNext(postNotification(processor))
         .doOnError(MessagingException.class, errorNotification(processor)));
 
-    // #4 Update ThreadLocal event before and after processor execution.
-    interceptors.add((processor, next) -> stream -> from(stream)
-        .doOnNext(event -> setCurrentEvent(event))
-        .transform(next)
-        .doOnNext(result -> setCurrentEvent(result)));
-
-    // #5 If the processor returns a CursorProvider, then have the StreamingManager manage it
+    // #6 If the processor returns a CursorProvider, then have the StreamingManager manage it
     interceptors.add((processor, next) -> stream -> from(stream)
         .transform(next)
         .map(result -> {
@@ -192,7 +196,7 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
           return result;
         }));
 
-    // #6 Apply processor interceptors.
+    // #7 Apply processor interceptors.
     muleContext.getProcessorInterceptorManager().getInterceptorFactories().stream()
         .forEach(interceptorFactory -> {
           ReactiveInterceptorAdapter reactiveInterceptorAdapter = new ReactiveInterceptorAdapter(interceptorFactory);
@@ -201,7 +205,7 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
         });
 
 
-    // #7 Handle errors that occur during Processor execution. This is done outside to any scheduling to ensure errors in
+    // #8 Handle errors that occur during Processor execution. This is done outside to any scheduling to ensure errors in
     // scheduling such as RejectedExecutionException's can be handled cleanly
     interceptors.add((processor, next) -> stream -> from(stream).concatMap(event -> just(event)
         .transform(next)
