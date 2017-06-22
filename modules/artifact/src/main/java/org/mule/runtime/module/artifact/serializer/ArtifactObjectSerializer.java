@@ -10,10 +10,11 @@ package org.mule.runtime.module.artifact.serializer;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.serialization.ObjectSerializer;
-import org.mule.runtime.core.api.serialization.SerializationProtocol;
+import org.mule.runtime.api.serialization.ObjectSerializer;
+import org.mule.runtime.api.serialization.SerializationProtocol;
 import org.mule.runtime.core.internal.serialization.JavaExternalSerializerProtocol;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
+import org.mule.runtime.module.artifact.serializer.protocol.CustomJavaSerializationProtocol;
 
 public class ArtifactObjectSerializer implements ObjectSerializer, MuleContextAware {
 

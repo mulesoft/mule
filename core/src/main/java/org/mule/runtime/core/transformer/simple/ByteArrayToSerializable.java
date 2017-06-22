@@ -8,7 +8,7 @@ package org.mule.runtime.core.transformer.simple;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
-import org.mule.runtime.core.api.serialization.SerializationProtocol;
+import org.mule.runtime.api.serialization.SerializationProtocol;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;

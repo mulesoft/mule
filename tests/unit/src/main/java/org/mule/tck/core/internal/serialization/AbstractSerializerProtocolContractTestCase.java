@@ -16,7 +16,7 @@ import static org.mockito.Mockito.verify;
 import static org.mule.runtime.api.message.Message.of;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.internal.message.InternalMessage;
-import org.mule.runtime.core.api.serialization.SerializationProtocol;
+import org.mule.runtime.api.serialization.SerializationProtocol;
 import org.mule.runtime.core.el.datetime.DateTime;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 

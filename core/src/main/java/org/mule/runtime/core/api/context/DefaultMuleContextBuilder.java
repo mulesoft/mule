@@ -29,8 +29,8 @@ import org.mule.runtime.core.api.context.notification.SecurityNotificationListen
 import org.mule.runtime.core.api.context.notification.TransactionNotificationListener;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
-import org.mule.runtime.core.api.serialization.JavaObjectSerializer;
-import org.mule.runtime.core.api.serialization.ObjectSerializer;
+import org.mule.runtime.core.internal.serialization.JavaObjectSerializer;
+import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.config.bootstrap.BootstrapServiceDiscoverer;

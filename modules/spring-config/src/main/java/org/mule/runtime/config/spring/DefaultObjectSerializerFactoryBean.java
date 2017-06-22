@@ -7,8 +7,8 @@
 package org.mule.runtime.config.spring;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.serialization.DefaultObjectSerializer;
-import org.mule.runtime.core.api.serialization.ObjectSerializer;
+import org.mule.runtime.api.serialization.DefaultObjectSerializer;
+import org.mule.runtime.api.serialization.ObjectSerializer;
 
 import javax.inject.Inject;
 

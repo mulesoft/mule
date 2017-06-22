@@ -31,7 +31,7 @@ import org.mule.runtime.core.api.registry.Registry;
 import org.mule.runtime.core.api.scheduler.SchedulerConfig;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.security.SecurityManager;
-import org.mule.runtime.core.api.serialization.ObjectSerializer;
+import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.transformer.DataTypeConversionResolver;
@@ -181,9 +181,9 @@ public interface MuleContext extends Lifecycle {
   ExtensionManager getExtensionManager();
 
   /**
-   * The instance of {@link org.mule.runtime.core.api.serialization.ObjectSerializer} to be used to serialize/deserealize objects
+   * The instance of {@link ObjectSerializer} to be used to serialize/deserealize objects
    *
-   * @return a {@link org.mule.runtime.core.api.serialization.ObjectSerializer}
+   * @return a {@link ObjectSerializer}
    * @since 3.7.0
    */
   ObjectSerializer getObjectSerializer();

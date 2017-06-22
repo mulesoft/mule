@@ -21,7 +21,7 @@ import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.api.serialization.ObjectSerializer;
+import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.classloader.net.MuleArtifactUrlStreamHandler;

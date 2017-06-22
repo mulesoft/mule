@@ -9,8 +9,8 @@ package org.mule.runtime.core.api.context;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
-import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
+import org.mule.runtime.api.serialization.ObjectSerializer;
 
 /**
  * Builder that is used to build instances of {@link MuleContext}. Implementing classes are stateful and should provide public

@@ -89,7 +89,7 @@ import org.mule.runtime.core.api.registry.Registry;
 import org.mule.runtime.core.api.scheduler.SchedulerConfig;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.security.SecurityManager;
-import org.mule.runtime.core.api.serialization.ObjectSerializer;
+import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.api.transformer.DataTypeConversionResolver;

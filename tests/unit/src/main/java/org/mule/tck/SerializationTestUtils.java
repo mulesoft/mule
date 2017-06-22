@@ -11,10 +11,10 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.serialization.ObjectSerializer;
+import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
-import org.mule.runtime.core.api.serialization.JavaObjectSerializer;
+import org.mule.runtime.core.internal.serialization.JavaObjectSerializer;
 
 public abstract class SerializationTestUtils {
 
