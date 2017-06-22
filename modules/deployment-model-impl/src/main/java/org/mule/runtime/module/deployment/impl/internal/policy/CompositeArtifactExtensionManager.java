@@ -14,11 +14,9 @@ import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.extension.api.manifest.ExtensionManifest;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 
-import java.net.URL;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -122,11 +120,6 @@ public class CompositeArtifactExtensionManager implements ExtensionManager {
   @Override
   public void registerConfigurationProvider(ConfigurationProvider configurationProvider) {
     throw new UnsupportedOperationException("Composite extension manager cannot register extension providers");
-  }
-
-  @Override
-  public ExtensionManifest parseExtensionManifestXml(URL manifestUrl) {
-    throw new UnsupportedOperationException("Composite extension manager cannot parse extension manifests");
   }
 
   public ExtensionManager getParentExtensionManager() {
