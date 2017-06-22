@@ -8,12 +8,16 @@ package org.mule.runtime.core.context.notification;
 
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.routing.filters.WildcardFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This does the work necessary to deliver events to a particular listener. It is generated for a particular {@link Configuration}
  * and stored in a {@link org.mule.runtime.core.context.notification.Policy}.
  */
 class Sender {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(Sender.class);
 
   private ListenerSubscriptionPair pair;
   private WildcardFilter subscriptionFilter;
@@ -29,8 +33,12 @@ class Sender {
         || (null != notification.getResourceIdentifier() && subscriptionFilter.accept(notification.getResourceIdentifier()))) {
       try {
         notifier.notify(pair.getListener(), notification);
-      } catch (Exception e) {
+      } catch (RuntimeException e) {
         // Exceptions from listeners do not affect the notification processing
+		LOGGER.error("Ignore " + e.getClass() + " " + e + " on " + notifier);
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("ExceptionDetails on " + notifier, e);
+		}
       }
     }
   }
