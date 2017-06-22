@@ -12,7 +12,7 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
+import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 
 import java.util.List;
 import java.util.function.Consumer;

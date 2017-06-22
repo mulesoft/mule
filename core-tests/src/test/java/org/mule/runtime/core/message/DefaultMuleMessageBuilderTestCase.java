@@ -27,6 +27,7 @@ import static org.mule.runtime.api.metadata.MediaType.XML;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.api.message.BaseAttributes;
 import org.mule.runtime.core.internal.message.DefaultMessageBuilder;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.internal.metadata.DefaultCollectionDataType;

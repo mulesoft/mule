@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.routing;
 
-import org.mule.runtime.core.management.stats.RouterStatistics;
+import org.mule.runtime.core.api.management.stats.RouterStatistics;
 
 public interface RouterStatisticsRecorder {
 

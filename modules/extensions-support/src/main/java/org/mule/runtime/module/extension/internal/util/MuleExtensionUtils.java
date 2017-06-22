@@ -21,7 +21,7 @@ import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_JOI
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_NONE;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_NOT_SUPPORTED;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.core.config.MuleManifest.getProductVersion;
+import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.core.api.util.UUID.getUUID;
 import static org.mule.runtime.core.api.util.collection.Collectors.toImmutableList;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
@@ -54,7 +54,7 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.internal.metadata.NullMetadataResolverFactory;
-import org.mule.runtime.core.management.stats.FlowConstructStatistics;
+import org.mule.runtime.core.internal.management.stats.DefaultFlowConstructStatistics;
 import org.mule.runtime.extension.api.annotation.param.ConfigName;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthModelProperty;
 import org.mule.runtime.extension.api.exception.IllegalConfigurationModelDefinitionException;
@@ -274,7 +274,7 @@ public class MuleExtensionUtils {
       }
 
       @Override
-      public FlowConstructStatistics getStatistics() {
+      public DefaultFlowConstructStatistics getStatistics() {
         return null;
       }
     };

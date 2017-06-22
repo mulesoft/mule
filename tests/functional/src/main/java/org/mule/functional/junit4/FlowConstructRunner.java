@@ -16,8 +16,8 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.message.DefaultMultiPartPayload;
-import org.mule.runtime.core.message.GroupCorrelation;
+import org.mule.runtime.core.api.message.DefaultMultiPartPayload;
+import org.mule.runtime.core.api.message.GroupCorrelation;
 
 import java.io.Serializable;
 import java.util.Map;

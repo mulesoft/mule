@@ -12,12 +12,12 @@ import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.exception.NotAnInputStreamException;
-import org.mule.runtime.core.message.PartAttributes;
-import org.mule.runtime.core.message.ds.ByteArrayDataSource;
-import org.mule.runtime.core.message.ds.InputStreamDataSource;
-import org.mule.runtime.core.message.ds.StringDataSource;
+import org.mule.runtime.core.api.message.PartAttributes;
+import org.mule.runtime.core.api.message.ds.ByteArrayDataSource;
+import org.mule.runtime.core.api.message.ds.InputStreamDataSource;
+import org.mule.runtime.core.api.message.ds.StringDataSource;
 import org.mule.runtime.core.api.util.func.CheckedConsumer;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
 

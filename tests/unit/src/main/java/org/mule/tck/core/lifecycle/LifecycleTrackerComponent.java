@@ -12,7 +12,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.component.Component;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
-import org.mule.runtime.core.management.stats.ComponentStatistics;
+import org.mule.runtime.core.api.management.stats.ComponentStatistics;
 
 /**
  * @author David Dossot (david@dossot.net)

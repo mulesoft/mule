@@ -40,7 +40,7 @@ import org.mule.runtime.core.api.TransformationService;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
-import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalMessage;

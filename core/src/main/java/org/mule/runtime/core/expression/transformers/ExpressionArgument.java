@@ -14,7 +14,7 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.expression.ExpressionConfig;
 
 /**

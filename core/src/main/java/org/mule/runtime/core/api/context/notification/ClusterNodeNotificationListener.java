@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.api.context.notification;
 
-import org.mule.runtime.core.context.notification.ClusterNodeNotification;
-
 /**
  * Defines a listener for {@link ClusterNodeNotification}
  *

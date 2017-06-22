@@ -15,8 +15,8 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.routing.RoutingException;
-import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.session.DefaultMuleSession;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.session.DefaultMuleSession;
 
 import java.io.NotSerializableException;
 

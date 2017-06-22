@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.api.context.notification;
 
-import org.mule.runtime.core.context.notification.ConnectorMessageNotification;
-
 /**
  * Observer interface to receive notifications about messages being sent and received from connectors
  */

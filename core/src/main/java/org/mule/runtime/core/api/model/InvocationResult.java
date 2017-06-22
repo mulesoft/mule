@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.model;
 
-import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
 
 import java.lang.reflect.Method;
 

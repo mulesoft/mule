@@ -13,8 +13,8 @@ import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
-import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.execution.TransactionalExecutionTemplate;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.execution.TransactionalExecutionTemplate;
 
 /**
  * Wraps the invocation of the next {@link Processor} with a transaction. If the {@link TransactionConfig} is null then no

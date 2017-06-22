@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.api.context.notification;
 
-import org.mule.runtime.core.context.notification.SecurityNotification;
-
 
 /**
  * <code>MuleContextNotificationListener</code> is an observer interface that objects can implement to receive notifications about

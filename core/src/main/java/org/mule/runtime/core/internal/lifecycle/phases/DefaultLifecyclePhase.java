@@ -9,8 +9,8 @@ package org.mule.runtime.core.internal.lifecycle.phases;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.api.lifecycle.LifecyclePhase;
 import org.mule.runtime.core.api.lifecycle.LifecycleStateEnabled;
-import org.mule.runtime.core.config.ExceptionHelper;
-import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.internal.config.ExceptionHelper;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.lifecycle.LifecycleObject;
 
 import java.lang.reflect.Method;

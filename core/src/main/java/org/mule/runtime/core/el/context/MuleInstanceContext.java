@@ -7,7 +7,7 @@
 package org.mule.runtime.core.el.context;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.config.MuleManifest;
+import org.mule.runtime.core.api.config.MuleManifest;
 
 /**
  * Expose information about the Mule instance:

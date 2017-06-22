@@ -26,8 +26,8 @@ import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.model.MinimalApplicationModelGenerator;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
-import org.mule.runtime.core.config.ConfigResource;
-import org.mule.runtime.core.config.bootstrap.ArtifactType;
+import org.mule.runtime.core.api.config.ConfigResource;
+import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 
 import java.util.List;
 import java.util.Map;

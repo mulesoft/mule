@@ -20,7 +20,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
-import org.mule.runtime.core.config.StartupContext;
+import org.mule.runtime.core.internal.config.StartupContext;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.domain.Domain;

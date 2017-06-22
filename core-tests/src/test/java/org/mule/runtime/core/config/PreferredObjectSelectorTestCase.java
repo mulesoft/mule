@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.config;
 
+import org.mule.runtime.core.internal.config.preferred.Preferred;
+import org.mule.runtime.core.internal.config.preferred.PreferredObjectSelector;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

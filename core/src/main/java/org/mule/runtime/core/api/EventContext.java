@@ -8,8 +8,8 @@ package org.mule.runtime.core.api;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
-import org.mule.runtime.core.config.DefaultMuleConfiguration;
-import org.mule.runtime.core.management.stats.ProcessingTime;
+import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
+import org.mule.runtime.core.api.management.stats.ProcessingTime;
 
 import java.time.OffsetTime;
 import java.util.Optional;

@@ -18,7 +18,7 @@ import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.api.routing.TransformingMatchable;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.util.TemplateParser;
 
 import java.util.LinkedList;

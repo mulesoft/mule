@@ -13,7 +13,7 @@ import org.mule.runtime.core.api.context.notification.TransactionNotificationLis
 import org.mule.runtime.core.api.transaction.AbstractSingleResourceTransaction;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.api.tx.TransactionException;
-import org.mule.runtime.core.context.notification.TransactionNotification;
+import org.mule.runtime.core.api.context.notification.TransactionNotification;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.concurrent.CountDownLatch;

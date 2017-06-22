@@ -6,35 +6,32 @@
  */
 package org.mule.runtime.core.processor;
 
-import static org.mule.runtime.core.api.Event.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setFlowConstructIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContext;
-import static org.mule.runtime.core.execution.MessageProcessorExecutionTemplate.createExecutionTemplate;
+import static org.mule.runtime.core.api.execution.MessageProcessorExecutionTemplate.createExecutionTemplate;
 import static reactor.core.publisher.Flux.from;
-
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.FlowConstructAware;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.execution.MessageProcessorExecutionTemplate;
-import org.mule.runtime.core.session.DefaultMuleSession;
+import org.mule.runtime.core.api.execution.MessageProcessorExecutionTemplate;
 
 import org.reactivestreams.Publisher;
 
 public class ResponseMessageProcessorAdapter extends AbstractInterceptingMessageProcessor
     implements Lifecycle, FlowConstructAware {
 
-  protected MessageProcessorExecutionTemplate messageProcessorExecutionTemplate = createExecutionTemplate();
+  private MessageProcessorExecutionTemplate messageProcessorExecutionTemplate = createExecutionTemplate();
 
   protected Processor responseProcessor;
 

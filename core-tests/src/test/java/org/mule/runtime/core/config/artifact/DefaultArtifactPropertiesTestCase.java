@@ -10,6 +10,7 @@ import static java.util.Collections.emptyMap;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
+import org.mule.runtime.core.internal.config.artifact.DefaultArtifactProperties;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import com.google.common.collect.ImmutableMap;

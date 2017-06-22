@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.routing;
 
-import static org.mule.runtime.core.config.i18n.CoreMessages.cannotCopyStreamPayload;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotCopyStreamPayload;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -15,7 +15,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.RoutingException;
-import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.util.StringMessageUtils;
 
 import org.slf4j.Logger;

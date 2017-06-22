@@ -6,7 +6,7 @@
  */
 package org.mule;
 
-import static org.mule.runtime.core.config.i18n.CoreMessages.agentsRunning;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.agentsRunning;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.DefaultMuleException;
 

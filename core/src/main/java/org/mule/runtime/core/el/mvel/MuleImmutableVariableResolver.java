@@ -7,7 +7,7 @@
 package org.mule.runtime.core.el.mvel;
 
 import org.mule.runtime.core.api.el.VariableAssignmentCallback;
-import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.mvel2.ImmutableElementException;
 
 @SuppressWarnings("serial")

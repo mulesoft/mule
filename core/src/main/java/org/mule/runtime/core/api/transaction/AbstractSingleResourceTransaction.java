@@ -11,7 +11,7 @@ import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transaction.xa.AbstractTransaction;
 import org.mule.runtime.core.api.transaction.xa.IllegalTransactionStateException;
-import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
 
 import java.lang.reflect.Field;
 import java.util.Collections;

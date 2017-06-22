@@ -17,9 +17,9 @@ import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.config.DefaultMuleConfiguration;
-import org.mule.runtime.core.message.DefaultEventBuilder;
-import org.mule.runtime.core.message.GroupCorrelation;
+import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
+import org.mule.runtime.core.internal.message.DefaultEventBuilder;
+import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.processor.chain.ModuleOperationMessageProcessorChainBuilder;
 
 import java.io.Serializable;

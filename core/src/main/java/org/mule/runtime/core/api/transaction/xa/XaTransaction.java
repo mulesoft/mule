@@ -9,7 +9,7 @@ package org.mule.runtime.core.api.transaction.xa;
 import org.mule.runtime.api.tx.MuleXaObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.tx.TransactionException;
-import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.core.api.transaction.TransactionRollbackException;

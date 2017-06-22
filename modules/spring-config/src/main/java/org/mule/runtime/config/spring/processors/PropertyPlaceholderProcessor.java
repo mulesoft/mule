@@ -9,7 +9,7 @@ package org.mule.runtime.config.spring.processors;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.PropertyFactory;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
 
 import java.io.IOException;
 import java.util.HashMap;

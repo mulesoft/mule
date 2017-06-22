@@ -17,8 +17,8 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.ExceptionNotificationListener;
 import org.mule.runtime.core.api.exception.RollbackSourceCallback;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
-import org.mule.runtime.core.context.notification.ExceptionNotification;
-import org.mule.runtime.core.context.notification.NotificationException;
+import org.mule.runtime.core.api.context.notification.ExceptionNotification;
+import org.mule.runtime.core.api.context.notification.NotificationException;
 import org.mule.runtime.core.api.util.concurrent.Latch;
 
 import java.util.ArrayList;

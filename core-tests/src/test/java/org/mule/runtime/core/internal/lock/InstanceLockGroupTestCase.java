@@ -13,7 +13,7 @@ import org.mule.runtime.core.api.lock.LockProvider;
 import org.mule.runtime.api.store.ObjectAlreadyExistsException;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
-import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.util.concurrent.Latch;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 

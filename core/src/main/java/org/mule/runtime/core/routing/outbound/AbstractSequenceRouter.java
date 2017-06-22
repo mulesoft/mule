@@ -17,8 +17,8 @@ import org.mule.runtime.core.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.runtime.core.api.routing.RoutePathNotFoundException;
 import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.api.transport.LegacyOutboundEndpoint;
-import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.message.GroupCorrelation;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.message.GroupCorrelation;
 
 import java.util.ArrayList;
 import java.util.List;

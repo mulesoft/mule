@@ -21,7 +21,7 @@ import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.interceptor.Interceptor;
 import org.mule.runtime.core.component.AbstractComponent;
 import org.mule.runtime.core.internal.message.InternalMessage;
-import org.mule.runtime.core.management.stats.ProcessingTime;
+import org.mule.runtime.core.api.management.stats.ProcessingTime;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.ArrayList;

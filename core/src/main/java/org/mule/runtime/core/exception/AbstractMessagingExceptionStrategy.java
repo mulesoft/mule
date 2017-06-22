@@ -9,8 +9,8 @@ package org.mule.runtime.core.exception;
 import static org.mule.runtime.core.api.Event.getCurrentEvent;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo.createInfo;
-import static org.mule.runtime.core.context.notification.ErrorHandlerNotification.PROCESS_END;
-import static org.mule.runtime.core.context.notification.ErrorHandlerNotification.PROCESS_START;
+import static org.mule.runtime.core.api.context.notification.ErrorHandlerNotification.PROCESS_END;
+import static org.mule.runtime.core.api.context.notification.ErrorHandlerNotification.PROCESS_START;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
@@ -19,10 +19,10 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.message.ExceptionPayload;
-import org.mule.runtime.core.context.notification.ErrorHandlerNotification;
+import org.mule.runtime.core.api.context.notification.ErrorHandlerNotification;
 import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
 import org.mule.runtime.core.internal.message.InternalMessage;
-import org.mule.runtime.core.management.stats.FlowConstructStatistics;
+import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 
 /**
  * Fire a notification, log exception, increment statistics, route the problematic message to a destination if one is configured

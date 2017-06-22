@@ -16,7 +16,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.config.ExceptionHelper;
+import org.mule.runtime.core.internal.config.ExceptionHelper;
 import org.mule.runtime.core.routing.filters.RegExFilter;
 import org.mule.runtime.core.routing.filters.WildcardFilter;
 

@@ -23,7 +23,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.model.EntryPointResolverSet;
-import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.model.resolvers.LegacyEntryPointResolverSet;
 import org.mule.runtime.core.internal.registry.JSR250ValidatorProcessor;
 import org.mule.runtime.core.internal.util.annotation.AnnotationMetaData;

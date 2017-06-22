@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api.util;
 
 import static java.lang.System.lineSeparator;
-import static org.mule.runtime.core.config.i18n.CoreMessages.failedToConvertStringUsingEncoding;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToConvertStringUsingEncoding;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.internal.util.ArrayUtils;

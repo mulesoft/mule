@@ -10,8 +10,8 @@ import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.DefaultEventContext.create;
 import static org.mule.runtime.core.api.Event.builder;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
-import static org.mule.runtime.core.config.i18n.CoreMessages.failedToScheduleWork;
-import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToScheduleWork;
+import static org.mule.runtime.core.api.context.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
 import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static reactor.core.publisher.Mono.just;
 
@@ -31,8 +31,8 @@ import org.mule.runtime.api.lifecycle.CreateException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.source.polling.PeriodicScheduler;
-import org.mule.runtime.core.context.notification.ConnectorMessageNotification;
-import org.mule.runtime.core.context.notification.NotificationHelper;
+import org.mule.runtime.core.api.context.notification.ConnectorMessageNotification;
+import org.mule.runtime.core.api.context.notification.NotificationHelper;
 
 import java.util.concurrent.ScheduledFuture;
 

@@ -8,7 +8,7 @@ package org.mule.runtime.core.exception;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.api.i18n.I18nMessage;
 
 public class MessageRedeliveredException extends MessagingException {

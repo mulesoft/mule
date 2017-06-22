@@ -18,8 +18,8 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.func.CheckedConsumer;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.execution.ModuleFlowProcessingPhaseTemplate;
-import org.mule.runtime.core.execution.ResponseCompletionCallback;
+import org.mule.runtime.core.internal.execution.ModuleFlowProcessingPhaseTemplate;
+import org.mule.runtime.core.internal.execution.ResponseCompletionCallback;
 
 import java.util.Map;
 import java.util.function.Function;

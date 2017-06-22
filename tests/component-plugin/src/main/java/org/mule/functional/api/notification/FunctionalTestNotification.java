@@ -10,7 +10,7 @@ import org.mule.functional.api.component.FunctionalTestProcessor;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.context.notification.CustomNotification;
+import org.mule.runtime.core.api.context.notification.CustomNotification;
 
 /**
  * A <code>FunctionlTestNotification</code> is fired by the {@link FunctionalTestProcessor} when it receives an event. Test cases

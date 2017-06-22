@@ -11,8 +11,8 @@ import static org.junit.Assert.fail;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo;
 import org.mule.runtime.core.api.context.notification.PipelineMessageNotificationListener;
-import org.mule.runtime.core.context.notification.NotificationException;
-import org.mule.runtime.core.context.notification.PipelineMessageNotification;
+import org.mule.runtime.core.api.context.notification.NotificationException;
+import org.mule.runtime.core.api.context.notification.PipelineMessageNotification;
 import org.mule.runtime.core.api.util.concurrent.Latch;
 
 import java.util.ArrayList;

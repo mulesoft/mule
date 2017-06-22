@@ -17,7 +17,7 @@ import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.context.notification.SecurityNotificationListener;
-import org.mule.runtime.core.context.notification.SecurityNotification;
+import org.mule.runtime.core.api.context.notification.SecurityNotification;
 import org.mule.runtime.core.api.util.concurrent.Latch;
 import org.mule.tck.junit4.rule.DynamicPort;
 

@@ -23,7 +23,7 @@ import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.routing.correlation.CorrelationSequenceComparator;
 import org.mule.runtime.core.routing.correlation.EventCorrelatorCallback;
 import org.mule.runtime.core.routing.correlation.ResequenceMessagesCorrelatorCallback;
-import org.mule.runtime.core.session.DefaultMuleSession;
+import org.mule.runtime.core.api.session.DefaultMuleSession;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 

@@ -11,7 +11,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.message.ExceptionPayload;
-import org.mule.runtime.core.message.DefaultMultiPartPayload;
+import org.mule.runtime.core.api.message.DefaultMultiPartPayload;
 
 import java.io.Serializable;
 import java.util.Collection;

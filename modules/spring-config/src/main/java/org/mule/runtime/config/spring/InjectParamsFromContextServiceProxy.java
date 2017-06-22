@@ -20,7 +20,7 @@ import org.mule.runtime.container.api.ServiceInvocationHandler;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.registry.IllegalDependencyInjectionException;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.config.PreferredObjectSelector;
+import org.mule.runtime.core.internal.config.preferred.PreferredObjectSelector;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;

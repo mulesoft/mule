@@ -7,7 +7,7 @@
 
 package org.mule.runtime.module.artifact.descriptor;
 
-import org.mule.runtime.core.config.bootstrap.ArtifactType;
+import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 
 import java.io.File;
 import java.util.Map;

@@ -22,7 +22,7 @@ import static org.mule.runtime.core.exception.Errors.Identifiers.UNKNOWN_ERROR_I
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.core.message.ErrorTypeBuilder;
+import org.mule.runtime.core.internal.message.ErrorTypeBuilder;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -10,11 +10,11 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import org.mule.runtime.core.execution.EndPhaseTemplate;
-import org.mule.runtime.core.execution.EndProcessPhase;
-import org.mule.runtime.core.execution.MessageProcessContext;
-import org.mule.runtime.core.execution.MessageProcessTemplate;
-import org.mule.runtime.core.execution.PhaseResultNotifier;
+import org.mule.runtime.core.api.execution.EndPhaseTemplate;
+import org.mule.runtime.core.internal.execution.EndProcessPhase;
+import org.mule.runtime.core.api.execution.MessageProcessContext;
+import org.mule.runtime.core.api.execution.MessageProcessTemplate;
+import org.mule.runtime.core.internal.execution.PhaseResultNotifier;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

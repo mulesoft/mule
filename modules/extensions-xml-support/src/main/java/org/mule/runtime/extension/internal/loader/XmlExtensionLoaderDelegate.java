@@ -49,7 +49,7 @@ import org.mule.runtime.config.spring.dsl.model.extension.xml.OperationComponent
 import org.mule.runtime.config.spring.dsl.model.extension.xml.XmlExtensionModelProperty;
 import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
 import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationParser;
-import org.mule.runtime.core.config.artifact.DefaultArtifactProperties;
+import org.mule.runtime.core.internal.config.artifact.DefaultArtifactProperties;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;

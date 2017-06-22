@@ -30,7 +30,7 @@ import static org.mule.runtime.api.exception.ExceptionHelper.getRootMuleExceptio
 import static org.mule.runtime.api.exception.ExceptionHelper.summarise;
 import static org.mule.runtime.api.exception.MuleException.refreshVerboseExceptions;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.config.i18n.CoreMessages.failedToBuildMessage;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToBuildMessage;
 
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.config.ConfigurationException;

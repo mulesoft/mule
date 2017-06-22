@@ -17,7 +17,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.internal.message.InternalMessage;
-import org.mule.runtime.core.session.DefaultMuleSession;
+import org.mule.runtime.core.api.session.DefaultMuleSession;
 
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Setup;

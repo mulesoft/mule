@@ -11,7 +11,7 @@ import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.config.builders.DefaultsConfigurationBuilder;
+import org.mule.runtime.core.api.config.builders.DefaultsConfigurationBuilder;
 
 import java.util.List;
 

@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.soap.api.message;
 
-import static org.mule.runtime.core.message.DefaultMultiPartPayload.BODY_ATTRIBUTES;
+import static org.mule.runtime.core.api.message.DefaultMultiPartPayload.BODY_ATTRIBUTES;
 import static org.mule.runtime.core.api.util.collection.Collectors.toImmutableMap;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.message.MultiPartPayload;
-import org.mule.runtime.core.message.DefaultMultiPartPayload;
-import org.mule.runtime.core.message.PartAttributes;
+import org.mule.runtime.core.api.message.DefaultMultiPartPayload;
+import org.mule.runtime.core.api.message.PartAttributes;
 
 import java.io.InputStream;
 import java.util.List;

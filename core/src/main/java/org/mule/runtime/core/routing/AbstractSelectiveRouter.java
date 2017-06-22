@@ -13,7 +13,7 @@ import static org.apache.commons.collections.ListUtils.union;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setFlowConstructIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
-import static org.mule.runtime.core.management.stats.RouterStatistics.TYPE_OUTBOUND;
+import static org.mule.runtime.core.api.management.stats.RouterStatistics.TYPE_OUTBOUND;
 import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.fromIterable;
@@ -40,7 +40,7 @@ import org.mule.runtime.core.api.routing.RouterStatisticsRecorder;
 import org.mule.runtime.core.api.routing.SelectiveRouter;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.management.stats.RouterStatistics;
+import org.mule.runtime.core.api.management.stats.RouterStatistics;
 
 import java.util.ArrayList;
 import java.util.Collection;

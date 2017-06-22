@@ -7,8 +7,7 @@
 package org.mule.runtime.core.internal.util.splash;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.internal.util.splash.SplashScreen;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
 
 import java.util.Date;
 

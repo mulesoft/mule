@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.config.spring.factories;
 
-import static org.mule.runtime.core.config.i18n.CoreMessages.failedToCreate;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToCreate;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;

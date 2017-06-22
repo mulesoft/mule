@@ -13,8 +13,8 @@ import static org.junit.Assert.assertTrue;
 import org.mule.runtime.core.api.context.notification.CustomNotificationListener;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
-import org.mule.runtime.core.context.notification.CustomNotification;
-import org.mule.runtime.core.context.notification.MuleContextNotification;
+import org.mule.runtime.core.api.context.notification.CustomNotification;
+import org.mule.runtime.core.api.context.notification.MuleContextNotification;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.concurrent.CountDownLatch;

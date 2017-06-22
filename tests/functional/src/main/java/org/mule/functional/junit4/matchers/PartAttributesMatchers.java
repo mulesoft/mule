@@ -6,7 +6,7 @@
  */
 package org.mule.functional.junit4.matchers;
 
-import org.mule.runtime.core.message.PartAttributes;
+import org.mule.runtime.core.api.message.PartAttributes;
 
 import org.hamcrest.Factory;
 import org.hamcrest.Matcher;

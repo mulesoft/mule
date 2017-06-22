@@ -7,7 +7,7 @@
 package org.mule.functional.junit4.matchers;
 
 import org.mule.runtime.api.message.MultiPartPayload;
-import org.mule.runtime.core.message.PartAttributes;
+import org.mule.runtime.core.api.message.PartAttributes;
 
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;

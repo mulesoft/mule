@@ -11,7 +11,7 @@ import static org.mule.runtime.core.api.Event.getCurrentEvent;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.message.OutputHandler;
+import org.mule.runtime.core.api.message.OutputHandler;
 import org.mule.runtime.core.transformer.simple.SerializableToByteArray;
 import org.mule.runtime.core.api.util.IOUtils;
 

@@ -9,8 +9,8 @@ package org.mule.runtime.core.routing;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.routing.RoutingException;
-import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.message.GroupCorrelation;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.message.GroupCorrelation;
 
 import java.util.ArrayList;
 import java.util.List;

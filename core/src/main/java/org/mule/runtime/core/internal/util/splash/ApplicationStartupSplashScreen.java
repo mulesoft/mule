@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.util.splash;
 import static org.apache.commons.lang3.SystemUtils.FILE_SEPARATOR;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.agent.Agent;
-import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
 
 import java.util.Collection;
 import java.util.StringTokenizer;

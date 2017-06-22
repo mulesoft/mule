@@ -8,7 +8,7 @@ package org.mule.runtime.core.el.datetime;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.el.datetime.Instant;
-import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
