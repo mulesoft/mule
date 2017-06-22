@@ -33,6 +33,8 @@ import org.mule.runtime.core.processor.strategy.ProactorStreamProcessingStrategy
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
@@ -296,6 +298,16 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
     assertThat(threads, not(hasItem(startsWith(CPU_LIGHT))));
     assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
     assertThat(threads, not(hasItem(startsWith(CUSTOM))));
+  }
+
+  @Test
+  @Description("Notifications are invoked on CPU_LITE thread")
+  public void asyncProcessorNotificationExecutionThreads() throws Exception {
+    AtomicReference<Thread> beforeThread = new AtomicReference<>();
+    AtomicReference<Thread> afterThread = new AtomicReference<>();
+    testAsyncCpuLightNotificationThreads(beforeThread, afterThread);
+    assertThat(beforeThread.get().getName(), startsWith(CPU_LIGHT));
+    assertThat(afterThread.get().getName(), startsWith(CPU_LIGHT));
   }
 
 }
