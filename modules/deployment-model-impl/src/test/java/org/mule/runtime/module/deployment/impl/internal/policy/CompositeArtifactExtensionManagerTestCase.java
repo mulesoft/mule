@@ -270,15 +270,6 @@ public class CompositeArtifactExtensionManagerTestCase extends AbstractMuleTestC
   }
 
   @Test
-  public void doesNotParsesExtensionManifestXml() throws Exception {
-    CompositeArtifactExtensionManager extensionManager = new CompositeArtifactExtensionManager(parentExtensionManager,
-                                                                                               childExtensionManager);
-
-    expectedException.expect(UnsupportedOperationException.class);
-    extensionManager.parseExtensionManifestXml(null);
-  }
-
-  @Test
   public void doesNotRegisterConfigurationProviders() throws Exception {
     CompositeArtifactExtensionManager extensionManager = new CompositeArtifactExtensionManager(parentExtensionManager,
                                                                                                childExtensionManager);
