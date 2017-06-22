@@ -36,7 +36,7 @@ public class LoggerMessageProcessor extends AbstractAnnotatedObject
 
   protected String message;
   protected String category;
-  protected String level = "DEBUG";
+  protected String level = "INFO";
 
   protected MuleContext muleContext;
   protected FlowConstruct flowConstruct;

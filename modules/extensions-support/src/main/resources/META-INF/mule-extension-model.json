@@ -671,7 +671,7 @@
               "required": false,
               "isConfigOverride": false,
               "expressionSupport": "NOT_SUPPORTED",
-              "defaultValue": "DEBUG",
+              "defaultValue": "INFO",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
                 "allowsInlineDefinition": true,
