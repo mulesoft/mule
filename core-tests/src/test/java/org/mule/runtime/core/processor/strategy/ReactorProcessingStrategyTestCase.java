@@ -27,6 +27,8 @@ import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.processor.strategy.ReactorProcessingStrategyFactory.ReactorProcessingStrategy;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 import org.junit.Test;
 
 import ru.yandex.qatools.allure.annotations.Description;
@@ -200,5 +202,15 @@ public class ReactorProcessingStrategyTestCase extends AbstractProcessingStrateg
     flow.start();
     expectRejected();
     process(flow, testEvent());
+  }
+
+  @Test
+  @Description("Notifications are invoked on CPU_LITE thread")
+  public void asyncProcessorNotificationExecutionThreads() throws Exception {
+    AtomicReference<Thread> beforeThread = new AtomicReference<>();
+    AtomicReference<Thread> afterThread = new AtomicReference<>();
+    testAsyncCpuLightNotificationThreads(beforeThread, afterThread);
+    assertThat(beforeThread.get().getName(), startsWith(CPU_LIGHT));
+    assertThat(afterThread.get().getName(), startsWith(CPU_LIGHT));
   }
 }

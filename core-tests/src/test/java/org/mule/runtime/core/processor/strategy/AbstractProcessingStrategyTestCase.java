@@ -28,14 +28,15 @@ import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.just;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.Flow.Builder;
-import org.mule.runtime.core.api.context.MuleContextBuilder;
-import org.mule.runtime.core.api.context.notification.ServerNotification;
+import org.mule.runtime.core.api.context.notification.MessageProcessorNotificationListener;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
@@ -43,8 +44,9 @@ import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.util.concurrent.NamedThreadFactory;
-import org.mule.runtime.core.context.notification.ServerNotificationManager;
+import org.mule.runtime.core.context.notification.MessageProcessorNotification;
 import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.processor.AnnotatedProcessor;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 
 import java.util.ArrayList;
@@ -62,6 +64,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -115,6 +118,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
       return CPU_LITE_ASYNC;
     }
   };
+  protected Processor annotatedAsyncProcessor = new AnnotatedAsyncProcessor();
 
   protected Processor failingProcessor = new ThreadTrackingProcessor() {
 
@@ -166,18 +170,6 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
         .processingStrategyFactory((muleContext, prefix) -> createProcessingStrategy(muleContext, prefix))
         // Avoid logging of errors by using a null exception handler.
         .messagingExceptionHandler((exception, event) -> event);
-  }
-
-  @Override
-  protected void configureMuleContext(MuleContextBuilder contextBuilder) {
-    super.configureMuleContext(contextBuilder);
-    contextBuilder.setNotificationManager(new ServerNotificationManager() {
-
-      @Override
-      public void fireNotification(ServerNotification notification) {
-        // Avoid processing of message processor notifications and verbose logging this may produce.
-      }
-    });
   }
 
   protected abstract ProcessingStrategy createProcessingStrategy(MuleContext muleContext, String schedulersNamePrefix);
@@ -434,6 +426,23 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
   @Test
   public abstract void tx() throws Exception;
 
+  protected void testAsyncCpuLightNotificationThreads(AtomicReference<Thread> beforeThread, AtomicReference<Thread> afterThread)
+      throws Exception {
+    muleContext.getNotificationManager().addInterfaceToType(MessageProcessorNotificationListener.class,
+                                                            MessageProcessorNotification.class);
+    muleContext.getNotificationManager().addListener((MessageProcessorNotificationListener) notification -> {
+      if (notification.getAction() == MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE) {
+        beforeThread.set(currentThread());
+      } else if (notification.getAction() == MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE) {
+        afterThread.set(currentThread());
+      }
+    });
+    flow = flowBuilder.get().processors(annotatedAsyncProcessor).build();
+    flow.initialise();
+    flow.start();
+    process(flow, testEvent());
+  }
+
   class MultipleInvocationLatchedProcessor implements Processor {
 
     private ProcessingType type;
@@ -600,5 +609,27 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
     };
   }
 
+  class AnnotatedAsyncProcessor extends AbstractAnnotatedObject implements AnnotatedProcessor {
+
+    @Override
+    public Event process(Event event) throws MuleException {
+      return asyncProcessor.process(event);
+    }
+
+    @Override
+    public Publisher<Event> apply(Publisher<Event> publisher) {
+      return asyncProcessor.apply(publisher);
+    }
+
+    @Override
+    public ComponentLocation getLocation() {
+      return TEST_CONNECTOR_LOCATION;
+    }
+
+    @Override
+    public ProcessingType getProcessingType() {
+      return asyncProcessor.getProcessingType();
+    }
+  }
 
 }
