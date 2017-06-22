@@ -19,6 +19,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclarer;
@@ -82,13 +83,13 @@ public class SoapInvokeOperationDeclarer {
   /**
    * Declares the invoke operation.
    *
-   * @param declarer   the soap extension declarer
-   * @param loader     a {@link ClassTypeLoader} to load some parameters types.
-   * @param soapErrors the {@link ErrorModel}s that this operation can throw.
+   * @param configDeclarer the soap config declarer
+   * @param loader         a {@link ClassTypeLoader} to load some parameters types.
+   * @param soapErrors     the {@link ErrorModel}s that this operation can throw.
    */
-  public OperationDeclarer declare(ExtensionDeclarer declarer, ClassTypeLoader loader, Set<ErrorModel> soapErrors) {
+  void declare(ConfigurationDeclarer configDeclarer, ClassTypeLoader loader, Set<ErrorModel> soapErrors) {
 
-    OperationDeclarer operation = declarer.withOperation(OPERATION_NAME)
+    OperationDeclarer operation = configDeclarer.withOperation(OPERATION_NAME)
         .describedAs(OPERATION_DESCRIPTION)
         .requiresConnection(true)
         .blocking(true)
@@ -100,7 +101,6 @@ public class SoapInvokeOperationDeclarer {
     declareOutput(operation, loader);
     declareMetadataKeyParameters(operation);
     declareRequestParameters(operation, loader);
-    return operation;
   }
 
   private void declareMetadata(OperationDeclarer operation, ClassTypeLoader loader) {
@@ -189,7 +189,8 @@ public class SoapInvokeOperationDeclarer {
     TypeWrapper keyType = new TypeWrapper(WebServiceTypeKey.class);
     ParameterGroupDeclarer group = operation
         .onParameterGroup(KEYS_GROUP)
-        .withModelProperty(new ParameterGroupModelProperty(new ParameterGroupDescriptor(KEYS_GROUP, keyType)));
+        .withModelProperty(
+                           new ParameterGroupModelProperty(new ParameterGroupDescriptor(KEYS_GROUP, keyType)));
 
     StringType stringType = TYPE_BUILDER.stringType().build();
     group.withRequiredParameter(SERVICE_PARAM)

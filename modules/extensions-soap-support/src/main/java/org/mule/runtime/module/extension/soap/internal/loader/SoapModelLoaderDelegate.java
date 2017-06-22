@@ -10,13 +10,13 @@ import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_DESCRIPTION;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapExtensionTypeFactory.getSoapExtensionType;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
-import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
@@ -32,7 +32,6 @@ import org.mule.runtime.module.extension.soap.internal.loader.property.SoapExten
 import org.mule.runtime.module.extension.soap.internal.loader.type.runtime.MessageDispatcherProviderTypeWrapper;
 import org.mule.runtime.module.extension.soap.internal.loader.type.runtime.SoapExtensionTypeWrapper;
 import org.mule.runtime.soap.api.exception.error.SoapErrors;
-
 import java.util.List;
 import java.util.Set;
 
@@ -104,9 +103,7 @@ final class SoapModelLoaderDelegate implements ModelLoaderDelegate {
         .withModelProperty(new ConfigurationFactoryModelProperty(configurationFactory))
         .withModelProperty(new ImplementingTypeModelProperty(clazz));
 
-    OperationDeclarer operation = operationDeclarer.declare(declarer, typeLoader, soapErrors);
-    configDeclarer.withOperation(operation);
-
+    operationDeclarer.declare(configDeclarer, typeLoader, soapErrors);
     return configDeclarer;
   }
 
