@@ -66,15 +66,23 @@ public class XmlApplicationParser {
   }
 
   public XmlApplicationParser(ServiceRegistry serviceRegistry, List<ClassLoader> pluginsClassLoaders) {
+    this(discoverNamespaceInfoProviders(serviceRegistry, pluginsClassLoaders));
+  }
+
+  private static List<XmlNamespaceInfoProvider> discoverNamespaceInfoProviders(ServiceRegistry serviceRegistry,
+                                                                               List<ClassLoader> pluginsClassLoaders) {
     final Builder<XmlNamespaceInfoProvider> namespaceInfoProvidersBuilder = ImmutableList.builder();
     namespaceInfoProvidersBuilder
         .addAll(serviceRegistry.lookupProviders(XmlNamespaceInfoProvider.class, XmlNamespaceInfoProvider.class.getClassLoader()));
     for (ClassLoader pluginClassLoader : pluginsClassLoaders) {
       namespaceInfoProvidersBuilder.addAll(serviceRegistry.lookupProviders(XmlNamespaceInfoProvider.class, pluginClassLoader));
     }
+    return namespaceInfoProvidersBuilder.build();
+  }
 
-    namespaceInfoProviders = namespaceInfoProvidersBuilder.build();
-    namespaceCache = CacheBuilder.newBuilder().build();
+  public XmlApplicationParser(List<XmlNamespaceInfoProvider> namespaceInfoProviders) {
+    this.namespaceInfoProviders = ImmutableList.<XmlNamespaceInfoProvider>builder().addAll(namespaceInfoProviders).build();
+    this.namespaceCache = CacheBuilder.newBuilder().build();
   }
 
   private String loadNamespaceFromProviders(String namespaceUri) {
