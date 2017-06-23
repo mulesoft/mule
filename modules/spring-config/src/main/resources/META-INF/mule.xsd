@@ -1193,19 +1193,15 @@
         </xsd:attribute>
     </xsd:complexType>
 
-
     <xsd:simpleType name="notificationTypes">
+        <xsd:union memberTypes="coreNotificationTypes extendedNotificationTypes"/>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="coreNotificationTypes">
         <xsd:restriction base="xsd:NMTOKEN">
             <xsd:enumeration value="CONTEXT"/>
             <xsd:enumeration value="SECURITY"/>
             <xsd:enumeration value="ASYNC-MESSAGE"/>
-            <xsd:enumeration value="ENDPOINT-MESSAGE">
-                <xsd:annotation>
-                    <xsd:documentation>
-                        @Deprecated since 4.0.
-                    </xsd:documentation>
-                </xsd:annotation>
-            </xsd:enumeration>
             <xsd:enumeration value="CONNECTOR-MESSAGE"/>
             <xsd:enumeration value="COMPONENT-MESSAGE"/>
             <xsd:enumeration value="PIPELINE-MESSAGE"/>
@@ -1218,6 +1214,18 @@
             <xsd:enumeration value="EXCEPTION"/>
             <xsd:enumeration value="TRANSACTION"/>
             <xsd:enumeration value="ROUTING"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="extendedNotificationTypes">
+        <xsd:restriction base="xsd:NMTOKEN">
+            <xsd:pattern value="[a-zA-Z]+:[A-Z\-]+">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Allows artifacts to define their own notifications, in format "[artifactID]:[NOTIFICATION-ID]". 
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:pattern>
         </xsd:restriction>
     </xsd:simpleType>
 
