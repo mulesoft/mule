@@ -28,6 +28,11 @@ public class NullDslResolvingContext implements DslResolvingContext {
   }
 
   @Override
+  public Optional<ExtensionModel> getExtensionForType(String typeId) {
+    return Optional.empty();
+  }
+
+  @Override
   public Set<ExtensionModel> getExtensions() {
     return emptySet();
   }

@@ -19,6 +19,7 @@ import static org.reflections.util.ClasspathHelper.forClassLoader;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.type.TypeCatalog;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 
@@ -45,7 +46,7 @@ class ClasspathBasedDslContext implements DslResolvingContext {
   private final ClassLoader classLoader;
   private final Map<String, Class<?>> extensionsByName = new HashMap<>();
   private final Map<String, ExtensionModel> resolvedModels = new HashMap<>();
-  private TypeCatalog typeCatalog;
+  private LazyValue<TypeCatalog> typeCatalog = new LazyValue<>(() -> TypeCatalog.getDefault(getExtensions()));
 
   ClasspathBasedDslContext(ClassLoader classLoader) {
     this.classLoader = classLoader;
@@ -64,6 +65,17 @@ class ClasspathBasedDslContext implements DslResolvingContext {
     return ofNullable(resolvedModels.get(name));
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Optional<ExtensionModel> getExtensionForType(String typeId) {
+    return getTypeCatalog().getDeclaringExtension(typeId).flatMap(this::getExtension);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Set<ExtensionModel> getExtensions() {
     return resolvedModels.size() != extensionsByName.size()
@@ -71,13 +83,12 @@ class ClasspathBasedDslContext implements DslResolvingContext {
         : copyOf(resolvedModels.values());
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public TypeCatalog getTypeCatalog() {
-    if (typeCatalog == null) {
-      typeCatalog = TypeCatalog.getDefault(getExtensions());
-    }
-
-    return typeCatalog;
+    return typeCatalog.get();
   }
 
   private void findExtensionsInClasspath() {

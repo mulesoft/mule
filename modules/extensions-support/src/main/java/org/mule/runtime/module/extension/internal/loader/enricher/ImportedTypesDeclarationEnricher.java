@@ -56,7 +56,7 @@ public final class ImportedTypesDeclarationEnricher extends AbstractAnnotatedDec
       }
 
       importTypes.forEach(imported -> extensionDeclaration
-          .addImportedType(new ImportedTypeModel(imported.from(), typeLoader.load(imported.type()))));
+          .addImportedType(new ImportedTypeModel(typeLoader.load(imported.type()))));
     }
   }
 }
