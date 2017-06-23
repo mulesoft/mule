@@ -62,26 +62,7 @@ public class ServerNotificationManagerConfigurator extends AbstractAnnotatedObje
     Map<String, Class<? extends ServerNotification>> eventMap = new HashMap<>(EVENT_MAP);
     Map<String, Class<? extends ServerNotificationListener>> interfaceMap = new HashMap<>(INTERFACE_MAP);
 
-    for (NotificationsProvider provider : muleContext.getRegistry().lookupObjects(NotificationsProvider.class)) {
-      for (Entry<String, Pair<Class<? extends ServerNotification>, Class<? extends ServerNotificationListener>>> entry : provider
-          .getEventListenerMapping().entrySet()) {
-
-        final String notificationType = entry.getKey();
-        if (!notificationType.matches("[a-z]+:[A-Z\\-]+")) {
-          throw new InitialisationException(createStaticMessage("Notification '%s' declared in '%s' doesn't comply with the '[plugin]:[NOTIFICATION]' format",
-                                                                notificationType, provider.toString()),
-                                            muleContext);
-        }
-
-        eventMap.put(notificationType, entry.getValue().getFirst());
-        interfaceMap.put(notificationType, entry.getValue().getSecond());
-      }
-    }
-
-    ServerNotificationManager notificationManager = muleContext.getNotificationManager();
-    if (dynamic != null) {
-      notificationManager.setNotificationDynamic(dynamic.booleanValue());
-    }
+    ServerNotificationManager notificationManager = populateNotificationTypeMappings(eventMap, interfaceMap);
 
     enableNotifications(notificationManager, eventMap, interfaceMap);
     disableNotifications(notificationManager, eventMap, interfaceMap);
@@ -98,6 +79,42 @@ public class ServerNotificationManagerConfigurator extends AbstractAnnotatedObje
         notificationManager.addListenerSubscriptionPair(sub);
       }
     }
+  }
+
+  public ServerNotificationManager populateNotificationTypeMappings(Map<String, Class<? extends ServerNotification>> eventMap,
+                                                                    Map<String, Class<? extends ServerNotificationListener>> interfaceMap)
+      throws InitialisationException {
+    Map<String, NotificationsProvider> providersMap = new HashMap<>();
+
+    for (NotificationsProvider provider : muleContext.getRegistry().lookupObjects(NotificationsProvider.class)) {
+      for (Entry<String, Pair<Class<? extends ServerNotification>, Class<? extends ServerNotificationListener>>> entry : provider
+          .getEventListenerMapping().entrySet()) {
+
+        final String notificationType = entry.getKey();
+        if (!notificationType.matches("[a-zA-Z]+:[A-Z\\-]+")) {
+          throw new InitialisationException(createStaticMessage("Notification '%s' declared in '%s' doesn't comply with the '[artifactID]:[NOTIFICATION-ID]' format",
+                                                                notificationType, provider.toString()),
+                                            this);
+        }
+
+        if (eventMap.containsKey(notificationType)) {
+          throw new InitialisationException(createStaticMessage("Notification '%s' declared in '%s' is already declared for another artifact in provider '%s'.",
+                                                                notificationType, provider.toString(),
+                                                                eventMap.get(notificationType)),
+                                            this);
+        }
+
+        eventMap.put(notificationType, entry.getValue().getFirst());
+        interfaceMap.put(notificationType, entry.getValue().getSecond());
+        providersMap.put(notificationType, provider);
+      }
+    }
+
+    ServerNotificationManager notificationManager = muleContext.getNotificationManager();
+    if (dynamic != null) {
+      notificationManager.setNotificationDynamic(dynamic.booleanValue());
+    }
+    return notificationManager;
   }
 
   private void disableNotifications(ServerNotificationManager notificationManager,
@@ -147,7 +164,7 @@ public class ServerNotificationManagerConfigurator extends AbstractAnnotatedObje
     if (config.getEventName() != null) {
       return ofNullable(eventMap.get(config.getEventName()));
     }
-    return ofNullable(eventMap.get(config.getInterfaseName()));
+    return ofNullable(eventMap.get(config.getInterfaceName()));
   }
 
   private Optional<Class<? extends ServerNotificationListener>> getInterfaceClass(NotificationConfig config,
@@ -155,8 +172,8 @@ public class ServerNotificationManagerConfigurator extends AbstractAnnotatedObje
     if (config.getInterfaceClass() != null) {
       return of(config.getInterfaceClass());
     }
-    if (config.getInterfaseName() != null) {
-      return of(interfaceMap.get(config.getInterfaseName()));
+    if (config.getInterfaceName() != null) {
+      return of(interfaceMap.get(config.getInterfaceName()));
     }
     return ofNullable(interfaceMap.get(config.getEventName()));
   }

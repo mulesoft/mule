@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.spring;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
 import static org.hamcrest.Matchers.containsString;
@@ -70,6 +71,25 @@ public class ServerNotificationManagerConfiguratorTestCase extends AbstractMuleT
     configurator.initialise();
 
     verify(notificationManager).addInterfaceToType(CompliantNotificationListener.class, CompliantNotification.class);
+  }
+
+  @Test
+  public void compliantEnabledDuplicateNotification() throws InitialisationException {
+    doReturn(asList((NotificationsProvider) () -> singletonMap("test:COMPLIANT",
+                                                               new Pair(CompliantNotification.class,
+                                                                        CompliantNotificationListener.class)),
+                    (NotificationsProvider) () -> singletonMap("test:COMPLIANT",
+                                                               new Pair(CompliantNotification.class,
+                                                                        CompliantNotificationListener.class))))
+                                                                            .when(registry)
+                                                                            .lookupObjects(NotificationsProvider.class);
+
+    configurator.setEnabledNotifications(singletonList(new EnabledNotificationConfig(CompliantNotificationListener.class,
+                                                                                     CompliantNotification.class)));
+
+    expected.expect(InitialisationException.class);
+    expected.expectMessage(containsString("'test:COMPLIANT'"));
+    configurator.initialise();
   }
 
   @Test

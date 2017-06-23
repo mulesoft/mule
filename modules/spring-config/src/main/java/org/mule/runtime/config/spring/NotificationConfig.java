@@ -111,18 +111,18 @@ public abstract class NotificationConfig<N extends ServerNotification, L extends
 
   private String eventName;
   private Class<N> eventClass;
-  private String interfaseName;
+  private String interfaceName;
   private Class<L> interfaceClass;
   private boolean eventExplicitlyConfigured;
   private boolean interfaceExplicitlyConfigured;
 
-  public void setInterfaseName(String interfaseName) {
+  public void setInterfaceName(String interfaceName) {
     interfaceExplicitlyConfigured = true;
-    this.interfaseName = interfaseName;
+    this.interfaceName = interfaceName;
   }
 
-  public String getInterfaseName() {
-    return interfaseName;
+  public String getInterfaceName() {
+    return interfaceName;
   }
 
   public void setEventClass(Class<N> eventClass) {

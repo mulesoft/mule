@@ -1219,10 +1219,10 @@
 
     <xsd:simpleType name="extendedNotificationTypes">
         <xsd:restriction base="xsd:NMTOKEN">
-            <xsd:pattern value="[a-z]+:[A-Z\-]+">
+            <xsd:pattern value="[a-zA-Z]+:[A-Z\-]+">
                 <xsd:annotation>
                     <xsd:documentation>
-                        Allows plugins to define their own notifications, in format "[plugin]:[NOTIFICATION]". 
+                        Allows artifacts to define their own notifications, in format "[artifactID]:[NOTIFICATION-ID]". 
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:pattern>

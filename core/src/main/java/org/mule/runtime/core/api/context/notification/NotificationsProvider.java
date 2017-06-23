@@ -20,9 +20,9 @@ public interface NotificationsProvider {
 
   /**
    * The key of the returned map is the string representation of the notification. It must be in the format
-   * {@code [plugin]:[NOTIFICATION]}
+   * {@code [artifactid]:[NOTIFICATION-ID]}
    * 
-   * @return the mapping of the notification id to the concrete types of {@link ServerNotification} and
+   * @return the mapping of the notification ID to the concrete types of {@link ServerNotification} and
    *         {@link ServerNotificationListener} it represents.
    */
   Map<String, Pair<Class<? extends ServerNotification>, Class<? extends ServerNotificationListener>>> getEventListenerMapping();
