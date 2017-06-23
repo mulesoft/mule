@@ -6,17 +6,16 @@
  */
 package org.mule.runtime.core.routing;
 
-import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.unmodifiableList;
+import static java.util.Optional.ofNullable;
 import static org.apache.commons.collections.ListUtils.union;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setFlowConstructIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.management.stats.RouterStatistics.TYPE_OUTBOUND;
-import static reactor.core.publisher.Flux.error;
+import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
 import static reactor.core.publisher.Flux.from;
-import static reactor.core.publisher.Flux.fromIterable;
 import static reactor.core.publisher.Flux.just;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -33,30 +32,25 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.management.stats.RouterStatistics;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.RoutePathNotFoundException;
-import org.mule.runtime.core.api.routing.RouterResultsHandler;
 import org.mule.runtime.core.api.routing.RouterStatisticsRecorder;
 import org.mule.runtime.core.api.routing.SelectiveRouter;
-import org.mule.runtime.core.api.routing.filter.Filter;
-import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.management.stats.RouterStatistics;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.reactivestreams.Publisher;
 
-import reactor.core.publisher.Mono;
-
 public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject implements SelectiveRouter,
     RouterStatisticsRecorder, Lifecycle, FlowConstructAware, MuleContextAware {
 
-  private final List<MessageProcessorFilterPair> conditionalMessageProcessors = new ArrayList<>();
+  private final List<MessageProcessorExpressionPair> conditionalMessageProcessors = new ArrayList<>();
   private Processor defaultProcessor;
-  private final RouterResultsHandler resultsHandler = new DefaultRouterResultsHandler();
   private RouterStatistics routerStatistics;
 
   final AtomicBoolean initialised = new AtomicBoolean(false);
@@ -141,28 +135,28 @@ public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject im
   }
 
   @Override
-  public void addRoute(Processor processor, Filter filter) {
+  public void addRoute(final String expression, final Processor processor) {
     synchronized (conditionalMessageProcessors) {
-      MessageProcessorFilterPair addedPair = new MessageProcessorFilterPair(processor, filter);
+      MessageProcessorExpressionPair addedPair = new MessageProcessorExpressionPair(expression, processor);
       conditionalMessageProcessors.add(transitionLifecycleManagedObjectForAddition(addedPair));
     }
   }
 
   @Override
-  public void removeRoute(Processor processor) {
+  public void removeRoute(final Processor processor) {
     updateRoute(processor, (RoutesUpdater) index -> {
-      MessageProcessorFilterPair removedPair = conditionalMessageProcessors.remove(index);
+      MessageProcessorExpressionPair removedPair = conditionalMessageProcessors.remove(index);
 
       transitionLifecycleManagedObjectForRemoval(removedPair);
     });
   }
 
   @Override
-  public void updateRoute(final Processor processor, final Filter filter) {
+  public void updateRoute(final String expression, final Processor processor) {
     updateRoute(processor, (RoutesUpdater) index -> {
-      MessageProcessorFilterPair addedPair = new MessageProcessorFilterPair(processor, filter);
+      MessageProcessorExpressionPair addedPair = new MessageProcessorExpressionPair(expression, processor);
 
-      MessageProcessorFilterPair removedPair =
+      MessageProcessorExpressionPair removedPair =
           conditionalMessageProcessors.set(index, transitionLifecycleManagedObjectForAddition(addedPair));
 
       transitionLifecycleManagedObjectForRemoval(removedPair);
@@ -170,56 +164,34 @@ public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject im
   }
 
   @Override
-  public void setDefaultRoute(Processor processor) {
+  public void setDefaultRoute(final Processor processor) {
     defaultProcessor = processor;
   }
 
   @Override
   public Event process(Event event) throws MuleException {
-    return routeWithProcessors(getProcessorsToRoute(event), event);
+    return routeWithProcessor(getProcessorToRoute(event), event);
   }
 
   @Override
   public Publisher<Event> apply(Publisher<Event> publisher) {
-    return from(publisher).concatMap(event -> {
-      try {
-        return fromIterable(getProcessorsToRoute(event))
-            .concatMap(mp -> just(event).transform(mp))
-            .collectList()
-            .handle((list, sink) -> {
-              Event aggregateEvent = resultsHandler.aggregateResults(list, event);
-              // Routes will also return null when an exception is thrown, so we need to take into account this case and not
-              // continue processing if the response has already been completed.
-              if (aggregateEvent != null && !Mono.from(event.getContext().getResponsePublisher()).toFuture().isDone()) {
-                sink.next(aggregateEvent);
-              }
-            });
-      } catch (RoutePathNotFoundException e) {
-        return error(new MessagingException(event, e, this));
-      }
-    });
+    return from(publisher).flatMap(checkedFunction(event -> {
+      Processor processor = getProcessorToRoute(event);
+      return just(event).transform(processor).doOnComplete(() -> updateStatistics(processor));
+    }));
   }
 
-  protected Collection<Processor> getProcessorsToRoute(Event event) throws RoutePathNotFoundException {
-    Collection<Processor> selectedProcessors = selectProcessors(event, Event.builder(event));
-    if (!selectedProcessors.isEmpty()) {
-      return selectedProcessors;
-    } else if (defaultProcessor != null) {
-      return singleton(defaultProcessor);
-    } else {
-      if (getRouterStatistics() != null && getRouterStatistics().isEnabled()) {
-        getRouterStatistics().incrementNoRoutedMessage();
-      }
-
-      throw new RoutePathNotFoundException(createStaticMessage("Can't process message because no route has been found matching any filter and no default route is defined"),
-                                           this);
-    }
+  protected Processor getProcessorToRoute(Event event) throws RoutePathNotFoundException {
+    final Processor processor = selectProcessors(event).orElse(defaultProcessor);
+    return ofNullable(processor)
+        .orElseThrow(() -> new RoutePathNotFoundException(createStaticMessage("Can't process message because no route has been found matching any filter and no default route is defined"),
+                                                          this));
   }
 
   /**
-   * @return the processors selected according to the specific router strategy or an empty collection (not null).
+   * @return the processor selected according to the specific router strategy.
    */
-  protected abstract Collection<Processor> selectProcessors(Event event, Event.Builder builder);
+  protected abstract Optional<Processor> selectProcessors(Event event);
 
   private Collection<?> getLifecycleManagedObjects() {
     if (defaultProcessor == null) {
@@ -269,26 +241,21 @@ public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject im
     return managedObject;
   }
 
-  private Event routeWithProcessors(Collection<Processor> processors, Event event) throws MuleException {
-    List<Event> results = new ArrayList<>();
+  private Event routeWithProcessor(Processor processor, Event event) throws MuleException {
+    Event result = processor.process(event);
 
-    for (Processor processor : processors) {
-      processEventWithProcessor(event, processor, results);
-    }
+    updateStatistics(processor);
 
-    return resultsHandler.aggregateResults(results, event);
+    return result;
   }
 
-  private void processEventWithProcessor(Event event, Processor processor, List<Event> results)
-      throws MuleException {
-    results.add(processor.process(event));
-
+  public void updateStatistics(Processor processor) {
     if (getRouterStatistics() != null && getRouterStatistics().isEnabled()) {
       getRouterStatistics().incrementRoutedMessage(processor);
     }
   }
 
-  public List<MessageProcessorFilterPair> getConditionalMessageProcessors() {
+  public List<MessageProcessorExpressionPair> getConditionalMessageProcessors() {
     return unmodifiableList(conditionalMessageProcessors);
   }
 

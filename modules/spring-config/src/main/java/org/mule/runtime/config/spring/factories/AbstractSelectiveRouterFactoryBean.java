@@ -11,7 +11,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.routing.AbstractSelectiveRouter;
-import org.mule.runtime.core.routing.MessageProcessorFilterPair;
+import org.mule.runtime.core.routing.MessageProcessorExpressionPair;
 
 import java.util.Collection;
 
@@ -21,18 +21,18 @@ public abstract class AbstractSelectiveRouterFactoryBean extends AbstractAnnotat
     implements FactoryBean<AbstractSelectiveRouter>, MuleContextAware {
 
   private Processor defaultProcessor;
-  private Collection<MessageProcessorFilterPair> conditionalMessageProcessors;
+  private Collection<MessageProcessorExpressionPair> conditionalMessageProcessors;
   private MuleContext muleContext;
 
   public AbstractSelectiveRouterFactoryBean() {
     super();
   }
 
-  public void setDefaultRoute(MessageProcessorFilterPair conditionalProcessor) {
+  public void setDefaultRoute(MessageProcessorExpressionPair conditionalProcessor) {
     defaultProcessor = conditionalProcessor.getMessageProcessor();
   }
 
-  public void setRoutes(Collection<MessageProcessorFilterPair> conditionalMessageProcessors) {
+  public void setRoutes(Collection<MessageProcessorExpressionPair> conditionalMessageProcessors) {
     this.conditionalMessageProcessors = conditionalMessageProcessors;
   }
 
@@ -43,8 +43,8 @@ public abstract class AbstractSelectiveRouterFactoryBean extends AbstractAnnotat
     router.setDefaultRoute(defaultProcessor);
     router.setMuleContext(muleContext);
 
-    for (final MessageProcessorFilterPair mpfp : conditionalMessageProcessors) {
-      router.addRoute(mpfp.getMessageProcessor(), mpfp.getFilter());
+    for (final MessageProcessorExpressionPair mpfp : conditionalMessageProcessors) {
+      router.addRoute(mpfp.getExpression(), mpfp.getMessageProcessor());
     }
 
     return router;

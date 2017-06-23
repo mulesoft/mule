@@ -23,30 +23,29 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.routing.filter.Filter;
 
 /**
- * A holder for a pair of MessageProcessor and Filter.
+ * A holder for a pair of MessageProcessor and an expression.
  */
-public class MessageProcessorFilterPair extends AbstractAnnotatedObject
+public class MessageProcessorExpressionPair extends AbstractAnnotatedObject
     implements FlowConstructAware, MuleContextAware, Lifecycle {
 
+  private final String expression;
   private final Processor messageProcessor;
-  private final Filter filter;
 
-  public MessageProcessorFilterPair(Processor messageProcessor, Filter filter) {
+  public MessageProcessorExpressionPair(String expression, Processor messageProcessor) {
+    requireNonNull(expression, "expression can't be null");
     requireNonNull(messageProcessor, "messageProcessor can't be null");
-    requireNonNull(filter, "filter can't be null");
+    this.expression = expression;
     this.messageProcessor = messageProcessor;
-    this.filter = filter;
+  }
+
+  public String getExpression() {
+    return expression;
   }
 
   public Processor getMessageProcessor() {
     return messageProcessor;
-  }
-
-  public Filter getFilter() {
-    return filter;
   }
 
   @Override
@@ -62,18 +61,12 @@ public class MessageProcessorFilterPair extends AbstractAnnotatedObject
     if (messageProcessor instanceof FlowConstructAware) {
       ((FlowConstructAware) messageProcessor).setFlowConstruct(flowConstruct);
     }
-    if (filter instanceof FlowConstructAware) {
-      ((FlowConstructAware) filter).setFlowConstruct(flowConstruct);
-    }
   }
 
   @Override
   public void setMuleContext(MuleContext context) {
     if (messageProcessor instanceof MuleContextAware) {
       ((MuleContextAware) messageProcessor).setMuleContext(context);
-    }
-    if (filter instanceof MuleContextAware) {
-      ((MuleContextAware) filter).setMuleContext(context);
     }
   }
 
@@ -82,18 +75,12 @@ public class MessageProcessorFilterPair extends AbstractAnnotatedObject
     if (messageProcessor instanceof Initialisable) {
       ((Initialisable) messageProcessor).initialise();
     }
-    if (filter instanceof Initialisable) {
-      ((Initialisable) filter).initialise();
-    }
   }
 
   @Override
   public void start() throws MuleException {
     if (messageProcessor instanceof Startable) {
       ((Startable) messageProcessor).start();
-    }
-    if (filter instanceof Startable) {
-      ((Startable) filter).start();
     }
   }
 
@@ -102,18 +89,12 @@ public class MessageProcessorFilterPair extends AbstractAnnotatedObject
     if (messageProcessor instanceof Stoppable) {
       ((Stoppable) messageProcessor).stop();
     }
-    if (filter instanceof Stoppable) {
-      ((Stoppable) filter).stop();
-    }
   }
 
   @Override
   public void dispose() {
     if (messageProcessor instanceof Disposable) {
       ((Disposable) messageProcessor).dispose();
-    }
-    if (filter instanceof Disposable) {
-      ((Disposable) filter).dispose();
     }
   }
 }

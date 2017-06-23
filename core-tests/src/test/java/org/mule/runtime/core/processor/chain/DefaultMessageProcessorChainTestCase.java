@@ -57,20 +57,19 @@ import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
-import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.api.util.ObjectUtils;
 import org.mule.runtime.core.exception.ErrorTypeLocator;
+import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 import org.mule.runtime.core.processor.ResponseMessageProcessorAdapter;
 import org.mule.runtime.core.processor.strategy.BlockingProcessingStrategyFactory;
-import org.mule.runtime.core.processor.strategy.ProactorStreamProcessingStrategyFactory;
-import org.mule.runtime.core.processor.strategy.TransactionAwareWorkQueueProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.DirectProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.ProactorStreamProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.ReactorProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.TransactionAwareWorkQueueProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.WorkQueueProcessingStrategyFactory;
 import org.mule.runtime.core.routing.ChoiceRouter;
 import org.mule.runtime.core.routing.ScatterGatherRouter;
-import org.mule.runtime.core.routing.filters.AcceptAllFilter;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -707,9 +706,9 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
   @Test
   public void testChoice() throws Exception {
     ChoiceRouter choiceRouter = new ChoiceRouter();
-    choiceRouter.addRoute(newChain(getAppendingMP("1")), new AcceptAllFilter());
-    choiceRouter.addRoute(newChain(getAppendingMP("2")), new AcceptAllFilter());
-    choiceRouter.addRoute(newChain(getAppendingMP("3")), new AcceptAllFilter());
+    choiceRouter.addRoute("true", newChain(getAppendingMP("1")));
+    choiceRouter.addRoute("true", newChain(getAppendingMP("2")));
+    choiceRouter.addRoute("true", newChain(getAppendingMP("3")));
 
     assertThat(process(newChain(choiceRouter), getTestEventUsingFlow("0")).getMessage().getPayload().getValue(), equalTo("01"));
   }

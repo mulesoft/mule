@@ -190,7 +190,7 @@ import org.mule.runtime.core.routing.IdempotentSecureHashMessageValidator;
 import org.mule.runtime.core.routing.MessageChunkAggregator;
 import org.mule.runtime.core.routing.MessageChunkSplitter;
 import org.mule.runtime.core.routing.MessageFilter;
-import org.mule.runtime.core.routing.MessageProcessorFilterPair;
+import org.mule.runtime.core.routing.MessageProcessorExpressionPair;
 import org.mule.runtime.core.routing.Resequencer;
 import org.mule.runtime.core.routing.RoundRobin;
 import org.mule.runtime.core.routing.ScatterGatherRouter;
@@ -542,15 +542,17 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
             .build());
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier(CHOICE).withTypeDefinition(fromType(ChoiceRouter.class))
         .withObjectFactoryType(ChoiceRouterFactoryBean.class)
-        .withSetterParameterDefinition("routes", fromChildCollectionConfiguration(MessageProcessorFilterPair.class).build())
-        .withSetterParameterDefinition("defaultRoute", fromChildConfiguration(MessageProcessorFilterPair.class).build()).build());
+        .withSetterParameterDefinition("routes", fromChildCollectionConfiguration(MessageProcessorExpressionPair.class).build())
+        .withSetterParameterDefinition("defaultRoute", fromChildConfiguration(MessageProcessorExpressionPair.class).build())
+        .build());
     componentBuildingDefinitions
-        .add(baseDefinition.copy().withIdentifier(WHEN).withTypeDefinition(fromType(MessageProcessorFilterPair.class))
+        .add(baseDefinition.copy().withIdentifier(WHEN).withTypeDefinition(fromType(MessageProcessorExpressionPair.class))
             .withObjectFactoryType(MessageProcessorFilterPairFactoryBean.class)
             .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
-            .withSetterParameterDefinition("expression", fromSimpleParameter("expression").build()).build());
+            .withSetterParameterDefinition("expression", fromSimpleParameter("expression").withDefaultValue("true").build())
+            .build());
     componentBuildingDefinitions
-        .add(baseDefinition.copy().withIdentifier(OTHERWISE).withTypeDefinition(fromType(MessageProcessorFilterPair.class))
+        .add(baseDefinition.copy().withIdentifier(OTHERWISE).withTypeDefinition(fromType(MessageProcessorExpressionPair.class))
             .withObjectFactoryType(MessageProcessorFilterPairFactoryBean.class)
             .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
             .withSetterParameterDefinition("expression", fromFixedValue("true").build()).build());

@@ -6,19 +6,19 @@
  */
 package org.mule.runtime.core.routing;
 
-import static java.util.Collections.emptySet;
-import static java.util.Collections.singleton;
-import static java.util.Collections.singletonList;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.RoutePathNotFoundException;
-import org.mule.runtime.core.api.routing.filter.Filter;
 
-import java.util.Collection;
+import java.util.Optional;
 
 /**
- * Routes the event to a single<code>MessageProcessor</code> using a {@link Filter} to evaluate the event being processed and find
+ * Routes the event to a single<code>MessageProcessor</code> using an expression to evaluate the event being processed and find
  * the first route that can be used.
  * <p>
  * If a default route has been configured and no match has been found, the default route will be used. Otherwise it continues the
@@ -26,23 +26,39 @@ import java.util.Collection;
  */
 public class ChoiceRouter extends AbstractSelectiveRouter {
 
+  private FlowConstruct flowConstruct;
+  private MuleContext muleContext;
+
   @Override
-  protected Collection<Processor> selectProcessors(Event event, Event.Builder builder) {
-    for (MessageProcessorFilterPair mpfp : getConditionalMessageProcessors()) {
-      if (mpfp.getFilter().accept(event, builder)) {
-        return singleton(mpfp.getMessageProcessor());
+  protected Optional<Processor> selectProcessors(Event event) {
+    for (MessageProcessorExpressionPair mpfp : getConditionalMessageProcessors()) {
+      if (muleContext.getExpressionManager().evaluateBoolean(mpfp.getExpression(), event, flowConstruct)) {
+        return of(mpfp.getMessageProcessor());
       }
     }
 
-    return emptySet();
+    return empty();
   }
 
   @Override
-  protected Collection<Processor> getProcessorsToRoute(Event event) throws RoutePathNotFoundException {
+  protected Processor getProcessorToRoute(Event event) throws RoutePathNotFoundException {
     try {
-      return super.getProcessorsToRoute(event);
+      return super.getProcessorToRoute(event);
     } catch (RoutePathNotFoundException e) {
-      return singletonList(event1 -> event1);
+      return event1 -> event1;
     }
   }
+
+  @Override
+  public void setFlowConstruct(FlowConstruct flowConstruct) {
+    super.setFlowConstruct(flowConstruct);
+    this.flowConstruct = flowConstruct;
+  }
+
+  @Override
+  public void setMuleContext(MuleContext context) {
+    super.setMuleContext(context);
+    this.muleContext = context;
+  }
+
 }
