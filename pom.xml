@@ -238,8 +238,8 @@
 
         <muleFileCommonsTestVersion>0.8.0-SNAPSHOT</muleFileCommonsTestVersion>
 
-        <muleHttpServiceTestVersion>1.0.0-SNAPSHOT</muleHttpServiceTestVersion>
-        <muleSchedulerServiceTestVersion>1.0.0-SNAPSHOT</muleSchedulerServiceTestVersion>
+        <muleHttpServiceTestVersion>1.0.0-BETA</muleHttpServiceTestVersion>
+        <muleSchedulerServiceTestVersion>1.0.0-BETA</muleSchedulerServiceTestVersion>
 
         <!-- Test Extensions -->
         <muleMetadataExtensionTestVersion>4.0.0-BETA-SNAPSHOT</muleMetadataExtensionTestVersion>
@@ -279,9 +279,9 @@
         <maven.surefire.plugin.version>2.19.1</maven.surefire.plugin.version>
         <maven.enforcer.plugin.version>1.4.1</maven.enforcer.plugin.version>
 
-        <mule.module.maven.plugin.version>1.0.0-BETA-SNAPSHOT</mule.module.maven.plugin.version>
-        <mule.extensions.maven.plugin.version>1.0.0-BETA-SNAPSHOT</mule.extensions.maven.plugin.version>
-        <mule.app.plugins.maven.plugin.version>1.0.0-BETA-SNAPSHOT</mule.app.plugins.maven.plugin.version>
+        <mule.module.maven.plugin.version>1.0.0-BETA</mule.module.maven.plugin.version>
+        <mule.extensions.maven.plugin.version>1.0.0-BETA</mule.extensions.maven.plugin.version>
+        <mule.app.plugins.maven.plugin.version>1.0.0-BETA</mule.app.plugins.maven.plugin.version>
         <mule.jmh.elasticsearch.maven.plugin.version>1.0.0-SNAPSHOT</mule.jmh.elasticsearch.maven.plugin.version>
 
         <maven.replacer.plugin>1.5.3</maven.replacer.plugin>
