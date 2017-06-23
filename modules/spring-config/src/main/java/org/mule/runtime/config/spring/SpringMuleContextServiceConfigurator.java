@@ -54,10 +54,12 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSFORMAT
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.DEFAULT_ARTIFACT_PROPERTIES_RESOURCE;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
+
 import org.mule.runtime.api.artifact.ArtifactProperties;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.service.Service;
+import org.mule.runtime.config.spring.NotificationConfig.EnabledNotificationConfig;
 import org.mule.runtime.config.spring.factories.ConstantFactoryBean;
 import org.mule.runtime.config.spring.factories.ExtensionManagerFactoryBean;
 import org.mule.runtime.config.spring.factories.TransactionManagerFactoryBean;
@@ -67,60 +69,61 @@ import org.mule.runtime.config.spring.processors.ParentContextPropertyPlaceholde
 import org.mule.runtime.config.spring.processors.PropertyPlaceholderProcessor;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.TransformationService;
-import org.mule.runtime.core.api.context.notification.ConnectionNotificationListener;
-import org.mule.runtime.core.api.context.notification.CustomNotificationListener;
-import org.mule.runtime.core.api.context.notification.ExceptionNotificationListener;
-import org.mule.runtime.core.api.context.notification.ManagementNotificationListener;
-import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
-import org.mule.runtime.core.api.context.notification.RegistryNotificationListener;
-import org.mule.runtime.core.api.context.notification.SecurityNotificationListener;
-import org.mule.runtime.core.api.context.notification.TransactionNotificationListener;
-import org.mule.runtime.core.api.time.TimeSupplier;
-import org.mule.runtime.core.component.state.DefaultComponentInitialStateManager;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
-import org.mule.runtime.core.internal.config.factory.HostNameFactory;
 import org.mule.runtime.core.api.context.notification.ConnectionNotification;
+import org.mule.runtime.core.api.context.notification.ConnectionNotificationListener;
 import org.mule.runtime.core.api.context.notification.CustomNotification;
+import org.mule.runtime.core.api.context.notification.CustomNotificationListener;
 import org.mule.runtime.core.api.context.notification.ExceptionNotification;
+import org.mule.runtime.core.api.context.notification.ExceptionNotificationListener;
 import org.mule.runtime.core.api.context.notification.ManagementNotification;
-import org.mule.runtime.core.internal.context.notification.MessageProcessingFlowTraceManager;
+import org.mule.runtime.core.api.context.notification.ManagementNotificationListener;
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
+import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
 import org.mule.runtime.core.api.context.notification.RegistryNotification;
+import org.mule.runtime.core.api.context.notification.RegistryNotificationListener;
 import org.mule.runtime.core.api.context.notification.SecurityNotification;
+import org.mule.runtime.core.api.context.notification.SecurityNotificationListener;
+import org.mule.runtime.core.api.context.notification.ServerNotification;
+import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
 import org.mule.runtime.core.api.context.notification.TransactionNotification;
+import org.mule.runtime.core.api.context.notification.TransactionNotificationListener;
+import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
+import org.mule.runtime.core.api.scheduler.SchedulerContainerPoolsConfig;
+import org.mule.runtime.core.api.time.TimeSupplier;
+import org.mule.runtime.core.api.util.queue.TransactionalQueueManager;
+import org.mule.runtime.core.component.state.DefaultComponentInitialStateManager;
 import org.mule.runtime.core.el.DefaultExpressionManager;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.exception.MessagingExceptionLocationProvider;
-import org.mule.runtime.core.internal.execution.MuleMessageProcessingManager;
 import org.mule.runtime.core.internal.config.CustomService;
 import org.mule.runtime.core.internal.config.CustomServiceRegistry;
+import org.mule.runtime.core.internal.config.factory.HostNameFactory;
 import org.mule.runtime.core.internal.connection.DefaultConnectionManager;
 import org.mule.runtime.core.internal.connectivity.DefaultConnectivityTestingService;
 import org.mule.runtime.core.internal.connector.MuleConnectorOperationLocator;
+import org.mule.runtime.core.internal.context.notification.MessageProcessingFlowTraceManager;
+import org.mule.runtime.core.internal.execution.MuleMessageProcessingManager;
 import org.mule.runtime.core.internal.lock.MuleLockFactory;
 import org.mule.runtime.core.internal.lock.SingleServerLockProvider;
+import org.mule.runtime.core.internal.management.stats.DefaultProcessingTimeWatcher;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.core.internal.streaming.DefaultStreamingManager;
 import org.mule.runtime.core.internal.transformer.DynamicDataTypeConversionResolver;
-import org.mule.runtime.core.internal.management.stats.DefaultProcessingTimeWatcher;
+import org.mule.runtime.core.internal.util.DefaultStreamCloserService;
 import org.mule.runtime.core.policy.DefaultPolicyManager;
 import org.mule.runtime.core.policy.DefaultPolicyStateHandler;
 import org.mule.runtime.core.processor.interceptor.DefaultProcessorInterceptorManager;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
-import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
-import org.mule.runtime.core.api.scheduler.SchedulerContainerPoolsConfig;
 import org.mule.runtime.core.security.DefaultMuleSecurityManager;
-import org.mule.runtime.core.internal.util.DefaultStreamCloserService;
-import org.mule.runtime.core.api.util.queue.TransactionalQueueManager;
 import org.mule.runtime.core.util.store.DefaultObjectStoreFactoryBean;
 import org.mule.runtime.core.util.store.MuleObjectStoreManager;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
@@ -362,17 +365,19 @@ class SpringMuleContextServiceConfigurator {
   }
 
   private static BeanDefinition createNotificationManagerBeanDefinition() {
-    List<NotificationConfig> defaultNotifications = new ArrayList<>();
-    defaultNotifications.add(new NotificationConfig(MuleContextNotificationListener.class, MuleContextNotification.class));
-    defaultNotifications.add(new NotificationConfig(SecurityNotificationListener.class, SecurityNotification.class));
-    defaultNotifications.add(new NotificationConfig(ManagementNotificationListener.class, ManagementNotification.class));
-    defaultNotifications.add(new NotificationConfig(ConnectionNotificationListener.class, ConnectionNotification.class));
-    defaultNotifications.add(new NotificationConfig(RegistryNotificationListener.class, RegistryNotification.class));
-    defaultNotifications.add(new NotificationConfig(CustomNotificationListener.class, CustomNotification.class));
-    defaultNotifications.add(new NotificationConfig(ExceptionNotificationListener.class, ExceptionNotification.class));
-    defaultNotifications.add(new NotificationConfig(TransactionNotificationListener.class, TransactionNotification.class));
     return getBeanDefinitionBuilder(ServerNotificationManagerConfigurator.class)
-        .addPropertyValue("enabledNotifications", defaultNotifications).getBeanDefinition();
+        .addPropertyValue("enabledNotifications", ImmutableList
+            .<NotificationConfig<? extends ServerNotification, ? extends ServerNotificationListener>>builder()
+            .add(new EnabledNotificationConfig<>(MuleContextNotificationListener.class, MuleContextNotification.class))
+            .add(new EnabledNotificationConfig<>(SecurityNotificationListener.class, SecurityNotification.class))
+            .add(new EnabledNotificationConfig<>(ManagementNotificationListener.class, ManagementNotification.class))
+            .add(new EnabledNotificationConfig<>(ConnectionNotificationListener.class, ConnectionNotification.class))
+            .add(new EnabledNotificationConfig<>(RegistryNotificationListener.class, RegistryNotification.class))
+            .add(new EnabledNotificationConfig<>(CustomNotificationListener.class, CustomNotification.class))
+            .add(new EnabledNotificationConfig<>(ExceptionNotificationListener.class, ExceptionNotification.class))
+            .add(new EnabledNotificationConfig<>(TransactionNotificationListener.class, TransactionNotification.class))
+            .build())
+        .getBeanDefinition();
   }
 
   private void createBootstrapBeanDefinitions() {

@@ -106,6 +106,7 @@ import org.mule.runtime.core.api.component.LifecycleAdapterFactory;
 import org.mule.runtime.core.api.config.ConfigurationExtension;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.context.notification.ListenerSubscriptionPair;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.interceptor.Interceptor;
 import org.mule.runtime.core.api.model.EntryPointResolver;
@@ -139,7 +140,6 @@ import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.component.DefaultJavaComponent;
 import org.mule.runtime.core.component.PooledJavaComponent;
-import org.mule.runtime.core.api.context.notification.ListenerSubscriptionPair;
 import org.mule.runtime.core.el.ExpressionLanguageComponent;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.el.mvel.configuration.AliasEntry;
@@ -241,6 +241,8 @@ import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
 import org.mule.runtime.dsl.api.component.TypeConverter;
 
+import com.google.common.collect.ImmutableMap;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -249,8 +251,6 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.regex.Pattern;
-
-import com.google.common.collect.ImmutableMap;
 
 /**
  * {@link ComponentBuildingDefinition} definitions for the components provided by the core runtime.
@@ -686,11 +686,12 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
             .withSetterParameterDefinition("eventClass", fromSimpleParameter("event-class").build());
 
     componentBuildingDefinitions.add(baseNotificationDefinition.copy()
-        .withTypeDefinition(fromType(NotificationConfig.EnabledNotificationConfig.class)).withIdentifier("notification").build());
+        .withTypeDefinition(fromType(NotificationConfig.EnabledNotificationConfig.class))
+        .withIdentifier("notification").build());
 
-    componentBuildingDefinitions
-        .add(baseNotificationDefinition.copy().withTypeDefinition(fromType(NotificationConfig.DisabledNotificationConfig.class))
-            .withIdentifier("disable-notification").build());
+    componentBuildingDefinitions.add(baseNotificationDefinition.copy()
+        .withTypeDefinition(fromType(NotificationConfig.DisabledNotificationConfig.class))
+        .withIdentifier("disable-notification").build());
 
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("notification-listener")
         .withTypeDefinition(fromType(ListenerSubscriptionPair.class))

@@ -9,6 +9,7 @@ package org.mule.runtime.core.api.context.notification;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -39,8 +40,8 @@ import org.slf4j.Logger;
  *
  * <p>
  * However, measurements showed that there was still a small impact on speed in some cases. To improve behaviour further the
- * {@link OptimisedNotificationHandler} was added. This allows a service that generates
- * notifications to cache locally a handler optimised for a particular class.
+ * {@link OptimisedNotificationHandler} was added. This allows a service that generates notifications to cache locally a handler
+ * optimised for a particular class.
  *
  * <p>
  * The dynamic flag stops this caching from occurring. This reduces efficiency slightly (about 15% cost on simple VM messages,
@@ -114,7 +115,7 @@ public class ServerNotificationManager implements Initialisable, Disposable, Ser
     configuration.removeListener(listener);
   }
 
-  public void disableInterface(Class<? extends ServerNotificationListener> iface) throws ClassNotFoundException {
+  public void disableInterface(Class<? extends ServerNotificationListener> iface) {
     configuration.disableInterface(iface);
   }
 
@@ -123,7 +124,7 @@ public class ServerNotificationManager implements Initialisable, Disposable, Ser
     configuration.disabledAllInterfaces(interfaces);
   }
 
-  public void disableType(Class<? extends ServerNotification> type) throws ClassNotFoundException {
+  public void disableType(Class<? extends ServerNotification> type) {
     configuration.disableType(type);
   }
 
