@@ -22,10 +22,6 @@ import org.mule.runtime.extension.api.resources.GeneratedResource;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,8 +34,6 @@ import org.springframework.beans.factory.xml.DelegatingEntityResolver;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
-import org.xml.sax.ext.EntityResolver2;
 
 /**
  * Custom implementation of resolver for schemas where it will delegate to our custom resolver, then if not found will try to
@@ -59,7 +53,6 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
   // TODO(fernandezlautaro): MULE-11024 once implemented, extensionSchemaFactory must not be Optional
   private Optional<SchemaResourceFactory> extensionSchemaFactory;
   private Map<String, Boolean> checkedEntities; //It saves already checked entities so that if the resolution already failed once, it will raise and exception and not loop failing over and over again.
-
 
   /**
    * Returns an instance of {@link ModuleDelegatingEntityResolver}
