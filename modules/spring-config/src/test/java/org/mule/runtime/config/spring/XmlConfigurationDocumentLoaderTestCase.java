@@ -18,6 +18,8 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -60,8 +62,8 @@ public class XmlConfigurationDocumentLoaderTestCase extends AbstractMuleTestCase
       fail("Should not have reach here as the document is malformed and an exception should have been thrown using the default constructor");
     } catch (MuleRuntimeException e) {
       // We want to be sure that the line and column are properly picked up
-      assertThat(e.getMessage(),
-                 StringContains.containsString("Cannot find the declaration of element \'mule\'"));
+      assertThat(getStackTrace(e),
+                 StringContains.containsString("Can't resolve  http://www.mulesoft.org/schema/mule/co"));
     }
   }
 
@@ -72,8 +74,8 @@ public class XmlConfigurationDocumentLoaderTestCase extends AbstractMuleTestCase
       fail("Should not have reach here as the document is malformed and an exception should have been thrown using the default constructor");
     } catch (MuleRuntimeException e) {
       // We want to be sure that the line and column are properly picked up
-      assertThat(e.getMessage(),
-                 StringContains.containsString("Cannot find the declaration of element \'mule\'"));
+      assertThat(getStackTrace(e),
+                 StringContains.containsString("Can't resolve  http://www.springframework.org/schema/beans/sprind"));
     }
   }
 
@@ -112,6 +114,13 @@ public class XmlConfigurationDocumentLoaderTestCase extends AbstractMuleTestCase
     assertThat(xmlGathererErrorHandlerTest.errors.get(0).getLineNumber(), is(LINE_NUMBER_ERROR));
   }
 
+
+  private String getStackTrace(Exception e) {
+    StringWriter errors = new StringWriter();
+    e.printStackTrace(new PrintWriter(errors));
+    return errors.toString();
+  }
+
   private Document getDocument(String filename) {
     final XmlConfigurationDocumentLoader xmlConfigurationDocumentLoader = schemaValidatingDocumentLoader();
     return getDocument(filename, xmlConfigurationDocumentLoader);
@@ -121,6 +130,7 @@ public class XmlConfigurationDocumentLoaderTestCase extends AbstractMuleTestCase
     final InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(filename);
     return xmlConfigurationDocumentLoader.loadDocument(filename, inputStream);
   }
+
   /**
    * Custom implementation to count errors for the current XSD validation for testing purposes only
    */
