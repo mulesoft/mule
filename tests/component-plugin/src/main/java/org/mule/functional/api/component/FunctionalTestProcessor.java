@@ -172,7 +172,7 @@ public class FunctionalTestProcessor extends AbstractAnnotatedObject
   /**
    * The service method that implements the test component logic.
    *
-   * @param event the current {@link EventC}
+   * @param event the current {@link Event}
    * @return a new message payload according to the configuration of the component
    * @throws Exception if there is a general failure or if {@link #isThrowException()} is true.
    */
@@ -234,9 +234,9 @@ public class FunctionalTestProcessor extends AbstractAnnotatedObject
   }
 
   /**
-   * An event callback is called when a message is received by the service. An MuleEvent callback isn't strictly required but it
-   * is usfal for performing assertions on the current message being received. Note that the FunctionalTestProcessor should be
-   * made a singleton when using MuleEvent callbacks
+   * An event callback is called when a message is received by the service. An Event callback isn't strictly required but it
+   * is useful for performing assertions on the current message being received. Note that the FunctionalTestProcessor should be
+   * made a singleton when using Event callbacks
    * <p/>
    * Another option is to register a {@link FunctionalTestNotificationListener} with Mule and this will deleiver a
    * {@link FunctionalTestNotification} for every message received by this service
@@ -250,9 +250,9 @@ public class FunctionalTestProcessor extends AbstractAnnotatedObject
   }
 
   /**
-   * An event callback is called when a message is received by the service. An MuleEvent callback isn't strictly required but it
-   * is usfal for performing assertions on the current message being received. Note that the FunctionalTestProcessor should be
-   * made a singleton when using MuleEvent callbacks
+   * An event callback is called when a message is received by the service. An Event callback isn't strictly required but it
+   * is useful for performing assertions on the current message being received. Note that the FunctionalTestProcessor should be
+   * made a singleton when using Event callbacks
    * <p/>
    * Another option is to register a {@link FunctionalTestNotificationListener} with Mule and this will deleiver a
    * {@link FunctionalTestNotification} for every message received by this service
@@ -422,7 +422,7 @@ public class FunctionalTestProcessor extends AbstractAnnotatedObject
   }
 
   /**
-   * @return the first {@code test:component} from a flow with the provided name.
+   * @return the first {@code test:processor} from a flow with the provided name.
    */
   public static FunctionalTestProcessor getFromFlow(MuleContext muleContext, String flowName) throws Exception {
     final FlowConstruct flowConstruct = muleContext.getRegistry().lookupObject(flowName);
