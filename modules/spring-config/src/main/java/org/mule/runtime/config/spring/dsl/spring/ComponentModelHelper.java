@@ -23,15 +23,13 @@ import org.mule.runtime.core.exception.ErrorHandler;
 import org.mule.runtime.core.exception.TemplateOnErrorHandler;
 import org.mule.runtime.core.routing.AbstractSelectiveRouter;
 import org.mule.runtime.core.source.scheduler.DefaultSchedulerMessageSource;
+import org.springframework.beans.PropertyValue;
+import org.springframework.beans.factory.config.BeanDefinition;
 
+import javax.xml.namespace.QName;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-
-import javax.xml.namespace.QName;
-
-import org.springframework.beans.PropertyValue;
-import org.springframework.beans.factory.config.BeanDefinition;
 
 public class ComponentModelHelper {
 
@@ -80,7 +78,17 @@ public class ComponentModelHelper {
       // this condition is required until flow-ref is migrated to the new parsing mechanism.
       return true;
     }
-    return isOfType(componentModel, Processor.class) || isOfType(componentModel, InterceptingMessageProcessor.class);
+    return isOfType(componentModel, Processor.class) || isOfType(componentModel, InterceptingMessageProcessor.class)
+        || isOfSmartConnectorType(componentModel);
+  }
+
+  /**
+   * TODO MULE-12932: temporal workaround until we define how Smart Connectors should behave with the component visitor.
+   * @param componentModel
+   * @return
+   */
+  private static boolean isOfSmartConnectorType(ComponentModel componentModel) {
+    return componentModel.getType() == null;
   }
 
   public static boolean isMessageSource(ComponentModel componentModel) {
