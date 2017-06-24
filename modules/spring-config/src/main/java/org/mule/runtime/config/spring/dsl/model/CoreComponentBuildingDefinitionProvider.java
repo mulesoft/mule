@@ -680,7 +680,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .build());
 
     ComponentBuildingDefinition.Builder baseNotificationDefinition =
-        baseDefinition.copy().withSetterParameterDefinition("interfaseName", fromSimpleParameter("interface").build())
+        baseDefinition.copy().withSetterParameterDefinition("interfaceName", fromSimpleParameter("interface").build())
             .withSetterParameterDefinition("eventName", fromSimpleParameter("event").build())
             .withSetterParameterDefinition("interfaceClass", fromSimpleParameter("interface-class").build())
             .withSetterParameterDefinition("eventClass", fromSimpleParameter("event-class").build());
