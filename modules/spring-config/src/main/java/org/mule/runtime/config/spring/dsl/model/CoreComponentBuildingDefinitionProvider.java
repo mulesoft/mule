@@ -197,7 +197,6 @@ import org.mule.runtime.core.routing.ScatterGatherRouter;
 import org.mule.runtime.core.routing.SimpleCollectionAggregator;
 import org.mule.runtime.core.routing.Splitter;
 import org.mule.runtime.core.routing.UntilSuccessful;
-import org.mule.runtime.core.routing.WireTap;
 import org.mule.runtime.core.routing.filters.EqualsFilter;
 import org.mule.runtime.core.routing.filters.ExceptionTypeFilter;
 import org.mule.runtime.core.routing.filters.ExpressionFilter;
@@ -282,7 +281,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   private static final String FLOW_REF = "flow-ref";
   private static final String EXCEPTION_LISTENER_ATTRIBUTE = "exceptionListener";
   private static final String SCATTER_GATHER = "scatter-gather";
-  private static final String WIRE_TAP = "wire-tap";
   private static final String ENRICHER = "enricher";
   private static final String ASYNC = "async";
   private static final String TRY = "try";
@@ -485,9 +483,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("aggregationStrategy", fromChildConfiguration(AggregationStrategy.class).build())
         .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
         .asScope().build());
-    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier(WIRE_TAP).withTypeDefinition(fromType(WireTap.class))
-        .withSetterParameterDefinition("tap", fromChildConfiguration(Processor.class).build())
-        .withSetterParameterDefinition("filter", fromChildConfiguration(Filter.class).build()).asScope().build());
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier(ENRICHER)
         .withObjectFactoryType(MessageEnricherObjectFactory.class).withTypeDefinition(fromType(MessageEnricher.class))
         .withSetterParameterDefinition("messageProcessor", fromChildConfiguration(Processor.class).build())

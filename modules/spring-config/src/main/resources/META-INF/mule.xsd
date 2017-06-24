@@ -4001,24 +4001,6 @@
         </xsd:complexType>
     </xsd:element>
 
-    <xsd:element name="wire-tap" substitutionGroup="abstract-intercepting-message-processor">
-        <xsd:annotation>
-            <xsd:documentation>
-                The WireTap inbound router allows you to route certain messages to a different message processor as well as to the component.
-            </xsd:documentation>
-        </xsd:annotation>
-        <xsd:complexType>
-            <xsd:complexContent>
-                <xsd:extension base="abstractInterceptingMessageProcessorType">
-                    <xsd:sequence>
-                        <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" maxOccurs="1"/>
-                        <xsd:element ref="abstract-filter" minOccurs="0"/>
-                    </xsd:sequence>
-                </xsd:extension>
-            </xsd:complexContent>
-        </xsd:complexType>
-    </xsd:element>
-
     <xsd:element name="combine-collections-transformer" substitutionGroup="abstract-global-intercepting-message-processor">
         <xsd:annotation>
             <xsd:documentation>
