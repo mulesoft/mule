@@ -53,28 +53,28 @@ public class ChoiceRouterTestCase extends AbstractReactiveProcessorTestCase {
 
   @Test
   public void testNoMatchingNorDefaultRoute() throws Exception {
-    choiceRouter.addRoute("payload == 'zap'", new TestMessageProcessor("bar"));
+    choiceRouter.addRoute(payloadZapExpression(), new TestMessageProcessor("bar"));
     Event inputEvent = fooEvent();
     assertThat(process(choiceRouter, inputEvent), is(inputEvent));
   }
 
   @Test
   public void testNoMatchingRouteWithDefaultRoute() throws Exception {
-    choiceRouter.addRoute("payload == 'zap'", new TestMessageProcessor("bar"));
+    choiceRouter.addRoute(payloadZapExpression(), new TestMessageProcessor("bar"));
     choiceRouter.setDefaultRoute(new TestMessageProcessor("default"));
     assertThat(process(choiceRouter, fooEvent()).getMessage().getPayload().getValue(), is("foo:default"));
   }
 
   @Test
   public void testMatchingRouteWithDefaultRoute() throws Exception {
-    choiceRouter.addRoute("payload == 'zap'", new TestMessageProcessor("bar"));
+    choiceRouter.addRoute(payloadZapExpression(), new TestMessageProcessor("bar"));
     choiceRouter.setDefaultRoute(new TestMessageProcessor("default"));
     assertThat(process(choiceRouter, zapEvent()).getMessage().getPayload().getValue(), is("zap:bar"));
   }
 
   @Test
   public void testMatchingRouteWithStatistics() throws Exception {
-    choiceRouter.addRoute("payload == 'zap'", new TestMessageProcessor("bar"));
+    choiceRouter.addRoute(payloadZapExpression(), new TestMessageProcessor("bar"));
     choiceRouter.setRouterStatistics(new RouterStatistics(TYPE_OUTBOUND));
     assertThat(process(choiceRouter, zapEvent()).getMessage().getPayload().getValue(), is("zap:bar"));
   }
@@ -82,7 +82,7 @@ public class ChoiceRouterTestCase extends AbstractReactiveProcessorTestCase {
   @Test
   public void testAddAndDeleteRoute() throws Exception {
     TestMessageProcessor mp = new TestMessageProcessor("bar");
-    choiceRouter.addRoute("payload == 'zap'", mp);
+    choiceRouter.addRoute(payloadZapExpression(), mp);
     choiceRouter.removeRoute(mp);
     choiceRouter.setRouterStatistics(new RouterStatistics(TYPE_OUTBOUND));
 
@@ -93,8 +93,8 @@ public class ChoiceRouterTestCase extends AbstractReactiveProcessorTestCase {
   @Test
   public void testUpdateRoute() throws Exception {
     TestMessageProcessor mp = new TestMessageProcessor("bar");
-    choiceRouter.addRoute("payload == 'paz'", mp);
-    choiceRouter.updateRoute("payload == 'zap'", mp);
+    choiceRouter.addRoute(payloadPazExpression(), mp);
+    choiceRouter.updateRoute(payloadZapExpression(), mp);
     assertThat(process(choiceRouter, zapEvent()).getMessage().getPayload().getValue(), is("zap:bar"));
   }
 
@@ -108,8 +108,16 @@ public class ChoiceRouterTestCase extends AbstractReactiveProcessorTestCase {
 
   @Test
   public void testRemovingUpdatingMissingRoutes() {
-    choiceRouter.updateRoute("payload == 'zap'", new TestMessageProcessor("bar"));
+    choiceRouter.updateRoute(payloadZapExpression(), new TestMessageProcessor("bar"));
     choiceRouter.removeRoute(new TestMessageProcessor("rab"));
   }
 
+  public String payloadZapExpression() {
+    return "payload == 'zap'";
+  }
+
+  public String payloadPazExpression() {
+    return "payload == 'paz'";
+  }
 }
+

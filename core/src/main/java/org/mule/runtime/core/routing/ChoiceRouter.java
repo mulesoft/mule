@@ -6,9 +6,6 @@
  */
 package org.mule.runtime.core.routing;
 
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -30,14 +27,11 @@ public class ChoiceRouter extends AbstractSelectiveRouter {
   private MuleContext muleContext;
 
   @Override
-  protected Optional<Processor> selectProcessors(Event event) {
-    for (MessageProcessorExpressionPair mpfp : getConditionalMessageProcessors()) {
-      if (muleContext.getExpressionManager().evaluateBoolean(mpfp.getExpression(), event, flowConstruct)) {
-        return of(mpfp.getMessageProcessor());
-      }
-    }
-
-    return empty();
+  protected Optional<Processor> selectProcessor(Event event) {
+    return getConditionalMessageProcessors().stream()
+        .filter(cmp -> muleContext.getExpressionManager().evaluateBoolean(cmp.getExpression(), event, flowConstruct, false, true))
+        .findFirst()
+        .map(cmp -> cmp.getMessageProcessor());
   }
 
   @Override

@@ -6,8 +6,10 @@
  */
 package org.mule.runtime.core.routing;
 
+import static java.lang.String.format;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.unmodifiableList;
+import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.collections.ListUtils.union;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -50,7 +52,7 @@ public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject im
     RouterStatisticsRecorder, Lifecycle, FlowConstructAware, MuleContextAware {
 
   private final List<MessageProcessorExpressionPair> conditionalMessageProcessors = new ArrayList<>();
-  private Processor defaultProcessor;
+  private Optional<Processor> defaultProcessor = empty();
   private RouterStatistics routerStatistics;
 
   final AtomicBoolean initialised = new AtomicBoolean(false);
@@ -165,7 +167,7 @@ public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject im
 
   @Override
   public void setDefaultRoute(final Processor processor) {
-    defaultProcessor = processor;
+    defaultProcessor = ofNullable(processor);
   }
 
   @Override
@@ -182,8 +184,8 @@ public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject im
   }
 
   protected Processor getProcessorToRoute(Event event) throws RoutePathNotFoundException {
-    final Processor processor = selectProcessors(event).orElse(defaultProcessor);
-    return ofNullable(processor)
+    Optional<Processor> selectedProcessor = selectProcessor(event);
+    return (selectedProcessor.isPresent() ? selectedProcessor : defaultProcessor)
         .orElseThrow(() -> new RoutePathNotFoundException(createStaticMessage("Can't process message because no route has been found matching any filter and no default route is defined"),
                                                           this));
   }
@@ -191,7 +193,7 @@ public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject im
   /**
    * @return the processor selected according to the specific router strategy.
    */
-  protected abstract Optional<Processor> selectProcessors(Event event);
+  protected abstract Optional<Processor> selectProcessor(Event event);
 
   private Collection<?> getLifecycleManagedObjects() {
     if (defaultProcessor == null) {
@@ -285,7 +287,7 @@ public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject im
 
   @Override
   public String toString() {
-    return String.format("%s [flow-construct=%s, started=%s]", getClass().getSimpleName(),
-                         flowConstruct != null ? flowConstruct.getName() : null, started);
+    return format("%s [flow-construct=%s, started=%s]", getClass().getSimpleName(),
+                  flowConstruct != null ? flowConstruct.getName() : null, started);
   }
 }
