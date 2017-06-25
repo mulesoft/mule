@@ -32,6 +32,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
+import org.mule.runtime.core.api.message.ErrorBuilder;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.ErrorMapping;
 import org.mule.runtime.core.exception.ErrorTypeLocator;
@@ -40,7 +41,6 @@ import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.exception.TypedException;
 import org.mule.runtime.core.exception.WrapperErrorMessageAwareException;
-import org.mule.runtime.core.api.message.ErrorBuilder;
 
 import java.util.List;
 import java.util.ListIterator;
@@ -255,10 +255,11 @@ public class ExceptionUtils {
                                        ErrorTypeLocator errorTypeLocator) {
     // TODO: MULE-10970/MULE-10971 - Change signature to AnnotatedObject once every processor and source is one
     Throwable causeException = messagingException.getCause() != null ? messagingException.getCause() : messagingException;
-    Optional<Error> error = messagingException.getEvent().getError();
-    if (!error.isPresent() || errorCauseMatchesException(causeException, error)
-        || !messagingException.causedExactlyBy(error.get().getCause().getClass())) {
 
+    if (!messagingException.getEvent().getError()
+        .filter(error -> errorCauseMatchesException(causeException, error)
+            || messagingException.causedExactlyBy(error.getCause().getClass()))
+        .isPresent()) {
       Error newError = getErrorFromFailingProcessor(annotatedObject, causeException, errorTypeLocator);
       Event event = Event.builder(messagingException.getEvent()).error(newError).build();
       messagingException.setProcessedEvent(event);
@@ -377,9 +378,9 @@ public class ExceptionUtils {
     return empty();
   }
 
-  static boolean errorCauseMatchesException(Throwable causeException, Optional<Error> error) {
+  static boolean errorCauseMatchesException(Throwable causeException, Error error) {
     Throwable throwable = causeException instanceof TypedException ? causeException.getCause() : causeException;
-    return !error.get().getCause().equals(throwable);
+    return throwable.equals(error.getCause());
   }
 
   public static Error getErrorFromFailingProcessor(Object annotatedObject, Throwable causeException,

@@ -26,6 +26,7 @@ import static org.mule.test.heisenberg.extension.model.HealthStatus.DEAD;
 import static org.mule.test.heisenberg.extension.model.HealthStatus.HEALTHY;
 import static org.mule.test.heisenberg.extension.model.KnockeableDoor.knock;
 import static org.mule.test.heisenberg.extension.model.Ricin.RICIN_KILL_MESSAGE;
+
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
@@ -34,6 +35,7 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
+import org.mule.test.heisenberg.extension.exception.HealthException;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
 import org.mule.test.heisenberg.extension.model.BarberPreferences;
 import org.mule.test.heisenberg.extension.model.CarDealer;
@@ -137,7 +139,7 @@ public class OperationExecutionTestCase extends AbstractExtensionFunctionalTestC
     assertThat(value.getKnownAddresses().get(0), is("explicitAddress"));
 
     // TODO MULE-11315: Enable this assertion when aliased parameters are injected correctly
-    //assertThat(value.getName(), is("Pepe"));
+    // assertThat(value.getName(), is("Pepe"));
   }
 
   @Test
@@ -309,7 +311,8 @@ public class OperationExecutionTestCase extends AbstractExtensionFunctionalTestC
 
   @Test
   public void operationWithExceptionEnricher() throws Throwable {
-    expectedException.expectCause(is(instanceOf(HeisenbergException.class)));
+    expectedException.expect(HeisenbergException.class);
+    expectedException.expectCause(is(instanceOf(HealthException.class)));
     expectedException.expectMessage(containsString(CURE_CANCER_MESSAGE));
     runFlowAndThrowCause("cureCancer");
   }

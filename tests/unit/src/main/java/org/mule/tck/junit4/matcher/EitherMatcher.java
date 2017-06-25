@@ -44,9 +44,9 @@ public class EitherMatcher<L, R> extends TypeSafeMatcher<Either<L, R>> {
 
   @Override
   public void describeTo(Description description) {
-    description.appendText("left ");
+    description.appendText("left is ");
     leftMatcher.describeTo(description);
-    description.appendText(" and right ");
+    description.appendText("; and right is ");
     rightMatcher.describeTo(description);
   }
 

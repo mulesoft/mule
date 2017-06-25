@@ -15,11 +15,12 @@ import static org.mule.runtime.api.message.Message.of;
 import static reactor.core.Exceptions.unwrap;
 import static reactor.core.publisher.Mono.just;
 
-import org.mule.runtime.core.exception.MuleFatalException;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.exception.MuleFatalException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -29,6 +30,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
 import reactor.core.publisher.Mono;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -38,8 +40,7 @@ public class MapProcessorTestCase extends AbstractMuleContextTestCase {
   @Mock
   private EventContext eventContext;
 
-  @Mock
-  private Event event;
+  private Event event = Event.builder(eventContext).message(Message.of(TEST_PAYLOAD)).build();
 
   private RuntimeException exception = new RuntimeException() {};
 

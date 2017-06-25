@@ -36,6 +36,7 @@ public class MessagingExceptionMatcher extends TypeSafeMatcher<MessagingExceptio
 
   @Override
   public void describeTo(Description description) {
+    description.appendText("a MessagingException with ");
     eventMatcher.describeTo(description);
   }
 
