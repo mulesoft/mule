@@ -216,12 +216,12 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
     public void testAllCoreExtensionsAreStoppedAfterRuntimeException() throws Exception
     {
         TestDeploymentServiceAwareExtension extensionFailsStops = mock(TestDeploymentServiceAwareExtension.class);
-        TestDeploymentServiceAwareExtension extension = mock(TestDeploymentServiceAwareExtension.class);
+        TestDeploymentServiceAwareExtension extensionStopsOk = mock(TestDeploymentServiceAwareExtension.class);
         List<MuleCoreExtension> extensions = new LinkedList<>();
         when(coreExtensionDiscoverer.discover()).thenReturn(extensions);
         when(coreExtensionDependencyResolver.resolveDependencies(extensions)).thenReturn(extensions);
         doThrow(RuntimeException.class).when(extensionFailsStops).stop();
-        extensions.add(extension);
+        extensions.add(extensionStopsOk);
         extensions.add(extensionFailsStops);
         coreExtensionManager.initialise();
         try
@@ -230,7 +230,9 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
         }
         finally
         {
-            verify(extension).stop();
+            InOrder stopsInOrder = inOrder(extensionFailsStops, extensionStopsOk);
+            stopsInOrder.verify(extensionFailsStops).stop();
+            stopsInOrder.verify(extensionStopsOk).stop();
         }
     }
 
