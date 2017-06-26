@@ -76,8 +76,8 @@
             <artifactId>mail</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.ning</groupId>
-            <artifactId>async-http-client</artifactId>
+            <groupId>org.glassfish.grizzly</groupId>
+            <artifactId>grizzly-http-client</artifactId>
             <exclusions>
                 <exclusion>
                     <groupId>io.netty</groupId>
