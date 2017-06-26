@@ -16,6 +16,8 @@ import org.mule.runtime.core.internal.exception.AbstractMessagingExceptionStrate
 
 /**
  * Provides a way to define custom exception strategies on test flows.
+ *
+ * @since 4.0
  */
 public class TestExceptionStrategy extends AbstractMessagingExceptionStrategy implements MessagingExceptionHandler {
 

@@ -23,6 +23,8 @@ public interface ExceptionStrategyCallback {
    * @param event     event that was begin processed when the exception was thrown.
    * @param delegate  exception handler defined in the flow.
    * @return the result of the managed exception.
+   *
+   * @since 4.0
    */
   Event handleException(MessagingException exception, Event event, MessagingExceptionHandler delegate);
 }
