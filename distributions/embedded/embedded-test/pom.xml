@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.mule.distributions</groupId>
         <artifactId>mule-embedded</artifactId>
-        <version>4.0.0-BETA</version>
+        <version>4.0.0-BETA.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
