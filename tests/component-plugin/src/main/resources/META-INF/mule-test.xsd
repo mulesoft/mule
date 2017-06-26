@@ -152,8 +152,7 @@
                 <xsd:attribute name="class" type="xsd:string" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
-                            // TODO(pablo.kraan):api - fix XSD
-                            A class name of an object that implements {{org.mule.tck.functional.EventCallback}}.
+                            A class name of an object that implements {{org.mule.functional.api.component.ExceptionStrategyCallback}}.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>

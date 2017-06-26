@@ -283,7 +283,7 @@ public abstract class AbstractMuleTestCase {
   }
 
   /**
-   * Lets subclasses to provide a builder configured in a different way
+   * Allows subclasses to provide a builder configured in a different way
    *
    * @return a event builder to use to build a test event
    * @throws MuleException
