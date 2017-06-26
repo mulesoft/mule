@@ -7,15 +7,14 @@
 package org.mule.runtime.core.routing;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.core.api.management.stats.RouterStatistics.TYPE_OUTBOUND;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.management.stats.RouterStatistics;
-import org.mule.runtime.core.routing.filters.EqualsFilter;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 import org.mule.tck.testmodels.mule.TestMessageProcessor;
 
@@ -49,43 +48,43 @@ public class ChoiceRouterTestCase extends AbstractReactiveProcessorTestCase {
   @Test
   public void testOnlyDefaultRoute() throws Exception {
     choiceRouter.setDefaultRoute(new TestMessageProcessor("default"));
-    assertEquals("foo:default", process(choiceRouter, fooEvent()).getMessageAsString(muleContext));
+    assertThat(process(choiceRouter, fooEvent()).getMessage().getPayload().getValue(), is("foo:default"));
   }
 
   @Test
   public void testNoMatchingNorDefaultRoute() throws Exception {
-    choiceRouter.addRoute(new TestMessageProcessor("bar"), new EqualsFilter("zap"));
+    choiceRouter.addRoute(payloadZapExpression(), new TestMessageProcessor("bar"));
     Event inputEvent = fooEvent();
     assertThat(process(choiceRouter, inputEvent), is(inputEvent));
   }
 
   @Test
   public void testNoMatchingRouteWithDefaultRoute() throws Exception {
-    choiceRouter.addRoute(new TestMessageProcessor("bar"), new EqualsFilter("zap"));
+    choiceRouter.addRoute(payloadZapExpression(), new TestMessageProcessor("bar"));
     choiceRouter.setDefaultRoute(new TestMessageProcessor("default"));
-    assertEquals("foo:default", process(choiceRouter, fooEvent()).getMessageAsString(muleContext));
+    assertThat(process(choiceRouter, fooEvent()).getMessage().getPayload().getValue(), is("foo:default"));
   }
 
   @Test
   public void testMatchingRouteWithDefaultRoute() throws Exception {
-    choiceRouter.addRoute(new TestMessageProcessor("bar"), new EqualsFilter("zap"));
+    choiceRouter.addRoute(payloadZapExpression(), new TestMessageProcessor("bar"));
     choiceRouter.setDefaultRoute(new TestMessageProcessor("default"));
-    assertEquals("zap:bar", process(choiceRouter, zapEvent()).getMessageAsString(muleContext));
+    assertThat(process(choiceRouter, zapEvent()).getMessage().getPayload().getValue(), is("zap:bar"));
   }
 
   @Test
   public void testMatchingRouteWithStatistics() throws Exception {
-    choiceRouter.addRoute(new TestMessageProcessor("bar"), new EqualsFilter("zap"));
-    choiceRouter.setRouterStatistics(new RouterStatistics(RouterStatistics.TYPE_OUTBOUND));
-    assertEquals("zap:bar", process(choiceRouter, zapEvent()).getMessageAsString(muleContext));
+    choiceRouter.addRoute(payloadZapExpression(), new TestMessageProcessor("bar"));
+    choiceRouter.setRouterStatistics(new RouterStatistics(TYPE_OUTBOUND));
+    assertThat(process(choiceRouter, zapEvent()).getMessage().getPayload().getValue(), is("zap:bar"));
   }
 
   @Test
   public void testAddAndDeleteRoute() throws Exception {
     TestMessageProcessor mp = new TestMessageProcessor("bar");
-    choiceRouter.addRoute(mp, new EqualsFilter("zap"));
+    choiceRouter.addRoute(payloadZapExpression(), mp);
     choiceRouter.removeRoute(mp);
-    choiceRouter.setRouterStatistics(new RouterStatistics(RouterStatistics.TYPE_OUTBOUND));
+    choiceRouter.setRouterStatistics(new RouterStatistics(TYPE_OUTBOUND));
 
     Event inputEvent = zapEvent();
     assertThat(process(choiceRouter, inputEvent), is(inputEvent));
@@ -94,9 +93,9 @@ public class ChoiceRouterTestCase extends AbstractReactiveProcessorTestCase {
   @Test
   public void testUpdateRoute() throws Exception {
     TestMessageProcessor mp = new TestMessageProcessor("bar");
-    choiceRouter.addRoute(mp, new EqualsFilter("paz"));
-    choiceRouter.updateRoute(mp, new EqualsFilter("zap"));
-    assertEquals("zap:bar", process(choiceRouter, zapEvent()).getMessageAsString(muleContext));
+    choiceRouter.addRoute(payloadPazExpression(), mp);
+    choiceRouter.updateRoute(payloadZapExpression(), mp);
+    assertThat(process(choiceRouter, zapEvent()).getMessage().getPayload().getValue(), is("zap:bar"));
   }
 
   protected Event fooEvent() throws MuleException {
@@ -109,8 +108,16 @@ public class ChoiceRouterTestCase extends AbstractReactiveProcessorTestCase {
 
   @Test
   public void testRemovingUpdatingMissingRoutes() {
-    choiceRouter.updateRoute(new TestMessageProcessor("bar"), new EqualsFilter("zap"));
+    choiceRouter.updateRoute(payloadZapExpression(), new TestMessageProcessor("bar"));
     choiceRouter.removeRoute(new TestMessageProcessor("rab"));
   }
 
+  public String payloadZapExpression() {
+    return "payload == 'zap'";
+  }
+
+  public String payloadPazExpression() {
+    return "payload == 'paz'";
+  }
 }
+

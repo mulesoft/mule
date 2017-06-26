@@ -7,20 +7,19 @@
 package org.mule.runtime.core.api.routing;
 
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.routing.filter.Filter;
 
 /**
- * Routes the event to <code>MessageProcessor</code>s using a {@link Filter} to evaluate the event being processed and determine
- * if a given route should be used.
+ * Routes the event to <code>MessageProcessor</code>s using an expression to evaluate the event being processed and determine if a
+ * given route should be used.
  * <p>
  * If the implementation supports the use of a default route then this will be used to route any events that don't match any other
  * routes.
  */
 public interface SelectiveRouter extends Processor {
 
-  void addRoute(Processor processor, Filter filter);
+  void addRoute(String expression, Processor processor);
 
-  void updateRoute(Processor processor, Filter filter);
+  void updateRoute(String expression, Processor processor);
 
   void removeRoute(Processor processor);
 

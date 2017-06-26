@@ -7,41 +7,32 @@
 package org.mule.runtime.config.spring.factories;
 
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
-import org.mule.runtime.core.routing.MessageProcessorFilterPair;
-import org.mule.runtime.core.routing.filters.AcceptAllFilter;
-import org.mule.runtime.core.routing.filters.ExpressionFilter;
+import org.mule.runtime.core.routing.MessageProcessorExpressionPair;
 
 import java.util.List;
 
 import org.springframework.beans.factory.FactoryBean;
 
 public class MessageProcessorFilterPairFactoryBean extends AbstractAnnotatedObject
-    implements FactoryBean<MessageProcessorFilterPair>, MuleContextAware {
+    implements FactoryBean<MessageProcessorExpressionPair> {
 
+  private String expression = "true";
   private List<Processor> messageProcessors;
-  private Filter filter = new ExpressionFilter();
 
-  public void setFilter(Filter filter) {
-    this.filter = filter;
+  public void setExpression(String expression) {
+    this.expression = expression;
   }
 
   public void setMessageProcessors(List<Processor> messageProcessors) {
     this.messageProcessors = messageProcessors;
   }
 
-  public void setExpression(String expression) {
-    ((ExpressionFilter) filter).setExpression(expression);
-  }
-
   @Override
-  public MessageProcessorFilterPair getObject() throws Exception {
+  public MessageProcessorExpressionPair getObject() throws Exception {
     MessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     for (Object processor : messageProcessors) {
       if (processor instanceof Processor) {
@@ -53,22 +44,14 @@ public class MessageProcessorFilterPairFactoryBean extends AbstractAnnotatedObje
       }
     }
 
-    MessageProcessorFilterPair filterPair = createFilterPair(builder);
+    MessageProcessorExpressionPair filterPair = new MessageProcessorExpressionPair(expression, builder.build());
     filterPair.setAnnotations(getAnnotations());
     return filterPair;
   }
 
-  private MessageProcessorFilterPair createFilterPair(MessageProcessorChainBuilder builder) throws Exception {
-    if (filter == null) {
-      return new MessageProcessorFilterPair(builder.build(), AcceptAllFilter.INSTANCE);
-    } else {
-      return new MessageProcessorFilterPair(builder.build(), filter);
-    }
-  }
-
   @Override
-  public Class<MessageProcessorFilterPair> getObjectType() {
-    return MessageProcessorFilterPair.class;
+  public Class<MessageProcessorExpressionPair> getObjectType() {
+    return MessageProcessorExpressionPair.class;
   }
 
   @Override
@@ -76,10 +59,4 @@ public class MessageProcessorFilterPairFactoryBean extends AbstractAnnotatedObje
     return true;
   }
 
-  @Override
-  public void setMuleContext(MuleContext context) {
-    if (filter != null && filter instanceof MuleContextAware) {
-      ((MuleContextAware) filter).setMuleContext(context);
-    }
-  }
 }

@@ -4001,24 +4001,6 @@
         </xsd:complexType>
     </xsd:element>
 
-    <xsd:element name="wire-tap" substitutionGroup="abstract-intercepting-message-processor">
-        <xsd:annotation>
-            <xsd:documentation>
-                The WireTap inbound router allows you to route certain messages to a different message processor as well as to the component.
-            </xsd:documentation>
-        </xsd:annotation>
-        <xsd:complexType>
-            <xsd:complexContent>
-                <xsd:extension base="abstractInterceptingMessageProcessorType">
-                    <xsd:sequence>
-                        <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" maxOccurs="1"/>
-                        <xsd:element ref="abstract-filter" minOccurs="0"/>
-                    </xsd:sequence>
-                </xsd:extension>
-            </xsd:complexContent>
-        </xsd:complexType>
-    </xsd:element>
-
     <xsd:element name="combine-collections-transformer" substitutionGroup="abstract-global-intercepting-message-processor">
         <xsd:annotation>
             <xsd:documentation>
@@ -4222,34 +4204,23 @@
         </xsd:complexType>
     </xsd:element>
 
-    <!-- Conditional Message Processor Elements -->
-    <xsd:complexType name="abstractMessageProcessorFilterPairType" abstract="true" />
-
-    <xsd:complexType name="whenMessageProcessorFilterPairType">
-      <xsd:complexContent>
-        <xsd:extension base="abstractMessageProcessorFilterPairType">
-          <xsd:sequence>
+    <xsd:complexType name="whenMessageProcessorExpressionPairType">
+        <xsd:sequence>
             <!-- if the first message processor is a filter, it determines
                  whether this when clause is chosen or not.  This is only allowed when
                  no expression is specified -->
             <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" minOccurs="1" maxOccurs="unbounded" />
-          </xsd:sequence>
-          <xsd:attribute name="expression" type="xsd:string" use="optional">
-              <xsd:annotation>
-                  <xsd:documentation>The expression to evaluate.
-                  </xsd:documentation>
-              </xsd:annotation>
-          </xsd:attribute>
-        </xsd:extension>
-      </xsd:complexContent>
+        </xsd:sequence>
+        <xsd:attribute name="expression" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>The expression to evaluate.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
     </xsd:complexType>
 
-    <xsd:complexType name="otherwiseMessageProcessorFilterPairType">
-      <xsd:complexContent>
-        <xsd:extension base="abstractMessageProcessorFilterPairType">
-          <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" minOccurs="1" maxOccurs="unbounded" />
-        </xsd:extension>
-      </xsd:complexContent>
+    <xsd:complexType name="otherwiseMessageProcessorExpressionPairType">
+        <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" minOccurs="1" maxOccurs="unbounded" />
     </xsd:complexType>
 
     <xsd:element name="foreach" type="foreachProcessorType"
@@ -4343,8 +4314,8 @@
         <xsd:complexContent>
             <xsd:extension base="abstractRoutingMessageProcessorType">
                 <xsd:sequence>
-                    <xsd:element name="when" type="whenMessageProcessorFilterPairType" minOccurs="1" maxOccurs="unbounded"/>
-                    <xsd:element name="otherwise" type="otherwiseMessageProcessorFilterPairType" minOccurs="0" maxOccurs="1"/>
+                    <xsd:element name="when" type="whenMessageProcessorExpressionPairType" minOccurs="1" maxOccurs="unbounded"/>
+                    <xsd:element name="otherwise" type="otherwiseMessageProcessorExpressionPairType" minOccurs="0" maxOccurs="1"/>
                 </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>
