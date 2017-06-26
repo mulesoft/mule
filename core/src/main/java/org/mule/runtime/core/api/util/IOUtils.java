@@ -13,7 +13,6 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
-import org.mule.runtime.core.exception.NotAnInputStreamException;
 import org.mule.runtime.core.api.message.PartAttributes;
 import org.mule.runtime.core.api.message.ds.ByteArrayDataSource;
 import org.mule.runtime.core.api.message.ds.InputStreamDataSource;

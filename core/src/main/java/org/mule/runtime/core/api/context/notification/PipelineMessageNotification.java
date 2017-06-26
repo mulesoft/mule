@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api.context.notification;
 
 import org.mule.runtime.core.api.construct.Pipeline;
-import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.api.exception.MessagingException;
 
 /**
  * <code>PipelineMessageNotification</code> is fired at key steps in the processing of {@link Pipeline}

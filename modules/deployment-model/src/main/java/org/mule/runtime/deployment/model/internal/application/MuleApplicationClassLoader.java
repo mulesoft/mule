@@ -97,9 +97,6 @@ public class MuleApplicationClassLoader extends MuleDeployableArtifactClassLoade
           }
         }).collect(toList()));
 
-    // TODO MULE-12255 Don't add the context classlaoder, it won't be needed when the test namespace parser is in a plugin rather
-    // than in the app.
-    classLoaders.add(currentThread().getContextClassLoader());
     return classLoaders;
   }
 }

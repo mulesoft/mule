@@ -11,7 +11,7 @@ import static java.util.Optional.ofNullable;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.message.ErrorBuilder;
 
 import java.util.Optional;

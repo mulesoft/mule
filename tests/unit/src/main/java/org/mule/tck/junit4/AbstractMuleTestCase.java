@@ -279,7 +279,17 @@ public abstract class AbstractMuleTestCase {
    * @throws MuleException
    */
   protected Event newEvent() throws MuleException {
-    return eventBuilder().message(of(TEST_PAYLOAD)).build();
+    return getEventBuilder().message(of(TEST_PAYLOAD)).build();
+  }
+
+  /**
+   * Lets subclasses to provide a builder configured in a different way
+   *
+   * @return a event builder to use to build a test event
+   * @throws MuleException
+   */
+  protected Event.Builder getEventBuilder() throws MuleException {
+    return eventBuilder();
   }
 
   protected Event nullPayloadEvent() throws MuleException {

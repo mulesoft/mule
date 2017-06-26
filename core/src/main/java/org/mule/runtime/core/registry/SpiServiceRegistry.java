@@ -11,10 +11,7 @@ import static java.util.Collections.emptyList;
 import org.mule.runtime.core.api.registry.AbstractServiceRegistry;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 
-import com.google.common.collect.ImmutableList;
-
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.ServiceLoader;
 

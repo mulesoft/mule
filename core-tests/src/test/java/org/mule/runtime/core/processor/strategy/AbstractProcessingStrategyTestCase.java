@@ -21,7 +21,7 @@ import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
-import static org.mule.runtime.core.exception.Errors.Identifiers.OVERLOAD_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.api.exception.Errors.Identifiers.OVERLOAD_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static reactor.core.Exceptions.bubble;
 import static reactor.core.publisher.Flux.from;
@@ -44,7 +44,7 @@ import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.util.concurrent.NamedThreadFactory;
-import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.processor.AnnotatedProcessor;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 

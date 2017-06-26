@@ -16,7 +16,7 @@ import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.el.context.FlowVariableMapContext;
 import org.mule.runtime.core.el.context.MessageContext;
 import org.mule.runtime.core.el.context.SessionVariableMapContext;
-import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.api.exception.MessagingException;
 
 import java.util.Map;
 

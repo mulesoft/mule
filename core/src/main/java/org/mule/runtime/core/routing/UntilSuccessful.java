@@ -22,7 +22,7 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.store.ListableObjectStore;
-import org.mule.runtime.core.exception.MessagingExceptionHandlerToSystemAdapter;
+import org.mule.runtime.core.internal.exception.MessagingExceptionHandlerToSystemAdapter;
 import org.mule.runtime.core.routing.filters.ExpressionFilter;
 import org.mule.runtime.core.routing.outbound.AbstractOutboundRouter;
 

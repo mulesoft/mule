@@ -17,7 +17,7 @@ import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.func.CheckedConsumer;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
-import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.internal.execution.ModuleFlowProcessingPhaseTemplate;
 import org.mule.runtime.core.internal.execution.ResponseCompletionCallback;
 

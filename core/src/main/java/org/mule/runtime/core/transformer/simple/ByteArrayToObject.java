@@ -9,7 +9,7 @@ package org.mule.runtime.core.transformer.simple;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transformOnObjectUnsupportedTypeOfEndpoint;
 import static org.mule.runtime.core.api.util.IOUtils.ifInputStream;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.exception.NotAnInputStreamException;
+import org.mule.runtime.core.api.util.NotAnInputStreamException;
 
 import java.io.IOException;
 import java.io.ObjectStreamConstants;

@@ -41,7 +41,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_RET
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 import static org.mule.runtime.core.component.ComponentAnnotations.ANNOTATION_NAME;
 import static org.mule.runtime.core.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
-import static org.mule.runtime.core.exception.ErrorMapping.ANNOTATION_ERROR_MAPPINGS;
+import static org.mule.runtime.core.internal.exception.ErrorMapping.ANNOTATION_ERROR_MAPPINGS;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -53,10 +53,10 @@ import org.mule.runtime.config.spring.dsl.processor.AbstractAttributeDefinitionV
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
-import org.mule.runtime.core.exception.ErrorMapping;
-import org.mule.runtime.core.exception.ErrorTypeMatcher;
-import org.mule.runtime.core.exception.ErrorTypeRepository;
-import org.mule.runtime.core.exception.SingleErrorTypeMatcher;
+import org.mule.runtime.core.internal.exception.ErrorMapping;
+import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
+import org.mule.runtime.core.api.exception.ErrorTypeRepository;
+import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.dsl.api.component.AttributeDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;

@@ -24,7 +24,7 @@ import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrate
 import static org.mule.runtime.core.api.context.notification.PipelineMessageNotification.PROCESS_COMPLETE;
 import static org.mule.runtime.core.api.context.notification.PipelineMessageNotification.PROCESS_END;
 import static org.mule.runtime.core.api.context.notification.PipelineMessageNotification.PROCESS_START;
-import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.UNKNOWN;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.UNKNOWN;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -40,14 +40,14 @@ import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
-import org.mule.runtime.core.exception.ErrorHandler;
+import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.api.context.notification.AsyncMessageNotification;
 import org.mule.runtime.core.api.context.notification.ErrorHandlerNotification;
 import org.mule.runtime.core.api.context.notification.PipelineMessageNotification;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
-import org.mule.runtime.core.exception.ErrorHandlerFactory;
-import org.mule.runtime.core.exception.ErrorTypeLocator;
-import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.internal.exception.ErrorHandlerFactory;
+import org.mule.runtime.core.api.exception.ErrorTypeLocator;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.internal.construct.DefaultFlowBuilder.DefaultFlow;
 import org.mule.runtime.core.api.management.stats.AllStatistics;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;

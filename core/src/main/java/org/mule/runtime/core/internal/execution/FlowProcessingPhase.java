@@ -18,7 +18,7 @@ import org.mule.runtime.core.api.execution.TransactionalErrorHandlingExecutionTe
 import org.mule.runtime.core.api.scheduler.SchedulerBusyException;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
-import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.execution.FlowProcessingPhaseTemplate;
 import org.mule.runtime.core.api.execution.MessageProcessContext;
 import org.mule.runtime.core.api.execution.RequestResponseFlowProcessingPhaseTemplate;

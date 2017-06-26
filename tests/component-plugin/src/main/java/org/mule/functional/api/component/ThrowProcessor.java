@@ -15,8 +15,8 @@ import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.exception.ErrorTypeRepository;
-import org.mule.runtime.core.exception.TypedException;
+import org.mule.runtime.core.api.exception.ErrorTypeRepository;
+import org.mule.runtime.core.api.exception.TypedException;
 
 import javax.inject.Inject;
 

@@ -45,7 +45,7 @@ import org.mule.runtime.core.api.transport.LegacyInboundEndpoint;
 import org.mule.runtime.core.api.util.ExceptionUtils;
 import org.mule.runtime.core.api.context.notification.MessageProcessorNotification;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
-import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.execution.MessageProcessorExecutionTemplate;
 import org.mule.runtime.core.processor.interceptor.ReactiveInterceptorAdapter;
 import org.mule.runtime.core.streaming.StreamingManager;

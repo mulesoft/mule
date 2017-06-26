@@ -22,7 +22,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.exception.OnErrorPropagateHandler;
+import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.streaming.StreamingManager;
 import org.mule.runtime.core.api.util.UUID;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;

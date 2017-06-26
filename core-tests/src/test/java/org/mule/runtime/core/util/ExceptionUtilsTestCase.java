@@ -40,8 +40,8 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.exception.ErrorTypeLocator;
-import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.api.exception.ErrorTypeLocator;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

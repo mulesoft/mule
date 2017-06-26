@@ -8,7 +8,7 @@ package org.mule.runtime.core.policy;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.api.exception.MessagingException;
 
 /**
  * Exception used to signal the failure exception of the flow.

@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.core.internal.message;
 
-import static org.mule.runtime.core.exception.Errors.CORE_NAMESPACE_NAME;
-import static org.mule.runtime.core.exception.Errors.Identifiers.ANY_IDENTIFIER;
-import static org.mule.runtime.core.exception.Errors.Identifiers.CRITICAL_IDENTIFIER;
+import static org.mule.runtime.core.api.exception.Errors.CORE_NAMESPACE_NAME;
+import static org.mule.runtime.core.api.exception.Errors.Identifiers.ANY_IDENTIFIER;
+import static org.mule.runtime.core.api.exception.Errors.Identifiers.CRITICAL_IDENTIFIER;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import org.mule.runtime.api.message.ErrorType;
 

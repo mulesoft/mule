@@ -9,7 +9,7 @@ package org.mule.runtime.core.api.execution;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.api.exception.MessagingException;
 
 /**
  * Template methods for {@link MessageSource} specific behavior during flow execution.

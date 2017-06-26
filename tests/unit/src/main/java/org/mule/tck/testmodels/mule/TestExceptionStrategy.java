@@ -7,11 +7,10 @@
 package org.mule.tck.testmodels.mule;
 
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.RollbackSourceCallback;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
-import org.mule.runtime.core.exception.AbstractExceptionListener;
-import org.mule.runtime.core.exception.MessagingException;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -21,12 +20,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * <code>TestExceptionStrategy</code> is used by the Mule test cases as a direct replacement of the
- * {@link org.mule.runtime.core.exception.AbstractMessagingExceptionStrategy}. This is used to test that overriding the default
- * Exception strategy works.
+ * Provides a exception strategy for testing purposes.
  */
-public class TestExceptionStrategy extends AbstractExceptionListener
-    implements MessagingExceptionHandler, SystemExceptionHandler {
+public class TestExceptionStrategy implements MessagingExceptionHandler, SystemExceptionHandler {
 
   /**
    * logger used by this class
@@ -41,7 +37,7 @@ public class TestExceptionStrategy extends AbstractExceptionListener
   // @GuardedBy("callbackLock")
   private ExceptionCallback callback;
   // @GuardedBy("callbackLock")
-  private List<Exception> unhandled = new LinkedList<Exception>();
+  private List<Exception> unhandled = new LinkedList<>();
 
   private volatile String testProperty;
 
@@ -107,7 +103,7 @@ public class TestExceptionStrategy extends AbstractExceptionListener
     synchronized (callbackLock) {
       if (this.callback != null) {
         callback = this.callback;
-        unhandledCopies = new ArrayList<Exception>(unhandled);
+        unhandledCopies = new ArrayList<>(unhandled);
         unhandled.clear();
       }
     }

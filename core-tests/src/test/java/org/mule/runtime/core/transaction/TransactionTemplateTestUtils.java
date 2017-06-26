@@ -10,7 +10,7 @@ import org.mockito.Answers;
 import org.mockito.Mockito;
 
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
-import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.transaction.Transaction;

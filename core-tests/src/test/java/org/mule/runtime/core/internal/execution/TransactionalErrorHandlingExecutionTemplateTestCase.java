@@ -36,10 +36,10 @@ import org.mule.runtime.core.api.transaction.ExternalTransactionAwareTransaction
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
-import org.mule.runtime.core.exception.ErrorHandler;
-import org.mule.runtime.core.exception.ErrorHandlerFactory;
-import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.exception.OnErrorContinueHandler;
+import org.mule.runtime.core.internal.exception.ErrorHandler;
+import org.mule.runtime.core.internal.exception.ErrorHandlerFactory;
+import org.mule.runtime.core.api.exception.MessagingException;
+import org.mule.runtime.core.internal.exception.OnErrorContinueHandler;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.api.execution.TransactionalExecutionTemplateTestCase;

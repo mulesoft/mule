@@ -34,7 +34,7 @@ import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.api.exception.MessagingException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,9 +57,6 @@ public class FunctionalTestProcessor extends AbstractAnnotatedObject
     implements Processor, Lifecycle, MuleContextAware, FlowConstructAware {
 
   private static final Logger logger = getLogger(FunctionalTestProcessor.class);
-
-  public static final int STREAM_SAMPLE_SIZE = 4;
-  public static final int STREAM_BUFFER_SIZE = 4096;
 
   private EventCallback eventCallback;
   private Object returnData = null;

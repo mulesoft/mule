@@ -14,7 +14,7 @@ import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.api.processor.MessageRouter;
 import org.mule.runtime.core.internal.config.ExceptionHelper;
-import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.api.exception.MessagingException;
 
 import java.util.Collections;
 import java.util.Map;

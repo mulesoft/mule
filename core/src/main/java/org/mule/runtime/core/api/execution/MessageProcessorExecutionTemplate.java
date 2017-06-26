@@ -12,7 +12,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.internal.execution.ExceptionToMessagingExceptionExecutionInterceptor;
 import org.mule.runtime.core.internal.execution.MessageProcessorExecutionInterceptor;
 import org.mule.runtime.core.internal.execution.MessageProcessorNotificationExecutionInterceptor;

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.policy;
 
-import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.api.exception.MessagingException;
 
 import java.util.Map;
 

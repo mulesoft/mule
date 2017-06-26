@@ -17,7 +17,7 @@ import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
-import org.mule.runtime.core.exception.MessageRedeliveredException;
+import org.mule.runtime.core.api.exception.MessageRedeliveredException;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
 import org.mule.runtime.core.transformer.simple.ByteArrayToHexString;
 import org.mule.runtime.core.util.store.ObjectStorePartition;

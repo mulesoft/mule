@@ -14,7 +14,7 @@ import static org.mule.runtime.core.api.context.notification.ExceptionNotificati
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.ExceptionNotificationListener;
 import org.mule.runtime.core.api.context.notification.ExceptionNotification;
-import org.mule.runtime.core.exception.DefaultSystemExceptionStrategy;
+import org.mule.runtime.core.internal.exception.DefaultSystemExceptionStrategy;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.concurrent.CountDownLatch;
