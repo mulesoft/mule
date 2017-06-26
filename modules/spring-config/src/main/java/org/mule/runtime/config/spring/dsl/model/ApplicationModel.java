@@ -372,7 +372,6 @@ public class ApplicationModel {
 
   private void convertArtifactDeclarationToComponentModel(Set<ExtensionModel> extensionModels,
                                                           ArtifactDeclaration artifactDeclaration) {
-    //TODO lautaro pepepeppe
     if (artifactDeclaration != null && !extensionModels.isEmpty()) {
       DslElementModelFactory elementFactory = DslElementModelFactory
           .getDefault(DslResolvingContext.getDefault(extensionModels));
