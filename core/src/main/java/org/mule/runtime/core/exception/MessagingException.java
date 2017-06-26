@@ -8,7 +8,10 @@
 package org.mule.runtime.core.exception;
 
 import static java.lang.String.format;
+import static java.lang.System.lineSeparator;
 import static org.apache.commons.lang3.StringUtils.abbreviate;
+import static org.mule.runtime.core.internal.config.ExceptionHelper.traverseCauseHierarchy;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.message.Message;
@@ -117,12 +120,13 @@ public class MessagingException extends MuleException {
   }
 
   public MessagingException(Event event, MessagingException original) {
-    super(original.getI18nMessage(), original.getCause());
+    super(original.getI18nMessage(),
+          original.getCause() instanceof TypedException ? original.getCause().getCause() : original.getCause());
     this.event = event;
     this.failingMessageProcessor = original.getFailingMessageProcessor();
     this.causeRollback = original.causedRollback();
     this.handled = original.handled();
-    original.getInfo().forEach((key, value) -> addInfo((String) key, value));
+    original.getInfo().forEach((key, value) -> addInfo(key, value));
     extractMuleMessage(event);
     setMessage(original.getMessage());
   }
@@ -233,11 +237,11 @@ public class MessagingException extends MuleException {
    * @param e exception type to check against
    * @return true if the cause exception is exaclty the provided exception type
    */
-  public boolean causedExactlyBy(final Class e) {
+  public boolean causedExactlyBy(final Class<? extends Throwable> e) {
     if (e == null) {
       throw new IllegalArgumentException("Class cannot be null");
     }
-    return (ExceptionHelper.traverseCauseHierarchy(this, causeException -> {
+    return (traverseCauseHierarchy(this, causeException -> {
       if (causeException.getClass().equals(e)) {
         return causeException;
       }
@@ -282,6 +286,15 @@ public class MessagingException extends MuleException {
       }
       return null;
     })) != null;
+  }
+
+  @Override
+  protected void appendSummaryMessage(StringBuilder builder) {
+    builder.append("Error Type              : ")
+        .append(getEvent().getError().map(e -> e.getErrorType()))
+        .append(lineSeparator());
+
+    super.appendSummaryMessage(builder);
   }
 
   /**
@@ -369,4 +382,8 @@ public class MessagingException extends MuleException {
     }
   }
 
+  @Override
+  public String toString() {
+    return super.toString() + "; ErrorType: " + getEvent().getError().map(e -> e.getErrorType());
+  }
 }
