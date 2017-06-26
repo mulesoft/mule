@@ -4229,24 +4229,24 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:complexType name="baseMultipleRoutesRoutingMessageProcessorType">
-        <xsd:complexContent>
-            <xsd:extension base="baseSingleRouteRoutingMessageProcessorType"/>
-        </xsd:complexContent>
-    </xsd:complexType>
+    <!--<xsd:complexType name="baseMultipleRoutesRoutingMessageProcessorType">-->
+        <!--<xsd:complexContent>-->
+            <!--<xsd:extension base="baseSingleRouteRoutingMessageProcessorType"/>-->
+        <!--</xsd:complexContent>-->
+    <!--</xsd:complexType>-->
 
-    <xsd:element name="custom-router" substitutionGroup="abstract-routing-message-processor">
-        <xsd:complexType>
-            <xsd:complexContent>
-                <xsd:extension base="baseMultipleRoutesRoutingMessageProcessorType">
-                <xsd:sequence>
-                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
-                </xsd:sequence>
-                <xsd:attribute name="class" type="substitutableClass" use="required"/>
-                </xsd:extension>
-            </xsd:complexContent>
-        </xsd:complexType>
-    </xsd:element>
+    <!--<xsd:element name="custom-router" substitutionGroup="abstract-routing-message-processor">-->
+        <!--<xsd:complexType>-->
+            <!--<xsd:complexContent>-->
+                <!--<xsd:extension base="baseMultipleRoutesRoutingMessageProcessorType">-->
+                <!--<xsd:sequence>-->
+                    <!--<xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>-->
+                <!--</xsd:sequence>-->
+                <!--<xsd:attribute name="class" type="substitutableClass" use="required"/>-->
+                <!--</xsd:extension>-->
+            <!--</xsd:complexContent>-->
+        <!--</xsd:complexType>-->
+    <!--</xsd:element>-->
 
     <xsd:complexType name="selectiveOutboundRouterType">
         <xsd:complexContent>
@@ -4269,14 +4269,14 @@
     </xsd:element>
 
     <!-- Deprecated -->
-    <xsd:element name="all" type="baseMultipleRoutesRoutingMessageProcessorType" substitutionGroup="abstract-routing-message-processor">
-        <xsd:annotation>
-            <xsd:documentation>
-                Sends the same message to multiple message processors.
-                @Deprecated since 3.5.0. Use scatter-gather instead
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
+    <!--<xsd:element name="all" type="baseMultipleRoutesRoutingMessageProcessorType" substitutionGroup="abstract-routing-message-processor">-->
+        <!--<xsd:annotation>-->
+            <!--<xsd:documentation>-->
+                <!--Sends the same message to multiple message processors.-->
+                <!--@Deprecated since 3.5.0. Use scatter-gather instead-->
+            <!--</xsd:documentation>-->
+        <!--</xsd:annotation>-->
+    <!--</xsd:element>-->
 
     <xsd:complexType name="processorWithAtLeastOneTargetType" >
         <xsd:complexContent>
