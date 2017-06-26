@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.internal.capability.xml;
 import static com.google.common.collect.ImmutableSet.copyOf;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
-import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.mockito.Mockito.mock;
@@ -179,12 +178,7 @@ public class SchemaGeneratorTestCase extends AbstractMuleTestCase {
 
     @Override
     public Optional<ExtensionModel> getExtensionForType(String typeId) {
-      Optional<String> extension = getTypeCatalog().getDeclaringExtension(typeId);
-      if (!extension.isPresent()) {
-        return empty();
-      }
-
-      return getExtension(extension.get());
+      return getTypeCatalog().getDeclaringExtension(typeId).flatMap(this::getExtension);
     }
 
     @Override

@@ -49,25 +49,7 @@
     {
       "baseType": {
         "format": "java",
-        "type": "Object",
-        "annotations": {
-          "typeId": "org.mule.test.heisenberg.extension.model.Weapon",
-          "classInformation": {
-            "hasDefaultConstructor": false,
-            "isInterface": true,
-            "isInstantiable": false,
-            "isAbstract": true,
-            "isFinal": false,
-            "implementedInterfaces": [],
-            "parent": "",
-            "genericTypes": []
-          },
-          "extensibleType": {},
-          "typeAlias": {
-            "value": "Weapon"
-          }
-        },
-        "fields": []
+        "type": "@ref:org.mule.test.heisenberg.extension.model.Weapon"
       },
       "subTypes": [
         {
@@ -80,262 +62,256 @@
   "externalLibraries": [],
   "importedTypes": [
     {
-      "type": {
-        "format": "java",
-        "type": "Object",
-        "annotations": {
-          "typeId": "org.mule.test.heisenberg.extension.model.Ricin",
-          "classInformation": {
-            "hasDefaultConstructor": true,
-            "isInterface": false,
-            "isInstantiable": true,
-            "isAbstract": false,
-            "isFinal": false,
-            "implementedInterfaces": [
-              "org.mule.test.heisenberg.extension.model.Weapon"
-            ],
-            "parent": "",
-            "genericTypes": []
-          },
-          "xmlHints": {
-            "allowInlineDefinition": true,
-            "allowTopLevelDefinition": true,
-            "allowReferences": true
-          },
-          "typeAlias": {
-            "value": "Ricin"
-          }
+      "format": "java",
+      "type": "Object",
+      "annotations": {
+        "typeId": "org.mule.test.heisenberg.extension.model.Ricin",
+        "classInformation": {
+          "hasDefaultConstructor": true,
+          "isInterface": false,
+          "isInstantiable": true,
+          "isAbstract": false,
+          "isFinal": false,
+          "implementedInterfaces": [
+            "org.mule.test.heisenberg.extension.model.Weapon"
+          ],
+          "parent": "",
+          "genericTypes": []
         },
-        "fields": [
-          {
-            "key": {
-              "name": "microgramsPerKilo",
-              "required": "true"
-            },
-            "model": {
-              "type": "Number",
-              "annotations": {
-                "typeId": "java.lang.Long"
-              }
-            },
+        "xmlHints": {
+          "allowInlineDefinition": true,
+          "allowTopLevelDefinition": true,
+          "allowReferences": true
+        },
+        "typeAlias": {
+          "value": "Ricin"
+        }
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "microgramsPerKilo",
+            "required": "true"
+          },
+          "model": {
+            "type": "Number",
             "annotations": {
-              "parameterPurpose": {
-                "role": "BEHAVIOUR"
-              },
-              "expressionSupport": {
-                "value": "SUPPORTED"
-              }
+              "typeId": "java.lang.Long"
             }
           },
-          {
-            "key": {
-              "name": "destination",
-              "required": "true"
+          "annotations": {
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
             },
-            "model": {
-              "type": "Object",
-              "annotations": {
-                "typeId": "org.mule.test.heisenberg.extension.model.KnockeableDoor",
-                "classInformation": {
-                  "hasDefaultConstructor": true,
-                  "isInterface": false,
-                  "isInstantiable": true,
-                  "isAbstract": false,
-                  "isFinal": false,
-                  "implementedInterfaces": [],
-                  "parent": "",
-                  "genericTypes": []
-                },
-                "xmlHints": {
-                  "allowInlineDefinition": true,
-                  "allowTopLevelDefinition": true,
-                  "allowReferences": true
-                },
-                "typeAlias": {
-                  "value": "door"
-                }
-              },
-              "fields": [
-                {
-                  "key": {
-                    "name": "victim",
-                    "required": "true"
-                  },
-                  "model": {
-                    "type": "String",
-                    "annotations": {
-                      "typeId": "java.lang.String"
-                    }
-                  },
-                  "annotations": {
-                    "parameterPurpose": {
-                      "role": "BEHAVIOUR"
-                    },
-                    "expressionSupport": {
-                      "value": "SUPPORTED"
-                    }
-                  }
-                },
-                {
-                  "key": {
-                    "name": "address",
-                    "required": "true"
-                  },
-                  "model": {
-                    "type": "String",
-                    "annotations": {
-                      "typeId": "java.lang.String"
-                    }
-                  },
-                  "annotations": {
-                    "parameterPurpose": {
-                      "role": "BEHAVIOUR"
-                    },
-                    "expressionSupport": {
-                      "value": "SUPPORTED"
-                    }
-                  }
-                },
-                {
-                  "key": {
-                    "name": "previous"
-                  },
-                  "model": "#..",
-                  "annotations": {
-                    "parameterPurpose": {
-                      "role": "BEHAVIOUR"
-                    },
-                    "expressionSupport": {
-                      "value": "SUPPORTED"
-                    }
-                  }
-                }
-              ]
-            },
-            "annotations": {
-              "parameterPurpose": {
-                "role": "BEHAVIOUR"
-              },
-              "expressionSupport": {
-                "value": "SUPPORTED"
-              }
+            "expressionSupport": {
+              "value": "SUPPORTED"
             }
           }
-        ]
-      }
-    },
-    {
-      "type": {
-        "format": "java",
-        "type": "Object",
-        "annotations": {
-          "typeId": "org.mule.test.heisenberg.extension.model.Weapon",
-          "classInformation": {
-            "hasDefaultConstructor": false,
-            "isInterface": true,
-            "isInstantiable": false,
-            "isAbstract": true,
-            "isFinal": false,
-            "implementedInterfaces": [],
-            "parent": "",
-            "genericTypes": []
-          },
-          "extensibleType": {},
-          "typeAlias": {
-            "value": "Weapon"
-          }
         },
-        "fields": []
-      }
-    },
-    {
-      "type": {
-        "format": "java",
-        "type": "Object",
-        "annotations": {
-          "typeId": "org.mule.test.vegan.extension.VeganCookBook",
-          "classInformation": {
-            "hasDefaultConstructor": true,
-            "isInterface": false,
-            "isInstantiable": true,
-            "isAbstract": false,
-            "isFinal": false,
-            "implementedInterfaces": [],
-            "parent": "",
-            "genericTypes": []
+        {
+          "key": {
+            "name": "destination",
+            "required": "true"
           },
-          "extensibleType": {},
-          "typeAlias": {
-            "value": "VeganCookBook"
-          }
-        },
-        "fields": [
-          {
-            "key": {
-              "name": "recipes"
-            },
-            "model": {
-              "type": "Array",
-              "annotations": {
-                "typeId": "java.util.List"
+          "model": {
+            "type": "Object",
+            "annotations": {
+              "typeId": "org.mule.test.heisenberg.extension.model.KnockeableDoor",
+              "classInformation": {
+                "hasDefaultConstructor": true,
+                "isInterface": false,
+                "isInstantiable": true,
+                "isAbstract": false,
+                "isFinal": false,
+                "implementedInterfaces": [],
+                "parent": "",
+                "genericTypes": []
               },
-              "item": {
-                "type": "String",
+              "xmlHints": {
+                "allowInlineDefinition": true,
+                "allowTopLevelDefinition": true,
+                "allowReferences": true
+              },
+              "typeAlias": {
+                "value": "door"
+              }
+            },
+            "fields": [
+              {
+                "key": {
+                  "name": "victim",
+                  "required": "true"
+                },
+                "model": {
+                  "type": "String",
+                  "annotations": {
+                    "typeId": "java.lang.String"
+                  }
+                },
                 "annotations": {
-                  "typeId": "java.lang.String"
+                  "parameterPurpose": {
+                    "role": "BEHAVIOUR"
+                  },
+                  "expressionSupport": {
+                    "value": "SUPPORTED"
+                  }
+                }
+              },
+              {
+                "key": {
+                  "name": "address",
+                  "required": "true"
+                },
+                "model": {
+                  "type": "String",
+                  "annotations": {
+                    "typeId": "java.lang.String"
+                  }
+                },
+                "annotations": {
+                  "parameterPurpose": {
+                    "role": "BEHAVIOUR"
+                  },
+                  "expressionSupport": {
+                    "value": "SUPPORTED"
+                  }
+                }
+              },
+              {
+                "key": {
+                  "name": "previous"
+                },
+                "model": "#..",
+                "annotations": {
+                  "parameterPurpose": {
+                    "role": "BEHAVIOUR"
+                  },
+                  "expressionSupport": {
+                    "value": "SUPPORTED"
+                  }
                 }
               }
-            },
-            "annotations": {
-              "parameterPurpose": {
-                "role": "BEHAVIOUR"
-              },
-              "expressionSupport": {
-                "value": "SUPPORTED"
-              }
-            }
+            ]
           },
-          {
-            "key": {
-              "name": "numberOfPages"
+          "annotations": {
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
             },
-            "model": {
-              "type": "Number",
-              "annotations": {
-                "typeId": "java.lang.Integer"
-              }
-            },
-            "annotations": {
-              "parameterPurpose": {
-                "role": "BEHAVIOUR"
-              },
-              "expressionSupport": {
-                "value": "SUPPORTED"
-              }
+            "expressionSupport": {
+              "value": "SUPPORTED"
             }
+          }
+        }
+      ]
+    },
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
+        "typeId": "org.mule.test.heisenberg.extension.model.Weapon",
+        "classInformation": {
+          "hasDefaultConstructor": false,
+          "isInterface": true,
+          "isInstantiable": false,
+          "isAbstract": true,
+          "isFinal": false,
+          "implementedInterfaces": [],
+          "parent": "",
+          "genericTypes": []
+        },
+        "extensibleType": {},
+        "typeAlias": {
+          "value": "Weapon"
+        }
+      },
+      "fields": []
+    },
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
+        "typeId": "org.mule.test.vegan.extension.VeganCookBook",
+        "classInformation": {
+          "hasDefaultConstructor": true,
+          "isInterface": false,
+          "isInstantiable": true,
+          "isAbstract": false,
+          "isFinal": false,
+          "implementedInterfaces": [],
+          "parent": "",
+          "genericTypes": []
+        },
+        "extensibleType": {},
+        "typeAlias": {
+          "value": "VeganCookBook"
+        }
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "recipes"
           },
-          {
-            "key": {
-              "name": "editorial"
+          "model": {
+            "type": "Array",
+            "annotations": {
+              "typeId": "java.util.List"
             },
-            "model": {
+            "item": {
               "type": "String",
               "annotations": {
                 "typeId": "java.lang.String"
               }
+            }
+          },
+          "annotations": {
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
             },
-            "annotations": {
-              "parameterPurpose": {
-                "role": "BEHAVIOUR"
-              },
-              "default": "Enemies of Bondiola",
-              "expressionSupport": {
-                "value": "NOT_SUPPORTED"
-              }
+            "expressionSupport": {
+              "value": "SUPPORTED"
             }
           }
-        ]
-      }
+        },
+        {
+          "key": {
+            "name": "numberOfPages"
+          },
+          "model": {
+            "type": "Number",
+            "annotations": {
+              "typeId": "java.lang.Integer"
+            }
+          },
+          "annotations": {
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
+            },
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "editorial"
+          },
+          "model": {
+            "type": "String",
+            "annotations": {
+              "typeId": "java.lang.String"
+            }
+          },
+          "annotations": {
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
+            },
+            "default": "Enemies of Bondiola",
+            "expressionSupport": {
+              "value": "NOT_SUPPORTED"
+            }
+          }
+        }
+      ]
     }
   ],
   "configurations": [
@@ -446,146 +422,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "Object",
-                "annotations": {
-                  "typeId": "org.mule.test.heisenberg.extension.model.Ricin",
-                  "classInformation": {
-                    "hasDefaultConstructor": true,
-                    "isInterface": false,
-                    "isInstantiable": true,
-                    "isAbstract": false,
-                    "isFinal": false,
-                    "implementedInterfaces": [
-                      "org.mule.test.heisenberg.extension.model.Weapon"
-                    ],
-                    "parent": "",
-                    "genericTypes": []
-                  },
-                  "xmlHints": {
-                    "allowInlineDefinition": true,
-                    "allowTopLevelDefinition": true,
-                    "allowReferences": true
-                  },
-                  "typeAlias": {
-                    "value": "Ricin"
-                  }
-                },
-                "fields": [
-                  {
-                    "key": {
-                      "name": "microgramsPerKilo",
-                      "required": "true"
-                    },
-                    "model": {
-                      "type": "Number",
-                      "annotations": {
-                        "typeId": "java.lang.Long"
-                      }
-                    },
-                    "annotations": {
-                      "parameterPurpose": {
-                        "role": "BEHAVIOUR"
-                      },
-                      "expressionSupport": {
-                        "value": "SUPPORTED"
-                      }
-                    }
-                  },
-                  {
-                    "key": {
-                      "name": "destination",
-                      "required": "true"
-                    },
-                    "model": {
-                      "type": "Object",
-                      "annotations": {
-                        "typeId": "org.mule.test.heisenberg.extension.model.KnockeableDoor",
-                        "classInformation": {
-                          "hasDefaultConstructor": true,
-                          "isInterface": false,
-                          "isInstantiable": true,
-                          "isAbstract": false,
-                          "isFinal": false,
-                          "implementedInterfaces": [],
-                          "parent": "",
-                          "genericTypes": []
-                        },
-                        "xmlHints": {
-                          "allowInlineDefinition": true,
-                          "allowTopLevelDefinition": true,
-                          "allowReferences": true
-                        },
-                        "typeAlias": {
-                          "value": "door"
-                        }
-                      },
-                      "fields": [
-                        {
-                          "key": {
-                            "name": "victim",
-                            "required": "true"
-                          },
-                          "model": {
-                            "type": "String",
-                            "annotations": {
-                              "typeId": "java.lang.String"
-                            }
-                          },
-                          "annotations": {
-                            "parameterPurpose": {
-                              "role": "BEHAVIOUR"
-                            },
-                            "expressionSupport": {
-                              "value": "SUPPORTED"
-                            }
-                          }
-                        },
-                        {
-                          "key": {
-                            "name": "address",
-                            "required": "true"
-                          },
-                          "model": {
-                            "type": "String",
-                            "annotations": {
-                              "typeId": "java.lang.String"
-                            }
-                          },
-                          "annotations": {
-                            "parameterPurpose": {
-                              "role": "BEHAVIOUR"
-                            },
-                            "expressionSupport": {
-                              "value": "SUPPORTED"
-                            }
-                          }
-                        },
-                        {
-                          "key": {
-                            "name": "previous"
-                          },
-                          "model": "#..",
-                          "annotations": {
-                            "parameterPurpose": {
-                              "role": "BEHAVIOUR"
-                            },
-                            "expressionSupport": {
-                              "value": "SUPPORTED"
-                            }
-                          }
-                        }
-                      ]
-                    },
-                    "annotations": {
-                      "parameterPurpose": {
-                        "role": "BEHAVIOUR"
-                      },
-                      "expressionSupport": {
-                        "value": "SUPPORTED"
-                      }
-                    }
-                  }
-                ]
+                "type": "@ref:org.mule.test.heisenberg.extension.model.Ricin"
               },
               "hasDynamicType": false,
               "required": true,
@@ -610,25 +447,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "Object",
-                "annotations": {
-                  "typeId": "org.mule.test.heisenberg.extension.model.Weapon",
-                  "classInformation": {
-                    "hasDefaultConstructor": false,
-                    "isInterface": true,
-                    "isInstantiable": false,
-                    "isAbstract": true,
-                    "isFinal": false,
-                    "implementedInterfaces": [],
-                    "parent": "",
-                    "genericTypes": []
-                  },
-                  "extensibleType": {},
-                  "typeAlias": {
-                    "value": "Weapon"
-                  }
-                },
-                "fields": []
+                "type": "@ref:org.mule.test.heisenberg.extension.model.Weapon"
               },
               "hasDynamicType": false,
               "required": true,
@@ -770,25 +589,7 @@
                   "typeId": "java.util.List"
                 },
                 "item": {
-                  "type": "Object",
-                  "annotations": {
-                    "typeId": "org.mule.test.heisenberg.extension.model.Weapon",
-                    "classInformation": {
-                      "hasDefaultConstructor": false,
-                      "isInterface": true,
-                      "isInstantiable": false,
-                      "isAbstract": true,
-                      "isFinal": false,
-                      "implementedInterfaces": [],
-                      "parent": "",
-                      "genericTypes": []
-                    },
-                    "extensibleType": {},
-                    "typeAlias": {
-                      "value": "Weapon"
-                    }
-                  },
-                  "fields": []
+                  "type": "@ref:org.mule.test.heisenberg.extension.model.Weapon"
                 }
               },
               "hasDynamicType": false,
@@ -832,25 +633,7 @@
                   }
                 },
                 "open": {
-                  "type": "Object",
-                  "annotations": {
-                    "typeId": "org.mule.test.heisenberg.extension.model.Weapon",
-                    "classInformation": {
-                      "hasDefaultConstructor": false,
-                      "isInterface": true,
-                      "isInstantiable": false,
-                      "isAbstract": true,
-                      "isFinal": false,
-                      "implementedInterfaces": [],
-                      "parent": "",
-                      "genericTypes": []
-                    },
-                    "extensibleType": {},
-                    "typeAlias": {
-                      "value": "Weapon"
-                    }
-                  },
-                  "fields": []
+                  "type": "@ref:org.mule.test.heisenberg.extension.model.Weapon"
                 },
                 "fields": []
               },
@@ -1951,90 +1734,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "Object",
-                "annotations": {
-                  "typeId": "org.mule.test.vegan.extension.VeganCookBook",
-                  "classInformation": {
-                    "hasDefaultConstructor": true,
-                    "isInterface": false,
-                    "isInstantiable": true,
-                    "isAbstract": false,
-                    "isFinal": false,
-                    "implementedInterfaces": [],
-                    "parent": "",
-                    "genericTypes": []
-                  },
-                  "extensibleType": {},
-                  "typeAlias": {
-                    "value": "VeganCookBook"
-                  }
-                },
-                "fields": [
-                  {
-                    "key": {
-                      "name": "recipes"
-                    },
-                    "model": {
-                      "type": "Array",
-                      "annotations": {
-                        "typeId": "java.util.List"
-                      },
-                      "item": {
-                        "type": "String",
-                        "annotations": {
-                          "typeId": "java.lang.String"
-                        }
-                      }
-                    },
-                    "annotations": {
-                      "parameterPurpose": {
-                        "role": "BEHAVIOUR"
-                      },
-                      "expressionSupport": {
-                        "value": "SUPPORTED"
-                      }
-                    }
-                  },
-                  {
-                    "key": {
-                      "name": "numberOfPages"
-                    },
-                    "model": {
-                      "type": "Number",
-                      "annotations": {
-                        "typeId": "java.lang.Integer"
-                      }
-                    },
-                    "annotations": {
-                      "parameterPurpose": {
-                        "role": "BEHAVIOUR"
-                      },
-                      "expressionSupport": {
-                        "value": "SUPPORTED"
-                      }
-                    }
-                  },
-                  {
-                    "key": {
-                      "name": "editorial"
-                    },
-                    "model": {
-                      "type": "String",
-                      "annotations": {
-                        "typeId": "java.lang.String"
-                      }
-                    },
-                    "annotations": {
-                      "parameterPurpose": {
-                        "role": "BEHAVIOUR"
-                      },
-                      "default": "Enemies of Bondiola",
-                      "expressionSupport": {
-                        "value": "NOT_SUPPORTED"
-                      }
-                    }
-                  }
-                ]
+                "type": "@ref:org.mule.test.vegan.extension.VeganCookBook"
               },
               "hasDynamicType": false,
               "required": false,
