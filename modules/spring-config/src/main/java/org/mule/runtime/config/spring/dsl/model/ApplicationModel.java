@@ -29,7 +29,8 @@ import static org.mule.runtime.extension.api.util.NameUtils.pluralize;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.DOMAIN_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.EE_DOMAIN_PREFIX;
-
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.app.declaration.ElementDeclaration;
 import org.mule.runtime.api.artifact.ArtifactProperties;
@@ -46,9 +47,8 @@ import org.mule.runtime.core.internal.config.artifact.DefaultArtifactProperties;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
-
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
+import org.springframework.util.PropertyPlaceholderHelper;
+import org.w3c.dom.Node;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -62,9 +62,6 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.function.Consumer;
-
-import org.springframework.util.PropertyPlaceholderHelper;
-import org.w3c.dom.Node;
 
 /**
  * An {@code ApplicationModel} holds a representation of all the artifact configuration using an abstract model to represent any
@@ -294,7 +291,7 @@ public class ApplicationModel {
    * @throws Exception when the application configuration has semantic errors.
    */
   public ApplicationModel(ArtifactConfig artifactConfig, ArtifactDeclaration artifactDeclaration) throws Exception {
-    this(artifactConfig, artifactDeclaration, emptySet(), of(new ComponentBuildingDefinitionRegistry()));
+    this(artifactConfig, artifactDeclaration, emptySet(), of(new ComponentBuildingDefinitionRegistry()), true);
   }
 
   /**
@@ -307,12 +304,15 @@ public class ApplicationModel {
    * @param extensionModels Set of {@link ExtensionModel extensionModels} that will be used to type componentModels
    * @param componentBuildingDefinitionRegistry an optional {@link ComponentBuildingDefinitionRegistry} used to correlate items in
    *        this model to their definitions
+   * @param runtimeMode true implies the mule application should behave as a runtime app (e.g.: smart connectors will be macro expanded)
+   *                    false implies the mule is being created from a tooling perspective.
    * @throws Exception when the application configuration has semantic errors.
    */
   // TODO: MULE-9638 remove this optional
   public ApplicationModel(ArtifactConfig artifactConfig, ArtifactDeclaration artifactDeclaration,
                           Set<ExtensionModel> extensionModels,
-                          Optional<ComponentBuildingDefinitionRegistry> componentBuildingDefinitionRegistry)
+                          Optional<ComponentBuildingDefinitionRegistry> componentBuildingDefinitionRegistry,
+                          boolean runtimeMode)
       throws Exception {
 
     this.componentBuildingDefinitionRegistry = componentBuildingDefinitionRegistry;
@@ -321,7 +321,9 @@ public class ApplicationModel {
     convertArtifactDeclarationToComponentModel(extensionModels, artifactDeclaration);
     validateModel(componentBuildingDefinitionRegistry);
     createEffectiveModel();
-    expandModules(extensionModels);
+    if (runtimeMode) {
+      expandModules(extensionModels);
+    }
     resolveComponentTypes();
     executeOnEveryMuleComponentTree(new ComponentLocationVisitor());
   }
@@ -370,6 +372,7 @@ public class ApplicationModel {
 
   private void convertArtifactDeclarationToComponentModel(Set<ExtensionModel> extensionModels,
                                                           ArtifactDeclaration artifactDeclaration) {
+    //TODO lautaro pepepeppe
     if (artifactDeclaration != null && !extensionModels.isEmpty()) {
       DslElementModelFactory elementFactory = DslElementModelFactory
           .getDefault(DslResolvingContext.getDefault(extensionModels));
