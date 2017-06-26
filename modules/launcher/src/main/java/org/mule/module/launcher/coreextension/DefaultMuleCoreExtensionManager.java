@@ -106,7 +106,7 @@ public class DefaultMuleCoreExtensionManager implements MuleCoreExtensionManager
             {
                 extension.stop();
             }
-            catch (MuleException e)
+            catch (Throwable e)
             {
                 logger.warn("Error stopping core extension: " + extension.getName(), e);
             }
