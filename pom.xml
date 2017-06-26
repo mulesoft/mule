@@ -223,7 +223,6 @@
         <xercesVersion>2.11.0</xercesVersion>
         <xmlApisVersion>1.4.01</xmlApisVersion>
         <xmlPullVersion>1.1.3.4.O</xmlPullVersion>
-        <xmlSecurityVersion>1.5.8</xmlSecurityVersion>
         <xstreamVersion>1.4.9</xstreamVersion>
         <xaPoolVersion>1.5.0</xaPoolVersion>
         <allureJunitVersion>1.4.23.HOTFIX1</allureJunitVersion>
