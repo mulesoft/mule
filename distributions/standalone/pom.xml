@@ -180,27 +180,6 @@
             <version>${project.version}</version>
         </dependency>
 
-        <!--
-            We need to register the endorsed XML jars as dependencies of the
-            distribution, so that they can be referenced in the assembly as in/excludes.
-        -->
-        <dependency>
-            <groupId>xml-apis</groupId>
-            <artifactId>xml-apis</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>xerces</groupId>
-            <artifactId>xercesImpl</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>xalan</groupId>
-            <artifactId>serializer</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>xalan</groupId>
-            <artifactId>xalan</artifactId>
-        </dependency>
-
         <!-- add aspectj weaver dependency that was removed from spring-security-3.1 -->
         <dependency>
             <groupId>org.aspectj</groupId>

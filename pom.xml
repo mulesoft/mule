@@ -219,10 +219,6 @@
         <weaveVersion>4.0.0-SNAPSHOT</weaveVersion>
         <woodstoxVersion>4.4.1</woodstoxVersion>
         <wrapperVersion>3.2.3</wrapperVersion>
-        <xalanVersion>2.7.2</xalanVersion>
-        <xmlSerializerVersion>2.7.2</xmlSerializerVersion>
-        <xercesVersion>2.11.0</xercesVersion>
-        <xmlApisVersion>1.4.01</xmlApisVersion>
         <xmlPullVersion>1.1.3.4.O</xmlPullVersion>
         <xstreamVersion>1.4.9</xstreamVersion>
         <xaPoolVersion>1.5.0</xaPoolVersion>
@@ -291,26 +287,6 @@
     <!-- Declare all dependencies that are used in more than one module here. -->
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>xerces</groupId>
-                <artifactId>xercesImpl</artifactId>
-                <version>${xercesVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>xalan</groupId>
-                <artifactId>xalan</artifactId>
-                <version>${xalanVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>xml-apis</groupId>
-                <artifactId>xml-apis</artifactId>
-                <version>${xmlApisVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>xalan</groupId>
-                <artifactId>serializer</artifactId>
-                <version>${xmlSerializerVersion}</version>
-            </dependency>
             <dependency>
                 <groupId>org.mule.runtime</groupId>
                 <artifactId>mule-api</artifactId>

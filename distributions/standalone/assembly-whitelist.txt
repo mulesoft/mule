@@ -112,16 +112,6 @@
 
 
 #
-# /lib/endorsed
-#
-/mule-standalone-${productVersion}/lib/endorsed
-/mule-standalone-${productVersion}/lib/endorsed/xalan-2.7.2.jar
-/mule-standalone-${productVersion}/lib/endorsed/xercesImpl-2.11.0.jar
-/mule-standalone-${productVersion}/lib/endorsed/xml-apis-1.4.01.jar
-/mule-standalone-${productVersion}/lib/endorsed/serializer-2.7.2.jar
-
-
-#
 # /lib/mule
 #
 /mule-standalone-${productVersion}/lib/mule

@@ -23,7 +23,6 @@ import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.core.api.util.NetworkUtils;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.api.util.UUID;
-import org.mule.runtime.core.api.util.xmlsecurity.XMLSecureFactories;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,8 +33,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
@@ -193,7 +190,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
 
     try {
       validateEncoding();
-      validateXML();
     } catch (FatalException e) {
       throw new RuntimeException(e);
     }
@@ -292,23 +288,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     // Check we have a valid and supported encoding
     if (!Charset.isSupported(encoding)) {
       throw new FatalException(CoreMessages.propertyHasInvalidValue("encoding", encoding), this);
-    }
-  }
-
-  /**
-   * Mule needs a proper JAXP implementation and will complain when run with a plain JDK 1.4. Use the supplied launcher or specify
-   * a proper JAXP implementation via <code>-Djava.endorsed.dirs</code>. See the following URLs for more information:
-   * <ul>
-   * <li><a href="http://xerces.apache.org/xerces2-j/faq-general.html#faq-4">Xerces</a>
-   * <li><a href="http://xml.apache.org/xalan-j/faq.html#faq-N100D6">Xalan</a>
-   * <li><a href="http://java.sun.com/j2se/1.4.2/docs/guide/standards/">Endorsed Standards Override Mechanism</a>
-   * </ul>
-   */
-  protected void validateXML() throws FatalException {
-    SAXParserFactory f = XMLSecureFactories.createDefault().getSAXParserFactory();
-    if (f == null || f.getClass().getName().indexOf("crimson") != -1) {
-      throw new FatalException(CoreMessages.valueIsInvalidFor(f.getClass().getName(), "javax.xml.parsers.SAXParserFactory"),
-                               this);
     }
   }
 

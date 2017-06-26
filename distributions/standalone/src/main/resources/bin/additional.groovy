@@ -25,7 +25,6 @@ wrapperAdditionalConfFile.withWriter() {
 
     Writer w ->
 
-    // there's always at least one ad-hoc option as we are setting JVM endorsed libs property this way.
     // create the file unconditionally
 
     w << "#encoding=UTF-8\n"
