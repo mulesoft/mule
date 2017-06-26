@@ -15,15 +15,16 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextI
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.FileUtils.deleteTree;
 import static org.mule.runtime.core.api.util.FileUtils.newFile;
+import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.junit4.TestsLogConfigurationHelper.clearLoggingConfig;
 import static org.mule.tck.junit4.TestsLogConfigurationHelper.configureLoggingForTest;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
@@ -31,29 +32,28 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.TransformationService;
 import org.mule.runtime.core.api.component.JavaComponent;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.config.builders.DefaultsConfigurationBuilder;
+import org.mule.runtime.core.api.config.builders.SimpleConfigurationBuilder;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.context.DefaultMuleContextBuilder;
+import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.MuleContextFactory;
+import org.mule.runtime.core.api.context.notification.MuleContextNotification;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
 import org.mule.runtime.core.api.el.ExpressionExecutor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
-import org.mule.runtime.core.internal.serialization.JavaObjectSerializer;
-import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.api.util.concurrent.Latch;
 import org.mule.runtime.core.component.DefaultJavaComponent;
-import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
-import org.mule.runtime.core.api.config.builders.DefaultsConfigurationBuilder;
-import org.mule.runtime.core.api.config.builders.SimpleConfigurationBuilder;
-import org.mule.runtime.core.api.context.DefaultMuleContextBuilder;
-import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
-import org.mule.runtime.core.api.context.notification.MuleContextNotification;
+import org.mule.runtime.core.internal.serialization.JavaObjectSerializer;
 import org.mule.runtime.core.object.SingletonObjectFactory;
 import org.mule.runtime.http.api.HttpService;
 import org.mule.tck.SensingNullMessageProcessor;
@@ -416,7 +416,15 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
    * @return a basic event builder with its context already set.
    */
   protected static Builder eventBuilder() throws MuleException {
-    FlowConstruct flowConstruct = getTestFlow(muleContext);
+    FlowConstruct flowConstruct = muleContext.getRegistry().lookupFlowConstruct(APPLE_FLOW);
+    if (flowConstruct == null) {
+      synchronized (muleContext) {
+        flowConstruct = muleContext.getRegistry().lookupFlowConstruct(APPLE_FLOW);
+        if (flowConstruct == null) {
+          flowConstruct = getTestFlow(muleContext);
+        }
+      }
+    }
     return Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR_LOCATION)).flow(flowConstruct);
   }
 

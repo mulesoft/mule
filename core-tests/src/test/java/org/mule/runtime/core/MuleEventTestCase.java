@@ -18,6 +18,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
+import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static reactor.core.publisher.Mono.from;
 
@@ -192,6 +193,9 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
 
     Event result = testEvent();
     Event before = testEvent();
+
+    // Remove Flow to simulate deserialization when Flow is not available
+    muleContext.getRegistry().unregisterObject(APPLE_FLOW);
 
     Event after =
         (Event) SerializationUtils.deserialize(org.apache.commons.lang3.SerializationUtils.serialize(before), muleContext);
