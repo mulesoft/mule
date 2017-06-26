@@ -96,7 +96,7 @@ public class ModuleOperationMessageProcessorChainBuilder extends ExplicitMessage
   /**
    * Generates message processor for a specific set of parameters & properties to be added in a new event.
    */
-  static class ModuleOperationProcessorChain extends ExplicitMessageProcessorChain
+  static public class ModuleOperationProcessorChain extends ExplicitMessageProcessorChain
       implements Processor {
 
     private Map<String, Pair<String, MetadataType>> properties;

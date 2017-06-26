@@ -10,8 +10,8 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
-import static org.apache.commons.lang3.StringUtils.join;
 import static org.apache.commons.lang3.ArrayUtils.addAll;
+import static org.apache.commons.lang3.StringUtils.join;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.config.spring.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
@@ -53,26 +53,18 @@ import org.mule.runtime.config.spring.processors.MuleInjectorProcessor;
 import org.mule.runtime.config.spring.processors.PostRegistrationActionsPostProcessor;
 import org.mule.runtime.config.spring.util.LaxInstantiationStrategyWrapper;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ConfigResource;
+import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.core.api.registry.TransformerResolver;
 import org.mule.runtime.core.api.transformer.Converter;
-import org.mule.runtime.core.api.config.ConfigResource;
-import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
+import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.registry.MuleRegistryHelper;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
-import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.module.extension.internal.config.ExtensionBuildingDefinitionProvider;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -94,6 +86,13 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.w3c.dom.Document;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * <code>MuleArtifactContext</code> is a simple extension application context that allows resources to be loaded from the
@@ -236,7 +235,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
       Set<ExtensionModel> extensions =
           muleContext.getExtensionManager() != null ? muleContext.getExtensionManager().getExtensions() : emptySet();
       applicationModel = new ApplicationModel(applicationConfigBuilder.build(), artifactDeclaration,
-                                              extensions, of(componentBuildingDefinitionRegistry));
+                                              extensions, of(componentBuildingDefinitionRegistry), true);
     } catch (Exception e) {
       throw new MuleRuntimeException(e);
     }

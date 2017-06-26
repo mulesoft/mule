@@ -17,6 +17,9 @@ import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.component.location.Location.builder;
 import static org.mule.runtime.config.spring.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.config.spring.XmlConfigurationDocumentLoader;
@@ -31,10 +34,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCase {
 
@@ -227,7 +226,7 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
     configFiles.stream().forEach(configFile -> builder.addConfigFile(configFile));
     final ArtifactConfig artifactConfig = builder.build();
     return new MinimalApplicationModelGenerator(new ApplicationModel(artifactConfig, new ArtifactDeclaration(), emptySet(),
-                                                                     Optional.of(componentBuildingDefinitionRegistry)),
+                                                                     Optional.of(componentBuildingDefinitionRegistry), true),
                                                 componentBuildingDefinitionRegistry);
   }
 

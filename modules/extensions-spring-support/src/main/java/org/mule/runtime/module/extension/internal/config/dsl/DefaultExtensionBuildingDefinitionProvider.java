@@ -13,6 +13,7 @@ import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fro
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionXmlNamespaceInfo.EXTENSION_NAMESPACE;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
+import com.google.common.collect.ImmutableList;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
@@ -29,9 +30,12 @@ import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
+import org.mule.runtime.config.spring.dsl.model.ComponentLocationVisitor;
 import org.mule.runtime.config.spring.dsl.model.extension.xml.XmlExtensionModelProperty;
+import org.mule.runtime.config.spring.dsl.spring.ComponentModelHelper;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.core.processor.chain.ModuleOperationMessageProcessorChainBuilder;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
@@ -52,8 +56,6 @@ import org.mule.runtime.module.extension.internal.config.dsl.parameter.ObjectTyp
 import org.mule.runtime.module.extension.internal.config.dsl.source.SourceDefinitionParser;
 import org.mule.runtime.module.extension.internal.runtime.DynamicConfigPolicy;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
-
-import com.google.common.collect.ImmutableList;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -90,19 +92,7 @@ public class DefaultExtensionBuildingDefinitionProvider implements ExtensionBuil
   public void init() {
     checkState(extensions != null, "extensions cannot be null");
     extensions.stream()
-        .filter(this::shouldRegisterExtensionParser)
         .forEach(this::registerExtensionParsers);
-  }
-
-  /**
-   * Taking an {@link ExtensionModel}, it will indicate whether it must register a {@link ComponentBuildingDefinitionProvider} or
-   * not.
-   *
-   * @param extensionModel to introspect
-   * @return true if a parser must be registered, false otherwise.
-   */
-  private boolean shouldRegisterExtensionParser(ExtensionModel extensionModel) {
-    return !extensionModel.getModelProperty(XmlExtensionModelProperty.class).isPresent();
   }
 
   /**
@@ -154,47 +144,77 @@ public class DefaultExtensionBuildingDefinitionProvider implements ExtensionBuil
     final DslSyntaxResolver dslSyntaxResolver =
         DslSyntaxResolver.getDefault(extensionModel, DslResolvingContext.getDefault(extensions));
 
-    final ClassLoader extensionClassLoader = getClassLoader(extensionModel);
-    withContextClassLoader(extensionClassLoader, () -> {
-      new IdempotentExtensionWalker() {
+    if (extensionModel.getModelProperty(XmlExtensionModelProperty.class).isPresent()) {
+      registerXmlExtensionParsers(definitionBuilder, extensionModel, dslSyntaxResolver);
+    } else {
+      final ClassLoader extensionClassLoader = getClassLoader(extensionModel);
+      withContextClassLoader(extensionClassLoader, () -> {
+        new IdempotentExtensionWalker() {
 
-        @Override
-        public void onConfiguration(ConfigurationModel model) {
-          parseWith(new ConfigurationDefinitionParser(definitionBuilder, extensionModel, model, dslSyntaxResolver,
-                                                      parsingContext));
-        }
+          @Override
+          public void onConfiguration(ConfigurationModel model) {
+            parseWith(new ConfigurationDefinitionParser(definitionBuilder, extensionModel, model, dslSyntaxResolver,
+                                                        parsingContext));
+          }
 
-        @Override
-        public void onOperation(OperationModel model) {
-          parseWith(new OperationDefinitionParser(definitionBuilder, extensionModel,
-                                                  model, dslSyntaxResolver, parsingContext));
-        }
+          @Override
+          public void onOperation(OperationModel model) {
+            parseWith(new OperationDefinitionParser(definitionBuilder, extensionModel,
+                                                    model, dslSyntaxResolver, parsingContext));
+          }
 
-        @Override
-        public void onConnectionProvider(ConnectionProviderModel model) {
-          parseWith(new ConnectionProviderDefinitionParser(definitionBuilder, model, extensionModel, dslSyntaxResolver,
-                                                           parsingContext));
-        }
+          @Override
+          public void onConnectionProvider(ConnectionProviderModel model) {
+            parseWith(new ConnectionProviderDefinitionParser(definitionBuilder, model, extensionModel, dslSyntaxResolver,
+                                                             parsingContext));
+          }
 
-        @Override
-        public void onSource(SourceModel model) {
-          parseWith(new SourceDefinitionParser(definitionBuilder, extensionModel, model, dslSyntaxResolver,
-                                               parsingContext));
-        }
+          @Override
+          public void onSource(SourceModel model) {
+            parseWith(new SourceDefinitionParser(definitionBuilder, extensionModel, model, dslSyntaxResolver,
+                                                 parsingContext));
+          }
 
-        @Override
-        protected void onParameter(ParameterGroupModel groupModel, ParameterModel model) {
-          registerTopLevelParameter(model.getType(), definitionBuilder, extensionClassLoader, dslSyntaxResolver, parsingContext);
-        }
+          @Override
+          protected void onParameter(ParameterGroupModel groupModel, ParameterModel model) {
+            registerTopLevelParameter(model.getType(), definitionBuilder, extensionClassLoader, dslSyntaxResolver,
+                                      parsingContext);
+          }
 
+        }.walk(extensionModel);
 
-      }.walk(extensionModel);
+        registerExportedTypesTopLevelParsers(extensionModel, definitionBuilder, extensionClassLoader, dslSyntaxResolver,
+                                             parsingContext);
 
-      registerExportedTypesTopLevelParsers(extensionModel, definitionBuilder, extensionClassLoader, dslSyntaxResolver,
-                                           parsingContext);
+        registerSubTypes(definitionBuilder, extensionClassLoader, dslSyntaxResolver, parsingContext);
+      });
+    }
+  }
 
-      registerSubTypes(definitionBuilder, extensionClassLoader, dslSyntaxResolver, parsingContext);
-    });
+  /**
+   * Goes over all operations defined within the extension and it will add the expected Java type of the chain that will contain
+   * the macro expanded code, so that {@link ComponentModelHelper#isProcessor(org.mule.runtime.config.spring.dsl.model.ComponentModel)}
+   * can properly determine it's a processor.
+   * Notice it does not registers sources, neither configurations, parameters, etc. as those will be properly handled by the
+   * {@link ComponentLocationVisitor}.
+   *
+   * @param definitionBuilder builder to generate the {@link ComponentBuildingDefinition} from the operation.
+   * @param extensionModel to introspect
+   * @param dslSyntaxResolver the resolver to obtain the XML name of the operation
+   */
+  private void registerXmlExtensionParsers(Builder definitionBuilder, ExtensionModel extensionModel,
+                                           DslSyntaxResolver dslSyntaxResolver) {
+    new IdempotentExtensionWalker() {
+
+      @Override
+      public void onOperation(OperationModel operationModel) {
+        definitions.add(
+                        definitionBuilder
+                            .withIdentifier(dslSyntaxResolver.resolve(operationModel).getElementName())
+                            .withTypeDefinition(fromType(ModuleOperationMessageProcessorChainBuilder.ModuleOperationProcessorChain.class))
+                            .build());
+      }
+    }.walk(extensionModel);
   }
 
   private void registerSubTypes(MetadataType type, Builder definitionBuilder,
