@@ -9,8 +9,10 @@ package org.mule.runtime.config.spring;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
 import org.mule.runtime.api.dsl.DslResolvingContext;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
@@ -21,6 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -49,6 +52,7 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
   private Map<String, String> customSchemaMappings;
   // TODO(fernandezlautaro): MULE-11024 once implemented, extensionSchemaFactory must not be Optional
   private Optional<SchemaResourceFactory> extensionSchemaFactory;
+  private Map<String, Boolean> checkedEntities; //It saves already checked entities so that if the resolution already failed once, it will raise and exception and not loop failing over and over again.
 
   /**
    * Returns an instance of {@link ModuleDelegatingEntityResolver}
@@ -61,6 +65,7 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
     this.muleEntityResolver = new MuleCustomEntityResolver(classLoader);
     this.springEntityResolver = new DelegatingEntityResolver(classLoader);
     this.extensions = extensions;
+    this.checkedEntities = new HashMap<>();
 
     ServiceRegistry spiServiceRegistry = new SpiServiceRegistry();
     // TODO(fernandezlautaro): MULE-11024 until the implementation is moved up to extensions-api, we need to work with Optional to avoid breaking the mule testing framework (cannot add the dependency, as it will imply a circular dependency)
@@ -93,7 +98,13 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
     if (inputSource == null) {
       inputSource = springEntityResolver.resolveEntity(publicId, systemId);
     }
-
+    if (inputSource == null) {
+      if (checkedEntities.get(systemId) != null) {
+        throw new MuleRuntimeException(createStaticMessage("Can't resolve %s %s", publicId == null ? "" : publicId, systemId));
+      } else {
+        checkedEntities.put(systemId, true);
+      }
+    }
     return inputSource;
   }
 
