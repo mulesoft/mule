@@ -59,7 +59,7 @@ public class XmlConfigurationDocumentLoaderTestCase extends AbstractMuleTestCase
   public void testMalformedXmlWithWrongMuleSchemaLocationAndNoExtensionsRaisesException() {
     try {
       getDocument("mule-wrong-mule-schema-location.xml");
-      fail("Should not have reach here as the document is malformed and an exception should have been thrown using the default constructor");
+      fail("Should not have reached this point as the document is malformed and an exception should have been thrown using the default constructor");
     } catch (MuleRuntimeException e) {
       // We want to be sure that the line and column are properly picked up
       assertThat(getStackTrace(e),
@@ -71,7 +71,7 @@ public class XmlConfigurationDocumentLoaderTestCase extends AbstractMuleTestCase
   public void testMalformedXmlWithWrongSchemaLocationAndNoExtensionsRaisesException() {
     try {
       getDocument("mule-wrong-schema-location.xml");
-      fail("Should not have reach here as the document is malformed and an exception should have been thrown using the default constructor");
+      fail("Should not have reached this point as the document is malformed and an exception should have been thrown using the default constructor");
     } catch (MuleRuntimeException e) {
       // We want to be sure that the line and column are properly picked up
       assertThat(getStackTrace(e),
@@ -83,7 +83,7 @@ public class XmlConfigurationDocumentLoaderTestCase extends AbstractMuleTestCase
   public void testMalformedXmlDefaultConstructor() throws XPathExpressionException {
     try {
       getDocument("mule-config-malformed.xml");
-      fail("Should not have reach here as the document is malformed and an exception should have been thrown using the default constructor");
+      fail("Should not have reached this point as the document is malformed and an exception should have been thrown using the default constructor");
     } catch (MuleRuntimeException e) {
       // We want to be sure that the line and column are properly picked up
       assertThat(e.getMessage(),
