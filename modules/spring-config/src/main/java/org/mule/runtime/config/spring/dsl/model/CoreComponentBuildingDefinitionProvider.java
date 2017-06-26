@@ -568,7 +568,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     componentBuildingDefinitions.add(baseAggregatorDefinition.copy().withIdentifier("resequencer")
         .withTypeDefinition(fromType(Resequencer.class))
         .build());
-    
+
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("splitter")
         .withTypeDefinition(fromType(Splitter.class))
         .withSetterParameterDefinition("expression", fromSimpleParameter("expression").build())

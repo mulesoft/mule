@@ -4023,7 +4023,7 @@
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    
+
     <xsd:complexType name="baseSplitterType">
         <xsd:complexContent>
             <xsd:extension base="abstractInterceptingMessageProcessorType"/>
