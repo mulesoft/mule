@@ -37,6 +37,8 @@ public abstract class AbstractPolicyTemplate implements RetryPolicyTemplate, Mul
 
     private MuleContext muleContext;
 
+    private boolean lastRetryInterrupted = false;
+
     protected transient final Log logger = LogFactory.getLog(getClass());
 
     public void setMuleContext(MuleContext context)
@@ -63,6 +65,13 @@ public abstract class AbstractPolicyTemplate implements RetryPolicyTemplate, Mul
                     {
                         notifier.onSuccess(context);
                     }
+                    // Needed for Polling Connectors as FTP.
+                    if(lastRetryInterrupted)
+                    {
+                        logger.info("Successfully connected to " + context.getDescription() + " after Interrupted IOException");
+                        lastRetryInterrupted = false;
+                    }
+
                     break;
                 }
                 catch (Exception e)
@@ -79,6 +88,7 @@ public abstract class AbstractPolicyTemplate implements RetryPolicyTemplate, Mul
                     if (cause instanceof InterruptedException || cause instanceof InterruptedIOException)
                     {
                         logger.error("Process was interrupted (InterruptedException), ceasing process");
+                        lastRetryInterrupted = true;
                         break;
                     }
                     else
