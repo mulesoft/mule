@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.core.internal.message;
 
+import static java.lang.String.format;
+import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.api.exception.Errors.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.ANY_IDENTIFIER;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.CRITICAL_IDENTIFIER;
-import static org.mule.runtime.api.util.Preconditions.checkState;
+
 import org.mule.runtime.api.message.ErrorType;
 
 /**
@@ -123,7 +125,7 @@ public final class ErrorTypeBuilder {
 
     @Override
     public String toString() {
-      return String.format("%s:%s", namespace, identifier);
+      return format("%s:%s", namespace, identifier);
     }
 
   }
