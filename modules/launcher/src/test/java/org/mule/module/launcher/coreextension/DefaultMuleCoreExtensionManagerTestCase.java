@@ -6,6 +6,7 @@
  */
 package org.mule.module.launcher.coreextension;
 
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -209,6 +210,28 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
         coreExtensionManager.initialise();
 
         verify(coreExtensionDependencyResolver).resolveDependencies(extensions);
+    }
+
+    @Test
+    public void testAllCoreExtensionsAreStoppedAfterRuntimeException() throws Exception
+    {
+        TestDeploymentServiceAwareExtension extensionFailsStops = mock(TestDeploymentServiceAwareExtension.class);
+        TestDeploymentServiceAwareExtension extension = mock(TestDeploymentServiceAwareExtension.class);
+        List<MuleCoreExtension> extensions = new LinkedList<>();
+        when(coreExtensionDiscoverer.discover()).thenReturn(extensions);
+        when(coreExtensionDependencyResolver.resolveDependencies(extensions)).thenReturn(extensions);
+        doThrow(RuntimeException.class).when(extensionFailsStops).stop();
+        extensions.add(extension);
+        extensions.add(extensionFailsStops);
+        coreExtensionManager.initialise();
+        try
+        {
+            coreExtensionManager.stop();
+        }
+        finally
+        {
+            verify(extension).stop();
+        }
     }
 
     public interface TestDeploymentServiceAwareExtension extends MuleCoreExtension, DeploymentServiceAware
