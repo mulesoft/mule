@@ -8,7 +8,7 @@ package org.mule.runtime.core.api.context.notification;
 
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.api.exception.MessagingException;
 
 /**
  * <code>AsyncMessageNotification</code> when async work is scheduled and completed for a given flow

@@ -138,6 +138,28 @@
         </xsd:complexType>
     </xsd:element>
 
+    <xsd:element name="exception-strategy" type="testExceptionStrategyType" substitutionGroup="mule:abstract-exception-strategy">
+        <xsd:annotation>
+            <xsd:documentation>
+                A processor that can be used for testing message flows. It is a configurable component. The return data for the component can be set so that users can simulate a call to a real service. This component can also track invocation history and fire notifications when messages are received.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="testExceptionStrategyType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractExceptionStrategyType">
+                <xsd:attribute name="class" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A class name of an object that implements {{org.mule.functional.api.component.ExceptionStrategyCallback}}.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
     <xsd:element name="assert" substitutionGroup="mule:abstract-message-processor" type="assertType">
         <xsd:annotation>
             <xsd:documentation>

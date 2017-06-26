@@ -14,7 +14,7 @@ import static reactor.core.publisher.Flux.from;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
-import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.api.exception.MessagingException;
 
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;

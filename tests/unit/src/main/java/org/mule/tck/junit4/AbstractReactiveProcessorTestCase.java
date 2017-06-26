@@ -16,7 +16,7 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.api.exception.MessagingException;
 
 import java.util.Collection;
 

@@ -31,7 +31,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
-import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.transformer.TransformerTemplate;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.api.util.TemplateParser;

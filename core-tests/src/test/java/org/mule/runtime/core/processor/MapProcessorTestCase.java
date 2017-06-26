@@ -16,11 +16,11 @@ import static reactor.core.Exceptions.unwrap;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.core.api.exception.MuleFatalException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.exception.MuleFatalException;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 

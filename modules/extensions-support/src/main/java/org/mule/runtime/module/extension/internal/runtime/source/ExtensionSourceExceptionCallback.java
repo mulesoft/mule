@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.source;
 import static org.mule.runtime.core.api.util.ExceptionUtils.createErrorEvent;
 
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.internal.execution.ExceptionCallback;
 import org.mule.runtime.core.api.execution.MessageProcessContext;
 import org.mule.runtime.core.internal.execution.ResponseCompletionCallback;

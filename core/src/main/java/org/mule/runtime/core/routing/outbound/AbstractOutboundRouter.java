@@ -32,7 +32,7 @@ import org.mule.runtime.core.api.routing.RouterResultsHandler;
 import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
-import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.execution.MessageProcessorExecutionTemplate;
 import org.mule.runtime.core.api.execution.TransactionalExecutionTemplate;
 import org.mule.runtime.core.api.management.stats.RouterStatistics;

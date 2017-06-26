@@ -58,7 +58,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.util.ObjectUtils;
-import org.mule.runtime.core.exception.ErrorTypeLocator;
+import org.mule.runtime.core.api.exception.ErrorTypeLocator;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 import org.mule.runtime.core.processor.ResponseMessageProcessorAdapter;

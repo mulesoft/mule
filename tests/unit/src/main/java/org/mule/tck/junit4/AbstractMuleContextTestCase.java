@@ -420,6 +420,11 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
     return Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR_LOCATION)).flow(flowConstruct);
   }
 
+  @Override
+  protected Event.Builder getEventBuilder() throws MuleException {
+    return eventBuilder();
+  }
+
   protected boolean isStartContext() {
     return startContext;
   }

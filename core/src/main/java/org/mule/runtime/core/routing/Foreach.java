@@ -21,7 +21,7 @@ import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.expression.ExpressionConfig;
 import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.routing.outbound.AbstractMessageSequenceSplitter;

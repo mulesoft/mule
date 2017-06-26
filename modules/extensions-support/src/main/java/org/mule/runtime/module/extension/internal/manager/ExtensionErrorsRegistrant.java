@@ -8,8 +8,8 @@ package org.mule.runtime.module.extension.internal.manager;
 
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.meta.model.error.ErrorModelBuilder.newError;
-import static org.mule.runtime.core.exception.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
-import static org.mule.runtime.core.exception.Errors.Identifiers.RETRY_EXHAUSTED_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.api.exception.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.api.exception.Errors.Identifiers.RETRY_EXHAUSTED_ERROR_IDENTIFIER;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getExtensionsErrorNamespace;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -19,9 +19,10 @@ import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
-import org.mule.runtime.core.exception.ErrorTypeLocator;
-import org.mule.runtime.core.exception.ErrorTypeRepository;
-import org.mule.runtime.core.exception.ExceptionMapper;
+import org.mule.runtime.core.api.exception.ErrorTypeLocator;
+import org.mule.runtime.core.api.exception.ErrorTypeRepository;
+import org.mule.runtime.core.api.exception.Errors;
+import org.mule.runtime.core.api.exception.ExceptionMapper;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.SingleExtensionImportTypesStrategy;
@@ -43,7 +44,7 @@ import java.util.Set;
  */
 class ExtensionErrorsRegistrant {
 
-  public static final String MULE = org.mule.runtime.core.exception.Errors.CORE_NAMESPACE_NAME;
+  public static final String MULE = Errors.CORE_NAMESPACE_NAME;
   private final ErrorTypeRepository errorTypeRepository;
   private final ErrorTypeLocator errorTypeLocator;
 

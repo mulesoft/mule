@@ -10,7 +10,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.TransformationService;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.api.exception.MessagingException;
 
 /**
  * Utility class for {@link ValueResolver} to handle transformation of values

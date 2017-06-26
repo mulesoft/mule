@@ -23,7 +23,7 @@ import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.policy.api.OperationPolicyPointcutParametersFactory;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 import org.mule.runtime.policy.api.SourcePolicyPointcutParametersFactory;

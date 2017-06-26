@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.api.context;
 
-import static org.mule.runtime.core.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
-import static org.mule.runtime.core.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
+import static org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
+import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
@@ -49,8 +49,8 @@ import org.mule.runtime.core.api.context.notification.RoutingNotification;
 import org.mule.runtime.core.api.context.notification.SecurityNotification;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.context.notification.TransactionNotification;
-import org.mule.runtime.core.exception.DefaultSystemExceptionStrategy;
-import org.mule.runtime.core.exception.ErrorTypeRepository;
+import org.mule.runtime.core.internal.exception.DefaultSystemExceptionStrategy;
+import org.mule.runtime.core.api.exception.ErrorTypeRepository;
 import org.mule.runtime.core.internal.client.DefaultLocalMuleClient;
 import org.mule.runtime.core.internal.lifecycle.MuleContextLifecycleManager;
 import org.mule.runtime.core.processor.interceptor.DefaultProcessorInterceptorManager;

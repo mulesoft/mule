@@ -29,7 +29,7 @@ import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.context.notification.MessageProcessorNotification;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
-import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.DefaultLocationPart;
 import org.mule.tck.junit4.AbstractMuleTestCase;

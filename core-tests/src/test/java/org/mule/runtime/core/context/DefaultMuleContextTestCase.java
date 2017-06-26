@@ -39,7 +39,7 @@ import org.mule.runtime.core.api.util.StreamCloserService;
 import org.mule.runtime.core.internal.config.ClusterConfiguration;
 import org.mule.runtime.core.api.config.builders.DefaultsConfigurationBuilder;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
-import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.internal.lifecycle.MuleContextLifecycleManager;
 import org.mule.runtime.core.internal.transformer.DynamicDataTypeConversionResolver;
 import org.mule.runtime.core.registry.MuleRegistryHelper;

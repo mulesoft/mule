@@ -11,7 +11,7 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.rules.ExpectedException.none;
 
-import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.test.module.extension.config.PetStoreConnectionTestCase;
 
 import org.junit.Rule;

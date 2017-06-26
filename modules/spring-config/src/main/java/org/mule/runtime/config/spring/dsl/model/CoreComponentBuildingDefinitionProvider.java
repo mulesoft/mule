@@ -73,7 +73,7 @@ import org.mule.runtime.config.spring.dsl.processor.CustomSecurityFilterObjectFa
 import org.mule.runtime.config.spring.dsl.processor.EncryptionSecurityFilterObjectFactory;
 import org.mule.runtime.config.spring.dsl.processor.EnvironmentPropertyObjectFactory;
 import org.mule.runtime.config.spring.dsl.processor.ExplicitMethodEntryPointResolverObjectFactory;
-import org.mule.runtime.config.spring.dsl.processor.MessageEnricherObjectFactory;
+import org.mule.runtime.config.spring.dsl.processor.factory.MessageEnricherObjectFactory;
 import org.mule.runtime.config.spring.dsl.processor.MethodEntryPoint;
 import org.mule.runtime.config.spring.dsl.processor.NoArgumentsEntryPointResolverObjectFactory;
 import org.mule.runtime.config.spring.dsl.processor.RetryPolicyTemplateObjectFactory;
@@ -146,10 +146,10 @@ import org.mule.runtime.core.el.mvel.configuration.AliasEntry;
 import org.mule.runtime.core.el.mvel.configuration.ImportEntry;
 import org.mule.runtime.core.el.mvel.configuration.MVELExpressionLanguageObjectFactory;
 import org.mule.runtime.core.el.mvel.configuration.MVELGlobalFunctionsConfig;
-import org.mule.runtime.core.exception.ErrorHandler;
-import org.mule.runtime.core.exception.OnErrorContinueHandler;
-import org.mule.runtime.core.exception.OnErrorPropagateHandler;
-import org.mule.runtime.core.exception.RedeliveryExceeded;
+import org.mule.runtime.core.internal.exception.ErrorHandler;
+import org.mule.runtime.core.internal.exception.OnErrorContinueHandler;
+import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
+import org.mule.runtime.core.internal.exception.RedeliveryExceeded;
 import org.mule.runtime.core.expression.ExpressionConfig;
 import org.mule.runtime.core.expression.transformers.AbstractExpressionTransformer;
 import org.mule.runtime.core.expression.transformers.BeanBuilderTransformer;
@@ -264,7 +264,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   private static final String ON_ERROR_CONTINUE = "on-error-continue";
   private static final String WHEN = "when";
   private static final String ON_ERROR_PROPAGATE = "on-error-propagate";
-  private static final String CUSTOM_EXCEPTION_STRATEGY = "custom-exception-strategy";
   private static final String ERROR_HANDLER = "error-handler";
   private static final String SET_PAYLOAD = "set-payload";
   private static final String LOGGER = "logger";
@@ -354,10 +353,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     componentBuildingDefinitions
         .add(baseDefinition.copy().withIdentifier("rollback-transaction").withTypeDefinition(fromType(NotWildcardFilter.class))
             .withSetterParameterDefinition("pattern", fromSimpleParameter("exception-pattern").build()).build());
-    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier(CUSTOM_EXCEPTION_STRATEGY)
-        .withTypeDefinition(fromConfigurationAttribute(CLASS_ATTRIBUTE))
-        .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
-        .asPrototype().build());
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier(ERROR_HANDLER)
         .withTypeDefinition(fromType(ErrorHandler.class))
         .withSetterParameterDefinition("globalName", fromSimpleParameter(NAME).build())

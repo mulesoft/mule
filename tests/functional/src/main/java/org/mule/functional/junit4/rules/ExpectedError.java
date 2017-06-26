@@ -14,18 +14,19 @@ import static org.junit.Assert.fail;
 import static org.mule.tck.junit4.matcher.ErrorTypeMatcher.errorType;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 import org.mule.tck.junit4.matcher.ErrorTypeMatcher;
 
 import com.google.common.base.Joiner;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.hamcrest.Matcher;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * JUnit rule for Mule errors

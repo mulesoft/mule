@@ -36,7 +36,7 @@ import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.context.notification.RoutingNotification;
-import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessorBase;
 import org.mule.runtime.core.api.util.ObjectUtils;

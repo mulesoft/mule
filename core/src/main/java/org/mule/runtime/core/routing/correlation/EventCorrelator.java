@@ -36,7 +36,7 @@ import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.api.store.PartitionableObjectStore;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.context.notification.RoutingNotification;
-import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.routing.EventGroup;
 import org.mule.runtime.core.api.util.StringMessageUtils;
 import org.mule.runtime.core.api.util.monitor.Expirable;

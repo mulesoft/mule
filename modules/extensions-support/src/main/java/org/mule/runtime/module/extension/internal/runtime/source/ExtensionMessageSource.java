@@ -36,7 +36,7 @@ import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
-import org.mule.runtime.core.exception.ErrorTypeLocator;
+import org.mule.runtime.core.api.exception.ErrorTypeLocator;
 import org.mule.runtime.core.internal.execution.ExceptionCallback;
 import org.mule.runtime.core.api.execution.MessageProcessContext;
 import org.mule.runtime.core.api.execution.MessageProcessingManager;

@@ -23,7 +23,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.from;
 import static org.mule.runtime.config.spring.dsl.spring.BeanDefinitionFactory.SOURCE_TYPE;
-import static org.mule.runtime.core.exception.Errors.Identifiers.ANY_IDENTIFIER;
+import static org.mule.runtime.core.api.exception.Errors.Identifiers.ANY_IDENTIFIER;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.extension.api.util.NameUtils.pluralize;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;

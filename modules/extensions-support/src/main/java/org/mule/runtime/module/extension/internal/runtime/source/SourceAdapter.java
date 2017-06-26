@@ -36,7 +36,7 @@ import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.functional.Either;
-import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.streaming.CursorProviderFactory;
 import org.mule.runtime.core.streaming.StreamingManager;
 import org.mule.runtime.extension.api.annotation.param.Config;

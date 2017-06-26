@@ -10,8 +10,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.exception.AbstractExceptionListener;
-import org.mule.runtime.core.exception.OnErrorPropagateHandler;
+import org.mule.runtime.core.internal.exception.AbstractExceptionListener;
+import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.ArrayList;

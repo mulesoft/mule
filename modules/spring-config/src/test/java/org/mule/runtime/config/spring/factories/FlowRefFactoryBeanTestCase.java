@@ -43,7 +43,7 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -65,7 +65,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleContextTestCase {
   private static final String DYNAMIC_NON_EXISTANT = "#[mel:'nonExistant']";
   private static final String NON_EXISTANT = "nonExistant";
 
-  private Event result = testEvent();
+  private Event result;
   private Flow targetFlow = mock(Flow.class, INITIALIZABLE_MESSAGE_PROCESSOR);
   private MessageProcessorChain targetSubFlow = mock(MessageProcessorChain.class, INITIALIZABLE_MESSAGE_PROCESSOR);
   private ApplicationContext applicationContext = mock(ApplicationContext.class);
@@ -76,6 +76,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleContextTestCase {
 
   @Before
   public void setup() throws MuleException {
+    result = testEvent();
     expressionManager = spy(muleContext.getExpressionManager());
     mockMuleContext = spy(muleContext);
     doReturn(expressionManager).when(mockMuleContext).getExpressionManager();

@@ -15,8 +15,8 @@ import static org.mule.runtime.api.exception.ExceptionHelper.getExceptionsAsList
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.core.component.ComponentAnnotations.ANNOTATION_NAME;
-import static org.mule.runtime.core.exception.ErrorMapping.ANNOTATION_ERROR_MAPPINGS;
-import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.UNKNOWN;
+import static org.mule.runtime.core.internal.exception.ErrorMapping.ANNOTATION_ERROR_MAPPINGS;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.UNKNOWN;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -34,13 +34,13 @@ import org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.message.ErrorBuilder;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.exception.ErrorMapping;
-import org.mule.runtime.core.exception.ErrorTypeLocator;
-import org.mule.runtime.core.exception.ErrorTypeRepository;
-import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.exception.SingleErrorTypeMatcher;
-import org.mule.runtime.core.exception.TypedException;
-import org.mule.runtime.core.exception.WrapperErrorMessageAwareException;
+import org.mule.runtime.core.internal.exception.ErrorMapping;
+import org.mule.runtime.core.api.exception.ErrorTypeLocator;
+import org.mule.runtime.core.api.exception.ErrorTypeRepository;
+import org.mule.runtime.core.api.exception.MessagingException;
+import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
+import org.mule.runtime.core.api.exception.TypedException;
+import org.mule.runtime.core.api.exception.WrapperErrorMessageAwareException;
 
 import java.util.List;
 import java.util.ListIterator;

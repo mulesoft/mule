@@ -108,7 +108,7 @@ import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.api.util.concurrent.Latch;
 import org.mule.runtime.core.internal.config.StartupContext;
-import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.policy.PolicyParametrization;
 import org.mule.runtime.core.policy.PolicyPointcut;
 import org.mule.runtime.core.registry.SpiServiceRegistry;

@@ -12,7 +12,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.extension.api.runtime.operation.FlowListener;
 
 import java.util.function.Consumer;

@@ -19,7 +19,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
-import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.api.exception.MessagingException;
 
 import org.junit.Test;
 

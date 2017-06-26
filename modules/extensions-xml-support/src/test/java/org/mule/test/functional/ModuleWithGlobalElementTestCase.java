@@ -12,7 +12,7 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import org.mule.extension.http.api.request.validator.ResponseValidatorTypedException;
-import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.test.runner.RunnerDelegateTo;
 
 import java.util.Collection;

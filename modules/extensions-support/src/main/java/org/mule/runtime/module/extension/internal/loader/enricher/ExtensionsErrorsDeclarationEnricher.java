@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
 import static java.lang.String.format;
-import static org.mule.runtime.core.exception.Errors.CORE_NAMESPACE_NAME;
+import static org.mule.runtime.core.api.exception.Errors.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.extension.api.error.MuleErrors.SOURCE_ERROR_RESPONSE_GENERATE;
 import static org.mule.runtime.extension.api.error.MuleErrors.SOURCE_ERROR_RESPONSE_SEND;
 import static org.mule.runtime.extension.api.error.MuleErrors.SOURCE_RESPONSE_GENERATE;
