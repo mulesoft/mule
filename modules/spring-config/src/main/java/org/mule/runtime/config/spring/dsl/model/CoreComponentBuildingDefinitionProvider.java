@@ -751,11 +751,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("objectStore", fromSimpleReferenceParameter("object-store-ref").build())
         .build());
 
-    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("custom-router")
-        .withTypeDefinition(fromConfigurationAttribute(CLASS_ATTRIBUTE))
-        .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
-        .build());
-
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("singleton-object")
         .withTypeDefinition(fromType(SingletonObjectFactory.class))
         .withConstructorParameterDefinition(fromSimpleParameter(CLASS_ATTRIBUTE).build())
