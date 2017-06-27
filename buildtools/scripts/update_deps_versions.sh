@@ -32,6 +32,9 @@ updateParentVersion() {
 VERSION_TO_DEPS=$1
 VERSION_CONNECTORS_MODULES=$2
 VERSION_TO_MULE=$3
+VERSION_TO_DEPS_AUX=$4
+VERSION_CONNECTORS_MODULES_AUX=$5
+
 
 # Properties with Deps Version (1.0.x) in the root pom.xml
 propertiesDeps=("muleEmbeddedApiVersion")
@@ -53,7 +56,6 @@ propertiesDeps=("muleHttpServiceTestVersion"
 
 # Using Snapshot as a workaround because the extensions have the mule artifacts as
 # deps. So there is a circular dependency.
-VERSION_TO_DEPS_AUX=1.0.0-BETA-SNAPSHOT
 updatePropertiesVersion "$VERSION_TO_DEPS_AUX" pom.xml propertiesDeps[@]
 
 
@@ -66,7 +68,6 @@ propertiesDeps=("muleHttpConnectorTestVersion"
 
 # Using Snapshot as a workaround because the extensions have the mule artifacts as
 # deps. So there is a circular dependency.
-VERSION_CONNECTORS_MODULES_AUX=0.8.0-SNAPSHOT
 updatePropertiesVersion "$VERSION_CONNECTORS_MODULES_AUX" pom.xml propertiesDeps[@]
 
 
