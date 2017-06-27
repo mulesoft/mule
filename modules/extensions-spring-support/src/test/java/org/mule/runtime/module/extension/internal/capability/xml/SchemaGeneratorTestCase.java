@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.internal.capability.xml;
 import static com.google.common.collect.ImmutableSet.copyOf;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
-import static java.util.Collections.emptySet;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.mockito.Mockito.mock;
@@ -55,6 +54,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -177,6 +177,11 @@ public class SchemaGeneratorTestCase extends AbstractMuleTestCase {
     }
 
     @Override
+    public Optional<ExtensionModel> getExtensionForType(String typeId) {
+      return getTypeCatalog().getDeclaringExtension(typeId).flatMap(this::getExtension);
+    }
+
+    @Override
     public Set<ExtensionModel> getExtensions() {
       return copyOf(extensionModels.values());
     }
@@ -192,7 +197,7 @@ public class SchemaGeneratorTestCase extends AbstractMuleTestCase {
     params.put(TYPE_PROPERTY_NAME, clazz.getName());
     params.put(VERSION, getProductVersion());
     //TODO MULE-11797: as this utils is consumed from org.mule.runtime.module.extension.internal.capability.xml.schema.AbstractXmlResourceFactory.generateResource(org.mule.runtime.api.meta.model.ExtensionModel), this util should get dropped once the ticket gets implemented.
-    final DslResolvingContext dslResolvingContext = getDefault(emptySet());
+    final DslResolvingContext dslResolvingContext = getDefault(new LinkedHashSet<>(extensionModels.values()));
     return loader.loadExtensionModel(clazz.getClassLoader(), dslResolvingContext, params);
   }
 

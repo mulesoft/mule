@@ -177,7 +177,7 @@ public final class SchemaBuilder {
 
   private SchemaBuilder withImportedTypes(Set<ImportedTypeModel> importedTypes) {
     this.importedTypes = importedTypes;
-    importedTypes.forEach(type -> dslContext.getExtension(type.getOriginExtensionName())
+    importedTypes.forEach(type -> dslContext.getExtensionForType(getTypeId(type.getImportedType()))
         .ifPresent(this::registerExtensionImport));
     return this;
   }
