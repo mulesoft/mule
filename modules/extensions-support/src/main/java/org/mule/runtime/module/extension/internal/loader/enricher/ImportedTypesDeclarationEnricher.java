@@ -61,7 +61,7 @@ public final class ImportedTypesDeclarationEnricher extends AbstractAnnotatedDec
         MetadataType importedType = typeLoader.load(imported.type());
 
         if (!(importedType instanceof ObjectType)) {
-          throw new IllegalArgumentException(format("Type '%s' is not an Object. Only objects can be imported from other extensions.",
+          throw new IllegalArgumentException(format("Type '%s' is not complex. Only complex types can be imported from other extensions.",
                                                     type.getTypeName()));
         }
 
