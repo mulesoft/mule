@@ -150,6 +150,7 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
             try
             {
                 retryTemplate.execute(callbackReconnection, this.connector.getMuleContext().getWorkManager());
+                return filesToFTPArray(client[0]);
             }
             catch (RetryPolicyExhaustedException retryPolicyExhaustedException)
             {
@@ -167,9 +168,6 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
         {
             throw new IllegalArgumentException(ASYNCHRONOUS_RECONNECTION_ERROR_MESSAGE);
         }
-
-
-        return filesToFTPArray(client[0]);
 
     }
 
