@@ -238,8 +238,8 @@
 
         <muleFileCommonsTestVersion>0.8.0-SNAPSHOT</muleFileCommonsTestVersion>
 
-        <muleHttpServiceTestVersion>1.0.0-BETA.1-SNAPSHOT</muleHttpServiceTestVersion>
-        <muleSchedulerServiceTestVersion>1.0.0-BETA.1-SNAPSHOT</muleSchedulerServiceTestVersion>
+        <muleHttpServiceTestVersion>1.0.0-BETA-SNAPSHOT</muleHttpServiceTestVersion>
+        <muleSchedulerServiceTestVersion>1.0.0-BETA-SNAPSHOT</muleSchedulerServiceTestVersion>
 
         <!-- Test Extensions -->
         <muleMetadataExtensionTestVersion>4.0.0-BETA-SNAPSHOT</muleMetadataExtensionTestVersion>
