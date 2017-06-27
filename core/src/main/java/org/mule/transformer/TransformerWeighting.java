@@ -180,7 +180,7 @@ public class TransformerWeighting implements Comparable
         }
         else
         {
-            if (isNotMatch())
+            if (!weighting.isNotMatch() && isNotMatch())
             {
                 return -1;
             }
