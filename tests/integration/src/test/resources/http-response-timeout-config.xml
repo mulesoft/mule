@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:mule-ss="http://www.mulesoft.org/schema/mule/spring-security"
+        xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+        xmlns:spring="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:ss="http://www.springframework.org/schema/security"
+        xsi:schemaLocation="http://www.mulesoft.org/schema/mule/spring-security http://www.mulesoft.org/schema/mule/spring-security/current/mule-spring-security.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/spring-security http://www.mulesoft.org/schema/mule/spring-security/current/mule-spring-security.xsd
+http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.0.xsd">
+
+    <http:request-config name="HTTP_Request" host="127.0.0.1" port="${port}" responseTimeout="${delay}">
+        <http:basic-authentication username="username" password="password"/>
+    </http:request-config>
+
+    <http:request-config name="preemptive" host="127.0.0.1" port="${port}" responseTimeout="${delay}">
+        <http:basic-authentication username="username" password="password" preemptive="true"/>
+    </http:request-config>
+
+    <http:listener-config name="HTTP_Listener_Configuration" host="0.0.0.0" port="${port}"/>
+
+    <flow name="flowRequestPreemptive">
+        <http:request config-ref="preemptive" path="/" method="GET"/>
+    </flow>
+
+    <spring:beans>
+        <ss:authentication-manager alias="authenticationManager">
+            <ss:authentication-provider>
+                <ss:user-service id="userService">
+                    <ss:user name="username" password="password" authorities="ROLE_ADMIN"/>
+                </ss:user-service>
+            </ss:authentication-provider>
+        </ss:authentication-manager>
+    </spring:beans>
+
+    <mule-ss:security-manager>
+        <mule-ss:delegate-security-provider name="memory-provider" delegate-ref="authenticationManager"/>
+    </mule-ss:security-manager>
+
+
+    <flow name="flowRequestNonPreemptive">
+        <http:request config-ref="HTTP_Request" path="/" method="GET"/>
+    </flow>
+
+    <flow name="flowListener">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/"/>
+        <http:basic-security-filter realm="mule-realm"/>
+        <component class="org.mule.test.integration.security.HttpAuthenticationResponseTimeoutTestCase$DelayComponent"/>
+        <set-payload value="OK"/>
+    </flow>
+</mule>
