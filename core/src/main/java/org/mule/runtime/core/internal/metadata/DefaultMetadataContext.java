@@ -63,7 +63,7 @@ public class DefaultMetadataContext implements MetadataContext {
    */
   @Override
   public <C> Optional<C> getConfig() {
-    return (Optional<C>) configInstance.map(Optional::of);
+    return (Optional<C>) configInstance.map(ConfigurationInstance::getValue);
   }
 
   /**
