@@ -4074,36 +4074,6 @@
         </xsd:complexType>
     </xsd:element>
 
-    <xsd:element name="custom-splitter" substitutionGroup="abstract-intercepting-message-processor">
-        <xsd:annotation>
-            <xsd:documentation>
-                Configures a custom message splitter. Mule provides an abstract implementation that has a template method that performs the message aggregation.
-            </xsd:documentation>
-        </xsd:annotation>
-        <xsd:complexType>
-            <xsd:complexContent>
-                <xsd:extension base="baseSplitterType">
-                    <xsd:sequence>
-                        <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
-                            <xsd:annotation>
-                                <xsd:documentation>
-                                    Spring-style property element for custom configuration.
-                                </xsd:documentation>
-                            </xsd:annotation>
-                        </xsd:element>
-                    </xsd:sequence>
-                    <xsd:attribute name="class" type="substitutableClass" use="required">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                Fully qualified class name of the custom correlation aggregator router to be used.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:attribute>
-                </xsd:extension>
-            </xsd:complexContent>
-        </xsd:complexType>
-    </xsd:element>
-
     <xsd:complexType name="whenMessageProcessorExpressionPairType">
         <xsd:sequence>
             <!-- if the first message processor is a filter, it determines
