@@ -15,6 +15,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.DataType.fromType;
+
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -40,7 +41,7 @@ public class SplitterIteratorTestCase extends AbstractMuleTestCase {
   private ExtendedExpressionManager expressionManager = mock(ExtendedExpressionManager.class);
   private final List<TypedValue<?>> integers = createListOfIntegers();
   private final ExpressionConfig expressionConfig = mock(ExpressionConfig.class);
-  private final Splitter splitter = new Splitter(expressionConfig);
+  private final Splitter splitter = new Splitter(expressionConfig, null);
   private final FlowCallStack flowCallStack = mock(FlowCallStack.class);
 
   @Before

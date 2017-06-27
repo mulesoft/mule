@@ -37,4 +37,13 @@ public abstract class AbstractSplitter extends AbstractMessageSequenceSplitter {
    */
   protected abstract List<?> splitMessage(Event event) throws MuleException;
 
+  @Override
+  public boolean accept(Event event) {
+    return false;
+  }
+
+  @Override
+  public boolean acceptsAll() {
+    return false;
+  }
 }

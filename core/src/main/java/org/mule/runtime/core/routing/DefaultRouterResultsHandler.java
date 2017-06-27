@@ -13,8 +13,8 @@ import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
-import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.api.routing.RouterResultsHandler;
+import org.mule.runtime.core.internal.message.InternalMessage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,7 +76,7 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler {
           object.getMessage() != null).collect(toList());
 
       if (nonNullResults.size() == 0) {
-        return previous;
+        return Event.builder(previous).message(Message.of(null)).build();
       } else if (nonNullResults.size() == 1) {
         return nonNullResults.get(0);
       } else {

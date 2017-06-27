@@ -17,10 +17,10 @@ import static org.mule.runtime.api.message.Message.of;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.exception.MessagingException;
-import org.mule.runtime.core.internal.message.InternalMessage;
+import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 import org.mule.tck.testmodels.mule.TestMessageProcessor;
 
@@ -56,18 +56,18 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
   @Before
   public void initialise() throws MuleException {
     processedEvents = new ArrayList<>();
-    simpleForeach = createForeach(getSimpleMessageProcessors());
+    simpleForeach = createForeach(getSimpleMessageProcessors(new TestMessageProcessor("zas")));
     nestedForeach = createForeach(getNestedMessageProcessors());
   }
 
-  private List<Processor> getSimpleMessageProcessors() {
+  private List<Processor> getSimpleMessageProcessors(Processor innerProcessor) {
     List<Processor> lmp = new ArrayList<>();
     lmp.add(event -> {
       String payload = event.getMessage().getPayload().getValue().toString();
       event = Event.builder(event).message(InternalMessage.builder(event.getMessage()).payload(payload + ":foo").build()).build();
       return event;
     });
-    lmp.add(new TestMessageProcessor("zas"));
+    lmp.add(innerProcessor);
     lmp.add(event -> {
       processedEvents.add(event);
       return event;
@@ -78,7 +78,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
   private List<Processor> getNestedMessageProcessors() throws MuleException {
     List<Processor> lmp = new ArrayList<>();
     Foreach internalForeach = new Foreach();
-    internalForeach.setMessageProcessors(getSimpleMessageProcessors());
+    internalForeach.setMessageProcessors(getSimpleMessageProcessors(new TestMessageProcessor("zas")));
     lmp.add(internalForeach);
     return lmp;
   }
@@ -232,11 +232,24 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
   }
 
   @Test
+  public void filteredErrors() throws Exception {
+    Foreach foreach = new Foreach();
+    foreach.setMuleContext(muleContext);
+    foreach.setMessageProcessors(singletonList(event -> {
+      throw new RuntimeException("Expected");
+    }));
+    foreach.setIgnoreErrorType("ANY");
+    foreach.initialise();
+
+    process(foreach, eventBuilder().message(of(new DummyNestedIterableClass().iterator())).build(), false);
+  }
+
+  @Test
   public void failingExpression() throws Exception {
     Foreach foreach = new Foreach();
     foreach.setMuleContext(muleContext);
     foreach.setCollectionExpression("!@INVALID");
-    foreach.setMessageProcessors(getSimpleMessageProcessors());
+    foreach.setMessageProcessors(getSimpleMessageProcessors(new TestMessageProcessor("zas")));
     foreach.initialise();
 
     expectedException.expect(instanceOf(MessagingException.class));

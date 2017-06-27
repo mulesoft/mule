@@ -12,41 +12,41 @@ import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo.createInfo;
-import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
-import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContext;
 import static org.mule.runtime.core.api.context.notification.ErrorHandlerNotification.PROCESS_END;
 import static org.mule.runtime.core.api.context.notification.ErrorHandlerNotification.PROCESS_START;
+import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
+import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContext;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.context.notification.ErrorHandlerNotification;
 import org.mule.runtime.core.api.exception.DisjunctiveErrorTypeMatcher;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
+import org.mule.runtime.core.api.exception.ErrorTypeRepository;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
+import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.context.notification.ErrorHandlerNotification;
+import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
 import org.mule.runtime.core.internal.message.InternalMessage;
-import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.processor.AbstractRequestResponseMessageProcessor;
 import org.mule.runtime.core.routing.requestreply.ReplyToPropertyRequestReplyReplier;
-import org.mule.runtime.core.api.transaction.TransactionCoordination;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.reactivestreams.Publisher;
+
 import reactor.core.publisher.Mono;
 
 public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
@@ -122,7 +122,8 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
         public Publisher<Event> apply(Publisher<Event> publisher) {
           // TODO MULE-11023 Migrate transaction execution template mechanism to use non-blocking API
           // Use child context if HandleExceptionInterceptor is being used to avoid response being completed twice.
-          // TODO MULE-12720 This code makes processCatch/processFinally work for this particular AbstractRequestResponseMessageProcessor, others don't work
+          // TODO MULE-12720 This code makes processCatch/processFinally work for this particular
+          // AbstractRequestResponseMessageProcessor, others don't work
           return Mono.from(publisher).flatMapMany(event -> processWithChildContext(event, p -> from(p)
               .flatMapMany(childEvent -> Mono.from(routeAsync(childEvent, exception)))));
         }
@@ -235,22 +236,19 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
       configuredMessageProcessors.setMessagingExceptionHandler(messagingExceptionHandler);
     }
 
-    errorTypeMatcher = createErrorType();
+    errorTypeMatcher = createErrorType(muleContext.getErrorTypeRepository(), errorType);
   }
 
-  private ErrorTypeMatcher createErrorType() {
-    if (errorType == null) {
+  public static ErrorTypeMatcher createErrorType(ErrorTypeRepository errorTypeRepository, String errorTypeNames) {
+    if (errorTypeNames == null) {
       return null;
     }
-    String[] errorTypeIdentifiers = errorType.split(",");
+    String[] errorTypeIdentifiers = errorTypeNames.split(",");
     List<ErrorTypeMatcher> matchers = stream(errorTypeIdentifiers).map((identifier) -> {
       String parsedIdentifier = identifier.trim();
-      Optional<ErrorType> optional =
-          muleContext.getErrorTypeRepository().lookupErrorType(buildFromStringRepresentation(parsedIdentifier));
-      ErrorType errorType = optional
+      return new SingleErrorTypeMatcher(errorTypeRepository.lookupErrorType(buildFromStringRepresentation(parsedIdentifier))
           .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not found ErrorType for the given identifier: '%s'",
-                                                                          parsedIdentifier)));
-      return new SingleErrorTypeMatcher(errorType);
+                                                                          parsedIdentifier))));
     }).collect(toList());
     return new DisjunctiveErrorTypeMatcher(matchers);
   }

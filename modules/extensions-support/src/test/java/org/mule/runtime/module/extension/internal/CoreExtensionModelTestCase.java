@@ -28,6 +28,7 @@ import static org.mule.runtime.core.api.config.MuleManifest.getVendorName;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.module.extension.internal.resources.MuleExtensionModelProvider.MULE_VERSION;
 import static org.mule.runtime.module.extension.internal.resources.MuleExtensionModelProvider.getExtensionModel;
+
 import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.model.MetadataType;
@@ -198,10 +199,11 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
 
     assertComponentDeterminesOutput(splitterModel);
 
-    assertThat(splitterModel.getAllParameterModels(), hasSize(2));
+    assertThat(splitterModel.getAllParameterModels(), hasSize(3));
 
     assertMultiPayload(splitterModel.getAllParameterModels().get(0), "payload", REQUIRED);
-    assertTarget(splitterModel.getAllParameterModels().get(1));
+    assertErrorType(splitterModel.getAllParameterModels().get(1), "filterOnErrorType");
+    assertTarget(splitterModel.getAllParameterModels().get(2));
   }
 
 
@@ -287,7 +289,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
 
     assertComponentDeterminesOutput(foreachModel);
 
-    assertThat(foreachModel.getAllParameterModels(), hasSize(5));
+    assertThat(foreachModel.getAllParameterModels(), hasSize(6));
 
     assertMultiPayload(foreachModel.getAllParameterModels().get(0), "collection", SUPPORTED);
 
@@ -306,7 +308,8 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(foreachModel.getAllParameterModels().get(3).getType(), instanceOf(DefaultStringType.class));
     assertThat(foreachModel.getAllParameterModels().get(3).isRequired(), is(false));
 
-    assertTarget(foreachModel.getAllParameterModels().get(4));
+    assertErrorType(foreachModel.getAllParameterModels().get(4), "ignoreErrorType");
+    assertTarget(foreachModel.getAllParameterModels().get(5));
   }
 
   @Test
@@ -508,25 +511,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(allParameterModels, hasSize(4));
 
     ParameterModel type = allParameterModels.get(0);
-    assertThat(type.getName(), is("type"));
-    assertThat(type.getType(), is(instanceOf(UnionType.class)));
-    List<MetadataType> types = ((UnionType) type.getType()).getTypes();
-    assertThat(types, hasSize(2));
-    assertThat(types.get(0), is(instanceOf(DefaultStringType.class)));
-    assertThat(types.get(1), is(instanceOf(DefaultStringType.class)));
-    assertThat(types.get(1).getAnnotation(EnumAnnotation.class).get().getValues(), arrayContainingInAnyOrder(
-                                                                                                             "ANY",
-                                                                                                             "REDELIVERY_EXHAUSTED",
-                                                                                                             "TRANSFORMATION",
-                                                                                                             "EXPRESSION",
-                                                                                                             "SECURITY",
-                                                                                                             "CLIENT_SECURITY",
-                                                                                                             "SERVER_SECURITY",
-                                                                                                             "ROUTING",
-                                                                                                             "CONNECTIVITY",
-                                                                                                             "RETRY_EXHAUSTED"));
-    assertThat(type.getExpressionSupport(), is(NOT_SUPPORTED));
-    assertThat(type.isRequired(), is(false));
+    assertErrorType(type, "type");
 
     ParameterModel when = allParameterModels.get(1);
     assertThat(when.getName(), is("when"));
@@ -614,6 +599,28 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(targetParameterModel.getType().getAnnotation(TypeIdAnnotation.class).get().getValue(),
                is(String.class.getName()));
     assertThat(targetParameterModel.isRequired(), is(false));
+  }
+
+  private void assertErrorType(ParameterModel errorTypeParam, String paramName) {
+    assertThat(errorTypeParam.getName(), is(paramName));
+    assertThat(errorTypeParam.getType(), is(instanceOf(UnionType.class)));
+    List<MetadataType> types = ((UnionType) errorTypeParam.getType()).getTypes();
+    assertThat(types, hasSize(2));
+    assertThat(types.get(0), is(instanceOf(DefaultStringType.class)));
+    assertThat(types.get(1), is(instanceOf(DefaultStringType.class)));
+    assertThat(types.get(1).getAnnotation(EnumAnnotation.class).get().getValues(), arrayContainingInAnyOrder(
+                                                                                                             "ANY",
+                                                                                                             "REDELIVERY_EXHAUSTED",
+                                                                                                             "TRANSFORMATION",
+                                                                                                             "EXPRESSION",
+                                                                                                             "SECURITY",
+                                                                                                             "CLIENT_SECURITY",
+                                                                                                             "SERVER_SECURITY",
+                                                                                                             "ROUTING",
+                                                                                                             "CONNECTIVITY",
+                                                                                                             "RETRY_EXHAUSTED"));
+    assertThat(errorTypeParam.getExpressionSupport(), is(NOT_SUPPORTED));
+    assertThat(errorTypeParam.isRequired(), is(false));
   }
 
   private void assertSchedulingStrategy(ParameterModel paramModel) {

@@ -807,6 +807,65 @@
             {
               "type": {
                 "format": "java",
+                "type": "Union",
+                "of": [
+                  {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String",
+                      "enum": {
+                        "type": "[Ljava.lang.String;",
+                        "values": [
+                          "ANY",
+                          "REDELIVERY_EXHAUSTED",
+                          "TRANSFORMATION",
+                          "EXPRESSION",
+                          "SECURITY",
+                          "CLIENT_SECURITY",
+                          "SERVER_SECURITY",
+                          "ROUTING",
+                          "CONNECTIVITY",
+                          "RETRY_EXHAUSTED"
+                        ]
+                      }
+                    }
+                  }
+                ]
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "name": "filterOnErrorType",
+              "displayModel": {
+                "displayName": "Filter on Error Type"
+              },
+              "description": "The full name of the error types or a comma separated list of full names, to filter out of the resulting payload when it occurs. This is useful to use validations inside this component.",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
                 "type": "String",
                 "annotations": {
                   "typeId": "java.lang.String"
@@ -1514,6 +1573,65 @@
         },
         {
           "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "Union",
+                "of": [
+                  {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String",
+                      "enum": {
+                        "type": "[Ljava.lang.String;",
+                        "values": [
+                          "ANY",
+                          "REDELIVERY_EXHAUSTED",
+                          "TRANSFORMATION",
+                          "EXPRESSION",
+                          "SECURITY",
+                          "CLIENT_SECURITY",
+                          "SERVER_SECURITY",
+                          "ROUTING",
+                          "CONNECTIVITY",
+                          "RETRY_EXHAUSTED"
+                        ]
+                      }
+                    }
+                  }
+                ]
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "name": "ignoreErrorType",
+              "displayModel": {
+                "displayName": "Ignore Error Type"
+              },
+              "description": "The full name of the error types or a comma separated list of full names, to ignore when processing an item. This is useful to use validations inside this component.",
+              "modelProperties": {}
+            },
             {
               "type": {
                 "format": "java",

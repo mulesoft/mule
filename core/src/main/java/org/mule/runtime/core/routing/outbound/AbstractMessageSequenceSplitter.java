@@ -7,14 +7,17 @@
 package org.mule.runtime.core.routing.outbound;
 
 import static java.util.Collections.emptySet;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.core.api.Acceptor;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.routing.RouterResultsHandler;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.message.GroupCorrelation;
+import org.mule.runtime.core.api.routing.RouterResultsHandler;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 import org.mule.runtime.core.routing.AbstractSplitter;
 import org.mule.runtime.core.routing.DefaultRouterResultsHandler;
@@ -34,7 +37,7 @@ import java.util.Set;
  * @see AbstractSplitter
  */
 public abstract class AbstractMessageSequenceSplitter extends AbstractInterceptingMessageProcessor
-    implements MuleContextAware {
+    implements MuleContextAware, Acceptor {
 
   protected RouterResultsHandler resultsHandler = new DefaultRouterResultsHandler();
   protected int batchSize;
@@ -89,11 +92,15 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
 
       builder.groupCorrelation(new GroupCorrelation(count, correlationSequence));
       initEventBuilder(messageSequence.next(), originalEvent, builder, resolvePropagatedFlowVars(lastResult));
-      final Event event = builder.build();
-      Event resultEvent = processNext(event);
-      if (resultEvent != null) {
+
+      try {
+        Event resultEvent = processNext(builder.build());
         resultEvents.add(resultEvent);
         lastResult = resultEvent;
+      } catch (MessagingException e) {
+        if (!accept(e.getEvent())) {
+          throw e;
+        }
       }
     }
     if (correlationSequence == 1) {

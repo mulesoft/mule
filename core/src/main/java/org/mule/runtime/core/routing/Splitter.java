@@ -6,13 +6,16 @@
  */
 package org.mule.runtime.core.routing;
 
+import static org.mule.runtime.core.internal.exception.TemplateOnErrorHandler.createErrorType;
+
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.expression.ExpressionConfig;
-import org.mule.runtime.core.routing.outbound.AbstractMessageSequenceSplitter;
+import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
 import org.mule.runtime.core.api.util.collection.EventToMessageSequenceSplittingStrategy;
 import org.mule.runtime.core.api.util.collection.SplittingStrategy;
+import org.mule.runtime.core.expression.ExpressionConfig;
+import org.mule.runtime.core.routing.outbound.AbstractMessageSequenceSplitter;
 
 /**
  * Splits a message that has a Collection, Iterable, MessageSequence or Iterator payload or an expression that resolves to some of
@@ -25,15 +28,20 @@ public class Splitter extends AbstractMessageSequenceSplitter implements Initial
 
   private ExpressionConfig config = new ExpressionConfig("#[payload]");
   private SplittingStrategy<Event, MessageSequence<?>> strategy;
+  private String filterOnErrorType = null;
+
+  private ErrorTypeMatcher filterOnErrorTypeMatcher = null;
 
   public Splitter() {
     // Used by spring
   }
 
-  public Splitter(ExpressionConfig config) {
+  public Splitter(ExpressionConfig config, ErrorTypeMatcher filterOnErrorTypeMatcher) {
     this.config = config;
+    this.filterOnErrorTypeMatcher = filterOnErrorTypeMatcher;
   }
 
+  @Override
   protected MessageSequence<?> splitMessageIntoSequence(Event event) {
     return this.strategy.split(event);
   }
@@ -43,9 +51,26 @@ public class Splitter extends AbstractMessageSequenceSplitter implements Initial
     config.validate();
     strategy = new EventToMessageSequenceSplittingStrategy(new ExpressionSplittingStrategy(muleContext.getExpressionManager(),
                                                                                            config.getFullExpression()));
+    if (filterOnErrorTypeMatcher == null) {
+      filterOnErrorTypeMatcher = createErrorType(muleContext.getErrorTypeRepository(), filterOnErrorType);
+    }
   }
 
   public void setExpression(String expression) {
     this.config.setExpression(expression);
+  }
+
+  public void setFilterOnErrorType(String filterOnErrorType) {
+    this.filterOnErrorType = filterOnErrorType;
+  }
+
+  @Override
+  public boolean accept(Event event) {
+    return filterOnErrorTypeMatcher != null && filterOnErrorTypeMatcher.match(event.getError().get().getErrorType());
+  }
+
+  @Override
+  public boolean acceptsAll() {
+    return false;
   }
 }

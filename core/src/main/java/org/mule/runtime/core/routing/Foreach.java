@@ -10,7 +10,9 @@ import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
 import static org.mule.runtime.api.exception.MuleException.INFO_LOCATION_KEY;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
+import static org.mule.runtime.core.internal.exception.TemplateOnErrorHandler.createErrorType;
 import static org.mule.runtime.core.routing.ExpressionSplittingStrategy.DEFAULT_SPIT_EXPRESSION;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -18,10 +20,11 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
+import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.expression.ExpressionConfig;
 import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.routing.outbound.AbstractMessageSequenceSplitter;
@@ -62,6 +65,9 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
   private String rootMessageVariableName;
   private String counterVariableName;
   private boolean xpathCollection;
+  private String ignoreErrorType = null;
+
+  private ErrorTypeMatcher ignoreErrorTypeMatcher = null;
 
   @Override
   public Event process(Event event) throws MuleException {
@@ -143,8 +149,10 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
 
   @Override
   public void initialise() throws InitialisationException {
+    ignoreErrorTypeMatcher = createErrorType(muleContext.getErrorTypeRepository(), ignoreErrorType);
+
     expressionConfig.setExpression(collectionExpression);
-    splitter = new Splitter(expressionConfig) {
+    splitter = new Splitter(expressionConfig, ignoreErrorTypeMatcher) {
 
       @Override
       protected void propagateFlowVars(Event previousResult, final Builder builder) {
@@ -171,6 +179,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     chainProcessors.add(splitter);
     chainProcessors.add(newChain(messageProcessors));
     ownedMessageProcessor = newChain(chainProcessors);
+
     super.initialise();
   }
 
@@ -194,4 +203,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     this.counterVariableName = counterVariableName;
   }
 
+  public void setIgnoreErrorType(String ignoreErrorType) {
+    this.ignoreErrorType = ignoreErrorType;
+  }
 }

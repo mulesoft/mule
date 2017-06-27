@@ -3779,51 +3779,6 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:complexType name="baseMessageFilterType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractGlobalInterceptingMessageProcessorType">
-                <xsd:attribute name="onUnaccepted" type="xsd:string">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Events that are not accepted by the filter are sent to this (optional) named message processor.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="throwOnUnaccepted" type="substitutableBoolean">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Whether to throw an exception if a message is not accepted
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-
-    <xsd:element name="message-filter" type="messageFilterType"  substitutionGroup="abstract-global-intercepting-message-processor">
-        <xsd:annotation>
-            <xsd:documentation>
-                A message processor that uses a filter to determine whether to process an event.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="messageFilterType">
-        <xsd:complexContent>
-            <xsd:extension base="baseMessageFilterType">
-                <xsd:sequence>
-                    <xsd:element ref="abstract-filter">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                Used to filter events.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
-                </xsd:sequence>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
     <xsd:element name="idempotent-message-validator" type="idempotentMessageValidatorType"
                  substitutionGroup="abstract-message-processor">
         <xsd:annotation>
@@ -4117,6 +4072,13 @@
             <xsd:complexContent>
                 <xsd:extension base="baseSplitterType">
                 <xsd:attributeGroup ref="optionalExpressionAttributes"/>
+                <xsd:attribute name="filterOnErrorType" type="errorIdentifierType" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The full name of the error types or a comma separated list of full names, to filter out of the resulting payload when it occurs. This is useful to use validations inside this component.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
             </xsd:complexContent>
         </xsd:complexType>
@@ -4225,6 +4187,13 @@
                     <xsd:annotation>
                         <xsd:documentation>
                             Property name used to store the number of message being iterated.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="ignoreErrorType" type="errorIdentifierType" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The full name of the error types or a comma separated list of full names, to ignore when processing an item. This is useful to use validations inside this component.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
