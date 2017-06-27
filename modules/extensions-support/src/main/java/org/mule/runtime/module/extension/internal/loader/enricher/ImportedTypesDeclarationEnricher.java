@@ -10,14 +10,16 @@ import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.parseRepeatableAnnotation;
 import org.mule.metadata.api.ClassTypeLoader;
-import org.mule.runtime.extension.api.annotation.Import;
-import org.mule.runtime.extension.api.annotation.ImportedTypes;
-import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.meta.model.ImportedTypeModel;
-import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
+import org.mule.runtime.extension.api.annotation.Import;
+import org.mule.runtime.extension.api.annotation.ImportedTypes;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 
 import java.util.List;
@@ -55,8 +57,17 @@ public final class ImportedTypesDeclarationEnricher extends AbstractAnnotatedDec
                                                          extensionDeclaration.getName()));
       }
 
-      importTypes.forEach(imported -> extensionDeclaration
-          .addImportedType(new ImportedTypeModel(typeLoader.load(imported.type()))));
+      importTypes.forEach(imported -> {
+        MetadataType importedType = typeLoader.load(imported.type());
+
+        if (!(importedType instanceof ObjectType)) {
+          throw new IllegalArgumentException(format("Type '%s' is not an Object. Only objects can be imported from other extensions.",
+                                                    type.getTypeName()));
+        }
+
+        extensionDeclaration
+            .addImportedType(new ImportedTypeModel((ObjectType) typeLoader.load(imported.type())));
+      });
     }
   }
 }
