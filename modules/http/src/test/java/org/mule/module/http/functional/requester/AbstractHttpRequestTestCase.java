@@ -6,16 +6,12 @@
  */
 package org.mule.module.http.functional.requester;
 
+import static org.mule.module.http.functional.proxy.ConfigurationUtil.configureHttpsServer;
+
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.CaseInsensitiveMapWrapper;
-import org.mule.util.FileUtils;
 import org.mule.util.IOUtils;
-
-import com.google.common.base.Supplier;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
-import com.google.common.collect.Sets;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -30,12 +26,15 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.collections.EnumerationUtils;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.AbstractHandler;
-import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
+
+import com.google.common.base.Supplier;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
+import com.google.common.collect.Sets;
 
 public class AbstractHttpRequestTestCase extends FunctionalTestCase
 {
@@ -94,23 +93,7 @@ public class AbstractHttpRequestTestCase extends FunctionalTestCase
 
     protected void enableHttpsServer(Server server)
     {
-        SslContextFactory sslContextFactory = new SslContextFactory();
-
-        try
-        {
-            sslContextFactory.setKeyStorePath(FileUtils.getResourcePath("tls/serverKeystore", getClass()));
-        }
-        catch (IOException e)
-        {
-            throw new RuntimeException(e);
-        }
-
-        sslContextFactory.setKeyStorePassword("mulepassword");
-        sslContextFactory.setKeyManagerPassword("mulepassword");
-
-        ServerConnector connector = new ServerConnector(server, sslContextFactory);
-        connector.setPort(httpsPort.getNumber());
-        server.addConnector(connector);
+        configureHttpsServer(server, httpsPort.getNumber(), getClass());
     }
 
     protected AbstractHandler createHandler(Server server)
