@@ -574,7 +574,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("expression", fromSimpleParameter("expression").build())
         .withSetterParameterDefinition("filterOnErrorType", fromSimpleParameter("filterOnErrorType").build())
         .build());
-    
+
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier(REQUEST_REPLY)
         .withTypeDefinition(fromType(SimpleAsyncRequestReplyRequester.class))
         .withSetterParameterDefinition("messageProcessor", fromChildConfiguration(Processor.class).build())
