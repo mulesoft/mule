@@ -54,7 +54,7 @@ propertiesDeps=("muleHttpServiceTestVersion"
 # Using Snapshot as a workaround because the extensions have the mule artifacts as
 # deps. So there is a circular dependency.
 VERSION_TO_DEPS_AUX=1.0.0-BETA-SNAPSHOT
-updatePropertiesVersion "$VERSION_TO_DEPS" pom.xml propertiesDeps[@]
+updatePropertiesVersion "$VERSION_TO_DEPS_AUX" pom.xml propertiesDeps[@]
 
 
 # Properties with 0.8.x in the root pom.xml
