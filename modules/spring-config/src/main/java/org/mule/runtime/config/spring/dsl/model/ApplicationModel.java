@@ -29,8 +29,7 @@ import static org.mule.runtime.extension.api.util.NameUtils.pluralize;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.DOMAIN_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.EE_DOMAIN_PREFIX;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
+
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.app.declaration.ElementDeclaration;
 import org.mule.runtime.api.artifact.ArtifactProperties;
@@ -47,8 +46,9 @@ import org.mule.runtime.core.internal.config.artifact.DefaultArtifactProperties;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
-import org.springframework.util.PropertyPlaceholderHelper;
-import org.w3c.dom.Node;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -62,6 +62,9 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.function.Consumer;
+
+import org.springframework.util.PropertyPlaceholderHelper;
+import org.w3c.dom.Node;
 
 /**
  * An {@code ApplicationModel} holds a representation of all the artifact configuration using an abstract model to represent any
@@ -304,8 +307,8 @@ public class ApplicationModel {
    * @param extensionModels Set of {@link ExtensionModel extensionModels} that will be used to type componentModels
    * @param componentBuildingDefinitionRegistry an optional {@link ComponentBuildingDefinitionRegistry} used to correlate items in
    *        this model to their definitions
-   * @param runtimeMode true implies the mule application should behave as a runtime app (e.g.: smart connectors will be macro expanded)
-   *                    false implies the mule is being created from a tooling perspective.
+   * @param runtimeMode true implies the mule application should behave as a runtime app (e.g.: smart connectors will be macro
+   *        expanded) false implies the mule is being created from a tooling perspective.
    * @throws Exception when the application configuration has semantic errors.
    */
   // TODO: MULE-9638 remove this optional
@@ -591,14 +594,12 @@ public class ApplicationModel {
         if (anyMappings.size() > 1) {
           throw new MuleRuntimeException(createStaticMessage("Only one mapping for ANY or an empty source type is allowed."));
         } else if (anyMappings.size() == 1 && !isErrorMappingWithSourceAny(errorMappings.get(errorMappings.size() - 1))) {
-          throw new MuleRuntimeException(
-                                         createStaticMessage("Only the last error mapping can have ANY or an empty source type."));
+          throw new MuleRuntimeException(createStaticMessage("Only the last error mapping can have ANY or an empty source type."));
         }
         List<String> sources = errorMappings.stream().map(model -> model.getParameters().get(SOURCE_TYPE)).collect(toList());
         List<String> distinctSources = sources.stream().distinct().collect(toList());
         if (sources.size() != distinctSources.size()) {
-          throw new MuleRuntimeException(
-                                         createStaticMessage(format("Repeated source types are not allowed. Offending types are %s.",
+          throw new MuleRuntimeException(createStaticMessage(format("Repeated source types are not allowed. Offending types are %s.",
                                                                     on(", ").join(disjunction(sources, distinctSources)))));
         }
       }

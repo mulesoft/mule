@@ -6,30 +6,18 @@
  */
 package org.mule.test.module.extension.connector;
 
+import static java.util.Collections.emptyMap;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import static org.mule.functional.junit4.matchers.ThatMatcher.that;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.EXCEPTION_MAPPINGS;
-import static java.util.Collections.emptyMap;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 
-import org.mule.functional.junit4.ExtensionFunctionalTestCase;
-import org.mule.runtime.extension.api.annotation.Extension;
-import org.mule.runtime.extension.api.annotation.Operations;
-import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
-import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
-import org.mule.test.petstore.extension.PetStoreConnector;
-import org.mule.test.petstore.extension.PetStoreOperations;
-import org.mule.test.petstore.extension.SimplePetStoreConnectionProvider;
-
-import java.io.IOException;
-import java.util.Map;
-import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
-import static org.mule.functional.junit4.matchers.ThatMatcher.that;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
 import org.junit.Test;
+
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;

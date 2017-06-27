@@ -8,6 +8,7 @@ package org.mule.functional.junit4.matchers;
 
 import static java.lang.String.format;
 import static org.junit.Assert.fail;
+
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.util.IOUtils;
@@ -19,24 +20,29 @@ import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
 /**
- * Verifies a {@link Message}'s payload, using a {@link String} matcher.
- * Works with {@link String} and {@link InputStream} payloads.
+ * Verifies a {@link Message}'s payload, using a {@link String} matcher. Works with {@link String} and {@link InputStream}
+ * payloads.
  *
  * @since 4.0
  */
-public class IsMessageWithPayload extends TypeSafeMatcher<Message> {
+public class IsMessageWithPayload<T> extends TypeSafeMatcher<Message> {
 
-  private final Matcher<String> matcher;
-  private String incomingValue;
+  private final Matcher<T> matcher;
+  private Object incomingValue;
 
-  public IsMessageWithPayload(Matcher<String> matcher) {
+  public IsMessageWithPayload(Matcher<T> matcher) {
     this.matcher = matcher;
   }
 
   @Override
   protected boolean matchesSafely(Message message) {
-    //Save the String since we may consume the payload here
-    incomingValue = getString(message.getPayload().getValue());
+    final Object payload = message.getPayload().getValue();
+    if (payload instanceof String || payload instanceof CursorStreamProvider || payload instanceof InputStream) {
+      // Save the String since we may consume the payload here
+      incomingValue = getString(payload);
+    } else {
+      incomingValue = payload;
+    }
     return matcher.matches(incomingValue);
   }
 

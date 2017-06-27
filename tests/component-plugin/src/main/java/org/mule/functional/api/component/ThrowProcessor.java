@@ -6,6 +6,7 @@
  */
 package org.mule.functional.api.component;
 
+import static java.lang.String.format;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
@@ -42,14 +43,14 @@ public class ThrowProcessor implements Processor {
       if (error != null) {
         ErrorTypeRepository errorTypeRepository = muleContext.getErrorTypeRepository();
         ErrorType errorType = errorTypeRepository.lookupErrorType(buildFromStringRepresentation(error))
-            .orElseThrow(() -> new DefaultMuleException(String.format("Could not find error: %s", error)));
+            .orElseThrow(() -> new DefaultMuleException(format("Could not find error: %s", error)));
         throw new TypedException(instantiatedException, errorType);
       } else {
         checkArgument(instantiatedException instanceof TypedException, EXCEPTION_ERROR);
         throw (TypedException) instantiatedException;
       }
     } catch (InstantiationException | IllegalAccessException e) {
-      throw new DefaultMuleException(String.format("Failed to instantiate exception class %s", exception.getSimpleName()));
+      throw new DefaultMuleException(format("Failed to instantiate exception class %s", exception.getSimpleName()));
     }
   }
 

@@ -18,6 +18,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.message.ErrorBuilder;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.config.ExceptionHelper;
 import org.mule.runtime.core.routing.filters.RegExFilter;
@@ -91,30 +92,30 @@ public class MessagingException extends MuleException {
    */
   @Deprecated
   public MessagingException(I18nMessage message, Message muleMessage, MuleContext context, Throwable cause) {
-    super(message, cause);
+    super(message, cause instanceof TypedException ? cause.getCause() : cause);
     this.muleMessage = muleMessage;
     this.event = null;
     setMessage(generateMessage(message, context));
   }
 
   public MessagingException(I18nMessage message, Event event, Throwable cause) {
-    super(message, cause);
-    this.event = event;
+    super(message, cause instanceof TypedException ? cause.getCause() : cause);
+    this.event = cause instanceof TypedException ? eventWithError(event, cause) : event;
     extractMuleMessage(event);
     setMessage(generateMessage(message, null));
   }
 
   public MessagingException(I18nMessage message, Event event, Throwable cause, Processor failingMessageProcessor) {
-    super(message, cause);
-    this.event = event;
+    super(message, cause instanceof TypedException ? cause.getCause() : cause);
+    this.event = cause instanceof TypedException ? eventWithError(event, cause) : event;
     extractMuleMessage(event);
     this.failingMessageProcessor = failingMessageProcessor;
     setMessage(generateMessage(message, null));
   }
 
   public MessagingException(Event event, Throwable cause) {
-    super(cause);
-    this.event = event;
+    super(cause instanceof TypedException ? cause.getCause() : cause);
+    this.event = cause instanceof TypedException ? eventWithError(event, cause) : event;
     extractMuleMessage(event);
     setMessage(generateMessage(getI18nMessage(), null));
   }
@@ -122,7 +123,7 @@ public class MessagingException extends MuleException {
   public MessagingException(Event event, MessagingException original) {
     super(original.getI18nMessage(),
           original.getCause() instanceof TypedException ? original.getCause().getCause() : original.getCause());
-    this.event = event;
+    this.event = original.getCause() instanceof TypedException ? eventWithError(event, original.getCause()) : event;
     this.failingMessageProcessor = original.getFailingMessageProcessor();
     this.causeRollback = original.causedRollback();
     this.handled = original.handled();
@@ -132,11 +133,16 @@ public class MessagingException extends MuleException {
   }
 
   public MessagingException(Event event, Throwable cause, Processor failingMessageProcessor) {
-    super(cause);
-    this.event = event;
+    super(cause instanceof TypedException ? cause.getCause() : cause);
+    this.event = cause instanceof TypedException ? eventWithError(event, cause) : event;
     extractMuleMessage(event);
     this.failingMessageProcessor = failingMessageProcessor;
     setMessage(generateMessage(getI18nMessage(), null));
+  }
+
+  private Event eventWithError(Event event, Throwable cause) {
+    return Event.builder(event)
+        .error(ErrorBuilder.builder(cause.getCause()).errorType(((TypedException) cause).getErrorType()).build()).build();
   }
 
   protected String generateMessage(I18nMessage message, MuleContext muleContext) {
@@ -290,8 +296,8 @@ public class MessagingException extends MuleException {
 
   @Override
   protected void appendSummaryMessage(StringBuilder builder) {
-    builder.append("Error Type              : ")
-        .append(getEvent().getError().map(e -> e.getErrorType()))
+    builder.append("Error Type            : ")
+        .append(getEvent().getError().map(e -> e.getErrorType().toString()).orElse("(None)"))
         .append(lineSeparator());
 
     super.appendSummaryMessage(builder);
@@ -384,6 +390,6 @@ public class MessagingException extends MuleException {
 
   @Override
   public String toString() {
-    return super.toString() + "; ErrorType: " + getEvent().getError().map(e -> e.getErrorType());
+    return super.toString() + "; ErrorType: " + getEvent().getError().map(e -> e.getErrorType().toString()).orElse("(None)");
   }
 }

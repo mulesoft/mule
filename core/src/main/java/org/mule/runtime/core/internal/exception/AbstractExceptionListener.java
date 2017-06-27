@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.exception;
 
+import static java.lang.Boolean.TRUE;
 import static java.text.MessageFormat.format;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.defaultString;
@@ -20,20 +21,20 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.GlobalNameableObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.context.notification.ExceptionNotification;
+import org.mule.runtime.core.api.context.notification.SecurityNotification;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.TypedException;
-import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.internal.config.ExceptionHelper;
-import org.mule.runtime.core.api.context.notification.ExceptionNotification;
-import org.mule.runtime.core.api.context.notification.SecurityNotification;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
+import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.transaction.TransactionCoordination;
+import org.mule.runtime.core.internal.config.ExceptionHelper;
 import org.mule.runtime.core.internal.message.ExceptionMessage;
 import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.routing.filters.WildcardFilter;
 import org.mule.runtime.core.routing.outbound.MulticastingRouter;
-import org.mule.runtime.core.api.transaction.TransactionCoordination;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -62,7 +63,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
   protected WildcardFilter commitTxFilter;
 
   protected boolean enableNotifications = true;
-  protected String logException = "mel:true";
+  protected String logException = TRUE.toString();
 
   protected String globalName;
 
@@ -202,7 +203,8 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
    * @param t the exception thrown
    */
   protected void logException(Throwable t, Event event) {
-    if (this.muleContext.getExpressionManager().evaluateBoolean(logException, event, flowConstruct, true, true)) {
+    if (TRUE.toString().equals(logException)
+        || this.muleContext.getExpressionManager().evaluateBoolean(logException, event, flowConstruct, true, true)) {
       doLogException(t);
     }
   }
