@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.java;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
@@ -21,6 +22,7 @@ import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingDelegate;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
+import org.mule.runtime.module.extension.internal.loader.java.property.CraftedExtensionModelProperty;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -63,6 +65,8 @@ public class CraftedExtensionModelLoaderTestCase extends AbstractMuleTestCase {
     ExtensionModel extensionModel = loader.loadExtensionModel(classLoader, dslResolvingContext, attributes);
     assertThat(extensionModel, is(notNullValue()));
     assertThat(extensionModel.getName(), is(EXTENSION_NAME));
+    assertThat(extensionModel.getModelProperties(), hasSize(1));
+    assertThat(extensionModel.getModelProperty(CraftedExtensionModelProperty.class), is(notNullValue()));
   }
 
   @Test
