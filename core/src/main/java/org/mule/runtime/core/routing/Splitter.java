@@ -74,12 +74,12 @@ public class Splitter extends AbstractMessageSequenceSplitter implements Initial
   }
 
   /**
-   * Handles the given error types so that items that cause them when being processes won't be included in the aggregated response
+   * Handles the given error types so that items that cause them when being processed are filtered from the aggregated response
    * collection, rather than propagating the error.
    * <p>
    * This is useful to use validations inside this component.
    * 
-   * @param filterOnErrorType A comma separated list of error types that should be handled by dropping the split part.
+   * @param filterOnErrorType A comma separated list of error types that should be handled by filtering the split part.
    */
   public void setFilterOnErrorType(String filterOnErrorType) {
     this.filterOnErrorType = filterOnErrorType;

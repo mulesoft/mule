@@ -4075,7 +4075,7 @@
                 <xsd:attribute name="filterOnErrorType" type="errorIdentifierType" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
-                            A comma separated list of error types that should be handled by dropping the split part. These errors are handled so that items that cause them when being processed won't be included in the aggregated response collection, rather than propagating the error. This is useful to use validations inside this component.
+                            A comma separated list of error types that should be handled by filtering the split part, rather than propagating the error. Filtered parts are not included in the aggregated response collection. This is useful to use validations inside this component.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -4193,7 +4193,7 @@
                 <xsd:attribute name="ignoreErrorType" type="errorIdentifierType" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
-                            A comma separated list of error types that should be handled by dropping the split part. These errors are handled so that items that cause them when being processed are ignored, rather than propagating the error. This is useful to use validations inside this component.
+                            A comma separated list of error types that should be handled, so that items that cause them when being processed are ignored, rather than propagating the error. This is useful to use validations inside this component.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>

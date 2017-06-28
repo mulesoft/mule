@@ -203,7 +203,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
    * <p>
    * This is useful to use validations inside this component.
    * 
-   * @param ignoreErrorType A comma separated list of error types that should be handled by dropping the split part.
+   * @param ignoreErrorType A comma separated list of error types that should be ignored when processing an item.
    */
   public void setIgnoreErrorType(String ignoreErrorType) {
     this.ignoreErrorType = ignoreErrorType;
