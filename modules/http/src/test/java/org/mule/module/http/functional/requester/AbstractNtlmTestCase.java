@@ -69,7 +69,7 @@ public abstract class AbstractNtlmTestCase extends AbstractHttpRequestTestCase
         return null;
     }
 
-    protected boolean authorizeRequest(String address, HttpServletRequest request, HttpServletResponse response) throws IOException
+    protected boolean authorizeRequest(String address, HttpServletRequest request, HttpServletResponse response, boolean addAuthorizeMessageInProxy) throws IOException
     {
         String auth = request.getHeader(clientAuthHeader);
         if (auth == null)
@@ -88,6 +88,10 @@ public abstract class AbstractNtlmTestCase extends AbstractHttpRequestTestCase
         {
             requestUrl = address;
             response.setStatus(SC_OK);
+            if(addAuthorizeMessageInProxy)
+            {
+                response.getWriter().print(AUTHORIZED);
+            }
             return true;
         }
         else
@@ -98,7 +102,7 @@ public abstract class AbstractNtlmTestCase extends AbstractHttpRequestTestCase
     }
     protected void handleRequest(String address, HttpServletRequest request, HttpServletResponse response) throws IOException
     {
-        authorizeRequest(address, request, response);
+        authorizeRequest(address, request, response, true);
     }
     @Override
     protected void handleRequest(Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException

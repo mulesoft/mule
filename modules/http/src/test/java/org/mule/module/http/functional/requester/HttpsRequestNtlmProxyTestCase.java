@@ -86,7 +86,7 @@ public class HttpsRequestNtlmProxyTestCase extends AbstractNtlmTestCase
             {
                 try
                 {
-                    authenticated = authorizeRequest(address, request, response);
+                    authenticated = authorizeRequest(address, request, response, false);
                     return authenticated;
                 }
                 catch (IOException e)
