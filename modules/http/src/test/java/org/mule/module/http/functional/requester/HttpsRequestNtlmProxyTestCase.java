@@ -76,7 +76,7 @@ public class HttpsRequestNtlmProxyTestCase extends AbstractNtlmTestCase
                     }
                     catch (IOException e)
                     {
-                        e.printStackTrace();
+                        // Do nothing
                     }
                 }
             }
