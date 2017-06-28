@@ -8,6 +8,8 @@ package org.mule.module.http.functional.requester;
 
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static javax.servlet.http.HttpServletResponse.SC_PROXY_AUTHENTICATION_REQUIRED;
+import static org.glassfish.grizzly.http.server.Constants.CLOSE;
+import static org.glassfish.grizzly.http.server.Constants.CONNECTION;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -29,8 +31,14 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.junit.Test;
 
+/**
+ * This is a simple Functional TestCase that simulates the case of a NTLM HTTP Proxy
+ * and an HTTPS Server behind that proxy. Authentication is required.
+ */
 public class HttpsRequestNtlmProxyTestCase extends AbstractNtlmTestCase
 {
+    private static final String TARGET_RESPONSE = "Response";
+
     @Override
     protected AbstractHandler createHandler(Server server)
     {
@@ -44,7 +52,7 @@ public class HttpsRequestNtlmProxyTestCase extends AbstractNtlmTestCase
             {
                 if (request.isSecure())
                 {
-                    // if the request is secure, the response 
+                    // if the request is secure, the response
                     // from the https target is being handled
                     simpleResponseFromTarget(response);
                 }
@@ -105,13 +113,13 @@ public class HttpsRequestNtlmProxyTestCase extends AbstractNtlmTestCase
     {
         MuleEvent event = runFlow(getFlowName());
         assertThat((int) event.getMessage().getInboundProperty(HTTP_STATUS_PROPERTY), is(SC_OK));
-        assertThat(event.getMessage().getPayloadAsString(), equalTo("Authorize"));
+        assertThat(event.getMessage().getPayloadAsString(), equalTo(TARGET_RESPONSE));
     }
 
     private void simpleResponseFromTarget(HttpServletResponse response) throws IOException
     {
-        response.setHeader("Connection", "close");
-        response.getOutputStream().print("Authorize");
+        response.setHeader(CONNECTION, CLOSE);
+        response.getOutputStream().print(TARGET_RESPONSE);
         response.setStatus(SC_OK);
         response.getOutputStream().flush();
         response.getOutputStream().close();
@@ -121,6 +129,4 @@ public class HttpsRequestNtlmProxyTestCase extends AbstractNtlmTestCase
     {
         return true;
     }
-
-
 }
