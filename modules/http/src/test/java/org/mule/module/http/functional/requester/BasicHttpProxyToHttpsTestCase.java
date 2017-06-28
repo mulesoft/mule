@@ -12,6 +12,9 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
+import static org.mule.module.http.api.HttpHeaders.Names.AUTHORIZATION;
+import static org.mule.module.http.api.HttpHeaders.Names.PROXY_AUTHENTICATE;
+import static org.mule.module.http.api.HttpHeaders.Names.PROXY_AUTHORIZATION;
 import org.mule.api.MuleEvent;
 
 import java.io.IOException;
@@ -21,6 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.jetty.proxy.ConnectHandler;
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.AbstractHandler;
@@ -30,23 +34,15 @@ public class BasicHttpProxyToHttpsTestCase extends AbstractHttpRequestTestCase
 {
 
     private static final String AUTHORIZED = "Authorized";
-    private static final String PASSWORD = "dXNlcjpwYXNzd29yZA==";
+    private static final String PROXY_PASSWORD = "dXNlcjpwYXNzd29yZA==";
+    private static final String PASSWORD = "am9obmRvZTpwYXNz";
 
     private Server httpsServer;
 
     @Override
     protected AbstractHandler createHandler(Server server)
     {
-        return new ConnectHandler() {
-
-            @Override
-            protected boolean handleAuthentication(HttpServletRequest request, HttpServletResponse response, String address)
-            {
-
-                String authorization = request.getHeader("Proxy-Authorization");
-                return authorization != null && authorization.equals("Basic " + PASSWORD);
-            }
-        };
+        return new ProxyConnectHTTPHandler();
     }
 
     @Override
@@ -73,7 +69,7 @@ public class BasicHttpProxyToHttpsTestCase extends AbstractHttpRequestTestCase
     protected void enableHttpsServer(Server server)
     {
         httpsServer = new Server();
-        httpsServer.setHandler(new AbstractHandler()
+        httpsServer.setHandler(new AuthenticateHandler(new AbstractHandler()
         {
             @Override
             public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
@@ -84,8 +80,98 @@ public class BasicHttpProxyToHttpsTestCase extends AbstractHttpRequestTestCase
 
                 baseRequest.setHandled(true);
             }
-        });
+        }));
         super.enableHttpsServer(httpsServer);
+    }
+
+    private static class ProxyConnectHTTPHandler extends ConnectHandler {
+
+        @Override
+        protected boolean handleAuthentication(HttpServletRequest request, HttpServletResponse response, String address) {
+            return true;
+        }
+
+        /**
+         * Override this method do to the {@link ConnectHandler#handleConnect(org.eclipse.jetty.server.Request, HttpServletRequest, HttpServletResponse, String)} doesn't allow me to generate a response with
+         * {@link HttpServletResponse#SC_PROXY_AUTHENTICATION_REQUIRED} neither {@link HttpServletResponse#SC_UNAUTHORIZED}.
+         */
+        @Override
+        protected void handleConnect(org.eclipse.jetty.server.Request baseRequest, HttpServletRequest request, HttpServletResponse response, String serverAddress)
+        {
+            try
+            {
+                if (!this.doHandleAuthentication(baseRequest, response))
+                {
+                    return;
+                }
+            }
+            catch (Exception e)
+            {
+                return;
+            }
+
+            // Just call super class method to establish the tunnel and avoid copy/paste.
+            super.handleConnect(baseRequest, request, response, serverAddress);
+        }
+
+        public boolean doHandleAuthentication(org.eclipse.jetty.server.Request request, HttpServletResponse httpResponse) throws IOException, ServletException {
+            boolean result = false;
+            if ("CONNECT" == (request.getMethod()))
+            {
+                String authorization = request.getHeader(PROXY_AUTHORIZATION);
+                if (authorization == null)
+                {
+                    httpResponse.setStatus(HttpServletResponse.SC_PROXY_AUTHENTICATION_REQUIRED);
+                    httpResponse.setHeader(PROXY_AUTHENTICATE, "Basic realm=\"Fake Realm\"");
+                    result = false;
+                }
+                else if (authorization.equals("Basic " + PROXY_PASSWORD))
+                {
+                    httpResponse.setStatus(HttpServletResponse.SC_OK, "Connection established");
+                    result = true;
+                }
+                else
+                {
+                    httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    httpResponse.getOutputStream().flush();
+                    httpResponse.getOutputStream().close();
+                    result = false;
+                }
+                httpResponse.getOutputStream().flush();
+                httpResponse.getOutputStream().close();
+                request.setHandled(true);
+            }
+            return result;
+        }
+    }
+
+    private static class AuthenticateHandler extends AbstractHandler {
+
+        private Handler target;
+
+        public AuthenticateHandler(Handler target) {
+            this.target = target;
+        }
+
+        @Override
+        public void handle(String pathInContext, org.eclipse.jetty.server.Request request, HttpServletRequest httpRequest,
+                           HttpServletResponse httpResponse) throws IOException, ServletException {
+            String authorization = httpRequest.getHeader(AUTHORIZATION);
+            if (authorization != null && authorization.equals("Basic " + PASSWORD))
+            {
+                httpResponse.addHeader("target", request.getUri().toString());
+                target.handle(pathInContext, request, httpRequest, httpResponse);
+            }
+            else
+            {
+                httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                httpResponse.setHeader("www-authenticate", "Basic realm=\"Fake Realm\"");
+                httpResponse.getOutputStream().flush();
+                httpResponse.getOutputStream().close();
+                request.setHandled(true);
+            }
+
+        }
     }
 
     @Override
@@ -105,6 +191,21 @@ public class BasicHttpProxyToHttpsTestCase extends AbstractHttpRequestTestCase
     public void validProxyHttpConnectToHttpsAuth() throws Exception
     {
         MuleEvent event = runFlow("httpFlow");
+
+        assertThat((int) event.getMessage().getInboundProperty(HTTP_STATUS_PROPERTY), is(SC_OK));
+        assertThat(event.getMessage().getPayloadAsString(), equalTo(AUTHORIZED));
+    }
+
+    /**
+     * Validates that during the CONNECT the HTTP proxy should pass the proxy authentication
+     * when accessing to an HTTPS using preemptive.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void validProxyHttpConnectToHttpsAuthUsingPreemptive() throws Exception
+    {
+        MuleEvent event = runFlow("httpFlowPreemptive");
 
         assertThat((int) event.getMessage().getInboundProperty(HTTP_STATUS_PROPERTY), is(SC_OK));
         assertThat(event.getMessage().getPayloadAsString(), equalTo(AUTHORIZED));
