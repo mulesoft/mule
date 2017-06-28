@@ -1577,16 +1577,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .asPrototype()
         .build());
 
-    buildingDefinitions.add(baseDefinition.copy().withIdentifier("reconnect-notifier")
-        .withTypeDefinition(fromType(ConnectNotifier.class))
-        .build());
-
-    buildingDefinitions.add(baseDefinition.copy()
-        .withIdentifier("reconnect-custom-notifier")
-        .withTypeDefinition(fromConfigurationAttribute(CLASS_ATTRIBUTE))
-        .asPrototype()
-        .build());
-
     return buildingDefinitions;
   }
 

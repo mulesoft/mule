@@ -1788,50 +1788,7 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-
-    <xsd:element name="reconnect-notifier" type="reconnectNotifierType"
-                 substitutionGroup="abstract-reconnect-notifier">
-        <xsd:annotation>
-            <xsd:documentation>
-                Fires a ConnectionNotification upon each reconnection attempt.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="reconnectNotifierType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractReconnectNotifierType"/>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="reconnect-custom-notifier" type="reconnectCustomNotifierType"
-                 substitutionGroup="abstract-reconnect-notifier">
-        <xsd:annotation>
-            <xsd:documentation>
-                A user-defined reconnection notifier.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="reconnectCustomNotifierType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractReconnectNotifierType">
-                <xsd:sequence>
-                    <xsd:group ref="propertiesGroup">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                Properties to be set on the created object.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:group>
-                </xsd:sequence>
-                <xsd:attribute name="class" type="substitutableClass" use="required">
-                    <xsd:annotation>
-                        <xsd:documentation>A class that implements the RetryNotifier interface.</xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
+    
     <!--==============================================================-->
     <!--   Flow Constructs                                            -->
     <!--==============================================================-->
