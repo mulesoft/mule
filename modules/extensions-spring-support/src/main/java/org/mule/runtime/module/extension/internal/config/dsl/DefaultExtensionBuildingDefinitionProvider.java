@@ -50,6 +50,7 @@ import org.mule.runtime.module.extension.internal.config.dsl.infrastructure.Exte
 import org.mule.runtime.module.extension.internal.config.dsl.operation.OperationDefinitionParser;
 import org.mule.runtime.module.extension.internal.config.dsl.parameter.ObjectTypeParameterParser;
 import org.mule.runtime.module.extension.internal.config.dsl.source.SourceDefinitionParser;
+import org.mule.runtime.module.extension.internal.loader.java.property.CraftedExtensionModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.DynamicConfigPolicy;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
@@ -102,7 +103,8 @@ public class DefaultExtensionBuildingDefinitionProvider implements ExtensionBuil
    * @return true if a parser must be registered, false otherwise.
    */
   private boolean shouldRegisterExtensionParser(ExtensionModel extensionModel) {
-    return !extensionModel.getModelProperty(XmlExtensionModelProperty.class).isPresent();
+    return !extensionModel.getModelProperty(XmlExtensionModelProperty.class).isPresent()
+        && !extensionModel.getModelProperty(CraftedExtensionModelProperty.class).isPresent();
   }
 
   /**

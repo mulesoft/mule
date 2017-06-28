@@ -16,6 +16,7 @@ import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingDelegate;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
+import org.mule.runtime.module.extension.internal.loader.java.property.CraftedExtensionModelProperty;
 
 /**
  * {@link ExtensionModelLoader} implementation to be used for extensions which model is {@code hand crafted}.
@@ -62,6 +63,7 @@ public class CraftedExtensionModelLoader extends ExtensionModelLoader {
     }
 
     delegate.accept(context.getExtensionDeclarer(), context);
+    context.getExtensionDeclarer().withModelProperty(new CraftedExtensionModelProperty());
   }
 
   private Class<?> getDelegateType(ExtensionLoadingContext context, ClassLoader classLoader) {
