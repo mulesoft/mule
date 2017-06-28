@@ -11,8 +11,6 @@ import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.http.api.HttpConstants.Method.POST;
-import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.extension.api.soap.message.DispatchingRequest;
 import org.mule.runtime.extension.api.soap.message.DispatchingResponse;
 import org.mule.runtime.extension.api.soap.message.MessageDispatcher;
@@ -22,7 +20,6 @@ import org.mule.runtime.http.api.domain.entity.InputStreamHttpEntity;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 import org.mule.runtime.soap.api.exception.DispatchingException;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
@@ -52,21 +49,16 @@ public final class DefaultHttpMessageDispatcher implements MessageDispatcher {
   public DispatchingResponse dispatch(DispatchingRequest context) {
     MultiMap<String, String> parameters = new MultiMap<>();
     context.getHeaders().forEach(parameters::put);
-
-    // It's important that content type is bundled with the headers
-    parameters.put(CONTENT_TYPE, context.getContentType());
-
     HttpRequest request = HttpRequest.builder()
         .setUri(context.getAddress())
         .setMethod(POST)
         .setEntity(new InputStreamHttpEntity(context.getContent()))
         .setHeaders(parameters)
         .build();
-
     try {
       HttpResponse response = client.send(request, 5000, false, null);
       InputStream content = response.getEntity().getContent();
-      return new DispatchingResponse(content, response.getHeaderValueIgnoreCase(CONTENT_TYPE), toHeadersMap(response));
+      return new DispatchingResponse(content, toHeadersMap(response));
     } catch (IOException e) {
       throw new DispatchingException("An error occurred while sending the SOAP request");
     } catch (TimeoutException e) {
@@ -80,15 +72,5 @@ public final class DefaultHttpMessageDispatcher implements MessageDispatcher {
   private Map<String, String> toHeadersMap(HttpResponse response) {
     return response.getHeaderNames().stream()
         .collect(toMap(identity(), name -> response.getHeaderValues(name).stream().collect(joining(" "))));
-  }
-
-  @Override
-  public void dispose() {
-    // Do nothing
-  }
-
-  @Override
-  public void initialise() throws InitialisationException {
-    // Do nothing
   }
 }

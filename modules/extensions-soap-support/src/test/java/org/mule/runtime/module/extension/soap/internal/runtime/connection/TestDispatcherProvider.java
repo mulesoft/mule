@@ -6,17 +6,19 @@
  */
 package org.mule.runtime.module.extension.soap.internal.runtime.connection;
 
+import static java.util.Collections.singletonMap;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.extension.api.soap.MessageDispatcherProvider;
 import org.mule.runtime.extension.api.soap.message.DispatchingRequest;
 import org.mule.runtime.extension.api.soap.message.DispatchingResponse;
 import org.mule.runtime.extension.api.soap.message.MessageDispatcher;
-
 import java.io.ByteArrayInputStream;
-import java.util.HashMap;
 
 public class TestDispatcherProvider implements MessageDispatcherProvider<MessageDispatcher> {
 
@@ -35,13 +37,13 @@ public class TestDispatcherProvider implements MessageDispatcherProvider<Message
     return success();
   }
 
-  public class TestMessageDispatcher implements MessageDispatcher {
+  public class TestMessageDispatcher implements MessageDispatcher, Initialisable, Disposable {
 
     private boolean disconnected = true;
 
     @Override
-    public DispatchingResponse dispatch(DispatchingRequest context) {
-      return new DispatchingResponse(new ByteArrayInputStream("".getBytes()), "text/xml", new HashMap<>());
+    public DispatchingResponse dispatch(DispatchingRequest request) {
+      return new DispatchingResponse(new ByteArrayInputStream("".getBytes()), singletonMap("Content-Type", "text/xml"));
     }
 
     @Override
