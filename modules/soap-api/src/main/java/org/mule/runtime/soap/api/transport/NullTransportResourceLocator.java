@@ -15,7 +15,7 @@ import java.io.InputStream;
 /**
  * Null implementation of {@link TransportResourceLocator}. It does not handle any resource.
  *
- * @since 1.0
+ * @since 4.0
  */
 public class NullTransportResourceLocator implements TransportResourceLocator {
 
