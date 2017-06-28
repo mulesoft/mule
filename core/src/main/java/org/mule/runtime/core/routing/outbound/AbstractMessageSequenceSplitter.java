@@ -7,14 +7,17 @@
 package org.mule.runtime.core.routing.outbound;
 
 import static java.util.Collections.emptySet;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.core.api.Acceptor;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.routing.RouterResultsHandler;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.message.GroupCorrelation;
+import org.mule.runtime.core.api.routing.RouterResultsHandler;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 import org.mule.runtime.core.routing.AbstractSplitter;
 import org.mule.runtime.core.routing.DefaultRouterResultsHandler;
@@ -39,6 +42,18 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
   protected RouterResultsHandler resultsHandler = new DefaultRouterResultsHandler();
   protected int batchSize;
   protected String counterVariableName;
+  protected Acceptor filterOnErrorTypeAcceptor = new Acceptor() {
+
+    @Override
+    public boolean acceptsAll() {
+      return false;
+    }
+
+    @Override
+    public boolean accept(Event event) {
+      return false;
+    }
+  };
 
   @Override
   public final Event process(Event event) throws MuleException {
@@ -89,11 +104,17 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
 
       builder.groupCorrelation(new GroupCorrelation(count, correlationSequence));
       initEventBuilder(messageSequence.next(), originalEvent, builder, resolvePropagatedFlowVars(lastResult));
-      final Event event = builder.build();
-      Event resultEvent = processNext(event);
-      if (resultEvent != null) {
-        resultEvents.add(resultEvent);
-        lastResult = resultEvent;
+
+      try {
+        Event resultEvent = processNext(builder.build());
+        if (resultEvent != null) {
+          resultEvents.add(resultEvent);
+          lastResult = resultEvent;
+        }
+      } catch (MessagingException e) {
+        if (!filterOnErrorTypeAcceptor.accept(e.getEvent())) {
+          throw e;
+        }
       }
     }
     if (correlationSequence == 1) {

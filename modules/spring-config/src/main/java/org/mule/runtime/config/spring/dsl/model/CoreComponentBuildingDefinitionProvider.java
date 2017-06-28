@@ -73,12 +73,12 @@ import org.mule.runtime.config.spring.dsl.processor.CustomSecurityFilterObjectFa
 import org.mule.runtime.config.spring.dsl.processor.EncryptionSecurityFilterObjectFactory;
 import org.mule.runtime.config.spring.dsl.processor.EnvironmentPropertyObjectFactory;
 import org.mule.runtime.config.spring.dsl.processor.ExplicitMethodEntryPointResolverObjectFactory;
-import org.mule.runtime.config.spring.dsl.processor.factory.MessageEnricherObjectFactory;
 import org.mule.runtime.config.spring.dsl.processor.MethodEntryPoint;
 import org.mule.runtime.config.spring.dsl.processor.NoArgumentsEntryPointResolverObjectFactory;
 import org.mule.runtime.config.spring.dsl.processor.RetryPolicyTemplateObjectFactory;
 import org.mule.runtime.config.spring.dsl.processor.TransformerConfigurator;
 import org.mule.runtime.config.spring.dsl.processor.UsernamePasswordFilterObjectFactory;
+import org.mule.runtime.config.spring.dsl.processor.factory.MessageEnricherObjectFactory;
 import org.mule.runtime.config.spring.dsl.spring.ComponentObjectFactory;
 import org.mule.runtime.config.spring.dsl.spring.ConfigurableInstanceFactory;
 import org.mule.runtime.config.spring.dsl.spring.ConfigurableObjectFactory;
@@ -146,10 +146,6 @@ import org.mule.runtime.core.el.mvel.configuration.AliasEntry;
 import org.mule.runtime.core.el.mvel.configuration.ImportEntry;
 import org.mule.runtime.core.el.mvel.configuration.MVELExpressionLanguageObjectFactory;
 import org.mule.runtime.core.el.mvel.configuration.MVELGlobalFunctionsConfig;
-import org.mule.runtime.core.internal.exception.ErrorHandler;
-import org.mule.runtime.core.internal.exception.OnErrorContinueHandler;
-import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
-import org.mule.runtime.core.internal.exception.RedeliveryExceeded;
 import org.mule.runtime.core.expression.ExpressionConfig;
 import org.mule.runtime.core.expression.transformers.AbstractExpressionTransformer;
 import org.mule.runtime.core.expression.transformers.BeanBuilderTransformer;
@@ -158,6 +154,10 @@ import org.mule.runtime.core.expression.transformers.ExpressionTransformer;
 import org.mule.runtime.core.interceptor.LoggingInterceptor;
 import org.mule.runtime.core.interceptor.TimerInterceptor;
 import org.mule.runtime.core.internal.enricher.MessageEnricher;
+import org.mule.runtime.core.internal.exception.ErrorHandler;
+import org.mule.runtime.core.internal.exception.OnErrorContinueHandler;
+import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
+import org.mule.runtime.core.internal.exception.RedeliveryExceeded;
 import org.mule.runtime.core.internal.transformer.codec.XmlEntityDecoder;
 import org.mule.runtime.core.internal.transformer.codec.XmlEntityEncoder;
 import org.mule.runtime.core.internal.transformer.compression.GZipCompressTransformer;
@@ -189,7 +189,6 @@ import org.mule.runtime.core.routing.IdempotentMessageValidator;
 import org.mule.runtime.core.routing.IdempotentSecureHashMessageValidator;
 import org.mule.runtime.core.routing.MessageChunkAggregator;
 import org.mule.runtime.core.routing.MessageChunkSplitter;
-import org.mule.runtime.core.routing.MessageFilter;
 import org.mule.runtime.core.routing.MessageProcessorExpressionPair;
 import org.mule.runtime.core.routing.Resequencer;
 import org.mule.runtime.core.routing.RoundRobin;
@@ -275,7 +274,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   private static final String CLASS_ATTRIBUTE = "class";
   private static final String SUB_FLOW = "sub-flow";
   private static final String RESPONSE = "response";
-  private static final String MESSAGE_FILTER = "message-filter";
   private static final String FLOW = "flow";
   private static final String FLOW_REF = "flow-ref";
   private static final String EXCEPTION_LISTENER_ATTRIBUTE = "exceptionListener";
@@ -447,11 +445,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
             .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
             .build());
     componentBuildingDefinitions
-        .add(baseDefinition.copy().withIdentifier(MESSAGE_FILTER).withTypeDefinition(fromType(MessageFilter.class))
-            .withConstructorParameterDefinition(fromChildConfiguration(Filter.class).build())
-            .withConstructorParameterDefinition(fromSimpleParameter("throwOnUnaccepted").withDefaultValue(false).build())
-            .withConstructorParameterDefinition(fromSimpleReferenceParameter("onUnaccepted").build()).asPrototype().build());
-    componentBuildingDefinitions
         .add(baseDefinition.copy().withIdentifier(FLOW).withTypeDefinition(fromType(Flow.class))
             .withObjectFactoryType(DefaultFlowFactoryBean.class)
             .withSetterParameterDefinition(NAME, fromSimpleParameter(NAME).build())
@@ -520,6 +513,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("rootMessageVariableName", fromSimpleParameter("rootMessageVariableName").build())
         .withSetterParameterDefinition("counterVariableName", fromSimpleParameter("counterVariableName").build())
         .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
+        .withSetterParameterDefinition("ignoreErrorType", fromSimpleParameter("ignoreErrorType").build())
         .build());
     componentBuildingDefinitions
         .add(baseDefinition.copy().withIdentifier(FIRST_SUCCESSFUL).withTypeDefinition(fromType(FirstSuccessful.class))
@@ -583,6 +577,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("splitter")
         .withTypeDefinition(fromType(Splitter.class))
         .withSetterParameterDefinition("expression", fromSimpleParameter("expression").build())
+        .withSetterParameterDefinition("filterOnErrorType", fromSimpleParameter("filterOnErrorType").build())
         .build());
 
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("custom-splitter")
