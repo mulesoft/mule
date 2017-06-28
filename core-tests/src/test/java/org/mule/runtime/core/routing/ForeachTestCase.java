@@ -199,7 +199,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
 
   @Test
   public void nestedIterablePayload() throws Exception {
-    Iterable iterable = new DummyNestedIterableClass();
+    Iterable<DummySimpleIterableClass> iterable = new DummyNestedIterableClass();
 
     process(nestedForeach, eventBuilder().message(of(iterable)).build());
     assertNestedProcessedMessages();
@@ -207,7 +207,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
 
   @Test
   public void nestedIteratorPayload() throws Exception {
-    Iterable iterable = new DummyNestedIterableClass();
+    Iterable<DummySimpleIterableClass> iterable = new DummyNestedIterableClass();
 
     process(nestedForeach, eventBuilder().message(of(iterable)).build());
     assertNestedProcessedMessages();

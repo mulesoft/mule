@@ -10,6 +10,7 @@ import static org.mule.runtime.core.internal.exception.TemplateOnErrorHandler.cr
 
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.Acceptor;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
 import org.mule.runtime.core.api.util.collection.EventToMessageSequenceSplittingStrategy;
@@ -30,15 +31,13 @@ public class Splitter extends AbstractMessageSequenceSplitter implements Initial
   private SplittingStrategy<Event, MessageSequence<?>> strategy;
   private String filterOnErrorType = null;
 
-  private ErrorTypeMatcher filterOnErrorTypeMatcher = null;
-
   public Splitter() {
     // Used by spring
   }
 
-  public Splitter(ExpressionConfig config, ErrorTypeMatcher filterOnErrorTypeMatcher) {
+  public Splitter(ExpressionConfig config, String filterOnErrorType) {
     this.config = config;
-    this.filterOnErrorTypeMatcher = filterOnErrorTypeMatcher;
+    this.filterOnErrorType = filterOnErrorType;
   }
 
   @Override
@@ -51,26 +50,38 @@ public class Splitter extends AbstractMessageSequenceSplitter implements Initial
     config.validate();
     strategy = new EventToMessageSequenceSplittingStrategy(new ExpressionSplittingStrategy(muleContext.getExpressionManager(),
                                                                                            config.getFullExpression()));
-    if (filterOnErrorTypeMatcher == null) {
-      filterOnErrorTypeMatcher = createErrorType(muleContext.getErrorTypeRepository(), filterOnErrorType);
-    }
+    filterOnErrorTypeAcceptor =
+        createFilterOnErrorTypeAcceptor(createErrorType(muleContext.getErrorTypeRepository(), filterOnErrorType));
+  }
+
+  private Acceptor createFilterOnErrorTypeAcceptor(ErrorTypeMatcher filterOnErrorTypeMatcher) {
+    return new Acceptor() {
+
+      @Override
+      public boolean acceptsAll() {
+        return false;
+      }
+
+      @Override
+      public boolean accept(Event event) {
+        return filterOnErrorTypeMatcher != null && filterOnErrorTypeMatcher.match(event.getError().get().getErrorType());
+      }
+    };
   }
 
   public void setExpression(String expression) {
     this.config.setExpression(expression);
   }
 
+  /**
+   * Handles the given error types so that items that cause them when being processes won't be included in the aggregated response
+   * collection, rather than propagating the error.
+   * <p>
+   * This is useful to use validations inside this component.
+   * 
+   * @param filterOnErrorType A comma separated list of error types that should be handled by dropping the split part.
+   */
   public void setFilterOnErrorType(String filterOnErrorType) {
     this.filterOnErrorType = filterOnErrorType;
-  }
-
-  @Override
-  public boolean accept(Event event) {
-    return filterOnErrorTypeMatcher != null && filterOnErrorTypeMatcher.match(event.getError().get().getErrorType());
-  }
-
-  @Override
-  public boolean acceptsAll() {
-    return false;
   }
 }

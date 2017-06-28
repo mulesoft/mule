@@ -14,6 +14,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.message.Message.of;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.Acceptor;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
@@ -130,10 +131,19 @@ public class AbstractSplitterTestCase extends AbstractMuleContextTestCase {
 
   private static class TestSplitter extends AbstractSplitter {
 
-    private boolean filtersErrors;
-
     public TestSplitter(boolean filtersErrors) {
-      this.filtersErrors = filtersErrors;
+      filterOnErrorTypeAcceptor = new Acceptor() {
+
+        @Override
+        public boolean acceptsAll() {
+          return filtersErrors;
+        }
+
+        @Override
+        public boolean accept(Event event) {
+          return filtersErrors;
+        }
+      };
     }
 
     @Override
@@ -144,16 +154,6 @@ public class AbstractSplitterTestCase extends AbstractMuleContextTestCase {
         parts.add(Event.builder(event).message(of(fruit)).build());
       }
       return parts;
-    }
-
-    @Override
-    public boolean accept(Event event) {
-      return filtersErrors;
-    }
-
-    @Override
-    public boolean acceptsAll() {
-      return filtersErrors;
     }
   }
 

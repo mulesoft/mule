@@ -37,11 +37,23 @@ import java.util.Set;
  * @see AbstractSplitter
  */
 public abstract class AbstractMessageSequenceSplitter extends AbstractInterceptingMessageProcessor
-    implements MuleContextAware, Acceptor {
+    implements MuleContextAware {
 
   protected RouterResultsHandler resultsHandler = new DefaultRouterResultsHandler();
   protected int batchSize;
   protected String counterVariableName;
+  protected Acceptor filterOnErrorTypeAcceptor = new Acceptor() {
+
+    @Override
+    public boolean acceptsAll() {
+      return false;
+    }
+
+    @Override
+    public boolean accept(Event event) {
+      return false;
+    }
+  };
 
   @Override
   public final Event process(Event event) throws MuleException {
@@ -100,7 +112,7 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
           lastResult = resultEvent;
         }
       } catch (MessagingException e) {
-        if (!accept(e.getEvent())) {
+        if (!filterOnErrorTypeAcceptor.accept(e.getEvent())) {
           throw e;
         }
       }
