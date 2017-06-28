@@ -12,6 +12,9 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
+import static org.mule.module.http.api.HttpHeaders.Names.AUTHORIZATION;
+import static org.mule.module.http.api.HttpHeaders.Names.PROXY_AUTHENTICATE;
+import static org.mule.module.http.api.HttpHeaders.Names.PROXY_AUTHORIZATION;
 import org.mule.api.MuleEvent;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -23,7 +26,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.AbstractHandler;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -55,12 +57,12 @@ public class BasicHttpProxyToHttpTestCase extends AbstractHttpRequestTestCase
         public void handle(String pathInContext, org.eclipse.jetty.server.Request request, HttpServletRequest httpRequest,
                            HttpServletResponse httpResponse) throws IOException, ServletException {
 
-            String authorization = httpRequest.getHeader("Authorization");
-            String proxyAuthorization = httpRequest.getHeader("Proxy-Authorization");
+            String authorization = httpRequest.getHeader(AUTHORIZATION);
+            String proxyAuthorization = httpRequest.getHeader(PROXY_AUTHORIZATION);
             if (proxyAuthorization == null)
             {
                 httpResponse.setStatus(HttpServletResponse.SC_PROXY_AUTHENTICATION_REQUIRED);
-                httpResponse.setHeader("Proxy-Authenticate", "Basic realm=\"Fake Realm\"");
+                httpResponse.setHeader(PROXY_AUTHENTICATE, "Basic realm=\"Fake Realm\"");
             }
             else if (proxyAuthorization
                 .equals("Basic " + PROXY_PASSWORD) && authorization != null && authorization.equals("Basic " + PASSWORD))
@@ -86,17 +88,29 @@ public class BasicHttpProxyToHttpTestCase extends AbstractHttpRequestTestCase
     }
 
     /**
-     * Validates that authentication header to HTTP are passed when using a proxy .
+     * Validates that authentication header to HTTP are passed when using a proxy.
      * https://github.com/AsyncHttpClient/async-http-client/issues/1321
      *
      * @throws Exception
      */
     @Test
-    @Ignore("MULE-12766 - Test that validates the fix from grizzly ahc https://github.com/javaee/grizzly-ahc/issues/3, "
-        + "should be enabled once library is migrated to the new release")
     public void validProxyHttpConnectToHttpAuth() throws Exception
     {
         MuleEvent event = runFlow("httpFlow");
+
+        assertThat((int) event.getMessage().getInboundProperty(HTTP_STATUS_PROPERTY), is(SC_OK));
+        assertThat(event.getMessage().getPayloadAsString(), equalTo(AUTHORIZED));
+    }
+
+    /**
+     * Validates that authentication header to HTTP are passed when using a proxy using preemptive.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void validProxyHttpConnectToHttpAuthUsingPreemptive() throws Exception
+    {
+        MuleEvent event = runFlow("httpFlowPreemptive");
 
         assertThat((int) event.getMessage().getInboundProperty(HTTP_STATUS_PROPERTY), is(SC_OK));
         assertThat(event.getMessage().getPayloadAsString(), equalTo(AUTHORIZED));

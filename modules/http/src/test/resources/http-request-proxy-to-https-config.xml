@@ -22,4 +22,13 @@
         <http:request config-ref="requestConfig" path="testPath" />
     </flow>
 
+    <http:request-config name="requestConfigPreemptive" host="localhost" port="${httpsPort}" protocol="HTTPS" tlsContext-ref="globalTlsContext">
+        <http:basic-authentication username="johndoe" password="pass" preemptive="true" />
+        <http:proxy host="localhost" port="${httpPort}" username="user" password="password" />
+    </http:request-config>
+
+    <flow name="httpFlowPreemptive">
+        <http:request config-ref="requestConfigPreemptive" path="testPath" />
+    </flow>
+
 </mule>

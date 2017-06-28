@@ -12,6 +12,9 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
+import static org.mule.module.http.api.HttpHeaders.Names.AUTHORIZATION;
+import static org.mule.module.http.api.HttpHeaders.Names.PROXY_AUTHENTICATE;
+import static org.mule.module.http.api.HttpHeaders.Names.PROXY_AUTHORIZATION;
 import org.mule.api.MuleEvent;
 
 import java.io.IOException;
@@ -115,11 +118,11 @@ public class BasicHttpProxyToHttpsTestCase extends AbstractHttpRequestTestCase
             boolean result = false;
             if ("CONNECT" == (request.getMethod()))
             {
-                String authorization = request.getHeader("Proxy-Authorization");
+                String authorization = request.getHeader(PROXY_AUTHORIZATION);
                 if (authorization == null)
                 {
                     httpResponse.setStatus(HttpServletResponse.SC_PROXY_AUTHENTICATION_REQUIRED);
-                    httpResponse.setHeader("Proxy-Authenticate", "Basic realm=\"Fake Realm\"");
+                    httpResponse.setHeader(PROXY_AUTHENTICATE, "Basic realm=\"Fake Realm\"");
                     result = false;
                 }
                 else if (authorization.equals("Basic " + PROXY_PASSWORD))
@@ -153,7 +156,7 @@ public class BasicHttpProxyToHttpsTestCase extends AbstractHttpRequestTestCase
         @Override
         public void handle(String pathInContext, org.eclipse.jetty.server.Request request, HttpServletRequest httpRequest,
                            HttpServletResponse httpResponse) throws IOException, ServletException {
-            String authorization = httpRequest.getHeader("Authorization");
+            String authorization = httpRequest.getHeader(AUTHORIZATION);
             if (authorization != null && authorization.equals("Basic " + PASSWORD))
             {
                 httpResponse.addHeader("target", request.getUri().toString());
@@ -188,6 +191,21 @@ public class BasicHttpProxyToHttpsTestCase extends AbstractHttpRequestTestCase
     public void validProxyHttpConnectToHttpsAuth() throws Exception
     {
         MuleEvent event = runFlow("httpFlow");
+
+        assertThat((int) event.getMessage().getInboundProperty(HTTP_STATUS_PROPERTY), is(SC_OK));
+        assertThat(event.getMessage().getPayloadAsString(), equalTo(AUTHORIZED));
+    }
+
+    /**
+     * Validates that during the CONNECT the HTTP proxy should pass the proxy authentication
+     * when accessing to an HTTPS using preemptive.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void validProxyHttpConnectToHttpsAuthUsingPreemptive() throws Exception
+    {
+        MuleEvent event = runFlow("httpFlowPreemptive");
 
         assertThat((int) event.getMessage().getInboundProperty(HTTP_STATUS_PROPERTY), is(SC_OK));
         assertThat(event.getMessage().getPayloadAsString(), equalTo(AUTHORIZED));
