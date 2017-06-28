@@ -14,6 +14,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.validation.SchemaFactory;
 
 import net.sf.saxon.jaxp.SaxonTransformerFactory;
 
@@ -50,63 +51,75 @@ public class XMLSecureFactoriesCache {
         });
   }
 
-  public DocumentBuilderFactory getDocumentBuilderFactory(final Boolean externalEntities, final Boolean expandEntities) {
-    XMLFactoryConfig config = new XMLFactoryConfig(externalEntities, expandEntities, DocumentBuilderFactory.class.toString()) {
+  public DocumentBuilderFactory getDocumentBuilderFactory(final DefaultXMLSecureFactories secureFactories) {
+    XMLFactoryConfig config = new XMLFactoryConfig(secureFactories, null, DocumentBuilderFactory.class.toString()) {
 
       @Override
       public Object createFactory() {
-        return DefaultXMLSecureFactories.createDocumentBuilderFactory(this.externalEntities, this.expandEntities);
+        return secureFactories.createDocumentBuilderFactory();
       }
     };
 
     return (DocumentBuilderFactory) cache.getUnchecked(config);
   }
 
-  public SAXParserFactory getSAXParserFactory(Boolean externalEntities, Boolean expandEntities) {
-    XMLFactoryConfig config = new XMLFactoryConfig(externalEntities, expandEntities, SAXParserFactory.class.toString()) {
+  public SAXParserFactory getSAXParserFactory(final DefaultXMLSecureFactories secureFactories) {
+    XMLFactoryConfig config = new XMLFactoryConfig(secureFactories, null, SAXParserFactory.class.toString()) {
 
       @Override
       public Object createFactory() {
-        return DefaultXMLSecureFactories.createSaxParserFactory(this.externalEntities, this.expandEntities);
+        return secureFactories.createSaxParserFactory();
       }
     };
 
     return (SAXParserFactory) cache.getUnchecked(config);
   }
 
-  public XMLInputFactory getXMLInputFactory(Boolean externalEntities, Boolean expandEntities) {
-    XMLFactoryConfig config = new XMLFactoryConfig(externalEntities, expandEntities, XMLInputFactory.class.toString()) {
+  public XMLInputFactory getXMLInputFactory(final DefaultXMLSecureFactories secureFactories) {
+    XMLFactoryConfig config = new XMLFactoryConfig(secureFactories, null, XMLInputFactory.class.toString()) {
 
       @Override
       public Object createFactory() {
-        return DefaultXMLSecureFactories.createXmlInputFactory(this.externalEntities, this.expandEntities);
+        return secureFactories.createXMLInputFactory();
       }
     };
 
     return (XMLInputFactory) cache.getUnchecked(config);
   }
 
-  public TransformerFactory getTransformerFactory(Boolean externalEntities, Boolean expandEntities) {
-    XMLFactoryConfig config = new XMLFactoryConfig(externalEntities, expandEntities, TransformerFactory.class.toString()) {
+  public TransformerFactory getTransformerFactory(final DefaultXMLSecureFactories secureFactories) {
+    XMLFactoryConfig config = new XMLFactoryConfig(secureFactories, null, TransformerFactory.class.toString()) {
 
       @Override
       public Object createFactory() {
-        return DefaultXMLSecureFactories.createTransformerFactory(this.externalEntities, this.expandEntities);
+        return secureFactories.createTransformerFactory();
       }
     };
 
     return (TransformerFactory) cache.getUnchecked(config);
   }
 
-  public TransformerFactory getSaxonTransformerFactory(Boolean externalEntities, Boolean expandEntities) {
-    XMLFactoryConfig config = new XMLFactoryConfig(externalEntities, expandEntities, SaxonTransformerFactory.class.toString()) {
+  public TransformerFactory getSaxonTransformerFactory(final DefaultXMLSecureFactories secureFactories) {
+    XMLFactoryConfig config = new XMLFactoryConfig(secureFactories, null, SaxonTransformerFactory.class.toString()) {
 
       @Override
       public Object createFactory() {
-        return DefaultXMLSecureFactories.createSaxonTransformerFactory(this.externalEntities, this.expandEntities);
+        return secureFactories.createSaxonTransformerFactory();
       }
     };
 
     return (TransformerFactory) cache.getUnchecked(config);
+  }
+
+  public SchemaFactory getSchemaFactory(final DefaultXMLSecureFactories secureFactories, String schemaLanguage) {
+    XMLFactoryConfig config = new XMLFactoryConfig(secureFactories, schemaLanguage, SchemaFactory.class.toString()) {
+
+      @Override
+      public Object createFactory() {
+        return secureFactories.createSchemaFactory(schemaLanguage);
+      }
+    };
+
+    return (SchemaFactory) cache.getUnchecked(config);
   }
 }
