@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+
+    <tls:context name="globalTlsContext" >
+        <tls:trust-store path="tls/trustStore" password="mulepassword"/>
+        <tls:key-store path="tls/clientKeystore" keyPassword="mulepassword" password="mulepassword"/>
+    </tls:context>
+    
+    <http:ntlm-proxy name="Proxy_Configuration" host="localhost" port="${httpPort}" username="Zaphod" password="Beeblebrox" ntlmDomain="Ursa-Minor"/>
+
+    <http:request-config protocol="HTTPS" name="ntlmProxy" host="localhost" port="${httpsPort}" basePath="basePath" proxy-ref="Proxy_Configuration" tlsContext-ref="globalTlsContext"/>
+    
+    <flow name="ntlmFlow">
+        <http:request config-ref="ntlmProxy" path="requestPath" method="GET" />
+    </flow>
+
+</mule>
