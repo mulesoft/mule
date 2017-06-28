@@ -95,8 +95,10 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
 
       try {
         Event resultEvent = processNext(builder.build());
-        resultEvents.add(resultEvent);
-        lastResult = resultEvent;
+        if (resultEvent != null) {
+          resultEvents.add(resultEvent);
+          lastResult = resultEvent;
+        }
       } catch (MessagingException e) {
         if (!accept(e.getEvent())) {
           throw e;
