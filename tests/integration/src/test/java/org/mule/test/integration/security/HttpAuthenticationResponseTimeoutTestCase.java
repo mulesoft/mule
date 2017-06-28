@@ -1,5 +1,6 @@
 package org.mule.test.integration.security;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -9,11 +10,15 @@ import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 
+import java.util.Collection;
 import java.util.concurrent.TimeoutException;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
+@RunWith(Parameterized.class)
 public class HttpAuthenticationResponseTimeoutTestCase extends FunctionalTestCase
 {
 
@@ -23,7 +28,22 @@ public class HttpAuthenticationResponseTimeoutTestCase extends FunctionalTestCas
     public SystemProperty delaySystemProperty = new SystemProperty("delay", DELAY.toString());
 
     @Rule
+    public SystemProperty isPreemptiveSystemProperty;
+
+    @Rule
     public DynamicPort port = new DynamicPort("port");
+
+
+    public HttpAuthenticationResponseTimeoutTestCase(String isPreemptive)
+    {
+        this.isPreemptiveSystemProperty = new SystemProperty("isPreemptive", isPreemptive);
+    }
+
+    @Parameterized.Parameters
+    public static Collection<Object> data()
+    {
+        return asList(new Object[] {"true", "false"});
+    }
 
     @Override
     protected String getConfigFile()
@@ -32,28 +52,14 @@ public class HttpAuthenticationResponseTimeoutTestCase extends FunctionalTestCas
     }
 
     @Test
-    public void testPreemptiveTimeout() throws Exception
+    public void testAuthenticationTimeout() throws Exception
     {
         try
         {
-            runFlow("flowRequestPreemptive");
+            runFlow("flowRequest");
             fail("TimeoutException must be triggered");
         }
-        catch(Exception timeoutException)
-        {
-            assertThat(timeoutException.getCause(), instanceOf(TimeoutException.class));
-        }
-    }
-
-    @Test
-    public void testNonPreemptiveTimeout() throws Exception
-    {
-        try
-        {
-            runFlow("flowRequestNonPreemptive");
-            fail("TimeoutException must be triggered");
-        }
-        catch(Exception timeoutException)
+        catch (Exception timeoutException)
         {
             assertThat(timeoutException.getCause(), instanceOf(TimeoutException.class));
         }
@@ -65,8 +71,9 @@ public class HttpAuthenticationResponseTimeoutTestCase extends FunctionalTestCas
         @Override
         public Object onCall(MuleEventContext eventContext) throws Exception
         {
-            Thread.sleep(DELAY + 500);
+            Thread.sleep(DELAY * 2);
             return eventContext.getMessage().getPayload();
         }
     }
+
 }

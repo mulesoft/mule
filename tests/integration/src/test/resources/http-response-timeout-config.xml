@@ -11,18 +11,10 @@ http://www.mulesoft.org/schema/mule/spring-security http://www.mulesoft.org/sche
 http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.0.xsd">
 
     <http:request-config name="HTTP_Request" host="127.0.0.1" port="${port}" responseTimeout="${delay}">
-        <http:basic-authentication username="username" password="password"/>
-    </http:request-config>
-
-    <http:request-config name="preemptive" host="127.0.0.1" port="${port}" responseTimeout="${delay}">
-        <http:basic-authentication username="username" password="password" preemptive="true"/>
+        <http:basic-authentication username="username" password="password" preemptive="${isPreemptive}"/>
     </http:request-config>
 
     <http:listener-config name="HTTP_Listener_Configuration" host="0.0.0.0" port="${port}"/>
-
-    <flow name="flowRequestPreemptive">
-        <http:request config-ref="preemptive" path="/" method="GET"/>
-    </flow>
 
     <spring:beans>
         <ss:authentication-manager alias="authenticationManager">
@@ -38,8 +30,7 @@ http://www.springframework.org/schema/security http://www.springframework.org/sc
         <mule-ss:delegate-security-provider name="memory-provider" delegate-ref="authenticationManager"/>
     </mule-ss:security-manager>
 
-
-    <flow name="flowRequestNonPreemptive">
+    <flow name="flowRequest">
         <http:request config-ref="HTTP_Request" path="/" method="GET"/>
     </flow>
 
@@ -49,4 +40,5 @@ http://www.springframework.org/schema/security http://www.springframework.org/sc
         <component class="org.mule.test.integration.security.HttpAuthenticationResponseTimeoutTestCase$DelayComponent"/>
         <set-payload value="OK"/>
     </flow>
+
 </mule>
