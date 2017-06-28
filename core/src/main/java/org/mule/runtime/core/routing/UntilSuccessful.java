@@ -23,7 +23,6 @@ import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.internal.exception.MessagingExceptionHandlerToSystemAdapter;
-import org.mule.runtime.core.routing.filters.ExpressionFilter;
 import org.mule.runtime.core.routing.outbound.AbstractOutboundRouter;
 
 /**
@@ -48,9 +47,8 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
   private int maxRetries = 5;
   private Long millisBetweenRetries = null;
   private Long secondsBetweenRetries = null;
-  private String failureExpression;
+  private String failureExpression = DEFAULT_FAILURE_EXPRESSION;
   private String ackExpression;
-  private ExpressionFilter failureExpressionFilter;
   private String eventKeyPrefix;
   protected Processor dlqMP;
   private boolean synchronous = false;
@@ -75,13 +73,6 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
     }
 
     super.initialise();
-
-    if (failureExpression != null) {
-      failureExpressionFilter = new ExpressionFilter(failureExpression);
-    } else {
-      failureExpressionFilter = new ExpressionFilter("exception != null");
-    }
-    failureExpressionFilter.setMuleContext(muleContext);
 
     if ((ackExpression != null) && (!muleContext.getExpressionManager().isExpression(ackExpression))) {
       throw new InitialisationException(createStaticMessage("Invalid ackExpression: " + ackExpression), this);
@@ -182,6 +173,7 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
     this.millisBetweenRetries = millisBetweenRetries;
   }
 
+  @Override
   public String getFailureExpression() {
     return failureExpression;
   }
@@ -201,11 +193,6 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
 
   public String getEventKeyPrefix() {
     return eventKeyPrefix;
-  }
-
-  @Override
-  public ExpressionFilter getFailureExpressionFilter() {
-    return failureExpressionFilter;
   }
 
   @Override

@@ -6,17 +6,17 @@
  */
 package org.mule.runtime.core.routing;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.api.exception.MessagingException;
+import org.mule.runtime.core.internal.message.InternalMessage;
 
 import java.io.NotSerializableException;
 import java.io.Serializable;
@@ -55,18 +55,16 @@ public abstract class AbstractUntilSuccessfulProcessingStrategy implements Until
 
     final Message msg = returnEvent.getMessage();
     if (msg == null) {
-      throw new MuleRuntimeException(I18nMessageFactory
-          .createStaticMessage("No message found in response to processing, which is therefore considered failed for event: "
-              + event));
+      throw new MuleRuntimeException(createStaticMessage("No message found in response to processing, which is therefore considered failed for event: "
+          + returnEvent));
     }
 
-    Builder builder = Event.builder(returnEvent);
-    final boolean errorDetected = untilSuccessfulConfiguration.getFailureExpressionFilter().accept(returnEvent, builder);
-    if (errorDetected) {
-      throw new MuleRuntimeException(I18nMessageFactory
-          .createStaticMessage("Failure expression positive when processing event: " + event));
+    if (muleContext.getExpressionManager().evaluateBoolean(untilSuccessfulConfiguration.getFailureExpression(), returnEvent,
+                                                           untilSuccessfulConfiguration.getFlowConstruct(), false, true)) {
+      throw new MuleRuntimeException(createStaticMessage("Failure expression positive when processing event: " + returnEvent));
     }
-    return builder.build();
+
+    return returnEvent;
   }
 
   /**
@@ -116,7 +114,7 @@ public abstract class AbstractUntilSuccessfulProcessingStrategy implements Until
         event.getMessageAsBytes(muleContext);
       }
     } catch (final Exception e) {
-      throw new MessagingException(I18nMessageFactory.createStaticMessage("Failed to prepare message for processing"), event, e,
+      throw new MessagingException(createStaticMessage("Failed to prepare message for processing"), event, e,
                                    getUntilSuccessfulConfiguration().getRouter());
     }
   }

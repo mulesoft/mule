@@ -29,6 +29,7 @@ import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROTOTYP
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SINGLETON_OBJECT_ELEMENT;
 import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STARTED;
 import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
+import static org.mule.runtime.core.routing.outbound.AbstractOutboundRouter.DEFAULT_FAILURE_EXPRESSION;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildCollectionConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildMapConfiguration;
@@ -502,7 +503,9 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
             .withSetterParameterDefinition("maxRetries", fromSimpleParameter("maxRetries").withDefaultValue(5).build())
             .withSetterParameterDefinition("millisBetweenRetries", fromSimpleParameter("millisBetweenRetries").build())
             .withSetterParameterDefinition("secondsBetweenRetries", fromSimpleParameter("secondsBetweenRetries").build())
-            .withSetterParameterDefinition("failureExpression", fromSimpleParameter("failureExpression").build())
+            .withSetterParameterDefinition("failureExpression",
+                                           fromSimpleParameter("failureExpression").withDefaultValue(DEFAULT_FAILURE_EXPRESSION)
+                                               .build())
             .withSetterParameterDefinition("ackExpression", fromSimpleParameter("ackExpression").build())
             .withSetterParameterDefinition("synchronous", fromSimpleParameter("synchronous").withDefaultValue(false).build())
             .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
@@ -517,7 +520,9 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .build());
     componentBuildingDefinitions
         .add(baseDefinition.copy().withIdentifier(FIRST_SUCCESSFUL).withTypeDefinition(fromType(FirstSuccessful.class))
-            .withSetterParameterDefinition("failureExpression", fromSimpleParameter("failureExpression").build())
+            .withSetterParameterDefinition("failureExpression",
+                                           fromSimpleParameter("failureExpression").withDefaultValue(DEFAULT_FAILURE_EXPRESSION)
+                                               .build())
             .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
             .build());
     componentBuildingDefinitions
@@ -673,8 +678,8 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
 
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("notification-listener")
         .withTypeDefinition(fromType(ListenerSubscriptionPair.class))
-        .withSetterParameterDefinition("listener", fromSimpleReferenceParameter("ref").build())
-        .withSetterParameterDefinition("subscription", fromSimpleParameter("subscription").build()).build());
+        .withConstructorParameterDefinition(fromSimpleReferenceParameter("ref").build())
+        .withConstructorParameterDefinition(fromSimpleParameter("subscription").build()).build());
 
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("username-password-filter")
         .withTypeDefinition(fromType(SecurityFilterMessageProcessor.class))

@@ -21,8 +21,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.message.ErrorBuilder;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.config.ExceptionHelper;
-import org.mule.runtime.core.routing.filters.RegExFilter;
-import org.mule.runtime.core.routing.filters.WildcardFilter;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -267,7 +265,7 @@ public class MessagingException extends MuleException {
   }
 
   /**
-   * Checks the cause exception type name matches the provided regex. Supports any java regex plus *, * prefix, * sufix
+   * Checks the cause exception type name matches the provided regex. Supports any java regex
    * 
    * @param regex regular expression to match against the exception type name
    * @return true if the exception matches the regex, false otherwise
@@ -276,22 +274,8 @@ public class MessagingException extends MuleException {
     if (regex == null) {
       throw new IllegalArgumentException("regex cannot be null");
     }
-    return (ExceptionHelper.traverseCauseHierarchy(this, e -> {
-      WildcardFilter wildcardFilter = new WildcardFilter(regex);
-      if (wildcardFilter.accept(e.getClass().getName())) {
-        return e;
-      }
-      try {
-        RegExFilter regExFilter = new RegExFilter(regex);
-        if (regExFilter.accept(e.getClass().getName())) {
-          return e;
-        }
-      } catch (Exception regexEx) {
-        // Do nothing, regex such as *, *something, something* will fail,
-        // just don't match
-      }
-      return null;
-    })) != null;
+    final Boolean matched = traverseCauseHierarchy(this, e -> e.getClass().getName().matches(regex));
+    return matched != null && matched;
   }
 
   @Override

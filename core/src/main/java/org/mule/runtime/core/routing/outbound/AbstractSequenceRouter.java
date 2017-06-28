@@ -6,19 +6,18 @@
  */
 package org.mule.runtime.core.routing.outbound;
 
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.noEndpointsForRouter;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
-import static org.mule.runtime.core.routing.AbstractRoutingStrategy.validateMessageIsNotConsumable;
-
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
+import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.runtime.core.api.routing.RoutePathNotFoundException;
 import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.api.transport.LegacyOutboundEndpoint;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
-import org.mule.runtime.core.api.message.GroupCorrelation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +34,7 @@ public abstract class AbstractSequenceRouter extends FilteringOutboundRouter {
     Message message = event.getMessage();
 
     if (routes == null || routes.size() == 0) {
-      throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), null);
+      throw new RoutePathNotFoundException(noEndpointsForRouter(), null);
     }
 
     Builder builder = Event.builder(event).groupCorrelation(new GroupCorrelation(routes.size(), null));
@@ -49,8 +48,7 @@ public abstract class AbstractSequenceRouter extends FilteringOutboundRouter {
         event = builder.build();
         builder = Event.builder(event);
         if (filterAccepted) {
-          validateMessageIsNotConsumable(event, message);
-          Event result = sendRequest(event, createEventToRoute(event, message), mp, true);
+          Event result = sendRequest(event, mp, true);
           if (result != null) {
             results.add(result);
           }

@@ -6,12 +6,13 @@
  */
 package org.mule.runtime.core.internal.context.notification;
 
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.notificationListenerSubscriptionAlreadyRegistered;
 import static org.mule.runtime.core.api.context.notification.ServerNotificationManager.toClass;
 
-import org.mule.runtime.core.api.context.notification.ServerNotification;
-import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.context.notification.ListenerSubscriptionPair;
+import org.mule.runtime.core.api.context.notification.ServerNotification;
+import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -74,14 +75,7 @@ public class Configuration {
   public synchronized void addListenerSubscriptionPair(ListenerSubscriptionPair pair) {
     dirty = true;
     if (!listenerSubscriptionPairs.add(pair)) {
-      logger.warn(CoreMessages.notificationListenerSubscriptionAlreadyRegistered(pair).toString());
-    }
-  }
-
-  synchronized void addAllListenerSubscriptionPairs(Collection pairs) {
-    dirty = true;
-    for (Iterator listener = pairs.iterator(); listener.hasNext();) {
-      addListenerSubscriptionPair((ListenerSubscriptionPair) listener.next());
+      logger.warn(notificationListenerSubscriptionAlreadyRegistered(pair).toString());
     }
   }
 

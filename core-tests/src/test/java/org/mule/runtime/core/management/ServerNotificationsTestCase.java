@@ -10,11 +10,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.runtime.core.api.context.notification.CustomNotification;
 import org.mule.runtime.core.api.context.notification.CustomNotificationListener;
+import org.mule.runtime.core.api.context.notification.MuleContextNotification;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
-import org.mule.runtime.core.api.context.notification.CustomNotification;
-import org.mule.runtime.core.api.context.notification.MuleContextNotification;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.concurrent.CountDownLatch;
@@ -98,29 +98,6 @@ public class ServerNotificationsTestCase extends AbstractMuleContextTestCase imp
 
     // Wait for the notifcation event to be fired as they are queued
     latch.await(2000, TimeUnit.MILLISECONDS);
-    assertEquals(2, customNotificationCount.get());
-  }
-
-  @Test
-  public void testCustomNotificationsWithWildcardSubscription() throws Exception {
-
-    final CountDownLatch latch = new CountDownLatch(2);
-
-    muleContext.registerListener((DummyNotificationListener) notification -> {
-      if (notification.getAction() == DummyNotification.EVENT_RECEIVED) {
-        customNotificationCount.incrementAndGet();
-        assertFalse("e quick bro".equals(notification.getResourceIdentifier()));
-        latch.countDown();
-      }
-    }, "* quick brown*");
-
-    muleContext.fireNotification(new DummyNotification("the quick brown fox jumped over the lazy dog",
-                                                       DummyNotification.EVENT_RECEIVED));
-    muleContext.fireNotification(new DummyNotification("e quick bro", DummyNotification.EVENT_RECEIVED));
-    muleContext.fireNotification(new DummyNotification(" quick brown", DummyNotification.EVENT_RECEIVED));
-
-    // Wait for the notifcation event to be fired as they are queued
-    latch.await(20000, TimeUnit.MILLISECONDS);
     assertEquals(2, customNotificationCount.get());
   }
 

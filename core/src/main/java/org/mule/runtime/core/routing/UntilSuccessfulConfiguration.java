@@ -11,7 +11,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.store.ListableObjectStore;
-import org.mule.runtime.core.routing.filters.ExpressionFilter;
 
 /**
  * Configuration required for UntilSuccessful router processing strategy.
@@ -24,9 +23,9 @@ public interface UntilSuccessfulConfiguration {
   ListableObjectStore<Event> getObjectStore();
 
   /**
-   * @return ExpressionFilter to determine if the message was processed successfully or not. Always returns a not null value.
+   * @return Expression to determine if the message was processed successfully or not. Always returns a not null value.
    */
-  ExpressionFilter getFailureExpressionFilter();
+  String getFailureExpression();
 
   /**
    * @return the route to which the message should be routed to. Always returns a not null value.
