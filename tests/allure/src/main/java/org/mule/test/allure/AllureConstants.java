@@ -382,4 +382,16 @@ public interface AllureConstants {
 
   }
 
+  interface LicenseFeature {
+
+    String LICENSE = "License";
+
+    interface LicenseManagementStory {
+
+      String LICENSE_MANAGEMENT = "License Management";
+
+    }
+
+  }
+
 }
