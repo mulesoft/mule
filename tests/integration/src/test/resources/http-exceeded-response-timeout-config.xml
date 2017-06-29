@@ -37,7 +37,7 @@ http://www.springframework.org/schema/security http://www.springframework.org/sc
     <flow name="flowListener">
         <http:listener config-ref="HTTP_Listener_Configuration" path="/"/>
         <http:basic-security-filter realm="mule-realm"/>
-        <component class="org.mule.test.integration.security.HttpAuthenticationRequestTimeoutTestCase$DelayComponent"/>
+        <component class="org.mule.test.integration.security.HttpAuthenticationExceededRequestTimeoutTestCase$DelayComponent"/>
         <set-payload value="OK"/>
     </flow>
 

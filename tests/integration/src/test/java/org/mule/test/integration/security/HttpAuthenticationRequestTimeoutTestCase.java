@@ -1,9 +1,10 @@
 package org.mule.test.integration.security;
 
+import static com.ning.http.client.AsyncHttpClientConfigDefaults.ASYNC_CLIENT;
 import static java.util.Arrays.asList;
-import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.api.lifecycle.Callable;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -11,7 +12,6 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.util.Collection;
-import java.util.concurrent.TimeoutException;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -19,13 +19,20 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
-public class HttpAuthenticationResponseTimeoutTestCase extends FunctionalTestCase
+public class HttpAuthenticationRequestTimeoutTestCase extends FunctionalTestCase
 {
 
-    private static Integer DELAY = 500;
+    private static Integer DELAY = 450;
+
+    private static Integer TIMEOUT = 600;
+
+    private static String GLOBAL_REQUEST_TIMEOUT = ASYNC_CLIENT + "requestTimeout";
 
     @Rule
-    public SystemProperty delaySystemProperty = new SystemProperty("delay", DELAY.toString());
+    public SystemProperty globalRequestTimeoutSystemProperty= new SystemProperty(GLOBAL_REQUEST_TIMEOUT, "300");
+
+    @Rule
+    public SystemProperty timeoutSystemProperty = new SystemProperty("timeout", TIMEOUT.toString());
 
     @Rule
     public SystemProperty isPreemptiveSystemProperty;
@@ -34,7 +41,7 @@ public class HttpAuthenticationResponseTimeoutTestCase extends FunctionalTestCas
     public DynamicPort port = new DynamicPort("port");
 
 
-    public HttpAuthenticationResponseTimeoutTestCase(String isPreemptive)
+    public HttpAuthenticationRequestTimeoutTestCase(String isPreemptive)
     {
         this.isPreemptiveSystemProperty = new SystemProperty("isPreemptive", isPreemptive);
     }
@@ -52,17 +59,10 @@ public class HttpAuthenticationResponseTimeoutTestCase extends FunctionalTestCas
     }
 
     @Test
-    public void testAuthenticationTimeout() throws Exception
+    public void testExceededAuthenticationTimeout() throws Exception
     {
-        try
-        {
-            runFlow("flowRequest");
-            fail("TimeoutException must be triggered");
-        }
-        catch (Exception timeoutException)
-        {
-            assertThat(timeoutException.getCause(), instanceOf(TimeoutException.class));
-        }
+        MuleEvent event = runFlow("flowRequest");
+        assertThat(event.getMessage().getPayloadAsString(), is("OK"));
     }
 
     public static class DelayComponent implements Callable
@@ -71,7 +71,7 @@ public class HttpAuthenticationResponseTimeoutTestCase extends FunctionalTestCas
         @Override
         public Object onCall(MuleEventContext eventContext) throws Exception
         {
-            Thread.sleep(DELAY * 2);
+            Thread.sleep(DELAY);
             return eventContext.getMessage().getPayload();
         }
     }
