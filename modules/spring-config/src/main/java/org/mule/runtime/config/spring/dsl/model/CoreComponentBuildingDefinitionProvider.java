@@ -1581,7 +1581,15 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
 
   private List<ComponentBuildingDefinition> getTransactionDefinitions() {
     List<ComponentBuildingDefinition> buildingDefinitions = new ArrayList<>();
-    
+
+    buildingDefinitions.add(baseDefinition.copy().withIdentifier("xa-transaction")
+        .withTypeDefinition(fromType(MuleTransactionConfig.class))
+        .withSetterParameterDefinition("factory", fromFixedValue(new XaTransactionFactory()).build())
+        .withSetterParameterDefinition("timeout", fromSimpleParameter("timeout").build())
+        .withSetterParameterDefinition("actionAsString", fromSimpleParameter("action").build())
+        .withSetterParameterDefinition("interactWithExternal", fromSimpleParameter("interactWithExternal").build())
+        .build());
+
     buildingDefinitions.add(baseDefinition.copy().withIdentifier("custom-transaction")
         .withTypeDefinition(fromType(MuleTransactionConfig.class))
         .withSetterParameterDefinition("factory", fromSimpleReferenceParameter("factory-ref").build())
