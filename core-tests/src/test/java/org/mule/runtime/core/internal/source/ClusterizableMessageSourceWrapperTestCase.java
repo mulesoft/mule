@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.source;
+package org.mule.runtime.core.internal.source;
 
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;

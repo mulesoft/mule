@@ -6,9 +6,15 @@
  */
 package org.mule.runtime.core.api.source;
 
+import org.mule.runtime.api.lifecycle.Lifecycle;
+
 /**
  * Defines a message source that runs in only one node of a cluster.
  */
-public interface ClusterizableMessageSource extends MessageSource {
+public interface ClusterizableMessageSource extends MessageSource, Lifecycle {
 
+  /**
+   * @return true is the source is started in the current cluster node, false otherwise.
+   */
+  boolean isStarted();
 }

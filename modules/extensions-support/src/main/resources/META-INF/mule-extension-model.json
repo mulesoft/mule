@@ -22,11 +22,11 @@
       "subTypes": [
         {
           "format": "java",
-          "type": "@ref:org.mule.runtime.core.source.scheduler.schedule.FixedFrequencyScheduler"
+          "type": "@ref:org.mule.runtime.core.api.source.polling.FixedFrequencyScheduler"
         },
         {
           "format": "java",
-          "type": "@ref:org.mule.runtime.core.source.scheduler.schedule.CronScheduler"
+          "type": "@ref:org.mule.runtime.core.api.source.polling.CronScheduler"
         }
       ]
     }
@@ -2808,7 +2808,7 @@
         "format": "java",
         "type": "Object",
         "annotations": {
-          "typeId": "org.mule.runtime.core.source.scheduler.schedule.FixedFrequencyScheduler",
+          "typeId": "org.mule.runtime.core.api.source.polling.FixedFrequencyScheduler",
           "classInformation": {
             "hasDefaultConstructor": true,
             "isInterface": false,
@@ -2891,7 +2891,7 @@
       "format": "java",
       "type": "Object",
       "annotations": {
-        "typeId": "org.mule.runtime.core.source.scheduler.schedule.CronScheduler",
+        "typeId": "org.mule.runtime.core.api.source.polling.CronScheduler",
         "classInformation": {
           "hasDefaultConstructor": true,
           "isInterface": false,

@@ -309,9 +309,13 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
         return originalBeanDefinition;
       }
       try {
-        beanClass = org.apache.commons.lang3.ClassUtils.getClass(originalBeanDefinition.getBeanClassName());
-      } catch (ClassNotFoundException e) {
-        throw new RuntimeException(e);
+        beanClass = originalBeanDefinition.getBeanClass();
+      } catch (IllegalStateException e) {
+        try {
+          beanClass = org.apache.commons.lang3.ClassUtils.getClass(originalBeanDefinition.getBeanClassName());
+        } catch (ClassNotFoundException e2) {
+          throw new RuntimeException(e2);
+        }
       }
     }
     BeanDefinition newBeanDefinition;
