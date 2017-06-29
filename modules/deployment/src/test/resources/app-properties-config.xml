@@ -1,17 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:spring="http://www.springframework.org/schema/beans"
-      xmlns:util="http://www.springframework.org/schema/util"
-      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-            http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-current.xsd">
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
-
-    <spring:beans>
-        <util:map id="appProperties">
-            <spring:entry key="appHome" value="${app.home}" />
-            <spring:entry key="myCustomProp" value="${someValue}" />
-        </util:map>
-    </spring:beans>
+    <global-property name="appHome" value="${app.home}"/>
 
 </mule>

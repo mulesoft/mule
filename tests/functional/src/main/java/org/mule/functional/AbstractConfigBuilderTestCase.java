@@ -72,13 +72,6 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
   }
 
   @Test
-  public void testEnvironmentProperties() {
-    assertEquals("true", muleContext.getRegistry().lookupObject("doCompression"));
-    assertEquals("this was set from the manager properties!", muleContext.getRegistry().lookupObject("beanProperty1"));
-    assertNotNull(muleContext.getRegistry().lookupObject("OS_Version"));
-  }
-
-  @Test
   public void testMuleConfiguration() {
     assertEquals(10, muleContext.getConfiguration().getDefaultResponseTimeout());
     assertEquals(20, muleContext.getConfiguration().getDefaultTransactionTimeout());

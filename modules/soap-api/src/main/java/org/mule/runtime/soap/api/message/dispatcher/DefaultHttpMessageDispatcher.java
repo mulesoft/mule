@@ -11,15 +11,16 @@ import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.http.api.HttpConstants.Method.POST;
+import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.extension.api.soap.message.DispatchingRequest;
 import org.mule.runtime.extension.api.soap.message.DispatchingResponse;
 import org.mule.runtime.extension.api.soap.message.MessageDispatcher;
 import org.mule.runtime.http.api.client.HttpClient;
-import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.http.api.domain.entity.InputStreamHttpEntity;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 import org.mule.runtime.soap.api.exception.DispatchingException;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
@@ -27,8 +28,8 @@ import java.util.concurrent.TimeoutException;
 
 
 /**
- * Default {@link MessageDispatcher} implementation that aims to dispatch messages through HTTP
- * with a prebuilt default configuration.
+ * Default {@link MessageDispatcher} implementation that aims to dispatch messages through HTTP with a prebuilt default
+ * configuration.
  *
  * @since 4.0
  */

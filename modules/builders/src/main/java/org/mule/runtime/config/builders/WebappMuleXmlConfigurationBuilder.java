@@ -7,20 +7,22 @@
 package org.mule.runtime.config.builders;
 
 import static java.util.Collections.emptyMap;
+import static java.util.Optional.empty;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader.resolveContextArtifactPluginClassLoaders;
-
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
+import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.config.spring.MuleArtifactContext;
 import org.mule.runtime.config.spring.OptionalObjectsController;
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.ConfigResource;
+import org.mule.runtime.core.api.config.ConfigurationException;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Optional;
 
 import javax.servlet.ServletContext;
 
@@ -92,11 +94,13 @@ public class WebappMuleXmlConfigurationBuilder extends SpringXmlConfigurationBui
   @Override
   protected MuleArtifactContext doCreateApplicationContext(MuleContext muleContext, ConfigResource[] artifactConfigResources,
                                                            ArtifactDeclaration artifactDeclaration,
-                                                           OptionalObjectsController optionalObjectsController) {
+                                                           OptionalObjectsController optionalObjectsController,
+                                                           Optional<ConfigurationProperties> parentConfigurationPropertiesResolver) {
     Resource[] artifactConfigServletContextResources = preProcessResources(artifactConfigResources);
 
     return new MuleArtifactContext(muleContext, artifactConfigServletContextResources, artifactDeclaration,
-                                   optionalObjectsController, emptyMap(), APP, resolveContextArtifactPluginClassLoaders());
+                                   optionalObjectsController, empty(), emptyMap(), APP,
+                                   resolveContextArtifactPluginClassLoaders());
   }
 
   private Resource[] preProcessResources(ConfigResource[] configResources) {

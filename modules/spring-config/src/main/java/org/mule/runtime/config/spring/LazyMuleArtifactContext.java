@@ -16,6 +16,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
+import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -31,6 +32,7 @@ import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,15 +62,17 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
    * @param artifactDeclaration the mule configuration defined programmatically
    * @param optionalObjectsController the {@link OptionalObjectsController} to use. Cannot be {@code null} @see
    *        org.mule.runtime.config.spring.SpringRegistry
+   * @param parentConfigurationProperties
    * @since 4.0
    */
   public LazyMuleArtifactContext(MuleContext muleContext, ConfigResource[] artifactConfigResources,
                                  ArtifactDeclaration artifactDeclaration, OptionalObjectsController optionalObjectsController,
                                  Map<String, String> artifactProperties, ArtifactType artifactType,
-                                 List<ClassLoader> pluginsClassLoaders)
+                                 List<ClassLoader> pluginsClassLoaders,
+                                 Optional<ConfigurationProperties> parentConfigurationProperties)
       throws BeansException {
     super(muleContext, artifactConfigResources, artifactDeclaration, optionalObjectsController, artifactProperties,
-          artifactType, pluginsClassLoaders);
+          artifactType, pluginsClassLoaders, parentConfigurationProperties);
   }
 
   @Override

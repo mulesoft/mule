@@ -32,7 +32,6 @@ public abstract class AbstractScriptConfigBuilderTestCase extends MuleArtifactFu
 
   @Test
   public void testManagerConfig() throws Exception {
-    assertEquals("true", muleContext.getRegistry().lookupObject("doCompression"));
     assertNotNull(muleContext.getTransactionManager());
   }
 

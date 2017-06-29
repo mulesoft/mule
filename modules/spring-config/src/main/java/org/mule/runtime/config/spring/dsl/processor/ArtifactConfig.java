@@ -24,7 +24,7 @@ public class ArtifactConfig {
 
   private String artifactName;
   private List<ConfigFile> configFiles = new ArrayList<>();
-  private Map<String, String> applicationProperties;
+  private Map<String, String> artifactProperties;
 
   private ArtifactConfig() {}
 
@@ -39,8 +39,8 @@ public class ArtifactConfig {
   /**
    * @return properties associated to the configuration.
    */
-  public Map<String, String> getApplicationProperties() {
-    return applicationProperties;
+  public Map<String, String> getArtifactProperties() {
+    return artifactProperties;
   }
 
   /**
@@ -69,11 +69,11 @@ public class ArtifactConfig {
     }
 
     /**
-     * @param applicationProperties properties associated to the configuration.
+     * @param artifactProperties properties associated to the configuration.
      * @return the builder
      */
-    public Builder setApplicationProperties(Map<String, String> applicationProperties) {
-      this.applicationConfig.applicationProperties = applicationProperties;
+    public Builder setArtifactProperties(Map<String, String> artifactProperties) {
+      this.applicationConfig.artifactProperties = artifactProperties;
       return this;
     }
 

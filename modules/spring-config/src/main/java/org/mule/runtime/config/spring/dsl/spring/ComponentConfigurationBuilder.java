@@ -11,7 +11,6 @@ import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROCESSING_STRATEGY_ATTRIBUTE;
 import static org.mule.runtime.config.spring.dsl.spring.CommonBeanDefinitionCreator.areMatchingTypes;
 import static org.mule.runtime.core.internal.util.ProcessingStrategyUtils.parseProcessingStrategy;
-
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.dsl.api.component.AttributeDefinition;
@@ -50,7 +49,7 @@ class ComponentConfigurationBuilder<T> {
   private final BeanDefinitionBuilderHelper beanDefinitionBuilderHelper;
   private final ObjectReferencePopulator objectReferencePopulator = new ObjectReferencePopulator();
   private final List<ComponentValue> complexParameters;
-  private final Map<String, String> simpleParameters;
+  private final Map<String, Object> simpleParameters;
   private final ComponentModel componentModel;
   private final ComponentBuildingDefinition<T> componentBuildingDefinition;
 
@@ -260,7 +259,7 @@ class ComponentConfigurationBuilder<T> {
 
     @Override
     public void onReferenceSimpleParameter(final String configAttributeName) {
-      String reference = simpleParameters.get(configAttributeName);
+      String reference = (String) simpleParameters.get(configAttributeName);
       if (reference != null) {
         this.value = new RuntimeBeanReference(reference);
       }

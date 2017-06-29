@@ -6,8 +6,6 @@
  */
 package org.mule.test.module.extension;
 
-import org.mule.test.module.extension.InvalidExtensionConfigTestCase;
-
 public class HeisenbergDefaultConfigNegativeTestCase extends InvalidExtensionConfigTestCase {
 
   @Override

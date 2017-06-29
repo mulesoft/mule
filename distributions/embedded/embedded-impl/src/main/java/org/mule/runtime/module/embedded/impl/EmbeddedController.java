@@ -20,7 +20,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTOR
 import static org.mule.runtime.module.deployment.impl.internal.application.DeployableMavenClassLoaderModelLoader.ADD_TEST_DEPENDENCIES_KEY;
 import static org.mule.runtime.module.embedded.impl.SerializationUtils.deserialize;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.embedded.api.ArtifactConfiguration;
 import org.mule.runtime.module.embedded.api.ContainerInfo;
@@ -60,20 +59,18 @@ public class EmbeddedController {
     setUpEnvironment();
   }
 
-  public void deployApplication(byte[] serializedArtifactConfiguration) throws IOException, ClassNotFoundException {
+  public synchronized void deployApplication(byte[] serializedArtifactConfiguration) throws IOException, ClassNotFoundException {
     ArtifactConfiguration artifactConfiguration = deserialize(serializedArtifactConfiguration);
-    withSystemProperties(artifactConfiguration.getDeploymentConfiguration().getArtifactProperties(), () -> {
-      try {
-        if (artifactConfiguration.getDeploymentConfiguration().enableTestDependencies()) {
-          setProperty(ADD_TEST_DEPENDENCIES_KEY, "true");
-        }
-        muleContainer.getDeploymentService().deploy(artifactConfiguration.getApplicationLocation().toURI());
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      } finally {
-        setProperty(ADD_TEST_DEPENDENCIES_KEY, "false");
+    try {
+      if (artifactConfiguration.getDeploymentConfiguration().enableTestDependencies()) {
+        setProperty(ADD_TEST_DEPENDENCIES_KEY, "true");
       }
-    });
+      muleContainer.getDeploymentService().deploy(artifactConfiguration.getApplicationLocation().toURI());
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    } finally {
+      setProperty(ADD_TEST_DEPENDENCIES_KEY, "false");
+    }
   }
 
   public void undeployApplication(byte[] serializedApplicationName) throws IOException, ClassNotFoundException {

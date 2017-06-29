@@ -208,6 +208,7 @@
         <rhinoJsr223Version>1.1</rhinoJsr223Version>
         <saxonVersion>9.7.0-15</saxonVersion>
         <slf4jVersion>1.7.25</slf4jVersion>
+        <snakeYamlVersion>1.18</snakeYamlVersion>
         <springVersion>4.1.9.RELEASE</springVersion>
         <springSecurityVersion>4.0.4.RELEASE</springSecurityVersion>
         <sshCoreVersion>1.4.0</sshCoreVersion>
@@ -1304,6 +1305,12 @@
                         <artifactId>c3p0</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>org.yaml</groupId>
+                <artifactId>snakeyaml</artifactId>
+                <version>${snakeYamlVersion}</version>
             </dependency>
 
             <dependency>

@@ -7,25 +7,28 @@
 package org.mule.runtime.config.spring;
 
 import static java.util.Collections.emptyMap;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader.resolveContextArtifactPluginClassLoaders;
-
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
+import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ConfigResource;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.ParentMuleContextAwareConfigurationBuilder;
-import org.mule.runtime.core.api.lifecycle.LifecycleManager;
-import org.mule.runtime.core.api.config.ConfigResource;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.config.builders.AbstractResourceConfigurationBuilder;
+import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -133,23 +136,32 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     if (parentObjectController != null) {
       applicationObjectcontroller = new CompositeOptionalObjectsController(applicationObjectcontroller, parentObjectController);
     }
+
+    Optional<ConfigurationProperties> parentConfigurationProperties = empty();
+    if (parentApplicationContext != null) {
+      parentConfigurationProperties = of(parentApplicationContext.getBean(ConfigurationProperties.class));
+    }
     // TODO MULE-10084 : Refactor to only accept artifactConfiguration and not artifactConfigResources
     final MuleArtifactContext muleArtifactContext =
-        doCreateApplicationContext(muleContext, artifactConfigResources, artifactDeclaration, applicationObjectcontroller);
+        doCreateApplicationContext(muleContext, artifactConfigResources, artifactDeclaration, applicationObjectcontroller,
+                                   parentConfigurationProperties);
     serviceConfigurators.forEach(serviceConfigurator -> serviceConfigurator.configure(muleContext.getCustomizationService()));
     return muleArtifactContext;
   }
 
   protected MuleArtifactContext doCreateApplicationContext(MuleContext muleContext, ConfigResource[] artifactConfigResources,
                                                            ArtifactDeclaration artifactDeclaration,
-                                                           OptionalObjectsController optionalObjectsController) {
+                                                           OptionalObjectsController optionalObjectsController,
+                                                           Optional<ConfigurationProperties> parentConfigurationProperties) {
     if (enableLazyInit) {
       return new LazyMuleArtifactContext(muleContext, artifactConfigResources, artifactDeclaration, optionalObjectsController,
-                                         getArtifactProperties(), artifactType, resolveContextArtifactPluginClassLoaders());
+                                         getArtifactProperties(), artifactType, resolveContextArtifactPluginClassLoaders(),
+                                         parentConfigurationProperties);
     }
 
     return new MuleArtifactContext(muleContext, artifactConfigResources, artifactDeclaration, optionalObjectsController,
-                                   getArtifactProperties(), artifactType, resolveContextArtifactPluginClassLoaders());
+                                   getArtifactProperties(), artifactType, resolveContextArtifactPluginClassLoaders(),
+                                   parentConfigurationProperties);
   }
 
 

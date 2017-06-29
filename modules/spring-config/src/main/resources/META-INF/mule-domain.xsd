@@ -3,7 +3,6 @@
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:mule="http://www.mulesoft.org/schema/mule/core"
             xmlns:spring="http://www.springframework.org/schema/beans"
-            xmlns:spring-context="http://www.springframework.org/schema/context"
             targetNamespace="http://www.mulesoft.org/schema/mule/domain"
             attributeFormDefault="unqualified"
             elementFormDefault="qualified">
@@ -61,13 +60,8 @@
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
-            <xsd:element ref="spring-context:property-placeholder">
-                <xsd:annotation>
-                    <xsd:documentation>
-                        Allows Spring property placeholders to be configured directly in the Mule configuration file.
-                    </xsd:documentation>
-                </xsd:annotation>
-            </xsd:element>
+            <xsd:element ref="mule:global-property"/>
+            <xsd:element ref="mule:configuration-properties"/>
             <xsd:element ref="mule:abstract-shared-connector"/>
             <xsd:element ref="mule:abstract-shared-transaction-manager"/>
             <xsd:element ref="mule:abstract-shared-extension" />
