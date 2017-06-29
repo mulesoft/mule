@@ -48,34 +48,34 @@ import java.util.stream.Stream;
  */
 public class ErrorsDeclarationEnricher implements DeclarationEnricher {
 
-  private ErrorsModelFactory errorModelDescriber;
-  private final LoadingCache<Class<?>, TypeWrapper> typeWrapperCache =
-      CacheBuilder.newBuilder().build(new CacheLoader<Class<?>, TypeWrapper>() {
-
-        @Override
-        public TypeWrapper load(Class<?> clazz) throws Exception {
-          return new TypeWrapper(clazz);
-        }
-      });
-
   @Override
   public void enrich(ExtensionLoadingContext extensionLoadingContext) {
+    LoadingCache<Class<?>, TypeWrapper> typeWrapperCache =
+        CacheBuilder.newBuilder().build(new CacheLoader<Class<?>, TypeWrapper>() {
+
+          @Override
+          public TypeWrapper load(Class<?> clazz) throws Exception {
+            return new TypeWrapper(clazz);
+          }
+        });
+
     ExtensionDeclaration declaration = extensionLoadingContext.getExtensionDeclarer().getDeclaration();
     Optional<ImplementingTypeModelProperty> implementingType = declaration.getModelProperty(ImplementingTypeModelProperty.class);
     String extensionNamespace = getExtensionsErrorNamespace(declaration);
-    errorModelDescriber = new ErrorsModelFactory(extensionNamespace);
+    ErrorsModelFactory errorModelDescriber = new ErrorsModelFactory(extensionNamespace);
     errorModelDescriber.getErrorModels().forEach(declaration::addErrorModel);
 
     if (implementingType.isPresent()) {
 
       ExtensionElement extensionElement = new ExtensionTypeWrapper<>(implementingType.get().getType());
-      extensionElement.getAnnotation(ErrorTypes.class).ifPresent(errorTypesAnnotation -> {
+      Optional<ErrorTypes> errorAnnotation = extensionElement.getAnnotation(ErrorTypes.class);
 
-        ErrorTypeDefinition<?>[] errorTypes = (ErrorTypeDefinition<?>[]) errorTypesAnnotation.value().getEnumConstants();
+      if (errorAnnotation.isPresent()) {
+        ErrorTypeDefinition<?>[] errorTypes = (ErrorTypeDefinition<?>[]) errorAnnotation.get().value().getEnumConstants();
 
         if (errorTypes.length > 0) {
-          errorModelDescriber = new ErrorsModelFactory(errorTypes, extensionNamespace);
-          errorModelDescriber.getErrorModels().forEach(declaration::addErrorModel);
+          ErrorsModelFactory operationErrorModelDescriber = new ErrorsModelFactory(errorTypes, extensionNamespace);
+          operationErrorModelDescriber.getErrorModels().forEach(declaration::addErrorModel);
 
           new IdempotentDeclarationWalker() {
 
@@ -84,21 +84,23 @@ public class ErrorsDeclarationEnricher implements DeclarationEnricher {
               Optional<ImplementingMethodModelProperty> modelProperty =
                   declaration.getModelProperty(ImplementingMethodModelProperty.class);
 
-              modelProperty.ifPresent(implementingMethodModelProperty -> {
-                MethodElement methodElement = new MethodWrapper(implementingMethodModelProperty.getMethod());
-                registerOperationErrorTypes(methodElement, declaration, errorModelDescriber, errorTypes, extensionElement);
-              });
+              if (modelProperty.isPresent()) {
+                MethodElement methodElement = new MethodWrapper(modelProperty.get().getMethod());
+                registerOperationErrorTypes(methodElement, declaration, operationErrorModelDescriber, errorTypes,
+                                            extensionElement, typeWrapperCache);
+              }
             }
           }.walk(declaration);
         }
-      });
+      }
     }
   }
 
   private void registerOperationErrorTypes(MethodElement operationMethod, OperationDeclaration operation,
                                            ErrorsModelFactory errorModelDescriber,
-                                           ErrorTypeDefinition<?>[] extensionErrorTypes, ExtensionElement extensionElement) {
-    getOperationThrowsDeclaration(operationMethod, extensionElement)
+                                           ErrorTypeDefinition<?>[] extensionErrorTypes, ExtensionElement extensionElement,
+                                           LoadingCache<Class<?>, TypeWrapper> typeWrapperCache) {
+    getOperationThrowsDeclaration(operationMethod, extensionElement, typeWrapperCache)
         .ifPresent(throwsAnnotation -> {
           Class<? extends ErrorTypeProvider>[] providers = throwsAnnotation.value();
           Stream.of(providers).forEach(provider -> {
@@ -118,7 +120,8 @@ public class ErrorsDeclarationEnricher implements DeclarationEnricher {
         });
   }
 
-  private Optional<Throws> getOperationThrowsDeclaration(MethodElement operationMethod, ExtensionElement extensionElement) {
+  private Optional<Throws> getOperationThrowsDeclaration(MethodElement operationMethod, ExtensionElement extensionElement,
+                                                         LoadingCache<Class<?>, TypeWrapper> typeWrapperCache) {
     TypeWrapper operationContainer = typeWrapperCache.getUnchecked(operationMethod.getDeclaringClass());
     return ofNullable(operationMethod.getAnnotation(Throws.class)
         .orElseGet(() -> operationContainer.getAnnotation(Throws.class)
