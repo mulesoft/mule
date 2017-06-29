@@ -569,19 +569,10 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withTypeDefinition(fromType(Resequencer.class))
         .build());
 
-    componentBuildingDefinitions.add(baseAggregatorDefinition.copy().withIdentifier("custom-aggregator")
-        .withTypeDefinition(fromConfigurationAttribute(CLASS_ATTRIBUTE))
-        .build());
-
-
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("splitter")
         .withTypeDefinition(fromType(Splitter.class))
         .withSetterParameterDefinition("expression", fromSimpleParameter("expression").build())
         .withSetterParameterDefinition("filterOnErrorType", fromSimpleParameter("filterOnErrorType").build())
-        .build());
-
-    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("custom-splitter")
-        .withTypeDefinition(fromConfigurationAttribute(CLASS_ATTRIBUTE))
         .build());
 
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier(REQUEST_REPLY)
@@ -749,11 +740,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("messageDigestAlgorithm", fromSimpleParameter("messageDigestAlgorithm").build())
         .withSetterParameterDefinition("idExpression", fromSimpleParameter("idExpression").build())
         .withSetterParameterDefinition("objectStore", fromSimpleReferenceParameter("object-store-ref").build())
-        .build());
-
-    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("custom-router")
-        .withTypeDefinition(fromConfigurationAttribute(CLASS_ATTRIBUTE))
-        .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
         .build());
 
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("singleton-object")

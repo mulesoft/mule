@@ -4024,37 +4024,6 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:element name="custom-aggregator"
-                 substitutionGroup="abstract-intercepting-message-processor">
-        <xsd:annotation>
-            <xsd:documentation>
-                Configures a custom message aggregator. Mule provides an abstract implementation that has a template method that performs the message aggregation. A common use of the aggregator router is to combine the results of multiple requests such as "ask this set of vendors for the best price of X".
-            </xsd:documentation>
-        </xsd:annotation>
-        <xsd:complexType>
-            <xsd:complexContent>
-                <xsd:extension base="baseAggregatorType">
-                    <xsd:sequence>
-                        <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
-                            <xsd:annotation>
-                                <xsd:documentation>
-                                    Spring-style property element for custom configuration.
-                                </xsd:documentation>
-                            </xsd:annotation>
-                        </xsd:element>
-                    </xsd:sequence>
-                    <xsd:attribute name="class" type="substitutableClass" use="required">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                Fully qualified class name of the custom correlation aggregator router to be used.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:attribute>
-                </xsd:extension>
-            </xsd:complexContent>
-        </xsd:complexType>
-    </xsd:element>
-
     <xsd:complexType name="baseSplitterType">
         <xsd:complexContent>
             <xsd:extension base="abstractInterceptingMessageProcessorType"/>
@@ -4097,36 +4066,6 @@
                         <xsd:annotation>
                             <xsd:documentation>
                                 The message chunk size (in bytes) that the current message will be split into. Note that this is mutually exclusive to the 'numberOfMessages' property.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:attribute>
-                </xsd:extension>
-            </xsd:complexContent>
-        </xsd:complexType>
-    </xsd:element>
-
-    <xsd:element name="custom-splitter" substitutionGroup="abstract-intercepting-message-processor">
-        <xsd:annotation>
-            <xsd:documentation>
-                Configures a custom message splitter. Mule provides an abstract implementation that has a template method that performs the message aggregation.
-            </xsd:documentation>
-        </xsd:annotation>
-        <xsd:complexType>
-            <xsd:complexContent>
-                <xsd:extension base="baseSplitterType">
-                    <xsd:sequence>
-                        <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
-                            <xsd:annotation>
-                                <xsd:documentation>
-                                    Spring-style property element for custom configuration.
-                                </xsd:documentation>
-                            </xsd:annotation>
-                        </xsd:element>
-                    </xsd:sequence>
-                    <xsd:attribute name="class" type="substitutableClass" use="required">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                Fully qualified class name of the custom correlation aggregator router to be used.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:attribute>
@@ -4234,19 +4173,6 @@
             <xsd:extension base="baseSingleRouteRoutingMessageProcessorType"/>
         </xsd:complexContent>
     </xsd:complexType>
-
-    <xsd:element name="custom-router" substitutionGroup="abstract-routing-message-processor">
-        <xsd:complexType>
-            <xsd:complexContent>
-                <xsd:extension base="baseMultipleRoutesRoutingMessageProcessorType">
-                <xsd:sequence>
-                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
-                </xsd:sequence>
-                <xsd:attribute name="class" type="substitutableClass" use="required"/>
-                </xsd:extension>
-            </xsd:complexContent>
-        </xsd:complexType>
-    </xsd:element>
 
     <xsd:complexType name="selectiveOutboundRouterType">
         <xsd:complexContent>
