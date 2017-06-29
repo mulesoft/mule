@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.validation;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
+import static java.util.Optional.empty;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.when;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockParameters;
@@ -21,6 +22,7 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
+import org.mule.runtime.module.extension.internal.loader.java.property.ClassLoaderModelProperty;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -54,6 +56,7 @@ public class NullSafeModelValidatorTestCase extends AbstractMuleTestCase {
     when(extensionModel.getOperationModels()).thenReturn(asList(operationModel));
     mockParameters(operationModel, parameterModel);
     when(extensionModel.getImportedTypes()).thenReturn(emptySet());
+    when(extensionModel.getModelProperty(ClassLoaderModelProperty.class)).thenReturn(empty());
   }
 
   @Test(expected = IllegalModelDefinitionException.class)

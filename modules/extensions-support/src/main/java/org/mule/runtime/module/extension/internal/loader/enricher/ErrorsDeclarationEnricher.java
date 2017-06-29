@@ -49,7 +49,6 @@ import java.util.stream.Stream;
 public class ErrorsDeclarationEnricher implements DeclarationEnricher {
 
   private ErrorsModelFactory errorModelDescriber;
-  private ExtensionElement extensionElement;
   private final LoadingCache<Class<?>, TypeWrapper> typeWrapperCache =
       CacheBuilder.newBuilder().build(new CacheLoader<Class<?>, TypeWrapper>() {
 
@@ -69,7 +68,7 @@ public class ErrorsDeclarationEnricher implements DeclarationEnricher {
 
     if (implementingType.isPresent()) {
 
-      extensionElement = new ExtensionTypeWrapper<>(implementingType.get().getType());
+      ExtensionElement extensionElement = new ExtensionTypeWrapper<>(implementingType.get().getType());
       extensionElement.getAnnotation(ErrorTypes.class).ifPresent(errorTypesAnnotation -> {
 
         ErrorTypeDefinition<?>[] errorTypes = (ErrorTypeDefinition<?>[]) errorTypesAnnotation.value().getEnumConstants();
@@ -87,7 +86,7 @@ public class ErrorsDeclarationEnricher implements DeclarationEnricher {
 
               modelProperty.ifPresent(implementingMethodModelProperty -> {
                 MethodElement methodElement = new MethodWrapper(implementingMethodModelProperty.getMethod());
-                registerOperationErrorTypes(methodElement, declaration, errorModelDescriber, errorTypes);
+                registerOperationErrorTypes(methodElement, declaration, errorModelDescriber, errorTypes, extensionElement);
               });
             }
           }.walk(declaration);
@@ -98,7 +97,7 @@ public class ErrorsDeclarationEnricher implements DeclarationEnricher {
 
   private void registerOperationErrorTypes(MethodElement operationMethod, OperationDeclaration operation,
                                            ErrorsModelFactory errorModelDescriber,
-                                           ErrorTypeDefinition<?>[] extensionErrorTypes) {
+                                           ErrorTypeDefinition<?>[] extensionErrorTypes, ExtensionElement extensionElement) {
     getOperationThrowsDeclaration(operationMethod, extensionElement)
         .ifPresent(throwsAnnotation -> {
           Class<? extends ErrorTypeProvider>[] providers = throwsAnnotation.value();

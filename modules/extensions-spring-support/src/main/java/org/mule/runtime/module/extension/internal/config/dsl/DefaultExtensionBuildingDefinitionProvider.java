@@ -38,6 +38,7 @@ import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
+import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 import org.mule.runtime.module.extension.internal.config.ExtensionBuildingDefinitionProvider;
 import org.mule.runtime.module.extension.internal.config.ExtensionConfig;
 import org.mule.runtime.module.extension.internal.config.dsl.config.ConfigurationDefinitionParser;
@@ -52,7 +53,6 @@ import org.mule.runtime.module.extension.internal.config.dsl.parameter.ObjectTyp
 import org.mule.runtime.module.extension.internal.config.dsl.source.SourceDefinitionParser;
 import org.mule.runtime.module.extension.internal.loader.java.property.CraftedExtensionModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.DynamicConfigPolicy;
-import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
 import com.google.common.collect.ImmutableList;
 
@@ -303,7 +303,7 @@ public class DefaultExtensionBuildingDefinitionProvider implements ExtensionBuil
                                           ClassLoader extensionClassLoader, DslSyntaxResolver dslSyntaxResolver,
                                           ExtensionParsingContext parsingContext) {
 
-    parameters.filter(IntrospectionUtils::isInstantiable)
+    parameters.filter(ExtensionMetadataTypeUtils::isInstanciable)
         .forEach(subType -> registerTopLevelParameter(subType,
                                                       definitionBuilder,
                                                       extensionClassLoader,

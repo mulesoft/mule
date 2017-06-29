@@ -41,51 +41,64 @@ import java.util.Set;
 public class ExtensionsErrorsDeclarationEnricher implements DeclarationEnricher {
 
   private static final String MULE = CORE_NAMESPACE_NAME;
-  private ErrorsModelFactory muleErrorsModelFactory;
 
   @Override
   public void enrich(ExtensionLoadingContext extensionLoadingContext) {
-    ExtensionDeclaration extensionDeclaration = extensionLoadingContext.getExtensionDeclarer().getDeclaration();
-    muleErrorsModelFactory = new ErrorsModelFactory(MuleErrors.class.getEnumConstants(), MULE);
-    Set<ErrorModel> errorModels = extensionDeclaration.getErrorModels();
-    new IdempotentDeclarationWalker() {
+    new ExtensionsErrorsDeclarer(extensionLoadingContext).apply();
+  }
 
-      @Override
-      public void onOperation(WithOperationsDeclaration owner, OperationDeclaration operationDeclaration) {
-        if (operationDeclaration.getModelProperty(ConnectivityModelProperty.class).isPresent()) {
-          operationDeclaration.addErrorModel(getErrorModel(CONNECTIVITY, errorModels, operationDeclaration));
-          operationDeclaration.addErrorModel(getErrorModel(RETRY_EXHAUSTED, errorModels, operationDeclaration));
+  private static final class ExtensionsErrorsDeclarer {
+
+    private final ExtensionLoadingContext extensionLoadingContext;
+    private ErrorsModelFactory muleErrorsModelFactory;
+
+    public ExtensionsErrorsDeclarer(ExtensionLoadingContext extensionLoadingContext) {
+      this.extensionLoadingContext = extensionLoadingContext;
+    }
+
+    private void apply() {
+      ExtensionDeclaration extensionDeclaration = extensionLoadingContext.getExtensionDeclarer().getDeclaration();
+      muleErrorsModelFactory = new ErrorsModelFactory(MuleErrors.class.getEnumConstants(), MULE);
+      Set<ErrorModel> errorModels = extensionDeclaration.getErrorModels();
+      new IdempotentDeclarationWalker() {
+
+        @Override
+        public void onOperation(WithOperationsDeclaration owner, OperationDeclaration operationDeclaration) {
+          if (operationDeclaration.getModelProperty(ConnectivityModelProperty.class).isPresent()) {
+            operationDeclaration.addErrorModel(getErrorModel(CONNECTIVITY, errorModels, operationDeclaration));
+            operationDeclaration.addErrorModel(getErrorModel(RETRY_EXHAUSTED, errorModels, operationDeclaration));
+          }
         }
-      }
 
-      @Override
-      protected void onSource(WithSourcesDeclaration owner, SourceDeclaration sourceDeclaration) {
-        sourceDeclaration.getSuccessCallback().ifPresent(callback -> {
-          registerError(SOURCE_RESPONSE_SEND, sourceDeclaration, extensionDeclaration);
-          registerError(SOURCE_RESPONSE_GENERATE, sourceDeclaration, extensionDeclaration);
-        });
+        @Override
+        protected void onSource(WithSourcesDeclaration owner, SourceDeclaration sourceDeclaration) {
+          sourceDeclaration.getSuccessCallback().ifPresent(callback -> {
+            registerError(SOURCE_RESPONSE_SEND, sourceDeclaration, extensionDeclaration);
+            registerError(SOURCE_RESPONSE_GENERATE, sourceDeclaration, extensionDeclaration);
+          });
 
-        sourceDeclaration.getErrorCallback().ifPresent(callback -> {
-          registerError(SOURCE_ERROR_RESPONSE_SEND, sourceDeclaration, extensionDeclaration);
-          registerError(SOURCE_ERROR_RESPONSE_GENERATE, sourceDeclaration, extensionDeclaration);
-        });
-      }
-    }.walk(extensionDeclaration);
-  }
+          sourceDeclaration.getErrorCallback().ifPresent(callback -> {
+            registerError(SOURCE_ERROR_RESPONSE_SEND, sourceDeclaration, extensionDeclaration);
+            registerError(SOURCE_ERROR_RESPONSE_GENERATE, sourceDeclaration, extensionDeclaration);
+          });
+        }
+      }.walk(extensionDeclaration);
+    }
 
-  private void registerError(MuleErrors error, SourceDeclaration sourceDeclaration, ExtensionDeclaration extensionDeclaration) {
-    ErrorModel errorModel = muleErrorsModelFactory.getErrorModel(error);
-    extensionDeclaration.addErrorModel(errorModel);
-    sourceDeclaration.addErrorModel(errorModel);
-  }
+    private void registerError(MuleErrors error, SourceDeclaration sourceDeclaration, ExtensionDeclaration extensionDeclaration) {
+      ErrorModel errorModel = muleErrorsModelFactory.getErrorModel(error);
+      extensionDeclaration.addErrorModel(errorModel);
+      sourceDeclaration.addErrorModel(errorModel);
+    }
 
-  private ErrorModel getErrorModel(ErrorTypeDefinition<?> errorTypeDefinition, Set<ErrorModel> errorModels,
-                                   ComponentDeclaration component) {
-    return errorModels
-        .stream()
-        .filter(error -> !error.getNamespace().equals(MULE) && error.getType().equals(errorTypeDefinition.getType()))
-        .findFirst()
-        .orElseThrow(() -> new IllegalModelDefinitionException(format("Trying to add the '%s' Error to the Component '%s' but the Extension doesn't declare it",
-                                                                      errorTypeDefinition, component.getName())));
+    private ErrorModel getErrorModel(ErrorTypeDefinition<?> errorTypeDefinition, Set<ErrorModel> errorModels,
+                                     ComponentDeclaration component) {
+      return errorModels
+          .stream()
+          .filter(error -> !error.getNamespace().equals(MULE) && error.getType().equals(errorTypeDefinition.getType()))
+          .findFirst()
+          .orElseThrow(() -> new IllegalModelDefinitionException(format("Trying to add the '%s' Error to the Component '%s' but the Extension doesn't declare it",
+                                                                        errorTypeDefinition, component.getName())));
+    }
   }
 }

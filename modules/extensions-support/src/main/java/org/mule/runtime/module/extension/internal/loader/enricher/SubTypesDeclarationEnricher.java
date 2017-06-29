@@ -33,37 +33,33 @@ import java.util.Optional;
  */
 public final class SubTypesDeclarationEnricher extends AbstractAnnotatedDeclarationEnricher {
 
-  private ClassTypeLoader typeLoader;
-
   @Override
   public void enrich(ExtensionLoadingContext extensionLoadingContext) {
-    ExtensionDeclarer declarer = extensionLoadingContext.getExtensionDeclarer();
-    ExtensionDeclaration extensionDeclaration = declarer.getDeclaration();
+    final ExtensionDeclarer declarer = extensionLoadingContext.getExtensionDeclarer();
+    final ExtensionDeclaration extensionDeclaration = declarer.getDeclaration();
 
     Optional<ImplementingTypeModelProperty> implementingType = extractImplementingTypeProperty(extensionDeclaration);
     if (!implementingType.isPresent()) {
       return;
     }
+
     Class<?> type = implementingType.get().getType();
-    typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(type.getClassLoader());
+    final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault()
+        .createTypeLoader(extensionLoadingContext.getExtensionClassLoader());
 
     List<SubTypeMapping> typeMappings = parseRepeatableAnnotation(type, SubTypeMapping.class, c -> ((SubTypesMapping) c).value());
     if (!typeMappings.isEmpty()) {
-      declareSubTypesMapping(declarer, typeMappings, extensionDeclaration.getName());
-    }
-  }
+      if (typeMappings.stream().map(SubTypeMapping::baseType).distinct().collect(toList()).size() != typeMappings.size()) {
+        throw new IllegalModelDefinitionException(String
+            .format("There should be only one SubtypeMapping for any given base type in extension [%s]."
+                + " Duplicated base types are not allowed", extensionDeclaration.getName()));
+      }
 
-  private void declareSubTypesMapping(ExtensionDeclarer declarer, List<SubTypeMapping> typeMappings, String name) {
-    if (typeMappings.stream().map(SubTypeMapping::baseType).distinct().collect(toList()).size() != typeMappings.size()) {
-      throw new IllegalModelDefinitionException(String
-          .format("There should be only one SubtypeMapping for any given base type in extension [%s]."
-              + " Duplicated base types are not allowed", name));
+      typeMappings.forEach(mapping -> declarer.withSubTypes(getMetadataType(mapping.baseType(), typeLoader),
+                                                            stream(mapping.subTypes())
+                                                                .map(subType -> getMetadataType(subType, typeLoader))
+                                                                .collect(toImmutableList())));
     }
-
-    typeMappings.forEach(mapping -> declarer.withSubTypes(getMetadataType(mapping.baseType(), typeLoader),
-                                                          stream(mapping.subTypes())
-                                                              .map(subType -> getMetadataType(subType, typeLoader))
-                                                              .collect(toImmutableList())));
   }
 
 }

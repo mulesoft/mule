@@ -31,8 +31,6 @@ import java.util.Optional;
  */
 public final class ImportedTypesDeclarationEnricher extends AbstractAnnotatedDeclarationEnricher {
 
-  private ClassTypeLoader typeLoader;
-
   @Override
   public void enrich(ExtensionLoadingContext extensionLoadingContext) {
     ExtensionDeclarer descriptor = extensionLoadingContext.getExtensionDeclarer();
@@ -43,7 +41,8 @@ public final class ImportedTypesDeclarationEnricher extends AbstractAnnotatedDec
       return;
     }
     final Class<?> type = implementingType.get().getType();
-    typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(type.getClassLoader());
+    final ClassTypeLoader typeLoader =
+        ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(extensionLoadingContext.getExtensionClassLoader());
 
     final List<Import> importTypes = parseRepeatableAnnotation(type, Import.class, c -> ((ImportedTypes) c).value());
 

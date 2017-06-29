@@ -12,6 +12,7 @@ import static org.mule.metadata.api.utils.MetadataTypeUtils.getLocalPart;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import org.mule.metadata.api.TypeLoader;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.model.ArrayType;
@@ -44,113 +45,128 @@ import org.mule.runtime.extension.api.loader.ProblemsReporter;
  */
 public final class NullSafeModelValidator implements ExtensionModelValidator {
 
-  private TypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
-
   @Override
   public void validate(ExtensionModel extensionModel, ProblemsReporter problemsReporter) {
-    new ExtensionWalker() {
+    new NullSafeValidationExecutor(extensionModel, problemsReporter).apply();
+  }
 
-      @Override
-      public void onParameter(ParameterizedModel owner, ParameterGroupModel groupModel, ParameterModel model) {
-        model.getType().accept(new MetadataTypeVisitor() {
+  private static final class NullSafeValidationExecutor {
 
-          @Override
-          public void visitObject(ObjectType objectType) {
-            if (objectType.getMetadataFormat().equals(JAVA) && !isMap(objectType)) {
-              objectType.getAnnotation(TypeIdAnnotation.class).map(TypeIdAnnotation::getValue)
-                  .ifPresent(typeId -> typeLoader.load(typeId).ifPresent(fieldMetadataType -> objectType
-                      .getFields().stream()
-                      .filter(f -> f.getAnnotation(NullSafeTypeAnnotation.class).isPresent())
-                      .forEach(f -> validateField(getLocalPart(f), f, getType(fieldMetadataType),
-                                                  f.getAnnotation(NullSafeTypeAnnotation.class).get()))));
+    private final ExtensionModel extensionModel;
+    private final ProblemsReporter problemsReporter;
+    private final TypeLoader typeLoader;
+
+    NullSafeValidationExecutor(ExtensionModel extensionModel, ProblemsReporter problemsReporter) {
+      this.extensionModel = extensionModel;
+      this.problemsReporter = problemsReporter;
+      this.typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(getClassLoader(extensionModel));
+    }
+
+    public void apply() {
+      new ExtensionWalker() {
+
+        @Override
+        public void onParameter(ParameterizedModel owner, ParameterGroupModel groupModel, ParameterModel model) {
+          model.getType().accept(new MetadataTypeVisitor() {
+
+            @Override
+            public void visitObject(ObjectType objectType) {
+              if (objectType.getMetadataFormat().equals(JAVA) && !isMap(objectType)) {
+                objectType.getAnnotation(TypeIdAnnotation.class).map(TypeIdAnnotation::getValue)
+                    .ifPresent(typeId -> typeLoader.load(typeId).ifPresent(fieldMetadataType -> objectType
+                        .getFields().stream()
+                        .filter(f -> f.getAnnotation(NullSafeTypeAnnotation.class).isPresent())
+                        .forEach(f -> validateField(getLocalPart(f), f, getType(fieldMetadataType),
+                                                    f.getAnnotation(NullSafeTypeAnnotation.class).get()))));
+              }
             }
-          }
 
-          private void validateField(String fieldName, ObjectFieldType field, Class<?> declaringClass,
-                                     NullSafeTypeAnnotation nullSafeTypeAnnotation) {
-            Class<?> nullSafeType = nullSafeTypeAnnotation.getType();
-            Class<?> fieldType = getType(field.getValue());
-            boolean hasDefaultOverride = nullSafeTypeAnnotation.hasDefaultOverride();
-            field.getValue().accept(new BasicTypeMetadataVisitor() {
+            private void validateField(String fieldName, ObjectFieldType field, Class<?> declaringClass,
+                                       NullSafeTypeAnnotation nullSafeTypeAnnotation) {
+              Class<?> nullSafeType = nullSafeTypeAnnotation.getType();
+              Class<?> fieldType = getType(field.getValue());
+              boolean hasDefaultOverride = nullSafeTypeAnnotation.hasDefaultOverride();
+              field.getValue().accept(new BasicTypeMetadataVisitor() {
 
-              @Override
-              protected void visitBasicType(MetadataType metadataType) {
-                problemsReporter.addError(new Problem(extensionModel, format(
-                                                                             "Field '%s' in class '%s' is annotated with '@%s' but is of type '%s'. That annotation can only be "
-                                                                                 + "used with complex types (Pojos, Lists, Maps)",
-                                                                             fieldName, declaringClass.getName(),
-                                                                             NullSafe.class.getSimpleName(),
-                                                                             fieldType.getName())));
-              }
-
-              @Override
-              public void visitArrayType(ArrayType arrayType) {
-                if (hasDefaultOverride) {
-                  problemsReporter.addError(
-                                            new Problem(extensionModel,
-                                                        format("Field '%s' in class '%s' is annotated with '@%s' is of type '%s'"
-                                                            + " but a 'defaultImplementingType' was provided."
-                                                            + " Type override is not allowed for Collections",
-                                                               fieldName,
-                                                               declaringClass.getName(),
-                                                               NullSafe.class.getSimpleName(),
-                                                               fieldType.getName())));
+                @Override
+                protected void visitBasicType(MetadataType metadataType) {
+                  problemsReporter.addError(new Problem(extensionModel, format(
+                                                                               "Field '%s' in class '%s' is annotated with '@%s' but is of type '%s'. That annotation can only be "
+                                                                                   + "used with complex types (Pojos, Lists, Maps)",
+                                                                               fieldName, declaringClass.getName(),
+                                                                               NullSafe.class.getSimpleName(),
+                                                                               fieldType.getName())));
                 }
-              }
 
-              @Override
-              public void visitObject(ObjectType objectType) {
-                if (objectType.isOpen()) {
+                @Override
+                public void visitArrayType(ArrayType arrayType) {
                   if (hasDefaultOverride) {
                     problemsReporter.addError(
                                               new Problem(extensionModel,
                                                           format("Field '%s' in class '%s' is annotated with '@%s' is of type '%s'"
                                                               + " but a 'defaultImplementingType' was provided."
-                                                              + " Type override is not allowed for Maps",
+                                                              + " Type override is not allowed for Collections",
                                                                  fieldName,
                                                                  declaringClass.getName(),
                                                                  NullSafe.class.getSimpleName(),
                                                                  fieldType.getName())));
                   }
-                  return;
                 }
 
-                if (hasDefaultOverride && isInstantiable(fieldType)) {
-                  problemsReporter.addError(new Problem(extensionModel, format(
-                                                                               "Field '%s' in class '%s' is annotated with '@%s' is of concrete type '%s',"
-                                                                                   + " but a 'defaultImplementingType' was provided."
-                                                                                   + " Type override is not allowed for concrete types",
-                                                                               fieldName,
-                                                                               declaringClass.getName(),
-                                                                               NullSafe.class.getSimpleName(),
-                                                                               fieldType.getName())));
-                }
+                @Override
+                public void visitObject(ObjectType objectType) {
+                  if (objectType.isOpen()) {
+                    if (hasDefaultOverride) {
+                      problemsReporter.addError(
+                                                new Problem(extensionModel,
+                                                            format("Field '%s' in class '%s' is annotated with '@%s' is of type '%s'"
+                                                                + " but a 'defaultImplementingType' was provided."
+                                                                + " Type override is not allowed for Maps",
+                                                                   fieldName,
+                                                                   declaringClass.getName(),
+                                                                   NullSafe.class.getSimpleName(),
+                                                                   fieldType.getName())));
+                    }
+                    return;
+                  }
 
-                if (!isInstantiable(nullSafeType)) {
-                  problemsReporter.addError(new Problem(extensionModel, format(
-                                                                               "Field '%s' in class '%s' is annotated with '@%s' but is of type '%s'. That annotation can only be "
-                                                                                   + "used with complex instantiable types (Pojos, Lists, Maps)",
-                                                                               fieldName,
-                                                                               declaringClass.getName(),
-                                                                               NullSafe.class.getSimpleName(),
-                                                                               nullSafeType.getName())));
-                }
+                  if (hasDefaultOverride && isInstantiable(fieldType)) {
+                    problemsReporter.addError(new Problem(extensionModel, format(
+                                                                                 "Field '%s' in class '%s' is annotated with '@%s' is of concrete type '%s',"
+                                                                                     + " but a 'defaultImplementingType' was provided."
+                                                                                     + " Type override is not allowed for concrete types",
+                                                                                 fieldName,
+                                                                                 declaringClass.getName(),
+                                                                                 NullSafe.class.getSimpleName(),
+                                                                                 fieldType.getName())));
+                  }
 
-                if (hasDefaultOverride && !fieldType.isAssignableFrom(nullSafeType)) {
-                  problemsReporter.addError(new Problem(extensionModel, format(
-                                                                               "Field '%s' in class '%s' is annotated with '@%s' of type '%s', but provided type '%s"
-                                                                                   + " is not a subtype of the parameter's type",
-                                                                               fieldName,
-                                                                               declaringClass.getName(),
-                                                                               NullSafe.class.getSimpleName(),
-                                                                               fieldType.getName(),
-                                                                               nullSafeType.getName())));
+                  if (!isInstantiable(nullSafeType)) {
+                    problemsReporter.addError(new Problem(extensionModel, format(
+                                                                                 "Field '%s' in class '%s' is annotated with '@%s' but is of type '%s'. That annotation can only be "
+                                                                                     + "used with complex instantiable types (Pojos, Lists, Maps)",
+                                                                                 fieldName,
+                                                                                 declaringClass.getName(),
+                                                                                 NullSafe.class.getSimpleName(),
+                                                                                 nullSafeType.getName())));
+                  }
+
+                  if (hasDefaultOverride && !fieldType.isAssignableFrom(nullSafeType)) {
+                    problemsReporter.addError(new Problem(extensionModel, format(
+                                                                                 "Field '%s' in class '%s' is annotated with '@%s' of type '%s', but provided type '%s"
+                                                                                     + " is not a subtype of the parameter's type",
+                                                                                 fieldName,
+                                                                                 declaringClass.getName(),
+                                                                                 NullSafe.class.getSimpleName(),
+                                                                                 fieldType.getName(),
+                                                                                 nullSafeType.getName())));
+                  }
                 }
-              }
-            });
-          }
-        });
-      }
-    }.walk(extensionModel);
+              });
+            }
+          });
+        }
+      }.walk(extensionModel);
+    }
   }
 }
