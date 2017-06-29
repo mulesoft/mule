@@ -26,6 +26,7 @@ import static org.mule.runtime.api.meta.Category.SELECT;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
@@ -288,6 +289,12 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertMessageType(((ArrayType) outputType).getType(), TYPE_LOADER.load(Integer.class),
                       TYPE_LOADER.load(IntegerAttributes.class));
     assertThat(operation.getOutputAttributes().getType(), is(instanceOf(VoidType.class)));
+  }
+
+  @Test(expected = IllegalParameterModelDefinitionException.class)
+  public void invalidParameterGroupName() throws Exception {
+    loaderFor(HeisenbergWithParameterGroupDefaultName.class)
+        .declare(new DefaultExtensionLoadingContext(getClass().getClassLoader(), getDefault(emptySet())));
   }
 
   @Test
@@ -869,6 +876,14 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   @Operations({HeisenbergExtension.class, ListOfResultsOperations.class})
   public static class HeisenbergWithListOfResultOperations {
 
+  }
+
+  @Extension(name = OTHER_HEISENBERG, description = EXTENSION_DESCRIPTION)
+  @Operations({HeisenbergExtension.class})
+  public static class HeisenbergWithParameterGroupDefaultName {
+
+    @ParameterGroup(name = DEFAULT_GROUP_NAME)
+    private PersonalInfo personalInfo;
   }
 
   public static class DuplicateConfigOperation {

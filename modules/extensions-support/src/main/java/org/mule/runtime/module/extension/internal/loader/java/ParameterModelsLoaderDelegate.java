@@ -15,7 +15,6 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFA
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.roleOf;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentDeclarationTypeName;
-import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getExpressionSupport;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldsWithGetters;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
@@ -159,7 +158,7 @@ public final class ParameterModelsLoaderDelegate {
       throw new IllegalParameterModelDefinitionException(
                                                          format("%s '%s' defines parameter group of name '%s' which is the default one. "
                                                              + "@%s cannot be used with the default group name",
-                                                                getComponentModelTypeName(component),
+                                                                getComponentDeclarationTypeName(component.getDeclaration()),
                                                                 ((NamedDeclaration) component.getDeclaration()).getName(),
                                                                 groupName,
                                                                 ParameterGroup.class.getSimpleName()));
