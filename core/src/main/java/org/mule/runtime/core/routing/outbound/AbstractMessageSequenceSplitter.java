@@ -7,6 +7,7 @@
 package org.mule.runtime.core.routing.outbound;
 
 import static java.util.Collections.emptySet;
+import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
@@ -24,6 +25,7 @@ import org.mule.runtime.core.routing.DefaultRouterResultsHandler;
 import org.mule.runtime.core.routing.MessageSequence;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -149,6 +151,9 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
     } else if (sequenceValue instanceof TypedValue) {
       builder.message(Message.builder().payload(((TypedValue) sequenceValue).getValue())
           .mediaType(((TypedValue) sequenceValue).getDataType().getMediaType()).build());
+    } else if (sequenceValue instanceof Collection) {
+      builder.message(Message.builder(originalEvent.getMessage()).payload(((Collection) sequenceValue).stream()
+          .map(v -> v instanceof TypedValue ? ((TypedValue) v).getValue() : v).collect(toList())).build());
     } else {
       builder.message(Message.builder(originalEvent.getMessage()).payload(sequenceValue).build());
     }
