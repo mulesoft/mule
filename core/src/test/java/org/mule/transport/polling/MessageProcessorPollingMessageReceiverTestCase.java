@@ -28,9 +28,11 @@ import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transport.NullPayload;
+import org.mule.transport.polling.schedule.FixedFrequencyScheduler;
 import org.mule.transport.polling.schedule.FixedFrequencySchedulerFactory;
 
 import java.util.Collection;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
@@ -138,6 +140,37 @@ public class MessageProcessorPollingMessageReceiverTestCase extends AbstractMule
 
         assertThat(getAllSchedulers().size(), is(0));
         verify(scheduler).dispose();
+    }
+
+    @Test
+    public void updateScheduler() throws Exception
+    {
+        MessageProcessorPollingMessageReceiver receiver = createReceiver(new MessageProcessor()
+        {
+            public MuleEvent process(MuleEvent event) throws MuleException
+            {
+                return null;
+            }
+        });
+
+        Collection<Scheduler> allSchedulers = getAllSchedulers();
+        assertThat(allSchedulers.size(), is(1));
+
+        FixedFrequencySchedulerFactory fixedFrequencySchedulerFactory = new FixedFrequencySchedulerFactory();
+        fixedFrequencySchedulerFactory.setFrequency(2000L);
+        fixedFrequencySchedulerFactory.setStartDelay(100L);
+        fixedFrequencySchedulerFactory.setTimeUnit(TimeUnit.MINUTES);
+        fixedFrequencySchedulerFactory.setMuleContext(muleContext);
+
+        receiver.updateScheduler(fixedFrequencySchedulerFactory);
+
+        Collection<Scheduler> allSchedulersUpdated = getAllSchedulers();
+        Scheduler scheduler = allSchedulersUpdated.iterator().next();
+
+        assertThat(allSchedulersUpdated.size(), is(1));
+        assertThat(((FixedFrequencyScheduler) scheduler).getFrequency(), is(2000L));
+        assertThat(((FixedFrequencyScheduler) scheduler).getStartDelay(), is(100L));
+        assertThat(((FixedFrequencyScheduler) scheduler).getTimeUnit(), is(TimeUnit.MINUTES));
     }
 
     private Collection<Scheduler> getAllSchedulers()

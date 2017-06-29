@@ -40,4 +40,9 @@ public class SchedulerMessages extends MessageFactory
     {
         return factory.createMessage(BUNDLE_PATH, 5);
     }
+
+    public static Message couldNotGetSchedulerStatus()
+    {
+        return factory.createMessage(BUNDLE_PATH, 6);
+    }
 }

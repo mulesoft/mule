@@ -284,6 +284,18 @@ public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessa
         scheduler = getSchedulerFactory().create(schedulerNameOf(this), createWork());
     }
 
+    /**
+     * <p>
+     * Updates the configured scheduler with the {@link SchedulerFactory}.
+     * </p>
+     * @param schedulerFactory The Scheduler Factory used to create the new Scheduler.
+     */
+    public void updateScheduler(SchedulerFactory schedulerFactory)
+    {
+        disposeScheduler();
+        scheduler = schedulerFactory.create(schedulerNameOf(this), createWork());
+    }
+
     private void disposeScheduler()
     {
         if (scheduler != null)
