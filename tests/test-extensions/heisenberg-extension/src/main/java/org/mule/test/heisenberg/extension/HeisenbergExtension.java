@@ -9,6 +9,12 @@ package org.mule.test.heisenberg.extension;
 import static org.mule.runtime.api.meta.Category.SELECT;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
+import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG_DEPENDENCY_ARTIFACT_ID;
+import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG_DEPENDENCY_DESCRIPTION;
+import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG_DEPENDENCY_GROUP_ID;
+import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG_DEPENDENCY_MAX_VERSION;
+import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG_DEPENDENCY_MIN_VERSION;
+import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG_DEPENDENCY_NAME;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
@@ -20,6 +26,7 @@ import org.mule.runtime.extension.api.annotation.Export;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Extensible;
 import org.mule.runtime.extension.api.annotation.Extension;
+import org.mule.runtime.extension.api.annotation.ExternalDependency;
 import org.mule.runtime.extension.api.annotation.ExternalLib;
 import org.mule.runtime.extension.api.annotation.OnException;
 import org.mule.runtime.extension.api.annotation.Operations;
@@ -67,6 +74,9 @@ import javax.inject.Inject;
 @ExternalLib(name = HeisenbergExtension.HEISENBERG_LIB_NAME, description = HeisenbergExtension.HEISENBERG_LIB_DESCRIPTION,
     fileName = HeisenbergExtension.HEISENBERG_LIB_FILE_NAME, requiredClassName = HeisenbergExtension.HEISENBERG_LIB_CLASS_NAME)
 @ErrorTypes(HeisenbergErrors.class)
+@ExternalDependency(name = HEISENBERG_DEPENDENCY_NAME, description = HEISENBERG_DEPENDENCY_DESCRIPTION,
+    groupId = HEISENBERG_DEPENDENCY_GROUP_ID, artifactId = HEISENBERG_DEPENDENCY_ARTIFACT_ID,
+    minVersion = HEISENBERG_DEPENDENCY_MIN_VERSION, maxVersion = HEISENBERG_DEPENDENCY_MAX_VERSION)
 public class HeisenbergExtension implements Lifecycle, MuleContextAware {
 
   public static final String HEISENBERG = "Heisenberg";
@@ -74,6 +84,13 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware {
   public static final String HEISENBERG_LIB_DESCRIPTION = "Native Heisenberg support";
   public static final String HEISENBERG_LIB_FILE_NAME = "heisenberg.so";
   public static final String HEISENBERG_LIB_CLASS_NAME = "org.heisenberg.HeisenbergJNI";
+
+  public static final String HEISENBERG_DEPENDENCY_NAME = "Heisenberg dependency";
+  public static final String HEISENBERG_DEPENDENCY_DESCRIPTION = "Maven Dependency support";
+  public static final String HEISENBERG_DEPENDENCY_GROUP_ID = "org.walther.white";
+  public static final String HEISENBERG_DEPENDENCY_ARTIFACT_ID = "metlab";
+  public static final String HEISENBERG_DEPENDENCY_MIN_VERSION = "0.9";
+  public static final String HEISENBERG_DEPENDENCY_MAX_VERSION = "1.5.1";
 
   public static final String AGE = "50";
   public static final String EXTENSION_DESCRIPTION = "My Test Extension just to unit test";

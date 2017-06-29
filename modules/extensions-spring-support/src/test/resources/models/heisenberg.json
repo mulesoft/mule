@@ -51,6 +51,16 @@
       "requiredClassName": "org.heisenberg.HeisenbergJNI"
     }
   ],
+  "externalDependencies": [
+    {
+      "groupId": "org.walther.white",
+      "artifactId": "metlab",
+      "minVersion": "0.9.0",
+      "maxVersion": "1.5.1",
+      "name": "Heisenberg dependency",
+      "description": "Maven Dependency support"
+    }
+  ],
   "importedTypes": [],
   "configurations": [
     {
