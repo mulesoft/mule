@@ -6,19 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java;
 
-import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.runtime.extension.api.annotation.privileged.DeclarationEnrichers;
-import org.mule.runtime.extension.api.loader.DeclarationEnricher;
-import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
-import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
-import org.mule.runtime.module.extension.internal.loader.enricher.*;
-import org.mule.runtime.module.extension.internal.loader.validation.*;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.function.BiFunction;
-
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
@@ -28,6 +15,43 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import org.mule.runtime.core.api.util.ClassUtils;
+import org.mule.runtime.extension.api.annotation.privileged.DeclarationEnrichers;
+import org.mule.runtime.extension.api.loader.DeclarationEnricher;
+import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
+import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
+import org.mule.runtime.module.extension.internal.loader.enricher.BooleanParameterDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.enricher.ConfigNameDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.enricher.ConnectionDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.enricher.DataTypeDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.enricher.DisplayDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.enricher.DynamicMetadataDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.enricher.ErrorsDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.enricher.ExtensionDescriptionsEnricher;
+import org.mule.runtime.module.extension.internal.loader.enricher.ExtensionsErrorsDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.enricher.ImportedTypesDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.enricher.JavaConfigurationDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.enricher.JavaExportedTypesDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.enricher.JavaOAuthDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.enricher.JavaXmlDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.enricher.ParameterLayoutOrderDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.enricher.SubTypesDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.validation.ConfigurationModelValidator;
+import org.mule.runtime.module.extension.internal.loader.validation.ConnectionProviderModelValidator;
+import org.mule.runtime.module.extension.internal.loader.validation.ExportedTypesModelValidator;
+import org.mule.runtime.module.extension.internal.loader.validation.JavaSubtypesModelValidator;
+import org.mule.runtime.module.extension.internal.loader.validation.MetadataComponentModelValidator;
+import org.mule.runtime.module.extension.internal.loader.validation.NullSafeModelValidator;
+import org.mule.runtime.module.extension.internal.loader.validation.OAuthConnectionProviderModelValidator;
+import org.mule.runtime.module.extension.internal.loader.validation.OperationParametersTypeModelValidator;
+import org.mule.runtime.module.extension.internal.loader.validation.OperationReturnTypeModelValidator;
+import org.mule.runtime.module.extension.internal.loader.validation.ParameterGroupModelValidator;
+import org.mule.runtime.module.extension.internal.loader.validation.ParameterTypeModelValidator;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.function.BiFunction;
 
 public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
 
@@ -47,7 +71,6 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
                                                                                          new OAuthConnectionProviderModelValidator()));
 
   private final List<DeclarationEnricher> customDeclarationEnrichers = unmodifiableList(asList(
-                                                                                               new ClassLoaderDeclarationEnricher(),
                                                                                                new JavaXmlDeclarationEnricher(),
                                                                                                new BooleanParameterDeclarationEnricher(),
                                                                                                new ConfigNameDeclarationEnricher(),
