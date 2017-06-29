@@ -6,10 +6,13 @@
  */
 package org.mule.runtime.core.routing;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.api.message.Message.of;
@@ -256,6 +259,39 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
     expectedException.expect(new FailingProcessorMatcher(foreach));
     expectedException.expectCause(instanceOf(ExpressionRuntimeException.class));
     process(foreach, eventBuilder().message(of(new DummyNestedIterableClass().iterator())).build(), false);
+  }
+
+  @Test
+  public void batchSize() throws Exception {
+    Foreach foreachMp = new Foreach();
+    foreachMp.setMuleContext(muleContext);
+    List<Processor> processors = getSimpleMessageProcessors(new TestMessageProcessor("zas"));
+    foreachMp.setMessageProcessors(processors);
+    foreachMp.setBatchSize(2);
+    foreachMp.initialise();
+
+    foreachMp.process(eventBuilder().message(of(asList(1, 2, 3))).build());
+
+    assertThat(processedEvents, hasSize(2));
+    assertThat(processedEvents.get(0).getMessageAsString(muleContext), is("[1, 2]:foo:zas"));
+    assertThat(processedEvents.get(1).getMessageAsString(muleContext), is("[3]:foo:zas"));
+  }
+
+  @Test
+  public void batchSizeWithCollectionAttributes() throws Exception {
+    Foreach foreachMp = new Foreach();
+    foreachMp.setMuleContext(muleContext);
+    List<Processor> processors = getSimpleMessageProcessors(new TestMessageProcessor("zas"));
+    foreachMp.setMessageProcessors(processors);
+    foreachMp.setBatchSize(2);
+    foreachMp.setCollectionExpression("collection");
+    foreachMp.initialise();
+
+    foreachMp.process(eventBuilder().addVariable("collection", asList(1, 2, 3)).message(of(null)).build());
+
+    assertThat(processedEvents, hasSize(2));
+    assertThat(processedEvents.get(0).getMessageAsString(muleContext), is("[1, 2]:foo:zas"));
+    assertThat(processedEvents.get(1).getMessageAsString(muleContext), is("[3]:foo:zas"));
   }
 
   private void assertSimpleProcessedMessages() {
