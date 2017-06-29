@@ -192,7 +192,7 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
 
     assertThat(library.getName(), is(HEISENBERG_LIB_NAME));
     assertThat(library.getDescription(), is(HEISENBERG_LIB_DESCRIPTION));
-    assertThat(library.getFileName().get(), is(HEISENBERG_LIB_FILE_NAME));
+    assertThat(library.getRegexMatcher().get(), is(HEISENBERG_LIB_FILE_NAME));
     assertThat(library.getRequiredClassName().get(), is(HEISENBERG_LIB_CLASS_NAME));
   }
 

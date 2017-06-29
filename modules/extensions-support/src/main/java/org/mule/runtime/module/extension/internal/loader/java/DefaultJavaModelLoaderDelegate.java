@@ -143,10 +143,10 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
 
     ExternalLibraryModelBuilder builder = ExternalLibraryModel.builder()
         .withName(externalLibAnnotation.name())
-        .withDescription(externalLibAnnotation.description());
+        .withDescription(externalLibAnnotation.description())
+        .withType(externalLibAnnotation.type());
 
-
-    ifNotBlank(externalLibAnnotation.fileName(), builder::withFileName);
+    ifNotBlank(externalLibAnnotation.nameRegexpMatcher(), builder::withRegexpMatcher);
     ifNotBlank(externalLibAnnotation.requiredClassName(), builder::withRequiredClassName);
 
     declarer.withExternalLibrary(builder.build());
