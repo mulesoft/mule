@@ -7,8 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.validation;
 
 import static java.lang.String.format;
-import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
-
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -20,9 +19,9 @@ import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * Validates that all {@link OperationModel operations} specify a valid return type.
@@ -33,7 +32,10 @@ import java.util.List;
  */
 public class OperationReturnTypeModelValidator implements ExtensionModelValidator {
 
-  private final List<Class<?>> illegalReturnTypes = ImmutableList.of(Event.class, Message.class);
+  private final Set<String> forbiddenTypes = ImmutableSet.<String>builder()
+      .add(Event.class.getName())
+      .add(Message.class.getName())
+      .build();
 
   @Override
   public void validate(ExtensionModel extensionModel, ProblemsReporter problemsReporter) {
@@ -45,16 +47,13 @@ public class OperationReturnTypeModelValidator implements ExtensionModelValidato
           throw missingReturnTypeException(extensionModel, operationModel);
         }
 
-        final Class<Object> returnType = getType(operationModel.getOutput().getType());
-
-        illegalReturnTypes.stream().filter(forbiddenType -> forbiddenType.isAssignableFrom(returnType)).findFirst()
-            .ifPresent(forbiddenType -> {
-              problemsReporter.addError(new Problem(operationModel, format(
-                                                                           "Operation '%s' in Extension '%s' specifies '%s' as a return type. Operations are "
-                                                                               + "not allowed to return objects of that type",
-                                                                           operationModel.getName(), extensionModel.getName(),
-                                                                           forbiddenType.getName())));
-            });
+        String id = getId(operationModel.getOutput().getType());
+        if (forbiddenTypes.contains(id)) {
+          problemsReporter.addError(new Problem(operationModel, format(
+                                                                       "Operation '%s' in Extension '%s' specifies '%s' as a return type. Operations are "
+                                                                           + "not allowed to return objects of that type",
+                                                                       operationModel.getName(), extensionModel.getName(), id)));
+        }
       }
     }.walk(extensionModel);
   }

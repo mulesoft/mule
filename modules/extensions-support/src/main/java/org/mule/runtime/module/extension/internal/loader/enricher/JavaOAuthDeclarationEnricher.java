@@ -60,10 +60,10 @@ import java.util.Set;
  */
 public class JavaOAuthDeclarationEnricher extends AbstractAnnotatedDeclarationEnricher {
 
-  private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
-  private final MetadataType stringType = typeLoader.load(String.class);
-  private final MetadataType voidType = typeLoader.load(Void.class);
-  private final MetadataType nullAttributesType = typeLoader.load(NullAttributes.class);
+  private final MetadataType stringType = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader().load(String.class);
+  private final MetadataType voidType = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader().load(Void.class);
+  private final MetadataType nullAttributesType =
+      ExtensionsTypeLoaderFactory.getDefault().createTypeLoader().load(NullAttributes.class);
 
   @Override
   public void enrich(ExtensionLoadingContext extensionLoadingContext) {

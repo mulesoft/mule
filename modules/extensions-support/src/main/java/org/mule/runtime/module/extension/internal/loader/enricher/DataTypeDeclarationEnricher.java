@@ -13,7 +13,7 @@ import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENC
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplementingMethod;
-import org.mule.metadata.api.ClassTypeLoader;
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
@@ -34,7 +34,7 @@ import org.mule.runtime.module.extension.internal.ExtensionProperties;
  */
 public final class DataTypeDeclarationEnricher extends AbstractAnnotatedDeclarationEnricher {
 
-  private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
+  private final MetadataType STRING_TYPE = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader().load(String.class);
 
   @Override
   public void enrich(ExtensionLoadingContext extensionLoadingContext) {
@@ -68,7 +68,7 @@ public final class DataTypeDeclarationEnricher extends AbstractAnnotatedDeclarat
     ParameterDeclaration parameter = new ParameterDeclaration(name);
     parameter.setRequired(false);
     parameter.setExpressionSupport(SUPPORTED);
-    parameter.setType(typeLoader.load(String.class), false);
+    parameter.setType(STRING_TYPE, false);
     parameter.setDescription(description);
     parameter.setLayoutModel(LayoutModel.builder().tabName(ADVANCED_TAB_NAME).build());
 
