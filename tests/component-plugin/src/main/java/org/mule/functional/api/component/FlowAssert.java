@@ -13,7 +13,7 @@ import java.util.TreeMap;
 
 public class FlowAssert {
 
-  private static Map<String, List<AssertionMessageProcessor>> assertions = new TreeMap<String, List<AssertionMessageProcessor>>();
+  private static Map<String, List<AssertionMessageProcessor>> assertions = new TreeMap<>();
 
   public static void verify() throws Exception {
     for (List<AssertionMessageProcessor> flowAssertions : assertions.values()) {
@@ -34,10 +34,12 @@ public class FlowAssert {
   }
 
   static void addAssertion(String flowName, AssertionMessageProcessor assertion) {
-    if (assertions.get(flowName) == null) {
-      assertions.put(flowName, new ArrayList<AssertionMessageProcessor>());
+    synchronized (assertions) {
+      if (assertions.get(flowName) == null) {
+        assertions.put(flowName, new ArrayList<AssertionMessageProcessor>());
+      }
+      assertions.get(flowName).add(assertion);
     }
-    assertions.get(flowName).add(assertion);
   }
 
   public static void reset() {
