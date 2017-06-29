@@ -61,7 +61,6 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     private MessageProcessor ownedMessageProcessor;
     private AbstractMessageSequenceSplitter splitter;
     private String collectionExpression;
-    private ExpressionConfig expressionConfig = new ExpressionConfig();
     private int batchSize;
     private String rootMessageVariableName;
     private String counterVariableName;
@@ -163,6 +162,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     {
         if (collectionExpression != null)
         {
+            ExpressionConfig expressionConfig = new ExpressionConfig();
             expressionConfig.setExpression(collectionExpression);
             checkEvaluator(expressionConfig);
             splitter = new ExpressionSplitter(expressionConfig);
