@@ -119,7 +119,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(cronSchedulerType.getFieldByName("timeZone").get().isRequired(), is(false));
     assertThat(cronSchedulerType.getFieldByName("timeZone").get().getValue(), instanceOf(DefaultStringType.class));
 
-    assertThat(coreExtensionModel.getExternalLibraryModels(), empty());
+    assertThat(coreExtensionModel.getExternalDependenciesModels(), empty());
     assertThat(coreExtensionModel.getImportedTypes(), empty());
     assertThat(coreExtensionModel.getConfigurationModels(), empty());
     assertThat(coreExtensionModel.getOperationModels(), hasSize(15));

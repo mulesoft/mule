@@ -16,28 +16,32 @@ import static org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoad
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.ExternalDependencyModel;
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
 import org.mule.runtime.api.meta.model.ExternalLibraryModel.ExternalLibraryModelBuilder;
 import org.mule.runtime.api.meta.model.declaration.fluent.Declarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.DeclaresExternalDependencies;
 import org.mule.runtime.api.meta.model.declaration.fluent.DeclaresExternalLibraries;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasModelProperties;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.annotation.Extension;
+import org.mule.runtime.extension.api.annotation.ExternalDependencies;
+import org.mule.runtime.extension.api.annotation.ExternalDependency;
 import org.mule.runtime.extension.api.annotation.ExternalLib;
 import org.mule.runtime.extension.api.annotation.ExternalLibs;
 import org.mule.runtime.extension.api.annotation.Operations;
-import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Config;
+import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
+import org.mule.runtime.extension.internal.property.LiteralModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.contributor.InfrastructureFieldContributor;
 import org.mule.runtime.module.extension.internal.loader.java.contributor.ParameterDeclarerContributor;
 import org.mule.runtime.module.extension.internal.loader.java.contributor.ParameterTypeUnwrapperContributor;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
-import org.mule.runtime.extension.internal.property.LiteralModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterResolverTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.TypedValueTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionElement;
@@ -115,6 +119,7 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
             .withModelProperty(new ImplementingTypeModelProperty(extensionType));
 
     parseExternalLibs(extensionElement, declarer);
+    parseExternalDependencies(extensionElement, declarer);
     addExceptionEnricher(extensionElement, declarer);
 
     configLoaderDelegate.declareConfigurations(declarer, extensionElement);
@@ -139,17 +144,39 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
     }
   }
 
+  void parseExternalDependencies(WithAnnotations withAnnotations, DeclaresExternalDependencies declarer) {
+    Optional<ExternalDependencies> externalLibs = withAnnotations.getAnnotation(ExternalDependencies.class);
+    if (externalLibs.isPresent()) {
+      stream(externalLibs.get().value()).forEach(lib -> parseExternalDependency(declarer, lib));
+    } else {
+      withAnnotations.getAnnotation(ExternalDependency.class).ifPresent(lib -> parseExternalDependency(declarer, lib));
+    }
+  }
+
   private void parseExternalLib(DeclaresExternalLibraries declarer, ExternalLib externalLibAnnotation) {
 
     ExternalLibraryModelBuilder builder = ExternalLibraryModel.builder()
         .withName(externalLibAnnotation.name())
         .withDescription(externalLibAnnotation.description());
 
-
     ifNotBlank(externalLibAnnotation.fileName(), builder::withFileName);
     ifNotBlank(externalLibAnnotation.requiredClassName(), builder::withRequiredClassName);
 
     declarer.withExternalLibrary(builder.build());
+  }
+
+  private void parseExternalDependency(DeclaresExternalDependencies declarer, ExternalDependency externalDependencyAnnotation) {
+
+    ExternalDependencyModel.ExternalDependencyModelBuilder builder = ExternalDependencyModel.builder()
+        .withName(externalDependencyAnnotation.name())
+        .withDescription(externalDependencyAnnotation.description());
+
+    ifNotBlank(externalDependencyAnnotation.artifactId(), builder::withArtifactId);
+    ifNotBlank(externalDependencyAnnotation.groupId(), builder::withGroupId);
+    ifNotBlank(externalDependencyAnnotation.minVersion(), builder::withMinVersion);
+    ifNotBlank(externalDependencyAnnotation.maxVersion(), builder::withMaxVersion);
+
+    declarer.withExternalDependency(builder.build());
   }
 
   <M extends WithAnnotations> HasModelProperties addExceptionEnricher(M model, HasModelProperties declarer) {

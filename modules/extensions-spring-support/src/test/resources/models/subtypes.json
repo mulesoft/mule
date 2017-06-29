@@ -60,6 +60,7 @@
     }
   ],
   "externalLibraries": [],
+  "externalDependencies": [],
   "importedTypes": [
     {
       "format": "java",
