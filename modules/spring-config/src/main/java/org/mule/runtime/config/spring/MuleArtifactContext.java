@@ -29,6 +29,7 @@ import static org.springframework.context.annotation.AnnotationConfigUtils.CONFI
 import static org.springframework.context.annotation.AnnotationConfigUtils.REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -65,6 +66,14 @@ import org.mule.runtime.core.registry.MuleRegistryHelper;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.module.extension.internal.config.ExtensionBuildingDefinitionProvider;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -87,13 +96,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.w3c.dom.Document;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-
 /**
  * <code>MuleArtifactContext</code> is a simple extension application context that allows resources to be loaded from the
  * Classpath of file system using the MuleBeanDefinitionReader.
@@ -111,6 +113,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
   private final Map<String, String> artifactProperties;
   private final ArtifactDeclaration artifactDeclaration;
   private final XmlConfigurationDocumentLoader xmlConfigurationDocumentLoader;
+  private final Optional<ConfigurationProperties> parentConfigurationProperties;
   protected ApplicationModel applicationModel;
   protected MuleContext muleContext;
   private Resource[] artifactConfigResources;
@@ -133,19 +136,23 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
    *        org.mule.runtime.config.spring.SpringRegistry
    * @param pluginsClassLoaders the classloades of the plugins included in the artifact, on hwich contexts the parsers will
    *        process.
+   * @param parentConfigurationProperties
    * @since 3.7.0
    */
   public MuleArtifactContext(MuleContext muleContext, ConfigResource[] artifactConfigResources,
                              ArtifactDeclaration artifactDeclaration, OptionalObjectsController optionalObjectsController,
                              Map<String, String> artifactProperties, ArtifactType artifactType,
-                             List<ClassLoader> pluginsClassLoaders)
+                             List<ClassLoader> pluginsClassLoaders,
+                             Optional<ConfigurationProperties> parentConfigurationProperties)
       throws BeansException {
-    this(muleContext, convert(artifactConfigResources), artifactDeclaration, optionalObjectsController, artifactProperties,
+    this(muleContext, convert(artifactConfigResources), artifactDeclaration, optionalObjectsController,
+         parentConfigurationProperties, artifactProperties,
          artifactType, pluginsClassLoaders);
   }
 
   public MuleArtifactContext(MuleContext muleContext, Resource[] artifactConfigResources,
                              ArtifactDeclaration artifactDeclaration, OptionalObjectsController optionalObjectsController,
+                             Optional<ConfigurationProperties> parentConfigurationProperties,
                              Map<String, String> artifactProperties, ArtifactType artifactType,
                              List<ClassLoader> pluginsClassLoaders) {
     checkArgument(optionalObjectsController != null, "optionalObjectsController cannot be null");
@@ -155,6 +162,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
     this.artifactProperties = artifactProperties;
     this.artifactType = artifactType;
     this.artifactDeclaration = artifactDeclaration;
+    this.parentConfigurationProperties = parentConfigurationProperties;
     this.xmlConfigurationDocumentLoader = newXmlConfigurationDocumentLoader();
 
     serviceRegistry.lookupProviders(ComponentBuildingDefinitionProvider.class, MuleArtifactContext.class.getClassLoader())
@@ -221,7 +229,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
   private void createApplicationModel() {
     try {
       ArtifactConfig.Builder applicationConfigBuilder = new ArtifactConfig.Builder();
-      applicationConfigBuilder.setApplicationProperties(this.artifactProperties);
+      applicationConfigBuilder.setArtifactProperties(this.artifactProperties);
       for (Resource springResource : artifactConfigResources) {
         Document document =
             xmlConfigurationDocumentLoader.loadDocument(muleContext.getExtensionManager() == null ? emptySet()
@@ -234,8 +242,10 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
       applicationConfigBuilder.setApplicationName(muleContext.getConfiguration().getId());
       Set<ExtensionModel> extensions =
           muleContext.getExtensionManager() != null ? muleContext.getExtensionManager().getExtensions() : emptySet();
-      applicationModel = new ApplicationModel(applicationConfigBuilder.build(), artifactDeclaration,
-                                              extensions, of(componentBuildingDefinitionRegistry), true);
+      applicationModel = new ApplicationModel(applicationConfigBuilder.build(), artifactDeclaration, extensions,
+                                              artifactProperties, parentConfigurationProperties,
+                                              of(componentBuildingDefinitionRegistry),
+                                              true);
     } catch (Exception e) {
       throw new MuleRuntimeException(e);
     }
@@ -377,7 +387,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
   @Override
   protected void customizeBeanFactory(DefaultListableBeanFactory beanFactory) {
     super.customizeBeanFactory(beanFactory);
-    new SpringMuleContextServiceConfigurator(muleContext, applicationModel.getArtifactProperties(), artifactType,
+    new SpringMuleContextServiceConfigurator(muleContext, applicationModel.getConfigurationProperties(), artifactType,
                                              optionalObjectsController, beanFactory, componentLocator)
                                                  .createArtifactServices();
   }

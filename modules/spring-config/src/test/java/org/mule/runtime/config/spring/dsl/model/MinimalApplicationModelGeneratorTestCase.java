@@ -6,8 +6,10 @@
  */
 package org.mule.runtime.config.spring.dsl.model;
 
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
+import static java.util.Optional.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
@@ -17,9 +19,6 @@ import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.component.location.Location.builder;
 import static org.mule.runtime.config.spring.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.config.spring.XmlConfigurationDocumentLoader;
@@ -29,6 +28,10 @@ import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
 import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationParser;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -226,6 +229,7 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
     configFiles.stream().forEach(configFile -> builder.addConfigFile(configFile));
     final ArtifactConfig artifactConfig = builder.build();
     return new MinimalApplicationModelGenerator(new ApplicationModel(artifactConfig, new ArtifactDeclaration(), emptySet(),
+                                                                     emptyMap(), empty(),
                                                                      Optional.of(componentBuildingDefinitionRegistry), true),
                                                 componentBuildingDefinitionRegistry);
   }

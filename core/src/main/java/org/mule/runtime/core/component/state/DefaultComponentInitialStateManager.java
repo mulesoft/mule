@@ -6,9 +6,8 @@
  */
 package org.mule.runtime.core.component.state;
 
-import static java.lang.Boolean.parseBoolean;
 import static org.mule.runtime.api.source.SchedulerMessageSource.SCHEDULER_MESSAGE_SOURCE_IDENTIFIER;
-import org.mule.runtime.api.artifact.ArtifactProperties;
+import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.meta.AnnotatedObject;
 
@@ -20,13 +19,13 @@ import javax.inject.Inject;
 public class DefaultComponentInitialStateManager implements ComponentInitialStateManager {
 
   @Inject
-  private ArtifactProperties artifactProperties;
+  private ConfigurationProperties configurationProperties;
 
   @Override
   public boolean mustStartMessageSource(AnnotatedObject component) {
-    if (artifactProperties.getProperty(DISABLE_SCHEDULER_SOURCES_PROPERTY) != null) {
+    if (configurationProperties.resolveProperty(DISABLE_SCHEDULER_SOURCES_PROPERTY).isPresent()) {
       if (component.getLocation().getComponentIdentifier().getIdentifier().equals(SCHEDULER_MESSAGE_SOURCE_IDENTIFIER)) {
-        return !parseBoolean(artifactProperties.getProperty(DISABLE_SCHEDULER_SOURCES_PROPERTY));
+        return !configurationProperties.resolveBooleanProperty(DISABLE_SCHEDULER_SOURCES_PROPERTY).orElse(false);
       }
     }
     return true;

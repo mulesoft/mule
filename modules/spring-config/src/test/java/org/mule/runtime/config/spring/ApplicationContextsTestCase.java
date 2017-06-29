@@ -16,7 +16,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.builders.DefaultsConfigurationBuilder;
@@ -143,25 +142,6 @@ public class ApplicationContextsTestCase extends AbstractMuleTestCase {
     appContext = new ClassPathXmlApplicationContext("application-context.xml");
     builder = new SpringConfigurationBuilder(appContext);
     builder.configure(context);
-
-    context.start();
-
-    Object orange = context.getRegistry().lookupObject("orange");
-    assertNotNull(orange);
-    assertTrue(orange instanceof Orange);
-    assertEquals("Pirulo", ((Orange) orange).getBrand());
-  }
-
-  /**
-   * Test that an existing appContext can be used as a parent AppContext for Mule
-   */
-  @Test
-  public void testParentContext() throws Exception {
-    ApplicationContext appContext = new ClassPathXmlApplicationContext("application-context.xml");
-
-    SpringXmlConfigurationBuilder builder = new SpringXmlConfigurationBuilder("mule-config.xml");
-    builder.setParentContext(appContext);
-    context = new DefaultMuleContextFactory().createMuleContext(testServicesConfigurationBuilder, builder);
 
     context.start();
 

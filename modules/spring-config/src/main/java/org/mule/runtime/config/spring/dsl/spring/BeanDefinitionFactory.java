@@ -14,9 +14,11 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.ANNOTATIONS_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.CONFIGURATION_IDENTIFIER;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.CONFIGURATION_PROPERTIES;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.DESCRIPTION_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.DOC_DESCRIPTION_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.ERROR_MAPPING_IDENTIFIER;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.GLOBAL_PROPERTY_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.INTERCEPTOR_STACK_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_DOMAIN_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_EE_DOMAIN_IDENTIFIER;
@@ -28,7 +30,6 @@ import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SECURITY
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SPRING_ENTRY_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SPRING_LIST_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SPRING_MAP_IDENTIFIER;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SPRING_PROPERTY_PLACEHOLDER_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SPRING_VALUE_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.from;
 import static org.mule.runtime.config.spring.dsl.spring.CommonBeanDefinitionCreator.adaptFilterBeanDefinitions;
@@ -42,7 +43,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_
 import static org.mule.runtime.core.component.ComponentAnnotations.ANNOTATION_NAME;
 import static org.mule.runtime.core.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
 import static org.mule.runtime.core.internal.exception.ErrorMapping.ANNOTATION_ERROR_MAPPINGS;
-
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.ErrorType;
@@ -50,13 +50,13 @@ import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.config.spring.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.processor.AbstractAttributeDefinitionVisitor;
+import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
+import org.mule.runtime.core.api.exception.ErrorTypeRepository;
+import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.internal.exception.ErrorMapping;
-import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
-import org.mule.runtime.core.api.exception.ErrorTypeRepository;
-import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.dsl.api.component.AttributeDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
@@ -104,7 +104,8 @@ public class BeanDefinitionFactory {
           .add(DESCRIPTION_IDENTIFIER)
           .add(ANNOTATIONS_ELEMENT_IDENTIFIER)
           .add(DOC_DESCRIPTION_IDENTIFIER)
-          .add(SPRING_PROPERTY_PLACEHOLDER_IDENTIFIER)
+          .add(GLOBAL_PROPERTY_IDENTIFIER)
+          .add(CONFIGURATION_PROPERTIES)
           .build();
 
   /**

@@ -96,13 +96,6 @@
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
-            <xsd:element ref="spring-context:property-placeholder">
-                <xsd:annotation>
-                    <xsd:documentation>
-                        Allows Spring property placeholders to be configured directly in the Mule configuration file.
-                    </xsd:documentation>
-                </xsd:annotation>
-            </xsd:element>
             <xsd:element ref="spring:ref">
                 <xsd:annotation>
                     <xsd:documentation>
@@ -148,6 +141,31 @@
     <xsd:complexType name="descriptionType">
         <xsd:complexContent mixed="true">
             <xsd:extension base="xsd:anyType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="configuration-properties" type="configurationPropertiesType" substitutionGroup="abstract-shared-extension">
+        <xsd:annotation>
+            <xsd:documentation>
+                References a file with configuration properties. Each property has a key and a value. The key can be referenced
+                from the mule configuration files using the following semantics:  ${key_name}. This allows to externalize configuration and change it based
+                on the environment the application is being deployed to.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="configurationPropertiesType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractExtensionType">
+                <xsd:attribute name="file" type="substitutableString" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The location of the file with the configuration properties to use. It may be a location in the classpath or an absolute location. The file location
+                            value may also contains references to properties that will only be resolved based on system properties or properties set at deployment time.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 

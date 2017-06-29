@@ -358,6 +358,22 @@ public interface AllureConstants {
 
   }
 
+  interface ConfigurationProperties {
+
+    String CONFIGURATION_PROPERTIES = "Configuration properties";
+
+    interface ComponentConfigurationAttributesStory {
+
+      String CONFIGURATION_PROPERTIES_RESOLVER_STORY = "Component configuration properties resolver story";
+
+      String COMPONENT_CONFIGURATION_PROPERTIES_STORY = "Component configuration properties story";
+
+      String COMPONENT_CONFIGURATION_YAML_STORY = "Component configuration properties with YAML story";
+
+    }
+
+  }
+
   interface InterceptonApi {
 
     String INTERCEPTION_API = "Interception API";

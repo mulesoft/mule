@@ -36,8 +36,8 @@ import org.springframework.beans.factory.config.BeanReference;
  * configuration element this object represents is identified by a {@link ComponentIdentifier} that can be retrieved using
  * {@code #getName}.
  * <p/>
- * It may have simple configuration parameters which are retrieve by using {@code #getParameterGroups} or complex parameters which are
- * retrieved using {@code #getInnerComponents}.
+ * It may have simple configuration parameters which are retrieve by using {@code #getParameterGroups} or complex parameters which
+ * are retrieved using {@code #getInnerComponents}.
  * <p/>
  * There's a set of configuration attributes or custom attributes that may not be mapped directly to the object that runs on
  * runtime but may be hold by a {@code ComponentModel}. Those attributes are retrieved by using {@code #getCustomAttributes}.
@@ -162,7 +162,7 @@ public class ComponentModel {
    * @return the value of the name attribute.
    */
   public String getNameAttribute() {
-    return parameters.get(NAME_ATTRIBUTE);
+    return (String) parameters.get(NAME_ATTRIBUTE);
   }
 
   /**
@@ -272,8 +272,9 @@ public class ComponentModel {
     public Builder() {}
 
     /**
-     * Creates an instance of the Builder which will allow to merge other root component models to the given one.
-     * The root component model provided here will be modified instead of cloned.
+     * Creates an instance of the Builder which will allow to merge other root component models to the given one. The root
+     * component model provided here will be modified instead of cloned.
+     * 
      * @param root {@link ComponentModel} to be used as root. It will be modified.
      */
     public Builder(ComponentModel root) {
@@ -378,6 +379,7 @@ public class ComponentModel {
     /**
      * Given the following root component it will merge its customAttributes, parameters and schemaValueParameters to the root
      * component model.
+     * 
      * @param otherRootComponentModel another component model created as root to be merged.
      * @return the builder.
      */

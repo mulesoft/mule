@@ -15,15 +15,13 @@ import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.VALUE_AT
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.from;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.to;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
-import org.mule.runtime.api.artifact.ArtifactProperties;
 import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
 import org.mule.runtime.config.spring.dsl.processor.SimpleConfigAttribute;
+import org.mule.runtime.core.component.config.ConfigurationPropertiesResolver;
 
 import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
-
-import org.springframework.util.PropertyPlaceholderHelper;
 
 /**
  * Class used to read xml files from {@link ConfigLine}s, unifying knowledge on how to properly read the files returning the
@@ -33,12 +31,10 @@ import org.springframework.util.PropertyPlaceholderHelper;
  */
 public class ComponentModelReader {
 
-  private PropertyPlaceholderHelper propertyPlaceholderHelper = new PropertyPlaceholderHelper("${", "}");
-  private Properties applicationProperties;
+  private final ConfigurationPropertiesResolver configurationPropertiesResolver;
 
-  public ComponentModelReader(ArtifactProperties artifactProperties) {
-    this.applicationProperties = new Properties();
-    this.applicationProperties.putAll(artifactProperties.toImmutableMap());
+  public ComponentModelReader(ConfigurationPropertiesResolver configurationPropertiesResolver) {
+    this.configurationPropertiesResolver = configurationPropertiesResolver;
   }
 
   public ComponentModel extractComponentDefinitionModel(ConfigLine configLine, String configFileName) {
@@ -82,7 +78,8 @@ public class ComponentModelReader {
   }
 
   private String resolveValueIfIsPlaceHolder(String value) {
-    return propertyPlaceholderHelper.replacePlaceholders(value, applicationProperties);
+    Object resolvedValue = configurationPropertiesResolver.resolveValue(value);
+    return resolvedValue instanceof String ? (String) resolvedValue : (resolvedValue != null ? resolvedValue.toString() : null);
   }
 
   private boolean isConfigurationTopComponent(ConfigLine parent) {

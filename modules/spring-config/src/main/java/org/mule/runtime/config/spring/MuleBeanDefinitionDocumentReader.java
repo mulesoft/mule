@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.config.spring;
 
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
+import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -17,16 +19,17 @@ import org.mule.runtime.config.spring.dsl.processor.ConfigFile;
 import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
 import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationParser;
 import org.mule.runtime.config.spring.dsl.spring.BeanDefinitionFactory;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Stack;
+
 import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
 import org.springframework.beans.factory.xml.DefaultBeanDefinitionDocumentReader;
 import org.springframework.beans.factory.xml.XmlReaderContext;
 import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Stack;
 
 /**
  * Allows us to hook in our own Hierarchical Parser delegate. this enables the parsing of custom spring bean elements nested
@@ -84,7 +87,7 @@ public class MuleBeanDefinitionDocumentReader extends DefaultBeanDefinitionDocum
       configLines.add(xmlApplicationParser.parse(root).get());
       ArtifactConfig artifactConfig = new ArtifactConfig.Builder()
           .addConfigFile(new ConfigFile(getConfigFileIdentifier(getReaderContext().getResource()), configLines)).build();
-      applicationModelStack.push(new ApplicationModel(artifactConfig, new ArtifactDeclaration(), emptySet(),
+      applicationModelStack.push(new ApplicationModel(artifactConfig, new ArtifactDeclaration(), emptySet(), emptyMap(), empty(),
                                                       of(componentBuildingDefinitionRegistry), true));
     } catch (Exception e) {
       throw new MuleRuntimeException(e);

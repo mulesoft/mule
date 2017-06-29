@@ -8,8 +8,6 @@ package org.mule.runtime.config.spring.dsl.model;
 
 import static com.google.common.base.Joiner.on;
 import static java.lang.String.format;
-import static java.lang.System.getProperties;
-import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
@@ -19,6 +17,7 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections.CollectionUtils.disjunction;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.from;
@@ -29,41 +28,54 @@ import static org.mule.runtime.extension.api.util.NameUtils.pluralize;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.DOMAIN_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.EE_DOMAIN_PREFIX;
-
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.app.declaration.ElementDeclaration;
-import org.mule.runtime.api.artifact.ArtifactProperties;
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.component.ConfigurationProperties;
+import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.config.spring.dsl.model.extension.xml.MacroExpansionModuleModel;
 import org.mule.runtime.config.spring.dsl.processor.ArtifactConfig;
 import org.mule.runtime.config.spring.dsl.processor.ConfigFile;
+import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
 import org.mule.runtime.config.spring.dsl.processor.ObjectTypeVisitor;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.core.internal.config.artifact.DefaultArtifactProperties;
+import org.mule.runtime.core.component.config.CompositeConfigurationPropertiesProvider;
+import org.mule.runtime.core.component.config.ConfigurationPropertiesComponent;
+import org.mule.runtime.core.component.config.ConfigurationPropertiesProvider;
+import org.mule.runtime.core.component.config.ConfigurationPropertiesResolver;
+import org.mule.runtime.core.component.config.ConfigurationProperty;
+import org.mule.runtime.core.component.config.DefaultConfigurationPropertiesResolver;
+import org.mule.runtime.core.component.config.GlobalPropertyConfigurationPropertiesProvider;
+import org.mule.runtime.core.component.config.MapConfigurationPropertiesResolver;
+import org.mule.runtime.core.component.config.PropertiesResolverConfigurationProperties;
+import org.mule.runtime.core.component.config.SystemPropertiesConfigurationProvider;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
+import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Properties;
 import java.util.Set;
 import java.util.function.Consumer;
 
-import org.springframework.util.PropertyPlaceholderHelper;
+import javax.xml.namespace.QName;
+
+import org.springframework.core.env.ConfigurablePropertyResolver;
 import org.w3c.dom.Node;
 
 /**
@@ -132,9 +144,9 @@ public class ApplicationModel {
   public static final String HTTP_TRANSPORT_NAMESPACE = "http-transport";
   public static final String BATCH_NAMESPACE = "batch";
   public static final String PARSER_TEST_NAMESPACE = "parsers-test";
-  public static final String PROPERTY_PLACEHOLDER_ELEMENT = "property-placeholder";
   public static final String GLOBAL_PROPERTY = "global-property";
   public static final String SECURITY_MANAGER = "security-manager";
+  public static final String CONFIGURATION_PROPERTIES_ELEMENT = "configuration-properties";
   public static final String SPRING_ENTRY_ELEMENT = "entry";
   public static final String SPRING_LIST_ELEMENT = "list";
   public static final String SPRING_MAP_ELEMENT = "map";
@@ -176,9 +188,6 @@ public class ApplicationModel {
       builder().withNamespace(CORE_PREFIX).withName(CONFIGURATION_ELEMENT).build();
   public static final ComponentIdentifier CUSTOM_TRANSFORMER_IDENTIFIER =
       builder().withNamespace(CORE_PREFIX).withName(CUSTOM_TRANSFORMER).build();
-  public static final ComponentIdentifier SPRING_PROPERTY_PLACEHOLDER_IDENTIFIER =
-      builder().withNamespace(SPRING_CONTEXT_NAMESPACE).withName(PROPERTY_PLACEHOLDER_ELEMENT)
-          .build();
   public static final ComponentIdentifier DOC_DESCRIPTION_IDENTIFIER =
       builder().withNamespace(DOC_NAMESPACE).withName(DESCRIPTION_ELEMENT).build();
   public static final ComponentIdentifier DESCRIPTION_IDENTIFIER =
@@ -211,6 +220,8 @@ public class ApplicationModel {
       builder().withNamespace(CORE_PREFIX).withName(GLOBAL_PROPERTY).build();
   public static final ComponentIdentifier SECURITY_MANAGER_IDENTIFIER =
       builder().withNamespace(CORE_PREFIX).withName(SECURITY_MANAGER).build();
+  public static final ComponentIdentifier CONFIGURATION_PROPERTIES =
+      builder().withNamespace(CORE_PREFIX).withName(CONFIGURATION_PROPERTIES_ELEMENT).build();
   public static final ComponentIdentifier MODULE_OPERATION_CHAIN =
       builder().withNamespace(CORE_PREFIX).withName(MODULE_OPERATION_CHAIN_ELEMENT).build();
 
@@ -281,8 +292,7 @@ public class ApplicationModel {
   private final Optional<ComponentBuildingDefinitionRegistry> componentBuildingDefinitionRegistry;
   private List<ComponentModel> muleComponentModels = new LinkedList<>();
   private List<ComponentModel> springComponentModels = new LinkedList<>();
-  private PropertyPlaceholderHelper propertyPlaceholderHelper = new PropertyPlaceholderHelper("${", "}");
-  private ArtifactProperties artifactProperties;
+  private PropertiesResolverConfigurationProperties configurationProperties;
 
   /**
    * Creates an {code ApplicationModel} from a {@link ArtifactConfig}.
@@ -294,7 +304,8 @@ public class ApplicationModel {
    * @throws Exception when the application configuration has semantic errors.
    */
   public ApplicationModel(ArtifactConfig artifactConfig, ArtifactDeclaration artifactDeclaration) throws Exception {
-    this(artifactConfig, artifactDeclaration, emptySet(), of(new ComponentBuildingDefinitionRegistry()), true);
+    this(artifactConfig, artifactDeclaration, emptySet(), emptyMap(), empty(), of(new ComponentBuildingDefinitionRegistry()),
+         true);
   }
 
   /**
@@ -305,6 +316,8 @@ public class ApplicationModel {
    * @param artifactConfig the mule artifact configuration content.
    * @param artifactDeclaration an {@link ArtifactDeclaration}
    * @param extensionModels Set of {@link ExtensionModel extensionModels} that will be used to type componentModels
+   * @param parentConfigurationProperties the {@link ConfigurablePropertyResolver} of the parent artifact. For instance,
+   *        application will receive the domain resolver.
    * @param componentBuildingDefinitionRegistry an optional {@link ComponentBuildingDefinitionRegistry} used to correlate items in
    *        this model to their definitions
    * @param runtimeMode true implies the mule application should behave as a runtime app (e.g.: smart connectors will be macro
@@ -314,12 +327,14 @@ public class ApplicationModel {
   // TODO: MULE-9638 remove this optional
   public ApplicationModel(ArtifactConfig artifactConfig, ArtifactDeclaration artifactDeclaration,
                           Set<ExtensionModel> extensionModels,
+                          Map<String, String> deploymentProperties,
+                          Optional<ConfigurationProperties> parentConfigurationProperties,
                           Optional<ComponentBuildingDefinitionRegistry> componentBuildingDefinitionRegistry,
                           boolean runtimeMode)
       throws Exception {
 
     this.componentBuildingDefinitionRegistry = componentBuildingDefinitionRegistry;
-    configurePropertyPlaceholderResolver(artifactConfig);
+    createConfigurationAttributeResolver(artifactConfig, parentConfigurationProperties, deploymentProperties);
     convertConfigFileToComponentModel(artifactConfig);
     convertArtifactDeclarationToComponentModel(extensionModels, artifactDeclaration);
     validateModel(componentBuildingDefinitionRegistry);
@@ -329,6 +344,96 @@ public class ApplicationModel {
     }
     resolveComponentTypes();
     executeOnEveryMuleComponentTree(new ComponentLocationVisitor());
+  }
+
+  private void createConfigurationAttributeResolver(ArtifactConfig artifactConfig,
+                                                    Optional<ConfigurationProperties> parentConfigurationProperties,
+                                                    Map<String, String> deploymentProperties) {
+
+    SystemPropertiesConfigurationProvider systemPropertiesConfigurationProvider = new SystemPropertiesConfigurationProvider();
+    DefaultConfigurationPropertiesResolver localResolver =
+        new DefaultConfigurationPropertiesResolver(empty(), systemPropertiesConfigurationProvider);
+    List<ConfigurationPropertiesProvider> configConfigurationPropertiesProviders =
+        getConfigurationPropertiesProvidersFromComponents(artifactConfig, localResolver);
+
+    Optional<ConfigurationPropertiesResolver> parentConfigurationPropertiesResolver = of(localResolver);
+    if (parentConfigurationProperties.isPresent()) {
+      parentConfigurationPropertiesResolver =
+          of(new DefaultConfigurationPropertiesResolver(empty(), new ConfigurationPropertiesProvider() {
+
+            @Override
+            public Optional<ConfigurationProperty> getConfigurationProperty(String configurationAttributeKey) {
+              return parentConfigurationProperties.get().resolveProperty(configurationAttributeKey)
+                  .map(value -> new ConfigurationProperty(parentConfigurationProperties, configurationAttributeKey, value));
+            }
+
+            @Override
+            public String getDescription() {
+              return "Domain properties";
+            }
+          }));
+    }
+
+    if (!configConfigurationPropertiesProviders.isEmpty()) {
+      CompositeConfigurationPropertiesProvider configurationAttributesProvider =
+          new CompositeConfigurationPropertiesProvider(configConfigurationPropertiesProviders);
+      parentConfigurationPropertiesResolver = of(new DefaultConfigurationPropertiesResolver(parentConfigurationPropertiesResolver,
+                                                                                            configurationAttributesProvider));
+
+    }
+    ConfigurationPropertiesProvider globalPropertiesConfigurationAttributeProvider =
+        createResolverFromGlobalProperties(artifactConfig);
+    DefaultConfigurationPropertiesResolver globalPropertiesConfigurationPropertiesResolver =
+        new DefaultConfigurationPropertiesResolver(parentConfigurationPropertiesResolver,
+                                                   globalPropertiesConfigurationAttributeProvider);
+    DefaultConfigurationPropertiesResolver systemPropertiesResolver =
+        new DefaultConfigurationPropertiesResolver(of(globalPropertiesConfigurationPropertiesResolver),
+                                                   systemPropertiesConfigurationProvider);
+    if (deploymentProperties.isEmpty()) {
+      this.configurationProperties = new PropertiesResolverConfigurationProperties(systemPropertiesResolver);
+    } else {
+      this.configurationProperties =
+          new PropertiesResolverConfigurationProperties(new DefaultConfigurationPropertiesResolver(of(systemPropertiesResolver),
+                                                                                                   new MapConfigurationPropertiesResolver(deploymentProperties,
+                                                                                                                                          "Deployment properties")));
+    }
+  }
+
+  private List<ConfigurationPropertiesProvider> getConfigurationPropertiesProvidersFromComponents(ArtifactConfig artifactConfig,
+                                                                                                  DefaultConfigurationPropertiesResolver localResolver) {
+    List<ConfigurationPropertiesProvider> configConfigurationPropertiesProviders = new ArrayList<>();
+    artifactConfig.getConfigFiles().stream()
+        .forEach(configFile -> configFile.getConfigLines().stream()
+            .forEach(configLine -> {
+              for (ConfigLine componentConfigLine : configLine.getChildren()) {
+                if (componentConfigLine.getNamespace() != null && componentConfigLine.getNamespace().equals(CORE_PREFIX)
+                    && componentConfigLine.getIdentifier().equals(ApplicationModel.CONFIGURATION_PROPERTIES_ELEMENT)) {
+                  String fileLocation = componentConfigLine.getConfigAttributes().get("file").getValue();
+                  ConfigurationPropertiesComponent propertiesComponent =
+                      new ConfigurationPropertiesComponent(localResolver.resolveValue(fileLocation).toString());
+                  DefaultComponentLocation.DefaultLocationPart locationPart =
+                      new DefaultComponentLocation.DefaultLocationPart(CONFIGURATION_PROPERTIES_ELEMENT,
+                                                                       of(TypedComponentIdentifier.builder()
+                                                                           .withType(ComponentType.GLOBAL)
+                                                                           .withIdentifier(CONFIGURATION_PROPERTIES)
+                                                                           .build()),
+                                                                       of(configFile.getFilename()),
+                                                                       of(configLine.getLineNumber()));
+                  propertiesComponent.setAnnotations(ImmutableMap
+                      .<QName, Object>builder().put(AbstractAnnotatedObject.LOCATION_KEY,
+                                                    new DefaultComponentLocation(of(CONFIGURATION_PROPERTIES_ELEMENT),
+                                                                                 Collections.singletonList(locationPart)))
+                      .build());
+                  configConfigurationPropertiesProviders.add(propertiesComponent);
+                  try {
+                    propertiesComponent.initialise();
+                  } catch (InitialisationException e) {
+                    throw new MuleRuntimeException(e);
+                  }
+                }
+              }
+            }));
+    return configConfigurationPropertiesProviders;
   }
 
   /**
@@ -419,45 +524,22 @@ public class ApplicationModel {
   }
 
 
-  private void configurePropertyPlaceholderResolver(ArtifactConfig artifactConfig) {
-    // TODO MULE-9825: a new mechanism for property placeholders need to be defined
-    final List<String> locations = new ArrayList<>();
-    final Map<String, String> globalProperties = new HashMap<>();
+  private ConfigurationPropertiesProvider createResolverFromGlobalProperties(ArtifactConfig artifactConfig) {
+    final Map<String, ConfigurationProperty> globalProperties = new HashMap<>();
+
     artifactConfig.getConfigFiles().stream().forEach(configFile -> {
       configFile.getConfigLines().get(0).getChildren().stream().forEach(configLine -> {
         if (GLOBAL_PROPERTY.equals(configLine.getIdentifier())) {
-          globalProperties.put(configLine.getConfigAttributes().get("name").getValue(),
-                               configLine.getConfigAttributes().get("value").getValue());
-        } else if (PROPERTY_PLACEHOLDER_ELEMENT.equals(configLine.getIdentifier())) {
-          String locationValue;
-          try {
-            locationValue = configLine.getConfigAttributes().get("location").getValue();
-          } catch (NullPointerException e) {
-            throw new MuleRuntimeException(createStaticMessage("location attribute not defined in " + configFile.getFilename()
-                + ":" + configLine.getLineNumber()));
-          }
-          locationValue = propertyPlaceholderHelper.replacePlaceholders(locationValue, getProperties());
-          locationValue = locationValue.replace("classpath:/", "");
-          locations.add(locationValue);
+          String key = configLine.getConfigAttributes().get("name").getValue();
+          String rawValue = configLine.getConfigAttributes().get("value").getValue();
+          globalProperties.put(key,
+                               new ConfigurationProperty(format("global-property - file: %s - lineNumber %s",
+                                                                configFile.getFilename(), configLine.getLineNumber()),
+                                                         key, rawValue));
         }
       });
     });
-    ImmutableMap.Builder<Object, Object> springProperties = ImmutableMap.builder();
-    for (String propertyFileLocation : locations) {
-      Properties properties = new Properties();
-      try (InputStream propertiesFileInputStream =
-          currentThread().getContextClassLoader().getResourceAsStream(propertyFileLocation)) {
-        properties.load(propertiesFileInputStream);
-        springProperties.putAll(properties);
-      } catch (NullPointerException e) {
-        throw new MuleRuntimeException(createStaticMessage("properties file " + propertyFileLocation + " does not exist"));
-      } catch (IOException e) {
-        throw new MuleRuntimeException(e);
-      }
-    }
-    Map<String, String> applicationProperties = artifactConfig.getApplicationProperties();
-    artifactProperties = new DefaultArtifactProperties(ImmutableMap.builder().putAll(globalProperties).build(), springProperties
-        .build(), applicationProperties != null ? ImmutableMap.builder().putAll(applicationProperties).build() : emptyMap());
+    return new GlobalPropertyConfigurationPropertiesProvider(globalProperties);
   }
 
   /**
@@ -479,7 +561,8 @@ public class ApplicationModel {
 
   private void convertConfigFileToComponentModel(ArtifactConfig artifactConfig) {
     List<ConfigFile> configFiles = artifactConfig.getConfigFiles();
-    ComponentModelReader componentModelReader = new ComponentModelReader(artifactProperties);
+    ComponentModelReader componentModelReader =
+        new ComponentModelReader(configurationProperties.getConfigurationPropertiesResolver());
     configFiles.stream().forEach(configFile -> {
       ComponentModel componentModel =
           componentModelReader.extractComponentDefinitionModel(configFile.getConfigLines().get(0), configFile.getFilename());
@@ -818,10 +901,10 @@ public class ApplicationModel {
   }
 
   /**
-   * @return the configured properties for the artifact.
+   * @return the attributes resolver for this artifact.
    */
-  public ArtifactProperties getArtifactProperties() {
-    return artifactProperties;
+  public ConfigurationProperties getConfigurationProperties() {
+    return configurationProperties;
   }
 }
 

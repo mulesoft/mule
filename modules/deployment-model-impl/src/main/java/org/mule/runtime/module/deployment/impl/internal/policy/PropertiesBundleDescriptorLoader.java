@@ -21,7 +21,7 @@ import java.util.Map;
  */
 public class PropertiesBundleDescriptorLoader implements BundleDescriptorLoader {
 
-  public static final String PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID = "PROPERTIES";
+  public static final String PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID = "PROPERTIES_EXTENSION";
 
   public static final String VERSION = "version";
   public static final String GROUP_ID = "groupId";

@@ -7,7 +7,6 @@
 package org.mule.runtime.module.deployment.impl.internal.application;
 
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
-import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.DEFAULT_ARTIFACT_PROPERTIES_RESOURCE;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE_LOCATION;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.MULE_APPLICATION_JSON;
@@ -55,8 +54,6 @@ public class ApplicationDescriptorFactory
     });
 
     File appClassesFolder = getAppClassesFolder(descriptor);
-    // get a ref to an optional app props file (right next to the descriptor)
-    setApplicationProperties(descriptor, new File(appClassesFolder, DEFAULT_ARTIFACT_PROPERTIES_RESOURCE));
   }
 
   @Override

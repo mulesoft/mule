@@ -89,7 +89,7 @@ import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.
 import static org.mule.runtime.module.deployment.internal.TestApplicationFactory.createTestApplicationFactory;
 import static org.mule.runtime.module.service.ServiceDescriptorFactory.SERVICE_PROVIDER_CLASS_NAME;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
-
+import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MulePluginModel.MulePluginModelBuilder;
@@ -347,7 +347,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   // Application file builders
   private final ApplicationFileBuilder emptyAppFileBuilder =
       new ApplicationFileBuilder("empty-app").definedBy("empty-config.xml");
-  private final ApplicationFileBuilder springPropertyAppFileBuilder =
+  private final ApplicationFileBuilder globalPropertyAppFileBuilder =
       new ApplicationFileBuilder("property-app").definedBy("app-properties-config.xml");
   private final ApplicationFileBuilder dummyAppDescriptorFileBuilder = new ApplicationFileBuilder("dummy-app")
       .definedBy("dummy-app-config.xml").configuredWith("myCustomProp", "someValue")
@@ -578,18 +578,19 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
   @Test
   public void appHomePropertyIsPresent() throws Exception {
-    addExplodedAppFromBuilder(springPropertyAppFileBuilder);
+    addExplodedAppFromBuilder(globalPropertyAppFileBuilder);
 
     startDeployment();
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, springPropertyAppFileBuilder.getId());
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, globalPropertyAppFileBuilder.getId());
 
-    final Application app = findApp(springPropertyAppFileBuilder.getId(), 1);
+    final Application app = findApp(globalPropertyAppFileBuilder.getId(), 1);
     final MuleRegistry registry = getMuleRegistry(app);
 
-    Map<String, Object> appProperties = registry.get("appProperties");
-    assertThat(appProperties, is(notNullValue()));
+    ConfigurationProperties configurationProperties = registry.lookupObject(ConfigurationProperties.class);
+    assertThat(configurationProperties, is(notNullValue()));
 
-    String appHome = (String) appProperties.get("appHome");
+    String appHome = configurationProperties.resolveStringProperty("appHome")
+        .orElseThrow(() -> new RuntimeException("Could not find property appHome"));
     assertThat(new File(appHome).exists(), is(true));
   }
 
@@ -3315,7 +3316,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
 
     policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getId(),
-                            new PolicyParametrization(FOO_POLICY_ID, pointparameters -> true, 1, emptyMap(),
+                            new PolicyParametrization(FOO_POLICY_ID, pointparameters -> true, 1,
+                                                      singletonMap(POLICY_PROPERTY_KEY, POLICY_PROPERTY_VALUE),
                                                       getResourceFile("/fooPolicy.xml")));
     policyManager.addPolicy(applicationFileBuilder.getId(), barPolicyFileBuilder.getId(),
                             new PolicyParametrization(BAR_POLICY_ID, poinparameters -> true, 2, emptyMap(),
@@ -3392,7 +3394,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
 
     policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getId(),
-                            new PolicyParametrization(FOO_POLICY_ID, parameters -> true, 1, emptyMap(),
+                            new PolicyParametrization(FOO_POLICY_ID, parameters -> true, 1,
+                                                      singletonMap(POLICY_PROPERTY_KEY, POLICY_PROPERTY_VALUE),
                                                       getResourceFile("/fooPolicy.xml")));
 
     executeApplicationFlow("main");
@@ -4218,13 +4221,6 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
     assertAppsDir(NONE, new String[] {applicationFileBuilder.getId()}, true);
     assertApplicationAnchorFileExists(applicationFileBuilder.getId());
-
-    // just assert no privileged entries were put in the registry
-    final Application app = findApp(applicationFileBuilder.getId(), 1);
-    final MuleRegistry registry = getMuleRegistry(app);
-
-    // mule-artifact.properties from the zip archive must have loaded properly
-    assertEquals("mule-artifact.properties should have been loaded.", "someValue", registry.get("myCustomProp"));
   }
 
   private PolicyFileBuilder createPolicyIncludingHelloPluginV2FileBuilder() {

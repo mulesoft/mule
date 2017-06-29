@@ -11,7 +11,6 @@ import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.format;
 import static java.lang.String.join;
 import static java.lang.Thread.currentThread;
-import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -24,7 +23,6 @@ import static org.mule.runtime.api.meta.model.display.LayoutModel.builder;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.config.spring.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
-
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -49,7 +47,8 @@ import org.mule.runtime.config.spring.dsl.model.extension.xml.OperationComponent
 import org.mule.runtime.config.spring.dsl.model.extension.xml.XmlExtensionModelProperty;
 import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
 import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationParser;
-import org.mule.runtime.core.internal.config.artifact.DefaultArtifactProperties;
+import org.mule.runtime.core.component.config.DefaultConfigurationPropertiesResolver;
+import org.mule.runtime.core.component.config.SystemPropertiesConfigurationProvider;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
@@ -195,7 +194,8 @@ final class XmlExtensionLoaderDelegate {
       throw new IllegalArgumentException(format("There was an issue trying to read the stream of '%s'", resource.getFile()));
     }
     ComponentModelReader componentModelReader =
-        new ComponentModelReader(new DefaultArtifactProperties(emptyMap(), emptyMap(), emptyMap()));
+        new ComponentModelReader(new DefaultConfigurationPropertiesResolver(empty(),
+                                                                            new SystemPropertiesConfigurationProvider()));
     // TODO MULE-12291: we would, ideally, leave either the relative path (modulePath) or the URL to the current config file,
     // rather than just the name of the file (which will be useless from a tooling POV)
     final String configFileName = modulePath.substring(modulePath.lastIndexOf("/") + 1);

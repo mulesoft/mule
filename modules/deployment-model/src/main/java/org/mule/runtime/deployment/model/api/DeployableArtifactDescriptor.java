@@ -21,7 +21,6 @@ import java.util.Set;
 public class DeployableArtifactDescriptor extends ArtifactDescriptor {
 
   public static final String DEFAULT_DEPLOY_PROPERTIES_RESOURCE = "mule-deploy.properties";
-  public static final String DEFAULT_ARTIFACT_PROPERTIES_RESOURCE = "mule-artifact.properties";
   public static final String PROPERTY_REDEPLOYMENT_ENABLED = "redeployment.enabled";
   public static final String PROPERTY_CONFIG_RESOURCES = "config.resources";
 
@@ -59,7 +58,7 @@ public class DeployableArtifactDescriptor extends ArtifactDescriptor {
 
   /**
    * @return the directory where the artifact content is stored.
-     */
+   */
   public File getArtifactLocation() {
     return this.location;
   }
