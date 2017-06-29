@@ -2,7 +2,7 @@
 <extension-manifest>
     <name>Heisenberg</name>
     <description><![CDATA[My Test Extension just to unit test]]></description>
-    <version>4.0.0-BETA-SNAPSHOT</version>
+    <version>${project.version}</version>
     <minMuleVersion>4.1</minMuleVersion>
     <exportedPackages>
         <package>org.mule.test.heisenberg.extension.model.types</package>

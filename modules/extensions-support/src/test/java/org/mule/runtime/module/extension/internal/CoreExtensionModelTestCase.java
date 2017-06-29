@@ -6,14 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal;
 
-import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.hamcrest.collection.IsEmptyCollection.empty;
-import static org.hamcrest.core.IsCollectionContaining.hasItem;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
@@ -30,6 +22,15 @@ import static org.mule.runtime.core.config.MuleManifest.getVendorName;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.module.extension.internal.resources.MuleExtensionModelProvider.getExtensionModel;
+import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.collection.IsEmptyCollection.empty;
+import static org.hamcrest.core.IsCollectionContaining.hasItem;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+
 import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.model.ArrayType;
@@ -79,6 +80,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
   private static final ErrorModel errorMuleAny = newError("ANY", "MULE").build();
 
   private static ExtensionModel coreExtensionModel = getExtensionModel();
+  private static String muleVersion = getProductVersion();
 
   @Test
   public void consistentWithManifest() {
@@ -87,7 +89,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(coreExtensionModel.getVersion(), is(getProductVersion()));
     assertThat(coreExtensionModel.getVendor(), is(getVendorName()));
     assertThat(coreExtensionModel.getCategory(), is(COMMUNITY));
-    assertThat(coreExtensionModel.getMinMuleVersion(), is(new MuleVersion("4.0.0-BETA-SNAPSHOT")));
+    assertThat(coreExtensionModel.getMinMuleVersion(), is(new MuleVersion(muleVersion)));
   }
 
   @Test
@@ -96,7 +98,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(coreExtensionModel.getXmlDslModel().getNamespace(), is("http://www.mulesoft.org/schema/mule/core"));
     assertThat(coreExtensionModel.getXmlDslModel().getSchemaLocation(),
                is("http://www.mulesoft.org/schema/mule/core/current/mule.xsd"));
-    assertThat(coreExtensionModel.getXmlDslModel().getSchemaVersion(), is("4.0.0-BETA-SNAPSHOT"));
+    assertThat(coreExtensionModel.getXmlDslModel().getSchemaVersion(), is(muleVersion));
     assertThat(coreExtensionModel.getXmlDslModel().getXsdFileName(), is("mule.xsd"));
   }
 
