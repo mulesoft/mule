@@ -7,6 +7,7 @@
 package org.mule.test.heisenberg.extension;
 
 import static java.lang.String.format;
+import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
@@ -144,6 +145,7 @@ public class HeisenbergSource extends Source<String, Attributes> {
   public void onTerminate(SourceResult sourceResult) {
     if (sourceResult.isSuccess()) {
       terminateStatus = SUCCESS;
+      error = empty();
     } else {
       sourceResult.getInvocationError().ifPresent(parameterError -> {
         terminateStatus = ERROR_INVOKE;

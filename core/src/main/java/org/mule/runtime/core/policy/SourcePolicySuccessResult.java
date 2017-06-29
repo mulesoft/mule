@@ -9,6 +9,8 @@ package org.mule.runtime.core.policy;
 import org.mule.runtime.core.api.Event;
 
 import java.util.Map;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * Result of a successful execution of a {@link SourcePolicy}.
@@ -18,22 +20,22 @@ import java.util.Map;
  *
  * @since 4.0
  */
-public class SuccessSourcePolicyResult {
+public class SourcePolicySuccessResult {
 
-  private final Event flowExecutionResult;
-  private final Map<String, Object> responseParameters;
+  private final Event result;
+  private final Supplier<Map<String, Object>> responseParameters;
   private final MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor;
 
   /**
    * Creates a new successful result from a policy execution.
    *
-   * @param flowExecutionResult the result of the flow execution.
+   * @param result the result of the flow execution.
    * @param responseParameters the response parameters to be sent by the source.
    * @param messageSourceResponseParametersProcessor a processor to create response parameters from an {@link Event}
    */
-  public SuccessSourcePolicyResult(Event flowExecutionResult, Map<String, Object> responseParameters,
+  public SourcePolicySuccessResult(Event result, Supplier<Map<String, Object>> responseParameters,
                                    MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor) {
-    this.flowExecutionResult = flowExecutionResult;
+    this.result = result;
     this.responseParameters = responseParameters;
     this.messageSourceResponseParametersProcessor = messageSourceResponseParametersProcessor;
   }
@@ -41,14 +43,14 @@ public class SuccessSourcePolicyResult {
   /**
    * @return the result of the flow execution.
    */
-  public Event getFlowExecutionResult() {
-    return flowExecutionResult;
+  public Event getResult() {
+    return result;
   }
 
   /**
    * @return the response parameters to be sent by the source.
    */
-  public Map<String, Object> getResponseParameters() {
+  public Supplier<Map<String, Object>> getResponseParameters() {
     return responseParameters;
   }
 
@@ -59,10 +61,9 @@ public class SuccessSourcePolicyResult {
    * failure which most likely can be an expression execution error. In such scenarios the error handler must be executed and an
    * error response must be send. This method must be used to generate the error response parameters
    * 
-   * @param event the event to use as source for generating the error response parameters.
    * @return the set of parameters to execute the function that sends the failure response.
    */
-  public Map<String, Object> createErrorResponseParameters(Event event) {
-    return messageSourceResponseParametersProcessor.getFailedExecutionResponseParametersFunction().apply(event);
+  public Function<Event, Map<String, Object>> createErrorResponseParameters() {
+    return event -> messageSourceResponseParametersProcessor.getFailedExecutionResponseParametersFunction().apply(event);
   }
 }

@@ -14,6 +14,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
+import static reactor.core.publisher.Mono.defer;
+import static reactor.core.publisher.Mono.from;
+import static reactor.core.publisher.Mono.just;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.DefaultEventContext;
@@ -27,6 +31,8 @@ import org.mule.tck.message.StringAttributes;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Mono;
 
 public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCase {
 
@@ -41,7 +47,7 @@ public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCa
   protected Policy policy = mock(Policy.class, RETURNS_DEEP_STUBS);
   protected Processor flowProcessor = mock(Processor.class);
   protected PolicyStateHandler policyStateHandler;
-  private ArgumentCaptor<Event> eventCaptor = ArgumentCaptor.forClass(Event.class);
+  private ArgumentCaptor<Publisher> eventCaptor = ArgumentCaptor.forClass(Publisher.class);
   private FlowConstruct mockFlowConstruct = mock(FlowConstruct.class, RETURNS_DEEP_STUBS);
   private Processor policyProcessor;
   private String executionId;
@@ -62,11 +68,11 @@ public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCa
   public void variablesAddedInNextProcessorNotPropagated() throws MuleException {
     Event initialEventWithVars = Event.builder(initialEvent).addVariable(INIT_VAR_NAME, INIT_VAR_VALUE).build();
     Event modifiedVarsEvent = Event.builder(initialEvent).addVariable(ADDED_VAR_NAME, ADDED_VAR_VALUE).build();
-    when(flowProcessor.process(any())).thenReturn(modifiedVarsEvent);
-    when(policy.getPolicyChain().process(any()))
-        .thenAnswer(invocation -> policyStateHandler.retrieveNextOperation(executionId).process(initialEventWithVars));
+    when(flowProcessor.apply(any())).thenReturn(just(modifiedVarsEvent));
+    when(policy.getPolicyChain().apply(any()))
+        .thenAnswer(invocation -> just(initialEventWithVars).transform(policyStateHandler.retrieveNextOperation(executionId)));
 
-    Event resultEvent = policyProcessor.process(initialEventWithVars);
+    Event resultEvent = just(initialEventWithVars).transform(policyProcessor).block();
 
     assertEquals(resultEvent.getVariableNames(), initialEventWithVars.getVariableNames());
   }
@@ -75,24 +81,24 @@ public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCa
   public void variablesAddedBeforeNextProcessorNotPropagatedToIt() throws MuleException {
     Event initialEventWithVars = Event.builder(initialEvent).addVariable(INIT_VAR_NAME, INIT_VAR_VALUE).build();
     Event modifiedVarsEvent = Event.builder(initialEvent).addVariable(ADDED_VAR_NAME, ADDED_VAR_VALUE).build();
-    when(flowProcessor.process(any())).thenReturn(initialEventWithVars);
-    when(policy.getPolicyChain().process(any()))
-        .thenAnswer(invocation -> policyStateHandler.retrieveNextOperation(executionId).process(modifiedVarsEvent));
+    when(flowProcessor.apply(any())).thenReturn(just(initialEventWithVars));
+    when(policy.getPolicyChain().apply(any()))
+        .thenAnswer(invocation -> just(modifiedVarsEvent).transform(policyStateHandler.retrieveNextOperation(executionId)));
 
-    policyProcessor.process(initialEventWithVars);
+    just(initialEventWithVars).transform(policyProcessor).block();
 
-    verify(flowProcessor).process(eventCaptor.capture());
-    assertEquals(eventCaptor.getValue().getVariableNames(), initialEventWithVars.getVariableNames());
+    verify(flowProcessor).apply(eventCaptor.capture());
+    assertEquals(((Event) from(eventCaptor.getValue()).block()).getVariableNames(), initialEventWithVars.getVariableNames());
   }
 
   @Test
   public void messageModifiedByNextProcessorIsPropagated() throws MuleException {
     Event modifiedMessageEvent = Event.builder(initialEvent).message(MESSAGE).build();
-    when(flowProcessor.process(any())).thenReturn(modifiedMessageEvent);
-    when(policy.getPolicyChain().process(any()))
-        .thenAnswer(invocation -> policyStateHandler.retrieveNextOperation(executionId).process(initialEvent));
+    when(flowProcessor.apply(any())).thenReturn(just(modifiedMessageEvent));
+    when(policy.getPolicyChain().apply(any()))
+        .thenAnswer(invocation -> just(initialEvent).transform(policyStateHandler.retrieveNextOperation(executionId)));
 
-    Event resultEvent = policyProcessor.process(initialEvent);
+    Event resultEvent = just(initialEvent).transform(policyProcessor).block();
 
     assertEquals(resultEvent.getMessage(), MESSAGE);
   }
@@ -100,25 +106,25 @@ public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCa
   @Test
   public void messageModifiedBeforeNextProcessorIsPropagatedToIt() throws MuleException {
     Event modifiedMessageEvent = Event.builder(initialEvent).message(MESSAGE).build();
-    when(flowProcessor.process(any())).thenReturn(modifiedMessageEvent);
-    when(policy.getPolicyChain().process(any()))
-        .thenAnswer(invocation -> policyStateHandler.retrieveNextOperation(executionId).process(modifiedMessageEvent));
+    when(flowProcessor.apply(any())).thenReturn(just(modifiedMessageEvent));
+    when(policy.getPolicyChain().apply(any()))
+        .thenAnswer(invocation -> just(modifiedMessageEvent).transform(policyStateHandler.retrieveNextOperation(executionId)));
 
-    policyProcessor.process(initialEvent);
+    just(initialEvent).transform(policyProcessor).block();
 
-    verify(flowProcessor).process(eventCaptor.capture());
-    assertEquals(eventCaptor.getValue().getMessage(), MESSAGE);
+    verify(flowProcessor).apply(eventCaptor.capture());
+    assertEquals(((Event) from(eventCaptor.getValue()).block()).getMessage(), MESSAGE);
   }
 
   @Test
   public void sessionModifiedByNextProcessorIsPropagated() throws MuleException {
     DefaultMuleSession session = new DefaultMuleSession();
     Event modifiedSessionEvent = Event.builder(initialEvent).session(session).build();
-    when(flowProcessor.process(any())).thenReturn(modifiedSessionEvent);
-    when(policy.getPolicyChain().process(any()))
-        .thenAnswer(invocation -> policyStateHandler.retrieveNextOperation(executionId).process(initialEvent));
+    when(flowProcessor.apply(any())).thenReturn(just(modifiedSessionEvent));
+    when(policy.getPolicyChain().apply(any()))
+        .thenAnswer(invocation -> just(initialEvent).transform(policyStateHandler.retrieveNextOperation(executionId)));
 
-    Event resultEvent = policyProcessor.process(initialEvent);
+    Event resultEvent = just(initialEvent).transform(policyProcessor).block();
 
     assertEquals(resultEvent.getSession(), session);
   }
@@ -127,14 +133,14 @@ public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCa
   public void sessionModifiedBeforeNextProcessorIsPropagatedToIt() throws MuleException {
     DefaultMuleSession session = new DefaultMuleSession();
     Event modifiedSessionEvent = Event.builder(initialEvent).session(session).build();
-    when(flowProcessor.process(any())).thenReturn(modifiedSessionEvent);
-    when(policy.getPolicyChain().process(any()))
-        .thenAnswer(invocation -> policyStateHandler.retrieveNextOperation(executionId).process(modifiedSessionEvent));
+    when(flowProcessor.apply(any())).thenReturn(just(modifiedSessionEvent));
+    when(policy.getPolicyChain().apply(any()))
+        .thenAnswer(invocation -> just(modifiedSessionEvent).transform(policyStateHandler.retrieveNextOperation(executionId)));
 
-    policyProcessor.process(initialEvent);
+    just(initialEvent).transform(policyProcessor).block();
 
-    verify(flowProcessor).process(eventCaptor.capture());
-    assertEquals(eventCaptor.getValue().getSession(), session);
+    verify(flowProcessor).apply(eventCaptor.capture());
+    assertEquals(((Event) from(eventCaptor.getValue()).block()).getSession(), session);
   }
 
   private Event createTestEvent() {

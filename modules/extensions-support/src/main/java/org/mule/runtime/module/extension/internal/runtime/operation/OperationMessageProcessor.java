@@ -31,6 +31,7 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getOperationExecutorFactory;
 import static org.slf4j.LoggerFactory.getLogger;
+import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.fromCallable;
 
@@ -147,64 +148,46 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
 
   @Override
   public Publisher<Event> apply(Publisher<Event> publisher) {
-    if (operationModel.isBlocking()) {
-      return from(publisher).map(checkedFunction(event -> withContextClassLoader(classLoader, () -> {
-        Optional<ConfigurationInstance> configuration;
-        OperationExecutionFunction operationExecutionFunction;
+    return from(publisher).flatMap(checkedFunction(event -> withContextClassLoader(classLoader, () -> {
+      Optional<ConfigurationInstance> configuration;
+      OperationExecutionFunction operationExecutionFunction;
 
-        if (event.getParameters().containsKey(INTERCEPTION_RESOLVED_CONTEXT)) {
-          // If the event already contains an execution context, use that one.
-          ExecutionContextAdapter<OperationModel> operationContext = getPrecalculatedContext(event);
-          configuration = operationContext.getConfiguration();
+      if (event.getParameters().containsKey(INTERCEPTION_RESOLVED_CONTEXT)) {
+        // If the event already contains an execution context, use that one.
+        ExecutionContextAdapter<OperationModel> operationContext = getPrecalculatedContext(event);
+        configuration = operationContext.getConfiguration();
 
-          operationExecutionFunction = (parameters, operationEvent) -> doProcess(operationEvent, operationContext).block();
-        } else {
-          // Otherwise, generate the context as usual.
-          configuration = getConfiguration(event);
+        operationExecutionFunction = (parameters, operationEvent) -> doProcess(operationEvent, operationContext);
+      } else {
+        // Otherwise, generate the context as usual.
+        configuration = getConfiguration(event);
 
-          operationExecutionFunction =
-              (parameters,
-               operationEvent) -> {
-                final ExecutionContextAdapter<OperationModel> operationContext =
-                    createExecutionContext(configuration, parameters, operationEvent);
-                return doProcess(operationEvent, operationContext)
-                    .block();
-              };
-        }
-
-        OperationPolicy policy = policyManager.createOperationPolicy(getLocation(), event,
-                                                                     getResolutionResult(event, configuration),
-                                                                     operationExecutionFunction);
-        return policy.process(event);
-      }, MuleException.class, e -> {
-        throw new DefaultMuleException(e);
-      })));
-    } else {
-      return from(publisher).flatMap(checkedFunction(event -> withContextClassLoader(classLoader, () -> {
-        ExecutionContextAdapter<OperationModel> operationContext;
-        if (event.getParameters().containsKey(INTERCEPTION_RESOLVED_CONTEXT)) {
-          // If the event already contains an execution context, use that one.
-          operationContext = getPrecalculatedContext(event);
-        } else {
-          // Otherwise, generate the context as usual.
-          operationContext = createExecutionContext(event);
-        }
-
-        // While a hook in reactor is used to map Throwable to MessagingException when an error occurs this does not cover the
-        // case
-        // where an error is explicitly triggered via a Sink such as such as when using Mono.create in ReactorCompletionCallback
-        // rather than being thrown by a reactor operator. Although changes could be made to Mule to cater for this in
-        // AbstractMessageProcessorChain, this is not trivial given processor interceptors and a potent performance overhead
-        // associated with the addition of many additional flatMaps. It would be slightly clearer to create the
-        // MessagingException in ReactorCompletionCallback where Mono.error is used but we don't have a reference to the
-        // processor there.
-        return doProcess(event, operationContext).onErrorMap(e -> !(e instanceof MessagingException),
-                                                             e -> new MessagingException(event, e, this));
-      }, MuleException.class, e -> {
-        throw new DefaultMuleException(e);
-      })));
-    }
-
+        operationExecutionFunction =
+            (parameters,
+             operationEvent) -> {
+              ExecutionContextAdapter<OperationModel> operationContext;
+              try {
+                operationContext = createExecutionContext(configuration, parameters, operationEvent);
+              } catch (MuleException e) {
+                return error(e);
+              }
+              // While a hook in reactor is used to map Throwable to MessagingException when an error occurs this does not cover
+              // the case where an error is explicitly triggered via a Sink such as such as when using Mono.create in
+              // ReactorCompletionCallback rather than being thrown by a reactor operator. Although changes could be made to Mule
+              // to cater for this in AbstractMessageProcessorChain, this is not trivial given processor interceptors and a potent
+              // performance overhead associated with the addition of many additional flatMaps. It would be slightly clearer to
+              // create the MessagingException in ReactorCompletionCallback where Mono.error is used but we don't have a reference
+              // to the processor there.
+              return doProcess(operationEvent, operationContext).onErrorMap(e -> !(e instanceof MessagingException),
+                                                                            e -> new MessagingException(event, e, this));
+            };
+      }
+      return policyManager
+          .createOperationPolicy(getLocation(), event, getResolutionResult(event, configuration), operationExecutionFunction)
+          .process(event);
+    }, MuleException.class, e -> {
+      throw new DefaultMuleException(e);
+    })));
   }
 
   private PrecalculatedExecutionContextAdapter getPrecalculatedContext(Event event) {

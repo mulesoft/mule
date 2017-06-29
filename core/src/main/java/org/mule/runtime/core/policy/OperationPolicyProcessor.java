@@ -7,14 +7,22 @@
 package org.mule.runtime.core.policy;
 
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
+import static reactor.core.publisher.Mono.error;
+import static reactor.core.publisher.Mono.from;
+import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.processor.MessageProcessors;
 import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.Optional;
+
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Mono;
 
 /**
  * This class is responsible for the processing of a policy applied to a {@link Processor}. Currently the only kind of
@@ -56,7 +64,12 @@ public class OperationPolicyProcessor implements Processor {
    */
   @Override
   public Event process(Event operationEvent) throws MuleException {
-    try {
+    return processToApply(operationEvent, this);
+  }
+
+  @Override
+  public Publisher<Event> apply(Publisher<Event> publisher) {
+    return from(publisher).then(operationEvent -> {
       PolicyStateId policyStateId = new PolicyStateId(operationEvent.getContext().getId(), policy.getPolicyId());
       Optional<Event> latestPolicyState = policyStateHandler.getLatestState(policyStateId);
       Event variablesProviderEvent =
@@ -66,30 +79,32 @@ public class OperationPolicyProcessor implements Processor {
       Processor operationCall = buildOperationExecutionWithPolicyFunction(nextProcessor, operationEvent);
       policyStateHandler.updateNextOperation(policyStateId.getExecutionIndentifier(), operationCall);
       return executePolicyChain(operationEvent, policyStateId, policyEvent);
-    } catch (MuleException e) {
-      throw e;
-    } catch (Exception e) {
-      throw new DefaultMuleException(e);
-    }
+    });
   }
 
-  private Event executePolicyChain(Event operationEvent, PolicyStateId policyStateId, Event policyEvent) throws MuleException {
-    Event policyChainResult = policy.getPolicyChain().process(policyEvent);
-    policyStateHandler.updateState(policyStateId, policyChainResult);
-    return policyEventConverter.createEvent(policyChainResult, operationEvent);
+  private Mono<Event> executePolicyChain(Event operationEvent, PolicyStateId policyStateId, Event policyEvent) {
+    return just(policyEvent).transform(policy.getPolicyChain())
+        .doOnNext(policyChainResult -> policyStateHandler.updateState(policyStateId, policyChainResult))
+        .map(policyChainResult -> policyEventConverter.createEvent(policyChainResult, operationEvent));
   }
 
-  private Processor buildOperationExecutionWithPolicyFunction(Processor nextOperation, Event operationEvent)
-      throws Exception {
-    return policyExecuteNextEvent -> {
-      try {
-        PolicyStateId policyStateId = new PolicyStateId(policyExecuteNextEvent.getContext().getId(), policy.getPolicyId());
-        policyStateHandler.updateState(policyStateId, policyExecuteNextEvent);
-        Event operationResult =
-            nextOperation.process(policyEventConverter.createEvent(policyExecuteNextEvent, operationEvent));
-        return policyEventConverter.createEvent(operationResult, policyExecuteNextEvent);
-      } catch (MuleException e) {
-        throw new MuleRuntimeException(e);
+  private Processor buildOperationExecutionWithPolicyFunction(Processor nextOperation, Event operationEvent) {
+    return new Processor() {
+
+      @Override
+      public Event process(Event event) throws MuleException {
+        return processToApply(event, this);
+      }
+
+      @Override
+      public Publisher<Event> apply(Publisher<Event> publisher) {
+        return from(publisher).then(policyExecuteNextEvent -> {
+          PolicyStateId policyStateId = new PolicyStateId(policyExecuteNextEvent.getContext().getId(), policy.getPolicyId());
+          policyStateHandler.updateState(policyStateId, policyExecuteNextEvent);
+          return just(policyExecuteNextEvent).map(event -> policyEventConverter.createEvent(event, operationEvent))
+              .transform(nextOperation)
+              .map(operationResult -> policyEventConverter.createEvent(operationResult, policyExecuteNextEvent));
+        });
       }
     };
   }

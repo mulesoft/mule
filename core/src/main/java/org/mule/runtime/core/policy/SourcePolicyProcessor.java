@@ -8,10 +8,16 @@ package org.mule.runtime.core.policy;
 
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.Event.builder;
+import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
+import static reactor.core.publisher.Mono.from;
+import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
+
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Mono;
 
 /**
  * This class is responsible for the processing of a policy applied to a {@link org.mule.runtime.core.api.source.MessageSource}.
@@ -62,16 +68,40 @@ public class SourcePolicyProcessor implements Processor {
    */
   @Override
   public Event process(Event sourceEvent) throws MuleException {
-    String executionIdentifier = sourceEvent.getContext().getId();
-    policyStateHandler.updateNextOperation(executionIdentifier, nextProcessorEvent -> {
-      policyStateHandler.updateState(new PolicyStateId(executionIdentifier, policy.getPolicyId()), nextProcessorEvent);
-      Event nextProcessorResult = nextProcessor.process(policyEventConverter.createEvent(nextProcessorEvent, sourceEvent));
-      return policyEventConverter.createEvent(nextProcessorResult, nextProcessorEvent);
-    });
-    Event sourcePolicyResult =
-        policy.getPolicyChain().process(policyEventConverter
-            .createEvent(sourceEvent, builder(sourceEvent.getContext()).message(of(null)).build()));
-    return policyEventConverter.createEvent(sourcePolicyResult, sourceEvent);
+    return processToApply(sourceEvent, this);
   }
 
+  @Override
+  public Publisher<Event> apply(Publisher<Event> publisher) {
+    return from(publisher).then(sourceEvent -> {
+      String executionIdentifier = sourceEvent.getContext().getId();
+      policyStateHandler.updateNextOperation(executionIdentifier,
+                                             buildSourceExecutionWithPolicyFunction(executionIdentifier, sourceEvent));
+      return just(sourceEvent)
+          .map(event -> policyEventConverter.createEvent(sourceEvent,
+                                                         builder(sourceEvent.getContext()).message(of(null)).build()))
+          .transform(policy.getPolicyChain()).map(event -> policyEventConverter.createEvent(event, sourceEvent));
+    });
+  }
+
+  private Processor buildSourceExecutionWithPolicyFunction(String executionIdentifier, Event sourceEvent) {
+    return new Processor() {
+
+      @Override
+      public Event process(Event event) throws MuleException {
+        return processToApply(event, this);
+      }
+
+      @Override
+      public Publisher<Event> apply(Publisher<Event> publisher) {
+        return from(publisher)
+            .then(event -> just(event)
+                .doOnNext(request -> policyStateHandler.updateState(new PolicyStateId(executionIdentifier, policy.getPolicyId()),
+                                                                    request))
+                .map(request -> policyEventConverter.createEvent(request, sourceEvent))
+                .transform(nextProcessor)
+                .map(result -> policyEventConverter.createEvent(result, event)));
+      }
+    };
+  }
 }

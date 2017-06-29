@@ -7,6 +7,8 @@
 package org.mule.runtime.core.policy;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static reactor.core.publisher.Mono.from;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -25,6 +27,9 @@ import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder
 import java.util.List;
 
 import javax.inject.Inject;
+
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Mono;
 
 /**
  * Policy chain for handling the message processor associated to a policy.
@@ -72,6 +77,11 @@ public class PolicyChain extends AbstractAnnotatedObject
   @Override
   public Event process(Event event) throws MuleException {
     return processorChain.process(event);
+  }
+
+  @Override
+  public Publisher<Event> apply(Publisher<Event> publisher) {
+    return from(publisher).transform(processorChain);
   }
 
   @Override

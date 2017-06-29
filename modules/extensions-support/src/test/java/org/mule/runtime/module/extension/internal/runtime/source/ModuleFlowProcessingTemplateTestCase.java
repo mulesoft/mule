@@ -6,12 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.argThat;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -20,10 +19,10 @@ import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.exception.MessagingException;
-import org.mule.runtime.core.internal.execution.ResponseCompletionCallback;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -32,7 +31,6 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.reactivestreams.Publisher;
@@ -40,7 +38,7 @@ import reactor.core.publisher.Mono;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class ExtensionFlowProcessingTemplateTestCase extends AbstractMuleTestCase {
+public class ModuleFlowProcessingTemplateTestCase extends AbstractMuleTestCase {
 
   @Mock
   private Message message;
@@ -53,9 +51,6 @@ public class ExtensionFlowProcessingTemplateTestCase extends AbstractMuleTestCas
 
   @Mock
   private SourceCompletionHandler completionHandler;
-
-  @Mock
-  private ResponseCompletionCallback responseCompletionCallback;
 
   @Mock
   private MessagingException messagingException;
@@ -94,44 +89,32 @@ public class ExtensionFlowProcessingTemplateTestCase extends AbstractMuleTestCas
 
   @Test
   public void sendResponseToClient() throws Exception {
-    from(template.sendResponseToClient(event, mockParameters, (event) -> mockParameters, responseCompletionCallback)).block();
+    from(template.sendResponseToClient(event, mockParameters)).block();
     verify(completionHandler).onCompletion(same(event), same(mockParameters));
-    verify(responseCompletionCallback).responseSentSuccessfully();
   }
 
   @Test
   public void failedToSendResponseToClient() throws Exception {
+    Reference<Throwable> exceptionReference = new Reference<>();
     when(completionHandler.onCompletion(same(event), same(mockParameters))).thenReturn(error(runtimeException));
-    from(template.sendResponseToClient(event, mockParameters, (event) -> mockParameters, responseCompletionCallback)).subscribe();
+    from(template.sendResponseToClient(event, mockParameters)).doOnError(exceptionReference::set).subscribe();
 
     verify(completionHandler, never()).onFailure(any(MessagingException.class), same(mockParameters));
-    verify(responseCompletionCallback).responseSentWithFailure(argThat(new ArgumentMatcher<MessagingException>() {
-
-      @Override
-      public boolean matches(Object o) {
-        return o instanceof MessagingException && ((MessagingException) o).getRootCause().equals(runtimeException);
-      }
-    }), eq(event));
+    assertThat(exceptionReference.get(), equalTo(runtimeException));
   }
 
   @Test
   public void sendFailureResponseToClient() throws Exception {
-    from(template.sendFailureResponseToClient(messagingException, mockParameters, responseCompletionCallback)).block();
+    from(template.sendFailureResponseToClient(messagingException, mockParameters)).block();
     verify(completionHandler).onFailure(messagingException, mockParameters);
-    verify(responseCompletionCallback).responseSentSuccessfully();
   }
 
   @Test
   public void failedToSendFailureResponseToClient() throws Exception {
+    Reference<Throwable> exceptionReference = new Reference<>();
     when(messagingException.getEvent()).thenReturn(event);
     when(completionHandler.onFailure(messagingException, mockParameters)).thenReturn(error(runtimeException));
-    from(template.sendFailureResponseToClient(messagingException, mockParameters, responseCompletionCallback)).subscribe();
-    verify(responseCompletionCallback).responseSentWithFailure(argThat(new ArgumentMatcher<MessagingException>() {
-
-      @Override
-      public boolean matches(Object o) {
-        return o instanceof MessagingException && ((MessagingException) o).getRootCause().equals(runtimeException);
-      }
-    }), eq(event));
+    from(template.sendFailureResponseToClient(messagingException, mockParameters)).doOnError(exceptionReference::set).subscribe();
+    assertThat(exceptionReference.get(), equalTo(runtimeException));
   }
 }
