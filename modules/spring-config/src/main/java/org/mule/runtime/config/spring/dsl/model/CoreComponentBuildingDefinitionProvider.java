@@ -1589,22 +1589,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("actionAsString", fromSimpleParameter("action").build())
         .withSetterParameterDefinition("interactWithExternal", fromSimpleParameter("interactWithExternal").build())
         .build());
-
-    buildingDefinitions.add(baseDefinition.copy().withIdentifier("custom-transaction")
-        .withTypeDefinition(fromType(MuleTransactionConfig.class))
-        .withSetterParameterDefinition("factory", fromSimpleReferenceParameter("factory-ref").build())
-        .withSetterParameterDefinition("factory", fromSimpleParameter("factory-class", o -> {
-          try {
-            return ClassUtils.instantiateClass((String) o);
-          } catch (Exception e) {
-            return null;
-          }
-        }).build())
-        .withSetterParameterDefinition("timeout", fromSimpleParameter("timeout").build())
-        .withSetterParameterDefinition("actionAsString", fromSimpleParameter("action").build())
-        .withSetterParameterDefinition("interactWithExternal", fromSimpleParameter("interactWithExternal").build())
-        .build());
-
+    
     buildingDefinitions.add(baseDefinition.copy()
         .withIdentifier("environment")
         .withTypeDefinition(fromType(Map.class))
