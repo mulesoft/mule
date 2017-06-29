@@ -2232,39 +2232,7 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-
-    <xsd:element name="custom-transaction-manager" type="customTransactionManagerType"
-                 substitutionGroup="abstract-transaction-manager">
-        <xsd:annotation>
-            <xsd:documentation>
-                A user-implemented transaction manager.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="customTransactionManagerType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractTransactionManagerType">
-                <xsd:sequence>
-                    <xsd:element name="environment" type="mapType" minOccurs="0" maxOccurs="1">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                The JNDI environment.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
-                    <xsd:group ref="propertiesGroup"/>
-                </xsd:sequence>
-                <xsd:attribute name="class" type="substitutableClass" use="required">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The class to instantiate to create a transaction manager.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
+    
     <xsd:element name="scheduling-strategy" type="schedulingStrategyType">
         <xsd:annotation>
             <xsd:documentation>
