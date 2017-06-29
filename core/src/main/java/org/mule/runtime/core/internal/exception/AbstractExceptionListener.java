@@ -20,7 +20,6 @@ import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.GlobalNameableObject;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.ExceptionNotification;
 import org.mule.runtime.core.api.context.notification.SecurityNotification;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
@@ -31,9 +30,7 @@ import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.config.ExceptionHelper;
-import org.mule.runtime.core.internal.message.ExceptionMessage;
 import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
-import org.mule.runtime.core.routing.outbound.MulticastingRouter;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -86,12 +83,6 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
     }
   }
 
-  public void addEndpoint(Processor processor) {
-    if (processor != null) {
-      messageProcessors.add(processor);
-    }
-  }
-
   /**
    * The initialise method is call every time the Exception stategy is assigned to a service or connector. This implementation
    * ensures that initialise is called only once. The actual initialisation code is contained in the <code>doInitialise()</code>
@@ -126,51 +117,6 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
 
   private Throwable getCause(Exception ex) {
     return ex.getCause() instanceof TypedException ? ex.getCause().getCause() : ex.getCause();
-  }
-
-  /**
-   * Routes the current exception to an error endpoint such as a Dead Letter Queue (jms) This method is only invoked if there is a
-   * Message available to dispatch. The message dispatched from this method will be an <code>ExceptionMessage</code> which
-   * contains the exception thrown the Message and any context information.
-   *
-   * @param event the MuleEvent being processed when the exception occurred
-   * @param flowConstruct the flow that was processing the event when the exception occurred.
-   * @param t the exception thrown. This will be sent with the ExceptionMessage
-   * @see ExceptionMessage
-   */
-  protected Event routeException(Event event, FlowConstruct flowConstruct, Throwable t) {
-    Event result = event;
-
-    if (!messageProcessors.isEmpty()) {
-      try {
-        if (logger.isDebugEnabled()) {
-          logger.debug("Message being processed is: "
-              + (muleContext.getTransformationService().getPayloadForLogging(event.getMessage())));
-        }
-        // Create an ExceptionMessage which contains the original payload, the exception, and some additional context info.
-        ExceptionMessage msg =
-            new ExceptionMessage(event, t, flowConstruct.getName(), event.getContext().getOriginatingConnectorName());
-
-        Message exceptionMessage = Message.builder(event.getMessage()).payload(msg).build();
-
-        MulticastingRouter router = buildRouter();
-        router.setRoutes(getMessageProcessors());
-        router.setMuleContext(muleContext);
-
-        // Route the ExceptionMessage to the new router
-        result = router.route(Event.builder(event).message(exceptionMessage).build());
-      } catch (Exception e) {
-        logFatal(event, e);
-      }
-    }
-
-    return result;
-  }
-
-  protected MulticastingRouter buildRouter() {
-    // Create an outbound router with all endpoints configured on the exception strategy
-    MulticastingRouter router = new MulticastingRouter();
-    return router;
   }
 
   protected void closeStream(Message message) {

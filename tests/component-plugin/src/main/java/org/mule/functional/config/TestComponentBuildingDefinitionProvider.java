@@ -7,7 +7,6 @@
 package org.mule.functional.config;
 
 import static org.mule.functional.config.TestXmlNamespaceInfoProvider.TEST_NAMESPACE;
-import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildCollectionConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromReferenceObject;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
@@ -16,6 +15,7 @@ import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fro
 import static org.mule.runtime.dsl.api.component.CommonTypeConverters.stringToClassConverter;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromConfigurationAttribute;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
+
 import org.mule.functional.api.component.AssertionMessageProcessor;
 import org.mule.functional.api.component.EventCallback;
 import org.mule.functional.api.component.FunctionalTestProcessor;
@@ -24,11 +24,9 @@ import org.mule.functional.api.component.ResponseAssertionMessageProcessor;
 import org.mule.functional.api.component.SharedConfig;
 import org.mule.functional.api.component.SharedSource;
 import org.mule.functional.api.component.SkeletonSource;
-import org.mule.functional.api.component.TestExceptionStrategy;
 import org.mule.functional.api.component.ThrowProcessor;
 import org.mule.functional.client.QueueWriterMessageProcessor;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.tck.processor.TestNonBlockingProcessor;
@@ -88,13 +86,6 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
         .withIdentifier("processor")
         .withTypeDefinition(fromType(FunctionalTestProcessor.class))
         .build());
-
-    componentBuildingDefinitions.add(baseDefinition.copy()
-        .withIdentifier("exception-strategy")
-        .withTypeDefinition(fromType(TestExceptionStrategy.class))
-        .withConstructorParameterDefinition(fromSimpleParameter("class").build())
-        .withSetterParameterDefinition("messageProcessors", fromChildCollectionConfiguration(Processor.class).build())
-        .asPrototype().build());
 
     componentBuildingDefinitions.add(baseDefinition.copy()
         .withIdentifier("throw")

@@ -27,19 +27,15 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.Pipeline;
-import org.mule.runtime.core.api.message.ExceptionPayload;
 import org.mule.runtime.core.api.processor.MessageRouter;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.routing.AggregationContext;
-import org.mule.runtime.core.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.runtime.core.api.routing.RoutePathNotFoundException;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
-import org.mule.runtime.core.routing.outbound.MulticastingRouter;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -53,21 +49,6 @@ import org.slf4j.LoggerFactory;
  * <p>
  * The <code>Scatter-Gather</code> router will broadcast copies of the current message to every endpoint registered with the
  * router in parallel.
- * </p>
- * It is very similar to the <code>&lt;all&gt;</code> implemented in the {@link MulticastingRouter} class, except that this router
- * processes in parallel instead of sequentially.
- * <p>
- * Differences with {@link MulticastingRouter} router:
- * </p>
- * <ul>
- * <li>When using {@link MulticastingRouter} changes to the payload performed in route n are visible in route (n+1). When using
- * {@link ScatterGatherRouter}, each route has different shallow copies of the original event</li>
- * <li>{@link MulticastingRouter} throws {@link CouldNotRouteOutboundMessageException} upon route failure and stops processing.
- * When catching the exception, you'll have no information about the result of any prior routes. {@link ScatterGatherRouter} will
- * process all routes no matter what. It will also aggregate the results of all routes into a {@link Collection} in which each
- * entry has the {@link ExceptionPayload} set accordingly and then will throw a {@link CompositeRoutingException} which will give
- * you visibility over the output of other routes.</li>
- * </ul>
  * <p>
  * For advanced use cases, a custom {@link AggregationStrategy} can be applied to customize the logic used to aggregate the route
  * responses back into one single element or to throw exception

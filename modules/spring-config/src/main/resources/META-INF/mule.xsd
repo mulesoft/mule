@@ -4176,22 +4176,6 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:complexType name="baseSingleRouteRoutingMessageProcessorType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractRoutingMessageProcessorType">
-                <xsd:sequence>
-                    <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" minOccurs="1" maxOccurs="unbounded" />
-                </xsd:sequence>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:complexType name="baseMultipleRoutesRoutingMessageProcessorType">
-        <xsd:complexContent>
-            <xsd:extension base="baseSingleRouteRoutingMessageProcessorType"/>
-        </xsd:complexContent>
-    </xsd:complexType>
-
     <xsd:complexType name="selectiveOutboundRouterType">
         <xsd:complexContent>
             <xsd:extension base="abstractRoutingMessageProcessorType">
@@ -4208,16 +4192,6 @@
         <xsd:annotation>
             <xsd:documentation>
                 Sends the message to the first message processor whose condition has been satisfied. If no conditions were satisfied, sends to the configured default message processor if configured, or throws an exception if not configured.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
-    <!-- Deprecated -->
-    <xsd:element name="all" type="baseMultipleRoutesRoutingMessageProcessorType" substitutionGroup="abstract-routing-message-processor">
-        <xsd:annotation>
-            <xsd:documentation>
-                Sends the same message to multiple message processors.
-                @Deprecated since 3.5.0. Use scatter-gather instead
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>

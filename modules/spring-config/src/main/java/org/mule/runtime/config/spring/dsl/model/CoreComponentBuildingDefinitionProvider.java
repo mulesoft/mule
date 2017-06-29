@@ -211,7 +211,6 @@ import org.mule.runtime.core.routing.filters.WildcardFilter;
 import org.mule.runtime.core.routing.filters.logic.AndFilter;
 import org.mule.runtime.core.routing.filters.logic.NotFilter;
 import org.mule.runtime.core.routing.filters.logic.OrFilter;
-import org.mule.runtime.core.routing.outbound.MulticastingRouter;
 import org.mule.runtime.core.routing.requestreply.SimpleAsyncRequestReplyRequester;
 import org.mule.runtime.core.security.MuleSecurityManagerConfigurator;
 import org.mule.runtime.core.security.PasswordBasedEncryptionStrategy;
@@ -287,7 +286,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   private static final String ROUND_ROBIN = "round-robin";
   private static final String CHOICE = "choice";
   private static final String OTHERWISE = "otherwise";
-  private static final String ALL = "all";
   private static final String SCHEDULER = "scheduler";
   private static final String REQUEST_REPLY = "request-reply";
   private static final String ERROR_TYPE = "errorType";
@@ -544,10 +542,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
             .withObjectFactoryType(MessageProcessorFilterPairFactoryBean.class)
             .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
             .withSetterParameterDefinition("expression", fromFixedValue("true").build()).build());
-    componentBuildingDefinitions
-        .add(baseDefinition.copy().withIdentifier(ALL).withTypeDefinition(fromType(MulticastingRouter.class))
-            .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
-            .build());
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("message-chunk-splitter")
         .withTypeDefinition(fromType(MessageChunkSplitter.class))
         .withSetterParameterDefinition("messageSize", fromSimpleParameter("messageSize").build()).build());
