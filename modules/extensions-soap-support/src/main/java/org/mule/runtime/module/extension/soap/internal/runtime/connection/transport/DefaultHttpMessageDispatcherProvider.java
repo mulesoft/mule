@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.soap.internal.runtime.connection.trans
 
 import static java.util.Objects.isNull;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
@@ -24,6 +25,8 @@ import org.mule.runtime.http.api.client.HttpClient;
 import org.mule.runtime.http.api.client.HttpClientConfiguration;
 import org.mule.runtime.soap.api.message.dispatcher.DefaultHttpMessageDispatcher;
 import org.mule.runtime.soap.api.message.dispatcher.HttpConfigBasedMessageDispatcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 
 /**
@@ -33,6 +36,8 @@ import javax.inject.Inject;
  * @since 4.0
  */
 public class DefaultHttpMessageDispatcherProvider implements HttpMessageDispatcherProvider, Lifecycle {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(DefaultHttpMessageDispatcher.class);
 
   @Inject
   private HttpService httpService;
@@ -54,7 +59,7 @@ public class DefaultHttpMessageDispatcherProvider implements HttpMessageDispatch
 
   @Override
   public void disconnect(MessageDispatcher connection) {
-    connection.dispose();
+    disposeIfNeeded(connection, LOGGER);
   }
 
   @Override

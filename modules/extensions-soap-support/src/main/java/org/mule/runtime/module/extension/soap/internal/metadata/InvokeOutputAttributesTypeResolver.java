@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.soap.internal.metadata;
 
+import static org.mule.runtime.extension.internal.soap.metadata.SoapOutputTypeBuilder.buildOutputAttributesType;
+
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataContext;
@@ -13,7 +15,6 @@ import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.AttributesTypeResolver;
 import org.mule.runtime.soap.api.client.SoapClient;
 import org.mule.runtime.soap.api.client.metadata.SoapOperationMetadata;
-import org.mule.runtime.soap.internal.metadata.SoapOutputTypeBuilder;
 
 /**
  * Resolves the output attributes metadata for the soap connect invoke operation
@@ -22,8 +23,6 @@ import org.mule.runtime.soap.internal.metadata.SoapOutputTypeBuilder;
  */
 public final class InvokeOutputAttributesTypeResolver extends BaseInvokeResolver
     implements AttributesTypeResolver<WebServiceTypeKey> {
-
-  private final SoapOutputTypeBuilder outputTypeBuilder = new SoapOutputTypeBuilder();
 
   /**
    * {@inheritDoc}
@@ -41,6 +40,6 @@ public final class InvokeOutputAttributesTypeResolver extends BaseInvokeResolver
       throws MetadataResolvingException, ConnectionException {
     SoapClient client = getClient(context, key);
     SoapOperationMetadata metadata = client.getMetadataResolver().getOutputMetadata(key.getOperation());
-    return outputTypeBuilder.buildAttributes(metadata, context.getTypeBuilder());
+    return buildOutputAttributesType(metadata.getHeadersType(), context.getTypeBuilder());
   }
 }

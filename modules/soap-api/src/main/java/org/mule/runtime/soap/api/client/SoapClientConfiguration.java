@@ -9,6 +9,7 @@ package org.mule.runtime.soap.api.client;
 import org.mule.runtime.extension.api.soap.message.MessageDispatcher;
 import org.mule.runtime.extension.api.soap.security.SecurityStrategy;
 import org.mule.runtime.soap.api.SoapVersion;
+import org.mule.runtime.soap.api.transport.TransportResourceLocator;
 
 import java.util.List;
 
@@ -27,6 +28,7 @@ public final class SoapClientConfiguration {
   private final boolean mtomEnabled;
   private final List<SecurityStrategy> securities;
   private final MessageDispatcher dispatcher;
+  private final TransportResourceLocator locator;
   private final String encoding;
 
   SoapClientConfiguration(String wsdlLocation,
@@ -37,6 +39,7 @@ public final class SoapClientConfiguration {
                           boolean mtomEnabled,
                           List<SecurityStrategy> securities,
                           MessageDispatcher dispatcher,
+                          TransportResourceLocator locator,
                           String encoding) {
     this.wsdlLocation = wsdlLocation;
     this.address = address;
@@ -46,6 +49,7 @@ public final class SoapClientConfiguration {
     this.mtomEnabled = mtomEnabled;
     this.securities = securities;
     this.dispatcher = dispatcher;
+    this.locator = locator;
     this.encoding = encoding;
   }
 
@@ -87,5 +91,9 @@ public final class SoapClientConfiguration {
 
   public String getEncoding() {
     return encoding;
+  }
+
+  public TransportResourceLocator getLocator() {
+    return locator;
   }
 }

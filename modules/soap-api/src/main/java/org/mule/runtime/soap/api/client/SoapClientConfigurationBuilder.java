@@ -19,6 +19,8 @@ import org.mule.runtime.extension.api.soap.security.UsernameTokenSecurityStrateg
 import org.mule.runtime.extension.api.soap.security.VerifySignatureSecurityStrategy;
 import org.mule.runtime.soap.api.SoapVersion;
 import org.mule.runtime.soap.api.message.SoapMessage;
+import org.mule.runtime.soap.api.transport.NullTransportResourceLocator;
+import org.mule.runtime.soap.api.transport.TransportResourceLocator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +41,7 @@ public class SoapClientConfigurationBuilder {
   private List<SecurityStrategy> securities = new ArrayList<>();
   private MessageDispatcher dispatcher;
   private String encoding;
+  private TransportResourceLocator locator = new NullTransportResourceLocator();
 
   SoapClientConfigurationBuilder() {}
 
@@ -108,8 +111,8 @@ public class SoapClientConfigurationBuilder {
    *
    * @return this builder.
    */
-  public SoapClientConfigurationBuilder enableMtom() {
-    this.mtomEnabled = true;
+  public SoapClientConfigurationBuilder enableMtom(boolean mtomEnabled) {
+    this.mtomEnabled = mtomEnabled;
     return this;
   }
 
@@ -129,6 +132,16 @@ public class SoapClientConfigurationBuilder {
   }
 
   /**
+   * Sets a list of {@link SecurityStrategy SecurityStrategies} to connect with a Secured Soap Web Service.
+   *
+   * @return this builder.
+   */
+  public SoapClientConfigurationBuilder withSecurities(List<SecurityStrategy> security) {
+    this.securities.addAll(security);
+    return this;
+  }
+
+  /**
    * Sets a custom {@link MessageDispatcher} that enables the send and retrieve of {@link SoapMessage}s using a custom underlying
    * transport.
    *
@@ -140,6 +153,16 @@ public class SoapClientConfigurationBuilder {
   }
 
   /**
+   * Sets a {@link TransportResourceLocator} instance to fetch the wsdl resources.
+   *
+   * @return this builder
+   */
+  public SoapClientConfigurationBuilder withResourceLocator(TransportResourceLocator locator) {
+    this.locator = locator;
+    return this;
+  }
+
+  /**
    * @return a new {@link SoapClientConfiguration} instance with the attributes specified.
    */
   public SoapClientConfiguration build() {
@@ -147,7 +170,7 @@ public class SoapClientConfigurationBuilder {
     checkNotNull(service, "Service cannot be null");
     checkNotNull(port, "Port cannot be null");
     checkNotNull(dispatcher, "Message Dispatcher cannot be null");
-    return new SoapClientConfiguration(wsdlLocation, address, service, port, version,
-                                       mtomEnabled, securities, dispatcher, encoding);
+    return new SoapClientConfiguration(wsdlLocation, address, service, port, version, mtomEnabled, securities,
+                                       dispatcher, locator, encoding);
   }
 }

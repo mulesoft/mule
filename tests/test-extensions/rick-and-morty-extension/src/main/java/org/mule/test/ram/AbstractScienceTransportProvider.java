@@ -6,16 +6,14 @@
  */
 package org.mule.test.ram;
 
-import static java.util.Collections.emptyMap;
+import static java.util.Collections.singletonMap;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.soap.MessageDispatcherProvider;
-import org.mule.runtime.extension.api.soap.message.DispatchingRequest;
 import org.mule.runtime.extension.api.soap.message.DispatchingResponse;
 import org.mule.runtime.extension.api.soap.message.MessageDispatcher;
-
 import java.io.ByteArrayInputStream;
 import java.net.URL;
 
@@ -23,27 +21,13 @@ public abstract class AbstractScienceTransportProvider implements MessageDispatc
 
   @Override
   public MessageDispatcher connect() throws ConnectionException {
-    return new MessageDispatcher() {
-
-      @Override
-      public DispatchingResponse dispatch(DispatchingRequest context) {
-        try {
-          URL resource = Thread.currentThread().getContextClassLoader().getResource("test-http-response.xml");
-          String response = String.format(IOUtils.toString(resource.openStream()), getResponseWord());
-          return new DispatchingResponse(new ByteArrayInputStream(response.getBytes()), "text/xml", emptyMap());
-        } catch (Exception e) {
-          throw new RuntimeException("Something went wrong when getting fake test response", e);
-        }
-      }
-
-      @Override
-      public void dispose() {
-
-      }
-
-      @Override
-      public void initialise() throws InitialisationException {
-
+    return request -> {
+      try {
+        URL resource = Thread.currentThread().getContextClassLoader().getResource("test-http-response.xml");
+        String response = String.format(IOUtils.toString(resource.openStream()), getResponseWord());
+        return new DispatchingResponse(new ByteArrayInputStream(response.getBytes()), singletonMap("Content-Type", "text/xml"));
+      } catch (Exception e) {
+        throw new RuntimeException("Something went wrong when getting fake test response", e);
       }
     };
   }
@@ -51,9 +35,7 @@ public abstract class AbstractScienceTransportProvider implements MessageDispatc
   protected abstract String getResponseWord();
 
   @Override
-  public void disconnect(MessageDispatcher connection) {
-    connection.dispose();
-  }
+  public void disconnect(MessageDispatcher connection) {}
 
   @Override
   public ConnectionValidationResult validate(MessageDispatcher connection) {
