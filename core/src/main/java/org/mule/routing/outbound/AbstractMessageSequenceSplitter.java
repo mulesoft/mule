@@ -22,18 +22,20 @@ import org.mule.routing.AbstractSplitter;
 import org.mule.routing.CorrelationMode;
 import org.mule.routing.DefaultRouterResultsHandler;
 import org.mule.routing.MessageSequence;
+import org.mule.util.CollectionUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.collections.Transformer;
+
 /**
- * Base implementation of a {@link MuleMessage} splitter, that converts its payload 
- * in a {@link MessageSequence}, and process each element of it.     
- * Implementations must implement {@link #splitMessageIntoSequence(MuleEvent)} and determine how 
- * the message is split.
+ * Base implementation of a {@link MuleMessage} splitter, that converts its payload in a {@link MessageSequence}, and
+ * process each element of it. Implementations must implement {@link #splitMessageIntoSequence(MuleEvent)} and determine
+ * how the message is split.
  * <p>
- * <b>EIP Reference:</b> <a
- * href="http://www.eaipatterns.com/Sequencer.html">http://www
+ * <b>EIP Reference:</b> <a href="http://www.eaipatterns.com/Sequencer.html">http://www
  * .eaipatterns.com/Sequencer.html</a>
  * 
  * @author flbulgarelli
@@ -85,8 +87,7 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
     }
 
     /**
-     * Converts the event into a {@link MessageSequence} that will retrieve each of
-     * the event elements
+     * Converts the event into a {@link MessageSequence} that will retrieve each of the event elements
      * 
      * @param event the event to split
      * @return a sequence of elements
@@ -113,6 +114,26 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
         for (; messageSequence.hasNext();)
         {
             Object payload = messageSequence.next();
+
+            if (payload instanceof Collection)
+            {
+                payload = CollectionUtils.collect((Collection) payload, new Transformer()
+                {
+                    @Override
+                    public Object transform(Object input)
+                    {
+                        if (input instanceof MuleMessage)
+                        {
+                            return ((MuleMessage) input).getPayload();
+                        }
+                        else
+                        {
+                            return input;
+                        }
+                    }
+                });
+            }
+
             MuleMessage message = createMessage(payload, originalEvent.getMessage());
             correlationSequence++;
             if (counterVariableName != null)

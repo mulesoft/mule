@@ -6,7 +6,11 @@
  */
 package org.mule.routing;
 
+import static java.util.Arrays.asList;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
@@ -28,6 +32,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.hamcrest.core.Is;
+import org.hamcrest.core.IsCollectionContaining;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -250,6 +256,43 @@ public class ForeachTestCase extends AbstractMuleContextTestCase
         assertAddedPathElements(originalMessageProcessors, mpPathElement);
     }
 
+    @Test
+    public void batchSize() throws Exception
+    {
+        Foreach foreachMp = new Foreach();
+        foreachMp.setMuleContext(muleContext);
+        List<MessageProcessor> processors = getSimpleMessageProcessors();
+        foreachMp.setMessageProcessors(processors);
+        foreachMp.setBatchSize(2);
+        foreachMp.initialise();
+
+        foreachMp.process(getTestEvent(asList(1, 2,3)));
+        
+        assertThat(processedEvents, hasSize(2));
+        assertThat(processedEvents.get(0).getMessageAsString(), is("[1, 2]:foo:zas"));
+        assertThat(processedEvents.get(1).getMessageAsString(), is("[3]:foo:zas"));
+    }
+
+    @Test
+    public void batchSizeWithCollectionAttributes() throws Exception
+    {
+        Foreach foreachMp = new Foreach();
+        foreachMp.setMuleContext(muleContext);
+        List<MessageProcessor> processors = getSimpleMessageProcessors();
+        foreachMp.setMessageProcessors(processors);
+        foreachMp.setBatchSize(2);
+        foreachMp.setCollectionExpression("flowVars.collection");
+        foreachMp.initialise();
+        
+        MuleEvent event = getTestEvent(null);
+        event.setFlowVariable("collection", asList(1, 2, 3));
+        foreachMp.process(event);
+
+        assertThat(processedEvents, hasSize(2));
+        assertThat(processedEvents.get(0).getMessageAsString(), is("[1, 2]:foo:zas"));
+        assertThat(processedEvents.get(1).getMessageAsString(), is("[3]:foo:zas"));
+    }
+    
     protected void assertAddedPathElements(List<MessageProcessor> processors, MessageProcessorPathElement mpPathElement)
     {
         verify(mpPathElement, times(processors.size())).addChild(any(MessageProcessor.class));
