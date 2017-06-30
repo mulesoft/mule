@@ -15,6 +15,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
+import static org.mule.runtime.api.meta.model.display.PathModel.Type.ANY;
+import static org.mule.runtime.api.meta.model.display.PathModel.Type.DIRECTORY;
 import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.LAB_ADDRESS_EXAMPLE;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.PARAMETER_ORIGINAL_OVERRIDED_DISPLAY_NAME;
@@ -153,7 +155,8 @@ public class DisplayDeclarationEnricherTestCase extends AbstractMuleTestCase {
     ParameterDeclaration pathParam = params.get(0);
     Optional<PathModel> pathModel = pathParam.getDisplayModel().getPathModel();
     assertThat(pathModel.isPresent(), is(true));
-    assertThat(pathModel.get().isDirectory(), is(false));
+    assertThat(pathModel.get().getType(), is(ANY));
+    assertThat(pathModel.get().acceptsUrls(), is(false));
     assertThat(pathModel.get().getFileExtensions(), hasItem("xml"));
   }
 
@@ -169,7 +172,8 @@ public class DisplayDeclarationEnricherTestCase extends AbstractMuleTestCase {
     ParameterDeclaration pathParam = params.get(0);
     Optional<PathModel> pathModel = pathParam.getDisplayModel().getPathModel();
     assertThat(pathModel.isPresent(), is(true));
-    assertThat(pathModel.get().isDirectory(), is(true));
+    assertThat(pathModel.get().getType(), is(DIRECTORY));
+    assertThat(pathModel.get().acceptsUrls(), is(false));
     assertThat(pathModel.get().getFileExtensions(), empty());
   }
 
@@ -184,7 +188,8 @@ public class DisplayDeclarationEnricherTestCase extends AbstractMuleTestCase {
     ParameterDeclaration pathParam = params.get(0);
     Optional<PathModel> pathModel = pathParam.getDisplayModel().getPathModel();
     assertThat(pathModel.isPresent(), is(true));
-    assertThat(pathModel.get().isDirectory(), is(false));
+    assertThat(pathModel.get().getType(), is(ANY));
+    assertThat(pathModel.get().acceptsUrls(), is(true));
     assertThat(pathModel.get().getFileExtensions(), empty());
   }
 

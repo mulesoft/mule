@@ -10,19 +10,20 @@ import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.api.meta.model.ExecutionType.CPU_INTENSIVE;
+
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.NullAttributes;
 import org.mule.runtime.extension.api.annotation.execution.Execution;
-import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Config;
+import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.Path;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.test.marvel.model.Missile;
 import org.mule.test.marvel.model.Villain;
-
 import java.util.concurrent.ScheduledExecutorService;
 
 public class IronManOperations implements Initialisable, Disposable {
@@ -63,7 +64,7 @@ public class IronManOperations implements Initialisable, Disposable {
     executorService.schedule(launch, MISSILE_TRAVEL_TIME, MILLISECONDS);
   }
 
-  public String findInstructions(@Path(acceptedFileExtensions = {"xml"}) String instructionsFile) {
+  public String findInstructions(@Optional @Path(acceptedFileExtensions = {"xml"}) String instructionsFile) {
     return instructionsFile;
   }
 

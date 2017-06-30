@@ -133,8 +133,12 @@ public final class DisplayDeclarationEnricher extends AbstractAnnotatedDeclarati
     String summary = summaryAnnotation != null ? summaryAnnotation.value() : null;
     String displayName = displayNameAnnotation != null ? displayNameAnnotation.value() : null;
     String example = exampleAnnotation != null ? exampleAnnotation.value() : null;
-    PathModel pathModel =
-        pathAnnotation != null ? new PathModel(pathAnnotation.isDirectory(), pathAnnotation.acceptedFileExtensions()) : null;
+    PathModel pathModel = null;
+    if (pathAnnotation != null) {
+      pathModel = new PathModel(pathAnnotation.type(),
+                                pathAnnotation.acceptsUrls(),
+                                pathAnnotation.acceptedFileExtensions());
+    }
 
     if (summary != null || displayName != null || example != null || pathModel != null) {
       declaration.setDisplayModel(DisplayModel.builder()
