@@ -421,9 +421,10 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
   protected MuleBeanDefinitionDocumentReader createBeanDefinitionDocumentReader(BeanDefinitionFactory beanDefinitionFactory) {
     if (artifactType.equals(ArtifactType.DOMAIN)) {
       return new MuleDomainBeanDefinitionDocumentReader(beanDefinitionFactory, xmlApplicationParser,
-                                                        componentBuildingDefinitionRegistry);
+                                                        componentBuildingDefinitionRegistry, this.artifactProperties);
     }
-    return new MuleBeanDefinitionDocumentReader(beanDefinitionFactory, xmlApplicationParser, componentBuildingDefinitionRegistry);
+    return new MuleBeanDefinitionDocumentReader(beanDefinitionFactory, xmlApplicationParser, componentBuildingDefinitionRegistry,
+                                                this.artifactProperties);
   }
 
   protected MuleDocumentLoader createLoader() {
