@@ -25,7 +25,7 @@ import org.junit.Test;
 public class ExceptionListenerTestCase extends AbstractMuleTestCase {
 
   @Test
-  public void testAddGoodEndpoint() throws Exception {
+  public void setSingleGoodProcessorEndpoint() throws Exception {
     AbstractExceptionListener router = new OnErrorPropagateHandler();
     Processor messageProcessor = mock(Processor.class);
     router.setMessageProcessors(singletonList(messageProcessor));
@@ -34,7 +34,7 @@ public class ExceptionListenerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void testSetGoodEndpoints() throws Exception {
+  public void setGoodProcessors() throws Exception {
     List<Processor> list = new ArrayList<Processor>();
     list.add(mock(Processor.class));
     list.add(mock(Processor.class));

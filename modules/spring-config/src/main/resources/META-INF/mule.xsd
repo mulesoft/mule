@@ -1675,47 +1675,6 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:complexType name="abstractExceptionStrategyType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractNotificationExceptionStrategyType">
-                <xsd:sequence>
-                    <xsd:element name="commit-transaction" type="exceptionPatternType" maxOccurs="1" minOccurs="0">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                            These exceptions will be considered "delivered" after handling by the exception strategy.  Any exception not
-                            accepted by this filter will be redelivered/rolled back.
-                            You can set a comma-separated list of wildcard patterns that will be matched against the fully qualified class name of the current exception.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
-                    <xsd:element name="rollback-transaction" type="exceptionPatternType" maxOccurs="1" minOccurs="0">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                            These exceptions will be redelivered/rolled back after handling by the exception strategy.
-                            You can set a comma-separated list of wildcard patterns that will be matched against the fully qualified class name of the current exception.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
-                    <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" minOccurs="0" maxOccurs="1">
-                        <xsd:annotation>
-                            <xsd:documentation>Destination to which an ExceptionMessage will be sent; this could be a router, or other message processor.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:group>
-                </xsd:sequence>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:complexType name="exceptionPatternType">
-        <xsd:attribute name="exception-pattern" type="xsd:string" use="required">
-            <xsd:annotation>
-                <xsd:documentation>A comma-separated list of wildcard expressions that will be matched against the fully qualified classname of the current exception received by the ExceptionStrategy.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-    </xsd:complexType>
-
     <!--==============================================================-->
     <!--   Reconnection strategies                                    -->
     <!--==============================================================-->
