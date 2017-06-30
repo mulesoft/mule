@@ -45,6 +45,8 @@ public class DefaultResourceReleaser implements ResourceReleaser {
     deregisterJdbcDrivers();
 
     cleanUpResourceBundle();
+
+    leakPreventionForDerbyDriver();
   }
 
   private void cleanUpResourceBundle() {
@@ -157,6 +159,30 @@ public class DefaultResourceReleaser implements ResourceReleaser {
       }
     } catch (Throwable e) {
       logger.warn("Unable to unregister Oracle's mbeans", e);
+    }
+  }
+
+  private void leakPreventionForDerbyDriver() {
+    try {
+      // Die Derby die
+      Class<?> abandonedConnectionCleanupThreadClass =
+          Class.forName("org.apache.derby.jdbc.EmbeddedDriver", false, this.getClass().getClassLoader());
+      Object driverObject = abandonedConnectionCleanupThreadClass.newInstance();
+
+      if (hasDeclaredMethod(abandonedConnectionCleanupThreadClass, "connect", String.class, java.util.Properties.class)) {
+        Method m = abandonedConnectionCleanupThreadClass.getDeclaredMethod("connect", String.class, java.util.Properties.class);
+        m.invoke(driverObject, "jdbc:derby:;shutdown=true", null);
+      }
+    } catch (Exception sq) {
+      // ClassNotFoundException, SQLException or any other, just ignore
+    }
+  }
+
+  private boolean hasDeclaredMethod(Class<?> clazz, String methodName, Class<?>... parameterTypes) {
+    try {
+      return clazz.getDeclaredMethod(methodName, parameterTypes) != null;
+    } catch (NoSuchMethodException ex) {
+      return false;
     }
   }
 
