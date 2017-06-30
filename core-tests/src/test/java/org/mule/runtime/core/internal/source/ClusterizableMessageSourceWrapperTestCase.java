@@ -14,7 +14,6 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.source.ClusterizableMessageSource;
 import org.mule.runtime.core.api.context.notification.ClusterNodeNotification;
 import org.mule.runtime.core.api.lifecycle.PrimaryNodeLifecycleNotificationListener;
 import org.mule.tck.junit4.AbstractMuleTestCase;
