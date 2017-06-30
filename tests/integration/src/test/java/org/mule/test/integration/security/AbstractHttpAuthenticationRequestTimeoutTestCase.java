@@ -22,7 +22,7 @@ public abstract class AbstractHttpAuthenticationRequestTimeoutTestCase extends F
     private static Integer delay;
 
     @Rule
-    public SystemProperty timeoutSystemProperty ;
+    public SystemProperty timeoutSystemProperty;
 
     @Rule
     public SystemProperty isPreemptiveSystemProperty;
