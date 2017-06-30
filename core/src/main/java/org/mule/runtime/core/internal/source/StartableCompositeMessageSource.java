@@ -61,10 +61,6 @@ public class StartableCompositeMessageSource extends AbstractAnnotatedObject
   public void addSource(MessageSource source) throws MuleException {
     MessageSource messageSource = source;
 
-    if (messageSource instanceof ClusterizableMessageSource) {
-      messageSource = new ClusterizableMessageSourceWrapper((ClusterizableMessageSource) messageSource);
-    }
-
     synchronized (sources) {
       sources.add(messageSource);
     }
