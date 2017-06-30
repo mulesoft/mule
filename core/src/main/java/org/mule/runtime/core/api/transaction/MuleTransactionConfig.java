@@ -8,9 +8,10 @@ package org.mule.runtime.core.api.transaction;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
-import org.mule.runtime.core.api.util.ClassUtils;
+import org.mule.runtime.core.api.context.MuleContextAware;
+
+import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +50,7 @@ public class MuleTransactionConfig implements TransactionConfig, MuleContextAwar
     this.action = action;
   }
 
+  @Override
   public void setMuleContext(MuleContext context) {
     // override only if not set in config
     if (this.timeout == null) {
@@ -56,10 +58,12 @@ public class MuleTransactionConfig implements TransactionConfig, MuleContextAwar
     }
   }
 
+  @Override
   public TransactionFactory getFactory() {
     return factory;
   }
 
+  @Override
   public void setFactory(TransactionFactory factory) {
     if (factory == null) {
       throw new IllegalArgumentException("Transaction Factory cannot be null");
@@ -67,19 +71,23 @@ public class MuleTransactionConfig implements TransactionConfig, MuleContextAwar
     this.factory = factory;
   }
 
+  @Override
   public byte getAction() {
     return action;
   }
 
+  @Override
   public void setAction(byte action) {
     this.action = action;
 
   }
 
+  @Override
   public boolean isInteractWithExternal() {
     return interactWithExternal;
   }
 
+  @Override
   public void setInteractWithExternal(boolean interactWithExternal) {
     this.interactWithExternal = interactWithExternal;
   }
@@ -128,6 +136,7 @@ public class MuleTransactionConfig implements TransactionConfig, MuleContextAwar
   /**
    * Will the result, at the end of running the transaction template, be an active transaction?
    */
+  @Override
   public boolean isTransacted() {
     if (action == ACTION_NEVER || action == ACTION_NONE || action == ACTION_NOT_SUPPORTED) {
       return false;
@@ -159,18 +168,22 @@ public class MuleTransactionConfig implements TransactionConfig, MuleContextAwar
     }
   }
 
+  @Override
   public boolean isConfigured() {
     return factory != null;
   }
 
+  @Override
   public int getTimeout() {
     return timeout == null ? 0 : timeout;
   }
 
+  @Override
   public void setTimeout(int timeout) {
     this.timeout = timeout;
   }
 
+  @Override
   public String toString() {
     StringBuilder buf = new StringBuilder();
     buf.append("Transaction{factory=").append(factory).append(", action=").append(getActionAsString()).append(", timeout=")
@@ -178,10 +191,12 @@ public class MuleTransactionConfig implements TransactionConfig, MuleContextAwar
     return buf.toString();
   }
 
+  @Override
   public int hashCode() {
-    return ClassUtils.hash(new Object[] {factory, action, timeout == null ? 0 : timeout});
+    return Objects.hash(factory, action, timeout == null ? 0 : timeout);
   }
 
+  @Override
   public boolean equals(Object obj) {
     if (this == obj)
       return true;
@@ -189,8 +204,8 @@ public class MuleTransactionConfig implements TransactionConfig, MuleContextAwar
       return false;
 
     final MuleTransactionConfig other = (MuleTransactionConfig) obj;
-    return ClassUtils.equal(factory, other.factory) && ClassUtils.equal(action, other.action)
-        && ClassUtils.equal(timeout, other.timeout);
+    return Objects.equals(factory, other.factory) && Objects.equals(action, other.action)
+        && Objects.equals(timeout, other.timeout);
   }
 
 }

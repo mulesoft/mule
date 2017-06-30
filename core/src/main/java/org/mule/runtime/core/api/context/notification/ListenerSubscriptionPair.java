@@ -10,8 +10,8 @@ import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
-import org.mule.runtime.core.api.util.ClassUtils;
 
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -50,7 +50,7 @@ public class ListenerSubscriptionPair extends AbstractAnnotatedObject {
 
   @Override
   public int hashCode() {
-    return ClassUtils.hash(new Object[] {listener, subscription});
+    return Objects.hash(listener, subscription);
   }
 
   @Override
@@ -63,7 +63,7 @@ public class ListenerSubscriptionPair extends AbstractAnnotatedObject {
     }
 
     ListenerSubscriptionPair other = (ListenerSubscriptionPair) obj;
-    return ClassUtils.equal(listener, other.listener) && ClassUtils.equal(subscription, other.subscription);
+    return Objects.equals(listener, other.listener) && Objects.equals(subscription, other.subscription);
   }
 
   @Override
