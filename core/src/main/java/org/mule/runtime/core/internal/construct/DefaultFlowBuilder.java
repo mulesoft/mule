@@ -37,7 +37,6 @@ import org.mule.runtime.core.interceptor.ProcessingTimeInterceptor;
 import org.mule.runtime.core.internal.construct.processor.FlowConstructStatisticsMessageProcessor;
 import org.mule.runtime.core.processor.strategy.TransactionAwareWorkQueueProcessingStrategyFactory;
 import org.mule.runtime.core.routing.requestreply.AsyncReplyToPropertyRequestReplyReplier;
-import org.mule.runtime.core.internal.source.ClusterizableMessageSourceWrapper;
 
 import java.util.List;
 import java.util.Optional;
