@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.core.internal.execution;
 
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 
@@ -39,6 +39,11 @@ public class HandleExceptionInterceptor implements ExecutionInterceptor<Event> {
         }
         e.setProcessedEvent(result);
       } catch (Exception messagingExceptionHandlerException) {
+        // TODO MULE-10370 - Once custom-exception-strategy gets removed we need to allow the inner exception handler to throw
+        // MessagingException for the cases where there's a failure inside the on-error-* element.
+        if (messagingExceptionHandlerException.getCause() instanceof MessagingException) {
+          throw (MessagingException) messagingExceptionHandlerException.getCause();
+        }
         throw messagingExceptionHandlerException;
       }
       throw e;
