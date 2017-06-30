@@ -64,9 +64,6 @@ public class MetadataComponentModelValidator implements ExtensionModelValidator 
 
   @Override
   public void validate(ExtensionModel extensionModel, ProblemsReporter problemsReporter) {
-    if (!(extensionModel instanceof ExtensionModel)) {
-      return;
-    }
 
     final Table<String, String, Class<?>> names = HashBasedTable.create();
     new ExtensionWalker() {

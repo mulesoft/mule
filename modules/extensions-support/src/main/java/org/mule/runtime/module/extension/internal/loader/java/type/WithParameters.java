@@ -32,4 +32,5 @@ public interface WithParameters {
    * @return A list of {@link ExtensionParameter} that are annotated with the given Annotation Class
    */
   List<ExtensionParameter> getParametersAnnotatedWith(Class<? extends Annotation> annotationClass);
+
 }

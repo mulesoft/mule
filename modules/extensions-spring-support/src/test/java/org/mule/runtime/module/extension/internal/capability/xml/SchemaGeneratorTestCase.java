@@ -42,6 +42,7 @@ import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.marvel.MarvelExtension;
 import org.mule.test.metadata.extension.MetadataExtension;
 import org.mule.test.oauth.TestOAuthExtension;
+import org.mule.test.values.extension.ValuesExtension;
 import org.mule.test.petstore.extension.PetStoreConnector;
 import org.mule.test.ram.RickAndMortyExtension;
 import org.mule.test.soap.extension.FootballSoapExtension;
@@ -138,7 +139,10 @@ public class SchemaGeneratorTestCase extends AbstractMuleTestCase {
                                                                                                "typed-value.xsd"),
                                                                    new SchemaGeneratorTestUnit(javaLoader,
                                                                                                TestOAuthExtension.class,
-                                                                                               "test-oauth.xsd"));
+                                                                                               "test-oauth.xsd"),
+                                                                   new SchemaGeneratorTestUnit(javaLoader,
+                                                                                               ValuesExtension.class,
+                                                                                               "values.xsd"));
 
     BiFunction<Class<?>, ExtensionModelLoader, ExtensionModel> createExtensionModel = (extension, loader) -> {
       ExtensionModel model = loadExtension(extension, loader);

@@ -6,13 +6,20 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
+import static java.lang.String.format;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldValue;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getGroupModelContainerName;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getRealName;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
-import org.mule.runtime.module.extension.internal.runtime.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterGroupArgumentResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -20,24 +27,31 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public class OperationParameterValueResolver implements ParameterValueResolver {
+public final class OperationParameterValueResolver implements ParameterValueResolver {
 
   private final OperationModel operationModel;
   private final ExecutionContext<OperationModel> executionContext;
+  private final Map<String, String> showInDslParameters;
 
-  public OperationParameterValueResolver(ExecutionContext<OperationModel> executionContext) {
+  OperationParameterValueResolver(ExecutionContext<OperationModel> executionContext) {
     this.executionContext = executionContext;
     this.operationModel = executionContext.getComponentModel();
+    this.showInDslParameters = getShowInDslParameters();
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public Object getParameterValue(String containerName) {
-    return getParameterGroup(containerName)
+  public Object getParameterValue(String parameterName) {
+    return getParameterGroup(parameterName)
         .map(group -> new ParameterGroupArgumentResolver<>(group).resolve(executionContext))
-        .orElseGet(() -> executionContext.getParameter(containerName));
+        .orElseGet(() -> {
+          String showInDslGroupName = showInDslParameters.get(parameterName);
+          return showInDslGroupName != null
+              ? getShowInDslParameterValue(parameterName, showInDslGroupName)
+              : executionContext.getParameter(parameterName);
+        });
   }
 
   private Optional<ParameterGroupDescriptor> getParameterGroup(String parameterGroupName) {
@@ -50,5 +64,26 @@ public class OperationParameterValueResolver implements ParameterValueResolver {
         .map(group -> group.getModelProperty(ParameterGroupModelProperty.class))
         .filter(Optional::isPresent)
         .map(group -> group.get().getDescriptor());
+  }
+
+  private Object getShowInDslParameterValue(String parameterName, String showInDslGroupName) {
+    Object group = executionContext.getParameter(showInDslGroupName);
+    try {
+      return getFieldValue(group, parameterName);
+    } catch (IllegalAccessException | NoSuchFieldException e) {
+      throw new IllegalStateException(format("An error occurred trying to obtain the field '%s' from the group '%s' of the Operation '%s'",
+                                             parameterName, showInDslGroupName, operationModel.getName()));
+    }
+  }
+
+  private Map<String, String> getShowInDslParameters() {
+    HashMap<String, String> showInDslMap = new HashMap<>();
+
+    operationModel.getParameterGroupModels().stream()
+        .filter(ParameterGroupModel::isShowInDsl)
+        .forEach(groupModel -> groupModel.getParameterModels()
+            .forEach(param -> showInDslMap.put(getRealName(param), getGroupModelContainerName(groupModel))));
+
+    return showInDslMap;
   }
 }

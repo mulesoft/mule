@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:values="http://www.mulesoft.org/schema/mule/values"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/values http://www.mulesoft.org/schema/mule/values/current/mule-values.xsd">
+
+    <values:config name="config">
+        <values:connection></values:connection>
+        <values:config-values>
+            <values:config-value value="config1"/>
+            <values:config-value value="config2"/>
+            <values:config-value value="config3"/>
+        </values:config-values>
+    </values:config>
+
+    <flow name="single-values-enabled-parameter">
+        <values:single-values-enabled-parameter channels="dummyValue"/>
+    </flow>
+
+    <flow name="singleValuesEnabledParameterWithConnection">
+        <values:single-values-enabled-parameter-with-connection config-ref="config" channels="dummyValue"/>
+    </flow>
+
+    <flow name="singleValuesEnabledParameterWithConfiguration">
+        <values:single-values-enabled-parameter-with-configuration config-ref="config" channels="dummyValue"/>
+    </flow>
+
+    <flow name="singleValuesEnabledParameterWithRequiredParameters">
+        <values:single-values-enabled-parameter-with-required-parameters channels="dummyValue" requiredInteger="2" requiredString="aString">
+            <values:strings>
+                <values:string value="1"/>
+                <values:string value="2"/>
+            </values:strings>
+        </values:single-values-enabled-parameter-with-required-parameters>
+    </flow>
+
+    <flow name="singleValuesEnabledParameterInsideParameterGroup">
+        <values:single-values-enabled-parameter-inside-parameter-group anyParameter="aParam" channels="dummyValue"/>
+    </flow>
+
+    <flow name="singleValuesEnabledParameterRequiresValuesOfParameterGroup">
+        <values:single-values-enabled-parameter-requires-values-of-parameter-group anyParameter="aParam" channels="dummyValue" values="dummyValue"/>
+    </flow>
+
+    <flow name="multiLevelValue">
+        <values:multi-level-value />
+    </flow>
+
+    <flow name="singleValuesWithRequiredParameterWithAlias">
+        <values:single-values-with-required-parameter-with-alias channels="dummyValue" superString="dummyValue"/>
+    </flow>
+
+    <flow name="resolverGetsMuleContextInjection">
+        <values:resolver-gets-mule-context-injection channel="dummyValue"/>
+    </flow>
+
+    <flow name="valuesInsideShowInDslGroup">
+        <values:values-inside-show-in-dsl-group values="dummyValue">
+            <values:values-group channels="dummyValue" anyParameter="someValue"/>
+        </values:values-inside-show-in-dsl-group>
+    </flow>
+
+</mule>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:values="http://www.mulesoft.org/schema/mule/values"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/values http://www.mulesoft.org/schema/mule/values/current/mule-values.xsd">
+
+    <values:config-with-value-config name="config-with-value" channel="dummyValue"/>
+
+    <values:value-with-required-param-config name="value-with-required-param" channel="dummyValue" required1="value1" required2="value2">
+        <values:connection/>
+    </values:value-with-required-param-config>
+
+    <values:values-with-required-params-from-show-in-dsl-group-config
+            name="values-with-required-params-from-show-in-dsl-group" valueParam="dummyValue">
+        <values:some-group channels="channels!!" anyParameter="someValue"/>
+    </values:values-with-required-params-from-show-in-dsl-group-config>
+
+    <values:values-with-required-params-from-param-group-config name="values-with-required-params-from-param-group-config"  channels="dummyValue" anyParameter="someValue" valueParam="dummyValue"/>
+
+</mule>

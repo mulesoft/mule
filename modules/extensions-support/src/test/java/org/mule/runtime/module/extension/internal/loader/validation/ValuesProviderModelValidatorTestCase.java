@@ -1,0 +1,215 @@
+/*
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+package org.mule.runtime.module.extension.internal.loader.validation;
+
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptySet;
+import static java.util.Collections.singletonList;
+import static java.util.Optional.empty;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
+import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.java.api.JavaTypeLoader;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.values.Value;
+import org.mule.runtime.api.values.ValueResolvingException;
+import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.loader.Problem;
+import org.mule.runtime.extension.api.loader.ProblemsReporter;
+import org.mule.runtime.extension.api.values.ValuesProvider;
+import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingParameterModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ValuesProviderFactoryModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ValuesProviderFactoryModelProperty.ValuesProviderFactoryModelPropertyBuilder;
+import org.mule.tck.size.SmallTest;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
+@SmallTest
+@RunWith(MockitoJUnitRunner.class)
+public class ValuesProviderModelValidatorTestCase {
+
+  private final JavaTypeLoader loader = new JavaTypeLoader(this.getClass().getClassLoader());
+  private final MetadataType STRING_TYPE = loader.load(String.class);
+  private final MetadataType NUMBER_TYPE = loader.load(Integer.class);
+  private ValuesProviderModelValidator valuesProviderModelValidator;
+
+  private ProblemsReporter problemsReporter;
+
+  @Mock
+  ExtensionModel extensionModel;
+
+  @Mock
+  OperationModel operationModel;
+
+  @Mock
+  ParameterModel operationParameter;
+
+  @Mock
+  ParameterModel configrationParameter;
+
+  @Mock
+  ConfigurationModel configurationModel;
+
+  @Mock
+  ParameterGroupModel parameterGroupModel;
+
+  @Mock
+  ParameterGroupModel configurationParameterGroupModel;
+
+  private ValuesProviderFactoryModelPropertyBuilder operationParameterBuilder;
+  private ValuesProviderFactoryModelPropertyBuilder configrationParameterBuilder;
+
+  @Before
+  public void setUp() {
+    valuesProviderModelValidator = new ValuesProviderModelValidator();
+    problemsReporter = new ProblemsReporter(extensionModel);
+
+    operationParameterBuilder = ValuesProviderFactoryModelProperty.builder(SomeValuesProvider.class);
+    configrationParameterBuilder = ValuesProviderFactoryModelProperty.builder(SomeValuesProvider.class);
+
+    visitableMock(operationModel);
+
+    when(extensionModel.getConfigurationModels()).thenReturn(asList(configurationModel));
+    when(configurationModel.getAllParameterModels()).thenReturn(asList(configrationParameter));
+    when(configurationModel.getParameterGroupModels()).thenReturn(asList(configurationParameterGroupModel));
+    when(configurationModel.getName()).thenReturn("SomeConfig");
+    when(configurationParameterGroupModel.getParameterModels()).thenReturn(asList(configrationParameter));
+
+    when(extensionModel.getOperationModels()).thenReturn(singletonList(operationModel));
+    when(operationModel.getAllParameterModels()).thenReturn(asList(operationParameter));
+    when(operationModel.getName()).thenReturn("superOperation");
+    when(parameterGroupModel.getParameterModels()).thenReturn(asList(operationParameter));
+
+    when(operationModel.getParameterGroupModels()).thenReturn(asList(parameterGroupModel));
+    mockParameter(configrationParameter, configrationParameterBuilder);
+    mockParameter(operationParameter, operationParameterBuilder);
+  }
+
+  @Test
+  public void valueProviderShouldBeInstantiable() {
+    ValuesProviderFactoryModelPropertyBuilder builder =
+        ValuesProviderFactoryModelProperty.builder(NonInstantiableProvider.class);
+    when(operationParameter.getModelProperty(ValuesProviderFactoryModelProperty.class)).thenReturn(Optional.of(builder.build()));
+
+    validate();
+    assertProblems("The Value Provider [NonInstantiableProvider] is not instantiable but it should");
+  }
+
+  @Test
+  public void parameterShouldExist() {
+    operationParameterBuilder.withInjectableParameter("someParam", STRING_TYPE, true);
+    when(operationParameter.getModelProperty(ValuesProviderFactoryModelProperty.class))
+        .thenReturn(Optional.of(operationParameterBuilder.build()));
+
+    validate();
+    assertProblems("The Value Provider [SomeValuesProvider] declares a parameter 'someParam' which doesn't exist in the operation 'superOperation'");
+  }
+
+  @Test
+  public void parameterShouldBeOfSametype() {
+    operationParameterBuilder.withInjectableParameter("someName", NUMBER_TYPE, true);
+    when(operationParameter.getModelProperty(ValuesProviderFactoryModelProperty.class))
+        .thenReturn(Optional.of(operationParameterBuilder.build()));
+
+    validate();
+    assertProblems("The Value Provider [SomeValuesProvider] defines a parameter 'someName' of type 'class java.lang.Integer' but in the operation 'superOperation' is of type 'class java.lang.String'");
+  }
+
+  @Test
+  public void injectConnectionInConnectionLessComponent() throws NoSuchFieldException {
+    operationParameterBuilder.withConnection(SomeValuesProvider.class.getDeclaredField("connection"));
+    when(operationParameter.getModelProperty(ValuesProviderFactoryModelProperty.class))
+        .thenReturn(Optional.of(operationParameterBuilder.build()));
+
+    validate();
+    assertProblems("The Value Provider [SomeValuesProvider] defines that requires a connection, but is used in the operation 'superOperation' which is connection less");
+  }
+
+  @Test
+  public void configurationBasedValueProviderDoesntSupportConnectionInjection() throws NoSuchFieldException {
+    configrationParameterBuilder.withConnection(SomeValuesProvider.class.getDeclaredField("connection"));
+    mockParameter(configrationParameter, configrationParameterBuilder);
+    when(configurationModel.getModelProperty(ValuesProviderFactoryModelProperty.class))
+        .thenReturn(Optional.of(configrationParameterBuilder.build()));
+
+    validate();
+    assertProblems("The Value Provider [SomeValuesProvider] defines that requires a connection which is not allowed for a Value Provider of a configuration's parameter [SomeConfig]");
+  }
+
+  @Test
+  public void configurationBasedValueProviderDoesntSupportConfigurationInjection() throws NoSuchFieldException {
+    configrationParameterBuilder.withConfig(SomeValuesProvider.class.getDeclaredField("connection"));
+    mockParameter(configrationParameter, configrationParameterBuilder);
+    when(configurationModel.getModelProperty(ValuesProviderFactoryModelProperty.class))
+        .thenReturn(Optional.of(configrationParameterBuilder.build()));
+
+    validate();
+    assertProblems("The Value Provider [SomeValuesProvider] defines that requires a configuration which is not allowed for a Value Provider of a configuration's parameter [SomeConfig]");
+  }
+
+  @Test
+  public void parameterWithValueProviderShouldBeOfStringType() {
+    when(operationParameter.getType()).thenReturn(NUMBER_TYPE);
+
+    validate();
+    assertProblems("The parameter [someName] of the operation 'superOperation' is not of String type. Parameters that provides Values should be of String type.");
+  }
+
+  private void assertProblems(String errorMessage) {
+    List<Problem> errors = problemsReporter.getErrors();
+    assertThat(errors, hasSize(1));
+    assertThat(errors.get(0).getMessage(), is(errorMessage));
+  }
+
+  private void validate() {
+    valuesProviderModelValidator.validate(extensionModel, problemsReporter);
+  }
+
+  private void mockParameter(ParameterModel parameter, ValuesProviderFactoryModelPropertyBuilder builder) {
+    when(parameter.getModelProperty(ValuesProviderFactoryModelProperty.class)).thenReturn(Optional.of(builder.build()));
+    when(parameter.getModelProperty(ImplementingParameterModelProperty.class)).thenReturn(empty());
+    when(parameter.getModelProperty(DeclaringMemberModelProperty.class)).thenReturn(empty());
+    when(parameter.getName()).thenReturn("someName");
+    when(parameter.getType()).thenReturn(STRING_TYPE);
+  }
+
+  public static class SomeValuesProvider implements ValuesProvider {
+
+    @Connection
+    String connection;
+
+    @Override
+    public Set<Value> resolve() {
+      return emptySet();
+    }
+  }
+
+  public class NonInstantiableProvider implements ValuesProvider {
+
+    private NonInstantiableProvider() {}
+
+    @Override
+    public Set<Value> resolve() throws ValueResolvingException {
+      return null;
+    }
+  }
+}

@@ -52,7 +52,7 @@ import org.mule.runtime.extension.api.model.source.ImmutableSourceCallbackModel;
 import org.mule.runtime.extension.api.model.source.ImmutableSourceModel;
 import org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty;
-import org.mule.runtime.module.extension.internal.runtime.ParameterValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 
 import com.google.common.collect.ImmutableList;
 
@@ -342,6 +342,7 @@ public final class MetadataMediator<T extends ComponentModel> {
                                         parameterModel.getDslConfiguration(),
                                         parameterModel.getDisplayModel().orElse(null),
                                         parameterModel.getLayoutModel().orElse(null),
+                                        parameterModel.getValuesProviderModel().orElse(null),
                                         parameterModel.getModelProperties());
         parameters.add(typedParameterModel);
       });
@@ -354,6 +355,7 @@ public final class MetadataMediator<T extends ComponentModel> {
                                                 parameterGroup.isShowInDsl(),
                                                 parameterGroup.getDisplayModel().orElse(null),
                                                 parameterGroup.getLayoutModel().orElse(null),
+                                                parameterGroup.getValuesProviderModel().orElse(null),
                                                 parameterGroup.getModelProperties()));
     });
     return parameterGroups;

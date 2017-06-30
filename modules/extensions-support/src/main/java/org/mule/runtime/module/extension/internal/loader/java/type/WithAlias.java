@@ -21,15 +21,17 @@ public interface WithAlias extends WithAnnotations, WithName {
    * @return The alias of the implementer component
    */
   default String getAlias() {
-    final java.util.Optional<Alias> alias = getAnnotation(Alias.class);
-    return alias.isPresent() ? alias.get().value() : getName();
+    return getAnnotation(Alias.class)
+        .map(Alias::value)
+        .orElseGet(this::getName);
   }
 
   /**
    * @return The description of the implementer component
    */
   default String getDescription() {
-    final java.util.Optional<Alias> alias = getAnnotation(Alias.class);
-    return alias.isPresent() ? alias.get().description() : EMPTY;
+    return getAnnotation(Alias.class)
+        .map(Alias::description)
+        .orElse(EMPTY);
   }
 }

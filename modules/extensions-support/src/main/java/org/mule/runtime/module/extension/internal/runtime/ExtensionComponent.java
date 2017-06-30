@@ -11,8 +11,10 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_CONFIGURATION;
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
+import static org.mule.runtime.api.values.ValueResolvingException.CONNECTION_FAILURE;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.TemplateParser.createMuleStyleParser;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.requiresConfig;
@@ -20,6 +22,8 @@ import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import org.mule.metadata.api.ClassTypeLoader;
+import org.mule.runtime.api.values.Value;
+import org.mule.runtime.api.resolving.ExtensionResolvingContext;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -34,8 +38,9 @@ import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.MetadataProvider;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
-import org.mule.runtime.api.metadata.resolving.FailureCode;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
+import org.mule.runtime.api.values.ComponentValuesProvider;
+import org.mule.runtime.api.values.ValueResolvingException;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
@@ -44,30 +49,33 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.core.api.util.TemplateParser;
+import org.mule.runtime.core.api.util.func.CheckedSupplier;
+import org.mule.runtime.core.internal.resolving.DefaultExtensionResolvingContext;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.metadata.DefaultMetadataContext;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.core.streaming.CursorProviderFactory;
 import org.mule.runtime.core.streaming.StreamingManager;
-import org.mule.runtime.core.api.util.TemplateParser;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.internal.metadata.MetadataMediator;
+import org.mule.runtime.module.extension.internal.values.ValuesProviderMediator;
 import org.mule.runtime.module.extension.internal.runtime.config.DynamicConfigurationProvider;
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.source.ExtensionMessageSource;
-
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
-
-import javax.inject.Inject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.inject.Inject;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 
 /**
  * Class that groups all the common behaviour between different extension's components, like {@link OperationMessageProcessor} and
@@ -78,7 +86,8 @@ import org.slf4j.LoggerFactory;
  * @since 4.0
  */
 public abstract class ExtensionComponent<T extends ComponentModel> extends AbstractAnnotatedObject
-    implements MuleContextAware, MetadataKeyProvider, MetadataProvider<T>, FlowConstructAware, Lifecycle {
+    implements MuleContextAware, MetadataKeyProvider, MetadataProvider<T>, ComponentValuesProvider, FlowConstructAware,
+    Lifecycle {
 
   private final static Logger LOGGER = LoggerFactory.getLogger(ExtensionComponent.class);
 
@@ -88,12 +97,14 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   private final T componentModel;
   private final AtomicReference<ConfigurationProvider> configurationProvider = new AtomicReference<>();
   private final MetadataMediator<T> metadataMediator;
+  private final ValuesProviderMediator<T> valuesProviderMediator;
   private final ClassTypeLoader typeLoader;
   private final LazyValue<Boolean> requiresConfig = new LazyValue<>(this::computeRequiresConfig);
-  protected final ClassLoader classLoader;
 
+  protected final ClassLoader classLoader;
   private CursorProviderFactory cursorProviderFactory;
   protected FlowConstruct flowConstruct;
+
   protected MuleContext muleContext;
 
   @Inject
@@ -117,6 +128,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     this.extensionManager = extensionManager;
     this.cursorProviderFactory = cursorProviderFactory;
     this.metadataMediator = new MetadataMediator<>(componentModel);
+    this.valuesProviderMediator = new ValuesProviderMediator<>(componentModel, muleContext);
     this.typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(classLoader);
   }
 
@@ -128,6 +140,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
    */
   @Override
   public final void initialise() throws InitialisationException {
+    valuesProviderMediator.setMuleContext(muleContext);
     if (cursorProviderFactory == null) {
       cursorProviderFactory = componentModel.getModelProperty(PagedOperationModelProperty.class)
           .map(p -> (CursorProviderFactory) streamingManager.forObjects().getDefaultCursorProviderFactory())
@@ -268,15 +281,42 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     }
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Set<Value> getValues(String parameterName) throws ValueResolvingException {
+    try {
+      return runWithValueProvidersContext(context -> withContextClassLoader(getClassLoader(this.extensionModel),
+                                                                            () -> valuesProviderMediator
+                                                                                .getValues(parameterName,
+                                                                                           getParameterValueResolver(),
+                                                                                           (CheckedSupplier<Object>) () -> context
+                                                                                               .getConnection().orElse(null),
+                                                                                           (CheckedSupplier<Object>) () -> context
+                                                                                               .getConfig().orElse(null))));
+    } catch (ConnectionException e) {
+      throw new ValueResolvingException("An error occurred obtaining the connection for the ValuesProvider", CONNECTION_FAILURE,
+                                        e);
+    }
+  }
+
   @Override
   public void setFlowConstruct(FlowConstruct flowConstruct) {
     this.flowConstruct = flowConstruct;
   }
 
-
   protected <R> R runWithMetadataContext(Function<MetadataContext, R> metadataContextFunction)
       throws MetadataResolvingException, ConnectionException {
     MetadataContext context = getMetadataContext();
+    R result = metadataContextFunction.apply(context);
+    context.dispose();
+    return result;
+  }
+
+  private <R> R runWithValueProvidersContext(Function<ExtensionResolvingContext, R> metadataContextFunction)
+      throws ValueResolvingException, ConnectionException {
+    ExtensionResolvingContext context = getResolvingContext();
     R result = metadataContextFunction.apply(context);
     context.dispose();
     return result;
@@ -290,11 +330,10 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     if (configuration.isPresent()) {
       ConfigurationProvider configurationProvider = findConfigurationProvider()
           .orElseThrow(() -> new MetadataResolvingException("Failed to create the required configuration for Metadata retrieval",
-                                                            FailureCode.INVALID_CONFIGURATION));
+                                                            INVALID_CONFIGURATION));
 
       if (configurationProvider instanceof DynamicConfigurationProvider) {
-        throw new MetadataResolvingException("Configuration used for Metadata fetch cannot be dynamic",
-                                             FailureCode.INVALID_CONFIGURATION);
+        throw new MetadataResolvingException("Configuration used for Metadata fetch cannot be dynamic", INVALID_CONFIGURATION);
       }
     }
 
@@ -302,6 +341,12 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
         .orElseGet(() -> extensionModel.getName() + "|" + componentModel.getName());
 
     return new DefaultMetadataContext(configuration, connectionManager, metadataService.getMetadataCache(cacheId), typeLoader);
+  }
+
+  private ExtensionResolvingContext getResolvingContext() throws ValueResolvingException, ConnectionException {
+    Event fakeEvent = getInitialiserEvent(muleContext);
+    Optional<ConfigurationInstance> configuration = getConfiguration(fakeEvent);
+    return new DefaultExtensionResolvingContext(configuration, connectionManager, typeLoader);
   }
 
   /**
@@ -368,4 +413,6 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   public ExtensionModel getExtensionModel() {
     return extensionModel;
   }
+
+
 }

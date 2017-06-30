@@ -6,16 +6,12 @@
  */
 package org.mule.runtime.core.internal.metadata;
 
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import org.mule.metadata.api.ClassTypeLoader;
-import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.metadata.MetadataCache;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.core.api.connector.ConnectionManager;
+import org.mule.runtime.core.internal.resolving.DefaultExtensionResolvingContext;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 
 import java.util.Optional;
@@ -26,12 +22,9 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public class DefaultMetadataContext implements MetadataContext {
+public class DefaultMetadataContext extends DefaultExtensionResolvingContext implements MetadataContext {
 
-  private final Optional<ConfigurationInstance> configInstance;
   private final MetadataCache cache;
-  private final ClassTypeLoader typeLoader;
-  private final ConnectionHandler connectionHandler;
 
   /**
    * Retrieves the configuration for the related component
@@ -46,37 +39,8 @@ public class DefaultMetadataContext implements MetadataContext {
                                 ConnectionManager connectionManager,
                                 MetadataCache cache, ClassTypeLoader typeLoader)
       throws ConnectionException {
-    this.configInstance = configInstance;
+    super(configInstance, connectionManager, typeLoader);
     this.cache = cache;
-    this.typeLoader = typeLoader;
-
-    if (configInstance.isPresent() && configInstance.get().getConnectionProvider().isPresent()) {
-      this.connectionHandler = connectionManager.getConnection(configInstance.get().getValue());
-    } else {
-      this.connectionHandler = null;
-    }
-  }
-
-  /**
-   * @param <C> Configuration type
-   * @return optional configuration of a component
-   */
-  @Override
-  public <C> Optional<C> getConfig() {
-    return (Optional<C>) configInstance.map(ConfigurationInstance::getValue);
-  }
-
-  /**
-   * Retrieves the connection for the related component and configuration
-   *
-   * @param <C> Connection type
-   * @return A connection instance of {@param <C>} type for the component. If the related configuration does not require a
-   *         connection {@link Optional#empty()} will be returned
-   * @throws ConnectionException when no valid connection is found for the related component and configuration
-   */
-  @Override
-  public <C> Optional<C> getConnection() throws ConnectionException {
-    return connectionHandler != null ? of((C) connectionHandler.getConnection()) : empty();
   }
 
   @Override
@@ -84,20 +48,4 @@ public class DefaultMetadataContext implements MetadataContext {
     return cache;
   }
 
-  @Override
-  public ClassTypeLoader getTypeLoader() {
-    return typeLoader;
-  }
-
-  @Override
-  public BaseTypeBuilder getTypeBuilder() {
-    return BaseTypeBuilder.create(JAVA);
-  }
-
-  @Override
-  public void dispose() {
-    if (connectionHandler != null) {
-      connectionHandler.release();
-    }
-  }
 }

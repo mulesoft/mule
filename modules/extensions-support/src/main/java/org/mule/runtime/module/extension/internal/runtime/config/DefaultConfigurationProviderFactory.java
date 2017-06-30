@@ -72,7 +72,7 @@ public final class DefaultConfigurationProviderFactory implements ConfigurationP
                                          e);
       }
 
-      return new ConfigurationProviderMetadataAdapter(name, extensionModel, configurationModel, configuration, muleContext);
+      return new ConfigurationProviderToolingAdapter(name, extensionModel, configurationModel, configuration, muleContext);
     });
   }
 
