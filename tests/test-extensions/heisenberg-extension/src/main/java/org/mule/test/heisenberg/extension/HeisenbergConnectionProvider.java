@@ -6,7 +6,7 @@
  */
 package org.mule.test.heisenberg.extension;
 
-import static org.mule.runtime.api.meta.LibraryType.NATIVE;
+import static org.mule.runtime.api.meta.ExternalLibraryType.NATIVE;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
