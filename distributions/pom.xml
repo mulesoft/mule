@@ -29,7 +29,7 @@
         <muleSchedulerServiceVersion>1.0.0-BETA.1</muleSchedulerServiceVersion>
         <muleHttpServiceVersion>1.0.0-BETA.1</muleHttpServiceVersion>
         <muleOAuthServiceVersion>1.0.0-BETA.1</muleOAuthServiceVersion>
-        <muleSoapServiceVersion>1.0.0-BETA.1-SNAPSHOT</muleSoapServiceVersion>
+        <muleSoapServiceVersion>1.0.0-BETA.1</muleSoapServiceVersion>
 	</properties>
 
     <modules>
