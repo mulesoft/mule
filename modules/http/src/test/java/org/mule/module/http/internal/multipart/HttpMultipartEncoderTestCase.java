@@ -41,7 +41,6 @@ public class HttpMultipartEncoderTestCase extends AbstractMuleTestCase
 
     private static final String FORTH_PART_CONTENT = "{ \"test\" : \"forth-part-test\"}";
 
-
     private final List<HttpPart> httpParts = new ArrayList<>();
 
     private final MultipartHttpEntity multipartHttpEntity = mock(MultipartHttpEntity.class);
@@ -64,7 +63,7 @@ public class HttpMultipartEncoderTestCase extends AbstractMuleTestCase
     @Test
     public void createMultipartRelatedContentWithStartParameter() throws Exception
     {
-        MimeMultipart mimeMultipart = createContent(multipartHttpEntity, "multipart/related; type=\"text/plain\"; start=thirdPart");
+        MimeMultipart mimeMultipart = createContent(multipartHttpEntity, "multipart/related; boundary= \"MIMEBoundary\"; type=\"text/plain\"; start=thirdPart");
         verifyBodyPart(mimeMultipart.getBodyPart(0), THIRD_PART_CONTENT, "thirdPart");
         verifyBodyPart(mimeMultipart.getBodyPart(1), FIRST_PART_CONTENT, "firstPart");
         verifyBodyPart(mimeMultipart.getBodyPart(2), SECOND_PART_CONTENT, "secondPart");
@@ -74,7 +73,7 @@ public class HttpMultipartEncoderTestCase extends AbstractMuleTestCase
     @Test
     public void createMultipartRelatedContentWithoutStartParameter() throws Exception
     {
-        MimeMultipart mimeMultipart = createContent(multipartHttpEntity, "multipart/related; type=\"text/plain\"; boundary= \"MIMEBoundary\"");
+        MimeMultipart mimeMultipart = createContent(multipartHttpEntity, "multipart/related; boundary=\"MIMEBoundary\"; type=\"text/plain\";");
         verifyBodyPart(mimeMultipart.getBodyPart(0), FIRST_PART_CONTENT, "firstPart");
         verifyBodyPart(mimeMultipart.getBodyPart(1), SECOND_PART_CONTENT, "secondPart");
         verifyBodyPart(mimeMultipart.getBodyPart(2), THIRD_PART_CONTENT, "thirdPart");
@@ -86,9 +85,8 @@ public class HttpMultipartEncoderTestCase extends AbstractMuleTestCase
     {
         try
         {
-            createContent(multipartHttpEntity, "multipart/related");
+            createContent(multipartHttpEntity, "multipart/related; boundary=\"MIMEBoundary\"");
             fail("Exception caused by no present type should be triggered");
-
         }
         catch(Exception e)
         {
@@ -103,7 +101,7 @@ public class HttpMultipartEncoderTestCase extends AbstractMuleTestCase
         httpParts.add(forthPart);
         try
         {
-            createContent(multipartHttpEntity, "multipart/related; type=\"text/plain\"; start=forthPart");
+            createContent(multipartHttpEntity, "multipart/related; boundary=\"MIMEBoundary\"; type=\"text/plain\"; start=forthPart");
             fail("Exception caused by ambiguous type should be triggered");
         }
         catch(Exception e)
