@@ -23,6 +23,11 @@
     </properties>
 
     <dependencies>
+        <!-- metadata model catalog dependencies -->
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-metadata-model-catalog</artifactId>
+        </dependency>
         <!-- Mule Dependencies -->
         <dependency>
             <groupId>org.mule.runtime</groupId>
