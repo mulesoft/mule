@@ -178,21 +178,9 @@ public class DefaultFlowBuilder implements Builder {
   public Flow build() {
     checkImmutable();
 
-    flow = new DefaultFlow(name, muleContext, resolveSource(source), processors,
+    flow = new DefaultFlow(name, muleContext, source, processors,
                            ofNullable(exceptionListener), ofNullable(processingStrategyFactory), initialState, maxConcurrency);
     return flow;
-  }
-
-  private MessageSource resolveSource(MessageSource source) {
-    if (source != null) {
-      if (source instanceof ClusterizableMessageSource) {
-        return new ClusterizableMessageSourceWrapper(muleContext, (ClusterizableMessageSource) source, flow);
-      } else {
-        return source;
-      }
-    } else {
-      return null;
-    }
   }
 
   protected final void checkImmutable() {
