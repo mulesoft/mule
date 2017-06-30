@@ -6,62 +6,51 @@
  */
 package org.mule.runtime.core.api.context.notification;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
+
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
-import org.mule.runtime.core.api.util.ClassUtils;
+
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * A simple tuple that stores a listener with an optional subscription (used to match a resource ID).
  */
 public class ListenerSubscriptionPair extends AbstractAnnotatedObject {
 
-  private static final String NULL_SUBSCRIPTION = "NULL";
-
-  private ServerNotificationListener listener;
-  private String subscription = NULL_SUBSCRIPTION;
-  private boolean nullSubscription = true;
+  private final ServerNotificationListener listener;
+  private final Optional<String> subscription;
 
   /**
    * For config - must be constructed using the setters
    */
   public ListenerSubscriptionPair() {
-    super();
+    listener = null;
+    subscription = empty();
   }
 
   public ListenerSubscriptionPair(ServerNotificationListener listener) {
-    setListener(listener);
+    this.listener = listener;
+    subscription = empty();
   }
 
   public ListenerSubscriptionPair(ServerNotificationListener listener, String subscription) {
-    setListener(listener);
-    setSubscription(subscription);
-  }
-
-  public void setListener(ServerNotificationListener listener) {
     this.listener = listener;
-  }
-
-  public void setSubscription(String subscription) {
-    if (null != subscription) {
-      this.subscription = subscription;
-      nullSubscription = false;
-    }
+    this.subscription = ofNullable(subscription);
   }
 
   public ServerNotificationListener getListener() {
     return listener;
   }
 
-  public String getSubscription() {
+  public Optional<String> getSubscription() {
     return subscription;
-  }
-
-  public boolean isNullSubscription() {
-    return nullSubscription;
   }
 
   @Override
   public int hashCode() {
-    return ClassUtils.hash(new Object[] {listener, subscription, nullSubscription});
+    return Objects.hash(listener, subscription);
   }
 
   @Override
@@ -74,8 +63,7 @@ public class ListenerSubscriptionPair extends AbstractAnnotatedObject {
     }
 
     ListenerSubscriptionPair other = (ListenerSubscriptionPair) obj;
-    return ClassUtils.equal(listener, other.listener) && ClassUtils.equal(subscription, other.subscription)
-        && (nullSubscription == other.nullSubscription);
+    return Objects.equals(listener, other.listener) && Objects.equals(subscription, other.subscription);
   }
 
   @Override

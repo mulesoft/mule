@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.core.routing.outbound;
 
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.noEndpointsForRouter;
+import static org.mule.runtime.core.api.util.TemplateParser.createSquareBracesStyleParser;
+
 import org.mule.runtime.api.el.MuleExpressionLanguage;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -18,7 +21,6 @@ import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.api.routing.TransformingMatchable;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.util.TemplateParser;
 
 import java.util.LinkedList;
@@ -39,7 +41,7 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter implements T
   private boolean useTemplates = true;
 
   // We used Square templates as they can exist as part of an URI.
-  protected TemplateParser parser = TemplateParser.createSquareBracesStyleParser();
+  protected TemplateParser parser = createSquareBracesStyleParser();
 
   @Override
   public void initialise() throws InitialisationException {
@@ -49,24 +51,19 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter implements T
 
   @Override
   public Event route(Event event) throws RoutingException {
-    Event result;
-
-    Message message = event.getMessage();
-
     if (routes == null || routes.size() == 0) {
-      throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), null);
+      throw new RoutePathNotFoundException(noEndpointsForRouter(), null);
     }
 
     Processor ep = getRoute(0, event);
 
     try {
-      result = sendRequest(event, createEventToRoute(event, message), ep, true);
+      return sendRequest(event, ep, true);
     } catch (RoutingException e) {
       throw e;
     } catch (MuleException e) {
       throw new CouldNotRouteOutboundMessageException(ep, e);
     }
-    return result;
   }
 
   public Filter getFilter() {

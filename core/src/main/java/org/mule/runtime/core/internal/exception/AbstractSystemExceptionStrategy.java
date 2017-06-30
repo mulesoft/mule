@@ -18,9 +18,9 @@ import org.mule.runtime.core.api.connector.ConnectException;
 import org.mule.runtime.core.api.exception.RollbackSourceCallback;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.api.message.ExceptionPayload;
+import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
 import org.mule.runtime.core.internal.message.InternalMessage;
-import org.mule.runtime.core.api.transaction.TransactionCoordination;
 
 /**
  * Fire a notification, log exception, clean up transaction if any, and trigger reconnection strategy if this is a
@@ -36,13 +36,8 @@ public abstract class AbstractSystemExceptionStrategy extends AbstractExceptionL
 
     doLogException(ex);
 
-    if (isRollback(ex)) {
-      logger.debug("Rolling back transaction");
-      rollback(ex, rollbackMethod);
-    } else {
-      logger.debug("Committing transaction");
-      commit();
-    }
+    logger.debug("Rolling back transaction");
+    rollback(ex, rollbackMethod);
 
     ExceptionPayload exceptionPayload = new DefaultExceptionPayload(ex);
     if (getCurrentEvent() != null) {

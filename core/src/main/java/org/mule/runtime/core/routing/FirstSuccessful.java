@@ -10,7 +10,6 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.routing.CouldNotRouteOutboundMessageException;
-import org.mule.runtime.core.routing.filters.ExpressionFilter;
 import org.mule.runtime.core.routing.outbound.AbstractOutboundRouter;
 
 /**
@@ -21,13 +20,13 @@ import org.mule.runtime.core.routing.outbound.AbstractOutboundRouter;
 public class FirstSuccessful extends AbstractOutboundRouter {
 
   private RoutingStrategy routingStrategy;
-  protected String failureExpression;
+  private String failureExpression = DEFAULT_FAILURE_EXPRESSION;
 
   @Override
   public void initialise() throws InitialisationException {
     super.initialise();
     routingStrategy =
-        new FirstSuccessfulRoutingStrategy(muleContext, failureExpression, (route, event) -> doProcessRoute(route, event));
+        new FirstSuccessfulRoutingStrategy(flowConstruct, failureExpression, (route, event) -> doProcessRoute(route, event));
   }
 
   /**
@@ -51,7 +50,6 @@ public class FirstSuccessful extends AbstractOutboundRouter {
    * Specifies an expression that when evaluated as determines if the processing of one a route was a failure or not.
    *
    * @param failureExpression
-   * @see ExpressionFilter
    */
   public void setFailureExpression(String failureExpression) {
     this.failureExpression = failureExpression;

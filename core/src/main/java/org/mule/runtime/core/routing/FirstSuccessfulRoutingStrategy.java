@@ -10,10 +10,8 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.Event.Builder;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.routing.filters.ExpressionFilter;
 
 import java.util.List;
 
@@ -26,21 +24,19 @@ import java.util.List;
  */
 public class FirstSuccessfulRoutingStrategy extends AbstractRoutingStrategy {
 
-  protected ExpressionFilter failureExpressionFilter;
+  private FlowConstruct flowConstruct;
+  private String failureExpression;
   private RouteProcessor processor;
 
   /**
-   * @param muleContext
+   * @param flowConstruct
    * @param failureExpression Mule expression that validates if a {@link Processor} execution was successful or not.
    */
-  public FirstSuccessfulRoutingStrategy(final MuleContext muleContext, final String failureExpression, RouteProcessor processor) {
-    super(muleContext);
-    if (failureExpression != null) {
-      failureExpressionFilter = new ExpressionFilter(failureExpression);
-    } else {
-      failureExpressionFilter = new ExpressionFilter("mel:exception != null");
-    }
-    failureExpressionFilter.setMuleContext(muleContext);
+  public FirstSuccessfulRoutingStrategy(final FlowConstruct flowConstruct, final String failureExpression,
+                                        RouteProcessor processor) {
+    super(flowConstruct.getMuleContext());
+    this.flowConstruct = flowConstruct;
+    this.failureExpression = failureExpression;
     this.processor = processor;
   }
 
@@ -52,17 +48,15 @@ public class FirstSuccessfulRoutingStrategy extends AbstractRoutingStrategy {
     Exception failExceptionCause = null;
     for (Processor mp : messageProcessors) {
       try {
-        Event toProcess = cloneEventForRouting(event, mp);
-        returnEvent = processor.processRoute(mp, toProcess);
+        returnEvent = processor.processRoute(mp, event);
 
         if (returnEvent == null) {
           failed = false;
         } else if (returnEvent.getMessage() == null) {
           failed = true;
         } else {
-          Builder builder = Event.builder(returnEvent);
-          failed = returnEvent == null || failureExpressionFilter.accept(returnEvent, builder);
-          returnEvent = builder.build();
+          failed = getMuleContext().getExpressionManager()
+              .evaluateBoolean(failureExpression, returnEvent, flowConstruct, false, true);
         }
       } catch (Exception ex) {
         failed = true;
@@ -83,11 +77,6 @@ public class FirstSuccessfulRoutingStrategy extends AbstractRoutingStrategy {
     }
 
     return returnEvent;
-  }
-
-  private Event cloneEventForRouting(Event event, Processor mp) throws MuleException {
-    validateMessageIsNotConsumable(event, event.getMessage());
-    return createEventToRoute(event, event.getMessage(), mp);
   }
 
   interface RouteProcessor {

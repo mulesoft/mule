@@ -6,10 +6,9 @@
  */
 package org.mule.runtime.core.internal.context.notification;
 
-import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.context.notification.ListenerSubscriptionPair;
 import org.mule.runtime.core.api.context.notification.NotifierCallback;
-import org.mule.runtime.core.routing.filters.WildcardFilter;
+import org.mule.runtime.core.api.context.notification.ServerNotification;
 
 /**
  * This does the work necessary to deliver events to a particular listener. It is generated for a particular {@link Configuration}
@@ -18,17 +17,15 @@ import org.mule.runtime.core.routing.filters.WildcardFilter;
 public class Sender {
 
   private ListenerSubscriptionPair pair;
-  private WildcardFilter subscriptionFilter;
 
   Sender(ListenerSubscriptionPair pair) {
     this.pair = pair;
-    subscriptionFilter = new WildcardFilter(pair.getSubscription());
-    subscriptionFilter.setCaseSensitive(false);
   }
 
   public void dispatch(ServerNotification notification, NotifierCallback notifier) {
-    if (pair.isNullSubscription()
-        || (null != notification.getResourceIdentifier() && subscriptionFilter.accept(notification.getResourceIdentifier()))) {
+    if (!pair.getSubscription().isPresent()
+        || (null != notification.getResourceIdentifier()
+            && pair.getSubscription().get().equalsIgnoreCase(notification.getResourceIdentifier()))) {
       try {
         notifier.notify(pair.getListener(), notification);
       } catch (Exception e) {

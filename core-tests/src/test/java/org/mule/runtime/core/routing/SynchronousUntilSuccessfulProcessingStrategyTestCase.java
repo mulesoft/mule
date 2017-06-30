@@ -14,6 +14,8 @@ import static org.hamcrest.core.IsSame.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -27,11 +29,10 @@ import static org.mule.tck.MuleTestUtils.getTestFlow;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.api.store.ListableObjectStore;
-import org.mule.runtime.core.routing.filters.ExpressionFilter;
+import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Before;
@@ -45,12 +46,10 @@ public class SynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstra
   private UntilSuccessfulConfiguration mockUntilSuccessfulConfiguration =
       mock(UntilSuccessfulConfiguration.class, Answers.RETURNS_DEEP_STUBS.get());
   private Processor mockRoute = mock(Processor.class, Answers.RETURNS_DEEP_STUBS.get());
-  private ExpressionFilter mockAlwaysTrueFailureExpressionFilter = mock(ExpressionFilter.class, Answers.RETURNS_DEEP_STUBS.get());
   private ListableObjectStore<Event> mockObjectStore = mock(ListableObjectStore.class, Answers.RETURNS_DEEP_STUBS.get());
 
   @Before
   public void setUp() throws Exception {
-    when(mockAlwaysTrueFailureExpressionFilter.accept(any(Event.class), any(Event.Builder.class))).thenReturn(true);
     when(mockUntilSuccessfulConfiguration.getRoute()).thenReturn(mockRoute);
     when(mockUntilSuccessfulConfiguration.getAckExpression()).thenReturn(null);
     when(mockUntilSuccessfulConfiguration.getMaxRetries()).thenReturn(DEFAULT_RETRIES);
@@ -88,22 +87,24 @@ public class SynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstra
   public void alwaysFailUsingFailureExpression() throws Exception {
     final Event testEvent = testEvent();
     when(mockRoute.process(any(Event.class))).thenReturn(testEvent);
-    when(mockUntilSuccessfulConfiguration.getFailureExpressionFilter()).thenReturn(mockAlwaysTrueFailureExpressionFilter);
+    when(mockUntilSuccessfulConfiguration.getFailureExpression()).thenReturn("true");
     SynchronousUntilSuccessfulProcessingStrategy processingStrategy = createProcessingStrategy();
     try {
       processingStrategy.route(testEvent(), getTestFlow(muleContext));
       fail("processing should throw exception");
     } catch (RoutingException e) {
       verify(mockRoute, times(DEFAULT_RETRIES + 1)).process(any(Event.class));
-      verify(mockAlwaysTrueFailureExpressionFilter, times(DEFAULT_RETRIES + 1)).accept(any(Event.class),
-                                                                                       any(Event.Builder.class));
     }
   }
 
   @Test
   public void successfulExecution() throws Exception {
+    when(mockUntilSuccessfulConfiguration.getMuleContext().getExpressionManager()
+        .evaluateBoolean(anyString(), any(), any(), anyBoolean(), anyBoolean())).thenReturn(true);
+
     SynchronousUntilSuccessfulProcessingStrategy processingStrategy = createProcessingStrategy();
     when(mockRoute.process(any(Event.class))).thenAnswer(invocation -> (Event) invocation.getArguments()[0]);
+    when(mockUntilSuccessfulConfiguration.getFailureExpression()).thenReturn("false");
     Event response = processingStrategy.route(testEvent(), getTestFlow(muleContext));
     assertThat(response.getMessage().getPayload().getValue(), equalTo(testEvent().getMessage().getPayload().getValue()));
     verify(mockRoute).process(any(Event.class));
@@ -112,7 +113,7 @@ public class SynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstra
 
   @Test
   public void retryOnOriginalEvent() throws Exception {
-    when(mockUntilSuccessfulConfiguration.getFailureExpressionFilter()).thenReturn(mockAlwaysTrueFailureExpressionFilter);
+    when(mockUntilSuccessfulConfiguration.getFailureExpression()).thenReturn("true");
     SynchronousUntilSuccessfulProcessingStrategy processingStrategy = createProcessingStrategy();
     when(mockRoute.process(any(Event.class))).then(invocation -> {
       Event argEvent = (Event) invocation.getArguments()[0];
@@ -126,8 +127,6 @@ public class SynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstra
     } catch (RoutingException e) {
       assertThat(e, instanceOf(RoutingException.class));
       verify(mockRoute, times(DEFAULT_RETRIES + 1)).process(any(Event.class));
-      verify(mockAlwaysTrueFailureExpressionFilter, times(DEFAULT_RETRIES + 1)).accept(any(Event.class),
-                                                                                       any(Event.Builder.class));
     }
   }
 
@@ -141,6 +140,7 @@ public class SynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstra
         .evaluate(eq(ackExpression), any(Event.class))).thenReturn(typedValue);
     SynchronousUntilSuccessfulProcessingStrategy processingStrategy = createProcessingStrategy();
     when(mockRoute.process(any(Event.class))).thenAnswer(invocation -> (Event) invocation.getArguments()[0]);
+    when(mockUntilSuccessfulConfiguration.getFailureExpression()).thenReturn("false");
     Event response = processingStrategy.route(testEvent(), getTestFlow(muleContext));
     assertThat(response.getMessage().getPayload().getValue(), equalTo(expressionEvaluationResult));
     verify(mockRoute).process(any(Event.class));
@@ -157,6 +157,7 @@ public class SynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstra
 
   private SynchronousUntilSuccessfulProcessingStrategy createProcessingStrategy() throws InitialisationException {
     SynchronousUntilSuccessfulProcessingStrategy processingStrategy = new SynchronousUntilSuccessfulProcessingStrategy();
+    processingStrategy.setMuleContext(muleContext);
     processingStrategy.setUntilSuccessfulConfiguration(mockUntilSuccessfulConfiguration);
     processingStrategy.initialise();
     return processingStrategy;

@@ -6,9 +6,12 @@
  */
 package org.mule.runtime.core.routing;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.tck.MuleTestUtils.createErrorMock;
 
@@ -18,11 +21,12 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleSession;
-import org.mule.runtime.core.internal.message.InternalMessage;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.CouldNotRouteOutboundMessageException;
-import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
 import org.mule.runtime.core.api.session.DefaultMuleSession;
+import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
+import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -47,19 +51,19 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
         createFirstSuccessfulRouter(new TestProcessor("abc"), new TestProcessor("def"), new TestProcessor("ghi"));
     fs.initialise();
 
-    assertEquals("No abc", getPayload(fs, session, ""));
-    assertEquals("No def", getPayload(fs, session, "abc"));
-    assertEquals("No ghi", getPayload(fs, session, "abcdef"));
-    assertEquals(EXCEPTION_SEEN, getPayload(fs, session, "abcdefghi"));
-    assertEquals("No def", getPayload(fs, session, "ABC"));
-    assertEquals("No ghi", getPayload(fs, session, "ABCDEF"));
-    assertEquals(EXCEPTION_SEEN, getPayload(fs, session, "ABCDEFGHI"));
+    assertThat(getPayload(fs, session, ""), is("No abc"));
+    assertThat(getPayload(fs, session, "abc"), is("No def"));
+    assertThat(getPayload(fs, session, "abcdef"), is("No ghi"));
+    assertThat(getPayload(fs, session, "abcdefghi"), is(EXCEPTION_SEEN));
+    assertThat(getPayload(fs, session, "ABC"), is("No def"));
+    assertThat(getPayload(fs, session, "ABCDEF"), is("No ghi"));
+    assertThat(getPayload(fs, session, "ABCDEFGHI"), is(EXCEPTION_SEEN));
   }
 
   @Test
   public void testFailureExpression() throws Exception {
     Processor intSetter = event -> {
-      return Event.builder(event).message(InternalMessage.builder(event.getMessage()).payload(Integer.valueOf(1)).build())
+      return Event.builder(event).message(Message.builder(event.getMessage()).payload(Integer.valueOf(1)).build())
           .build();
     };
 
@@ -67,7 +71,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
     fs.setFailureExpression("#[mel:payload is Integer]");
     fs.initialise();
 
-    assertEquals("abc", fs.process(eventBuilder().message(of("")).build()).getMessageAsString(muleContext));
+    assertThat(fs.process(eventBuilder().message(of("")).build()).getMessageAsString(muleContext), is("abc"));
   }
 
   @Test
@@ -76,7 +80,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
     FirstSuccessful fs = createFirstSuccessfulRouter(nullReturningMp);
     fs.initialise();
 
-    assertNull(fs.process(testEvent()));
+    assertThat(fs.process(testEvent()), nullValue());
   }
 
   @Test
@@ -93,8 +97,11 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
     }
   }
 
-  private FirstSuccessful createFirstSuccessfulRouter(Processor... processors) throws MuleException {
+  private FirstSuccessful createFirstSuccessfulRouter(Processor... processors) throws Exception {
     FirstSuccessful fs = new FirstSuccessful();
+    final FlowConstruct flow = mock(FlowConstruct.class);
+    when(flow.getMuleContext()).thenReturn(muleContext);
+    fs.setFlowConstruct(flow);
     fs.setMuleContext(muleContext);
 
     List<Processor> routes = Arrays.asList(processors);

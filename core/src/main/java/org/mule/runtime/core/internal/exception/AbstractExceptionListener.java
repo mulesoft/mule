@@ -33,7 +33,6 @@ import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.config.ExceptionHelper;
 import org.mule.runtime.core.internal.message.ExceptionMessage;
 import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
-import org.mule.runtime.core.routing.filters.WildcardFilter;
 import org.mule.runtime.core.routing.outbound.MulticastingRouter;
 
 import java.util.List;
@@ -59,9 +58,6 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
 
   protected AtomicBoolean initialised = new AtomicBoolean(false);
 
-  protected WildcardFilter rollbackTxFilter;
-  protected WildcardFilter commitTxFilter;
-
   protected boolean enableNotifications = true;
   protected String logException = TRUE.toString();
 
@@ -75,17 +71,6 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
   @Override
   public void setGlobalName(String globalName) {
     this.globalName = globalName;
-  }
-
-  protected boolean isRollback(Throwable t) {
-    // Work with the root exception, not anything thaat wraps it
-    t = ExceptionHelper.getRootException(t);
-    if (rollbackTxFilter == null && commitTxFilter == null) {
-      return true;
-    } else {
-      return (rollbackTxFilter != null && rollbackTxFilter.accept(t.getClass().getName()))
-          || (commitTxFilter != null && !commitTxFilter.accept(t.getClass().getName()));
-    }
   }
 
   public List<Processor> getMessageProcessors() {
@@ -258,28 +243,12 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
     }
   }
 
-  public WildcardFilter getCommitTxFilter() {
-    return commitTxFilter;
-  }
-
-  public void setCommitTxFilter(WildcardFilter commitTxFilter) {
-    this.commitTxFilter = commitTxFilter;
-  }
-
   public boolean isEnableNotifications() {
     return enableNotifications;
   }
 
   public void setEnableNotifications(boolean enableNotifications) {
     this.enableNotifications = enableNotifications;
-  }
-
-  public WildcardFilter getRollbackTxFilter() {
-    return rollbackTxFilter;
-  }
-
-  public void setRollbackTxFilter(WildcardFilter rollbackTxFilter) {
-    this.rollbackTxFilter = rollbackTxFilter;
   }
 
   @Override

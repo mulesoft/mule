@@ -7,6 +7,9 @@
 package org.mule.runtime.core.routing;
 
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotCopyStreamPayload;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
+import static org.mule.runtime.core.api.util.StringMessageUtils.truncate;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -15,8 +18,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.RoutingException;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
-import org.mule.runtime.core.api.util.StringMessageUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,8 +68,8 @@ public abstract class AbstractRoutingStrategy implements RoutingStrategy {
       if (logger.isTraceEnabled()) {
         if (resultMessage != null) {
           try {
-            logger.trace("Response payload: \n" + StringMessageUtils
-                .truncate(muleContext.getTransformationService().getPayloadForLogging(resultMessage), 100, false));
+            logger.trace("Response payload: \n"
+                + truncate(muleContext.getTransformationService().getPayloadForLogging(resultMessage), 100, false));
           } catch (Exception e) {
             logger.trace("Response payload: \n(unable to retrieve payload: " + e.getMessage());
           }
@@ -81,10 +82,10 @@ public abstract class AbstractRoutingStrategy implements RoutingStrategy {
   private Event sendRequestEvent(Event routedEvent, Message message, Processor route, boolean awaitResponse)
       throws MuleException {
     if (route == null) {
-      throw new DispatchException(CoreMessages.objectIsNull("route"), null);
+      throw new DispatchException(objectIsNull("route"), null);
     }
 
-    return route.process(createEventToRoute(routedEvent, message, route));
+    return route.process(routedEvent);
   }
 
   /**

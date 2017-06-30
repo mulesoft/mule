@@ -37,16 +37,15 @@ import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.TransformationService;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.ErrorTypeLocator;
 import org.mule.runtime.core.api.exception.MessagingException;
-import org.mule.runtime.core.internal.message.InternalMessage;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
-import org.mule.runtime.core.routing.filters.ExpressionFilter;
+import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.util.concurrent.Latch;
+import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.util.store.SimpleMemoryObjectStore;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -86,7 +85,6 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
   private FlowConstruct mockFlow = mock(FlowConstruct.class, RETURNS_DEEP_STUBS.get());
   private Event event;
   private Processor mockRoute = mock(Processor.class, RETURNS_DEEP_STUBS.get());
-  private ExpressionFilter mockAlwaysTrueFailureExpressionFilter = mock(ExpressionFilter.class, RETURNS_DEEP_STUBS.get());
   private ThreadPoolExecutor mockPool = mock(ThreadPoolExecutor.class, RETURNS_DEEP_STUBS.get());
   private ScheduledThreadPoolExecutor mockScheduledPool = mock(ScheduledThreadPoolExecutor.class, RETURNS_DEEP_STUBS.get());
   private SimpleMemoryObjectStore<Event> objectStore = new SimpleMemoryObjectStore<>();
@@ -100,7 +98,6 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
 
   @Before
   public void setUp() throws Exception {
-    when(mockAlwaysTrueFailureExpressionFilter.accept(any(Event.class), any(Event.Builder.class))).thenReturn(true);
     when(mockUntilSuccessfulConfiguration.getRoute()).thenReturn(mockRoute);
     when(mockUntilSuccessfulConfiguration.getAckExpression()).thenReturn(null);
     when(mockUntilSuccessfulConfiguration.getMaxRetries()).thenReturn(DEFAULT_RETRIES);
@@ -152,7 +149,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
   @Test
   public void alwaysFailUsingFailureExpression() throws Exception {
     when(mockUntilSuccessfulConfiguration.getDlqMP()).thenReturn(null);
-    when(mockUntilSuccessfulConfiguration.getFailureExpressionFilter()).thenReturn(mockAlwaysTrueFailureExpressionFilter);
+    when(mockUntilSuccessfulConfiguration.getFailureExpression()).thenReturn("true");
     executeUntilSuccessfulFailingRoute(() -> {
       throw new RuntimeException(EXPECTED_FAILURE_MSG);
     });
@@ -174,7 +171,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
   @Test
   public void alwaysFailMessageUsingFailureExpression() throws Exception {
     when(mockUntilSuccessfulConfiguration.getDlqMP()).thenReturn(null);
-    when(mockUntilSuccessfulConfiguration.getFailureExpressionFilter()).thenReturn(mockAlwaysTrueFailureExpressionFilter);
+    when(mockUntilSuccessfulConfiguration.getFailureExpression()).thenReturn("true");
     executeUntilSuccessfulFailingRoute(() -> {
       throw new MessagingException(CoreMessages.createStaticMessage(EXPECTED_FAILURE_MSG), event, mockRoute);
     });
@@ -197,7 +194,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
   @Test
   public void alwaysFailMessageWrapUsingFailureExpression() throws Exception {
     when(mockUntilSuccessfulConfiguration.getDlqMP()).thenReturn(null);
-    when(mockUntilSuccessfulConfiguration.getFailureExpressionFilter()).thenReturn(mockAlwaysTrueFailureExpressionFilter);
+    when(mockUntilSuccessfulConfiguration.getFailureExpression()).thenReturn("true");
     executeUntilSuccessfulFailingRoute(() -> {
       throw new MessagingException(event, new RuntimeException(EXPECTED_FAILURE_MSG));
     });
@@ -220,7 +217,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
   @Test
   public void alwaysFailUsingFailureExpressionDLQ() throws Exception {
     when(mockUntilSuccessfulConfiguration.getDlqMP()).thenReturn(mockDLQ);
-    when(mockUntilSuccessfulConfiguration.getFailureExpressionFilter()).thenReturn(mockAlwaysTrueFailureExpressionFilter);
+    when(mockUntilSuccessfulConfiguration.getFailureExpression()).thenReturn("true");
     executeUntilSuccessfulFailingRoute(() -> {
       throw new RuntimeException(EXPECTED_FAILURE_MSG);
     });
@@ -246,7 +243,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
   @Test
   public void alwaysFailMessageUsingFailureExpressionDLQ() throws Exception {
     when(mockUntilSuccessfulConfiguration.getDlqMP()).thenReturn(mockDLQ);
-    when(mockUntilSuccessfulConfiguration.getFailureExpressionFilter()).thenReturn(mockAlwaysTrueFailureExpressionFilter);
+    when(mockUntilSuccessfulConfiguration.getFailureExpression()).thenReturn("true");
     executeUntilSuccessfulFailingRoute(() -> {
       throw new MessagingException(CoreMessages.createStaticMessage(EXPECTED_FAILURE_MSG), event, mockRoute);
     });
@@ -272,7 +269,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
   @Test
   public void alwaysFailMessageWrapUsingFailureExpressionDLQ() throws Exception {
     when(mockUntilSuccessfulConfiguration.getDlqMP()).thenReturn(mockDLQ);
-    when(mockUntilSuccessfulConfiguration.getFailureExpressionFilter()).thenReturn(mockAlwaysTrueFailureExpressionFilter);
+    when(mockUntilSuccessfulConfiguration.getFailureExpression()).thenReturn("true");
     executeUntilSuccessfulFailingRoute(() -> {
       throw new MessagingException(event, new RuntimeException(EXPECTED_FAILURE_MSG));
     });

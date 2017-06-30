@@ -11,6 +11,7 @@ import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.core.api.context.notification.ErrorHandlerNotification.PROCESS_END;
 import static org.mule.runtime.core.api.context.notification.ErrorHandlerNotification.PROCESS_START;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.lifecycle.Stoppable;
@@ -82,16 +83,11 @@ public abstract class AbstractMessagingExceptionStrategy extends AbstractExcepti
 
     Event result;
 
-    if (isRollback(ex)) {
-      logger.debug("Rolling back transaction");
-      rollback(ex);
+    logger.debug("Rolling back transaction");
+    rollback(ex);
 
-      logger.debug("Routing exception message");
-      result = routeException(event, flowConstruct, ex);
-    } else {
-      logger.debug("Routing exception message");
-      result = routeException(event, flowConstruct, ex);
-    }
+    logger.debug("Routing exception message");
+    result = routeException(event, flowConstruct, ex);
 
     closeStream(event.getMessage());
 

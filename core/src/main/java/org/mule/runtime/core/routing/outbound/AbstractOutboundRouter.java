@@ -7,7 +7,10 @@
 package org.mule.runtime.core.routing.outbound;
 
 import static java.util.Collections.emptyList;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.api.execution.MessageProcessorExecutionTemplate.createNotificationExecutionTemplate;
+import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
+import static org.mule.runtime.core.api.util.StringMessageUtils.truncate;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -23,22 +26,19 @@ import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
+import org.mule.runtime.core.api.execution.MessageProcessorExecutionTemplate;
+import org.mule.runtime.core.api.management.stats.RouterStatistics;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.OutboundRouter;
 import org.mule.runtime.core.api.routing.RouterResultsHandler;
 import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
-import org.mule.runtime.core.api.exception.MessagingException;
-import org.mule.runtime.core.api.execution.MessageProcessorExecutionTemplate;
-import org.mule.runtime.core.api.execution.TransactionalExecutionTemplate;
-import org.mule.runtime.core.api.management.stats.RouterStatistics;
 import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.routing.DefaultRouterResultsHandler;
-import org.mule.runtime.core.api.util.StringMessageUtils;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -51,6 +51,8 @@ import org.slf4j.LoggerFactory;
  * <code>AbstractOutboundRouter</code> is a base router class that tracks statistics about message processing through the router.
  */
 public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwner implements OutboundRouter {
+
+  public static final String DEFAULT_FAILURE_EXPRESSION = "error != null";
 
   /**
    * logger used by this class
@@ -72,8 +74,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
 
   @Override
   public Event process(final Event event) throws MuleException {
-    ExecutionTemplate<Event> executionTemplate =
-        TransactionalExecutionTemplate.createTransactionalExecutionTemplate(muleContext, getTransactionConfig());
+    ExecutionTemplate<Event> executionTemplate = createTransactionalExecutionTemplate(muleContext, getTransactionConfig());
     ExecutionCallback<Event> processingCallback = () -> {
       try {
         return route(event);
@@ -94,12 +95,10 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
 
   protected abstract Event route(Event event) throws MuleException;
 
-  protected final Event sendRequest(final Event originalEvent, final Event eventToRoute, final Processor route,
-                                    boolean awaitResponse)
-      throws MuleException {
+  protected final Event sendRequest(final Event event, final Processor route, boolean awaitResponse) throws MuleException {
     Event result;
     try {
-      result = sendRequestEvent(originalEvent, eventToRoute, route, awaitResponse);
+      result = sendRequestEvent(event, route, awaitResponse);
     } catch (MessagingException me) {
       throw me;
     } catch (Exception e) {
@@ -117,8 +116,8 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
       if (logger.isTraceEnabled()) {
         if (resultMessage != null) {
           try {
-            logger.trace("Response payload: \n" + StringMessageUtils
-                .truncate(muleContext.getTransformationService().getPayloadForLogging(resultMessage), 100, false));
+            logger.trace("Response payload: \n"
+                + truncate(muleContext.getTransformationService().getPayloadForLogging(resultMessage), 100, false));
           } catch (Exception e) {
             logger.trace("Response payload: \n(unable to retrieve payload: " + e.getMessage());
           }
@@ -211,13 +210,11 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
   /**
    * Send message event to destination.
    */
-  protected Event sendRequestEvent(Event originalEvent, Event eventToRoute, Processor route,
-                                   boolean awaitResponse)
-      throws MuleException {
+  protected Event sendRequestEvent(Event event, Processor route, boolean awaitResponse) throws MuleException {
     if (route == null) {
-      throw new DispatchException(CoreMessages.objectIsNull("connector operation"), null);
+      throw new DispatchException(objectIsNull("connector operation"), null);
     }
-    return doProcessRoute(route, eventToRoute);
+    return doProcessRoute(route, event);
   }
 
   protected Event doProcessRoute(Processor route, Event event) throws MuleException, MessagingException {
@@ -226,13 +223,6 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
     } else {
       return notificationTemplate.execute(route, event);
     }
-  }
-
-  /**
-   * Create a new event to be routed to the target MP
-   */
-  protected Event createEventToRoute(Event routedEvent, Message message) {
-    return Event.builder(routedEvent).message(message).build();
   }
 
   @Override
