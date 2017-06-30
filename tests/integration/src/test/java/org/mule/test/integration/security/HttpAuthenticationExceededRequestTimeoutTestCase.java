@@ -1,63 +1,39 @@
 package org.mule.test.integration.security;
 
-import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import org.mule.api.MuleEventContext;
-import org.mule.api.lifecycle.Callable;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.tck.junit4.rule.SystemProperty;
-
-import java.util.Collection;
 import java.util.concurrent.TimeoutException;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
-@RunWith(Parameterized.class)
-public class HttpAuthenticationExceededRequestTimeoutTestCase extends FunctionalTestCase
+public class HttpAuthenticationExceededRequestTimeoutTestCase extends AbstractHttpAuthenticationRequestTimeoutTestCase
 {
 
-    private static Integer TIMEOUT = 500;
+    private static int TIMEOUT = 500;
 
-    @Rule
-    public SystemProperty timeoutSystemProperty = new SystemProperty("timeout", TIMEOUT.toString());
-
-    @Rule
-    public SystemProperty delayComponentSystemProperty = new SystemProperty("delayComponent", this.getClass().toString() + "$DelayComponent");
-
-    @Rule
-    public SystemProperty isPreemptiveSystemProperty;
-
-    @Rule
-    public DynamicPort port = new DynamicPort("port");
-
+    private static int DELAY = TIMEOUT * 2;
 
     public HttpAuthenticationExceededRequestTimeoutTestCase(String isPreemptive)
     {
-        this.isPreemptiveSystemProperty = new SystemProperty("isPreemptive", isPreemptive);
-    }
-
-    @Parameterized.Parameters
-    public static Collection<Object> data()
-    {
-        return asList(new Object[] {"true", "false"});
+        super(isPreemptive);
     }
 
     @Override
-    protected String getConfigFile()
+    protected int getTimeout()
     {
-        return "http-exceeded-response-timeout-config.xml";
+        return TIMEOUT;
+    }
+
+    @Override
+    protected int getDelay()
+    {
+        return DELAY;
     }
 
     @Test
     public void testAuthenticationTimeout() throws Exception
     {
-
         try
         {
             runFlow("flowRequest");
@@ -66,17 +42,6 @@ public class HttpAuthenticationExceededRequestTimeoutTestCase extends Functional
         catch (Exception timeoutException)
         {
             assertThat(timeoutException.getCause(), instanceOf(TimeoutException.class));
-        }
-    }
-
-    public static class DelayComponent implements Callable
-    {
-
-        @Override
-        public Object onCall(MuleEventContext eventContext) throws Exception
-        {
-            Thread.sleep(TIMEOUT * 2);
-            return eventContext.getMessage().getPayload();
         }
     }
 
