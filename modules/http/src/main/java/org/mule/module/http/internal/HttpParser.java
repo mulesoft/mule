@@ -280,6 +280,26 @@ public class HttpParser
     }
 
     /**
+     * Extracts a parameter value from a content type
+     *
+     * @param contentType the content type
+     * @param parameterName: the name of the parameter to extract.
+     * @return the value of the extracted parameter.
+     */
+    public static String getContentTypeParameter(String contentType, String parameterName)
+    {
+        try
+        {
+            ContentType contentTypeValue = new ContentType(contentType);
+            return contentTypeValue.getParameter(parameterName);
+        }
+        catch (ParseException e)
+        {
+            throw new MuleRuntimeException(e);
+        }
+    }
+
+    /**
      * Normalize a path that may contains spaces, %20 or +.
      *
      * @param path path with encoded spaces or raw spaces
