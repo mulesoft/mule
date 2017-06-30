@@ -45,8 +45,6 @@ public class DefaultResourceReleaser implements ResourceReleaser {
     deregisterJdbcDrivers();
 
     cleanUpResourceBundle();
-
-    leakPreventionForDerbyDriver();
   }
 
   private void cleanUpResourceBundle() {
@@ -122,6 +120,10 @@ public class DefaultResourceReleaser implements ResourceReleaser {
       if (isMySqlDriver(driver)) {
         shutdownMySqlAbandonedConnectionCleanupThread();
       }
+
+      if (isDerbyEmbeddedDriver(driver)) {
+        leakPreventionForDerbyEmbeddedDriver();
+      }
     } catch (Exception e) {
       logger.warn(format("Can not deregister driver %s. This can cause a memory leak.", driver.getClass()), e);
     }
@@ -133,6 +135,10 @@ public class DefaultResourceReleaser implements ResourceReleaser {
 
   private boolean isMySqlDriver(Driver driver) {
     return isDriver(driver, "com.mysql.jdbc.Driver");
+  }
+
+  private boolean isDerbyEmbeddedDriver(Driver driver) {
+    return isDriver(driver, "org.apache.derby.jdbc.EmbeddedDriver");
   }
 
   private boolean isDriver(Driver driver, String expectedDriverClass) {
@@ -162,7 +168,7 @@ public class DefaultResourceReleaser implements ResourceReleaser {
     }
   }
 
-  private void leakPreventionForDerbyDriver() {
+  private void leakPreventionForDerbyEmbeddedDriver() {
     try {
       // Die Derby die
       Class<?> abandonedConnectionCleanupThreadClass =
@@ -173,8 +179,8 @@ public class DefaultResourceReleaser implements ResourceReleaser {
         Method m = abandonedConnectionCleanupThreadClass.getDeclaredMethod("connect", String.class, java.util.Properties.class);
         m.invoke(driverObject, "jdbc:derby:;shutdown=true", null);
       }
-    } catch (Exception sq) {
-      // ClassNotFoundException, SQLException or any other, just ignore
+    } catch (Throwable e) {
+      logger.warn("Unable to unregister Derby's embedded driver", e);
     }
   }
 
