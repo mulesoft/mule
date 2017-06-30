@@ -11,6 +11,8 @@ import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationParser;
 import org.mule.runtime.config.spring.dsl.spring.BeanDefinitionFactory;
 import org.mule.runtime.config.spring.parsers.specific.DomainElementsValidator;
 
+import java.util.Map;
+
 /**
  * Allows us to hook in our own Hierarchical Parser delegate. this enables the parsing of custom spring bean elements nested
  * within each other
@@ -21,8 +23,9 @@ public class MuleDomainBeanDefinitionDocumentReader extends MuleBeanDefinitionDo
 
   public MuleDomainBeanDefinitionDocumentReader(BeanDefinitionFactory beanDefinitionFactory,
                                                 XmlApplicationParser xmlApplicationParser,
-                                                ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry) {
-    super(beanDefinitionFactory, xmlApplicationParser, componentBuildingDefinitionRegistry);
+                                                ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry,
+                                                Map<String, String> artifactProperties) {
+    super(beanDefinitionFactory, xmlApplicationParser, componentBuildingDefinitionRegistry, artifactProperties);
   }
 
   @Override
