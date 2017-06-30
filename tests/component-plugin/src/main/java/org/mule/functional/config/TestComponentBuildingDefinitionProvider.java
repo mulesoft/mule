@@ -149,6 +149,9 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
         .withTypeDefinition(fromType(SharedConfig.class))
         .build());
 
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("custom-source")
+        .withTypeDefinition(fromConfigurationAttribute("class")).build());
+
     return componentBuildingDefinitions;
   }
 }
