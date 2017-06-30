@@ -783,12 +783,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
                                        fromSimpleReferenceParameter("object-ref").build())
         .build());
 
-    componentBuildingDefinitions.add(baseDefinition.copy()
-        .withIdentifier("custom-agent")
-        .withTypeDefinition(fromConfigurationAttribute(CLASS_ATTRIBUTE))
-        .asPrototype()
-        .build());
-
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("expression-language")
         .withTypeDefinition(fromType(MVELExpressionLanguage.class))
         .withObjectFactoryType(MVELExpressionLanguageObjectFactory.class)
