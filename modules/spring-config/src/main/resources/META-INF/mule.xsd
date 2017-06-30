@@ -301,25 +301,6 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="custom-agent" type="customAgentType" substitutionGroup="abstract-agent"/>
-    <xsd:complexType name="customAgentType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractAgentType">
-                <xsd:sequence>
-                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
-                </xsd:sequence>
-                <xsd:attribute name="class" type="substitutableClass" use="required"/>
-                <xsd:attribute name="name" type="substitutableName" use="required">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Identifies the agent in the registry.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
     <!-- Message Processors -->
     <xsd:element name="abstract-message-processor" abstract="true" type="abstractMessageProcessorType">
         <xsd:annotation>
