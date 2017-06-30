@@ -10,6 +10,7 @@ package org.mule.runtime.module.deployment.impl.internal.artifact;
 import static com.google.common.io.Files.createTempDir;
 import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.IntStream.range;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasProperty;
@@ -80,13 +81,22 @@ public class MavenClassLoaderModelLoaderTestCase {
       // It is should fail
     }
     properties.put("muleRuntimeConfig.maven.repositories.mavenCentral.url", "https://repo.maven.apache.org/maven2/");
-    testWithSystemProperties(properties,
-                             () -> {
-                               GlobalConfigLoader.reset();
-                               assertThat(mavenClassLoaderModelLoader.load(artifactFile, emptyMap(), APP).getDependencies(),
-                                          hasItem(hasProperty("descriptor",
-                                                              (hasProperty("artifactId", equalTo("commons-collections"))))));
-                             });
+    range(1, 10).parallel().forEach(number -> {
+      try {
+        testWithSystemProperties(properties,
+                                 () -> {
+                                   GlobalConfigLoader.reset();
+                                   assertThat(mavenClassLoaderModelLoader.load(artifactFile, emptyMap(), APP).getDependencies(),
+                                              hasItem(hasProperty("descriptor",
+                                                                  (hasProperty("artifactId", equalTo("commons-collections"))))));
+                                 });
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    });
+
+    String a = "b";
+    System.out.println(a);
   }
 
   private Map<String, String> getMuleFreeSystemProperties() {

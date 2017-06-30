@@ -73,12 +73,17 @@ public class MavenClassLoaderModelLoader implements ClassLoaderModelLoader {
     try {
       MavenConfiguration updatedMavenConfiguration = getMavenConfig();
       if (!mavenRuntimeConfig.equals(updatedMavenConfiguration)) {
-        stamp = lock.tryConvertToWriteLock(stamp);
-        if (stamp == 0L) {
+        long writeStamp = lock.tryConvertToWriteLock(stamp);
+        if (writeStamp == 0L) {
+          lock.unlockRead(stamp);
           stamp = lock.writeLock();
+        } else {
+          stamp = writeStamp;
         }
-        mavenRuntimeConfig = updatedMavenConfiguration;
-        createClassLoaderModelLoaders();
+        if (!mavenRuntimeConfig.equals(updatedMavenConfiguration)) {
+          mavenRuntimeConfig = updatedMavenConfiguration;
+          createClassLoaderModelLoaders();
+        }
       }
 
       if (deployableMavenClassLoaderModelLoader.supportsArtifactType(artifactType)) {
