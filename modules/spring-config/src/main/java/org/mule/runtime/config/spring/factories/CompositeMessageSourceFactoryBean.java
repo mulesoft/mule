@@ -10,7 +10,7 @@ import static java.util.Collections.emptyList;
 
 import org.mule.runtime.core.api.source.CompositeMessageSource;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.source.StartableCompositeMessageSource;
+import org.mule.runtime.core.internal.source.StartableCompositeMessageSource;
 
 import java.util.List;
 

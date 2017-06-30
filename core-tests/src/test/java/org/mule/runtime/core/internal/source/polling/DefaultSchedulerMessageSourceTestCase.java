@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.source.polling;
+package org.mule.runtime.core.internal.source.polling;
 
 import static java.util.Collections.singletonMap;
 import static org.mockito.Matchers.any;
@@ -18,8 +18,8 @@ import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.core.source.scheduler.DefaultSchedulerMessageSource;
-import org.mule.runtime.core.source.scheduler.schedule.FixedFrequencyScheduler;
+import org.mule.runtime.core.internal.source.scheduler.DefaultSchedulerMessageSource;
+import org.mule.runtime.core.api.source.polling.FixedFrequencyScheduler;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.probe.PollingProber;

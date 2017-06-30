@@ -22,7 +22,7 @@ import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.internal.exception.TemplateOnErrorHandler;
 import org.mule.runtime.core.routing.AbstractSelectiveRouter;
-import org.mule.runtime.core.source.scheduler.DefaultSchedulerMessageSource;
+import org.mule.runtime.core.internal.source.scheduler.DefaultSchedulerMessageSource;
 
 import java.util.HashMap;
 import java.util.Map;

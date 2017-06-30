@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.source;
+package org.mule.runtime.core.internal.source;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -21,7 +21,6 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.PrimaryNodeLifecycleNotificationListener;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.ClusterizableMessageSource;
-import org.mule.runtime.core.api.source.MessageSource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +30,7 @@ import org.slf4j.LoggerFactory;
  * the node is primary or not inside a cluster. Non clustered nodes are always primary.
  */
 public class ClusterizableMessageSourceWrapper extends AbstractAnnotatedObject
-    implements MessageSource, Lifecycle, MuleContextAware, FlowConstructAware {
+    implements ClusterizableMessageSource, MuleContextAware, FlowConstructAware {
 
   protected static final Logger logger = LoggerFactory.getLogger(ClusterizableMessageSourceWrapper.class);
 

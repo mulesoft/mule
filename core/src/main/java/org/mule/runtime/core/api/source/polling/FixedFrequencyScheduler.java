@@ -4,14 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.source.scheduler.schedule;
+package org.mule.runtime.core.api.source.polling;
 
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.source.polling.PeriodicScheduler;
 
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;

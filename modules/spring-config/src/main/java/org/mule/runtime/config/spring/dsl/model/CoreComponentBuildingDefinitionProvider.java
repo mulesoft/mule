@@ -59,7 +59,6 @@ import static org.mule.runtime.internal.dsl.DslConstants.POOLING_PROFILE_ELEMENT
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
-
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.DataUnit;
@@ -88,7 +87,7 @@ import org.mule.runtime.config.spring.factories.AsyncMessageProcessorsFactoryBea
 import org.mule.runtime.config.spring.factories.ChoiceRouterFactoryBean;
 import org.mule.runtime.config.spring.factories.DefaultFlowFactoryBean;
 import org.mule.runtime.config.spring.factories.FlowRefFactoryBean;
-import org.mule.runtime.config.spring.factories.MessageProcessorChainFactoryBean;
+import org.mule.runtime.config.spring.factories.processor.MessageProcessorChainFactoryBean;
 import org.mule.runtime.config.spring.factories.MessageProcessorFilterPairFactoryBean;
 import org.mule.runtime.config.spring.factories.ModuleOperationMessageProcessorChainFactoryBean;
 import org.mule.runtime.config.spring.factories.ResponseMessageProcessorsFactoryBean;
@@ -158,6 +157,10 @@ import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.internal.exception.OnErrorContinueHandler;
 import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.internal.exception.RedeliveryExceeded;
+import org.mule.runtime.core.internal.source.StartableCompositeMessageSource;
+import org.mule.runtime.core.internal.source.scheduler.DefaultSchedulerMessageSource;
+import org.mule.runtime.core.api.source.polling.CronScheduler;
+import org.mule.runtime.core.api.source.polling.FixedFrequencyScheduler;
 import org.mule.runtime.core.internal.transformer.codec.XmlEntityDecoder;
 import org.mule.runtime.core.internal.transformer.codec.XmlEntityEncoder;
 import org.mule.runtime.core.internal.transformer.compression.GZipCompressTransformer;
@@ -212,10 +215,6 @@ import org.mule.runtime.core.routing.requestreply.SimpleAsyncRequestReplyRequest
 import org.mule.runtime.core.security.MuleSecurityManagerConfigurator;
 import org.mule.runtime.core.security.PasswordBasedEncryptionStrategy;
 import org.mule.runtime.core.security.SecretKeyEncryptionStrategy;
-import org.mule.runtime.core.source.StartableCompositeMessageSource;
-import org.mule.runtime.core.source.scheduler.DefaultSchedulerMessageSource;
-import org.mule.runtime.core.source.scheduler.schedule.CronScheduler;
-import org.mule.runtime.core.source.scheduler.schedule.FixedFrequencyScheduler;
 import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.streaming.object.CursorIteratorProviderFactory;
 import org.mule.runtime.core.transformer.AbstractTransformer;

@@ -9,8 +9,8 @@ package org.mule.runtime.config.spring.factories;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.source.polling.PeriodicScheduler;
-import org.mule.runtime.core.source.scheduler.DefaultSchedulerMessageSource;
-import org.mule.runtime.core.source.scheduler.schedule.FixedFrequencyScheduler;
+import org.mule.runtime.core.internal.source.scheduler.DefaultSchedulerMessageSource;
+import org.mule.runtime.core.api.source.polling.FixedFrequencyScheduler;
 import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
 
 public class SchedulingMessageSourceFactoryBean extends AbstractAnnotatedObjectFactory<DefaultSchedulerMessageSource>
