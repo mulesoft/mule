@@ -6,8 +6,12 @@
  */
 package org.mule.module.http.internal.multipart;
 
+import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_DISPOSITION;
+import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_ID;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
+import static org.mule.module.http.internal.HttpParser.getContentTypeParameter;
+import org.mule.api.MuleRuntimeException;
 import org.mule.module.http.internal.HttpParser;
 import org.mule.module.http.internal.domain.MultipartHttpEntity;
 import org.mule.util.IOUtils;
@@ -29,10 +33,34 @@ public class HttpMultipartEncoder
 
     private static final String FORM_DATA = "form-data";
 
-    public static MimeMultipart createMultpartContent(MultipartHttpEntity body, String contentType)
+    private static final String RELATED = "related";
+
+    private static final String TYPE_PARAMETER = "type";
+
+    private static final String START_PARAMETER = "start";
+
+    public static final String MANDATORY_TYPE_ERROR_MESSAGE = "Type parameter is not present in multipart/related content type, but it is mandatory.";
+
+    public static final String AMBIGUOUS_TYPE_ERROR_MESSAGE = "Type parameter and root body part content type must be the same.";
+
+
+    private HttpMultipartEncoder()
     {
+    }
+
+    public static MimeMultipart createContent(MultipartHttpEntity body, String contentType)
+    {
+
         String contentTypeSubType = HttpParser.getContentTypeSubType(contentType);
+        String typeParameter = getContentTypeParameter(contentType, TYPE_PARAMETER);
+
+        if (contentTypeSubType.equals(RELATED) &&  typeParameter == null)
+        {
+            throw new MuleRuntimeException(createStaticMessage(MANDATORY_TYPE_ERROR_MESSAGE));
+        }
+
         MimeMultipart mimeMultipartContent = new HttpMimeMultipart(contentType, contentTypeSubType);
+
         final Collection<HttpPart> parts = body.getParts();
 
         for (HttpPart part : parts)
@@ -50,6 +78,12 @@ public class HttpMultipartEncoder
             {
                 internetHeaders.addHeader(CONTENT_DISPOSITION, getContentDisposition(part));
             }
+
+            if (contentTypeSubType.equals(RELATED) && part.getName() != null)
+            {
+                internetHeaders.addHeader(CONTENT_ID, part.getName());
+            }
+
             if (internetHeaders.getHeader(CONTENT_TYPE) == null && part.getContentType() != null)
             {
                 internetHeaders.addHeader(CONTENT_TYPE, part.getContentType());
@@ -57,13 +91,39 @@ public class HttpMultipartEncoder
             try
             {
                 final byte[] partContent = IOUtils.toByteArray(part.getInputStream());
-                mimeMultipartContent.addBodyPart(new MimeBodyPart(internetHeaders, partContent));
+                String rootContentId = getContentTypeParameter(contentType, START_PARAMETER);
+
+                if (contentTypeSubType.equals(RELATED) && part.getName() != null && part.getName().equals(rootContentId))
+                {
+                    mimeMultipartContent.addBodyPart(new MimeBodyPart(internetHeaders, partContent), 0);
+                }
+                else
+                {
+                    mimeMultipartContent.addBodyPart(new MimeBodyPart(internetHeaders, partContent));
+                }
             }
             catch (Exception e)
             {
-                throw new RuntimeException(e);
+                throw new MuleRuntimeException(e);
             }
         }
+
+        try
+        {
+            if (contentTypeSubType.equals(RELATED) && mimeMultipartContent.getCount() > 0)
+            {
+                String rootBodyPartContentType = mimeMultipartContent.getBodyPart(0).getContentType();
+                if (rootBodyPartContentType != null && (!rootBodyPartContentType.equals(typeParameter)))
+                {
+                    throw new MuleRuntimeException(createStaticMessage(AMBIGUOUS_TYPE_ERROR_MESSAGE));
+                }
+            }
+        }
+        catch (MessagingException e)
+        {
+            throw new MuleRuntimeException(e);
+        }
+
         return mimeMultipartContent;
     }
 
@@ -85,10 +145,11 @@ public class HttpMultipartEncoder
 
     public static byte[] createMultipartContent(MultipartHttpEntity multipartEntity, String contentType) throws IOException, MessagingException
     {
-        MimeMultipart mimeMultipartContent = HttpMultipartEncoder.createMultpartContent(multipartEntity, contentType);
+        MimeMultipart mimeMultipartContent = HttpMultipartEncoder.createContent(multipartEntity, contentType);
         final ByteArrayOutputStream byteArrayOutputStream;
         byteArrayOutputStream = new ByteArrayOutputStream();
         mimeMultipartContent.writeTo(byteArrayOutputStream);
         return byteArrayOutputStream.toByteArray();
     }
+
 }
