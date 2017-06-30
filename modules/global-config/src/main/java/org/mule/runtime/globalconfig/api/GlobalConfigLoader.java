@@ -116,11 +116,16 @@ public class GlobalConfigLoader {
     long stamp = lock.readLock();
     try {
       if (mavenConfig == null) {
-        stamp = lock.tryConvertToWriteLock(stamp);
-        if (stamp == 0L) {
+        long writeStamp = lock.tryConvertToWriteLock(stamp);
+        if (writeStamp == 0L) {
+          lock.unlockRead(stamp);
           stamp = lock.writeLock();
+        } else {
+          stamp = writeStamp;
         }
-        initialiseGlobalConfig();
+        if (mavenConfig == null) {
+          initialiseGlobalConfig();
+        }
       }
       return mavenConfig;
     } finally {
