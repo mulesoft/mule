@@ -134,7 +134,14 @@ public class EmbeddedTestHelper {
   public File getPackagedApplication(File applicationFolder) throws Exception {
     File compressedFile = temporaryFolder.newFile(applicationFolder.getName());
     ZipFile zipFile = new ZipFile(compressedFile.getAbsolutePath() + ".jar");
-    zipFile.addFolder(applicationFolder, new ZipParameters());
+    File[] files = applicationFolder.listFiles();
+    for (File file : files) {
+      if (file.isDirectory()) {
+        zipFile.addFolder(file, new ZipParameters());
+      } else {
+        zipFile.addFile(file, new ZipParameters());
+      }
+    }
     return zipFile.getFile();
   }
 
