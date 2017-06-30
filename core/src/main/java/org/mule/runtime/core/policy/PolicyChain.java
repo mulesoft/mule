@@ -29,7 +29,6 @@ import java.util.List;
 import javax.inject.Inject;
 
 import org.reactivestreams.Publisher;
-import reactor.core.publisher.Mono;
 
 /**
  * Policy chain for handling the message processor associated to a policy.

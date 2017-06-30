@@ -8,7 +8,8 @@ package org.mule.runtime.core.policy;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
-import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
+import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
+import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContext;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
@@ -17,15 +18,11 @@ import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.processor.ReactiveProcessor;
-import org.mule.runtime.core.api.rx.Exceptions;
 
 import java.util.List;
 import java.util.Optional;
 
 import org.reactivestreams.Publisher;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 /**
  * Abstract implementation that performs the chaining of a set of policies and the {@link Processor} being intercepted.
@@ -67,7 +64,8 @@ public abstract class AbstractCompositePolicy<ParametersTransformer, ParametersP
    * execution.
    */
   public final Publisher<Event> processPolicies(Event operationEvent) {
-    return just(operationEvent).transform(new AbstractCompositePolicy.NextOperationCall());
+    return just(operationEvent)
+        .flatMapMany(event -> processWithChildContext(event, new AbstractCompositePolicy.NextOperationCall()));
   }
 
   /**
@@ -114,34 +112,20 @@ public abstract class AbstractCompositePolicy<ParametersTransformer, ParametersP
 
     @Override
     public Event process(Event event) throws MuleException {
-      checkState(index <= parameterizedPolicies.size(), "composite policy index is greater that the number of policies.");
-      if (index == parameterizedPolicies.size()) {
-        try {
-          return from(processNextOperation(event)).block();
-        } catch (Throwable throwable) {
-          throw rxExceptionToMuleException(throwable);
-        }
-      }
-      Policy policy = parameterizedPolicies.get(index);
-      index++;
-      try {
-        return from(processPolicy(policy, this, event)).block();
-      } catch (Throwable throwable) {
-        throw rxExceptionToMuleException(throwable);
-      }
+      return processToApply(event, this);
     }
 
     @Override
     public Publisher<Event> apply(Publisher<Event> publisher) {
-      return Flux.from(publisher).flatMap(event -> {
-        checkState(index <= parameterizedPolicies.size(), "composite policy index is greater that the number of policies.");
-        if (index == parameterizedPolicies.size()) {
-          return processNextOperation(event);
-        }
-        Policy policy = parameterizedPolicies.get(index);
-        index++;
-        return from(processPolicy(policy, this, event));
-      }).onErrorMap(throwable -> !(throwable instanceof MuleException), throwable -> new DefaultMuleException(throwable));
+      return from(publisher)
+          .then(event -> {
+            checkState(index <= parameterizedPolicies.size(), "composite policy index is greater that the number of policies.");
+            if (index == parameterizedPolicies.size()) {
+              return from(processNextOperation(event));
+            }
+            return from(processPolicy(parameterizedPolicies.get(index++), this, event));
+          })
+          .onErrorMap(throwable -> !(throwable instanceof MuleException), throwable -> new DefaultMuleException(throwable));
     }
   }
 

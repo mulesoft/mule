@@ -17,7 +17,6 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
 
 import org.reactivestreams.Publisher;
-import reactor.core.publisher.Mono;
 
 /**
  * This class is responsible for the processing of a policy applied to a {@link org.mule.runtime.core.api.source.MessageSource}.
@@ -73,15 +72,17 @@ public class SourcePolicyProcessor implements Processor {
 
   @Override
   public Publisher<Event> apply(Publisher<Event> publisher) {
-    return from(publisher).then(sourceEvent -> {
-      String executionIdentifier = sourceEvent.getContext().getId();
-      policyStateHandler.updateNextOperation(executionIdentifier,
-                                             buildSourceExecutionWithPolicyFunction(executionIdentifier, sourceEvent));
-      return just(sourceEvent)
-          .map(event -> policyEventConverter.createEvent(sourceEvent,
-                                                         builder(sourceEvent.getContext()).message(of(null)).build()))
-          .transform(policy.getPolicyChain()).map(event -> policyEventConverter.createEvent(event, sourceEvent));
-    });
+    return from(publisher)
+        .then(sourceEvent -> {
+          String executionIdentifier = sourceEvent.getContext().getCorrelationId();
+          policyStateHandler.updateNextOperation(executionIdentifier,
+                                                 buildSourceExecutionWithPolicyFunction(executionIdentifier, sourceEvent));
+          return just(sourceEvent)
+              .map(event -> policyEventConverter.createEvent(sourceEvent,
+                                                             builder(sourceEvent.getContext()).message(of(null)).build()))
+              .transform(policy.getPolicyChain())
+              .map(event -> policyEventConverter.createEvent(event, sourceEvent));
+        });
   }
 
   private Processor buildSourceExecutionWithPolicyFunction(String executionIdentifier, Event sourceEvent) {

@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.policy;
 
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 
 import java.util.Map;

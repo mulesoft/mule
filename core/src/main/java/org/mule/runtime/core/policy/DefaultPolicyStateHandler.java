@@ -7,6 +7,7 @@
 package org.mule.runtime.core.policy;
 
 import static java.util.Optional.ofNullable;
+
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
 

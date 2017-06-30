@@ -7,8 +7,8 @@
 package org.mule.runtime.core.policy;
 
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.functional.Either;
+import org.mule.runtime.core.api.processor.Processor;
 
 import org.reactivestreams.Publisher;
 
