@@ -270,13 +270,6 @@ public class ObjectFactory {
   }
 
   /**
-   * Create an instance of {@link All }
-   */
-  public All createAll() {
-    return new All();
-  }
-
-  /**
    * Create an instance of {@link WhiteSpace }
    */
   public WhiteSpace createWhiteSpace() {
@@ -456,14 +449,6 @@ public class ObjectFactory {
   @XmlElementDecl(namespace = "http://www.w3.org/2001/XMLSchema", name = "key")
   public JAXBElement<Keybase> createKey(Keybase value) {
     return new JAXBElement<Keybase>(_Key_QNAME, Keybase.class, null, value);
-  }
-
-  /**
-   * Create an instance of {@link JAXBElement }{@code <}{@link All }{@code >}}
-   */
-  @XmlElementDecl(namespace = "http://www.w3.org/2001/XMLSchema", name = "all")
-  public JAXBElement<All> createAll(All value) {
-    return new JAXBElement<All>(_All_QNAME, All.class, null, value);
   }
 
   /**

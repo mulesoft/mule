@@ -802,7 +802,7 @@
             <xsd:extension base="annotatedType"/>
         </xsd:complexContent>
     </xsd:complexType>
-    
+
     <xsd:group name="messageSource">
         <xsd:choice>
             <xsd:element ref="abstract-message-source">
@@ -2059,7 +2059,7 @@
     </xsd:complexType>
 
     <!--  Processing Strategies -->
-    
+
     <xsd:element name="abstract-processing-strategy" type="processingStrategyType" abstract="true">
         <xsd:annotation>
             <xsd:documentation>
@@ -2080,7 +2080,7 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-    
+
     <xsd:element name="custom-processing-strategy" type="customProcessingStrategy" substitutionGroup="abstract-processing-strategy">
         <xsd:annotation>
             <xsd:documentation>
@@ -2104,7 +2104,7 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-    
+
     <xsd:element name="flow-ref" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
@@ -3415,7 +3415,7 @@
                         </xsd:annotation>
                         <xsd:complexType>
                             <xsd:attributeGroup ref="expressionAttributes"/>
-                        <!-- 
+                        <!--
                          -->
                             <xsd:attribute name="optional" type="substitutableBoolean" use="optional">
                                 <xsd:annotation>
@@ -3979,7 +3979,7 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                
+
                 <!-- TODO MULE-12379 Allow inline definition of object stores in elements -->
                 <xsd:attribute name="processed-groups-object-store" type="xsd:string" use="optional">
                     <xsd:annotation>
@@ -3995,8 +3995,8 @@
                             The object store where the event groups are going to be stored.
                         </xsd:documentation>
                     </xsd:annotation>
-                </xsd:attribute>                
-                
+                </xsd:attribute>
+
                 <xsd:attribute name="persistentStores" type="substitutableBoolean" default="false">
                 	<xsd:annotation>
                         <xsd:documentation>
@@ -4213,14 +4213,7 @@
     </xsd:element>
 
     <!-- Deprecated -->
-    <xsd:element name="all" type="baseMultipleRoutesRoutingMessageProcessorType" substitutionGroup="abstract-routing-message-processor">
-        <xsd:annotation>
-            <xsd:documentation>
-                Sends the same message to multiple message processors.
-                @Deprecated since 3.5.0. Use scatter-gather instead
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
+
 
     <xsd:complexType name="processorWithAtLeastOneTargetType" >
         <xsd:complexContent>
@@ -4231,7 +4224,7 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-    
+
     <xsd:complexType name="processorWithExactlyOneTargetType" >
         <xsd:complexContent>
             <xsd:extension base="abstractRoutingMessageProcessorType">
@@ -4263,7 +4256,7 @@
             </xsd:complexContent>
         </xsd:complexType>
     </xsd:element>
-    
+
     <xsd:element name="until-successful" substitutionGroup="abstract-routing-message-processor">
         <xsd:annotation>
             <xsd:documentation>
@@ -4334,7 +4327,7 @@
             </xsd:complexContent>
         </xsd:complexType>
     </xsd:element>
-    
+
     <xsd:element name="scatter-gather" substitutionGroup="abstract-routing-message-processor">
         <xsd:annotation>
             <xsd:documentation>
@@ -4364,7 +4357,7 @@
                     <xsd:attribute name="timeout" type="substitutableLong" use="optional" default="0">
                         <xsd:annotation>
                             <xsd:documentation>
-                                Sets a timeout in milliseconds for each route. Values lower or equals than zero means no timeout. 
+                                Sets a timeout in milliseconds for each route. Values lower or equals than zero means no timeout.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:attribute>
@@ -4372,7 +4365,7 @@
             </xsd:complexContent>
         </xsd:complexType>
     </xsd:element>
-    
+
     <xsd:complexType name="aggregationStrategyType">
         <xsd:complexContent>
             <xsd:extension base="annotatedType">
@@ -4396,8 +4389,8 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-    
-	
+
+
     <xsd:element name="round-robin" substitutionGroup="abstract-routing-message-processor"
                  type="processorWithAtLeastOneTargetType">
         <xsd:annotation>

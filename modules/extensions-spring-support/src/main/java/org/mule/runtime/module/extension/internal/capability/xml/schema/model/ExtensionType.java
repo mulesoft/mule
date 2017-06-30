@@ -57,7 +57,6 @@ import javax.xml.namespace.QName;
 public class ExtensionType extends Annotated {
 
   protected GroupRef group;
-  protected All all;
   protected ExplicitGroup choice;
   protected ExplicitGroup sequence;
   @XmlElements({@XmlElement(name = "attributeGroup", type = AttributeGroupRef.class),
@@ -83,24 +82,6 @@ public class ExtensionType extends Annotated {
    */
   public void setGroup(GroupRef value) {
     this.group = value;
-  }
-
-  /**
-   * Gets the value of the all property.
-   *
-   * @return possible object is {@link All }
-   */
-  public All getAll() {
-    return all;
-  }
-
-  /**
-   * Sets the value of the all property.
-   *
-   * @param value allowed object is {@link All }
-   */
-  public void setAll(All value) {
-    this.all = value;
   }
 
   /**
