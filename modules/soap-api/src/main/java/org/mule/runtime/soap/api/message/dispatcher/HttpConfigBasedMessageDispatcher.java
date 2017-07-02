@@ -35,8 +35,6 @@ public final class HttpConfigBasedMessageDispatcher implements MessageDispatcher
    * <p>
    * Dispatches the message using the {@link ExtensionsClient} executing the {@code request} operation of the HTTP extension.
    * <p>
-   * This method executes the request operation with the http {@code parseResponse} flag set to false in order to receive always
-   * the complete response stream and to pass it to the service to process it.
    */
   @Override
   public DispatchingResponse dispatch(DispatchingRequest req) {

@@ -163,6 +163,8 @@ public interface AllureConstants {
       String STREAMING = "Streaming";
       String TCP_BUILDER = "TCP Builders";
       String NTLM = "NTLM";
+      String URL_ENCODED = "URL encoded body";
+      String MULTIPART = "Multipart body";
     }
 
   }
