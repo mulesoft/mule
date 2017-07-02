@@ -18,5 +18,5 @@ import org.mule.runtime.core.api.MuleContext;
  */
 public interface EventCallback {
 
-  public void eventReceived(Event event, Object component, MuleContext muleContext) throws Exception;
+  void eventReceived(Event event, Object component, MuleContext muleContext) throws Exception;
 }
