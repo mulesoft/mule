@@ -73,8 +73,7 @@ public final class ReflectiveHttpConfigBasedRequester {
     DefaultOperationParametersBuilder params = builder().configName(configName)
         .addParameter("method", method)
         .addParameter("url", url)
-        .addParameter("headers", headers)
-        .addParameter("parseResponse", false);
+        .addParameter("headers", headers);
 
     if (body != null) {
       params.addParameter("body", new TypedValue<>(body, INPUT_STREAM));
