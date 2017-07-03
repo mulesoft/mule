@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.util.queue;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.commons.io.FileUtils.deleteQuietly;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 
@@ -23,7 +24,6 @@ import java.math.BigInteger;
 public class QueueFileProvider {
 
   private static final String OPEN_FILE_OPTIONS = "rws";
-  private static final String UTF_8_ENCODING = "UTF-8";
 
   private final boolean newFile;
   private File file;
@@ -61,7 +61,7 @@ public class QueueFileProvider {
 
   private static String toHex(String filename) {
     try {
-      return new BigInteger(filename.getBytes(UTF_8_ENCODING)).toString(16);
+      return new BigInteger(filename.getBytes(UTF_8.name())).toString(16);
     } catch (UnsupportedEncodingException e) {
       // This should never happen
       return filename;

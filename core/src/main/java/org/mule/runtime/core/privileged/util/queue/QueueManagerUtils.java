@@ -15,7 +15,7 @@ import java.io.IOException;
 
 /**
  * Provides utilities to work with queues for testing purposes without having to export all the classes in
- * org.mule.runtime.core.internal.util.queue package. For testing purposes only.
+ * {@code org.mule.runtime.core.internal.util.queue} package. For testing purposes only.
  *
  * @since 4.0
  */
