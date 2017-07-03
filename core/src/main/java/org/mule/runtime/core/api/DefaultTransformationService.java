@@ -53,6 +53,8 @@ public class DefaultTransformationService implements TransformationService {
   }
 
   /**
+   * TODO MULE-12982 - cleanup DefaultTransformationService
+   * <p/>
    * @deprecated use {@code {@link #transform(Message, DataType)} or {@link #transform(Object, DataType, DataType)}} instead
    * or use a method that could be exposed in the API.
    * <p/>
@@ -123,6 +125,8 @@ public class DefaultTransformationService implements TransformationService {
   }
 
   /**
+   * TODO MULE-12982 - cleanup DefaultTransformationService
+   * <p/>
    * @deprecated use {@code {@link #transform(Message, DataType)} or {@link #transform(Object, DataType, DataType)}} instead
    * or use a method that could be exposed in the API.
    * <p/>
