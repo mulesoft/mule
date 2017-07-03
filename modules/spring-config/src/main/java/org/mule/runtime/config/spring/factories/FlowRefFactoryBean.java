@@ -99,22 +99,10 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
         ((AnnotatedObject) referencedFlow).setAnnotations(getAnnotations());
       }
       if (referencedFlow instanceof Initialisable) {
-        if (referencedFlow instanceof FlowConstructAware) {
-          ((FlowConstructAware) referencedFlow).setFlowConstruct(flowConstruct);
-        }
-
-        if (referencedFlow instanceof MuleContextAware) {
-          ((MuleContextAware) referencedFlow).setMuleContext(muleContext);
-        }
-
+        prepareProcessor(referencedFlow, flowConstruct);
         if (referencedFlow instanceof MessageProcessorChain) {
           for (Processor processor : ((MessageProcessorChain) referencedFlow).getMessageProcessors()) {
-            if (processor instanceof FlowConstructAware) {
-              ((FlowConstructAware) processor).setFlowConstruct(flowConstruct);
-            }
-            if (processor instanceof MuleContextAware) {
-              ((MuleContextAware) processor).setMuleContext(muleContext);
-            }
+            prepareProcessor(processor, flowConstruct);
           }
         }
         initialiseIfNeeded(referencedFlow);
@@ -123,6 +111,15 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
     }
 
     return referencedFlow;
+  }
+
+  private void prepareProcessor(Processor p, FlowConstruct flowConstruct) {
+    if (p instanceof FlowConstructAware) {
+      ((FlowConstructAware) p).setFlowConstruct(flowConstruct);
+    }
+    if (p instanceof MuleContextAware) {
+      ((MuleContextAware) p).setMuleContext(muleContext);
+    }
   }
 
   @Override
@@ -150,6 +147,7 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
 
     private FlowConstruct flowConstruct;
     private LoadingCache<String, Processor> cache;
+    private boolean isExpression;
 
     public FlowRefMessageProcessor() {
       this.cache = CacheBuilder.newBuilder()
@@ -161,6 +159,8 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
               return getReferencedFlow(key, flowConstruct);
             }
           });
+
+      this.isExpression = muleContext.getExpressionManager().isExpression(refName);
     }
 
     @Override
@@ -211,7 +211,12 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
     }
 
     protected Processor resolveReferencedProcessor(Event event) throws MuleException {
-      String flowName = muleContext.getExpressionManager().parse(refName, event, flowConstruct);
+      String flowName;
+      if (isExpression) {
+        flowName = muleContext.getExpressionManager().parse(refName, event, flowConstruct);
+      } else {
+        flowName = refName;
+      }
 
       try {
         return cache.getUnchecked(flowName);
@@ -252,12 +257,20 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
 
     @Override
     public void stop() throws MuleException {
-      stopIfNeeded(cache.asMap().values());
+      for (Processor p : cache.asMap().values()) {
+        if (!(p instanceof Flow)) {
+          stopIfNeeded(p);
+        }
+      }
     }
 
     @Override
     public void dispose() {
-      disposeIfNeeded(cache.asMap().values(), LOGGER);
+      for (Processor p : cache.asMap().values()) {
+        if (!(p instanceof Flow)) {
+          disposeIfNeeded(p, LOGGER);
+        }
+      }
       cache.invalidateAll();
       cache.cleanUp();
     }
