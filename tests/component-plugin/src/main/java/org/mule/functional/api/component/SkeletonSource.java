@@ -17,8 +17,7 @@ import org.mule.runtime.core.api.source.MessageSource;
  *
  * @since 4.0
  */
-public class SkeletonSource extends AbstractAnnotatedObject implements MessageSource, Startable
-{
+public class SkeletonSource extends AbstractAnnotatedObject implements MessageSource, Startable {
 
   private Processor listener;
   private boolean started;
@@ -33,8 +32,7 @@ public class SkeletonSource extends AbstractAnnotatedObject implements MessageSo
   }
 
   @Override
-  public void start() throws MuleException
-  {
+  public void start() throws MuleException {
     started = true;
   }
 
