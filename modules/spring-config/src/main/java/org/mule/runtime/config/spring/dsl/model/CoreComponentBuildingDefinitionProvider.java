@@ -782,7 +782,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("object",
                                        fromSimpleReferenceParameter("object-ref").build())
         .build());
-    
+
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("expression-language")
         .withTypeDefinition(fromType(MVELExpressionLanguage.class))
         .withObjectFactoryType(MVELExpressionLanguageObjectFactory.class)
