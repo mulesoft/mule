@@ -11,7 +11,7 @@ import org.mule.runtime.core.internal.util.journal.JournalEntry;
 import org.mule.runtime.core.internal.util.journal.JournalEntrySerializer;
 import org.mule.runtime.core.internal.util.journal.TransactionCompletePredicate;
 import org.mule.runtime.core.internal.util.journal.TransactionJournal;
-import org.mule.runtime.core.util.queue.QueueStore;
+import org.mule.runtime.core.internal.util.queue.QueueStore;
 
 import com.google.common.collect.Multimap;
 

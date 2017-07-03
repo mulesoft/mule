@@ -18,9 +18,7 @@ import static org.mule.runtime.core.internal.util.journal.TransactionJournal.TX1
 import static org.mule.runtime.core.internal.util.journal.TransactionJournal.TX2_LOG_FILE_NAME;
 
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.internal.util.journal.queue.LocalQueueTxJournalEntry;
-import org.mule.runtime.core.internal.util.journal.queue.LocalTxQueueTransactionJournal;
-import org.mule.runtime.core.util.queue.DefaultQueueStore;
+import org.mule.runtime.core.internal.util.queue.DefaultQueueStore;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import com.google.common.collect.Multimap;

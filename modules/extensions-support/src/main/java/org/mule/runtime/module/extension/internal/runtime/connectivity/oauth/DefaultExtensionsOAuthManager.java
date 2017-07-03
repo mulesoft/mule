@@ -37,7 +37,7 @@ import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.api.util.Pair;
 import org.mule.runtime.core.internal.util.LazyLookup;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
-import org.mule.runtime.core.util.store.LazyObjectStoreToMapAdapter;
+import org.mule.runtime.core.internal.util.store.LazyObjectStoreToMapAdapter;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthCodeRequest;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeState;

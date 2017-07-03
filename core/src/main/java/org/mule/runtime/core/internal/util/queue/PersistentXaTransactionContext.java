@@ -8,10 +8,7 @@ package org.mule.runtime.core.internal.util.queue;
 
 import org.mule.runtime.core.internal.util.journal.queue.XaQueueTxJournalEntry;
 import org.mule.runtime.core.internal.util.journal.queue.XaTxQueueTransactionJournal;
-import org.mule.runtime.core.util.queue.QueueProvider;
-import org.mule.runtime.core.util.queue.QueueStore;
-import org.mule.runtime.core.util.queue.XaQueueTransactionContext;
-import org.mule.runtime.core.util.xa.ResourceManagerException;
+import org.mule.runtime.core.api.transaction.xa.ResourceManagerException;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -23,7 +20,7 @@ import org.apache.commons.collections.Closure;
 import org.apache.commons.collections.CollectionUtils;
 
 /**
- * Implementation of {@link org.mule.runtime.core.util.queue.XaQueueTransactionContext} for persistent queues using XA
+ * Implementation of {@link XaQueueTransactionContext} for persistent queues using XA
  * transactions
  */
 public class PersistentXaTransactionContext implements XaQueueTransactionContext {

@@ -8,8 +8,8 @@ package org.mule.runtime.core.internal.util.journal.queue;
 
 import static org.apache.commons.collections.CollectionUtils.find;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.util.queue.QueueProvider;
-import org.mule.runtime.core.util.queue.RecoverableQueueStore;
+import org.mule.runtime.core.internal.util.queue.QueueProvider;
+import org.mule.runtime.core.internal.util.queue.RecoverableQueueStore;
 
 import com.google.common.collect.Multimap;
 

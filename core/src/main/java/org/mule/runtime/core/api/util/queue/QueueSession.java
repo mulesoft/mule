@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.util.queue;
 
-import org.mule.runtime.core.util.xa.ResourceManagerException;
+import org.mule.runtime.core.api.transaction.xa.ResourceManagerException;
 
 import javax.transaction.xa.XAResource;
 

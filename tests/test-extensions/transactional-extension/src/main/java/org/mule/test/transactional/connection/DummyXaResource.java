@@ -8,7 +8,7 @@ package org.mule.test.transactional.connection;
 
 import org.mule.runtime.core.api.util.queue.Queue;
 import org.mule.runtime.core.api.util.queue.QueueSession;
-import org.mule.runtime.core.util.xa.ResourceManagerException;
+import org.mule.runtime.core.api.transaction.xa.ResourceManagerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

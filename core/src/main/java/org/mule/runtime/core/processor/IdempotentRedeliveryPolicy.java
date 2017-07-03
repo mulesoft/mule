@@ -20,8 +20,8 @@ import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.exception.MessageRedeliveredException;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
 import org.mule.runtime.core.transformer.simple.ByteArrayToHexString;
-import org.mule.runtime.core.util.store.ObjectStorePartition;
-import org.mule.runtime.core.util.store.ProvidedObjectStoreWrapper;
+import org.mule.runtime.core.internal.util.store.ObjectStorePartition;
+import org.mule.runtime.core.internal.util.store.ProvidedObjectStoreWrapper;
 
 import java.io.InputStream;
 import java.security.MessageDigest;

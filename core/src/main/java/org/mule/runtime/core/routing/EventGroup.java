@@ -19,7 +19,7 @@ import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.store.PartitionableObjectStore;
 import org.mule.runtime.core.api.session.DefaultMuleSession;
 import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
+import org.mule.runtime.core.api.store.DeserializationPostInitialisable;
 
 import java.io.Serializable;
 import java.util.Arrays;

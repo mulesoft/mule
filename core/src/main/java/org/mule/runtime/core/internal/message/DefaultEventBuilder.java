@@ -32,11 +32,9 @@ import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
-import org.mule.runtime.core.internal.message.DefaultMessageBuilder;
-import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.api.session.DefaultMuleSession;
 import org.mule.runtime.core.internal.util.CopyOnWriteCaseInsensitiveMap;
-import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
+import org.mule.runtime.core.api.store.DeserializationPostInitialisable;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -408,7 +406,7 @@ public class DefaultEventBuilder implements Event.Builder {
 
     /**
      * Invoked after deserialization. This is called when the marker interface
-     * {@link org.mule.runtime.core.util.store.DeserializationPostInitialisable} is used. This will get invoked after the object
+     * {@link DeserializationPostInitialisable} is used. This will get invoked after the object
      * has been deserialized passing in the current MuleContext when using either
      * {@link org.mule.runtime.core.transformer.wire.SerializationWireFormat},
      * {@link org.mule.runtime.core.transformer.wire.SerializedMuleMessageWireFormat} or the

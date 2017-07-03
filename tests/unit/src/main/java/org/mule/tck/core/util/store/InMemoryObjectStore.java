@@ -7,17 +7,15 @@
 package org.mule.tck.core.util.store;
 
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
-
-import java.io.Serializable;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.concurrent.ConcurrentSkipListMap;
-
 import org.mule.runtime.api.store.ObjectAlreadyExistsException;
 import org.mule.runtime.api.store.ObjectDoesNotExistException;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
-import org.mule.runtime.core.util.store.AbstractMonitoredObjectStore;
+import org.mule.runtime.core.internal.util.store.AbstractMonitoredObjectStore;
+
+import java.io.Serializable;
+import java.util.Map;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 /**
  * <code>InMemoryObjectStore</code> implements an optionally bounded in-memory store for message IDs with periodic expiry of old
@@ -26,10 +24,10 @@ import org.mule.runtime.core.util.store.AbstractMonitoredObjectStore;
  */
 public class InMemoryObjectStore<T extends Serializable> extends AbstractMonitoredObjectStore<T> {
 
-  protected ConcurrentSkipListMap<Long, StoredObject<T>> store;
+  protected final ConcurrentSkipListMap<Long, StoredObject<T>> store;
 
   public InMemoryObjectStore() {
-    this.store = new ConcurrentSkipListMap<Long, StoredObject<T>>();
+    this.store = new ConcurrentSkipListMap<>();
   }
 
   @Override
@@ -56,7 +54,7 @@ public class InMemoryObjectStore<T extends Serializable> extends AbstractMonitor
 
     // this block is unfortunately necessary to counter a possible race condition
     // between multiple nonatomic calls to containsObject/storeObject
-    StoredObject<T> obj = new StoredObject<T>(id, value);
+    StoredObject<T> obj = new StoredObject<>(id, value);
     synchronized (store) {
       if (store.values().contains(obj)) {
         throw new ObjectAlreadyExistsException();
@@ -86,9 +84,8 @@ public class InMemoryObjectStore<T extends Serializable> extends AbstractMonitor
 
   @SuppressWarnings("unchecked")
   private Map.Entry<?, ?> findEntry(Serializable key) {
-    Iterator<?> entryIterator = store.entrySet().iterator();
-    while (entryIterator.hasNext()) {
-      Map.Entry<?, ?> entry = (Map.Entry<?, ?>) entryIterator.next();
+    for (Object o : store.entrySet()) {
+      Map.Entry<?, ?> entry = (Map.Entry<?, ?>) o;
 
       StoredObject<T> object = (StoredObject<T>) entry.getValue();
       if (object.getId().equals(key)) {
@@ -118,7 +115,7 @@ public class InMemoryObjectStore<T extends Serializable> extends AbstractMonitor
     }
   }
 
-  protected int expireAndCount() {
+  private int expireAndCount() {
     // first we trim the store according to max size
     int expiredEntries = 0;
 
@@ -141,11 +138,11 @@ public class InMemoryObjectStore<T extends Serializable> extends AbstractMonitor
     return expiredEntries;
   }
 
-  protected boolean isTrimNeeded(int currentSize) {
+  private boolean isTrimNeeded(int currentSize) {
     return currentSize > maxEntries;
   }
 
-  protected boolean isExpirationNeeded() {
+  private boolean isExpirationNeeded() {
     // this is not guaranteed to be precise, but we don't mind
     int currentSize = store.size();
 
@@ -153,7 +150,7 @@ public class InMemoryObjectStore<T extends Serializable> extends AbstractMonitor
     return entryTTL > 0 && currentSize != 0;
   }
 
-  protected int doTrimAndExpire() {
+  private int doTrimAndExpire() {
     int expiredEntries = 0;
 
     if (isTrimNeeded(store.size())) {
@@ -208,7 +205,7 @@ public class InMemoryObjectStore<T extends Serializable> extends AbstractMonitor
     private Serializable id;
     private T item;
 
-    public StoredObject(Serializable id, T item) {
+    StoredObject(Serializable id, T item) {
       this.id = id;
       this.item = item;
     }
@@ -233,11 +230,7 @@ public class InMemoryObjectStore<T extends Serializable> extends AbstractMonitor
 
       StoredObject<T> that = (StoredObject<T>) o;
 
-      if (!id.equals(that.id)) {
-        return false;
-      }
-
-      return true;
+      return id.equals(that.id);
     }
 
     @Override

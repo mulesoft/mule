@@ -19,7 +19,7 @@ import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.xa.XaTransaction;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-import org.mule.runtime.core.util.xa.XaResourceFactoryHolder;
+import org.mule.runtime.core.api.transaction.xa.XaResourceFactoryHolder;
 
 import java.util.Random;
 
