@@ -91,12 +91,9 @@ public class MavenClassLoaderModelLoaderTestCase {
                                                                   (hasProperty("artifactId", equalTo("commons-collections"))))));
                                  });
       } catch (Exception e) {
-        e.printStackTrace();
+        fail(e.getMessage());
       }
     });
-
-    String a = "b";
-    System.out.println(a);
   }
 
   private Map<String, String> getMuleFreeSystemProperties() {
