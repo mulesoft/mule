@@ -29,6 +29,9 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.Event;
@@ -38,12 +41,8 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
-import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -182,20 +181,13 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleContextTestCase {
     verify((MuleContextAware) targetMuleContextAwareAware).setMuleContext(mockMuleContext);
   }
 
-  @Test(expected = MuleRuntimeException.class)
-  public void staticFlowRefDoesNotExist() throws Exception {
-    doReturn(false).when(expressionManager).isExpression(anyString());
-
-    getFlowRefProcessor(createFlowRefFactoryBean(NON_EXISTANT));
-  }
-
   private Processor getFlowRefProcessor(FlowRefFactoryBean factoryBean) throws Exception {
     Processor processor = factoryBean.getObject();
     setMuleContextIfNeeded(processor, mockMuleContext);
     return processor;
   }
 
-  @Test(expected = MessagingException.class)
+  @Test(expected = MuleRuntimeException.class)
   public void dynamicFlowRefDoesNotExist() throws Exception {
     doReturn(true).when(expressionManager).isExpression(anyString());
     doReturn("other").when(expressionManager).parse(eq(DYNAMIC_NON_EXISTANT), any(Event.class), any(FlowConstruct.class));
@@ -208,7 +200,6 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleContextTestCase {
     flowRefFactoryBean.setName(name);
     flowRefFactoryBean.setApplicationContext(applicationContext);
     flowRefFactoryBean.setMuleContext(mockMuleContext);
-    flowRefFactoryBean.initialise();
     return flowRefFactoryBean;
   }
 
