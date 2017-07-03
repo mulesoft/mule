@@ -7,14 +7,27 @@
 package org.mule.test.marvel;
 
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
+import static org.mule.runtime.api.meta.model.display.PathModel.Type.DIRECTORY;
+import static org.mule.test.marvel.MissileProvider.NAME;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.display.Path;
 import org.mule.test.marvel.model.Missile;
 
-@Alias(("missile"))
+@Alias(NAME)
 public class MissileProvider implements ConnectionProvider<Missile> {
+
+  public static final String NAME = "missile";
+
+  @Path(type = DIRECTORY)
+  @Parameter
+  @Optional
+  private String missileConfigurationDirectory;
 
   @Override
   public Missile connect() throws ConnectionException {
