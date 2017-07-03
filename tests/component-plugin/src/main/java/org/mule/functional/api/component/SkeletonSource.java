@@ -6,6 +6,8 @@
  */
 package org.mule.functional.api.component;
 
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
@@ -15,9 +17,11 @@ import org.mule.runtime.core.api.source.MessageSource;
  *
  * @since 4.0
  */
-public class SkeletonSource extends AbstractAnnotatedObject implements MessageSource {
+public class SkeletonSource extends AbstractAnnotatedObject implements MessageSource, Startable
+{
 
   private Processor listener;
+  private boolean started;
 
   @Override
   public void setListener(Processor listener) {
@@ -26,5 +30,15 @@ public class SkeletonSource extends AbstractAnnotatedObject implements MessageSo
 
   public Processor getListener() {
     return listener;
+  }
+
+  @Override
+  public void start() throws MuleException
+  {
+    started = true;
+  }
+
+  public boolean isStarted() {
+    return started;
   }
 }
