@@ -208,10 +208,10 @@ public class RegexExpressionLanguageFunctionTestCase extends AbstractMuleTestCas
     message = mock(InternalMessage.class);
     when(event.getMessage()).thenAnswer(invocation -> message);
     InternalMessage transformedMessage = mock(InternalMessage.class, RETURNS_DEEP_STUBS);
-    when(transformedMessage.getPayload()).thenReturn(new TypedValue<Object>(payload, DataType.fromObject(payload)));
+    when(transformedMessage.getPayload()).thenReturn(new TypedValue<>(payload, DataType.fromObject(payload)));
     DefaultTransformationService transformationService = mock(DefaultTransformationService.class);
     when(muleContext.getTransformationService()).thenReturn(transformationService);
-    when(transformationService.internalTransform(any(InternalMessage.class), any(DataType.class))).thenReturn(transformedMessage);
+    when(transformationService.transform(any(InternalMessage.class), any(DataType.class))).thenReturn(transformedMessage);
     context.addFinalVariable("message", new MessageContext(event, eventBuilder, muleContext));
   }
 
