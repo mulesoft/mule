@@ -9,7 +9,6 @@ package org.mule.runtime.core.policy;
 import org.mule.runtime.core.api.Event;
 
 import java.util.Map;
-import java.util.function.Function;
 
 /**
  * Implementation of this interfaces must provide functions to convert and {@link Event} to the response parameters of the success

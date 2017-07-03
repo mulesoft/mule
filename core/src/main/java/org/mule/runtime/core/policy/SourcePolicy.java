@@ -7,8 +7,10 @@
 package org.mule.runtime.core.policy;
 
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.functional.Either;
+import org.mule.runtime.core.api.processor.Processor;
+
+import org.reactivestreams.Publisher;
 
 /**
  * Interceptor of a {@link Processor} that executes logic before and after it. It allows to modify the content of the response (if
@@ -26,8 +28,7 @@ public interface SourcePolicy {
    * @param sourceEvent the event with the data created from the source message that must be used to execute the source policy.
    *        execute the successful or failure response function of the source.
    * @return the result of processing the {@code event} through the policy chain.
-   * @throws Exception
    */
-  Either<FailureSourcePolicyResult, SuccessSourcePolicyResult> process(Event sourceEvent) throws Exception;
+  Publisher<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> process(Event sourceEvent);
 
 }

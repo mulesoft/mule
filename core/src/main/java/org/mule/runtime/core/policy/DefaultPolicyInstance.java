@@ -12,12 +12,16 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.slf4j.LoggerFactory.getLogger;
+import static reactor.core.publisher.Mono.error;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
@@ -27,6 +31,7 @@ import org.mule.runtime.core.internal.management.stats.DefaultFlowConstructStati
 
 import java.util.Optional;
 
+import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
 
@@ -62,7 +67,18 @@ public class DefaultPolicyInstance implements PolicyInstance, FlowConstruct, Mul
 
   @Override
   public MessagingExceptionHandler getExceptionListener() {
-    return null;
+    return new MessagingExceptionHandler() {
+
+      @Override
+      public Event handleException(MessagingException exception, Event event) {
+        return null;
+      }
+
+      @Override
+      public Publisher<Event> apply(MessagingException exception) {
+        return error(exception);
+      }
+    };
   }
 
   @Override

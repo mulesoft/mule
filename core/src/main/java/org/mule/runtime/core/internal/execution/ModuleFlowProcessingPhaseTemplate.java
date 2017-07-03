@@ -16,7 +16,6 @@ import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.policy.MessageSourceResponseParametersProcessor;
 
 import java.util.Map;
-import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
 
@@ -51,31 +50,29 @@ public interface ModuleFlowProcessingPhaseTemplate extends MessageProcessTemplat
    * Template method to send a response after processing the message.
    * <p>
    * This method is executed within the flow so if it fails it will trigger the exception strategy.
-   *
-   * @param flowExecutionResponse the result of the flow execution
+   * 
+   * @param response the result of the flow execution
    * @param parameters the resolved set of parameters required to send the response.
-   * @param errorResponseParametersFunction function that generates the error parameters to be sent in the case of a failure.
-   * @param responseCompletionCallback callback to be used for notifying the result of the operation
+   * @return void publisher that will signal the success or failure of sending response to client.
    */
-  Publisher<Void> sendResponseToClient(Event flowExecutionResponse, Map<String, Object> parameters,
-                                       Function<Event, Map<String, Object>> errorResponseParametersFunction,
-                                       ResponseCompletionCallback responseCompletionCallback);
+  Publisher<Void> sendResponseToClient(Event response, Map<String, Object> parameters);
 
 
   /**
+   * Template method to send a failure response after processing the message.
+   *
    * @param exception exception thrown during the flow execution.
    * @param parameters the resolved set of parameters required to send the failure response.
-   * @param responseCompletionCallback callback to be used for notifying the result of the operation
+   * @return void publisher that will signal the success or failure of sending failure response to client.
    */
-  Publisher<Void> sendFailureResponseToClient(MessagingException exception, Map<String, Object> parameters,
-                                              ResponseCompletionCallback responseCompletionCallback);
+  Publisher<Void> sendFailureResponseToClient(MessagingException exception, Map<String, Object> parameters);
 
   /**
    * @param either that communicates the result of the flow execution.
-   *               <ul>
-   *               <li>{@link Event} if the execution finished correctly</li>
-   *               <li>{@link MessagingException} if an error occurred during the execution</li>
-   *               </ul>
+   *        <ul>
+   *        <li>{@link Event} if the execution finished correctly</li>
+   *        <li>{@link MessagingException} if an error occurred during the execution</li>
+   *        </ul>
    */
   void sendAfterTerminateResponseToClient(Either<MessagingException, Event> either);
 }

@@ -8,6 +8,8 @@ package org.mule.runtime.core.policy;
 
 import org.mule.runtime.core.api.Event;
 
+import org.reactivestreams.Publisher;
+
 public interface OperationPolicy {
 
   /**
@@ -18,6 +20,6 @@ public interface OperationPolicy {
    * @return the result of processing the {@code event} through the policy chain.
    * @throws Exception
    */
-  Event process(Event operationEvent) throws Exception;
+  Publisher<Event> process(Event operationEvent);
 
 }

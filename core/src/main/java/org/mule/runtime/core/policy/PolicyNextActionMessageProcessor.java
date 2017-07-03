@@ -7,14 +7,20 @@
 package org.mule.runtime.core.policy;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
+import static reactor.core.publisher.Mono.error;
+import static reactor.core.publisher.Mono.from;
+import static reactor.core.publisher.Mono.just;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
-import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
 
 import javax.inject.Inject;
+
+import org.reactivestreams.Publisher;
 
 /**
  * Next-operation message processor implementation.
@@ -31,18 +37,19 @@ public class PolicyNextActionMessageProcessor extends AbstractAnnotatedObject im
 
   @Override
   public Event process(Event event) throws MuleException {
-    Processor nextOperation = policyStateHandler.retrieveNextOperation(event.getContext().getId());
-    if (nextOperation == null) {
-      throw new MuleRuntimeException(createStaticMessage("There's no next operation configured for event context id "
-          + event.getContext().getId()));
-    }
-    try {
-      return nextOperation.process(event);
-    } catch (MuleException e) {
-      throw e;
-    } catch (Exception e) {
-      throw new DefaultMuleException(e);
-    }
+    return processToApply(event, this);
   }
 
+  @Override
+  public Publisher<Event> apply(Publisher<Event> publisher) {
+    return from(publisher)
+        .flatMapMany(event -> {
+          Processor nextOperation = policyStateHandler.retrieveNextOperation(event.getContext().getCorrelationId());
+          if (nextOperation == null) {
+            return error(new MuleRuntimeException(createStaticMessage("There's no next operation configured for event context id "
+                + event.getContext().getId())));
+          }
+          return just(event).transform(nextOperation);
+        });
+  }
 }

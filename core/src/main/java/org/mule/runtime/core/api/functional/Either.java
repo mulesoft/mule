@@ -61,6 +61,18 @@ final public class Either<L, R> {
   }
 
   /**
+   * Allows to reduce to a single value using left and right functions with the same return type.
+   *
+   * @param leftFunc the function to apply to the left value
+   * @param rightFunc the function to apply to the left value
+   * @param <T> the return type of the function.
+   * @return the result of applying the function on left of right values.
+   */
+  public <T> T reduce(Function<? super L, ? extends T> leftFunc, Function<? super R, ? extends T> rightFunc) {
+    return isLeft() ? leftFunc.apply(left.get()) : rightFunc.apply(right.get());
+  }
+
+  /**
    * Allows to execute a function over the left value if it is present
    * 
    * @param func the function to apply to the left value

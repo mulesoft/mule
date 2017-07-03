@@ -189,4 +189,22 @@ public class MessageProcessors {
         .doOnError(MessagingException.class, me -> me.setProcessedEvent(builder(event.getContext(), me.getEvent()).build()));
   }
 
+  /**
+   * Process a {@link Flow} using a child {@link EventContext}. This is useful if it is necessary to performing
+   * processing in a scope and handle an empty result rather than complete the response for the whole Flow.
+   *
+   * @param event the event to process.
+   * @param processor the processor to process.
+   * @return the future result of processing processor.
+   */
+  public static Publisher<Event> processFlowWithChildContext(Event event, ReactiveProcessor processor) {
+    EventContext child = child(event.getContext());
+    just(Event.builder(child, event).build())
+        .transform(processor)
+        .subscribe(requestUnbounded());
+    return from(child.getResponsePublisher())
+        .map(result -> Event.builder(event.getContext(), result).build())
+        .doOnError(MessagingException.class, me -> me.setProcessedEvent(builder(event.getContext(), me.getEvent()).build()));
+  }
+
 }

@@ -66,20 +66,14 @@ final class ModuleFlowProcessingTemplate implements ModuleFlowProcessingPhaseTem
   }
 
   @Override
-  public Publisher<Void> sendResponseToClient(Event event, Map<String, Object> parameters,
-                                              Function<Event, Map<String, Object>> errorResponseParametersFunction,
-                                              ResponseCompletionCallback responseCompletionCallback) {
-    return from(completionHandler.onCompletion(event, parameters)).transform(notifyCompletion(event, responseCompletionCallback));
+  public Publisher<Void> sendResponseToClient(Event response, Map<String, Object> parameters) {
+    return from(completionHandler.onCompletion(response, parameters));
   }
 
   @Override
   public Publisher<Void> sendFailureResponseToClient(MessagingException messagingException,
-                                                     Map<String, Object> parameters,
-                                                     ResponseCompletionCallback responseCompletionCallback) {
-    return from(completionHandler.onFailure(messagingException, parameters)).transform(notifyCompletion(
-                                                                                                        messagingException
-                                                                                                            .getEvent(),
-                                                                                                        responseCompletionCallback));
+                                                     Map<String, Object> parameters) {
+    return from(completionHandler.onFailure(messagingException, parameters));
   }
 
   @Override
@@ -89,10 +83,4 @@ final class ModuleFlowProcessingTemplate implements ModuleFlowProcessingPhaseTem
                  (CheckedConsumer<Event>) event -> completionHandler.onTerminate(either));
   }
 
-  private Function<Publisher<Void>, Publisher<Void>> notifyCompletion(Event event,
-                                                                      ResponseCompletionCallback responseCompletionCallback) {
-    return publisher -> from(publisher)
-        .doOnSuccess(v -> responseCompletionCallback.responseSentSuccessfully())
-        .doOnError(e -> responseCompletionCallback.responseSentWithFailure(new MessagingException(event, e), event));
-  }
 }
