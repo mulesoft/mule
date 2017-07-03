@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Sopecialization of {@link LifecycleTrackerProcessor} that validates the phase transition being done on this component.
+ * Specialization of {@link LifecycleTrackerProcessor} that validates the phase transition being done on this component.
  * 
  * @since 4.0
  */
