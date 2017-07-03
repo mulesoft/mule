@@ -38,7 +38,7 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder;
 import org.mule.runtime.core.internal.metadata.DefaultCollectionDataType;
-import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
+import org.mule.runtime.core.api.store.DeserializationPostInitialisable;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

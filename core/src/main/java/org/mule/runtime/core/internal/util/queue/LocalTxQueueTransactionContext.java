@@ -7,14 +7,8 @@
 package org.mule.runtime.core.internal.util.queue;
 
 import org.mule.runtime.core.internal.util.journal.queue.LocalTxQueueTransactionJournal;
-import org.mule.runtime.core.util.queue.LocalQueueTransactionContext;
-import org.mule.runtime.core.util.queue.QueueProvider;
-import org.mule.runtime.core.util.queue.QueueStore;
-import org.mule.runtime.core.util.queue.QueueTransactionContextFactory;
-import org.mule.runtime.core.util.queue.QueueTypeTransactionContextAdapter;
-import org.mule.runtime.core.util.queue.TransientQueueTransactionContext;
-import org.mule.runtime.core.util.xa.AbstractTransactionContext;
-import org.mule.runtime.core.util.xa.ResourceManagerException;
+import org.mule.runtime.core.api.transaction.xa.AbstractTransactionContext;
+import org.mule.runtime.core.api.transaction.xa.ResourceManagerException;
 
 import java.io.Serializable;
 import java.util.concurrent.TimeUnit;

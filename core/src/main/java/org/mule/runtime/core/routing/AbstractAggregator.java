@@ -34,8 +34,8 @@ import org.mule.runtime.core.api.store.PartitionableObjectStore;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 import org.mule.runtime.core.routing.correlation.EventCorrelator;
 import org.mule.runtime.core.routing.correlation.EventCorrelatorCallback;
-import org.mule.runtime.core.util.store.ProvidedObjectStoreWrapper;
-import org.mule.runtime.core.util.store.ProvidedPartitionableObjectStoreWrapper;
+import org.mule.runtime.core.internal.util.store.ProvidedObjectStoreWrapper;
+import org.mule.runtime.core.internal.util.store.ProvidedPartitionableObjectStoreWrapper;
 
 import java.util.function.Supplier;
 

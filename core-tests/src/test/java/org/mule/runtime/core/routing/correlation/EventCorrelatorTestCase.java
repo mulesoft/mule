@@ -29,7 +29,7 @@ import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.api.store.PartitionableObjectStore;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.routing.EventGroup;
-import org.mule.runtime.core.util.store.PartitionedInMemoryObjectStore;
+import org.mule.runtime.core.api.store.PartitionedInMemoryObjectStore;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.probe.PollingProber;

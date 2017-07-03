@@ -16,7 +16,7 @@ import static org.mule.runtime.core.api.util.queue.QueueConfiguration.MAXIMUM_CA
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.store.ObjectStoreException;
-import org.mule.runtime.core.util.queue.QueueStore;
+import org.mule.runtime.core.internal.util.queue.QueueStore;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.Serializable;

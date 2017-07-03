@@ -14,7 +14,6 @@ import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.core.api.transaction.TransactionRollbackException;
 import org.mule.runtime.core.api.transaction.TransactionStatusException;
-import org.mule.runtime.core.util.xa.XaResourceFactoryHolder;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -101,9 +100,7 @@ public class XaTransaction extends AbstractTransaction {
        */
       delistResources();
       txManager.commit();
-    } catch (RollbackException e) {
-      throw new TransactionRollbackException(CoreMessages.transactionMarkedForRollback(), e);
-    } catch (HeuristicRollbackException e) {
+    } catch (RollbackException | HeuristicRollbackException e) {
       throw new TransactionRollbackException(CoreMessages.transactionMarkedForRollback(), e);
     } catch (Exception e) {
       throw new IllegalTransactionStateException(CoreMessages.transactionCommitFailed(), e);
@@ -152,8 +149,6 @@ public class XaTransaction extends AbstractTransaction {
        */
       // delistResources();
       txManager.rollback();
-    } catch (SystemException e) {
-      throw new TransactionRollbackException(e);
     } catch (Exception e) {
       throw new TransactionRollbackException(e);
     } finally {
@@ -208,7 +203,7 @@ public class XaTransaction extends AbstractTransaction {
   /**
    * @param key Must be the provider of the resource object. i.e. for JDBC it's the XADataSource, for JMS is the
    *        XAConnectionFactory. It can be a wrapper in which case should be a
-   *        {@link org.mule.runtime.core.util.xa.XaResourceFactoryHolder} to be able to determine correctly if there's already a
+   *        {@link XaResourceFactoryHolder} to be able to determine correctly if there's already a
    *        resource for that {@link javax.transaction.xa.XAResource} provider.
    * @param resource the resource object. It must be an {@link javax.transaction.xa.XAResource} or a
    *        {@link MuleXaObject}
@@ -246,11 +241,7 @@ public class XaTransaction extends AbstractTransaction {
       }
       resource.setTransactionTimeout(getTimeoutInSeconds());
       return jtaTransaction.enlistResource(resource);
-    } catch (RollbackException e) {
-      throw new TransactionException(e);
-    } catch (SystemException e) {
-      throw new TransactionException(e);
-    } catch (XAException e) {
+    } catch (RollbackException | SystemException | XAException e) {
       throw new TransactionException(e);
     }
   }
@@ -295,9 +286,7 @@ public class XaTransaction extends AbstractTransaction {
     }
     try {
       txManager.resume(transaction);
-    } catch (InvalidTransactionException e) {
-      throw new TransactionException(e);
-    } catch (SystemException e) {
+    } catch (InvalidTransactionException | SystemException e) {
       throw new TransactionException(e);
     }
   }
@@ -318,9 +307,8 @@ public class XaTransaction extends AbstractTransaction {
   }
 
   protected void delistResources() {
-    Iterator i = resources.entrySet().iterator();
-    while (i.hasNext()) {
-      Map.Entry entry = (Map.Entry) i.next();
+    for (Object o : resources.entrySet()) {
+      Map.Entry entry = (Map.Entry) o;
       final Object xaObject = entry.getValue();
       if (xaObject instanceof MuleXaObject) {
         // there is need for reuse object

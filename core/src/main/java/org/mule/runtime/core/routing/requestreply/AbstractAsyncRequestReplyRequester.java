@@ -41,7 +41,7 @@ import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessorBase;
 import org.mule.runtime.core.api.util.ObjectUtils;
 import org.mule.runtime.core.api.util.concurrent.Latch;
-import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
+import org.mule.runtime.core.api.store.DeserializationPostInitialisable;
 
 import java.io.Serializable;
 import java.util.List;
@@ -54,12 +54,11 @@ import org.apache.commons.collections.buffer.BoundedFifoBuffer;
 public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterceptingMessageProcessorBase
     implements RequestReplyRequesterMessageProcessor, FlowConstructAware, Initialisable, Startable, Stoppable, Disposable {
 
-  public static final int MAX_PROCESSED_GROUPS = 50000;
-  public static final int UNCLAIMED_TIME_TO_LIVE = 60000;
-  public static int UNCLAIMED_INTERVAL = 60000;
+  private static final int MAX_PROCESSED_GROUPS = 50000;
+  private static final int UNCLAIMED_TIME_TO_LIVE = 60000;
+  private static final int UNCLAIMED_INTERVAL = 60000;
+  private static final String NAME_TEMPLATE = "%s.%s.%s.asyncReplies";
 
-
-  public static final String NAME_TEMPLATE = "%s.%s.%s.asyncReplies";
   protected String name;
 
   protected volatile long timeout = -1;
@@ -73,7 +72,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
   private String storePrefix = "";
 
   protected final ConcurrentMap<String, Event> responseEvents = new ConcurrentHashMap<>();
-  protected final Object processedLock = new Object();
+  private final Object processedLock = new Object();
   // @GuardedBy processedLock
   private final BoundedFifoBuffer processed = new BoundedFifoBuffer(MAX_PROCESSED_GROUPS);
 
@@ -167,7 +166,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
     // template method
   }
 
-  protected String getAsyncReplyCorrelationId(Event event) {
+  private String getAsyncReplyCorrelationId(Event event) {
     StringBuilder stringBuilder = new StringBuilder();
     stringBuilder.append(event.getContext().getCorrelationId());
     event.getGroupCorrelation().getSequence().ifPresent(v -> stringBuilder.append("-" + v));
@@ -178,7 +177,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
     processNext(event);
   }
 
-  protected Event receiveAsyncReply(Event event) throws MuleException {
+  private Event receiveAsyncReply(Event event) throws MuleException {
     String asyncReplyCorrelationId = getAsyncReplyCorrelationId(event);
     System.out.println("receiveAsyncReply: " + asyncReplyCorrelationId);
     Latch asyncReplyLatch = locks.get(asyncReplyCorrelationId);
@@ -186,7 +185,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
     // result
     boolean interruptedWhileWaiting = false;
     boolean resultAvailable = false;
-    Event result = null;
+    Event result;
 
     try {
       if (logger.isDebugEnabled()) {
@@ -239,11 +238,11 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
     }
   }
 
-  protected void postLatchAwait(String asyncReplyCorrelationId) throws MessagingException {
+  private void postLatchAwait(String asyncReplyCorrelationId) throws MessagingException {
     // Template method
   }
 
-  protected void addProcessed(Object id) {
+  private void addProcessed(Object id) {
     synchronized (processedLock) {
       if (processed.isFull()) {
         processed.remove();
@@ -252,7 +251,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
     }
   }
 
-  protected boolean isAlreadyProcessed(Object id) {
+  private boolean isAlreadyProcessed(Object id) {
     synchronized (processedLock) {
       return processed.contains(id);
     }

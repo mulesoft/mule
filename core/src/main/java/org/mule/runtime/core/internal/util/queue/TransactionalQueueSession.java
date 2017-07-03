@@ -9,14 +9,9 @@ package org.mule.runtime.core.internal.util.queue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.util.queue.QueueSession;
 import org.mule.runtime.core.internal.util.journal.queue.LocalTxQueueTransactionJournal;
-import org.mule.runtime.core.util.queue.AbstractQueueSession;
-import org.mule.runtime.core.util.queue.LocalQueueTransactionContext;
-import org.mule.runtime.core.util.queue.QueueProvider;
-import org.mule.runtime.core.util.queue.QueueTransactionContext;
-import org.mule.runtime.core.util.queue.QueueXaResourceManager;
-import org.mule.runtime.core.util.xa.AbstractResourceManager;
-import org.mule.runtime.core.util.xa.AbstractTransactionContext;
-import org.mule.runtime.core.util.xa.ResourceManagerException;
+import org.mule.runtime.core.api.transaction.xa.AbstractResourceManager;
+import org.mule.runtime.core.api.transaction.xa.AbstractTransactionContext;
+import org.mule.runtime.core.api.transaction.xa.ResourceManagerException;
 import org.mule.runtime.core.internal.util.xa.XaTransactionRecoverer;
 
 import java.util.concurrent.locks.ReentrantReadWriteLock;
