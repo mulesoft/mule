@@ -119,7 +119,7 @@ public class MessageContextTestCase extends AbstractELTestCase {
     when(transformedMessage.getPayload()).thenReturn(expectedPayload);
     DefaultTransformationService transformationService = mock(DefaultTransformationService.class);
     muleContext.setTransformationService(transformationService);
-    when(transformationService.internalTransform(any(InternalMessage.class), any(DataType.class))).thenReturn(transformedMessage);
+    when(transformationService.transform(any(InternalMessage.class), any(DataType.class))).thenReturn(transformedMessage);
     assertSame(transformedMessage.getPayload().getValue(),
                evaluate("message.payloadAs(org.mule.tck.testmodels.fruit.Banana)", event));
   }

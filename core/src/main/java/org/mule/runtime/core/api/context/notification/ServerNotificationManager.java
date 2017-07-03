@@ -9,9 +9,6 @@ package org.mule.runtime.core.api.context.notification;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
 import static org.slf4j.LoggerFactory.getLogger;
-
-import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
@@ -55,7 +52,7 @@ import org.slf4j.Logger;
  * <li>Enquiring whether an event is enabled returns true if any subclass is enabled.</li>
  * </ul>
  */
-public class ServerNotificationManager implements Initialisable, Disposable, ServerNotificationHandler, MuleContextAware {
+public class ServerNotificationManager implements ServerNotificationHandler, MuleContextAware {
 
   private static final Logger logger = getLogger(ServerNotificationManager.class);
 
@@ -81,7 +78,10 @@ public class ServerNotificationManager implements Initialisable, Disposable, Ser
     this.dynamic = dynamic;
   }
 
-  @Override
+  /**
+   * Do not make this object {@link org.mule.runtime.api.lifecycle.Initialisable}. It needs to be initialised before every other
+   * object to send notifications.
+   */
   public void initialise() throws InitialisationException {
     notificationsLiteScheduler = muleContext.getSchedulerService().cpuLightScheduler();
     notificationsIoScheduler = muleContext.getSchedulerService().ioScheduler();
@@ -180,7 +180,10 @@ public class ServerNotificationManager implements Initialisable, Disposable, Ser
     return enabled;
   }
 
-  @Override
+  /**
+   * Do not make this object {@link org.mule.runtime.api.lifecycle.Disposable}. It needs to be alive after everything else has
+   * died
+   */
   public void dispose() {
     disposeLock.writeLock().lock();
     try {
