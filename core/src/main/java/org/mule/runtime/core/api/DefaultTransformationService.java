@@ -53,8 +53,11 @@ public class DefaultTransformationService implements TransformationService {
   }
 
   /**
+   * @deprecated use {@code {@link #transform(Message, DataType)} or {@link #transform(Object, DataType, DataType)}} instead
+   * or use a method that could be exposed in the API.
+   * <p/>
    * Given a {@code value) it will try to transform it to the expected type defined in the {@code expectedDataType}
-   *
+   * <p/>
    * @param value the value to transform
    * @param valueDataType the value's {@link DataType}
    * @param expectedDataType the expected type's {@link DataType}
@@ -64,6 +67,7 @@ public class DefaultTransformationService implements TransformationService {
    * @throws MessageTransformerException If a problem occurs transforming the value
    * @throws TransformerException If a problem occurs transforming the value
    */
+  @Deprecated
   public Object internalTransform(Object value, DataType valueDataType, DataType expectedDataType)
       throws MessagingException, MessageTransformerException, TransformerException {
     Transformer transformer;
@@ -119,6 +123,9 @@ public class DefaultTransformationService implements TransformationService {
   }
 
   /**
+   * @deprecated use {@code {@link #transform(Message, DataType)} or {@link #transform(Object, DataType, DataType)}} instead
+   * or use a method that could be exposed in the API.
+   * <p/>
    * Attempts to obtain the payload of this message with the desired Class type. This will try and resolve a transformer that can
    * do this transformation. If a transformer cannot be found an exception is thrown. Any transformers added to the registry will
    * be checked for compatibility
@@ -134,6 +141,7 @@ public class DefaultTransformationService implements TransformationService {
    *         payload is an InputStream in which case the stream will be read and the payload will become the fully read stream.
    * @throws TransformerException if a transformer cannot be found or there is an error during transformation of the payload
    */
+  @Deprecated
   public Message internalTransform(Message message, DataType outputDataType) throws TransformerException {
     checkNotNull(message, "Message cannot be null");
     checkNotNull(outputDataType, "DataType cannot be null");
