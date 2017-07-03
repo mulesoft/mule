@@ -13,6 +13,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 import static org.mule.runtime.core.api.util.ClassUtils.isInstance;
+import static org.mule.runtime.core.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.el.BindingContext;
@@ -33,10 +34,10 @@ import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.el.GlobalBindingContextProvider;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
-import org.mule.runtime.core.streaming.StreamingManager;
-import org.mule.runtime.core.internal.util.OneTimeWarning;
 import org.mule.runtime.core.api.util.TemplateParser;
+import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
+import org.mule.runtime.core.internal.util.OneTimeWarning;
+import org.mule.runtime.core.streaming.StreamingManager;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -93,17 +94,17 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
 
   @Override
   public TypedValue evaluate(String expression) {
-    return evaluate(expression, BindingContext.builder().build());
+    return evaluate(expression, NULL_BINDING_CONTEXT);
   }
 
   @Override
   public TypedValue evaluate(String expression, Event event) {
-    return evaluate(expression, event, BindingContext.builder().build());
+    return evaluate(expression, event, NULL_BINDING_CONTEXT);
   }
 
   @Override
   public TypedValue evaluate(String expression, BindingContext context) {
-    return evaluate(expression, null, null, null, context);
+    return evaluate(expression, null, null, context);
   }
 
   @Override
@@ -113,12 +114,12 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
 
   @Override
   public TypedValue evaluate(String expression, Event event, FlowConstruct flowConstruct) {
-    return evaluate(expression, event, Event.builder(event), flowConstruct, BindingContext.builder().build());
+    return evaluate(expression, event, Event.builder(event), flowConstruct, NULL_BINDING_CONTEXT);
   }
 
   @Override
   public TypedValue evaluate(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct) {
-    return evaluate(expression, event, eventBuilder, flowConstruct, BindingContext.builder().build());
+    return evaluate(expression, event, eventBuilder, flowConstruct, NULL_BINDING_CONTEXT);
   }
 
   @Override
@@ -133,7 +134,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
 
   @Override
   public TypedValue evaluate(String expression, DataType outputType) {
-    return evaluate(expression, outputType, BindingContext.builder().build());
+    return evaluate(expression, outputType, NULL_BINDING_CONTEXT);
   }
 
   @Override
@@ -191,7 +192,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   public boolean evaluateBoolean(String expression, Event event, FlowConstruct flowConstruct, boolean nullReturnsTrue,
                                  boolean nonBooleanReturnsTrue)
       throws ExpressionRuntimeException {
-    return resolveBoolean(evaluate(expression, DataType.BOOLEAN, BindingContext.builder().build(), event, flowConstruct, false)
+    return resolveBoolean(evaluate(expression, DataType.BOOLEAN, NULL_BINDING_CONTEXT, event, flowConstruct, false)
         .getValue(), nullReturnsTrue,
                           nonBooleanReturnsTrue, expression);
   }

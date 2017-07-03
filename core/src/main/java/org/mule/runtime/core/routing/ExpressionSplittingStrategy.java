@@ -6,7 +6,8 @@
  */
 package org.mule.runtime.core.routing;
 
-import org.mule.runtime.api.el.BindingContext;
+import static org.mule.runtime.core.el.BindingContextUtils.NULL_BINDING_CONTEXT;
+
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.el.ExpressionManager;
@@ -48,7 +49,7 @@ public class ExpressionSplittingStrategy implements SplittingStrategy<Event, Ite
 
   @Override
   public Iterator<TypedValue<?>> split(Event event) {
-    Iterator<TypedValue<?>> result = expressionManager.split(expression, event, BindingContext.builder().build());
+    Iterator<TypedValue<?>> result = expressionManager.split(expression, event, NULL_BINDING_CONTEXT);
     return result != null ? result : Collections.<TypedValue<?>>emptyList().iterator();
   }
 
