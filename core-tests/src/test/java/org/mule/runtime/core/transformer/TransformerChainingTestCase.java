@@ -15,7 +15,7 @@ import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.TransformationService;
+import org.mule.runtime.core.api.DefaultTransformationService;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -28,11 +28,11 @@ import org.junit.Test;
 
 public class TransformerChainingTestCase extends AbstractMuleContextTestCase {
 
-  private TransformationService transformationService;
+  private DefaultTransformationService transformationService;
 
   @Before
   public void setUp() throws Exception {
-    transformationService = new TransformationService(muleContext);
+    transformationService = new DefaultTransformationService(muleContext);
   }
 
   @Test

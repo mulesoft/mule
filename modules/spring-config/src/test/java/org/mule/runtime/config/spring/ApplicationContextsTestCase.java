@@ -151,20 +151,4 @@ public class ApplicationContextsTestCase extends AbstractMuleTestCase {
     assertEquals("Pirulo", ((Orange) orange).getBrand());
   }
 
-  /**
-   * Test the most common approach: Create the Spring config + Mule config in a single AppContext.
-   */
-  @Test
-  public void testAppContextTogetherWithMuleConfig() throws Exception {
-    context = new DefaultMuleContextFactory()
-        .createMuleContext(testServicesConfigurationBuilder,
-                           new SpringXmlConfigurationBuilder(new String[] {"application-context.xml", "mule-config.xml"}, false));
-
-    context.start();
-
-    Object orange = context.getRegistry().lookupObject("orange");
-    assertNotNull(orange);
-    assertTrue(orange instanceof Orange);
-    assertEquals("Pirulo", ((Orange) orange).getBrand());
-  }
 }

@@ -24,7 +24,6 @@ import static org.mule.runtime.core.api.util.ObjectUtils.getInt;
 import static org.mule.runtime.core.api.util.ObjectUtils.getLong;
 import static org.mule.runtime.core.api.util.ObjectUtils.getShort;
 import static org.mule.runtime.core.api.util.ObjectUtils.getString;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeBuilder;
@@ -32,10 +31,10 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.CaseInsensitiveMapWrapper;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.message.ExceptionPayload;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder;
 import org.mule.runtime.core.internal.metadata.DefaultCollectionDataType;
 import org.mule.runtime.core.api.store.DeserializationPostInitialisable;
@@ -536,7 +535,7 @@ public class DefaultMessageBuilder
         out.writeBoolean(false);
         // TODO MULE-10013 remove this logic from here
         byte[] valueAsByteArray = (byte[]) getCurrentEvent().getMuleContext().getTransformationService()
-            .transform(this, DataType.BYTE_ARRAY).getPayload().getValue();
+            .internalTransform(this, DataType.BYTE_ARRAY).getPayload().getValue();
         out.writeInt(valueAsByteArray.length);
         new DataOutputStream(out).write(valueAsByteArray);
         out.writeObject(DataType.BYTE_ARRAY);

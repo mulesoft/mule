@@ -8,8 +8,8 @@ package org.mule.functional.junit4;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.DefaultTransformationService;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.TransformationService;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.probe.PollingProber;
@@ -118,14 +118,14 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase {
   }
 
   /**
-   * Uses {@link TransformationService} to get a {@link String} representation of a message.
+   * Uses {@link DefaultTransformationService} to get a {@link String} representation of a message.
    *
    * @param message message to get payload from
    * @return String representation of the message payload
    * @throws Exception if there is an unexpected error obtaining the payload representation
    */
   protected String getPayloadAsString(Message message, MuleContext muleContext) throws Exception {
-    return (String) muleContext.getTransformationService().transform(message, DataType.STRING).getPayload().getValue();
+    return (String) muleContext.getTransformationService().internalTransform(message, DataType.STRING).getPayload().getValue();
   }
 
 }

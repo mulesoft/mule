@@ -28,13 +28,13 @@ import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.api.DefaultTransformationService;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.TransformationService;
-import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -56,14 +56,14 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
   public static final String CUSTOM_CONTENT_TYPE = CUSTOM_MIME_TYPE + "; charset=" + CUSTOM_ENCODING;
 
   private MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
-  private TransformationService transformationService;
+  private DefaultTransformationService transformationService;
 
   @Before
   public void setUp() throws Exception {
     when(muleContext.getConfiguration().getDefaultEncoding()).thenReturn(DEFAULT_ENCODING.name());
     when(muleContext.getRegistry().lookupObject(OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE))
         .thenReturn(mock(RetryPolicyTemplate.class));
-    transformationService = new TransformationService(muleContext);
+    transformationService = new DefaultTransformationService(muleContext);
   }
 
   @Test

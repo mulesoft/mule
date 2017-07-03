@@ -133,12 +133,6 @@ public class ParameterizedConfigParserTestCase extends AbstractConfigParserTestC
   }
 
   @Test
-  public void muleContextInjected() throws Exception {
-    HeisenbergExtension heisenberg = lookupHeisenberg(testConfig);
-    assertThat(heisenberg.getMuleContext(), is(muleContext));
-  }
-
-  @Test
   public void dependenciesInjected() throws Exception {
     HeisenbergExtension heisenberg = lookupHeisenberg(testConfig);
     assertThat(heisenberg.getExtensionManager(), is(sameInstance(muleContext.getExtensionManager())));

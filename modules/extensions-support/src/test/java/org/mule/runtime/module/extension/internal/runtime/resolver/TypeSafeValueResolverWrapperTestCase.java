@@ -16,10 +16,9 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.TransformationService;
+import org.mule.runtime.core.api.DefaultTransformationService;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
@@ -29,7 +28,7 @@ import org.junit.Test;
 @SmallTest
 public class TypeSafeValueResolverWrapperTestCase extends AbstractMuleContextTestCase {
 
-  private TransformationService transformationService = mock(TransformationService.class);
+  private DefaultTransformationService transformationService = mock(DefaultTransformationService.class);
   private ValueResolver<String> staticValueResolver = mock(ValueResolver.class);
   private ValueResolver<String> dynamicValueResolver = mock(ValueResolver.class);
   private TypeSafeValueResolverWrapper<Integer> dynamicResolver;
@@ -55,7 +54,7 @@ public class TypeSafeValueResolverWrapperTestCase extends AbstractMuleContextTes
     staticResolver.setTransformationService(transformationService);
     staticResolver.initialise();
 
-    when(transformationService.transform(eq("123"), any(DataType.class), any(DataType.class))).thenReturn(123);
+    when(transformationService.internalTransform(eq("123"), any(DataType.class), any(DataType.class))).thenReturn(123);
   }
 
   @Test

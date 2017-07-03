@@ -10,7 +10,6 @@ package org.mule.runtime.core.internal.message;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
@@ -22,6 +21,7 @@ import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleSession;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.connector.DefaultReplyToHandler;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -29,12 +29,11 @@ import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.api.security.SecurityContext;
-import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
-import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.api.session.DefaultMuleSession;
-import org.mule.runtime.core.internal.util.CopyOnWriteCaseInsensitiveMap;
 import org.mule.runtime.core.api.store.DeserializationPostInitialisable;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
+import org.mule.runtime.core.internal.util.CopyOnWriteCaseInsensitiveMap;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -334,7 +333,7 @@ public class DefaultEventBuilder implements Event.Builder {
         throw new TransformerException(CoreMessages.objectIsNull("outputType"));
       }
 
-      Message transformedMessage = muleContext.getTransformationService().transform(message, outputType);
+      Message transformedMessage = muleContext.getTransformationService().internalTransform(message, outputType);
       if (message.getPayload().getDataType().isStreamType()) {
         setMessage(transformedMessage);
       }
@@ -373,7 +372,7 @@ public class DefaultEventBuilder implements Event.Builder {
     public String getMessageAsString(Charset encoding, MuleContext muleContext) throws MuleException {
       try {
         Message transformedMessage = muleContext.getTransformationService()
-            .transform(message, DataType.builder().type(String.class).charset(encoding).build());
+            .internalTransform(message, DataType.builder().type(String.class).charset(encoding).build());
         if (message.getPayload().getDataType().isStreamType()) {
           setMessage(transformedMessage);
         }
@@ -405,9 +404,8 @@ public class DefaultEventBuilder implements Event.Builder {
     }
 
     /**
-     * Invoked after deserialization. This is called when the marker interface
-     * {@link DeserializationPostInitialisable} is used. This will get invoked after the object
-     * has been deserialized passing in the current MuleContext when using either
+     * Invoked after deserialization. This is called when the marker interface {@link DeserializationPostInitialisable} is used.
+     * This will get invoked after the object has been deserialized passing in the current MuleContext when using either
      * {@link org.mule.runtime.core.transformer.wire.SerializationWireFormat},
      * {@link org.mule.runtime.core.transformer.wire.SerializedMuleMessageWireFormat} or the
      * {@link org.mule.runtime.core.transformer.simple.ByteArrayToSerializable} transformer.

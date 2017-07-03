@@ -26,11 +26,11 @@ import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.core.api.DefaultTransformationService;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.TransformationService;
-import org.mule.runtime.core.internal.message.InternalMessage;
-import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.api.message.GroupCorrelation;
+import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
+import org.mule.runtime.core.internal.message.InternalMessage;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -117,9 +117,9 @@ public class MessageContextTestCase extends AbstractELTestCase {
     InternalMessage transformedMessage = mock(InternalMessage.class, RETURNS_DEEP_STUBS);
     final TypedValue<Object> expectedPayload = new TypedValue<>(new Object(), OBJECT);
     when(transformedMessage.getPayload()).thenReturn(expectedPayload);
-    TransformationService transformationService = mock(TransformationService.class);
+    DefaultTransformationService transformationService = mock(DefaultTransformationService.class);
     muleContext.setTransformationService(transformationService);
-    when(transformationService.transform(any(InternalMessage.class), any(DataType.class))).thenReturn(transformedMessage);
+    when(transformationService.internalTransform(any(InternalMessage.class), any(DataType.class))).thenReturn(transformedMessage);
     assertSame(transformedMessage.getPayload().getValue(),
                evaluate("message.payloadAs(org.mule.tck.testmodels.fruit.Banana)", event));
   }
@@ -127,10 +127,10 @@ public class MessageContextTestCase extends AbstractELTestCase {
   @Test
   public void payloadAsDataType() throws Exception {
     InternalMessage transformedMessage = mock(InternalMessage.class, RETURNS_DEEP_STUBS);
-    TransformationService transformationService = mock(TransformationService.class);
+    DefaultTransformationService transformationService = mock(DefaultTransformationService.class);
     when(transformedMessage.getPayload()).thenReturn(new TypedValue<Object>(TEST_PAYLOAD, STRING));
     muleContext.setTransformationService(transformationService);
-    when(transformationService.transform(event.getMessage(), DataType.STRING)).thenReturn(transformedMessage);
+    when(transformationService.internalTransform(event.getMessage(), DataType.STRING)).thenReturn(transformedMessage);
     Object result = evaluate("message.payloadAs(" + DataType.class.getName() + ".STRING)", event);
     assertSame(TEST_PAYLOAD, result);
   }
