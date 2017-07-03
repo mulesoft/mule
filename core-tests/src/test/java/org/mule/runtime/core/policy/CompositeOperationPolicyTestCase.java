@@ -31,7 +31,6 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.rx.Exceptions;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.Optional;
@@ -40,8 +39,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.reactivestreams.Publisher;
-import reactor.core.publisher.Mono;
 
 //TODO MULE-10927 - create a common class between CompositeOperationPolicyTestCase and CompositeSourcePolicyTestCase
 public class CompositeOperationPolicyTestCase extends AbstractMuleTestCase {
@@ -104,7 +101,7 @@ public class CompositeOperationPolicyTestCase extends AbstractMuleTestCase {
     Event result = from(compositeOperationPolicy.process(initialEvent))
         .doOnNext(event1 -> System.out.println("FINAL " + event1.getMessage().getPayload().getValue())).block();
 
-    assertThat(result, is(nextProcessResultEvent));
+    assertThat(result.getMessage(), is(nextProcessResultEvent.getMessage()));
     verify(operationExecutionFunction).execute(any(), same(initialEvent));
     verify(operationPolicyProcessorFactory).createOperationPolicy(same(firstPolicy), any());
     verify(firstPolicyOperationPolicyProcessor).apply(any());
@@ -117,7 +114,7 @@ public class CompositeOperationPolicyTestCase extends AbstractMuleTestCase {
                                                             operationParametersProcessor, operationExecutionFunction);
 
     Event result = from(compositeOperationPolicy.process(initialEvent)).block();
-    assertThat(result, is(nextProcessResultEvent));
+    assertThat(result.getMessage(), is(nextProcessResultEvent.getMessage()));
     verify(operationExecutionFunction).execute(any(), same(initialEvent));
     verify(operationPolicyProcessorFactory).createOperationPolicy(same(firstPolicy), any());
     verify(operationPolicyProcessorFactory).createOperationPolicy(same(secondPolicy), any());
