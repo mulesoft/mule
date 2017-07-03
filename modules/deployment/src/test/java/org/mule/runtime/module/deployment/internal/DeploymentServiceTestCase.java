@@ -89,6 +89,7 @@ import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.
 import static org.mule.runtime.module.deployment.internal.TestApplicationFactory.createTestApplicationFactory;
 import static org.mule.runtime.module.service.ServiceDescriptorFactory.SERVICE_PROVIDER_CLASS_NAME;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
+
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
@@ -2013,8 +2014,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
       executeApplicationFlow("main");
       fail("Expected to fail as there should be a missing class");
     } catch (MessagingException e) {
-      assertThat(e.getCause().getCause(), instanceOf(NoClassDefFoundError.class));
-      assertThat(e.getCause().getCause().getMessage(), containsString("org/foo/EchoTest"));
+      assertThat(e.getCause(), instanceOf(NoClassDefFoundError.class));
+      assertThat(e.getCause().getMessage(), containsString("org/foo/EchoTest"));
     }
   }
 

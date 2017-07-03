@@ -7,19 +7,19 @@
 
 package org.foo.resource;
 
+import org.mule.functional.api.component.EventCallback;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
+
 import java.net.URL;
 
-public class ResourceConsumer {
-    public ResourceConsumer() {
+public class ResourceConsumer implements EventCallback {
+
+  public void eventReceived(Event event, Object component, MuleContext muleContext) throws Exception {
+    URL resource = this.getClass().getResource("/META-INF/app-resource.txt");
+
+    if (resource == null) {
+        throw new IllegalStateException("Error reading app resource");
     }
-
-    public String consumeResource(Object payload) {
-        URL resource = this.getClass().getResource("/META-INF/app-resource.txt");
-
-        if (resource == null) {
-            throw new IllegalStateException("Error reading app resource");
-        }
-
-        return "success";
-    }
+  }
 }

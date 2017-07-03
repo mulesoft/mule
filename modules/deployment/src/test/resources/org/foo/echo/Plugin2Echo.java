@@ -7,13 +7,15 @@
 
 package org.foo.echo;
 
+import org.mule.functional.api.component.EventCallback;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
+
 import org.bar.BarUtils;
 
-public class Plugin2Echo {
-    public Plugin2Echo() {
-    }
+public class Plugin2Echo implements EventCallback{
 
-    public String echo(String data) {
-        return (new BarUtils()).doStuff();
-    }
+  public void eventReceived(Event event, Object component, MuleContext muleContext) throws Exception {
+    new BarUtils().doStuff();
+  }
 }

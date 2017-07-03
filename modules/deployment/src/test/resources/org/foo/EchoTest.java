@@ -7,8 +7,14 @@
 
 package org.foo;
 
-public class EchoTest {
-  public EchoTest() {
+import org.mule.functional.api.component.EventCallback;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
+
+public class EchoTest implements EventCallback {
+
+  public void eventReceived(Event event, Object component, MuleContext muleContext) throws Exception {
+    // Nothing to do
   }
 
   public String echo(String data) {
