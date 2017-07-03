@@ -4,9 +4,8 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.interception;
+package org.mule.runtime.core.internal.interception;
 
-import org.mule.runtime.api.interception.InterceptionEvent;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
@@ -14,8 +13,9 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
-import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.message.ErrorBuilder;
+import org.mule.runtime.core.api.source.MessageSource;
 
 import java.util.Map;
 import java.util.Optional;
@@ -26,7 +26,7 @@ import java.util.Set;
  *
  * @since 4.0
  */
-public class DefaultInterceptionEvent implements InterceptionEvent {
+public class DefaultInterceptionEvent implements InternalInterceptionEvent {
 
   public static final String INTERCEPTION_RESOLVED_PARAMS = "core:interceptionResolvedParams";
   public static final String INTERCEPTION_RESOLVED_CONTEXT = "core:interceptionResolvedContext";
@@ -67,6 +67,11 @@ public class DefaultInterceptionEvent implements InterceptionEvent {
   }
 
   @Override
+  public MuleSession getSession() {
+    return interceptedInput.getSession();
+  }
+
+  @Override
   public DefaultInterceptionEvent message(Message message) {
     interceptedOutput = interceptedOutput.message(message);
     return this;
@@ -93,6 +98,12 @@ public class DefaultInterceptionEvent implements InterceptionEvent {
   @Override
   public DefaultInterceptionEvent removeVariable(String key) {
     interceptedOutput = interceptedOutput.removeVariable(key);
+    return this;
+  }
+
+  @Override
+  public DefaultInterceptionEvent session(MuleSession session) {
+    interceptedOutput = interceptedOutput.session(session);
     return this;
   }
 
