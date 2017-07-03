@@ -12,12 +12,9 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.management.stats.ComponentStatistics;
+import org.mule.runtime.core.api.processor.Processor;
 
-/**
- * @author David Dossot (david@dossot.net)
- */
 public class LifecycleTrackerProcessor extends AbstractLifecycleTracker implements FlowConstructAware, Processor {
 
   public static String LIFECYCLE_TRACKER_PROCESSOR_PROPERTY = "lifecycle";

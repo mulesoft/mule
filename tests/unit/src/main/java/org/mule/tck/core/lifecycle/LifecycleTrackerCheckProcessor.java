@@ -11,6 +11,11 @@ import static java.lang.String.format;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Sopecialization of {@link LifecycleTrackerProcessor} that validates the phase transition being done on this component.
+ * 
+ * @since 4.0
+ */
 public class LifecycleTrackerCheckProcessor extends LifecycleTrackerProcessor {
 
   private final List<String> tracker = new ArrayList<String>() {
