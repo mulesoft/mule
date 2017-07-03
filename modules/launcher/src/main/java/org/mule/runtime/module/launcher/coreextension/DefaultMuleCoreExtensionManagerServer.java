@@ -90,7 +90,7 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
 
       try {
         extension.stop();
-      } catch (MuleException e) {
+      } catch (Throwable e) {
         logger.warn("Error stopping core extension: " + extension.getName(), e);
       }
     }

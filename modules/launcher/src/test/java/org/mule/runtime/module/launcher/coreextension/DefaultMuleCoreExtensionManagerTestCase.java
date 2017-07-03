@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.launcher.coreextension;
 
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -183,6 +184,26 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
     coreExtensionManager.initialise();
 
     verify(coreExtensionDependencyResolver).resolveDependencies(extensions);
+  }
+
+  @Test
+  public void testAllCoreExtensionsAreStoppedAfterRuntimeException() throws Exception {
+    TestDeploymentServiceAwareExtension extensionFailsStops = mock(TestDeploymentServiceAwareExtension.class);
+    TestDeploymentServiceAwareExtension extensionStopsOk = mock(TestDeploymentServiceAwareExtension.class);
+    InOrder stopsInOrder = inOrder(extensionFailsStops, extensionStopsOk);
+    List<MuleCoreExtension> extensions = new LinkedList<>();
+    when(coreExtensionDiscoverer.discover()).thenReturn(extensions);
+    when(coreExtensionDependencyResolver.resolveDependencies(extensions)).thenReturn(extensions);
+    doThrow(RuntimeException.class).when(extensionFailsStops).stop();
+    extensions.add(extensionStopsOk);
+    extensions.add(extensionFailsStops);
+    coreExtensionManager.initialise();
+    try {
+      coreExtensionManager.stop();
+    } finally {
+      stopsInOrder.verify(extensionFailsStops).stop();
+      stopsInOrder.verify(extensionStopsOk).stop();
+    }
   }
 
   private <ServiceType, CoreExtensionType extends MuleCoreExtension> void testServiceInjection(Class<ServiceType> serviceType,
