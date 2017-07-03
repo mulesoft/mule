@@ -148,7 +148,7 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
         .withIdentifier("shared-config")
         .withTypeDefinition(fromType(SharedConfig.class))
         .build());
-    
+
     return componentBuildingDefinitions;
   }
 }
