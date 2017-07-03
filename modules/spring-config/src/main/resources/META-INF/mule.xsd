@@ -815,18 +815,6 @@
         </xsd:choice>
     </xsd:group>
 
-    <xsd:element name="custom-source" type="customMessageSourceType" substitutionGroup="abstract-message-source"/>
-    <xsd:complexType name="customMessageSourceType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractMessageSourceType">
-                <xsd:sequence>
-                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
-                </xsd:sequence>
-                <xsd:attribute name="class" type="substitutableClass" use="required"/>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
     <xsd:element name="composite-source" type="compositeMessageSourceType" substitutionGroup="abstract-message-source"/>
     <xsd:complexType name="compositeMessageSourceType">
         <xsd:complexContent>
