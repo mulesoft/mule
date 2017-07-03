@@ -13,6 +13,8 @@ import static org.mule.runtime.core.DefaultMuleContext.LOCAL_OBJECT_STORE_MANAGE
 import static org.mule.runtime.core.DefaultMuleContext.LOCAL_PERSISTENT_OBJECT_STORE_KEY;
 import static org.mule.runtime.core.DefaultMuleContext.LOCAL_QUEUE_MANAGER_KEY;
 import static org.mule.runtime.core.DefaultMuleContext.LOCAL_TRANSIENT_OBJECT_STORE_KEY;
+import static org.mule.runtime.core.api.config.MuleProperties.DEFAULT_LOCAL_TRANSIENT_USER_OBJECT_STORE_NAME;
+import static org.mule.runtime.core.api.config.MuleProperties.DEFAULT_LOCAL_USER_OBJECT_STORE_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.DEFAULT_USER_OBJECT_STORE_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.DEFAULT_USER_TRANSIENT_OBJECT_STORE_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_QUEUE_MANAGER;
@@ -45,12 +47,12 @@ public class LocalStoreAliasConfigTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void userObjectStore() throws Exception {
-    this.testSame(DEFAULT_USER_OBJECT_STORE_NAME, "_localUserObjectStore");
+    this.testSame(DEFAULT_USER_OBJECT_STORE_NAME, DEFAULT_LOCAL_USER_OBJECT_STORE_NAME);
   }
 
   @Test
   public void transientUserObjectStore() throws Exception {
-    this.testSame(DEFAULT_USER_TRANSIENT_OBJECT_STORE_NAME, "_localTransientUserObjectStore");
+    this.testSame(DEFAULT_USER_TRANSIENT_OBJECT_STORE_NAME, DEFAULT_LOCAL_TRANSIENT_USER_OBJECT_STORE_NAME);
   }
 
   @Test

@@ -13,7 +13,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.TransformationService;
+import org.mule.runtime.core.api.DefaultTransformationService;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.util.AttributeEvaluator;
@@ -26,8 +26,8 @@ import javax.inject.Inject;
  * If the expression does not return a value of that type, then it tries to locate a {@link Transformer} which can do the
  * transformation from the obtained type to the expected one.
  * <p>
- * It resolves the expressions by making use of the {@link AttributeEvaluator} so that it's compatible with simple
- * expressions and templates alike
+ * It resolves the expressions by making use of the {@link AttributeEvaluator} so that it's compatible with simple expressions and
+ * templates alike
  *
  * @param <T>
  * @since 3.7.0
@@ -40,7 +40,7 @@ public class TypeSafeExpressionValueResolver<T> implements ValueResolver<T>, Ini
   private TypeSafeValueResolverWrapper<T> delegate;
 
   @Inject
-  private TransformationService transformationService;
+  private DefaultTransformationService transformationService;
 
   @Inject
   private ExtendedExpressionManager extendedExpressionManager;
@@ -74,7 +74,7 @@ public class TypeSafeExpressionValueResolver<T> implements ValueResolver<T>, Ini
     delegate.initialise();
   }
 
-  public void setTransformationService(TransformationService transformationService) {
+  public void setTransformationService(DefaultTransformationService transformationService) {
     this.transformationService = transformationService;
   }
 

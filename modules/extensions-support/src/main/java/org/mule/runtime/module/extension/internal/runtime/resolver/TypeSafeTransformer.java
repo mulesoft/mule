@@ -7,10 +7,10 @@
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.TransformationService;
+import org.mule.runtime.core.api.DefaultTransformationService;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.api.exception.MessagingException;
 
 /**
  * Utility class for {@link ValueResolver} to handle transformation of values
@@ -19,9 +19,9 @@ import org.mule.runtime.core.api.exception.MessagingException;
  */
 public class TypeSafeTransformer {
 
-  private TransformationService transformationService;
+  private DefaultTransformationService transformationService;
 
-  public TypeSafeTransformer(TransformationService transformationService) {
+  public TypeSafeTransformer(DefaultTransformationService transformationService) {
     this.transformationService = transformationService;
   }
 
@@ -40,8 +40,8 @@ public class TypeSafeTransformer {
   public <T> T transform(Object value, DataType valueDataType, DataType expectedDataType)
       throws MessagingException, MessageTransformerException, TransformerException {
 
-    //TODO review that event is not need but there was logic to use MessageTransform
-    return (T) transformationService.transform(value, valueDataType, expectedDataType);
+    // TODO review that event is not need but there was logic to use MessageTransform
+    return (T) transformationService.internalTransform(value, valueDataType, expectedDataType);
   }
 }
 

@@ -16,8 +16,8 @@ import static org.mule.runtime.api.message.Message.of;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.DefaultTransformationService;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.TransformationService;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -33,7 +33,7 @@ public class TransformationServiceNullTransformationTestCase extends AbstractMul
     MuleContext muleContext = mock(MuleContext.class);
     MuleConfiguration muleConfiguration = mock(MuleConfiguration.class);
     when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
-    TransformationService transformationService = new TransformationService(muleContext);
+    DefaultTransformationService transformationService = new DefaultTransformationService(muleContext);
 
     Transformer transformer1 = mock(Transformer.class);
     when(transformer1.transform(any(Object.class))).thenReturn(null);

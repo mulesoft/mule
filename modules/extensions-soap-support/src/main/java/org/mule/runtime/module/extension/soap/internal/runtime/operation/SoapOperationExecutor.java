@@ -22,11 +22,11 @@ import org.mule.runtime.api.el.MuleExpressionLanguage;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.TransformationService;
+import org.mule.runtime.core.api.DefaultTransformationService;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.extension.api.soap.SoapAttachment;
@@ -38,14 +38,14 @@ import org.mule.runtime.soap.api.message.SoapRequestBuilder;
 import org.mule.runtime.soap.api.message.SoapResponse;
 import org.mule.runtime.soap.internal.exception.error.SoapExceptionEnricher;
 
-import org.reactivestreams.Publisher;
-
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 import javax.inject.Inject;
+
+import org.reactivestreams.Publisher;
 
 /**
  * {@link OperationExecutor} implementation that executes SOAP operations using a provided {@link SoapClient}.
@@ -58,7 +58,7 @@ public final class SoapOperationExecutor implements OperationExecutor {
   private MuleExpressionLanguage expressionExecutor;
 
   @Inject
-  private TransformationService transformationService;
+  private DefaultTransformationService transformationService;
 
   private final ConnectionArgumentResolver connectionResolver = new ConnectionArgumentResolver();
   private final SoapExceptionEnricher soapExceptionEnricher = new SoapExceptionEnricher();
@@ -156,6 +156,6 @@ public final class SoapOperationExecutor implements OperationExecutor {
     if (value instanceof InputStream) {
       return (InputStream) value;
     }
-    return (InputStream) transformationService.transform(value, DataType.fromObject(value), INPUT_STREAM);
+    return (InputStream) transformationService.internalTransform(value, DataType.fromObject(value), INPUT_STREAM);
   }
 }

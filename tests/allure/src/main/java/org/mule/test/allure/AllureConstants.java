@@ -336,6 +336,11 @@ public interface AllureConstants {
       String MULE_CONTEXT_START_ORDER_STORY = "MuleContext start order";
     }
 
+    interface ArtifactObjectsDependencyInjectionStory {
+
+      String ARTIFACT_OBJECTS_DEPENDENCY_INJECTION_STORY = "Artifact Objects Dependency injection Store";
+    }
+
   }
 
   interface TransactionFeature {

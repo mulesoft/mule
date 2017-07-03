@@ -11,7 +11,6 @@ import static java.util.Collections.singletonList;
 import static org.mule.runtime.api.exception.MuleException.INFO_LOCATION_KEY;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.routing.ExpressionSplittingStrategy.DEFAULT_SPIT_EXPRESSION;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -125,12 +124,12 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     if (payload instanceof Document || payload.getClass().getName().startsWith("org.dom4j.")) {
       return message;
     } else {
-      return muleContext.getTransformationService().transform(message, DataType.fromType(Document.class));
+      return muleContext.getTransformationService().internalTransform(message, DataType.fromType(Document.class));
     }
   }
 
   private Message transformBack(Message message) throws TransformerException {
-    return muleContext.getTransformationService().transform(message, DataType.STRING);
+    return muleContext.getTransformationService().internalTransform(message, DataType.STRING);
   }
 
   @Override

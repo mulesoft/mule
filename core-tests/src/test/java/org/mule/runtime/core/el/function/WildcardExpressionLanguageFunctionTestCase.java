@@ -14,22 +14,21 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.DataType.STRING;
-
 import org.mule.mvel2.CompileException;
 import org.mule.mvel2.ParserConfiguration;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.core.api.DefaultTransformationService;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.TransformationService;
 import org.mule.runtime.core.api.el.ExpressionExecutor;
-import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.el.context.MessageContext;
 import org.mule.runtime.core.el.mvel.MVELExpressionExecutor;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguageContext;
+import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
+import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -222,9 +221,9 @@ public class WildcardExpressionLanguageFunctionTestCase extends AbstractMuleTest
     when(event.getMessage()).thenAnswer(invocation -> message);
     InternalMessage transformedMessage = mock(InternalMessage.class, RETURNS_DEEP_STUBS);
     when(transformedMessage.getPayload()).thenReturn(new TypedValue<>(payload, STRING));
-    TransformationService transformationService = mock(TransformationService.class);
+    DefaultTransformationService transformationService = mock(DefaultTransformationService.class);
     when(muleContext.getTransformationService()).thenReturn(transformationService);
-    when(transformationService.transform(any(InternalMessage.class), any(DataType.class))).thenReturn(transformedMessage);
+    when(transformationService.internalTransform(any(InternalMessage.class), any(DataType.class))).thenReturn(transformedMessage);
     context.addFinalVariable("message", new MessageContext(event, eventBuilder, muleContext));
   }
 

@@ -11,7 +11,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.TransformationService;
+import org.mule.runtime.core.api.DefaultTransformationService;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 
@@ -33,7 +33,7 @@ class ExpressionBasedParameterResolver<T> implements ParameterResolver<T>, Initi
   private TypeSafeExpressionValueResolver<T> valueResolver;
 
   @Inject
-  private TransformationService transformationService;
+  private DefaultTransformationService transformationService;
   @Inject
   private ExtendedExpressionManager extendedExpressionManager;
 
@@ -71,7 +71,7 @@ class ExpressionBasedParameterResolver<T> implements ParameterResolver<T>, Initi
     valueResolver.initialise();
   }
 
-  public void setTransformationService(TransformationService transformationService) {
+  public void setTransformationService(DefaultTransformationService transformationService) {
     this.transformationService = transformationService;
   }
 

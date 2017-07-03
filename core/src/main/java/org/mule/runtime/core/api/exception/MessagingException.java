@@ -11,7 +11,6 @@ import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
 import static org.apache.commons.lang3.StringUtils.abbreviate;
 import static org.mule.runtime.core.internal.config.ExceptionHelper.traverseCauseHierarchy;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.message.Message;
@@ -163,7 +162,8 @@ public class MessagingException extends MuleException {
               // TODO MULE-10266 review how the transformationService is obtained when building an exception.
               try {
                 addInfo(PAYLOAD_INFO_KEY,
-                        muleContext.getTransformationService().transform(muleMessage, DataType.STRING).getPayload().getValue());
+                        muleContext.getTransformationService().internalTransform(muleMessage, DataType.STRING).getPayload()
+                            .getValue());
               } catch (Exception e) {
                 addInfo(PAYLOAD_INFO_KEY, format("%s while getting payload: %s", e.getClass().getName(), e.getMessage()));
               }

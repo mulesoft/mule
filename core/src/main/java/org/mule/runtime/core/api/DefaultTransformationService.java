@@ -12,16 +12,19 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.api.transformation.TransformationService;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.transformer.MessageTransformer;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
-import org.mule.runtime.core.api.exception.MessagingException;
+import org.mule.runtime.core.api.util.func.CheckedSupplier;
 import org.mule.runtime.core.transformer.TransformerUtils;
 
 import java.io.InputStream;
@@ -38,20 +41,25 @@ import org.slf4j.LoggerFactory;
  *
  * TODO Redefine this interface as part of Mule 4.0 transformation improvements (MULE-9141)
  */
-public class TransformationService {
+public class DefaultTransformationService implements TransformationService {
 
-  private static final Logger logger = LoggerFactory.getLogger(TransformationService.class);
+  private static final Logger logger = LoggerFactory.getLogger(DefaultTransformationService.class);
 
   private MuleContext muleContext;
 
   @Inject
-  public TransformationService(MuleContext muleContext) {
+  public DefaultTransformationService(MuleContext muleContext) {
     this.muleContext = muleContext;
   }
 
   /**
+   * TODO MULE-12982 - cleanup DefaultTransformationService
+   * <p/>
+   * @deprecated use {@code {@link #transform(Message, DataType)} or {@link #transform(Object, DataType, DataType)}} instead
+   * or use a method that could be exposed in the API.
+   * <p/>
    * Given a {@code value) it will try to transform it to the expected type defined in the {@code expectedDataType}
-   *
+   * <p/>
    * @param value the value to transform
    * @param valueDataType the value's {@link DataType}
    * @param expectedDataType the expected type's {@link DataType}
@@ -61,7 +69,8 @@ public class TransformationService {
    * @throws MessageTransformerException If a problem occurs transforming the value
    * @throws TransformerException If a problem occurs transforming the value
    */
-  public Object transform(Object value, DataType valueDataType, DataType expectedDataType)
+  @Deprecated
+  public Object internalTransform(Object value, DataType valueDataType, DataType expectedDataType)
       throws MessagingException, MessageTransformerException, TransformerException {
     Transformer transformer;
     if (value != null) {
@@ -81,7 +90,7 @@ public class TransformationService {
   /**
    * Applies a list of transformers returning the result of the transformation as a new message instance. If the list of
    * transformers is empty or transformation would be redundant then the same message instances will be returned.
-   * 
+   *
    *
    * @param message
    * @param event the event being processed
@@ -100,7 +109,7 @@ public class TransformationService {
   /**
    * Applies a list of transformers returning the result of the transformation as a new message instance. If the list of
    * transformers is empty or transformation would be redundant then the same message instances will be returned.
-   * 
+   *
    *
    * @param message
    * @param event the event being processed
@@ -116,6 +125,11 @@ public class TransformationService {
   }
 
   /**
+   * TODO MULE-12982 - cleanup DefaultTransformationService
+   * <p/>
+   * @deprecated use {@code {@link #transform(Message, DataType)} or {@link #transform(Object, DataType, DataType)}} instead
+   * or use a method that could be exposed in the API.
+   * <p/>
    * Attempts to obtain the payload of this message with the desired Class type. This will try and resolve a transformer that can
    * do this transformation. If a transformer cannot be found an exception is thrown. Any transformers added to the registry will
    * be checked for compatibility
@@ -131,7 +145,8 @@ public class TransformationService {
    *         payload is an InputStream in which case the stream will be read and the payload will become the fully read stream.
    * @throws TransformerException if a transformer cannot be found or there is an error during transformation of the payload
    */
-  public Message transform(Message message, DataType outputDataType) throws TransformerException {
+  @Deprecated
+  public Message internalTransform(Message message, DataType outputDataType) throws TransformerException {
     checkNotNull(message, "Message cannot be null");
     checkNotNull(outputDataType, "DataType cannot be null");
 
@@ -319,4 +334,23 @@ public class TransformationService {
     return (T) result;
   }
 
+  @Override
+  public Object transform(Object value, DataType valueDataType, DataType expectedDataType) {
+    return transformThrowingRuntimeException(() -> this.internalTransform(value, valueDataType, expectedDataType));
+  }
+
+  @Override
+  public Message transform(Message message, DataType outputDataType) {
+    return transformThrowingRuntimeException(() -> this.internalTransform(message, outputDataType));
+  }
+
+  private <T> T transformThrowingRuntimeException(CheckedSupplier<T> supplier) {
+    try {
+      return supplier.get();
+    } catch (RuntimeException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new MuleRuntimeException(e);
+    }
+  }
 }

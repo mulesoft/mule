@@ -11,7 +11,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.TransformationService;
+import org.mule.runtime.core.api.DefaultTransformationService;
 import org.mule.runtime.core.api.transformer.Transformer;
 
 import javax.inject.Inject;
@@ -33,7 +33,7 @@ public class TypeSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
   private Resolver<T> resolver;
 
   @Inject
-  private TransformationService transformationService;
+  private DefaultTransformationService transformationService;
 
   public TypeSafeValueResolverWrapper(ValueResolver valueResolverDelegate, Class<T> expectedType) {
     this.expectedType = expectedType;
@@ -65,7 +65,7 @@ public class TypeSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
     }
   }
 
-  public void setTransformationService(TransformationService transformationService) {
+  public void setTransformationService(DefaultTransformationService transformationService) {
     this.transformationService = transformationService;
   }
 

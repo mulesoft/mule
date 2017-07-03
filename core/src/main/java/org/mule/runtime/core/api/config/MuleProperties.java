@@ -134,7 +134,7 @@ public class MuleProperties {
   public static final String DEFAULT_LOCAL_USER_OBJECT_STORE_NAME = "_localUserObjectStore";
   public static final String DEFAULT_LOCAL_TRANSIENT_USER_OBJECT_STORE_NAME = "_localTransientUserObjectStore";
   public static final String OBJECT_STORE_MANAGER = "_muleObjectStoreManager";
-  public static final String LOCAL_OBJECT_STORE_MANAGER = "_localObjectStoreManager";
+  public static final String LOCAL_OBJECT_STORE_MANAGER = "_muleLocalObjectStoreManager";
   public static final String OBJECT_MULE_APPLICATION_PROPERTIES = "_muleProperties";
   public static final String OBJECT_MULE_OUTBOUND_ENDPOINT_EXECUTOR_FACTORY = "_muleOutboundEndpointExecutorFactory";
   public static final String OBJECT_MULE_STREAM_CLOSER_SERVICE = "_muleStreamCloserService";
@@ -147,6 +147,7 @@ public class MuleProperties {
   public static final String OBJECT_EXPRESSION_LANGUAGE = "_muleExpressionLanguage";
   public static final String OBJECT_EXPRESSION_MANAGER = "_muleExpressionManager";
   public static final String OBJECT_LOCK_FACTORY = "_muleLockFactory";
+  public static final String LOCAL_OBJECT_LOCK_FACTORY = "_muleLocalLockFactory";
   public static final String OBJECT_LOCK_PROVIDER = "_muleLockProvider";
   public static final String OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER = "_muleMessageProcessingManager";
   public static final String OBJECT_PROCESSING_TIME_WATCHER = "_muleProcessingTimeWatcher";
@@ -168,15 +169,18 @@ public class MuleProperties {
   public static final String OBJECT_POLICY_MANAGER_STATE_HANDLER = "_mulePolicyStateHandler";
   public static final String OBJECT_PROCESSOR_INTERCEPTOR_MANAGER = "_muleProcessorInterceptorManager";
   public static final String OBJECT_STREAMING_MANAGER = "_muleStreamingManager";
+  public static final String OBJECT_SERVICE_DISCOVERER = "_muleServiceDiscoverer";
   public static final String OBJECT_CURSOR_MANAGER = "_muleStreamingManager";
   public static final String OBJECT_TRANSFORMATION_SERVICE = "_muleTransformationService";
   public static final String OBJECT_COMPONENT_INITIAL_STATE_MANAGER = ComponentInitialStateManager.SERVICE_ID;
   public static final String DEFAULT_TLS_CONTEXT_FACTORY_REGISTRY_KEY = "_muleDefaultTlsContextFactory";
   public static final String OBJECT_SCHEDULER_POOLS_CONFIG = "_muleSchedulerPoolsConfig";
   public static final String OBJECT_SCHEDULER_BASE_CONFIG = "_muleSchedulerBaseConfig";
+  public static final String OBJECT_CLUSTER_SERVICE = "_muleClusterService";
 
   // Not currently used as these need to be instance variables of the MuleContext.
   public static final String OBJECT_NOTIFICATION_MANAGER = "_muleNotificationManager";
+  public static final String OBJECT_NOTIFICATION_HANDLER = "_muleNotificationHandler";
 
   /**
    * Specifies whether mule should process messages synchronously, i.e. that a mule-model can only process one message at a time,

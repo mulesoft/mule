@@ -20,8 +20,8 @@ import static org.mule.runtime.api.message.Message.of;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.DefaultTransformationService;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.TransformationService;
 import org.mule.runtime.core.api.transformer.DataTypeConversionResolver;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -54,12 +54,12 @@ public class TransformationServiceTestCase extends AbstractMuleTestCase {
 
   private MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
   private DataTypeConversionResolver conversionResolver = mock(DataTypeConversionResolver.class);
-  private TransformationService transformationService;
+  private DefaultTransformationService transformationService;
 
   @Before
   public void setUp() throws Exception {
     when(muleContext.getDataTypeConverterResolver()).thenReturn(conversionResolver);
-    this.transformationService = new TransformationService(muleContext);
+    this.transformationService = new DefaultTransformationService(muleContext);
   }
 
   private static final DataType dataTypeB = DataType.fromType(B.class);
