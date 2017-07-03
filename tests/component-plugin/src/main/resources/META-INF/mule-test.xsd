@@ -300,26 +300,4 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-
-    <xsd:element name="custom-source" type="testMessageSourceType" substitutionGroup="mule:abstract-message-source">
-        <xsd:annotation>
-                <xsd:documentation>
-                        Message source used to test other functionality
-                </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
-    <xsd:complexType name="testMessageSourceType">
-        <xsd:complexContent>
-            <xsd:extension base="mule:abstractMessageSourceType">
-                <xsd:attribute name="class" type="mule:substitutableClass" use="required">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Sets the class that will be used as message source. Needs to implement MessageSource interface
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
 </xsd:schema>
