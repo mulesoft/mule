@@ -63,8 +63,6 @@ public class BindingContextUtils {
 
     BindingContext.Builder contextBuilder = BindingContext.builder(baseContext);
 
-    contextBuilder.addBinding(ID, new TypedValue<>(event.getContext().getId(), STRING));
-    contextBuilder.addBinding(CORRELATION_ID, new TypedValue<>(event.getContext().getCorrelationId(), STRING));
     Map<String, TypedValue> flowVars = new HashMap<>();
     event.getVariableNames().forEach(name -> {
       TypedValue value = event.getVariable(name);
@@ -79,6 +77,9 @@ public class BindingContextUtils {
     contextBuilder.addBinding(PARAMETERS,
                               new TypedValue<>(unmodifiableMap(event.getParameters()),
                                                fromType(event.getParameters().getClass())));
+
+    contextBuilder.addBinding(ID, new TypedValue<>(event.getContext().getId(), STRING));
+    contextBuilder.addBinding(CORRELATION_ID, new TypedValue<>(event.getContext().getCorrelationId(), STRING));
 
     Message message = event.getMessage();
     contextBuilder.addBinding(ATTRIBUTES, message.getAttributes());
