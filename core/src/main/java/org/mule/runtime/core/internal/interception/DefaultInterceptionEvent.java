@@ -6,6 +6,10 @@
  */
 package org.mule.runtime.core.internal.interception;
 
+import static org.mule.runtime.core.el.BindingContextUtils.NULL_BINDING_CONTEXT;
+import static org.mule.runtime.core.el.BindingContextUtils.addEventBindings;
+
+import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
@@ -115,9 +119,14 @@ public class DefaultInterceptionEvent implements InternalInterceptionEvent {
     return this;
   }
 
+  @Override
+  public BindingContext asBindingContext() {
+    return addEventBindings(resolve(), NULL_BINDING_CONTEXT);
+  }
+
   /**
    * Updates the state of this object if needed, overriding the {@code interceptedInput} with the result built from
-   * {@code interceptedOutput} and resetting {@codeinterceptedOutput}.
+   * {@code interceptedOutput} and resetting {@code interceptedOutput}.
    *
    * @return {@link Event} with the result.
    */

@@ -13,8 +13,8 @@ import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
+import static org.mule.runtime.core.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 
-import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
@@ -34,7 +34,6 @@ import java.util.regex.Pattern;
 public class AttributeEvaluator {
 
   private static final Pattern SINGLE_EXPRESSION_REGEX_PATTERN = compile("^#\\[(?:(?!#\\[).)*]$", DOTALL);
-  private static final BindingContext NULL_BINDING_CONTEXT = BindingContext.builder().build();
   private static final List<Class<?>> BLACK_LIST_TYPES =
       asList(Object.class, InputStream.class, Iterator.class, Serializable.class);
 

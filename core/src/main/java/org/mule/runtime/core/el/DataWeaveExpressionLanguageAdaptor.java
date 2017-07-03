@@ -6,12 +6,11 @@
  */
 package org.mule.runtime.core.el;
 
-import static java.util.Collections.unmodifiableMap;
-import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.DataType.fromType;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.expressionEvaluationFailed;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
-import static org.mule.runtime.core.api.config.i18n.CoreMessages.expressionEvaluationFailed;
+import static org.mule.runtime.core.el.BindingContextUtils.addEventBindings;
 import static org.mule.runtime.core.el.DefaultExpressionManager.DW_PREFIX;
 import static org.mule.runtime.core.el.DefaultExpressionManager.PREFIX_EXPR_SEPARATOR;
 
@@ -22,8 +21,6 @@ import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
-import org.mule.runtime.api.message.Error;
-import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
@@ -36,9 +33,7 @@ import org.mule.runtime.core.el.context.AppContext;
 import org.mule.runtime.core.el.context.MuleInstanceContext;
 import org.mule.runtime.core.el.context.ServerContext;
 
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.function.Function;
 
 import javax.inject.Inject;
@@ -208,38 +203,12 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
     return contextBuilder;
   }
 
-  private void addEventBindings(Event event, BindingContext.Builder contextBuilder) {
-    if (event != null) {
-      contextBuilder.addBinding(ID, new TypedValue<>(event.getContext().getId(), STRING));
-      contextBuilder.addBinding(CORRELATION_ID, new TypedValue<>(event.getContext().getCorrelationId(), STRING));
-      Map<String, TypedValue> flowVars = new HashMap<>();
-      event.getVariableNames().forEach(name -> {
-        TypedValue value = event.getVariable(name);
-        flowVars.put(name, value);
-        contextBuilder.addBinding(name, value);
-      });
-      contextBuilder.addBinding(VARIABLES,
-                                new TypedValue<>(unmodifiableMap(flowVars), fromType(flowVars.getClass())));
-      contextBuilder.addBinding(PROPERTIES,
-                                new TypedValue<>(unmodifiableMap(event.getProperties()),
-                                                 fromType(event.getProperties().getClass())));
-      contextBuilder.addBinding(PARAMETERS,
-                                new TypedValue<>(unmodifiableMap(event.getParameters()),
-                                                 fromType(event.getParameters().getClass())));
-
-      Message message = event.getMessage();
-      contextBuilder.addBinding(ATTRIBUTES, message.getAttributes());
-      contextBuilder.addBinding(PAYLOAD, message.getPayload());
-      contextBuilder.addBinding(DATA_TYPE, new TypedValue<>(message.getPayload().getDataType(), fromType(DataType.class)));
-      Error error = event.getError().isPresent() ? event.getError().get() : null;
-      contextBuilder.addBinding(ERROR, new TypedValue<>(error, fromType(Error.class)));
-    }
-  }
-
   private BindingContext.Builder bindingContextBuilderFor(Event event, BindingContext context) {
-    BindingContext.Builder contextBuilder = BindingContext.builder(context);
-    addEventBindings(event, contextBuilder);
-    return contextBuilder;
+    if (event != null) {
+      return BindingContext.builder(addEventBindings(event, context));
+    } else {
+      return BindingContext.builder(context);
+    }
   }
 
   private String sanitize(String expression) {

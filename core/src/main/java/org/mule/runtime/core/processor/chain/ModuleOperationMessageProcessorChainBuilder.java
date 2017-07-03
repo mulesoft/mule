@@ -6,12 +6,15 @@
  */
 package org.mule.runtime.core.processor.chain;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.mule.runtime.core.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.core.internal.message.InternalMessage.builder;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
+
 import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.utils.MetadataTypeUtils;
@@ -26,15 +29,15 @@ import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.Pair;
-import org.reactivestreams.Publisher;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import org.reactivestreams.Publisher;
 
 /**
  * Creates a chain for any operation, where it parametrizes two type of values (parameter and property) to the inner processors
@@ -209,10 +212,10 @@ public class ModuleOperationMessageProcessorChainBuilder extends ExplicitMessage
             DataType.builder()
                 .type(String.class)
                 .mediaType(mediaType)
-                .charset(StandardCharsets.UTF_8)
+                .charset(UTF_8)
                 .build();
         evaluatedResult = expressionManager
-            .evaluate(value, expectedOutputType, BindingContext.builder().build(), event, flowConstruct, false).getValue();
+            .evaluate(value, expectedOutputType, NULL_BINDING_CONTEXT, event, flowConstruct, false).getValue();
       }
       return evaluatedResult;
     }
