@@ -135,7 +135,6 @@ import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.internal.exception.OnErrorContinueHandler;
 import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.internal.exception.RedeliveryExceeded;
-import org.mule.runtime.core.internal.source.StartableCompositeMessageSource;
 import org.mule.runtime.core.internal.source.scheduler.DefaultSchedulerMessageSource;
 import org.mule.runtime.core.internal.transformer.codec.XmlEntityDecoder;
 import org.mule.runtime.core.internal.transformer.codec.XmlEntityEncoder;
@@ -581,7 +580,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("idExpression", fromSimpleParameter("idExpression").build())
         .withSetterParameterDefinition("idExpression", fromSimpleParameter("idExpression").build())
         .withSetterParameterDefinition("objectStore", fromSimpleReferenceParameter("object-store-ref").build()).build());
-    
+
     componentBuildingDefinitions.add(baseDefinition.withIdentifier("configuration")
         .withTypeDefinition(fromType(MuleConfiguration.class)).withObjectFactoryType(MuleConfigurationConfigurator.class)
         .withSetterParameterDefinition("defaultErrorHandlerName",
