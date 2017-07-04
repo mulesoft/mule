@@ -581,11 +581,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("idExpression", fromSimpleParameter("idExpression").build())
         .withSetterParameterDefinition("idExpression", fromSimpleParameter("idExpression").build())
         .withSetterParameterDefinition("objectStore", fromSimpleReferenceParameter("object-store-ref").build()).build());
-
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier("composite-source")
-        .withTypeDefinition(fromType(StartableCompositeMessageSource.class))
-        .withSetterParameterDefinition("messageSources", fromChildCollectionConfiguration(MessageSource.class).build())
-        .withSetterParameterDefinition("muleContext", fromReferenceObject(MuleContext.class).build()).build());
+    
     componentBuildingDefinitions.add(baseDefinition.withIdentifier("configuration")
         .withTypeDefinition(fromType(MuleConfiguration.class)).withObjectFactoryType(MuleConfigurationConfigurator.class)
         .withSetterParameterDefinition("defaultErrorHandlerName",
