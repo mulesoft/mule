@@ -9,7 +9,7 @@ package org.mule.runtime.core.policy;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.functional.Either.left;
 import static org.mule.runtime.core.api.functional.Either.right;
-import static org.mule.runtime.core.api.processor.MessageProcessors.processFlowWithChildContext;
+import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContext;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
@@ -81,7 +81,7 @@ public class CompositeSourcePolicy extends
   @Override
   protected Publisher<Event> processNextOperation(Event event) {
     return just(event)
-        .then(request -> from(processFlowWithChildContext(request, flowExecutionProcessor)))
+        .then(request -> from(processWithChildContext(request, flowExecutionProcessor)))
         .map(flowExecutionResponse -> {
           originalResponseParameters =
               getParametersProcessor().getSuccessfulExecutionResponseParametersFunction().apply(flowExecutionResponse);

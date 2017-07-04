@@ -95,6 +95,11 @@ abstract class AbstractEventContext implements EventContext {
   @Override
   public final void success() {
     synchronized (this) {
+      if (responseProcessor.isTerminated()) {
+        LOGGER.warn(this + " response already completed, ignoring.");
+        return;
+      }
+
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug(this + " response completed with no result.");
       }
@@ -108,6 +113,11 @@ abstract class AbstractEventContext implements EventContext {
   @Override
   public final void success(Event event) {
     synchronized (this) {
+      if (responseProcessor.isTerminated()) {
+        LOGGER.warn(this + " response was already completed, ignoring.");
+        return;
+      }
+
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug(this + " response completed with result.");
       }
@@ -121,6 +131,11 @@ abstract class AbstractEventContext implements EventContext {
   @Override
   public final void error(Throwable throwable) {
     synchronized (this) {
+      if (responseProcessor.isTerminated()) {
+        LOGGER.warn(this + " response already completed, ignoring.");
+        return;
+      }
+
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug(this + " response completed with error.");
       }

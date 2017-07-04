@@ -66,7 +66,7 @@ public class OperationPolicyProcessor implements Processor {
   @Override
   public Publisher<Event> apply(Publisher<Event> publisher) {
     return from(publisher).then(operationEvent -> {
-      PolicyStateId policyStateId = new PolicyStateId(operationEvent.getContext().getId(), policy.getPolicyId());
+      PolicyStateId policyStateId = new PolicyStateId(operationEvent.getContext().getCorrelationId(), policy.getPolicyId());
       Optional<Event> latestPolicyState = policyStateHandler.getLatestState(policyStateId);
       Event variablesProviderEvent =
           latestPolicyState.orElseGet(() -> Event.builder(operationEvent.getContext()).message(of(null)).build());

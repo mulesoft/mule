@@ -103,8 +103,9 @@ public class MessageProcessors {
    * Adapt a {@link ReactiveProcessor} used via non-blocking API {@link ReactiveProcessor#apply(Object)} by blocking and waiting
    * for response {@link Event} or throwing an {@link MuleException} in the case of an error.
    * <p/>
-   * A plain {@link ReactiveProcessor} does not handle {@link EventContext} completion or error handling so this method simply
-   * uses {@code just(event).transform(processor).block();}
+   * If the {@link ReactiveProcessor} drops the event due to an error or stop action, then the result of returned will be that of
+   * the {@link EventContext} completion. Attempting to adapt a processor implementation that filters events and does not complete
+   * the {@link EventContext} will cause this method to never return.
    *
    * @param event event to process.
    * @param processor processor to adapt.
@@ -112,60 +113,8 @@ public class MessageProcessors {
    * @throws MuleException
    */
   public static Event processToApply(Event event, ReactiveProcessor processor) throws MuleException {
-    if (processor instanceof Flow) {
-      return processToApply(event, (Flow) processor);
-    } else if (processor instanceof MessageProcessorChain) {
-      return processToApply(event, (MessageProcessorChain) processor);
-    } else {
-      try {
-        return just(event).transform(processor).block();
-      } catch (Throwable e) {
-        throw rxExceptionToMuleException(e);
-      }
-    }
-  }
-
-  /**
-   * Adapt a {@link MessageProcessorChain} used via non-blocking API {@link ReactiveProcessor#apply(Object)} by blocking and
-   * waiting for response {@link Event} or throwing an {@link MuleException} in the case of an error.
-   * <p/>
-   * A {@link MessageProcessorChain} does not handle {@link EventContext} completion but does do error handling so this method
-   * manually completes response and then blocks on {@link EventContext} response {@link Publisher}.
-   *
-   * @param event event to process.
-   * @param messageProcessorChain processor chain to adapt.
-   * @return result event
-   * @throws MuleException
-   */
-  public static Event processToApply(Event event, MessageProcessorChain messageProcessorChain) throws MuleException {
     try {
-      just(event)
-          .transform(messageProcessorChain)
-          .subscribe(response -> event.getContext().success(response), throwable -> event.getContext().error(throwable));
-      return from(event.getContext().getResponsePublisher()).block();
-    } catch (Throwable e) {
-      throw rxExceptionToMuleException(e);
-    }
-  }
-
-  /**
-   * Adapt a {@link Flow} used via non-blocking API {@link ReactiveProcessor#apply(Object)} by blocking and waiting for response
-   * {@link Event} or throwing an {@link MuleException} in the case of an error.
-   * <p/>
-   * A {@link Flow} handles {@link EventContext} completion and error handling so this method dispatches {@link Event} to
-   * {@link Flow} and then blocks on {@link EventContext} response {@link Publisher}.
-   *
-   * @param event event to process.
-   * @param flow flow to adapt.
-   * @return result event
-   * @throws MuleException
-   */
-  public static Event processToApply(Event event, Flow flow) throws MuleException {
-    try {
-      just(event)
-          .transform(flow)
-          .subscribe(requestUnbounded());
-      return from(event.getContext().getResponsePublisher()).block();
+      return just(event).transform(processor).switchIfEmpty(from(event.getContext().getResponsePublisher())).block();
     } catch (Throwable e) {
       throw rxExceptionToMuleException(e);
     }
@@ -183,25 +132,11 @@ public class MessageProcessors {
     EventContext child = child(event.getContext());
     just(Event.builder(child, event).build())
         .transform(processor)
-        .subscribe(child::success, child::error);
-    return from(child.getResponsePublisher())
-        .map(result -> Event.builder(event.getContext(), result).build())
-        .doOnError(MessagingException.class, me -> me.setProcessedEvent(builder(event.getContext(), me.getEvent()).build()));
-  }
-
-  /**
-   * Process a {@link Flow} using a child {@link EventContext}. This is useful if it is necessary to performing
-   * processing in a scope and handle an empty result rather than complete the response for the whole Flow.
-   *
-   * @param event the event to process.
-   * @param processor the processor to process.
-   * @return the future result of processing processor.
-   */
-  public static Publisher<Event> processFlowWithChildContext(Event event, ReactiveProcessor processor) {
-    EventContext child = child(event.getContext());
-    just(Event.builder(child, event).build())
-        .transform(processor)
-        .subscribe(requestUnbounded());
+        .subscribe(response -> {
+          if (!(from(child.getResponsePublisher()).toFuture().isDone())) {
+            child.success(response);
+          }
+        }, child::error);
     return from(child.getResponsePublisher())
         .map(result -> Event.builder(event.getContext(), result).build())
         .doOnError(MessagingException.class, me -> me.setProcessedEvent(builder(event.getContext(), me.getEvent()).build()));
