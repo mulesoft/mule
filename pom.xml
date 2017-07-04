@@ -244,7 +244,7 @@
         <antrun.plugin.version>1.8</antrun.plugin.version>
         <install.plugin.version>2.5.2</install.plugin.version>
         <checkstyle.plugin.version>2.17</checkstyle.plugin.version>
-        <javaFormatter.plugin.version>1.8.0</javaFormatter.plugin.version>
+        <javaFormatter.plugin.version>2.0.1</javaFormatter.plugin.version>
         <license.maven.plugin.version>2.11</license.maven.plugin.version>
         <gpg.plugin.version>1.6</gpg.plugin.version>
         <gmavenPluginVersion>1.5</gmavenPluginVersion>
@@ -1466,7 +1466,7 @@
                     <version>${checkstyle.plugin.version}</version>
                 </plugin>
                 <plugin>
-                    <groupId>com.marvinformatics.formatter</groupId>
+                    <groupId>net.revelc.code.formatter</groupId>
                     <artifactId>formatter-maven-plugin</artifactId>
                     <version>${javaFormatter.plugin.version}</version>
                     <configuration>
@@ -1475,7 +1475,6 @@
                         <compilerTargetPlatform>${javaVersion}</compilerTargetPlatform>
                         <configFile>${basedir}/${formatterConfigPath}</configFile>
                         <configJsFile>${basedir}/${formatterConfigPath}</configJsFile>
-                        <lineEnding>LF</lineEnding>
                         <aggregator>false</aggregator>
                         <executionRoot>true</executionRoot>
                     </configuration>
@@ -1805,7 +1804,7 @@
                 </executions>
             </plugin>
                 <plugin>
-                    <groupId>com.marvinformatics.formatter</groupId>
+                    <groupId>net.revelc.code.formatter</groupId>
                     <artifactId>formatter-maven-plugin</artifactId>
                 </plugin>
             <plugin>
