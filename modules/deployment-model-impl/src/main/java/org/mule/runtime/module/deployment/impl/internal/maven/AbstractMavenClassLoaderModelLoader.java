@@ -19,7 +19,6 @@ import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConst
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.EXPORTED_RESOURCES;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MAVEN;
 import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.isStandalone;
-
 import org.mule.maven.client.api.LocalRepositorySupplierFactory;
 import org.mule.maven.client.api.MavenClient;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
@@ -27,7 +26,6 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants;
-import org.mule.runtime.globalconfig.api.GlobalConfigLoader;
 import org.mule.runtime.module.artifact.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.descriptor.BundleScope;
@@ -111,7 +109,7 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
       }
     }
 
-    File localMavenRepositoryLocation = GlobalConfigLoader.getMavenConfig().getLocalMavenRepositoryLocation();
+    File localMavenRepositoryLocation = mavenClient.getMavenConfiguration().getLocalMavenRepositoryLocation();
 
     Supplier<File> compositeRepoLocationSupplier =
         localRepositorySupplierFactory
