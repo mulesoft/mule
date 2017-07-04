@@ -11,7 +11,6 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.INVALID_PARAMETER;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
-import static org.mule.runtime.module.extension.internal.values.ValuesProviderMediatorUtils.cloneAndEnrichMetadataKey;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
@@ -123,7 +122,7 @@ public final class ValuesProviderMediator<T extends ParameterizedModel & Enricha
     Set<Value> valueSet = valueProvider.resolve();
 
     return valueSet.stream()
-        .map(option -> cloneAndEnrichMetadataKey(option, parameters))
+        .map(option -> ValuesProviderMediatorUtils.cloneAndEnrichValue(option, parameters))
         .map(ValueBuilder::build)
         .collect(toSet());
   }
@@ -138,8 +137,9 @@ public final class ValuesProviderMediator<T extends ParameterizedModel & Enricha
   private List<ParameterModel> getParameters(String valueName) {
     return containerModel.getAllParameterModels()
         .stream()
-        .filter(parameterModel -> parameterModel.getValueProviderModel().isPresent())
-        .filter(parameterModel -> parameterModel.getValueProviderModel().get().getProviderName().equals(valueName))
+        .filter(parameterModel -> parameterModel.getValueProviderModel()
+            .map(provider -> provider.getProviderName().equals(valueName))
+            .orElse(false))
         .collect(toList());
   }
 

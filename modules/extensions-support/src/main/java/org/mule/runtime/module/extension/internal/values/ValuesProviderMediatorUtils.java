@@ -9,11 +9,8 @@ package org.mule.runtime.module.extension.internal.values;
 import static java.util.stream.Collectors.toMap;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
-import org.mule.runtime.api.metadata.MetadataKey;
-import org.mule.runtime.api.metadata.MetadataKeyBuilder;
 import org.mule.runtime.api.values.Value;
 import org.mule.runtime.extension.api.values.ValueBuilder;
-import org.mule.runtime.module.extension.internal.metadata.MultilevelMetadataKeyBuilder;
 
 import java.util.List;
 import java.util.Map;
@@ -26,34 +23,34 @@ import java.util.Map;
 class ValuesProviderMediatorUtils {
 
   /**
-   * Given a {@link MetadataKey}, this is navigated recursively cloning each {@link MetadataKey} of the tree structure creating a
-   * {@link MultilevelMetadataKeyBuilder} and adding the partName of each {@link MetadataKey} found.
+   * Given a {@link Value}, this is navigated recursively cloning each {@link Value} of the tree structure creating a
+   * {@link ValueBuilder} and adding the partName of each {@link Value} found.
    *
-   * @param key              {@link MetadataKey} to be cloned and enriched
-   * @param partOrderMapping {@link Map} that contains the mapping of the name of each part of the {@link MetadataKey}
-   * @return a {@link MetadataKeyBuilder} with the cloned and enriched keys
+   * @param value            {@link Value} to be cloned and enriched
+   * @param partOrderMapping {@link Map} that contains the mapping of the name of each part of the {@link Value}
+   * @return a {@link ValueBuilder} with the cloned and enriched values
    */
-  static ValueBuilder cloneAndEnrichMetadataKey(Value key, Map<Integer, String> partOrderMapping) {
-    return cloneAndEnrichMetadataKey(key, partOrderMapping, 1);
+  static ValueBuilder cloneAndEnrichValue(Value value, Map<Integer, String> partOrderMapping) {
+    return cloneAndEnrichValue(value, partOrderMapping, 1);
   }
 
-  static ValueBuilder cloneAndEnrichMetadataKey(Value key, List<ParameterModel> parameters) {
-    return cloneAndEnrichMetadataKey(key, orderParts(parameters), 1);
+  static ValueBuilder cloneAndEnrichValue(Value value, List<ParameterModel> parameters) {
+    return cloneAndEnrichValue(value, orderParts(parameters), 1);
   }
 
   /**
-   * Given a {@link MetadataKey}, this is navigated recursively cloning each {@link MetadataKey} of the tree structure creating a
-   * {@link MultilevelMetadataKeyBuilder} and adding the partName of each {@link MetadataKey} found.
+   * Given a {@link Value}, this is navigated recursively cloning each {@link Value} of the tree structure creating a
+   * {@link ValueBuilder} and adding the partName of each {@link Value} found.
    *
-   * @param key              {@link MetadataKey} to be cloned and enriched
-   * @param partOrderMapping {@link Map} that contains the mapping of the name of each part of the {@link MetadataKey}
-   * @param level            the current level of the part of the {@link MetadataKey} to be cloned and enriched
-   * @return a {@link MetadataKeyBuilder} with the cloned and enriched keys
+   * @param value            {@link Value} to be cloned and enriched
+   * @param partOrderMapping {@link Map} that contains the mapping of the name of each part of the {@link Value}
+   * @param level            the current level of the part of the {@link Value} to be cloned and enriched
+   * @return a {@link ValueBuilder} with the cloned and enriched values
    */
-  static ValueBuilder cloneAndEnrichMetadataKey(Value key, Map<Integer, String> partOrderMapping, int level) {
+  static ValueBuilder cloneAndEnrichValue(Value value, Map<Integer, String> partOrderMapping, int level) {
     final ValueBuilder keyBuilder =
-        ValueBuilder.newValue(key.getId(), partOrderMapping.get(level)).withDisplayName(key.getDisplayName());
-    key.getChilds().forEach(childKey -> keyBuilder.withChild(cloneAndEnrichMetadataKey(childKey, partOrderMapping, level + 1)));
+        ValueBuilder.newValue(value.getId(), partOrderMapping.get(level)).withDisplayName(value.getDisplayName());
+    value.getChilds().forEach(childKey -> keyBuilder.withChild(cloneAndEnrichValue(childKey, partOrderMapping, level + 1)));
     return keyBuilder;
   }
 
