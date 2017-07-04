@@ -151,7 +151,7 @@ public final class ValueProviderFactoryModelProperty implements ModelProperty {
 
     public ValueProviderFactoryModelProperty build() {
       return new ValueProviderFactoryModelProperty(dynamicOptionsResolver, injectableParameters,
-                                                    connectionField, configField);
+                                                   connectionField, configField);
     }
 
     public void withConnection(Field connectionField) {

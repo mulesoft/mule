@@ -6,13 +6,14 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldValue;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
-import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
 import java.lang.reflect.Field;
 import java.util.Optional;
@@ -36,9 +37,9 @@ public class ObjectBasedParameterValueResolver implements ParameterValueResolver
   @Override
   public Object getParameterValue(String parameterName) throws ValueResolvingException {
     try {
-      Optional<Field> field = IntrospectionUtils.getField(object.getClass(), parameterName);
+      Optional<Field> field = getField(object.getClass(), parameterName);
       if (field.isPresent()) {
-        return IntrospectionUtils.getFieldValue(object, parameterName);
+        return getFieldValue(object, parameterName);
       } else {
         for (ParameterGroupModel parameterGroupModel : parameterizedModel.getParameterGroupModels()) {
           Optional<ParameterGroupModelProperty> modelProperty =
@@ -48,10 +49,10 @@ public class ObjectBasedParameterValueResolver implements ParameterValueResolver
             ParameterGroupModelProperty property = modelProperty.get();
             Field container = (Field) property.getDescriptor().getContainer();
 
-            Object parameterGroup = IntrospectionUtils.getFieldValue(object, container.getName());
-            Optional<Field> desiredField = IntrospectionUtils.getField(parameterGroup.getClass(), parameterName);
+            Object parameterGroup = getFieldValue(object, container.getName());
+            Optional<Field> desiredField = getField(parameterGroup.getClass(), parameterName);
             if (desiredField.isPresent()) {
-              return IntrospectionUtils.getFieldValue(parameterGroup, parameterName);
+              return getFieldValue(parameterGroup, parameterName);
             }
           }
         }
