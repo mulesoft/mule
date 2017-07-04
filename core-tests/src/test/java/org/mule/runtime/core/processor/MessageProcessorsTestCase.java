@@ -91,102 +91,101 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
   @Test
   public void processToApplyMap() throws Exception {
     assertThat(processToApply(input, map), is(output));
-    assertThat(from(input.getContext().getResponsePublisher()).toFuture().isDone(), is(false));
+    assertThat(from(eventContext.getResponsePublisher()).toFuture().isDone(), is(false));
   }
 
   @Test
   public void processToApplyMapInChain() throws Exception {
     assertThat(processToApply(input, createChain(map)), is(output));
-    assertThat(from(input.getContext().getResponsePublisher()).toFuture().isDone(), is(false));
+    assertThat(from(eventContext.getResponsePublisher()).toFuture().isDone(), is(false));
   }
 
   @Test
   public void processToApplyMapInFlow() throws Exception {
     assertThat(processToApply(input, createFlow(map)).getMessage(), is(output.getMessage()));
-    assertThat(from(input.getContext().getResponsePublisher()).block(), is(output));
+    assertThat(from(eventContext.getResponsePublisher()).block(), is(output));
   }
 
   @Test
   public void processToApplyAckAndStop() throws Exception {
     assertThat(processToApply(input, ackAndStop), is(nullValue()));
-    assertThat(from(input.getContext().getResponsePublisher()).block(), is(nullValue()));
+    assertThat(from(eventContext.getResponsePublisher()).block(), is(nullValue()));
   }
 
   @Test
   public void processToApplyAckAndStopInChain() throws Exception {
     assertThat(processToApply(input, createChain(ackAndStop)), is(nullValue()));
-    assertThat(from(input.getContext().getResponsePublisher()).block(), is(nullValue()));
+    assertThat(from(eventContext.getResponsePublisher()).block(), is(nullValue()));
   }
 
   @Test
   public void processToApplyAckAndStopInFlow() throws Exception {
     assertThat(processToApply(input, createFlow(ackAndStop)), is(nullValue()));
-    assertThat(from(input.getContext().getResponsePublisher()).block(), is(nullValue()));
+    assertThat(from(eventContext.getResponsePublisher()).block(), is(nullValue()));
   }
 
   @Test
   public void processToApplyRespondAndStop() throws Exception {
     assertThat(processToApply(input, respondAndStop), is(response));
-    assertThat(from(input.getContext().getResponsePublisher()).block(), is(response));
+    assertThat(from(eventContext.getResponsePublisher()).block(), is(response));
   }
 
   @Test
   public void processToApplyRespondAndStopInChain() throws Exception {
     assertThat(processToApply(input, createChain(respondAndStop)), is(response));
-    assertThat(from(input.getContext().getResponsePublisher()).block(), is(response));
+    assertThat(from(eventContext.getResponsePublisher()).block(), is(response));
   }
 
   @Test
   public void processToApplyRespondAndStopInFlow() throws Exception {
     assertThat(processToApply(input, createFlow(respondAndStop)).getMessage(), is(response.getMessage()));
-    assertThat(from(input.getContext().getResponsePublisher()).block(), is(response));
+    assertThat(from(eventContext.getResponsePublisher()).block(), is(response));
   }
 
   @Test
   public void processToApplyAckAndMap() throws Exception {
     assertThat(processToApply(input, ackAndMap), is(output));
-    assertThat(from(input.getContext().getResponsePublisher()).block(), is(nullValue()));
+    assertThat(from(eventContext.getResponsePublisher()).block(), is(nullValue()));
   }
 
   @Test
   public void processToApplyAckAndMapInChain() throws Exception {
     assertThat(processToApply(input, createChain(ackAndMap)), is(output));
-    assertThat(from(input.getContext().getResponsePublisher()).block(), is(nullValue()));
+    assertThat(from(eventContext.getResponsePublisher()).block(), is(nullValue()));
   }
 
   @Test
   public void processToApplyAckAndMapInFlow() throws Exception {
     assertThat(processToApply(input, createFlow(ackAndMap)), is(nullValue()));
-    assertThat(from(input.getContext().getResponsePublisher()).block(), is(nullValue()));
+    assertThat(from(eventContext.getResponsePublisher()).block(), is(nullValue()));
   }
 
   @Test
   public void processToApplyRespondAndMap() throws Exception {
     assertThat(processToApply(input, respondAndMap), is(output));
-    assertThat(from(input.getContext().getResponsePublisher()).block(), is(response));
+    assertThat(from(eventContext.getResponsePublisher()).block(), is(response));
   }
 
   @Test
   public void processToApplyRespondAndMapInChain() throws Exception {
     assertThat(processToApply(input, createChain(respondAndMap)), is(output));
-    assertThat(from(input.getContext().getResponsePublisher()).block(), is(response));
+    assertThat(from(eventContext.getResponsePublisher()).block(), is(response));
   }
 
   @Test
   public void processToApplyRespondAndMapInFlow() throws Exception {
     assertThat(processToApply(input, createFlow(respondAndMap)).getMessage(), is(response.getMessage()));
-    assertThat(from(input.getContext().getResponsePublisher()).block(), is(response));
+    assertThat(from(eventContext.getResponsePublisher()).block(), is(response));
   }
 
   @Test
   public void processToApplyError() throws Exception {
+    thrown.expect((is(instanceOf(MessagingException.class))));
+    thrown.expectCause(is(exception));
     try {
       processToApply(input, error);
-      fail("Exception expected");
-    } catch (Throwable t) {
-      assertThat(t, is(instanceOf(MessagingException.class)));
-      assertThat(t.getCause(), is(exception));
-      assertThat(from(input.getContext().getResponsePublisher()).toFuture().isDone(), is(false));
+    } finally {
+      assertThat(from(eventContext.getResponsePublisher()).toFuture().isDone(), is(false));
     }
   }
 
@@ -200,7 +199,7 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
       assertThat(t.getCause(), is(exception));
     }
 
-    assertThat(from(input.getContext().getResponsePublisher()).toFuture().isDone(), is(true));
+    assertThat(from(eventContext.getResponsePublisher()).toFuture().isDone(), is(true));
 
     thrown.expectCause((is(instanceOf(MessagingException.class))));
     thrown.expectCause(hasCause(is(exception)));
@@ -218,7 +217,7 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
       assertThat(t.getCause(), is(exception));
     }
 
-    assertThat(from(input.getContext().getResponsePublisher()).toFuture().isDone(), is(true));
+    assertThat(from(eventContext.getResponsePublisher()).toFuture().isDone(), is(true));
 
     thrown.expectCause((is(instanceOf(MessagingException.class))));
     thrown.expectCause(hasCause(is(exception)));
