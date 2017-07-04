@@ -2364,6 +2364,15 @@
                               "annotations": {
                                 "description": {
                                   "value": "The location (which will be resolved relative to the current classpath and file system, if possible) of the trust store."
+                                },
+                                "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                                  "displayModel": {
+                                    "pathModel": {
+                                      "type": "FILE",
+                                      "fileExtensions": [],
+                                      "acceptsUrls": false
+                                    }
+                                  }
                                 }
                               }
                             },
@@ -2487,6 +2496,15 @@
                               "annotations": {
                                 "description": {
                                   "value": "The location (which will be resolved relative to the current classpath and file system, if possible) of the key store."
+                                },
+                                "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                                  "displayModel": {
+                                    "pathModel": {
+                                      "type": "FILE",
+                                      "fileExtensions": [],
+                                      "acceptsUrls": false
+                                    }
+                                  }
                                 }
                               }
                             },
@@ -11456,6 +11474,15 @@
                           "annotations": {
                             "description": {
                               "value": "The location (which will be resolved relative to the current classpath and file system, if possible) of the trust store."
+                            },
+                            "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                              "displayModel": {
+                                "pathModel": {
+                                  "type": "FILE",
+                                  "fileExtensions": [],
+                                  "acceptsUrls": false
+                                }
+                              }
                             }
                           }
                         },
@@ -11579,6 +11606,15 @@
                           "annotations": {
                             "description": {
                               "value": "The location (which will be resolved relative to the current classpath and file system, if possible) of the key store."
+                            },
+                            "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                              "displayModel": {
+                                "pathModel": {
+                                  "type": "FILE",
+                                  "fileExtensions": [],
+                                  "acceptsUrls": false
+                                }
+                              }
                             }
                           }
                         },
@@ -12426,8 +12462,7 @@
           "isAbstract": false,
           "isFinal": false,
           "implementedInterfaces": [
-            "org.mule.runtime.api.lifecycle.Lifecycle",
-            "org.mule.runtime.core.api.context.MuleContextAware"
+            "org.mule.runtime.api.lifecycle.Lifecycle"
           ],
           "parent": "",
           "genericTypes": []
