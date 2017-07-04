@@ -8,7 +8,6 @@ package org.mule.runtime.config.spring.factories;
 
 import static java.util.Collections.emptyList;
 
-import org.mule.runtime.core.api.source.CompositeMessageSource;
 import org.mule.runtime.core.api.source.MessageSource;
 
 import java.util.List;
