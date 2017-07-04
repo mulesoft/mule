@@ -14,6 +14,10 @@
     <name>Mule Runtime APIs BOM</name>
     <description>Module that provides all the APIs versions provided by the Mule Runtime for a particular runtime version. Users of the APIs should use this BOM when depending on any Mule API.</description>
 
+    <properties>
+        <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
+    </properties>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
