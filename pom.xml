@@ -221,14 +221,14 @@
         <allureJunitVersion>1.4.23.HOTFIX1</allureJunitVersion>
 
         <!-- Mule Snapshot Dependencies -->
-        <muleDslApiVersion>1.0.0-BETA.1-SNAPSHOT</muleDslApiVersion>
-        <muleExtensionsApiVersion>1.0.0-BETA.1-SNAPSHOT</muleExtensionsApiVersion>
-        <muleHttpPolicyApiVersion>1.0.0-BETA.1-SNAPSHOT</muleHttpPolicyApiVersion>
-        <muleMavenClientApi>1.0.0-BETA.1-SNAPSHOT</muleMavenClientApi>
+        <muleDslApiVersion>1.0.0-BETA.2-SNAPSHOT</muleDslApiVersion>
+        <muleExtensionsApiVersion>1.0.0-BETA.2-SNAPSHOT</muleExtensionsApiVersion>
+        <muleHttpPolicyApiVersion>1.0.0-BETA.2-SNAPSHOT</muleHttpPolicyApiVersion>
+        <muleMavenClientApi>1.0.0-BETA.2-SNAPSHOT</muleMavenClientApi>
         <muleMavenClientImpl>1.0.0-BETA.2-SNAPSHOT</muleMavenClientImpl>
-        <mulePolicyApiVersion>1.0.0-BETA.1-SNAPSHOT</mulePolicyApiVersion>
-        <muleApiVersion>1.0.0-BETA.1-SNAPSHOT</muleApiVersion>
-        <muleMetadataModelVersion>1.0.0-BETA.1-SNAPSHOT</muleMetadataModelVersion>
+        <mulePolicyApiVersion>1.0.0-BETA.2-SNAPSHOT</mulePolicyApiVersion>
+        <muleApiVersion>1.0.0-BETA.2-SNAPSHOT</muleApiVersion>
+        <muleMetadataModelVersion>1.0.0-BETA.2-SNAPSHOT</muleMetadataModelVersion>
         <metadataModelApiVersion>${muleMetadataModelVersion}</metadataModelApiVersion>
 
         <muleHttpConnectorTestVersion>0.8.0-SNAPSHOT</muleHttpConnectorTestVersion>
@@ -238,16 +238,16 @@
 
         <muleFileCommonsTestVersion>0.8.0-SNAPSHOT</muleFileCommonsTestVersion>
 
-        <muleHttpServiceTestVersion>1.0.0-BETA.1</muleHttpServiceTestVersion>
-        <muleSchedulerServiceTestVersion>1.0.0-BETA.1</muleSchedulerServiceTestVersion>
+        <muleHttpServiceTestVersion>1.0.0-BETA.2-SNAPSHOT</muleHttpServiceTestVersion>
+        <muleSchedulerServiceTestVersion>1.0.0-BETA.2-SNAPSHOT</muleSchedulerServiceTestVersion>
 
         <!-- Test Extensions -->
-        <muleMetadataExtensionTestVersion>4.0.0-BETA.1-SNAPSHOT</muleMetadataExtensionTestVersion>
-        <muleVeganExtensionTestVersion>4.0.0-BETA.1-SNAPSHOT</muleVeganExtensionTestVersion>
-        <muleHeisenbergExtensionTestVersion>4.0.0-BETA.1-SNAPSHOT</muleHeisenbergExtensionTestVersion>
-        <muleMarvelExtensionTestVersion>4.0.0-BETA.1-SNAPSHOT</muleMarvelExtensionTestVersion>
-        <mulePetstoreExtensionTestVersion>4.0.0-BETA.1-SNAPSHOT</mulePetstoreExtensionTestVersion>
-        <muleSubtypesExtensionTestVersion>4.0.0-BETA.1-SNAPSHOT</muleSubtypesExtensionTestVersion>
+        <muleMetadataExtensionTestVersion>4.0.0-BETA.2-SNAPSHOT</muleMetadataExtensionTestVersion>
+        <muleVeganExtensionTestVersion>4.0.0-BETA.2-SNAPSHOT</muleVeganExtensionTestVersion>
+        <muleHeisenbergExtensionTestVersion>4.0.0-BETA.2-SNAPSHOT</muleHeisenbergExtensionTestVersion>
+        <muleMarvelExtensionTestVersion>4.0.0-BETA.2-SNAPSHOT</muleMarvelExtensionTestVersion>
+        <mulePetstoreExtensionTestVersion>4.0.0-BETA.2-SNAPSHOT</mulePetstoreExtensionTestVersion>
+        <muleSubtypesExtensionTestVersion>4.0.0-BETA.2-SNAPSHOT</muleSubtypesExtensionTestVersion>
 
         <!--Maven plugins versions-->
         <dependency.plugin.version>2.10</dependency.plugin.version>

@@ -26,10 +26,10 @@
 	<properties>
         <muleEmbeddedApiVersion>1.0.0-BETA.2-SNAPSHOT</muleEmbeddedApiVersion>
 
-        <muleSchedulerServiceVersion>1.0.0-BETA.1-SNAPSHOT</muleSchedulerServiceVersion>
-        <muleHttpServiceVersion>1.0.0-BETA.1-SNAPSHOT</muleHttpServiceVersion>
-        <muleOAuthServiceVersion>1.0.0-BETA.1-SNAPSHOT</muleOAuthServiceVersion>
-        <muleSoapServiceVersion>1.0.0-BETA.1-SNAPSHOT</muleSoapServiceVersion>
+        <muleSchedulerServiceVersion>1.0.0-BETA.2-SNAPSHOT</muleSchedulerServiceVersion>
+        <muleHttpServiceVersion>1.0.0-BETA.2-SNAPSHOT</muleHttpServiceVersion>
+        <muleOAuthServiceVersion>1.0.0-BETA.2-SNAPSHOT</muleOAuthServiceVersion>
+        <muleSoapServiceVersion>1.0.0-BETA.2-SNAPSHOT</muleSoapServiceVersion>
 	</properties>
 
     <modules>
