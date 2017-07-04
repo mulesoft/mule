@@ -13,6 +13,10 @@
     <packaging>pom</packaging>
     <name>Mule Embedded</name>
 
+    <properties>
+        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+    </properties>
+
     <modules>
         <module>embedded-impl</module>
         <module>embedded-impl-bom</module>

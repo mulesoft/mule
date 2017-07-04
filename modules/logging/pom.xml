@@ -15,7 +15,7 @@
 
     <properties>
         <skipExportTests>false</skipExportTests>
-        <formatterConfigPath>../formatter.xml</formatterConfigPath>
+        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 
     <dependencies>

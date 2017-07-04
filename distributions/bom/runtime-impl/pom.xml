@@ -13,6 +13,10 @@
     <name>Mule Runtime Implementation Libraries BOM</name>
     <description>A BOM project that provides all the implementation libraries required by the Mule runtime</description>
 
+    <properties>
+        <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.mule.runtime</groupId>

@@ -14,6 +14,10 @@
     <name>Mule Runtime BOM</name>
     <description>Mule runtime modules for BOMs</description>
 
+    <properties>
+        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+    </properties>
+
     <modules>
         <module>runtime-api</module>
         <module>runtime-impl</module>

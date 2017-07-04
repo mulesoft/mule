@@ -17,6 +17,10 @@
         This is needed in our various distributions we publish.
     </description>
     
+    <properties>
+        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+    </properties>
+    
     <dependencies>
         <dependency>
             <groupId>org.mule.services</groupId>

@@ -11,6 +11,10 @@
     <packaging>pom</packaging>
     <name>Mule Tests</name>
 
+    <properties>
+        <formatterConfigPath>../formatter.xml</formatterConfigPath>
+    </properties>
+
     <modules>
         <module>allure</module>
         <module>unit</module>
