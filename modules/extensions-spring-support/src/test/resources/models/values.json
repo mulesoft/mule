@@ -37,10 +37,8 @@
                   "required1",
                   "required2"
                 ],
-                "valueParts": {
-                  "1": "channel"
-                },
-                "category": "WithRequiredParametersFromConfigValuesProvider"
+                "partOrder": 1,
+                "providerName": "channel"
               },
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
@@ -341,10 +339,8 @@
                 "requiredParameters": [
                   "anyParameter"
                 ],
-                "valueParts": {
-                  "1": "valueParam"
-                },
-                "category": "WithRequiredParameterFromGroupValuesProvider"
+                "partOrder": 1,
+                "providerName": "valueParam"
               },
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
@@ -385,10 +381,8 @@
               "isConfigOverride": false,
               "valuesProviderModel": {
                 "requiredParameters": [],
-                "valueParts": {
-                  "1": "channels"
-                },
-                "category": "SimpleValuesProvider"
+                "partOrder": 1,
+                "providerName": "channels"
               },
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
@@ -666,10 +660,8 @@
                 "requiredParameters": [
                   "anyParameter"
                 ],
-                "valueParts": {
-                  "1": "valueParam"
-                },
-                "category": "WithRequiredParameterFromGroupValuesProvider"
+                "partOrder": 1,
+                "providerName": "valueParam"
               },
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
@@ -710,10 +702,8 @@
               "isConfigOverride": false,
               "valuesProviderModel": {
                 "requiredParameters": [],
-                "valueParts": {
-                  "1": "channels"
-                },
-                "category": "SimpleValuesProvider"
+                "partOrder": 1,
+                "providerName": "channels"
               },
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
@@ -1116,10 +1106,8 @@
                   "isConfigOverride": false,
                   "valuesProviderModel": {
                     "requiredParameters": [],
-                    "valueParts": {
-                      "1": "channels"
-                    },
-                    "category": "WithConfigValuesProvider"
+                    "partOrder": 1,
+                    "providerName": "channels"
                   },
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
@@ -1218,10 +1206,8 @@
                   "isConfigOverride": false,
                   "valuesProviderModel": {
                     "requiredParameters": [],
-                    "valueParts": {
-                      "1": "channels"
-                    },
-                    "category": "WithConnectionValuesProvider"
+                    "partOrder": 1,
+                    "providerName": "channels"
                   },
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
@@ -1277,10 +1263,8 @@
                       "required1",
                       "required2"
                     ],
-                    "valueParts": {
-                      "1": "channel"
-                    },
-                    "category": "WithRequiredParametersFromConfigValuesProvider"
+                    "partOrder": 1,
+                    "providerName": "channel"
                   },
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
@@ -1532,10 +1516,8 @@
                     "requiredParameters": [
                       "anyParameter"
                     ],
-                    "valueParts": {
-                      "1": "valueParam"
-                    },
-                    "category": "WithRequiredParameterFromGroupValuesProvider"
+                    "partOrder": 1,
+                    "providerName": "valueParam"
                   },
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
@@ -1576,10 +1558,8 @@
                   "isConfigOverride": false,
                   "valuesProviderModel": {
                     "requiredParameters": [],
-                    "valueParts": {
-                      "1": "channels"
-                    },
-                    "category": "SimpleValuesProvider"
+                    "partOrder": 1,
+                    "providerName": "channels"
                   },
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
@@ -1808,10 +1788,8 @@
                     "requiredParameters": [
                       "anyParameter"
                     ],
-                    "valueParts": {
-                      "1": "valueParam"
-                    },
-                    "category": "WithRequiredParameterFromGroupValuesProvider"
+                    "partOrder": 1,
+                    "providerName": "valueParam"
                   },
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
@@ -1852,10 +1830,8 @@
                   "isConfigOverride": false,
                   "valuesProviderModel": {
                     "requiredParameters": [],
-                    "valueParts": {
-                      "1": "channels"
-                    },
-                    "category": "SimpleValuesProvider"
+                    "partOrder": 1,
+                    "providerName": "channels"
                   },
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
@@ -2272,10 +2248,8 @@
                   "isConfigOverride": false,
                   "valuesProviderModel": {
                     "requiredParameters": [],
-                    "valueParts": {
-                      "1": "channel"
-                    },
-                    "category": "SimpleValuesProvider"
+                    "partOrder": 1,
+                    "providerName": "channel"
                   },
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
@@ -2473,10 +2447,8 @@
               "isConfigOverride": false,
               "valuesProviderModel": {
                 "requiredParameters": [],
-                "valueParts": {
-                  "1": "channel"
-                },
-                "category": "SimpleValuesProvider"
+                "partOrder": 1,
+                "providerName": "channel"
               },
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
@@ -2773,6 +2745,11 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
+              "valuesProviderModel": {
+                "requiredParameters": [],
+                "partOrder": 1,
+                "providerName": "values"
+              },
               "expressionSupport": "SUPPORTED",
               "defaultValue": "AMERICA",
               "role": "BEHAVIOUR",
@@ -2802,6 +2779,11 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
+              "valuesProviderModel": {
+                "requiredParameters": [],
+                "partOrder": 2,
+                "providerName": "values"
+              },
               "expressionSupport": "SUPPORTED",
               "defaultValue": "USA",
               "role": "BEHAVIOUR",
@@ -2831,6 +2813,11 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
+              "valuesProviderModel": {
+                "requiredParameters": [],
+                "partOrder": 3,
+                "providerName": "values"
+              },
               "expressionSupport": "SUPPORTED",
               "defaultValue": "SFO",
               "role": "BEHAVIOUR",
@@ -2860,15 +2847,6 @@
             "query": false
           },
           "showInDsl": false,
-          "valuesProviderModel": {
-            "requiredParameters": [],
-            "valueParts": {
-              "1": "continent",
-              "2": "country",
-              "3": "city"
-            },
-            "category": "MultiLevelValuesProvider"
-          },
           "name": "values",
           "description": "",
           "modelProperties": {}
@@ -2921,10 +2899,8 @@
               "isConfigOverride": false,
               "valuesProviderModel": {
                 "requiredParameters": [],
-                "valueParts": {
-                  "1": "channel"
-                },
-                "category": "WithMuleContextValuesProvider"
+                "partOrder": 1,
+                "providerName": "channel"
               },
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
@@ -2998,10 +2974,8 @@
               "isConfigOverride": false,
               "valuesProviderModel": {
                 "requiredParameters": [],
-                "valueParts": {
-                  "1": "channels"
-                },
-                "category": "SimpleValuesProvider"
+                "partOrder": 1,
+                "providerName": "channels"
               },
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
@@ -3075,10 +3049,8 @@
               "isConfigOverride": false,
               "valuesProviderModel": {
                 "requiredParameters": [],
-                "valueParts": {
-                  "1": "channels"
-                },
-                "category": "SimpleValuesProvider"
+                "partOrder": 1,
+                "providerName": "channels"
               },
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
@@ -3187,10 +3159,8 @@
                 "requiredParameters": [
                   "anyParameter"
                 ],
-                "valueParts": {
-                  "1": "values"
-                },
-                "category": "WithRequiredParameterFromGroupValuesProvider"
+                "partOrder": 1,
+                "providerName": "values"
               },
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
@@ -3231,10 +3201,8 @@
               "isConfigOverride": false,
               "valuesProviderModel": {
                 "requiredParameters": [],
-                "valueParts": {
-                  "1": "channels"
-                },
-                "category": "SimpleValuesProvider"
+                "partOrder": 1,
+                "providerName": "channels"
               },
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
@@ -3346,10 +3314,8 @@
                   "requiredBoolean",
                   "strings"
                 ],
-                "valueParts": {
-                  "1": "channels"
-                },
-                "category": "WithRequiredParametersValuesProvider"
+                "partOrder": 1,
+                "providerName": "channels"
               },
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
@@ -3573,10 +3539,8 @@
                 "requiredParameters": [
                   "superString"
                 ],
-                "valueParts": {
-                  "1": "channels"
-                },
-                "category": "WithRequiredParameterWithAliasValuesProvider"
+                "partOrder": 1,
+                "providerName": "channels"
               },
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
@@ -3657,10 +3621,8 @@
                 "requiredParameters": [
                   "anyParameter"
                 ],
-                "valueParts": {
-                  "1": "values"
-                },
-                "category": "WithRequiredParameterFromGroupValuesProvider"
+                "partOrder": 1,
+                "providerName": "values"
               },
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
@@ -3701,10 +3663,8 @@
               "isConfigOverride": false,
               "valuesProviderModel": {
                 "requiredParameters": [],
-                "valueParts": {
-                  "1": "channels"
-                },
-                "category": "SimpleValuesProvider"
+                "partOrder": 1,
+                "providerName": "channels"
               },
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",

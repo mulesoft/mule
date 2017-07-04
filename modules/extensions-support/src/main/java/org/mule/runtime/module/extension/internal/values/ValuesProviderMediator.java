@@ -7,27 +7,25 @@
 package org.mule.runtime.module.extension.internal.values;
 
 import static java.lang.String.format;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
-import static org.mule.runtime.api.values.ValueResolvingException.INVALID_PARAMETER;
-import static org.mule.runtime.api.values.ValueResolvingException.UNKNOWN;
+import static org.mule.runtime.extension.api.values.ValueResolvingException.INVALID_PARAMETER;
+import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
 import static org.mule.runtime.module.extension.internal.values.ValuesProviderMediatorUtils.cloneAndEnrichMetadataKey;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.EnrichableModel;
-import org.mule.runtime.api.meta.model.parameter.HasValuesProviderModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.values.Value;
-import org.mule.runtime.api.values.ValueBuilder;
-import org.mule.runtime.api.values.ValueResolvingException;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.extension.api.values.ValueBuilder;
+import org.mule.runtime.extension.api.values.ValueResolvingException;
 import org.mule.runtime.extension.api.values.ValuesProvider;
 import org.mule.runtime.module.extension.internal.loader.java.property.ValuesProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 
-import java.util.Optional;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -83,23 +81,27 @@ public final class ValuesProviderMediator<T extends ParameterizedModel & Enricha
    * @return a {@link Set} of {@link Value} correspondent to the given parameter
    * @throws ValueResolvingException if an error occurs resolving {@link Value values}
    */
-  public <P extends EnrichableModel & HasValuesProviderModel> Set<Value> getValues(String parameterName,
-                                                                                   ParameterValueResolver parameterValueResolver,
-                                                                                   Supplier<Object> connectionSupplier,
-                                                                                   Supplier<Object> configurationSupplier)
+  public Set<Value> getValues(String parameterName, ParameterValueResolver parameterValueResolver,
+                              Supplier<Object> connectionSupplier, Supplier<Object> configurationSupplier)
       throws ValueResolvingException {
-    P parameter = (P) getParameter(parameterName)
-        .orElseThrow(() -> new ValueResolvingException(format("Unable to find model for parameter or parameter group with name '%s'.",
-                                                              parameterName),
-                                                       INVALID_PARAMETER));
+    List<ParameterModel> parameters = getParameters(parameterName);
 
-    ValuesProviderFactoryModelProperty factoryModelProperty = parameter.getModelProperty(ValuesProviderFactoryModelProperty.class)
-        .orElseThrow(() -> new ValueResolvingException(format("The parameter with name '%s' is not an Values Provider",
-                                                              parameterName),
-                                                       INVALID_PARAMETER));
+    if (parameters.isEmpty()) {
+      throw new ValueResolvingException(format("Unable to find model for parameter or parameter group with name '%s'.",
+                                               parameterName),
+                                        INVALID_PARAMETER);
+    }
+
+    ParameterModel parameterModel = parameters.get(0);
+
+    ValuesProviderFactoryModelProperty factoryModelProperty =
+        parameterModel.getModelProperty(ValuesProviderFactoryModelProperty.class)
+            .orElseThrow(() -> new ValueResolvingException(format("The parameter with name '%s' is not an Values Provider",
+                                                                  parameterName),
+                                                           INVALID_PARAMETER));
 
     try {
-      return resolveValues(parameter, factoryModelProperty, parameterValueResolver, connectionSupplier, configurationSupplier);
+      return resolveValues(parameters, factoryModelProperty, parameterValueResolver, connectionSupplier, configurationSupplier);
     } catch (Exception e) {
       throw new ValueResolvingException(format("An error occurred trying to resolve the Values for parameter '%s' of component '%s'",
                                                parameterName, containerModel.getName()),
@@ -107,7 +109,7 @@ public final class ValuesProviderMediator<T extends ParameterizedModel & Enricha
     }
   }
 
-  private Set<Value> resolveValues(HasValuesProviderModel parameter, ValuesProviderFactoryModelProperty factoryModelProperty,
+  private Set<Value> resolveValues(List<ParameterModel> parameters, ValuesProviderFactoryModelProperty factoryModelProperty,
                                    ParameterValueResolver parameterValueResolver, Supplier<Object> connectionSupplier,
                                    Supplier<Object> configurationSupplier)
       throws NoSuchMethodException, InstantiationException, IllegalAccessException, java.lang.reflect.InvocationTargetException,
@@ -121,7 +123,7 @@ public final class ValuesProviderMediator<T extends ParameterizedModel & Enricha
     Set<Value> valueSet = valueProvider.resolve();
 
     return valueSet.stream()
-        .map(option -> cloneAndEnrichMetadataKey(option, parameter.getValuesProviderModel().get().getValueParts()))
+        .map(option -> cloneAndEnrichMetadataKey(option, parameters))
         .map(ValueBuilder::build)
         .collect(toSet());
   }
@@ -130,29 +132,15 @@ public final class ValuesProviderMediator<T extends ParameterizedModel & Enricha
    * Given a parameter or parameter group name, this method will look for the correspondent {@link ParameterModel} or
    * {@link ParameterGroupModel}
    *
-   * @param parameterName name of the parameter or parameter group to find
+   * @param valueName name of value provider
    * @return the correspondent parameter
    */
-  private <P extends EnrichableModel & HasValuesProviderModel> Optional<P> getParameter(String parameterName) {
-    Optional<ParameterModel> optionalParamModel = containerModel.getAllParameterModels()
+  private List<ParameterModel> getParameters(String valueName) {
+    return containerModel.getAllParameterModels()
         .stream()
-        .filter(parameterModel -> parameterModel.getName().equals(parameterName))
-        .findFirst();
-
-    if (optionalParamModel.isPresent()) {
-      return of((P) optionalParamModel.get());
-    }
-
-    Optional<ParameterGroupModel> optionalGroupModel = containerModel.getParameterGroupModels()
-        .stream()
-        .filter(parameterGroupModel -> parameterGroupModel.getName().equals(parameterName))
-        .findFirst();
-
-    if (optionalGroupModel.isPresent()) {
-      return of((P) optionalGroupModel.get());
-    }
-
-    return empty();
+        .filter(parameterModel -> parameterModel.getValuesProviderModel().isPresent())
+        .filter(parameterModel -> parameterModel.getValuesProviderModel().get().getProviderName().equals(valueName))
+        .collect(toList());
   }
 
   /**

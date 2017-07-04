@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.values;
 
-import static org.mule.runtime.api.values.ValueResolvingException.UNKNOWN;
+import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
-import org.mule.runtime.api.values.ValueResolvingException;
+import org.mule.runtime.extension.api.values.ValueResolvingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.values.ValuesProvider;
 import org.mule.runtime.module.extension.internal.loader.java.property.ValuesProviderFactoryModelProperty;

@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
 import static java.lang.Thread.currentThread;
-import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
@@ -24,11 +23,11 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclarat
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.api.meta.model.parameter.ValuesProviderModel;
-import org.mule.runtime.extension.api.annotation.values.OfValues;
-import org.mule.runtime.extension.api.annotation.values.ValuePart;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.values.OfValues;
+import org.mule.runtime.extension.api.annotation.values.ValuePart;
 import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarationWalker;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
@@ -114,29 +113,30 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
         introspectParameterGroups(containerDeclaration.getParameterGroups());
     Map<ParameterDeclaration, Class<? extends ValuesProvider>> dynamicOptions = introspectParameters(allParameters);
 
-    dynamicOptions.forEach((paramDeclaration, resolverClass) -> enrichParameter(paramDeclaration.getName(), resolverClass,
+    dynamicOptions.forEach((paramDeclaration, resolverClass) -> enrichParameter(resolverClass,
                                                                                 paramDeclaration,
                                                                                 paramDeclaration::setValuesProviderModel,
-                                                                                singletonMap(1, paramDeclaration.getName()),
-                                                                                parameterNames));
+                                                                                1,
+                                                                                parameterNames, paramDeclaration.getName()));
+
     dynamicGroupOptions
-        .forEach((paramDeclaration, resolverClass) -> enrichParameter(paramDeclaration.getName(), resolverClass, paramDeclaration,
-                                                                      paramDeclaration::setValuesProviderModel,
-                                                                      getParts(paramDeclaration), parameterNames));
+        .forEach((paramGroupDeclaration, resolverClass) -> getParts(paramGroupDeclaration)
+            .forEach((paramDeclaration, order) -> enrichParameter(resolverClass, paramDeclaration,
+                                                                  paramDeclaration::setValuesProviderModel, order, parameterNames,
+                                                                  paramGroupDeclaration.getName())));
   }
 
   /**
    * Enriches a parameter that has an associated {@link ValuesProvider}
    *
-   * @param parameterName           the name of the parameter to enrich
    * @param resolverClass           the class of the {@link ValuesProvider}
-   * @param paramDeclaration             {@link ParameterDeclaration} or {@link ParameterGroupDeclaration} paramDeclaration
+   * @param paramDeclaration        {@link ParameterDeclaration} or {@link ParameterGroupDeclaration} paramDeclaration
    * @param containerParameterNames parameters container's names
    */
-  private void enrichParameter(String parameterName, Class<? extends ValuesProvider> resolverClass,
+  private void enrichParameter(Class<? extends ValuesProvider> resolverClass,
                                BaseDeclaration paramDeclaration,
-                               Consumer<ValuesProviderModel> valueProviderModelConsumer, Map<Integer, String> parts,
-                               Map<String, String> containerParameterNames) {
+                               Consumer<ValuesProviderModel> valueProviderModelConsumer, Integer partOrder,
+                               Map<String, String> containerParameterNames, String name) {
 
     ValuesProviderFactoryModelPropertyBuilder propertyBuilder =
         ValuesProviderFactoryModelProperty.builder(resolverClass);
@@ -152,8 +152,8 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
     paramDeclaration.addModelProperty(propertyBuilder.build());
 
     valueProviderModelConsumer
-        .accept(new ValuesProviderModel(getRequiredParametersAliases(resolverParameters, containerParameterNames), parts,
-                                        resolverClass.getSimpleName()));
+        .accept(new ValuesProviderModel(getRequiredParametersAliases(resolverParameters, containerParameterNames), partOrder,
+                                        name));
   }
 
   /**
@@ -247,11 +247,11 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
         .collect(toList());
   }
 
-  private Map<Integer, String> getParts(ParameterGroupDeclaration paramDeclaration) {
-    Map<Integer, String> parts = new HashMap<>();
+  private Map<ParameterDeclaration, Integer> getParts(ParameterGroupDeclaration paramDeclaration) {
+    Map<ParameterDeclaration, Integer> parts = new HashMap<>();
 
     paramDeclaration.getParameters().forEach(param -> getAnnotation(param, ValuePart.class)
-        .ifPresent(part -> parts.put(part.order(), param.getName())));
+        .ifPresent(part -> parts.put(param, part.order())));
 
     return parts;
   }

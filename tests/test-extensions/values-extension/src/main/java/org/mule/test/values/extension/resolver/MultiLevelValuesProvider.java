@@ -7,7 +7,7 @@
 package org.mule.test.values.extension.resolver;
 
 import org.mule.runtime.api.values.Value;
-import org.mule.runtime.api.values.ValueBuilder;
+import org.mule.runtime.extension.api.values.ValueBuilder;
 import org.mule.runtime.extension.api.values.ValuesProvider;
 
 import java.util.Collections;

@@ -355,7 +355,6 @@ public final class MetadataMediator<T extends ComponentModel> {
                                                 parameterGroup.isShowInDsl(),
                                                 parameterGroup.getDisplayModel().orElse(null),
                                                 parameterGroup.getLayoutModel().orElse(null),
-                                                parameterGroup.getValuesProviderModel().orElse(null),
                                                 parameterGroup.getModelProperties()));
     });
     return parameterGroups;
