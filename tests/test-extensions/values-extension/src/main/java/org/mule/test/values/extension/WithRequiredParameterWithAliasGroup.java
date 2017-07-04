@@ -9,7 +9,7 @@ package org.mule.test.values.extension;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.values.OfValues;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.test.values.extension.resolver.WithRequiredParameterWithAliasValuesProvider;
+import org.mule.test.values.extension.resolver.WithRequiredParameterWithAliasValueProvider;
 
 public class WithRequiredParameterWithAliasGroup {
 
@@ -18,6 +18,6 @@ public class WithRequiredParameterWithAliasGroup {
   String requiredString;
 
   @Parameter
-  @OfValues(WithRequiredParameterWithAliasValuesProvider.class)
+  @OfValues(WithRequiredParameterWithAliasValueProvider.class)
   String channels;
 }

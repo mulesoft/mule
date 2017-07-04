@@ -9,29 +9,29 @@ package org.mule.test.values.extension;
 import org.mule.runtime.extension.api.annotation.values.OfValues;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
-import org.mule.test.values.extension.resolver.MultiLevelValuesProvider;
-import org.mule.test.values.extension.resolver.SimpleValuesProvider;
-import org.mule.test.values.extension.resolver.WithConfigValuesProvider;
-import org.mule.test.values.extension.resolver.WithConnectionValuesProvider;
-import org.mule.test.values.extension.resolver.WithMuleContextValuesProvider;
-import org.mule.test.values.extension.resolver.WithRequiredParameterFromGroupValuesProvider;
-import org.mule.test.values.extension.resolver.WithRequiredParametersValuesProvider;
+import org.mule.test.values.extension.resolver.MultiLevelValueProvider;
+import org.mule.test.values.extension.resolver.SimpleValueProvider;
+import org.mule.test.values.extension.resolver.WithConfigValueProvider;
+import org.mule.test.values.extension.resolver.WithConnectionValueProvider;
+import org.mule.test.values.extension.resolver.WithMuleContextValueProvider;
+import org.mule.test.values.extension.resolver.WithRequiredParameterFromGroupValueProvider;
+import org.mule.test.values.extension.resolver.WithRequiredParametersValueProvider;
 
 import java.util.List;
 
 public class ValuesOperations {
 
-  public void singleValuesEnabledParameter(@OfValues(SimpleValuesProvider.class) String channels) {
+  public void singleValuesEnabledParameter(@OfValues(SimpleValueProvider.class) String channels) {
 
   }
 
-  public void singleValuesEnabledParameterWithConnection(@OfValues(WithConnectionValuesProvider.class) String channels,
+  public void singleValuesEnabledParameterWithConnection(@OfValues(WithConnectionValueProvider.class) String channels,
                                                          @Connection ValuesConnection connection) {}
 
-  public void singleValuesEnabledParameterWithConfiguration(@OfValues(WithConfigValuesProvider.class) String channels,
+  public void singleValuesEnabledParameterWithConfiguration(@OfValues(WithConfigValueProvider.class) String channels,
                                                             @Connection ValuesConnection connection) {}
 
-  public void singleValuesEnabledParameterWithRequiredParameters(@OfValues(WithRequiredParametersValuesProvider.class) String channels,
+  public void singleValuesEnabledParameterWithRequiredParameters(@OfValues(WithRequiredParametersValueProvider.class) String channels,
                                                                  String requiredString,
                                                                  boolean requiredBoolean,
                                                                  int requiredInteger,
@@ -40,11 +40,11 @@ public class ValuesOperations {
   public void singleValuesEnabledParameterInsideParameterGroup(@ParameterGroup(
       name = "ValuesGroup") GroupWithValuesParameter optionsParameter) {}
 
-  public void singleValuesEnabledParameterRequiresValuesOfParameterGroup(@OfValues(WithRequiredParameterFromGroupValuesProvider.class) String values,
+  public void singleValuesEnabledParameterRequiresValuesOfParameterGroup(@OfValues(WithRequiredParameterFromGroupValueProvider.class) String values,
                                                                          @ParameterGroup(
                                                                              name = "ValuesGroup") GroupWithValuesParameter optionsParameter) {}
 
-  public void multiLevelValue(@OfValues(MultiLevelValuesProvider.class) @ParameterGroup(
+  public void multiLevelValue(@OfValues(MultiLevelValueProvider.class) @ParameterGroup(
       name = "values") GroupAsMultiLevelValue optionsParameter) {
 
   }
@@ -52,11 +52,11 @@ public class ValuesOperations {
   public void singleValuesWithRequiredParameterWithAlias(@ParameterGroup(
       name = "someGroup") WithRequiredParameterWithAliasGroup group) {}
 
-  public void resolverGetsMuleContextInjection(@OfValues(WithMuleContextValuesProvider.class) String channel) {
+  public void resolverGetsMuleContextInjection(@OfValues(WithMuleContextValueProvider.class) String channel) {
 
   }
 
-  public void valuesInsideShowInDslGroup(@OfValues(WithRequiredParameterFromGroupValuesProvider.class) String values,
+  public void valuesInsideShowInDslGroup(@OfValues(WithRequiredParameterFromGroupValueProvider.class) String values,
                                          @ParameterGroup(name = "ValuesGroup",
                                              showInDsl = true) GroupWithValuesParameter optionsParameter) {
 

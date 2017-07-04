@@ -8,20 +8,18 @@ package org.mule.test.values.extension.resolver;
 
 import org.mule.runtime.extension.api.values.ValueBuilder;
 import org.mule.runtime.api.values.Value;
-import org.mule.runtime.extension.api.annotation.param.Config;
-import org.mule.runtime.extension.api.values.ValuesProvider;
-import org.mule.test.values.extension.config.SimpleConfig;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.values.ValueProvider;
 
 import java.util.Set;
 
-public class WithConfigValuesProvider implements ValuesProvider {
+public class WithRequiredParameterFromGroupValueProvider implements ValueProvider {
 
-  @Config
-  private SimpleConfig configuration;
+  @Parameter
+  String anyParameter;
 
   @Override
   public Set<Value> resolve() {
-    return ValueBuilder.getValuesFor(configuration.getConfigValues());
+    return ValueBuilder.getValuesFor("anyParameter:" + anyParameter);
   }
-
 }

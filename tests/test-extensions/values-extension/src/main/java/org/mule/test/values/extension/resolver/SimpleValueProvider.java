@@ -8,21 +8,15 @@ package org.mule.test.values.extension.resolver;
 
 import org.mule.runtime.extension.api.values.ValueBuilder;
 import org.mule.runtime.api.values.Value;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.values.ValuesProvider;
+import org.mule.runtime.extension.api.values.ValueProvider;
 
 import java.util.Set;
 
-public class WithRequiredParametersFromConfigValuesProvider implements ValuesProvider {
-
-  @Parameter
-  private String required1;
-
-  @Parameter
-  private String required2;
+public class SimpleValueProvider implements ValueProvider {
 
   @Override
   public Set<Value> resolve() {
-    return ValueBuilder.getValuesFor("required1:" + required1, "required2:" + required2);
+    return ValueBuilder.getValuesFor("channel1", "channel2", "channel3");
   }
+
 }

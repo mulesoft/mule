@@ -4,21 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.test.values.extension;
+package org.mule.test.values.extension.source;
 
-import org.mule.runtime.extension.api.annotation.values.OfValues;
-import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.values.OfValues;
 import org.mule.test.values.extension.resolver.SimpleValueProvider;
 
-public class GroupWithValuesParameter {
+public class SimpleSource extends AbstractSource {
 
   @OfValues(SimpleValueProvider.class)
   @Parameter
-  String channels;
-
-  @Optional
-  @Parameter
-  String anyParameter;
+  String channel;
 
 }

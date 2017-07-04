@@ -908,20 +908,33 @@ public final class IntrospectionUtils {
         .orElse(groupModel.getName());
   }
 
-  public static String getRealName(ParameterDeclaration parameterDeclaration) {
-    return getRealName(parameterDeclaration.getName(),
-                       () -> parameterDeclaration.getModelProperty(ImplementingParameterModelProperty.class),
-                       () -> parameterDeclaration.getModelProperty(DeclaringMemberModelProperty.class));
+  /**
+   * Resolves the original name of a parameter before it was modified due to the usage of an Alias.
+   *
+   * @param parameterDeclaration parameter from which look for their original name
+   * @return the original name
+   */
+  public static String getImplementingName(ParameterDeclaration parameterDeclaration) {
+    return getImplementingName(parameterDeclaration.getName(),
+                               () -> parameterDeclaration.getModelProperty(ImplementingParameterModelProperty.class),
+                               () -> parameterDeclaration.getModelProperty(DeclaringMemberModelProperty.class));
   }
 
-  public static String getRealName(ParameterModel parameterModel) {
-    return getRealName(parameterModel.getName(), () -> parameterModel.getModelProperty(ImplementingParameterModelProperty.class),
-                       () -> parameterModel.getModelProperty(DeclaringMemberModelProperty.class));
+  /**
+   * Resolves the original name of a parameter before it was modified due to the usage of an Alias.
+   *
+   * @param parameterModel parameter from which look for their original name
+   * @return the original name
+   */
+  public static String getImplementingName(ParameterModel parameterModel) {
+    return getImplementingName(parameterModel.getName(),
+                               () -> parameterModel.getModelProperty(ImplementingParameterModelProperty.class),
+                               () -> parameterModel.getModelProperty(DeclaringMemberModelProperty.class));
   }
 
-  private static String getRealName(String originalName,
-                                    Supplier<Optional<ImplementingParameterModelProperty>> implementingParameter,
-                                    Supplier<Optional<DeclaringMemberModelProperty>> declaringMember) {
+  private static String getImplementingName(String originalName,
+                                            Supplier<Optional<ImplementingParameterModelProperty>> implementingParameter,
+                                            Supplier<Optional<DeclaringMemberModelProperty>> declaringMember) {
     Optional<ImplementingParameterModelProperty> parameter = implementingParameter.get();
     if (parameter.isPresent()) {
       return parameter.get().getParameter().getName();

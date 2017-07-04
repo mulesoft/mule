@@ -8,15 +8,23 @@ package org.mule.test.values.extension.config;
 
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Operations;
+import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.test.values.extension.connection.ValuesConnectionProvider;
 import org.mule.test.values.extension.ValuesOperations;
-import org.mule.test.values.extension.connection.ConnectionWithValuesWithRequiredParamsFromShowInDslGroup;
 import org.mule.test.values.extension.connection.ConnectionWithValueParameter;
 import org.mule.test.values.extension.connection.ConnectionWithValueWithRequiredParam;
 import org.mule.test.values.extension.connection.ConnectionWithValuesWithRequiredParamsFromParamGroup;
+import org.mule.test.values.extension.connection.ConnectionWithValuesWithRequiredParamsFromShowInDslGroup;
+import org.mule.test.values.extension.connection.ValuesConnectionProvider;
+import org.mule.test.values.extension.source.SourceWithConfiguration;
+import org.mule.test.values.extension.source.SourceWithConnection;
+import org.mule.test.values.extension.source.SourceWithMultiLevelValue;
+import org.mule.test.values.extension.source.SourceWithRequiredParameterInsideShowInDslGroup;
+import org.mule.test.values.extension.source.SourceWithRequiredParameterWithAlias;
+import org.mule.test.values.extension.source.SourceWithValuesWithRequiredParameterInsideParamGroup;
+import org.mule.test.values.extension.source.SourceWithValuesWithRequiredParameters;
 
 import java.util.List;
 
@@ -25,6 +33,10 @@ import java.util.List;
     ConnectionWithValueWithRequiredParam.class, ConnectionWithValuesWithRequiredParamsFromParamGroup.class,
     ConnectionWithValuesWithRequiredParamsFromShowInDslGroup.class})
 @Operations({ValuesOperations.class})
+@Sources({SourceWithConfiguration.class, SourceWithConnection.class, SourceWithValuesWithRequiredParameters.class,
+    SourceWithValuesWithRequiredParameterInsideParamGroup.class,
+    SourceWithRequiredParameterWithAlias.class, SourceWithRequiredParameterInsideShowInDslGroup.class,
+    SourceWithMultiLevelValue.class})
 public class SimpleConfig {
 
   @Parameter

@@ -11,13 +11,13 @@ import org.mule.runtime.extension.api.annotation.values.OfValues;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.test.values.extension.GroupWithValuesParameter;
-import org.mule.test.values.extension.resolver.WithRequiredParameterFromGroupValuesProvider;
+import org.mule.test.values.extension.resolver.WithRequiredParameterFromGroupValueProvider;
 
 @Alias("WithValuesWithRequiredParamsFromShowInDslGroup")
 public class ConnectionWithValuesWithRequiredParamsFromShowInDslGroup extends AbstractConnectionProvider {
 
   @Parameter
-  @OfValues(WithRequiredParameterFromGroupValuesProvider.class)
+  @OfValues(WithRequiredParameterFromGroupValueProvider.class)
   String valueParam;
 
   @ParameterGroup(name = "someGroup", showInDsl = true)

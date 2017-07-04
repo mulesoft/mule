@@ -15,58 +15,51 @@ import org.junit.Test;
 
 import java.util.Set;
 
-public class OperationValuesTestCase extends AbstractValuesTestCase {
+public class SourcesValuesTestCase extends AbstractValuesTestCase {
 
   @Override
   protected String getConfigFile() {
-    return "values/operation-values.xml";
+    return "values/sources-values.xml";
   }
 
   @Test
-  public void singleOptions() throws Exception {
-    Set<Value> channels = getValues("single-values-enabled-parameter", "channels");
+  public void singleValues() throws Exception {
+    Set<Value> channels = getValuesFromSource("simple-source", "channel");
     assertThat(channels, hasSize(3));
     assertThat(channels, hasValues("channel1", "channel2", "channel3"));
   }
 
   @Test
-  public void singleOptionsEnabledParameterWithConnection() throws Exception {
-    Set<Value> channels = getValues("singleValuesEnabledParameterWithConnection", "channels");
+  public void singleValuesEnabledParameterWithConnection() throws Exception {
+    Set<Value> channels = getValuesFromSource("source-with-connection", "channel");
     assertThat(channels, hasSize(3));
     assertThat(channels, hasValues("connection1", "connection2", "connection3"));
   }
 
   @Test
-  public void singleOptionsEnabledParameterWithConfiguration() throws Exception {
-    Set<Value> channels = getValues("singleValuesEnabledParameterWithConfiguration", "channels");
+  public void singleValuesEnabledParameterWithConfiguration() throws Exception {
+    Set<Value> channels = getValuesFromSource("source-with-configuration", "channel");
     assertThat(channels, hasSize(3));
     assertThat(channels, hasValues("config1", "config2", "config3"));
   }
 
   @Test
-  public void singleOptionsEnabledParameterWithRequiredParameters() throws Exception {
-    Set<Value> channels = getValues("singleValuesEnabledParameterWithRequiredParameters", "channels");
+  public void singleValuesEnabledParameterWithRequiredParameters() throws Exception {
+    Set<Value> channels = getValuesFromSource("source-with-values-with-required-parameters", "channels");
     assertThat(channels, hasSize(4));
     assertThat(channels, hasValues("requiredInteger:2", "requiredBoolean:false", "strings:[1, 2]", "requiredString:aString"));
   }
 
   @Test
-  public void singleOptionsEnabledParameterInsideParameterGroup() throws Exception {
-    Set<Value> channels = getValues("singleValuesEnabledParameterInsideParameterGroup", "channels");
+  public void singleValuesEnabledParameterInsideParameterGroup() throws Exception {
+    Set<Value> channels = getValuesFromSource("source-with-values-with-required-parameter-inside-param-group", "channels");
     assertThat(channels, hasSize(3));
     assertThat(channels, hasValues("channel1", "channel2", "channel3"));
   }
 
   @Test
-  public void singleOptionsEnabledParameterRequiresValuesOfParameterGroup() throws Exception {
-    Set<Value> channels = getValues("singleValuesEnabledParameterRequiresValuesOfParameterGroup", "values");
-    assertThat(channels, hasSize(1));
-    assertThat(channels, hasValues("anyParameter:aParam"));
-  }
-
-  @Test
-  public void multiLevelOption() throws Exception {
-    Set<Value> values = getValues("multiLevelValue", "values");
+  public void multiLevelValue() throws Exception {
+    Set<Value> values = getValuesFromSource("source-with-multi-level-value", "values");
     ValueMatcher americaValue = valueWithId("America")
         .withDisplayName("America")
         .withPartName("continent")
@@ -81,22 +74,15 @@ public class OperationValuesTestCase extends AbstractValuesTestCase {
   }
 
   @Test
-  public void singleOptionsWithRequiredParameterWithAlias() throws Exception {
-    Set<Value> channels = getValues("singleValuesWithRequiredParameterWithAlias", "channels");
+  public void singleValuesWithRequiredParameterWithAlias() throws Exception {
+    Set<Value> channels = getValuesFromSource("source-with-required-parameter-with-alias", "channels");
     assertThat(channels, hasSize(1));
     assertThat(channels, hasValues("requiredString:dummyValue"));
   }
 
   @Test
-  public void resolverGetsMuleContextInjection() throws Exception {
-    Set<Value> values = getValues("resolverGetsMuleContextInjection", "channel");
-    assertThat(values, hasSize(1));
-    assertThat(values, hasValues("INJECTED!!!"));
-  }
-
-  @Test
   public void optionsInsideShowInDslGroup() throws Exception {
-    Set<Value> values = getValues("valuesInsideShowInDslGroup", "values");
+    Set<Value> values = getValuesFromSource("source-with-required-parameter-inside-show-in-dsl-group", "values");
     assertThat(values, hasSize(1));
     assertThat(values, hasValues("anyParameter:someValue"));
   }

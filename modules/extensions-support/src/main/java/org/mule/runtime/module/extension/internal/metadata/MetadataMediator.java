@@ -342,7 +342,7 @@ public final class MetadataMediator<T extends ComponentModel> {
                                         parameterModel.getDslConfiguration(),
                                         parameterModel.getDisplayModel().orElse(null),
                                         parameterModel.getLayoutModel().orElse(null),
-                                        parameterModel.getValuesProviderModel().orElse(null),
+                                        parameterModel.getValueProviderModel().orElse(null),
                                         parameterModel.getModelProperties());
         parameters.add(typedParameterModel);
       });

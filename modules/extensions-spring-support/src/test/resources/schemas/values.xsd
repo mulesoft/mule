@@ -163,6 +163,40 @@
             </xs:complexContent>
         </xs:complexType>
     </xs:element>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="SourceWithConfigurationType" substitutionGroup="mule:abstract-message-source" name="source-with-configuration"></xs:element>
+    <xs:complexType name="SourceWithConfigurationType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
+                    <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+                </xs:sequence>
+                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+                    <xs:annotation>
+                        <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="xs:string" use="required" name="channel"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="SourceWithConnectionType" substitutionGroup="mule:abstract-message-source" name="source-with-connection"></xs:element>
+    <xs:complexType name="SourceWithConnectionType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
+                    <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+                </xs:sequence>
+                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+                    <xs:annotation>
+                        <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="xs:string" use="required" name="channel"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
     <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="SingleValuesEnabledParameterWithConfigurationType" substitutionGroup="mule:abstract-operator" name="single-values-enabled-parameter-with-configuration"></xs:element>
     <xs:complexType name="SingleValuesEnabledParameterWithConfigurationType">
         <xs:complexContent>
@@ -205,6 +239,109 @@
             </xs:complexContent>
         </xs:complexType>
     </xs:element>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="SimpleSourceType" substitutionGroup="mule:abstract-message-source" name="simple-source"></xs:element>
+    <xs:complexType name="SimpleSourceType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
+                    <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+                </xs:sequence>
+                <xs:attribute type="xs:string" use="required" name="channel"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="SourceWithMultiLevelValueType" substitutionGroup="mule:abstract-message-source" name="source-with-multi-level-value"></xs:element>
+    <xs:complexType name="SourceWithMultiLevelValueType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
+                    <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+                </xs:sequence>
+                <xs:attribute type="mule:expressionString" use="optional" default="some value" name="required"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" default="AMERICA" name="continent"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" default="USA" name="country"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" default="SFO" name="city"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="SourceWithRequiredParameterInsideShowInDslGroupType" substitutionGroup="mule:abstract-message-source" name="source-with-required-parameter-inside-show-in-dsl-group"></xs:element>
+    <xs:complexType name="SourceWithRequiredParameterInsideShowInDslGroupType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
+                    <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+                    <xs:element minOccurs="1" maxOccurs="1" name="values-group">
+                        <xs:complexType>
+                            <xs:complexContent>
+                                <xs:extension base="mule:abstractExtensionType">
+                                    <xs:sequence></xs:sequence>
+                                    <xs:attribute type="mule:expressionString" use="required" name="channels"></xs:attribute>
+                                    <xs:attribute type="mule:expressionString" use="optional" name="anyParameter"></xs:attribute>
+                                </xs:extension>
+                            </xs:complexContent>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute type="xs:string" use="required" name="values"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="SourceWithRequiredParameterWithAliasType" substitutionGroup="mule:abstract-message-source" name="source-with-required-parameter-with-alias"></xs:element>
+    <xs:complexType name="SourceWithRequiredParameterWithAliasType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
+                    <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+                </xs:sequence>
+                <xs:attribute type="mule:expressionString" use="required" name="superString"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="required" name="channels"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="SourceWithValuesWithRequiredParameterInsideParamGroupType" substitutionGroup="mule:abstract-message-source" name="source-with-values-with-required-parameter-inside-param-group"></xs:element>
+    <xs:complexType name="SourceWithValuesWithRequiredParameterInsideParamGroupType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
+                    <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+                </xs:sequence>
+                <xs:attribute type="mule:expressionString" use="required" name="channels"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" name="anyParameter"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="SourceWithValuesWithRequiredParametersType" substitutionGroup="mule:abstract-message-source" name="source-with-values-with-required-parameters"></xs:element>
+    <xs:complexType name="SourceWithValuesWithRequiredParametersType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
+                    <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+                    <xs:element minOccurs="0" maxOccurs="1" name="strings">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element minOccurs="0" maxOccurs="unbounded" name="string">
+                                    <xs:complexType>
+                                        <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
+                                    </xs:complexType>
+                                </xs:element>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute type="xs:string" use="required" name="channels"></xs:attribute>
+                <xs:attribute type="xs:string" use="required" name="requiredString"></xs:attribute>
+                <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="requiredBoolean"></xs:attribute>
+                <xs:attribute type="mule:substitutableInt" use="required" name="requiredInteger"></xs:attribute>
+                <xs:attribute type="mule:substitutableName" use="optional" name="strings"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
     <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="MultiLevelValueType" substitutionGroup="mule:abstract-operator" name="multi-level-value"></xs:element>
     <xs:complexType name="MultiLevelValueType">
         <xs:complexContent>

@@ -11,14 +11,14 @@ import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProvider
 import org.mule.runtime.extension.api.annotation.values.OfValues;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.test.values.extension.connection.ValuesConnectionProvider;
-import org.mule.test.values.extension.resolver.WithRequiredParametersFromConfigValuesProvider;
+import org.mule.test.values.extension.resolver.WithRequiredParametersFromConfigValueProvider;
 
 @Configuration(name = "ValueWithRequiredParam")
 @ConnectionProviders(ValuesConnectionProvider.class)
 public class ConfigWithValueAndRequiredParam {
 
   @Parameter
-  @OfValues(WithRequiredParametersFromConfigValuesProvider.class)
+  @OfValues(WithRequiredParametersFromConfigValueProvider.class)
   String channel;
 
   @Parameter

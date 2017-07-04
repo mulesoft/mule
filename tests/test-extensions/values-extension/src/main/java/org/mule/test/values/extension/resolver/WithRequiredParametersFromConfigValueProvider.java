@@ -9,17 +9,20 @@ package org.mule.test.values.extension.resolver;
 import org.mule.runtime.extension.api.values.ValueBuilder;
 import org.mule.runtime.api.values.Value;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.values.ValuesProvider;
+import org.mule.runtime.extension.api.values.ValueProvider;
 
 import java.util.Set;
 
-public class WithRequiredParameterWithAliasValuesProvider implements ValuesProvider {
+public class WithRequiredParametersFromConfigValueProvider implements ValueProvider {
 
   @Parameter
-  String requiredString;
+  private String required1;
+
+  @Parameter
+  private String required2;
 
   @Override
   public Set<Value> resolve() {
-    return ValueBuilder.getValuesFor("requiredString:" + requiredString);
+    return ValueBuilder.getValuesFor("required1:" + required1, "required2:" + required2);
   }
 }

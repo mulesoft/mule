@@ -13,14 +13,14 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.test.values.extension.GroupWithValuesParameter;
 import org.mule.test.values.extension.connection.ValuesConnectionProvider;
-import org.mule.test.values.extension.resolver.WithRequiredParameterFromGroupValuesProvider;
+import org.mule.test.values.extension.resolver.WithRequiredParameterFromGroupValueProvider;
 
 @Configuration(name = "ValuesWithRequiredParamsFromShowInDslGroup")
 @ConnectionProviders(ValuesConnectionProvider.class)
 public class ConfigWithValuesWithRequiredParamsFromShowInDslGroup {
 
   @Parameter
-  @OfValues(WithRequiredParameterFromGroupValuesProvider.class)
+  @OfValues(WithRequiredParameterFromGroupValueProvider.class)
   String valueParam;
 
   @ParameterGroup(name = "someGroup", showInDsl = true)

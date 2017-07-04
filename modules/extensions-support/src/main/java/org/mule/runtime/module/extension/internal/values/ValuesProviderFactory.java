@@ -9,10 +9,10 @@ package org.mule.runtime.module.extension.internal.values;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
+import org.mule.runtime.extension.api.values.ValueProvider;
 import org.mule.runtime.extension.api.values.ValueResolvingException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.extension.api.values.ValuesProvider;
-import org.mule.runtime.module.extension.internal.loader.java.property.ValuesProviderFactoryModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
@@ -21,33 +21,38 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
- * Provides instances of the {@link ValuesProvider}
+ * Provides instances of the {@link ValueProvider}
  *
  * @since 4.0
  */
 public class ValuesProviderFactory {
 
-  private final ValuesProviderFactoryModelProperty factoryModelProperty;
+  private final ValueProviderFactoryModelProperty factoryModelProperty;
   private final ParameterValueResolver parameterValueResolver;
   private final Supplier<Object> connectionSupplier;
   private final Supplier<Object> configurationSupplier;
+  private final Field connectionField;
+  private final Field configField;
   private final MuleContext muleContext;
 
-  public ValuesProviderFactory(ValuesProviderFactoryModelProperty factoryModelProperty,
+  public ValuesProviderFactory(ValueProviderFactoryModelProperty factoryModelProperty,
                                ParameterValueResolver parameterValueResolver, Supplier<Object> connectionSupplier,
-                               Supplier<Object> configurationSupplier, MuleContext muleContext) {
+                               Supplier<Object> configurationSupplier, Field connectionField, Field configField,
+                               MuleContext muleContext) {
     this.factoryModelProperty = factoryModelProperty;
     this.parameterValueResolver = parameterValueResolver;
     this.connectionSupplier = connectionSupplier;
     this.configurationSupplier = configurationSupplier;
+    this.connectionField = connectionField;
+    this.configField = configField;
     this.muleContext = muleContext;
   }
 
-  ValuesProvider createValueProvider() throws ValueResolvingException {
-    Class<? extends ValuesProvider> resolverClass = factoryModelProperty.getValueProvider();
+  ValueProvider createValueProvider() throws ValueResolvingException {
+    Class<? extends ValueProvider> resolverClass = factoryModelProperty.getValueProvider();
 
     try {
-      ValuesProvider resolver = instantiateClass(resolverClass);
+      ValueProvider resolver = instantiateClass(resolverClass);
       initialiseIfNeeded(resolver, true, muleContext);
 
       for (String requiredParam : factoryModelProperty.getRequiredParameters()) {
@@ -56,11 +61,11 @@ public class ValuesProviderFactory {
       }
 
       if (factoryModelProperty.usesConnection()) {
-        injectValueIntoField(resolver, connectionSupplier.get(), factoryModelProperty.getConnectionField());
+        injectValueIntoField(resolver, connectionSupplier.get(), connectionField);
       }
 
       if (factoryModelProperty.usesConfig()) {
-        injectValueIntoField(resolver, configurationSupplier.get(), factoryModelProperty.getConfigField());
+        injectValueIntoField(resolver, configurationSupplier.get(), configField);
       }
       return resolver;
     } catch (Exception e) {
@@ -68,7 +73,7 @@ public class ValuesProviderFactory {
     }
   }
 
-  private static void injectValueIntoField(ValuesProvider fieldContainer, Object valueToInject, String requiredParamName) {
+  private static void injectValueIntoField(ValueProvider fieldContainer, Object valueToInject, String requiredParamName) {
     Optional<Field> optionalField = IntrospectionUtils.getField(fieldContainer.getClass(), requiredParamName);
     if (optionalField.isPresent()) {
       Field field = optionalField.get();
@@ -76,7 +81,7 @@ public class ValuesProviderFactory {
     }
   }
 
-  private static void injectValueIntoField(ValuesProvider fieldContainer, Object valueToInject, Field field) {
+  private static void injectValueIntoField(ValueProvider fieldContainer, Object valueToInject, Field field) {
     field.setAccessible(true);
     org.springframework.util.ReflectionUtils.setField(field, fieldContainer, valueToInject);
   }

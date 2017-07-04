@@ -8,12 +8,12 @@ package org.mule.test.values.extension.resolver;
 
 import org.mule.runtime.api.values.Value;
 import org.mule.runtime.extension.api.values.ValueBuilder;
-import org.mule.runtime.extension.api.values.ValuesProvider;
+import org.mule.runtime.extension.api.values.ValueProvider;
 
 import java.util.Collections;
 import java.util.Set;
 
-public class MultiLevelValuesProvider implements ValuesProvider {
+public class MultiLevelValueProvider implements ValueProvider {
 
   private static final String AMERICA = "America";
   private static final String ARGENTINA = "Argentina";

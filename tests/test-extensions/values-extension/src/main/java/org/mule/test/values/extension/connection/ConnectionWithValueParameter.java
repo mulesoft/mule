@@ -10,13 +10,13 @@ package org.mule.test.values.extension.connection;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.values.OfValues;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.test.values.extension.resolver.SimpleValuesProvider;
+import org.mule.test.values.extension.resolver.SimpleValueProvider;
 
 @Alias("with-value-parameter")
 public class ConnectionWithValueParameter extends AbstractConnectionProvider {
 
   @Parameter
-  @OfValues(SimpleValuesProvider.class)
+  @OfValues(SimpleValueProvider.class)
   String channel;
 
 }

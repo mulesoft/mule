@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 import static java.lang.String.format;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldValue;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getGroupModelContainerName;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getRealName;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
@@ -17,6 +16,7 @@ import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescripto
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterGroupArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
+import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -82,7 +82,8 @@ public final class OperationParameterValueResolver implements ParameterValueReso
     operationModel.getParameterGroupModels().stream()
         .filter(ParameterGroupModel::isShowInDsl)
         .forEach(groupModel -> groupModel.getParameterModels()
-            .forEach(param -> showInDslMap.put(getRealName(param), getGroupModelContainerName(groupModel))));
+            .forEach(param -> showInDslMap.put(IntrospectionUtils.getImplementingName(param),
+                                               getGroupModelContainerName(groupModel))));
 
     return showInDslMap;
   }

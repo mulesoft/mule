@@ -19,27 +19,27 @@ import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
-import org.mule.runtime.api.meta.model.parameter.ValuesProviderModel;
+import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
-import org.mule.runtime.extension.api.values.ValuesProvider;
+import org.mule.runtime.extension.api.values.ValueProvider;
 import org.mule.runtime.extension.api.util.NameUtils;
-import org.mule.runtime.module.extension.internal.loader.java.property.ValuesProviderFactoryModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.ValuesProviderFactoryModelProperty.InjectableParameterInfo;
+import org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty.InjectableParameterInfo;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
 import java.util.Map;
 
 /**
- * {@link ExtensionModelValidator} for the correct usage of {@link ValuesProviderModel} and
- * {@link ValuesProviderFactoryModelProperty}
+ * {@link ExtensionModelValidator} for the correct usage of {@link ValueProviderModel} and
+ * {@link ValueProviderFactoryModelProperty}
  *
  * @since 4.0
  */
-public final class ValuesProviderModelValidator implements ExtensionModelValidator {
+public final class ValueProviderModelValidator implements ExtensionModelValidator {
 
   @Override
   public void validate(ExtensionModel model, ProblemsReporter problemsReporter) {
@@ -70,18 +70,18 @@ public final class ValuesProviderModelValidator implements ExtensionModelValidat
   private void validateModel(ParameterizedModel model, ProblemsReporter problemsReporter, boolean supportsConnectionsAndConfigs) {
     model.getAllParameterModels()
         .forEach(param -> param
-            .getModelProperty(ValuesProviderFactoryModelProperty.class)
+            .getModelProperty(ValueProviderFactoryModelProperty.class)
             .ifPresent(modelProperty -> validateOptionsResolver(param, modelProperty, model, problemsReporter,
                                                                 supportsConnectionsAndConfigs)));
   }
 
-  private void validateOptionsResolver(ParameterModel param, ValuesProviderFactoryModelProperty modelProperty,
+  private void validateOptionsResolver(ParameterModel param, ValueProviderFactoryModelProperty modelProperty,
                                        ParameterizedModel model,
                                        ProblemsReporter problemsReporter, boolean supportsConnectionsAndConfigs) {
-    Class<? extends ValuesProvider> valueProvider = modelProperty.getValueProvider();
+    Class<? extends ValueProvider> valueProvider = modelProperty.getValueProvider();
     String providerName = valueProvider.getSimpleName();
     Map<String, MetadataType> allParameters =
-        model.getAllParameterModels().stream().collect(toMap(IntrospectionUtils::getRealName, ParameterModel::getType));
+        model.getAllParameterModels().stream().collect(toMap(IntrospectionUtils::getImplementingName, ParameterModel::getType));
     String modelName = NameUtils.getModelName(model);
     String modelTypeName = NameUtils.getComponentModelTypeName(model);
 

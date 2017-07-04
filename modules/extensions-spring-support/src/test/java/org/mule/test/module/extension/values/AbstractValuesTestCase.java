@@ -39,13 +39,22 @@ public abstract class AbstractValuesTestCase extends MuleArtifactFunctionalTestC
     return hasItems(valuesMatchers);
   }
 
-  private ExtensionComponent<?> getComponentFromFlow(String flowName) throws Exception {
+  private ExtensionComponent<?> getProcessorFromFlow(String flowName) throws Exception {
     Flow flow = (Flow) getFlowConstruct(flowName);
     return (ExtensionComponent) flow.getProcessors().get(0);
   }
 
+  private ExtensionComponent<?> getSourceFromFlow(String flowName) throws Exception {
+    Flow flow = (Flow) getFlowConstruct(flowName);
+    return (ExtensionComponent) flow.getSource();
+  }
+
+  Set<Value> getValuesFromSource(String flowName, String parameterName) throws Exception {
+    return getSourceFromFlow(flowName).getValues(parameterName);
+  }
+
   Set<Value> getValues(String flowName, String parameterName) throws Exception {
-    return getComponentFromFlow(flowName).getValues(parameterName);
+    return getProcessorFromFlow(flowName).getValues(parameterName);
   }
 
   Set<Value> getValuesFromConfig(String configName, String parameterName) throws Exception {

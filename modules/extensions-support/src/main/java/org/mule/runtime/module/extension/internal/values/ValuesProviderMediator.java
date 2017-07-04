@@ -20,9 +20,9 @@ import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.values.Value;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.values.ValueBuilder;
+import org.mule.runtime.extension.api.values.ValueProvider;
 import org.mule.runtime.extension.api.values.ValueResolvingException;
-import org.mule.runtime.extension.api.values.ValuesProvider;
-import org.mule.runtime.module.extension.internal.loader.java.property.ValuesProviderFactoryModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 
 import java.util.List;
@@ -45,7 +45,7 @@ public final class ValuesProviderMediator<T extends ParameterizedModel & Enricha
    * Creates a new instance of the mediator
    *
    * @param containerModel container model which is a {@link ParameterizedModel} and {@link EnrichableModel}
-   * @param muleContext context to be able to initialize {@link ValuesProvider} if necessary
+   * @param muleContext context to be able to initialize {@link ValueProvider} if necessary
    */
   public ValuesProviderMediator(T containerModel, MuleContext muleContext) {
     this.containerModel = containerModel;
@@ -57,7 +57,7 @@ public final class ValuesProviderMediator<T extends ParameterizedModel & Enricha
    * the {@link Value values} for the parameter.
    *
    * @param parameterName          the name of the parameter to resolve their possible {@link Value values}
-   * @param parameterValueResolver parameter resolver required if the associated {@link ValuesProvider} requires
+   * @param parameterValueResolver parameter resolver required if the associated {@link ValueProvider} requires
    *                               the value of parameters from the same parameter container.
    * @return a {@link Set} of {@link Value} correspondent to the given parameter
    * @throws ValueResolvingException if an error occurs resolving {@link Value values}
@@ -72,12 +72,12 @@ public final class ValuesProviderMediator<T extends ParameterizedModel & Enricha
    * the {@link Value values} for the parameter.
    *
    * @param parameterName          the name of the parameter to resolve their possible {@link Value values}
-   * @param parameterValueResolver parameter resolver required if the associated {@link ValuesProvider} requires
+   * @param parameterValueResolver parameter resolver required if the associated {@link ValueProvider} requires
    *                               the value of parameters from the same parameter container.
    * @param connectionSupplier     supplier of connection instances related to the container and used, if necessary, by the
-   *                               {@link ValuesProvider}
+   *                               {@link ValueProvider}
    * @param configurationSupplier  supplier of connection instances related to the container and used, if necessary, by the
-   *                               {@link ValuesProvider}
+   *                               {@link ValueProvider}
    * @return a {@link Set} of {@link Value} correspondent to the given parameter
    * @throws ValueResolvingException if an error occurs resolving {@link Value values}
    */
@@ -94,8 +94,8 @@ public final class ValuesProviderMediator<T extends ParameterizedModel & Enricha
 
     ParameterModel parameterModel = parameters.get(0);
 
-    ValuesProviderFactoryModelProperty factoryModelProperty =
-        parameterModel.getModelProperty(ValuesProviderFactoryModelProperty.class)
+    ValueProviderFactoryModelProperty factoryModelProperty =
+        parameterModel.getModelProperty(ValueProviderFactoryModelProperty.class)
             .orElseThrow(() -> new ValueResolvingException(format("The parameter with name '%s' is not an Values Provider",
                                                                   parameterName),
                                                            INVALID_PARAMETER));
@@ -109,14 +109,14 @@ public final class ValuesProviderMediator<T extends ParameterizedModel & Enricha
     }
   }
 
-  private Set<Value> resolveValues(List<ParameterModel> parameters, ValuesProviderFactoryModelProperty factoryModelProperty,
+  private Set<Value> resolveValues(List<ParameterModel> parameters, ValueProviderFactoryModelProperty factoryModelProperty,
                                    ParameterValueResolver parameterValueResolver, Supplier<Object> connectionSupplier,
                                    Supplier<Object> configurationSupplier)
       throws NoSuchMethodException, InstantiationException, IllegalAccessException, java.lang.reflect.InvocationTargetException,
       InitialisationException, org.mule.runtime.module.extension.internal.runtime.ValueResolvingException,
       ValueResolvingException {
 
-    ValuesProvider valueProvider =
+    ValueProvider valueProvider =
         factoryModelProperty.createFactory(parameterValueResolver, connectionSupplier, configurationSupplier, muleContext)
             .createValueProvider();
 
@@ -138,8 +138,8 @@ public final class ValuesProviderMediator<T extends ParameterizedModel & Enricha
   private List<ParameterModel> getParameters(String valueName) {
     return containerModel.getAllParameterModels()
         .stream()
-        .filter(parameterModel -> parameterModel.getValuesProviderModel().isPresent())
-        .filter(parameterModel -> parameterModel.getValuesProviderModel().get().getProviderName().equals(valueName))
+        .filter(parameterModel -> parameterModel.getValueProviderModel().isPresent())
+        .filter(parameterModel -> parameterModel.getValueProviderModel().get().getProviderName().equals(valueName))
         .collect(toList());
   }
 

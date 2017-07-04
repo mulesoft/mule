@@ -9,13 +9,13 @@ package org.mule.test.values.extension.connection;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.values.OfValues;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.test.values.extension.resolver.WithRequiredParametersFromConfigValuesProvider;
+import org.mule.test.values.extension.resolver.WithRequiredParametersFromConfigValueProvider;
 
 @Alias("WithValueWithRequiredParam")
 public class ConnectionWithValueWithRequiredParam extends AbstractConnectionProvider {
 
   @Parameter
-  @OfValues(WithRequiredParametersFromConfigValuesProvider.class)
+  @OfValues(WithRequiredParametersFromConfigValueProvider.class)
   String channel;
 
   @Parameter

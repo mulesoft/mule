@@ -296,7 +296,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
                                                                                            (CheckedSupplier<Object>) () -> context
                                                                                                .getConfig().orElse(null))));
     } catch (ConnectionException e) {
-      throw new ValueResolvingException("An error occurred obtaining the connection for the ValuesProvider", CONNECTION_FAILURE,
+      throw new ValueResolvingException("An error occurred obtaining the connection for the ValueProvider", CONNECTION_FAILURE,
                                         e);
     }
   }

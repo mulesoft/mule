@@ -10,11 +10,11 @@ import org.mule.runtime.extension.api.values.ValueBuilder;
 import org.mule.runtime.api.values.Value;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.extension.api.values.ValuesProvider;
+import org.mule.runtime.extension.api.values.ValueProvider;
 
 import java.util.Set;
 
-public class WithMuleContextValuesProvider implements ValuesProvider, MuleContextAware {
+public class WithMuleContextValueProvider implements ValueProvider, MuleContextAware {
 
   private MuleContext context;
 

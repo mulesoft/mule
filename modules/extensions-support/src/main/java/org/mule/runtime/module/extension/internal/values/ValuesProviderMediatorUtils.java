@@ -59,7 +59,7 @@ class ValuesProviderMediatorUtils {
 
   private static Map<Integer, String> orderParts(List<ParameterModel> parameters) {
     return parameters.stream()
-        .collect(toMap(param -> param.getValuesProviderModel().get().getPartOrder(), NamedObject::getName));
+        .collect(toMap(param -> param.getValueProviderModel().get().getPartOrder(), NamedObject::getName));
   }
 
 }

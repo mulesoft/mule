@@ -9,12 +9,12 @@ package org.mule.test.values.extension.resolver;
 import static org.mule.runtime.extension.api.values.ValueBuilder.getValuesFor;
 import org.mule.runtime.api.values.Value;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.values.ValuesProvider;
+import org.mule.runtime.extension.api.values.ValueProvider;
 
 import java.util.List;
 import java.util.Set;
 
-public class WithRequiredParametersValuesProvider implements ValuesProvider {
+public class WithRequiredParametersValueProvider implements ValueProvider {
 
   @Parameter
   String requiredString;

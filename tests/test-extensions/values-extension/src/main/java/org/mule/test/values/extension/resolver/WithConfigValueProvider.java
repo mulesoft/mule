@@ -8,19 +8,20 @@ package org.mule.test.values.extension.resolver;
 
 import org.mule.runtime.extension.api.values.ValueBuilder;
 import org.mule.runtime.api.values.Value;
-import org.mule.runtime.extension.api.annotation.param.Connection;
-import org.mule.runtime.extension.api.values.ValuesProvider;
-import org.mule.test.values.extension.ValuesConnection;
+import org.mule.runtime.extension.api.annotation.param.Config;
+import org.mule.runtime.extension.api.values.ValueProvider;
+import org.mule.test.values.extension.config.SimpleConfig;
 
 import java.util.Set;
 
-public class WithConnectionValuesProvider implements ValuesProvider {
+public class WithConfigValueProvider implements ValueProvider {
 
-  @Connection
-  ValuesConnection connection;
+  @Config
+  private SimpleConfig configuration;
 
   @Override
   public Set<Value> resolve() {
-    return ValueBuilder.getValuesFor(connection.getEntities());
+    return ValueBuilder.getValuesFor(configuration.getConfigValues());
   }
+
 }
