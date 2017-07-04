@@ -24,6 +24,7 @@ public class MuleFoldersUtil
     public static final String DOMAINS_FOLDER = "domains";
     public static final String PLUGINS_FOLDER = "plugins";
     public static final String USER_FOLDER = "user";
+    public static final String TEMP_FOLDER = "tmp";
 
     private MuleFoldersUtil()
     {
@@ -91,8 +92,14 @@ public class MuleFoldersUtil
         return new File(getMuleLibFolder(), USER_FOLDER);
     }
 
-    public static File getAppTempFolder(String appName)
+    public static File getAppExecutionFolder(String appName)
     {
         return new File(getExecutionFolder(), appName);
     }
+
+    public static File getAppTempFolder(String appName)
+    {
+        return new File(getAppExecutionFolder(appName), TEMP_FOLDER);
+    }
+
 }

@@ -1318,6 +1318,29 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
+    public void undeploysAppWithPlugin() throws Exception
+    {
+        addPackedAppFromBuilder(echoPluginAppFileBuilder);
+
+        deploymentService.start();
+
+        assertDeploymentSuccess(applicationDeploymentListener, echoPluginAppFileBuilder.getId());
+        final Application app = findApp(echoPluginAppFileBuilder.getId(), 1);
+
+        // As this app has a plugin, the tmp directory must exist
+        assertApplicationTmpFileExists(app.getArtifactName());
+
+        // Remove the anchor file so undeployment starts
+        assertTrue("Unable to remove anchor file", removeAppAnchorFile(echoPluginAppFileBuilder.getId()));
+
+        assertUndeploymentSuccess(applicationDeploymentListener, echoPluginAppFileBuilder.getId());
+        assertStatus(app, ApplicationStatus.DESTROYED);
+
+        // Check the tmp directory was effectively removed
+        assertApplicationTmpFileDoesNotExists(app.getArtifactName());
+    }
+
+    @Test
     public void deploysAppWithPluginSharedLibrary() throws Exception
     {
         addPackedAppFromBuilder(sharedLibPluginAppFileBuilder);
@@ -3320,6 +3343,16 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertThat(getArtifactAnchorFile(applicationName, appsDir).exists(), is(true));
     }
 
+    private void assertApplicationTmpFileExists(String applicationName)
+    {
+        assertThat(getApplicationTmpFile(applicationName).exists(), is(true));
+    }
+
+    private void assertApplicationTmpFileDoesNotExists(String applicationName)
+    {
+        assertThat(getApplicationTmpFile(applicationName).exists(), is(false));
+    }
+
     private void assertApplicationAnchorFileDoesNotExists(String applicationName)
     {
         assertThat(getArtifactAnchorFile(applicationName, appsDir).exists(), is(false));
@@ -3340,6 +3373,12 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         String anchorFileName = artifactName + MuleDeploymentService.ARTIFACT_ANCHOR_SUFFIX;
         return new File(artifactDir, anchorFileName);
     }
+
+    private File getApplicationTmpFile(String applicationName)
+    {
+        return MuleFoldersUtil.getAppTempFolder(applicationName);
+    }
+
 
     private void assertAppFolderIsDeleted(String appName)
     {
