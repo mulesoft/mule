@@ -104,7 +104,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
 
   @Override
   public TypedValue evaluate(String expression, BindingContext context) {
-    return evaluate(expression, null, null, context);
+    return evaluate(expression, null, null, null, context);
   }
 
   @Override
@@ -155,7 +155,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   }
 
   private TypedValue handleStreaming(TypedValue value, Event event) {
-    //TODO required a better fix for MULE-12486
+    // TODO required a better fix for MULE-12486
     if (event == null) {
       return value;
     }
