@@ -122,7 +122,7 @@ public class DefaultResourceReleaser implements ResourceReleaser {
       }
 
       if (isDerbyEmbeddedDriver(driver)) {
-        leakPreventionForDerbyEmbeddedDriver();
+        leakPreventionForDerbyEmbeddedDriver(driver);
       }
     } catch (Exception e) {
       logger.warn(format("Can not deregister driver %s. This can cause a memory leak.", driver.getClass()), e);
@@ -138,7 +138,8 @@ public class DefaultResourceReleaser implements ResourceReleaser {
   }
 
   private boolean isDerbyEmbeddedDriver(Driver driver) {
-    return isDriver(driver, "org.apache.derby.jdbc.EmbeddedDriver");
+    // This is the dummy driver which is registered with the DriverManager and which is autoloaded by JDBC4
+    return isDriver(driver, "org.apache.derby.jdbc.AutoloadedDriver");
   }
 
   private boolean isDriver(Driver driver, String expectedDriverClass) {
@@ -168,15 +169,10 @@ public class DefaultResourceReleaser implements ResourceReleaser {
     }
   }
 
-  private void leakPreventionForDerbyEmbeddedDriver() {
+  private void leakPreventionForDerbyEmbeddedDriver(Object driverObject) {
     try {
-      // Die Derby die
-      Class<?> abandonedConnectionCleanupThreadClass =
-          Class.forName("org.apache.derby.jdbc.EmbeddedDriver", false, this.getClass().getClassLoader());
-      Object driverObject = abandonedConnectionCleanupThreadClass.newInstance();
-
-      if (hasDeclaredMethod(abandonedConnectionCleanupThreadClass, "connect", String.class, java.util.Properties.class)) {
-        Method m = abandonedConnectionCleanupThreadClass.getDeclaredMethod("connect", String.class, java.util.Properties.class);
+      if (hasDeclaredMethod(driverObject.getClass(), "connect", String.class, java.util.Properties.class)) {
+        Method m = driverObject.getClass().getDeclaredMethod("connect", String.class, java.util.Properties.class);
         m.invoke(driverObject, "jdbc:derby:;shutdown=true", null);
       }
     } catch (Throwable e) {
