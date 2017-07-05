@@ -180,9 +180,14 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
                                                                         e -> new MessagingException(event, e));
         };
       }
-      return policyManager
-          .createOperationPolicy(getLocation(), event, getResolutionResult(event, configuration), operationExecutionFunction)
-          .process(event);
+      if (getLocation() != null) {
+        return policyManager
+            .createOperationPolicy(getLocation(), event, getResolutionResult(event, configuration), operationExecutionFunction)
+            .process(event);
+      } else {
+        // If this operation has no component location then it is internal. Don't apply policies on internal operations.
+        return operationExecutionFunction.execute(getResolutionResult(event, configuration), event);
+      }
     }, MuleException.class, e -> {
       throw new DefaultMuleException(e);
     })));
