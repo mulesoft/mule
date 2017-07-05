@@ -8,7 +8,6 @@ package org.mule.runtime.core.api.registry;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.agent.Agent;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -73,8 +72,6 @@ public interface MuleRegistry extends LifecycleRegistry {
 
   Collection<FlowConstruct> lookupFlowConstructs();
 
-  Agent lookupAgent(String agentName);
-
   // /////////////////////////////////////////////////////////////////////////
   // Registration methods
   // /////////////////////////////////////////////////////////////////////////
@@ -85,10 +82,6 @@ public interface MuleRegistry extends LifecycleRegistry {
 
   void registerFlowConstruct(FlowConstruct flowConstruct) throws MuleException;
 
-  void registerAgent(Agent agent) throws MuleException;
-
-  void unregisterAgent(String agentName) throws MuleException;
-
   /**
    * Will execute any processors on an object and fire any lifecycle methods according to the current lifecycle without actually
    * registering the object in the registry. This is useful for prototype objects that are created per request and would clutter
@@ -98,8 +91,7 @@ public interface MuleRegistry extends LifecycleRegistry {
    *
    * @param object the object to process
    * @return the same object with any processors and lifecycle methods called
-   * @throws MuleException if the registry fails to perform the lifecycle change or process object
-   *         processors for the object.
+   * @throws MuleException if the registry fails to perform the lifecycle change or process object processors for the object.
    */
   Object applyProcessorsAndLifecycle(Object object) throws MuleException;
 

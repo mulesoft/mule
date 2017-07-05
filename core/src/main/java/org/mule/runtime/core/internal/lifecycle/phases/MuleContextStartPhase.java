@@ -6,15 +6,14 @@
  */
 package org.mule.runtime.core.internal.lifecycle.phases;
 
-import org.mule.runtime.api.service.Service;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.agent.Agent;
-import org.mule.runtime.core.api.component.Component;
-import org.mule.runtime.core.api.config.Config;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.api.service.Service;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.component.Component;
+import org.mule.runtime.core.api.config.Config;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.registry.Registry;
 import org.mule.runtime.core.api.routing.OutboundRouter;
@@ -35,11 +34,9 @@ import java.util.Set;
  * The MuleContextStartPhase defines the lifecycle behaviour when the Mule context is started. The MuleContext is associated with
  * one or more registries that inherit the lifecycle of the MuleContext.
  * <p/>
- * This phase is responsible for starting objects. Any object that implements
- * {@link Startable} will have its
- * {@link Startable#start()} method called. Objects are initialised in the order based on
- * type: {@link org.mule.runtime.core.api.agent.Agent}, {@link org.mule.runtime.core.api.construct.FlowConstruct}, followed by any
- * other object that implements {@link Startable}.
+ * This phase is responsible for starting objects. Any object that implements {@link Startable} will have its
+ * {@link Startable#start()} method called. Objects are initialised in the order based on type:
+ * {@link org.mule.runtime.core.api.construct.FlowConstruct}, followed by any other object that implements {@link Startable}.
  *
  * @see org.mule.runtime.core.api.MuleContext
  * @see org.mule.runtime.core.api.lifecycle.LifecycleManager
@@ -61,7 +58,6 @@ public class MuleContextStartPhase extends DefaultLifecyclePhase {
     startOrderedObjects.add(new NotificationLifecycleObject(ConfigurationProvider.class));
     startOrderedObjects.add(new NotificationLifecycleObject(Config.class));
     startOrderedObjects.add(new NotificationLifecycleObject(LegacyConnector.class));
-    startOrderedObjects.add(new NotificationLifecycleObject(Agent.class));
     startOrderedObjects.add(new NotificationLifecycleObject(FlowConstruct.class));
     startOrderedObjects.add(new NotificationLifecycleObject(Startable.class));
 

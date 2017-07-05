@@ -16,7 +16,6 @@ import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.meta.NameableObject;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.agent.Agent;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.registry.LifecycleRegistry;
 import org.mule.runtime.core.api.registry.MuleRegistry;
@@ -229,14 +228,6 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider {
    * {@inheritDoc}
    */
   @Override
-  public Agent lookupAgent(String name) {
-    return (Agent) registry.lookupObject(name);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
   public FlowConstruct lookupFlowConstruct(String name) {
     return (FlowConstruct) registry.lookupObject(name);
   }
@@ -291,24 +282,8 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider {
    * {@inheritDoc}
    */
   @Override
-  public void registerAgent(Agent agent) throws MuleException {
-    registry.registerObject(getName(agent), agent, Agent.class);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
   public void registerFlowConstruct(FlowConstruct flowConstruct) throws MuleException {
     registry.registerObject(getName(flowConstruct), flowConstruct, FlowConstruct.class);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void unregisterAgent(String agentName) throws MuleException {
-    registry.unregisterObject(agentName, Agent.class);
   }
 
   /**
