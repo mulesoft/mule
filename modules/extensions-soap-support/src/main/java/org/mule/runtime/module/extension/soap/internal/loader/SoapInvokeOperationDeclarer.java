@@ -29,7 +29,6 @@ import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
 import org.mule.runtime.core.internal.metadata.DefaultMetadataResolverFactory;
-import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.declaration.type.annotation.TypedValueTypeAnnotation;
 import org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty;
@@ -170,7 +169,7 @@ public class SoapInvokeOperationDeclarer {
     operation.onParameterGroup(TRANSPORT_GROUP).withLayout(getLayout(2))
         .withOptionalParameter(TRANSPORT_HEADERS_PARAM)
         .ofType(TYPE_BUILDER.objectType()
-            .openWith(TYPE_LOADER.load(String.class))
+            .openWith(loader.load(String.class))
             .with(new TypeIdAnnotation(Map.class.getName()))
             .build())
         .withDsl(ParameterDslConfiguration.getDefaultInstance())
