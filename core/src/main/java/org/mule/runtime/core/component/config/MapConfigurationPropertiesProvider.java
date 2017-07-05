@@ -17,7 +17,7 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public class MapConfigurationPropertiesResolver implements ConfigurationPropertiesProvider {
+public class MapConfigurationPropertiesProvider implements ConfigurationPropertiesProvider {
 
   private final Map<String, String> properties;
   private final String description;
@@ -28,7 +28,7 @@ public class MapConfigurationPropertiesResolver implements ConfigurationProperti
    * @param properties map with properties to use.
    * @param description the description of the provider.
    */
-  public MapConfigurationPropertiesResolver(Map<String, String> properties, String description) {
+  public MapConfigurationPropertiesProvider(Map<String, String> properties, String description) {
     this.properties = properties;
     this.description = description;
   }

@@ -44,6 +44,7 @@ import org.mule.runtime.config.spring.dsl.processor.ArtifactConfig;
 import org.mule.runtime.config.spring.dsl.processor.ConfigFile;
 import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
 import org.mule.runtime.config.spring.dsl.processor.ObjectTypeVisitor;
+import org.mule.runtime.core.component.config.ResourceProvider;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.RuntimeConfigurationException;
 import org.mule.runtime.core.component.config.CompositeConfigurationPropertiesProvider;
@@ -52,8 +53,9 @@ import org.mule.runtime.core.component.config.ConfigurationPropertiesProvider;
 import org.mule.runtime.core.component.config.ConfigurationPropertiesResolver;
 import org.mule.runtime.core.component.config.ConfigurationProperty;
 import org.mule.runtime.core.component.config.DefaultConfigurationPropertiesResolver;
+import org.mule.runtime.core.component.config.FileConfigurationPropertiesProvider;
 import org.mule.runtime.core.component.config.GlobalPropertyConfigurationPropertiesProvider;
-import org.mule.runtime.core.component.config.MapConfigurationPropertiesResolver;
+import org.mule.runtime.core.component.config.MapConfigurationPropertiesProvider;
 import org.mule.runtime.core.component.config.PropertiesResolverConfigurationProperties;
 import org.mule.runtime.core.component.config.SystemPropertiesConfigurationProvider;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
@@ -284,6 +286,7 @@ public class ApplicationModel {
   private final Optional<ComponentBuildingDefinitionRegistry> componentBuildingDefinitionRegistry;
   private List<ComponentModel> muleComponentModels = new LinkedList<>();
   private PropertiesResolverConfigurationProperties configurationProperties;
+  private ResourceProvider externalResourceProvider;
 
   /**
    * Creates an {code ApplicationModel} from a {@link ArtifactConfig}.
@@ -294,9 +297,11 @@ public class ApplicationModel {
    * @param artifactDeclaration an {@link ArtifactDeclaration}
    * @throws Exception when the application configuration has semantic errors.
    */
-  public ApplicationModel(ArtifactConfig artifactConfig, ArtifactDeclaration artifactDeclaration) throws Exception {
+  public ApplicationModel(ArtifactConfig artifactConfig, ArtifactDeclaration artifactDeclaration,
+                          ResourceProvider externalResourceProvider)
+      throws Exception {
     this(artifactConfig, artifactDeclaration, emptySet(), emptyMap(), empty(), of(new ComponentBuildingDefinitionRegistry()),
-         true);
+         true, externalResourceProvider);
   }
 
   /**
@@ -321,10 +326,11 @@ public class ApplicationModel {
                           Map<String, String> deploymentProperties,
                           Optional<ConfigurationProperties> parentConfigurationProperties,
                           Optional<ComponentBuildingDefinitionRegistry> componentBuildingDefinitionRegistry,
-                          boolean runtimeMode)
+                          boolean runtimeMode, ResourceProvider externalResourceProvider)
       throws Exception {
 
     this.componentBuildingDefinitionRegistry = componentBuildingDefinitionRegistry;
+    this.externalResourceProvider = externalResourceProvider;
     createConfigurationAttributeResolver(artifactConfig, parentConfigurationProperties, deploymentProperties);
     convertConfigFileToComponentModel(artifactConfig);
     convertArtifactDeclarationToComponentModel(extensionModels, artifactDeclaration);
@@ -346,6 +352,8 @@ public class ApplicationModel {
         new DefaultConfigurationPropertiesResolver(empty(), systemPropertiesConfigurationProvider);
     List<ConfigurationPropertiesProvider> configConfigurationPropertiesProviders =
         getConfigurationPropertiesProvidersFromComponents(artifactConfig, localResolver);
+    FileConfigurationPropertiesProvider externalPropertiesConfigurationProvider =
+        new FileConfigurationPropertiesProvider(externalResourceProvider, "External files");
 
     Optional<ConfigurationPropertiesResolver> parentConfigurationPropertiesResolver = of(localResolver);
     if (parentConfigurationProperties.isPresent()) {
@@ -373,19 +381,22 @@ public class ApplicationModel {
 
     }
     ConfigurationPropertiesProvider globalPropertiesConfigurationAttributeProvider =
-        createResolverFromGlobalProperties(artifactConfig);
+        createProviderFromGlobalProperties(artifactConfig);
     DefaultConfigurationPropertiesResolver globalPropertiesConfigurationPropertiesResolver =
         new DefaultConfigurationPropertiesResolver(parentConfigurationPropertiesResolver,
                                                    globalPropertiesConfigurationAttributeProvider);
     DefaultConfigurationPropertiesResolver systemPropertiesResolver =
         new DefaultConfigurationPropertiesResolver(of(globalPropertiesConfigurationPropertiesResolver),
                                                    systemPropertiesConfigurationProvider);
+    DefaultConfigurationPropertiesResolver externalPropertiesResolver =
+        new DefaultConfigurationPropertiesResolver(of(systemPropertiesResolver),
+                                                   externalPropertiesConfigurationProvider);
     if (deploymentProperties.isEmpty()) {
-      this.configurationProperties = new PropertiesResolverConfigurationProperties(systemPropertiesResolver);
+      this.configurationProperties = new PropertiesResolverConfigurationProperties(externalPropertiesResolver);
     } else {
       this.configurationProperties =
-          new PropertiesResolverConfigurationProperties(new DefaultConfigurationPropertiesResolver(of(systemPropertiesResolver),
-                                                                                                   new MapConfigurationPropertiesResolver(deploymentProperties,
+          new PropertiesResolverConfigurationProperties(new DefaultConfigurationPropertiesResolver(of(externalPropertiesResolver),
+                                                                                                   new MapConfigurationPropertiesProvider(deploymentProperties,
                                                                                                                                           "Deployment properties")));
     }
   }
@@ -401,7 +412,8 @@ public class ApplicationModel {
                     && componentConfigLine.getIdentifier().equals(ApplicationModel.CONFIGURATION_PROPERTIES_ELEMENT)) {
                   String fileLocation = componentConfigLine.getConfigAttributes().get("file").getValue();
                   ConfigurationPropertiesComponent propertiesComponent =
-                      new ConfigurationPropertiesComponent(localResolver.resolveValue(fileLocation).toString());
+                      new ConfigurationPropertiesComponent(localResolver.resolveValue(fileLocation).toString(),
+                                                           externalResourceProvider);
                   DefaultComponentLocation.DefaultLocationPart locationPart =
                       new DefaultComponentLocation.DefaultLocationPart(CONFIGURATION_PROPERTIES_ELEMENT,
                                                                        of(TypedComponentIdentifier.builder()
@@ -538,7 +550,7 @@ public class ApplicationModel {
   }
 
 
-  private ConfigurationPropertiesProvider createResolverFromGlobalProperties(ArtifactConfig artifactConfig) {
+  private ConfigurationPropertiesProvider createProviderFromGlobalProperties(ArtifactConfig artifactConfig) {
     final Map<String, ConfigurationProperty> globalProperties = new HashMap<>();
 
     artifactConfig.getConfigFiles().stream().forEach(configFile -> {

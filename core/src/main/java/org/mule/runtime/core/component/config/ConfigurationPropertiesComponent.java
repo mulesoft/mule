@@ -8,10 +8,9 @@ package org.mule.runtime.core.component.config;
 
 import static java.lang.String.format;
 import static java.lang.String.join;
-import static java.lang.Thread.currentThread;
 import static java.util.Optional.of;
-import static org.apache.commons.io.FileUtils.toFile;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -21,7 +20,6 @@ import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,9 +42,12 @@ public class ConfigurationPropertiesComponent extends AbstractAnnotatedObject
 
   private final Map<String, ConfigurationProperty> configurationAttributes = new HashMap<>();
   private String fileLocation;
+  private ResourceProvider resourceProvider;
 
-  public ConfigurationPropertiesComponent(String fileLocation) throws ConfigurationPropertiesException {
+  public ConfigurationPropertiesComponent(String fileLocation, ResourceProvider resourceProvider)
+      throws ConfigurationPropertiesException {
     this.fileLocation = fileLocation;
+    this.resourceProvider = resourceProvider;
   }
 
   @Override
@@ -65,26 +66,36 @@ public class ConfigurationPropertiesComponent extends AbstractAnnotatedObject
 
   @Override
   public void initialise() throws InitialisationException {
-    ClassLoader contextClassLoader = currentThread().getContextClassLoader();
-    File attributesFile;
-    URL resourceFromClassPath = contextClassLoader.getResource(fileLocation);
-    if (resourceFromClassPath != null) {
-      attributesFile = toFile(resourceFromClassPath);
-    } else {
-      attributesFile = new File(fileLocation);
-    }
-    if (!attributesFile.exists()) {
-      throw new ConfigurationPropertiesException(createStaticMessage(String
-          .format("Couldn't find configuration properties file %s neither on classpath or in file system", fileLocation)), this);
-    }
-    if (!attributesFile.getName().endsWith(PROPERTIES_EXTENSION) && !attributesFile.getName().endsWith(YAML_EXTENSION)) {
+    if (!fileLocation.endsWith(PROPERTIES_EXTENSION) && !fileLocation.endsWith(YAML_EXTENSION)) {
       throw new ConfigurationPropertiesException(createStaticMessage(format("Configuration properties file %s must end with yaml or properties extension",
                                                                             fileLocation)),
                                                  this);
     }
 
-    try (InputStream is = new FileInputStream(attributesFile)) {
-      if (attributesFile.getName().endsWith(PROPERTIES_EXTENSION)) {
+    InputStream is = null;
+
+    try {
+      is = resourceProvider.getResourceAsStream(fileLocation);
+      if (is == null) {
+        File attributesFile = new File(fileLocation);
+        if (attributesFile.exists()) {
+          is = new FileInputStream(attributesFile);
+        }
+      }
+    } catch (Exception e) {
+      // ignore, will detect if is is null
+    }
+
+    if (is == null) {
+      throw new ConfigurationPropertiesException(createStaticMessage(
+                                                                     String.format(
+                                                                                   "Couldn't find configuration properties file %s neither on classpath or in file system",
+                                                                                   fileLocation)),
+                                                 this);
+    }
+
+    try {
+      if (fileLocation.endsWith(PROPERTIES_EXTENSION)) {
         Properties properties = new Properties();
         properties.load(is);
         properties.keySet().stream().map(key -> {
@@ -104,7 +115,7 @@ public class ConfigurationPropertiesComponent extends AbstractAnnotatedObject
       throw e;
     } catch (Exception e) {
       throw new ConfigurationPropertiesException(createStaticMessage("Couldn't read from file "
-          + attributesFile.getAbsolutePath()), this, e);
+          + fileLocation), this, e);
     }
   }
 

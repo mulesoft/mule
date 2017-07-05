@@ -11,7 +11,7 @@ import java.util.Optional;
 /**
  * A provider of configuration attributes.
  * <p>
- * Configuration attributes must be provider upon request since there may be implementations of this interface that do not have a
+ * Configuration attributes must be provided upon request since there may be implementations of this interface that do not have a
  * small number of configuration attributes and doing a lookup of the attributes may not be trivial. Such would be the case of a
  * vault implementation of this interface which will probably lookup for values from a remote entity.
  *

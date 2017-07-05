@@ -44,6 +44,7 @@ import org.mule.runtime.config.spring.dsl.model.ApplicationModel;
 import org.mule.runtime.config.spring.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.model.MinimalApplicationModelGenerator;
+import org.mule.runtime.core.component.config.ClassLoaderResourceProvider;
 import org.mule.runtime.config.spring.dsl.processor.ArtifactConfig;
 import org.mule.runtime.config.spring.dsl.processor.ConfigFile;
 import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
@@ -62,6 +63,7 @@ import org.mule.runtime.config.spring.processors.MuleInjectorProcessor;
 import org.mule.runtime.config.spring.processors.PostRegistrationActionsPostProcessor;
 import org.mule.runtime.config.spring.util.LaxInstantiationStrategyWrapper;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.component.config.ResourceProvider;
 import org.mule.runtime.core.api.config.ConfigResource;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.config.RuntimeConfigurationException;
@@ -244,10 +246,11 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
       ArtifactConfig artifactConfig = resolveArtifactConfig();
       Set<ExtensionModel> extensions =
           muleContext.getExtensionManager() != null ? muleContext.getExtensionManager().getExtensions() : emptySet();
+      ResourceProvider externalResourceProvider = new ClassLoaderResourceProvider(muleContext.getExecutionClassLoader());
       applicationModel = new ApplicationModel(artifactConfig, artifactDeclaration, extensions,
                                               artifactProperties, parentConfigurationProperties,
                                               of(componentBuildingDefinitionRegistry),
-                                              true);
+                                              true, externalResourceProvider);
     } catch (Exception e) {
       throw new MuleRuntimeException(e);
     }
