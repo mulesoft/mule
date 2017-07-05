@@ -7,7 +7,6 @@
 package org.mule.runtime.core.api.util;
 
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
-import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
 import static reactor.core.Exceptions.unwrap;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
@@ -15,9 +14,9 @@ import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.core.streaming.CursorProviderFactory;
 import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
-import org.mule.runtime.core.api.util.func.CheckedFunction;
 
 /**
  * Utilities for handling {@link Cursor} instances
@@ -98,6 +97,25 @@ public final class StreamingUtils {
       return cursorProviderFactory.of(event, value);
     } else {
       return value;
+    }
+  }
+
+  /**
+   * Closes the given {@code cursor} swallowing any exceptions found.
+   *
+   * @param cursor a {@link Cursor}
+   * @return whether the {@code cursor} was closed or not
+   */
+  public static boolean closeQuietly(Cursor cursor) {
+    if (cursor == null) {
+      return false;
+    }
+
+    try {
+      cursor.close();
+      return true;
+    } catch (Exception e) {
+      return false;
     }
   }
 
