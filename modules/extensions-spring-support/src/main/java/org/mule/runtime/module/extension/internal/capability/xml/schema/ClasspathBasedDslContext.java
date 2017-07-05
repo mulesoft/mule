@@ -11,7 +11,7 @@ import static java.util.Collections.emptySet;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
-import static org.mule.runtime.core.internal.util.annotation.AnnotationUtils.getAnnotation;
+import static org.mule.runtime.core.privileged.util.annotation.AnnotationUtils.getAnnotation;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.loadExtension;
 import static org.reflections.util.ClasspathHelper.forClassLoader;

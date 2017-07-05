@@ -15,8 +15,8 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.internal.context.notification.Configuration;
-import org.mule.runtime.core.internal.context.notification.OptimisedNotificationHandler;
 import org.mule.runtime.core.internal.context.notification.Policy;
+import org.mule.runtime.core.privileged.context.notification.OptimisedNotificationHandler;
 
 import java.util.Collection;
 import java.util.Map;

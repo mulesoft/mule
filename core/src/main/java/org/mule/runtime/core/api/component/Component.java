@@ -7,10 +7,11 @@
 package org.mule.runtime.core.api.component;
 
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
+
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.management.stats.ComponentStatistics;
+import org.mule.runtime.core.api.processor.Processor;
 
 /**
  * A <code>Component</code> component processes a {@link Event} by invoking the component instance that has been configured,
@@ -18,7 +19,10 @@ import org.mule.runtime.core.api.management.stats.ComponentStatistics;
  * <p/>
  * Implementations of <code>Component</code> can use different types of component implementation, implement component instance
  * pooling or implement <em>bindings</em> which allow for service composition.
+ * 
+ * @deprecated Transport infrastructure is deprecated.
  */
+@Deprecated
 public interface Component extends Processor, FlowConstructAware {
 
   /**

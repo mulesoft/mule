@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.api.model.resolvers;
 
-import org.mule.runtime.core.internal.VoidResult;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.model.EntryPointResolver;
 import org.mule.runtime.core.api.model.InvocationResult;

@@ -155,29 +155,29 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-            <xsd:element name="global-property" type="globalPropertyType">
-                <xsd:annotation>
-                    <xsd:documentation>
-                        A global property is a named string. It can be inserted in most attribute values using standard (ant-style) Spring placeholders.
-                    </xsd:documentation>
-                </xsd:annotation>
-            </xsd:element>
+    <xsd:element name="global-property" type="globalPropertyType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A global property is a named string. It can be inserted in most attribute values using standard (ant-style) Spring placeholders.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
 
-            <xsd:element name="configuration" type="configurationType">
-                <xsd:annotation>
-                    <xsd:documentation>
-                        Specifies defaults and general settings for the Mule instance.
-                    </xsd:documentation>
-                </xsd:annotation>
-            </xsd:element>
+    <xsd:element name="configuration" type="configurationType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Specifies defaults and general settings for the Mule instance.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
 
-            <xsd:element name="notifications" type="notificationManagerType">
-                <xsd:annotation>
-                    <xsd:documentation>
-                        Registers listeners for notifications and associates interfaces with particular events.
-                    </xsd:documentation>
-                </xsd:annotation>
-            </xsd:element>
+    <xsd:element name="notifications" type="notificationManagerType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Registers listeners for notifications and associates interfaces with particular events.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
 
     <xsd:element name="abstract-shared-extension" abstract="true" type="abstractExtensionType">
         <xsd:annotation>
@@ -2003,90 +2003,6 @@
             </xsd:complexContent>
         </xsd:complexType>
     </xsd:element>
-
-    <!--==============================================================-->
-    <!-- Components                                              -->
-    <!--==============================================================-->
-
-    <xsd:element name="abstract-component" abstract="true" type="abstractComponentType" substitutionGroup="abstract-message-processor">
-        <xsd:annotation>
-            <xsd:documentation>
-                A placeholder for a component element. A component is invoked when inbound messages are received by the service.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="abstractComponentType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractMessageProcessorType">
-            <xsd:group ref="interceptorGroup" minOccurs="0">
-                <xsd:annotation>
-                    <xsd:documentation>
-                        Interceptors that can be used to intercept component invocation.
-                    </xsd:documentation>
-                </xsd:annotation>
-            </xsd:group>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="component" type="defaultJavaComponentType" substitutionGroup="abstract-component">
-        <xsd:annotation>
-            <xsd:documentation>
-                A simple POJO (Plain Old Java Object) component that will be invoked by Mule when a message is received. The class or object instance to be used can be specified using a child object factory element, or via the 'class' attribute.  If the 'class' attribute is used, an object factory cannot be configured as well. Using the 'class' attribute is equivilant to using the propotype object factory ('prototype-object' child element).
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="defaultJavaComponentType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractComponentType">
-                <xsd:sequence>
-                    <xsd:group ref="entryPointResolvers">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                Entry point resolvers that are used to determine how a message is passed to a component.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:group>
-                    <xsd:element ref="abstract-object-factory" minOccurs="0">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                Object factory used to obtain the object instance that will be used for the component implementation. The object factory is responsible for object creation and may implement different patterns, such as singleton or prototype, or look up an instance from other object containers.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
-                    <xsd:element ref="abstract-lifecycle-adapter-factory" minOccurs="0"/>
-                </xsd:sequence>
-                <xsd:attribute name="class" type="substitutableClass">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Specifies a component class. This is a shortcut that is equivalent to providing a 'prototype-object' element.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="pooled-component" type="pooledJavaComponentType" substitutionGroup="abstract-component">
-        <xsd:annotation>
-            <xsd:documentation>
-                A pooled POJO (Plain Old Java Object) component that will be invoked by Mule when a message is received. The instance can be specified via a factory or a class.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="pooledJavaComponentType">
-        <xsd:complexContent>
-            <xsd:extension base="defaultJavaComponentType">
-                <xsd:sequence>
-                    <xsd:element ref="abstract-pooling-profile" minOccurs="0">
-                        <xsd:annotation>
-                            <xsd:documentation>Characteristics of the object pool.</xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
-                </xsd:sequence>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
 
     <!--==============================================================-->
     <!--   Transactions                                               -->
@@ -4279,122 +4195,8 @@
     </xsd:complexType>
 
     <!--==============================================================-->
-    <!--  Lifecycle Adapters                                            -->
+    <!--  Pooling                                                     -->
     <!--==============================================================-->
-
-    <xsd:element name="abstract-lifecycle-adapter-factory" abstract="true" type="abstractLifecycleAdapterFactory"/>
-    <xsd:complexType name="abstractLifecycleAdapterFactory">
-        <xsd:annotation>
-            <xsd:documentation>
-                Allows a lifecycle adaptor factory to be implemented, which allows an alternative custom lifecycle adaptor to be used if required instead of the default implementation that propagates the Mule lifecycle to component implementations.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:complexType>
-    <xsd:complexType name="customLifecycleAdapterFactory">
-        <xsd:complexContent>
-            <xsd:extension base="abstractLifecycleAdapterFactory">
-                <xsd:sequence>
-                    <xsd:group ref="propertiesGroup"/>
-                </xsd:sequence>
-                <xsd:attribute name="class" type="substitutableClass" use="required">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            An implementation of the LifecycleAdapter interface.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-    <xsd:element name="custom-lifecycle-adapter-factory" type="customLifecycleAdapterFactory"
-                 substitutionGroup="abstract-lifecycle-adapter-factory">
-        <xsd:annotation>
-            <xsd:documentation>
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
-    <!--==============================================================-->
-    <!--  Object Factories                                            -->
-    <!--==============================================================-->
-
-    <xsd:element name="abstract-object-factory" abstract="true" type="abstractObjectFactoryType"/>
-    <xsd:complexType name="abstractObjectFactoryType">
-        <xsd:annotation>
-            <xsd:documentation>
-                An object factory is used to obtain object instances. The object factory is responsible for object creation and can implement different patterns, such a singleton or prototype, or lookup an instance from other object containers.
-            </xsd:documentation>
-        </xsd:annotation>
-        <xsd:sequence>
-            <xsd:group ref="propertiesGroup">
-                <xsd:annotation>
-                    <xsd:documentation>
-                        Properties to be set on the created object.
-                    </xsd:documentation>
-                </xsd:annotation>
-            </xsd:group>
-        </xsd:sequence>
-    </xsd:complexType>
-
-    <xsd:complexType name="genericObjectFactoryType">
-        <xsd:sequence>
-            <xsd:element ref="abstract-object-factory"/>
-        </xsd:sequence>
-    </xsd:complexType>
-
-    <xsd:element name="spring-object" type="springBeanLookupType" substitutionGroup="abstract-object-factory"/>
-    <xsd:complexType name="springBeanLookupType">
-        <xsd:annotation>
-            <xsd:documentation>
-                Object factory used to obtain Spring bean instances. This object factory does not create any instances but rather looks them up from Spring.
-            </xsd:documentation>
-        </xsd:annotation>
-        <xsd:complexContent>
-            <xsd:extension base="abstractObjectFactoryType">
-                <xsd:attribute name="bean" type="substitutableName">
-                    <xsd:annotation>
-                        <xsd:documentation>Name of Spring bean to look up.</xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="singleton-object" type="singletonObjectFactoryType" substitutionGroup="abstract-object-factory"/>
-    <xsd:complexType name="singletonObjectFactoryType">
-        <xsd:annotation>
-            <xsd:documentation>
-                Object factory that creates and always returns a singleton object instance.
-            </xsd:documentation>
-        </xsd:annotation>
-        <xsd:complexContent>
-            <xsd:extension base="abstractObjectFactoryType">
-                <xsd:attribute name="class" type="substitutableClass">
-                    <xsd:annotation>
-                        <xsd:documentation>Class name</xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="prototype-object" type="prototypeObjectFactoryType" substitutionGroup="abstract-object-factory"/>
-    <xsd:complexType name="prototypeObjectFactoryType">
-        <xsd:annotation>
-            <xsd:documentation>
-                Object factory that creates and returns a new 'prototype' object instance every time it is called.
-            </xsd:documentation>
-        </xsd:annotation>
-        <xsd:complexContent>
-            <xsd:extension base="abstractObjectFactoryType">
-                <xsd:attribute name="class" type="substitutableClass">
-                    <xsd:annotation>
-                        <xsd:documentation>Class name</xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
 
     <xsd:element name="abstract-pooling-profile" abstract="true" type="abstractPoolingProfileType"/>
     <xsd:complexType name="abstractPoolingProfileType"/>
@@ -4465,7 +4267,6 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-
 
     <!--==============================================================-->
     <!--  Utils / Standard Types                                      -->

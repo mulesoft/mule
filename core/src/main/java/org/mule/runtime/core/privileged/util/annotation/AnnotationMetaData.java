@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.util.annotation;
+package org.mule.runtime.core.privileged.util.annotation;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
