@@ -9,6 +9,8 @@ package org.mule.runtime.module.extension.internal.util;
 import static java.lang.String.format;
 import static java.lang.reflect.Modifier.isPublic;
 import static java.util.Arrays.stream;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
@@ -39,6 +41,7 @@ import org.mule.metadata.api.model.VoidType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.metadata.message.MessageMetadataTypeBuilder;
+import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Startable;
@@ -49,6 +52,7 @@ import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
+import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
@@ -78,9 +82,10 @@ import org.mule.runtime.extension.internal.property.LiteralModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingParameterModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterResolverTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.TypedValueTypeModelProperty;
-
 import com.google.common.collect.ImmutableList;
 import org.springframework.core.ResolvableType;
 
@@ -106,6 +111,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 /**
@@ -896,6 +902,52 @@ public final class IntrospectionUtils {
     }
   }
 
+  public static String getGroupModelContainerName(ParameterGroupModel groupModel) {
+    return groupModel.getModelProperty(ParameterGroupModelProperty.class)
+        .map(modelProperty -> getContainerName(modelProperty.getDescriptor().getContainer()))
+        .orElse(groupModel.getName());
+  }
+
+  /**
+   * Resolves the original name of a parameter before it was modified due to the usage of an Alias.
+   *
+   * @param parameterDeclaration parameter from which look for their original name
+   * @return the original name
+   */
+  public static String getImplementingName(ParameterDeclaration parameterDeclaration) {
+    return getImplementingName(parameterDeclaration.getName(),
+                               () -> parameterDeclaration.getModelProperty(ImplementingParameterModelProperty.class),
+                               () -> parameterDeclaration.getModelProperty(DeclaringMemberModelProperty.class));
+  }
+
+  /**
+   * Resolves the original name of a parameter before it was modified due to the usage of an Alias.
+   *
+   * @param parameterModel parameter from which look for their original name
+   * @return the original name
+   */
+  public static String getImplementingName(ParameterModel parameterModel) {
+    return getImplementingName(parameterModel.getName(),
+                               () -> parameterModel.getModelProperty(ImplementingParameterModelProperty.class),
+                               () -> parameterModel.getModelProperty(DeclaringMemberModelProperty.class));
+  }
+
+  private static String getImplementingName(String originalName,
+                                            Supplier<Optional<ImplementingParameterModelProperty>> implementingParameter,
+                                            Supplier<Optional<DeclaringMemberModelProperty>> declaringMember) {
+    Optional<ImplementingParameterModelProperty> parameter = implementingParameter.get();
+    if (parameter.isPresent()) {
+      return parameter.get().getParameter().getName();
+    }
+
+    Optional<DeclaringMemberModelProperty> field = declaringMember.get();
+    if (field.isPresent()) {
+      return field.get().getDeclaringField().getName();
+    }
+
+    return originalName;
+  }
+
   public static boolean isParameterResolver(Set<ModelProperty> modelProperties) {
     return modelProperties.stream().anyMatch(modelProperty -> modelProperty instanceof ParameterResolverTypeModelProperty);
   }
@@ -920,4 +972,26 @@ public final class IntrospectionUtils {
     return metadataType.getAnnotation(TypedValueTypeAnnotation.class).isPresent();
   }
 
+  /**
+   * Resolves the correspondent {@link ConnectionProviderModel} for a given {@link ConnectionProvider} instance.
+   *
+   * @param connectionProvider     connection provider class
+   * @param allConnectionProviders list of available {@link ConnectionProviderModel}
+   * @return an {@link Optional} value of the {@link ConnectionProviderModel}
+   */
+  public static Optional<ConnectionProviderModel> getConnectionProviderModel(Class<? extends ConnectionProvider> connectionProvider,
+                                                                             List<ConnectionProviderModel> allConnectionProviders) {
+    for (ConnectionProviderModel providerModel : allConnectionProviders) {
+      Optional<ImplementingTypeModelProperty> modelProperty = providerModel.getModelProperty(ImplementingTypeModelProperty.class);
+
+      if (modelProperty.isPresent()) {
+        ImplementingTypeModelProperty property = modelProperty.get();
+
+        if (property.getType().equals(connectionProvider)) {
+          return of(providerModel);
+        }
+      }
+    }
+    return empty();
+  }
 }

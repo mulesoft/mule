@@ -4,7 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.runtime;
+package org.mule.runtime.module.extension.internal.runtime.resolver;
+
+import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 
 /**
  * Contract for extension components that knows how to resolve parameter values
@@ -17,5 +19,5 @@ public interface ParameterValueResolver {
    * @return The parameter value
    * @throws ValueResolvingException if the resolution fails
    */
-  Object getParameterValue(String containerName) throws ValueResolvingException;
+  Object getParameterValue(String parameterName) throws ValueResolvingException;
 }

@@ -81,8 +81,8 @@ public final class DefaultImplicitConfigurationProviderFactory implements Implic
                                                 ImmutableExpirationPolicy.getDefault(new TimeSupplier()), muleContext);
       }
 
-      return new ConfigurationProviderMetadataAdapter(providerName, extensionModel,
-                                                      implicitConfigurationModel, configurationInstance, muleContext);
+      return new ConfigurationProviderToolingAdapter(providerName, extensionModel,
+                                                     implicitConfigurationModel, configurationInstance, muleContext);
 
     } catch (MuleException e) {
       throw new MuleRuntimeException(e);
