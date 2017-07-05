@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.soap.internal.loader;
 import static org.mule.metadata.java.api.JavaTypeLoader.JAVA;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.PRIMARY_CONTENT;
+import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
 
 import org.mule.metadata.api.ClassTypeLoader;
@@ -78,7 +79,6 @@ public class SoapInvokeOperationDeclarer {
   public static final String TRANSPORT_HEADERS_PARAM = "transportHeaders";
 
   private static final BaseTypeBuilder TYPE_BUILDER = BaseTypeBuilder.create(JAVA);
-  private static final ClassTypeLoader TYPE_LOADER = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
 
   /**
    * Declares the invoke operation.
@@ -136,7 +136,7 @@ public class SoapInvokeOperationDeclarer {
         .withDslInlineRepresentation(true)
         .withLayout(getLayout(1));
 
-    MetadataType binaryType = TYPE_LOADER.load(InputStream.class);
+    MetadataType binaryType = loader.load(InputStream.class);
     ObjectType attachments = TYPE_BUILDER.objectType()
         .openWith(TYPE_BUILDER.binaryType()
             .id(InputStream.class.getName())
@@ -146,6 +146,7 @@ public class SoapInvokeOperationDeclarer {
 
     message.withOptionalParameter(BODY_PARAM).ofDynamicType(binaryType)
         .withRole(PRIMARY_CONTENT)
+        .defaultingTo(PAYLOAD)
         .withLayout(getLayout(3))
         .withDisplayModel(DisplayModel.builder()
             .summary("The XML body to include in the SOAP message, with all the required parameters.")

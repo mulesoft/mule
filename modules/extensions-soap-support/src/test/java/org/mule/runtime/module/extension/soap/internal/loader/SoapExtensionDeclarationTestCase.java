@@ -18,18 +18,20 @@ import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.core.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_DESCRIPTION;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
+import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.VERSION;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.ATTACHMENTS_PARAM;
+import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.BODY_PARAM;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.HEADERS_PARAM;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.OPERATION_DESCRIPTION;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.OPERATION_NAME;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.OPERATION_PARAM;
-import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.BODY_PARAM;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.SERVICE_PARAM;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.TRANSPORT_HEADERS_PARAM;
 import static org.mule.test.soap.extension.CalcioServiceProvider.CALCIO_DESC;
 import static org.mule.test.soap.extension.CalcioServiceProvider.CALCIO_ID;
+
 import org.mule.metadata.api.model.BinaryType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
@@ -42,15 +44,12 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.module.extension.internal.loader.enricher.ModuleErrors;
 import org.mule.runtime.soap.api.exception.error.SoapErrors;
 import org.mule.test.soap.extension.FootballSoapExtension;
-
 import com.google.common.collect.ImmutableList;
-
+import org.junit.Test;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.junit.Test;
 
 public class SoapExtensionDeclarationTestCase extends AbstractSoapExtensionDeclarationTestCase {
 
@@ -85,7 +84,6 @@ public class SoapExtensionDeclarationTestCase extends AbstractSoapExtensionDecla
                              new ParameterProber("firstDivision", StringType.class),
                              new ParameterProber("secondDivision", StringType.class),
                              new ParameterProber("wsdlLocation", StringType.class));
-
   }
 
   private void assertErrorModels(Set<ErrorModel> errors) {
@@ -105,7 +103,7 @@ public class SoapExtensionDeclarationTestCase extends AbstractSoapExtensionDecla
     ParameterProber[] probers = new ParameterProber[] {
         new ParameterProber(OPERATION_PARAM, StringType.class),
         new ParameterProber(SERVICE_PARAM, StringType.class),
-        new ParameterProber(BODY_PARAM, null, BinaryType.class, false),
+        new ParameterProber(BODY_PARAM, PAYLOAD, BinaryType.class, false),
         new ParameterProber(HEADERS_PARAM, null, BinaryType.class, false),
         new ParameterProber(TRANSPORT_HEADERS_PARAM, null, ObjectType.class, false),
         new ParameterProber(ATTACHMENTS_PARAM, null, ObjectType.class, false),
