@@ -29,9 +29,6 @@ public class DisableTimeoutsConfigTestCase extends FunctionalTestCase
     public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
     @Rule
-    public DynamicPort dynamicPort3 = new DynamicPort("port3");
-
-    @Rule
     public SystemProperty disableTimeouts = new SystemProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "timeout.disable", "true");
 
     @Override
@@ -56,15 +53,5 @@ public class DisableTimeoutsConfigTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("vm://tcpTimeout", "hi", null);
         assertEquals("hiho", message.getPayload());
-    }
-
-    @Test
-    public void httpListenerResponseTimeout() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        MuleMessage message = client.send("vm://httpListenerTimeout", "hi", null);
-        assertNotNull(message);
-        assertEquals("hi folks", message.getPayload());
-        assertNull(message.getExceptionPayload());
     }
 }
