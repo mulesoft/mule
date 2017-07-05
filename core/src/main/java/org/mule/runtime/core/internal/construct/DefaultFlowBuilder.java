@@ -31,14 +31,12 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
-import org.mule.runtime.core.api.source.ClusterizableMessageSource;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.interceptor.ProcessingTimeInterceptor;
 import org.mule.runtime.core.internal.construct.processor.FlowConstructStatisticsMessageProcessor;
 import org.mule.runtime.core.processor.strategy.TransactionAwareWorkQueueProcessingStrategyFactory;
 import org.mule.runtime.core.routing.requestreply.AsyncReplyToPropertyRequestReplyReplier;
-import org.mule.runtime.core.internal.source.ClusterizableMessageSourceWrapper;
 
 import java.util.List;
 import java.util.Optional;
@@ -180,21 +178,9 @@ public class DefaultFlowBuilder implements Builder {
   public Flow build() {
     checkImmutable();
 
-    flow = new DefaultFlow(name, muleContext, resolveSource(source), processors,
+    flow = new DefaultFlow(name, muleContext, source, processors,
                            ofNullable(exceptionListener), ofNullable(processingStrategyFactory), initialState, maxConcurrency);
     return flow;
-  }
-
-  private MessageSource resolveSource(MessageSource source) {
-    if (source != null) {
-      if (source instanceof ClusterizableMessageSource) {
-        return new ClusterizableMessageSourceWrapper(muleContext, (ClusterizableMessageSource) source, flow);
-      } else {
-        return source;
-      }
-    } else {
-      return null;
-    }
   }
 
   protected final void checkImmutable() {
