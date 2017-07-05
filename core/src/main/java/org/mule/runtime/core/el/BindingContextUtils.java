@@ -16,6 +16,7 @@ import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.core.api.Event;
 
 import java.util.HashMap;
@@ -36,6 +37,7 @@ public class BindingContextUtils {
   public static final String VARIABLES = "variables";
   public static final String PROPERTIES = "properties";
   public static final String PARAMETERS = "parameters";
+  public static final String AUTHENTICATION = "authentication";
   public static final String FLOW = "flow";
   public static final String SERVER = "server";
   public static final String MULE = "mule";
@@ -85,6 +87,9 @@ public class BindingContextUtils {
     contextBuilder.addBinding(DATA_TYPE, new TypedValue<>(message.getPayload().getDataType(), fromType(DataType.class)));
     Error error = event.getError().isPresent() ? event.getError().get() : null;
     contextBuilder.addBinding(ERROR, new TypedValue<>(error, fromType(Error.class)));
+
+    Authentication authentication = event.getSecurityContext() != null ? event.getSecurityContext().getAuthentication() : null;
+    contextBuilder.addBinding(AUTHENTICATION, new TypedValue<>(authentication, fromType(Authentication.class)));
 
     return contextBuilder.build();
   }

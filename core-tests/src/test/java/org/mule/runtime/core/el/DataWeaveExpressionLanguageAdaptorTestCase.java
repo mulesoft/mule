@@ -15,6 +15,7 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
@@ -30,6 +31,7 @@ import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
+import static org.mule.runtime.core.el.BindingContextUtils.AUTHENTICATION;
 import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.ATTRIBUTES;
 import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.DATA_TYPE;
 import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.ERROR;
@@ -50,13 +52,18 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.message.NullAttributes;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleManifest;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.message.BaseAttributes;
+import org.mule.runtime.core.api.security.DefaultMuleAuthentication;
+import org.mule.runtime.core.api.security.DefaultMuleCredentials;
+import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.internal.message.InternalMessage;
+import org.mule.runtime.core.security.DefaultSecurityContext;
 
 import com.google.common.collect.Sets;
 
@@ -268,6 +275,26 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
     assertThat(result.getValue(), is(instanceOf(Map.class)));
     assertThat((Map<String, TypedValue>) result.getValue(), hasEntry(var1, varValue));
     assertThat((Map<String, TypedValue>) result.getValue(), hasEntry(var2, varValue));
+  }
+
+  @Test
+  public void authenticationBinding() throws Exception {
+    Event event = spy(testEvent());
+    Authentication authentication =
+        new DefaultMuleAuthentication(new DefaultMuleCredentials("username", "password".toCharArray()));
+    SecurityContext securityContext = new DefaultSecurityContext(authentication);
+    when(event.getSecurityContext()).thenReturn(securityContext);
+    TypedValue result = expressionLanguage.evaluate(AUTHENTICATION, event, BindingContext.builder().build());
+    assertThat(result.getValue(), is(instanceOf(Authentication.class)));
+    assertThat(result.getValue(), is(authentication));
+    assertThat(result.getDataType().getType(), is(equalTo(Authentication.class)));
+  }
+
+  @Test
+  public void authenticationBindingWhenNullSecurityContext() throws Exception {
+    Event event = spy(testEvent());
+    TypedValue result = expressionLanguage.evaluate(AUTHENTICATION, event, BindingContext.builder().build());
+    assertNull(result.getValue());
   }
 
   @Test
