@@ -294,7 +294,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
   public void authenticationBindingWhenNullSecurityContext() throws Exception {
     Event event = spy(testEvent());
     TypedValue result = expressionLanguage.evaluate(AUTHENTICATION, event, BindingContext.builder().build());
-    assertNull(result.getValue());
+    assertThat(result.getValue(), is(nullValue()));
   }
 
   @Test
