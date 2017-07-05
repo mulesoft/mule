@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:fn="http://www.mulesoft.org/schema/mule/fn"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/fn http://www.mulesoft.org/schema/mule/fn/current/mule-fn.xsd">
+
+    <flow name="staticGlobalEcho">
+        <fn:evaluate>
+            <fn:payload>#[Fn::customEcho('myMessage')]</fn:payload>
+        </fn:evaluate>
+    </flow>
+
+    <flow name="payloadGlobalEcho">
+        <fn:evaluate>
+            <fn:payload>#[Fn::customEcho()]</fn:payload>
+        </fn:evaluate>
+    </flow>
+
+    <flow name="variableGlobalEcho">
+        <fn:evaluate>
+            <fn:payload>#[Fn::customEcho(variables.myMessage)]</fn:payload>
+        </fn:evaluate>
+    </flow>
+
+    <flow name="echoWithDefault">
+        <fn:evaluate>
+            <fn:payload>#[Fn::echoWithDefault()]</fn:payload>
+        </fn:evaluate>
+    </flow>
+
+    <flow name="toMap">
+        <fn:evaluate>
+            <fn:payload>#[Fn::toMap({user:'pepe', pass:'pass'})]</fn:payload>
+        </fn:evaluate>
+    </flow>
+
+    <flow name="xpathWithDefaults">
+        <fn:evaluate>
+            <fn:payload>#[Fn::xpath("/mule/flow[6]/@name")]</fn:payload>
+        </fn:evaluate>
+    </flow>
+
+    <flow name="xpathWithDefaultNode">
+        <fn:evaluate>
+            <fn:payload>#[Fn::xpath("/mule/flow[7]/@name", variables.xmlPayload)]</fn:payload>
+        </fn:evaluate>
+    </flow>
+
+    <flow name="xpathWithOverrides">
+        <fn:evaluate>
+            <fn:payload>#[Fn::xpath("/mule/flow", variables.xmlPayload, 'NODESET')]</fn:payload>
+        </fn:evaluate>
+    </flow>
+
+</mule>

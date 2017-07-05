@@ -249,6 +249,23 @@
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
+            <artifactId>test-weave-function-extension</artifactId>
+            <version>${project.version}</version>
+            <classifier>mule-plugin</classifier>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.mockito</groupId>
+                    <artifactId>mockito-all</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>net.sf.saxon</groupId>
+                    <artifactId>Saxon-HE</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.tests</groupId>
             <artifactId>mule-rick-and-morty-extension</artifactId>
             <version>${project.version}</version>
             <classifier>mule-plugin</classifier>

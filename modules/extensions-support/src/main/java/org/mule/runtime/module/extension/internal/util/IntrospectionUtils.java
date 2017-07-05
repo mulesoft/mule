@@ -87,7 +87,6 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Parameter
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterResolverTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.TypedValueTypeModelProperty;
 import com.google.common.collect.ImmutableList;
-import org.springframework.core.ResolvableType;
 
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -113,6 +112,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
+
+import org.springframework.core.ResolvableType;
 
 /**
  * Set of utility operations to get insights about objects and their components
@@ -609,7 +610,7 @@ public final class IntrospectionUtils {
     return type.equals(void.class) || type.equals(Void.class);
   }
 
-  public static Collection<Method> getOperationMethods(Class<?> declaringClass) {
+  public static Collection<Method> getApiMethods(Class<?> declaringClass) {
     return getMethodsStream(declaringClass)
         .filter(method -> !method.isAnnotationPresent(Ignore.class) && !isLifecycleMethod(method))
         .collect(toCollection(LinkedHashSet::new));

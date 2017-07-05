@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.capability.xml.description;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getOperationMethods;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getApiMethods;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.WithOperationsDeclaration;
@@ -84,7 +84,7 @@ final class OperationDescriptionDocumenter extends AbstractDescriptionDocumenter
         while (operationClass != null && !operationClass.equals(Object.class)) {
           TypeElement operationElement = processingEnv.getElementUtils().getTypeElement(operationClass.getName());
           if (operationElement != null) {
-            for (Method operation : getOperationMethods(operationClass)) {
+            for (Method operation : getApiMethods(operationClass)) {
               operationElement.getEnclosedElements().stream()
                   .filter(e -> e.getSimpleName().toString().equals(operation.getName())).findFirst()
                   .ifPresent(operationMethodElement -> methods.put(operation.getName(), operationMethodElement));

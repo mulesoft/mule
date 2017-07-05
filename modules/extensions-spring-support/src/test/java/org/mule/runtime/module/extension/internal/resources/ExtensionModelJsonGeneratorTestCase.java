@@ -36,6 +36,7 @@ import org.mule.runtime.module.extension.internal.runtime.connectivity.basic.Tes
 import org.mule.runtime.module.extension.soap.internal.loader.SoapExtensionModelLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+import org.mule.test.function.extension.WeaveFunctionExtension;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.marvel.MarvelExtension;
 import org.mule.test.metadata.extension.MetadataExtension;
@@ -140,6 +141,9 @@ public class ExtensionModelJsonGeneratorTestCase extends AbstractMuleTestCase {
                                                                           new ExtensionJsonGeneratorTestUnit(javaLoader,
                                                                                                              TestOAuthExtension.class,
                                                                                                              "test-oauth.json"),
+                                                                          new ExtensionJsonGeneratorTestUnit(javaLoader,
+                                                                                                             WeaveFunctionExtension.class,
+                                                                                                             "test-fn.json"),
                                                                           new ExtensionJsonGeneratorTestUnit(javaLoader,
                                                                                                              ValuesExtension.class,
                                                                                                              "values.json"));
