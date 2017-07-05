@@ -8,6 +8,7 @@ package org.mule.runtime.core.el.context;
 
 import static org.junit.Assert.assertEquals;
 import static org.mule.runtime.api.message.Message.of;
+
 import org.mule.runtime.core.api.Event;
 
 import org.junit.Test;
@@ -20,7 +21,7 @@ public class FlowTestCase extends AbstractELTestCase {
 
   @Override
   public void setupFlowConstruct() throws Exception {
-    flowConstruct = getTestFlowWithComponent("flowName", Object.class);
+    flowConstruct = getTestFlow("flowName");
   }
 
   @Test

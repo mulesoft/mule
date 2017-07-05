@@ -10,19 +10,19 @@ import static java.util.Optional.of;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.api.store.ObjectStoreException;
-import org.mule.runtime.core.routing.correlation.EventCorrelatorCallback;
 import org.mule.runtime.core.api.session.DefaultMuleSession;
+import org.mule.runtime.core.routing.correlation.EventCorrelatorCallback;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.tck.testmodels.fruit.Apple;
 
 import java.util.Iterator;
 
@@ -37,7 +37,7 @@ public class AggregatorTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void testMessageAggregator() throws Exception {
-    Flow flow = getTestFlowWithComponent("test", Apple.class);
+    Flow flow = getTestFlow("test");
     MuleSession session = new DefaultMuleSession();
 
     TestEventAggregator router = new TestEventAggregator(3);

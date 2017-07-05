@@ -16,10 +16,10 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.FileUtils.deleteTree;
 import static org.mule.runtime.core.api.util.FileUtils.newFile;
 import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
-import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.junit4.TestsLogConfigurationHelper.clearLoggingConfig;
 import static org.mule.tck.junit4.TestsLogConfigurationHelper.configureLoggingForTest;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
@@ -30,7 +30,6 @@ import org.mule.runtime.core.api.DefaultTransformationService;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.component.JavaComponent;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.config.MuleConfiguration;
@@ -40,7 +39,6 @@ import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.DefaultMuleContextBuilder;
 import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.MuleContextFactory;
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
@@ -52,10 +50,9 @@ import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.api.util.concurrent.Latch;
-import org.mule.runtime.core.component.DefaultJavaComponent;
 import org.mule.runtime.core.internal.serialization.JavaObjectSerializer;
-import org.mule.runtime.core.object.SingletonObjectFactory;
 import org.mule.runtime.http.api.HttpService;
+import org.mule.tck.MuleTestUtils;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.TriggerableMessageSource;
@@ -399,15 +396,14 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
     // template method
   }
 
-  public static Flow getTestFlowWithComponent(String name, Class<?> clazz) throws Exception {
-    final SingletonObjectFactory of = new SingletonObjectFactory(clazz, null);
-    of.initialise();
-    final JavaComponent component = new DefaultJavaComponent(of);
-    ((MuleContextAware) component).setMuleContext(muleContext);
-
-    Flow flow = builder(name, muleContext).processors(component).build();
+  public static Flow getTestFlow(String name) throws MuleException {
+    Flow flow = builder(name, muleContext).build();
     muleContext.getRegistry().registerFlowConstruct(flow);
     return flow;
+  }
+
+  public static Flow getTestFlow(MuleContext muleContext) throws MuleException {
+    return MuleTestUtils.getTestFlow(muleContext);
   }
 
   /**

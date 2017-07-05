@@ -10,6 +10,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.api.message.Message.of;
+
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
@@ -19,7 +20,6 @@ import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.api.session.DefaultMuleSession;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.tck.testmodels.fruit.Apple;
 
 import org.junit.Test;
 
@@ -32,7 +32,7 @@ public class MessageChunkAggregatorTestCase extends AbstractMuleContextTestCase 
   @Test
   public void testMessageProcessor() throws Exception {
     MuleSession session = new DefaultMuleSession();
-    Flow flow = getTestFlowWithComponent("test", Apple.class);
+    Flow flow = getTestFlow("test");
     assertNotNull(flow);
 
     MessageChunkAggregator router = new MessageChunkAggregator();
