@@ -11,16 +11,23 @@ import org.mule.runtime.core.api.context.notification.ServerNotification;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Generic support for notification listeners that store the received notifications to run assertions on them.
+ * 
+ * @param <T> the type of notifications to store.
+ * 
+ * @since 4.0
+ */
 public abstract class AbstractNotificationLogger<T extends ServerNotification> implements NotificationLogger {
 
-  private LinkedList notifications = new LinkedList();
+  private LinkedList<T> notifications = new LinkedList<>();
 
   public synchronized void onNotification(T notification) {
     notifications.addLast(notification);
   }
 
   @Override
-  public List getNotifications() {
+  public List<T> getNotifications() {
     return notifications;
   }
 

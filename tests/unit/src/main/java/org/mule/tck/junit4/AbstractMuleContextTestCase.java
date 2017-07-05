@@ -16,6 +16,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.FileUtils.deleteTree;
 import static org.mule.runtime.core.api.util.FileUtils.newFile;
 import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.junit4.TestsLogConfigurationHelper.clearLoggingConfig;
 import static org.mule.tck.junit4.TestsLogConfigurationHelper.configureLoggingForTest;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -52,7 +53,6 @@ import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.api.util.concurrent.Latch;
 import org.mule.runtime.core.internal.serialization.JavaObjectSerializer;
 import org.mule.runtime.http.api.HttpService;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.TriggerableMessageSource;
@@ -396,14 +396,10 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
     // template method
   }
 
-  public static Flow getTestFlow(String name) throws MuleException {
+  public static Flow getNamedTestFlow(String name) throws MuleException {
     Flow flow = builder(name, muleContext).build();
     muleContext.getRegistry().registerFlowConstruct(flow);
     return flow;
-  }
-
-  public static Flow getTestFlow(MuleContext muleContext) throws MuleException {
-    return MuleTestUtils.getTestFlow(muleContext);
   }
 
   /**

@@ -32,7 +32,7 @@ public class MessageChunkAggregatorTestCase extends AbstractMuleContextTestCase 
   @Test
   public void testMessageProcessor() throws Exception {
     MuleSession session = new DefaultMuleSession();
-    Flow flow = getTestFlow("test");
+    Flow flow = getNamedTestFlow("test");
     assertNotNull(flow);
 
     MessageChunkAggregator router = new MessageChunkAggregator();

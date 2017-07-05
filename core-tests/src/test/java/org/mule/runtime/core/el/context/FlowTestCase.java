@@ -21,7 +21,7 @@ public class FlowTestCase extends AbstractELTestCase {
 
   @Override
   public void setupFlowConstruct() throws Exception {
-    flowConstruct = getTestFlow("flowName");
+    flowConstruct = getNamedTestFlow("flowName");
   }
 
   @Test

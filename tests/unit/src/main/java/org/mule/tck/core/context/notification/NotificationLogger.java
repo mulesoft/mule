@@ -8,8 +8,16 @@ package org.mule.tck.core.context.notification;
 
 import java.util.List;
 
+/**
+ * Provides access to the notifications generated during a test run.
+ * 
+ * @since 4.0
+ */
 public interface NotificationLogger {
 
+  /**
+   * @return the notifications generated during a test run.
+   */
   public List getNotifications();
 
 }

@@ -11,6 +11,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
@@ -40,7 +41,7 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase {
   @Test
   public void testMessageResequencer() throws Exception {
     MuleSession session = new DefaultMuleSession();
-    Flow flow = getTestFlow("test");
+    Flow flow = getNamedTestFlow("test");
     assertNotNull(flow);
 
     TestEventResequencer router = new TestEventResequencer(3);
@@ -74,7 +75,7 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase {
   @Test
   public void testMessageResequencerWithComparator() throws Exception {
     MuleSession session = new DefaultMuleSession();
-    Flow flow = getTestFlow("test");
+    Flow flow = getNamedTestFlow("test");
     assertNotNull(flow);
 
     TestEventResequencer router = new TestEventResequencer(3);
