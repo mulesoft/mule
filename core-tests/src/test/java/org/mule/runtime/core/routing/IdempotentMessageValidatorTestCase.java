@@ -37,7 +37,7 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
     idempotent.setObjectStore(new InMemoryObjectStore<String>());
 
     final EventContext contextA = mock(EventContext.class);
-    when(contextA.getId()).thenReturn("1");
+    when(contextA.getCorrelationId()).thenReturn("1");
 
     Message okMessage = InternalMessage.builder().payload("OK").build();
     Event event = Event.builder(contextA).message(okMessage).build();
@@ -47,7 +47,7 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
     assertThat(processedEvent, sameInstance(event));
 
     final EventContext contextB = mock(EventContext.class);
-    when(contextB.getId()).thenReturn("1");
+    when(contextB.getCorrelationId()).thenReturn("1");
 
     // This will not process, because the ID is a duplicate
     event = Event.builder(contextB).message(okMessage).build();

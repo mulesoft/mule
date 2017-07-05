@@ -12,12 +12,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.EventContext;
-import org.mule.runtime.core.api.routing.ValidationException;
 import org.mule.runtime.api.store.ObjectAlreadyExistsException;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.EventContext;
+import org.mule.runtime.core.api.routing.ValidationException;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -67,7 +67,7 @@ public class IdempotentMessageValidatorMule6079TestCase extends AbstractMuleCont
     public void run() {
       Message okMessage = InternalMessage.builder().payload("OK").build();
       EventContext context = mock(EventContext.class);
-      when(context.getId()).thenReturn("1");
+      when(context.getCorrelationId()).thenReturn("1");
       Event event = Event.builder(context).message(okMessage).build();
 
       try {

@@ -32,7 +32,6 @@ public class BindingContextUtils {
   public static final String DATA_TYPE = "dataType";
   public static final String ATTRIBUTES = "attributes";
   public static final String ERROR = "error";
-  public static final String ID = "id";
   public static final String CORRELATION_ID = "correlationId";
   public static final String VARIABLES = "variables";
   public static final String PROPERTIES = "properties";
@@ -78,7 +77,6 @@ public class BindingContextUtils {
                               new TypedValue<>(unmodifiableMap(event.getParameters()),
                                                fromType(event.getParameters().getClass())));
 
-    contextBuilder.addBinding(ID, new TypedValue<>(event.getContext().getId(), STRING));
     contextBuilder.addBinding(CORRELATION_ID, new TypedValue<>(event.getContext().getCorrelationId(), STRING));
 
     Message message = event.getMessage();
