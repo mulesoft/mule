@@ -807,17 +807,6 @@
         </xsd:choice>
     </xsd:group>
 
-    <xsd:element name="composite-source" type="compositeMessageSourceType" substitutionGroup="abstract-message-source"/>
-    <xsd:complexType name="compositeMessageSourceType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractMessageSourceType">
-                <xsd:sequence maxOccurs="unbounded">
-                    <xsd:group ref="messageSource"/>
-                </xsd:sequence>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
     <xsd:complexType name="commonTransformerType">
         <xsd:complexContent>
             <xsd:extension base="abstractMessageProcessorType">
