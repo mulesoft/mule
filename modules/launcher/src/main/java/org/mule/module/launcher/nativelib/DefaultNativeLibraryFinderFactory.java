@@ -34,7 +34,7 @@ public class DefaultNativeLibraryFinderFactory implements NativeLibraryFinderFac
 
         if (COPY_APPLICATION_NATIVE_LIBRARIES.isEnabled())
         {
-            File perAppNativeLibs = new File(MuleFoldersUtil.getAppTempFolder(appName), MuleFoldersUtil.LIB_FOLDER);
+            File perAppNativeLibs = new File(MuleFoldersUtil.getAppExecutionFolder(appName), MuleFoldersUtil.LIB_FOLDER);
 
             nativeLibraryFinder = new PerAppCopyNativeLibraryFinder(libDir, perAppNativeLibs);
         }

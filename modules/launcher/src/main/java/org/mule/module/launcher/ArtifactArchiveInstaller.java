@@ -9,6 +9,7 @@ package org.mule.module.launcher;
 import static org.mule.module.launcher.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
 
 import org.mule.config.i18n.MessageFactory;
+import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.util.FileUtils;
 import org.mule.util.FilenameUtils;
 
@@ -125,6 +126,9 @@ public class ArtifactArchiveInstaller
         {
             final File artifactDir = new File(artifactParentDir, artifactName);
             FileUtils.deleteDirectory(artifactDir);
+            // delete also the tmp directory (eg: when having plugins)
+            final File tmpDir = MuleFoldersUtil.getAppTempFolder(artifactName);
+            FileUtils.deleteDirectory(tmpDir);
             // remove a marker, harmless, but a tidy artifact dir is always better :)
             File marker = getArtifactAnchorFile(artifactName);
             marker.delete();
