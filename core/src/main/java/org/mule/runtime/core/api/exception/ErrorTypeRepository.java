@@ -77,8 +77,8 @@ public class ErrorTypeRepository {
 
   public ErrorTypeRepository() {
     this.errorTypes.put(ANY, ANY_ERROR_TYPE);
-    this.errorTypes.put(SOURCE, SOURCE_ERROR_TYPE);
     this.errorTypes.put(SOURCE_RESPONSE, SOURCE_RESPONSE_ERROR_TYPE);
+    this.internalErrorTypes.put(SOURCE, SOURCE_ERROR_TYPE);
     this.internalErrorTypes.put(CRITICAL, CRITICAL_ERROR_TYPE);
     this.internalErrorTypes.put(UNKNOWN, UNKNOWN_ERROR_TYPE);
   }

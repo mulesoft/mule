@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/heisenberg http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd">
+                          http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+                          http://www.mulesoft.org/schema/mule/heisenberg http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd">
 
     <heisenberg:config name="heisenberg"
                        
@@ -91,6 +93,16 @@
         </heisenberg:listen-payments>
 
         <set-payload value="#[mel:java.lang.Long.valueOf('100')]"/>
+
+        <error-handler>
+            <on-error-propagate type="SOURCE_RESPONSE_GENERATE">
+                <set-payload value="Expected."/>
+                <test:queue name="out"/>
+            </on-error-propagate>
+            <on-error-propagate type="SOURCE, SOURCE_RESPONSE">
+                <test:queue name="out"/>
+            </on-error-propagate>
+        </error-handler>
     </flow>
 
     <flow name="sourceWithInvalidSuccessAndErrorParameters" initialState="stopped">
@@ -123,6 +135,7 @@
         </heisenberg:listen-payments>
 
         <set-payload value="#[hi ++]"/>
+
     </flow>
 
     <flow name="sourceFailsOnSuccessBodyCallsOnErrorAndOnTerminate" initialState="stopped">
@@ -139,6 +152,16 @@
         </heisenberg:listen-payments>
 
         <set-payload value="#[mel:java.lang.Long.valueOf('100')]"/>
+
+        <error-handler>
+            <on-error-propagate type="SOURCE_RESPONSE_SEND">
+                <set-payload value="Expected."/>
+                <test:queue name="out"/>
+            </on-error-propagate>
+            <on-error-propagate type="SOURCE_RESPONSE">
+                <test:queue name="out"/>
+            </on-error-propagate>
+        </error-handler>
     </flow>
 
     <flow name="failureInFlowCallsOnErrorDirectly" initialState="stopped">

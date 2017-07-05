@@ -6,9 +6,11 @@
  */
 package org.mule.test.module.extension.source;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.SOURCE_ERROR_RESPONSE_GENERATE;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.SOURCE_ERROR_RESPONSE_SEND;
 import static org.mule.tck.junit4.matcher.ErrorTypeMatcher.errorType;
@@ -20,7 +22,6 @@ import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatu
 import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatus.ERROR_INVOKE;
 import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatus.SUCCESS;
 import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
-
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.test.heisenberg.extension.HeisenbergSource;
@@ -37,6 +38,8 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
 
   public static final int TIMEOUT_MILLIS = 50000;
   public static final int POLL_DELAY_MILLIS = 100;
+
+  private static final String OUT = "test://out";
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
@@ -117,6 +120,8 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
 
     assertThat(HeisenbergSource.terminateStatus, is(SUCCESS));
     assertThat(HeisenbergSource.error, empty());
+
+    assertThat(muleContext.getClient().request(OUT, RECEIVE_TIMEOUT).getRight().get(), hasPayload(equalTo("Expected.")));
   }
 
   @Test
@@ -128,6 +133,8 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
 
     assertThat(HeisenbergSource.terminateStatus, is(SUCCESS));
     assertThat(HeisenbergSource.error, empty());
+
+    assertThat(muleContext.getClient().request(OUT, RECEIVE_TIMEOUT).getRight().get(), hasPayload(equalTo("Expected.")));
   }
 
   @Test
@@ -161,7 +168,6 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
   public void failureInFlowCallsOnErrorDirectlyAndHandlesItCorrectly() throws Exception {
     startFlow("failureInFlowCallsOnErrorDirectly");
     probe(TIMEOUT_MILLIS, POLL_DELAY_MILLIS, () -> assertState(false, true, true));
-
   }
 
   @Test
