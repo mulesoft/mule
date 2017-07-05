@@ -181,11 +181,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
         @Override
         public Event process(Event event) throws MuleException {
-          if (useBlockingCodePath()) {
-            return pipeline.process(event);
-          } else {
-            return processToApply(event, this);
-          }
+          return processToApply(event, this);
         }
 
         @Override
@@ -286,19 +282,6 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     disposeIfDisposable(pipeline);
     disposeIfDisposable(source);
     super.doDispose();
-  }
-
-  /**
-   * Determines is blocking synchronous code path should be used. This is used in the following cases:
-   * <ol>
-   * <li>If a transaction is active and a processing strategy supporting transactions is configured. (synchronous or default
-   * strategies)</li>
-   * </ol>
-   * 
-   * @return true if blocking synchronous code path should be used, false otherwise.
-   */
-  protected boolean useBlockingCodePath() {
-    return isTransactionActive() && (processingStrategy.isSynchronous() || txAwareProcessingStrategy);
   }
 
   protected Sink getSink() {
