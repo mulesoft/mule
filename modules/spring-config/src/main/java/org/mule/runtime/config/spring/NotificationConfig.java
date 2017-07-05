@@ -10,8 +10,6 @@ import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.context.notification.AsyncMessageNotification;
 import org.mule.runtime.core.api.context.notification.AsyncMessageNotificationListener;
 import org.mule.runtime.core.api.context.notification.ClusterNodeNotificationListener;
-import org.mule.runtime.core.api.context.notification.ComponentMessageNotification;
-import org.mule.runtime.core.api.context.notification.ComponentMessageNotificationListener;
 import org.mule.runtime.core.api.context.notification.ConnectionNotification;
 import org.mule.runtime.core.api.context.notification.ConnectionNotificationListener;
 import org.mule.runtime.core.api.context.notification.ConnectorMessageNotification;
@@ -66,7 +64,6 @@ public abstract class NotificationConfig<N extends ServerNotification, L extends
         .put("CONTEXT", MuleContextNotification.class)
         .put("SECURITY", SecurityNotification.class)
         .put("CONNECTOR-MESSAGE", ConnectorMessageNotification.class)
-        .put("COMPONENT-MESSAGE", ComponentMessageNotification.class)
         .put("MANAGEMENT", ManagementNotification.class)
         .put("MESSAGE-PROCESSOR", MessageProcessorNotification.class)
         .put("EXCEPTION-STRATEGY", ErrorHandlerNotification.class)
@@ -90,7 +87,6 @@ public abstract class NotificationConfig<N extends ServerNotification, L extends
         .put("REGISTRY", RegistryNotificationListener.class)
         .put("CUSTOM", CustomNotificationListener.class)
         .put("CONNECTOR-MESSAGE", ConnectorMessageNotificationListener.class)
-        .put("COMPONENT-MESSAGE", ComponentMessageNotificationListener.class)
         .put("EXCEPTION", ExceptionNotificationListener.class)
         .put("TRANSACTION", TransactionNotificationListener.class)
         .put("ROUTING", RoutingNotificationListener.class)

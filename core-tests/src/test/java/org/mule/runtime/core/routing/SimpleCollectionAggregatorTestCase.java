@@ -14,16 +14,16 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.api.message.Message.of;
+
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.api.message.GroupCorrelation;
+import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.tck.testmodels.fruit.Apple;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,7 +40,7 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
   @Test
   public void testAggregateMultipleEvents() throws Exception {
 
-    Flow flow = getTestFlowWithComponent("test", Apple.class);
+    Flow flow = getNamedTestFlow("test");
     assertNotNull(flow);
 
     SimpleCollectionAggregator router = new SimpleCollectionAggregator();
@@ -85,7 +85,7 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
 
   @Test
   public void testAggregateSingleEvent() throws Exception {
-    Flow flow = getTestFlowWithComponent("test", Apple.class);
+    Flow flow = getNamedTestFlow("test");
     assertNotNull(flow);
 
     SimpleCollectionAggregator router = new SimpleCollectionAggregator();
@@ -116,7 +116,7 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
 
   @Test
   public void testAggregateMessageCollections() throws Exception {
-    Flow flow = getTestFlowWithComponent("test", Apple.class);
+    Flow flow = getNamedTestFlow("test");
     assertNotNull(flow);
 
     SimpleCollectionAggregator router = new SimpleCollectionAggregator();
