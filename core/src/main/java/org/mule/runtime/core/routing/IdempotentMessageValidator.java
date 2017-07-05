@@ -15,6 +15,7 @@ import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.el.BindingContextUtils.CORRELATION_ID;
 import static org.mule.runtime.core.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -58,8 +59,8 @@ public class IdempotentMessageValidator extends AbstractAnnotatedObject
   protected volatile ObjectStore<String> store;
   protected String storePrefix;
 
-  protected String idExpression = format("%sid%s", DEFAULT_EXPRESSION_PREFIX, DEFAULT_EXPRESSION_POSTFIX);
-  protected String valueExpression = format("%sid%s", DEFAULT_EXPRESSION_PREFIX, DEFAULT_EXPRESSION_POSTFIX);
+  protected String idExpression = format("%s%s%s", DEFAULT_EXPRESSION_PREFIX, CORRELATION_ID, DEFAULT_EXPRESSION_POSTFIX);
+  protected String valueExpression = format("%s%s%s", DEFAULT_EXPRESSION_PREFIX, CORRELATION_ID, DEFAULT_EXPRESSION_POSTFIX);
 
   @Override
   public void setMuleContext(MuleContext context) {
