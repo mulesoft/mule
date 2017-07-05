@@ -55,10 +55,11 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   private MessageProcessorChain configuredMessageProcessors;
   private Processor replyToMessageProcessor = new ReplyToPropertyRequestReplyReplier();
 
-  private String errorType = null;
-  private ErrorTypeMatcher errorTypeMatcher = null;
   private String when;
   private boolean handleException;
+
+  protected String errorType = null;
+  protected ErrorTypeMatcher errorTypeMatcher = null;
 
   @Override
   final public Event handleException(MessagingException exception, Event event) {
