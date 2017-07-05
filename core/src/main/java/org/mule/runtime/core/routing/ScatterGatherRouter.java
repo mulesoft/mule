@@ -16,6 +16,7 @@ import static org.mule.runtime.core.api.processor.MessageProcessors.processToApp
 import static org.mule.runtime.core.api.rx.Exceptions.checkedConsumer;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
 import static org.mule.runtime.core.internal.util.ProcessingStrategyUtils.isSynchronousProcessing;
+import static org.mule.runtime.core.routing.AbstractRoutingStrategy.validateMessageIsNotConsumable;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.fromIterable;
 import static reactor.core.publisher.Flux.just;
@@ -113,6 +114,7 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
   public Publisher<Event> apply(Publisher<Event> publisher) {
     return from(publisher).doOnNext(checkedConsumer(event -> {
       assertMorethanOneRoute();
+      validateMessageIsNotConsumable(event.getMessage());
     })).concatMap(event -> from(fromIterable(routeChains).concatMap(processor -> just(event).transform(scheduleRoute(processor))))
         .collectList()
         .map(checkedFunction(list -> aggregationStrategy.aggregate(new AggregationContext(event, list)))));
