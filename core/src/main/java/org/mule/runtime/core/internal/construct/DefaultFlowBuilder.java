@@ -16,27 +16,23 @@ import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STARTED;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
-import static org.mule.runtime.core.api.execution.ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate;
 import static org.mule.runtime.core.api.util.ExceptionUtils.updateMessagingExceptionWithError;
 import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.Flow.Builder;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
-import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.source.ClusterizableMessageSource;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.interceptor.ProcessingTimeInterceptor;
 import org.mule.runtime.core.internal.construct.processor.FlowConstructStatisticsMessageProcessor;
@@ -221,36 +217,7 @@ public class DefaultFlowBuilder implements Builder {
 
     @Override
     public Event process(final Event event) throws MuleException {
-      if (useBlockingCodePath()) {
-        return processBlockingSynchronous(event);
-      } else {
-        return processToApply(event, this);
-      }
-    }
-
-    /*
-     * Process flow using blocking {@link Processor#process(Event)} methods synchronously without apply any processing strategy.
-     * Note that individual processors internally may still you asynchronous non-blocking behaviour to achieved required
-     * functionality.
-     */
-    private Event processBlockingSynchronous(Event event) throws MessagingException, DefaultMuleException {
-      // TODO MULE-11023 Migrate transaction execution template mechanism to use non-blocking API
-      final Event newEvent = createMuleEventForCurrentFlow(event, event.getReplyToDestination(), event.getReplyToHandler());
-      try {
-        ExecutionTemplate<Event> executionTemplate =
-            createErrorHandlingExecutionTemplate(getMuleContext(), this, getExceptionListener());
-        Event result = executionTemplate.execute(() -> getPipeline().process(newEvent));
-        newEvent.getContext().success(result);
-        return createReturnEventForParentFlowConstruct(result, event);
-      } catch (MessagingException e) {
-        e.setProcessedEvent(createReturnEventForParentFlowConstruct(e.getEvent(), event));
-        newEvent.getContext().error(e);
-        throw e;
-      } catch (Exception e) {
-        newEvent.getContext().error(e);
-        resetRequestContextEvent(event);
-        throw new DefaultMuleException(CoreMessages.createStaticMessage("Flow execution exception"), e);
-      }
+      return processToApply(event, this);
     }
 
     @Override
