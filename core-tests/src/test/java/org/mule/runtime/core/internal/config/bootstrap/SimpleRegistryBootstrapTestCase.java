@@ -30,7 +30,7 @@ import org.junit.Test;
 
 public class SimpleRegistryBootstrapTestCase extends AbstractMuleContextTestCase {
 
-  public static final String TEST_TRANSACTION_FACTORY_CLASS = "javax.jms.Connection";
+  public static final String TEST_TRANSACTION_FACTORY_CLASS = "org.foo.Connection";
 
   @Test(expected = ClassNotFoundException.class)
   public void registeringOptionalTransaction() throws Exception {

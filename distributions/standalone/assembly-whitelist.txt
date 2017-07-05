@@ -202,6 +202,7 @@
 /mule-standalone-${productVersion}/lib/opt/httpcore-4.2.5.jar
 /mule-standalone-${productVersion}/lib/opt/javassist-3.7.ga.jar
 /mule-standalone-${productVersion}/lib/opt/javax.inject-1.jar
+/mule-standalone-${productVersion}/lib/opt/javax.jms-api-2.0.1.jar
 /mule-standalone-${productVersion}/lib/opt/javax.transaction-api-1.2.jar
 /mule-standalone-${productVersion}/lib/opt/jaxb-api-2.1.jar
 /mule-standalone-${productVersion}/lib/opt/jaxb-impl-2.1.13.jar

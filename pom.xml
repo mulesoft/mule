@@ -266,6 +266,7 @@
         <aetherProviderVersion>3.3.9</aetherProviderVersion>
         <powermockVersion>1.6.5</powermockVersion>
         <allure.maven.plugin.version>2.5</allure.maven.plugin.version>
+        <javaxJmsApiVersion>2.0.1</javaxJmsApiVersion>
         <jetty.maven.plugin.version>9.2.10.v20150310</jetty.maven.plugin.version>
 
         <formatterConfigPath>formatter.xml</formatterConfigPath>
@@ -318,6 +319,13 @@
                 <artifactId>javax.annotation-api</artifactId>
                 <version>1.2</version>
             </dependency>
+
+            <dependency>
+                <groupId>javax.jms</groupId>
+                <artifactId>javax.jms-api</artifactId>
+                <version>${javaxJmsApiVersion}</version>
+            </dependency>
+            
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-beans</artifactId>
