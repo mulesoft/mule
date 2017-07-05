@@ -15,6 +15,7 @@ package org.mule.runtime.module.extension.internal.loader.java.type;
  * @since 4.0
  */
 public interface ComponentElement
-    extends WithMessageSources, WithOperationContainers, WithConnectionProviders, ParameterizableTypeElement {
+    extends WithMessageSources, WithOperationContainers, WithFunctionContainers, WithConnectionProviders,
+    ParameterizableTypeElement {
 
 }

@@ -19,7 +19,7 @@ import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.test.heisenberg.extension.model.DifferedKnockableDoor;
-import org.mule.test.typed.value.extension.extension.SimplePojo;
+import org.mule.test.function.extension.SimplePojo;
 import org.mule.test.typed.value.extension.extension.TypedValueSource;
 import org.mule.test.vegan.extension.VeganProductInformation;
 

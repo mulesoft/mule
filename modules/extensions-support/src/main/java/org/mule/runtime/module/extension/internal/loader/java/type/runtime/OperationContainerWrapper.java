@@ -35,7 +35,7 @@ final class OperationContainerWrapper extends TypeWrapper implements OperationCo
    */
   @Override
   public List<MethodElement> getOperations() {
-    return Stream.of(aClass).map(IntrospectionUtils::getOperationMethods).flatMap(Collection::stream).map(MethodWrapper::new)
+    return Stream.of(aClass).map(IntrospectionUtils::getApiMethods).flatMap(Collection::stream).map(MethodWrapper::new)
         .collect(toList());
   }
 }

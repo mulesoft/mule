@@ -15,7 +15,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_
 import static org.mule.runtime.core.api.util.ClassUtils.isInstance;
 import static org.mule.runtime.core.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.DefaultValidationResult;
 import org.mule.runtime.api.el.ValidationResult;
@@ -79,9 +78,11 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   public void initialise() throws InitialisationException {
     Collection<GlobalBindingContextProvider> contextProviders =
         muleContext.getRegistry().lookupObjects(GlobalBindingContextProvider.class);
-    for (GlobalBindingContextProvider contextProvider : contextProviders) {
-      expressionLanguage.addGlobalBindings(contextProvider.getBindingContext());
-    }
+
+    contextProviders.stream()
+        .map(GlobalBindingContextProvider::getBindingContext)
+        .forEach(expressionLanguage::addGlobalBindings);
+
     if (melDefault) {
       LOGGER.warn("Using MEL as the default expression language.");
     }
