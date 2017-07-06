@@ -9,13 +9,12 @@ package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 import static java.util.Arrays.stream;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
-import org.mule.runtime.extension.api.annotation.ExpressionFunctions;
+
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
-import org.mule.runtime.module.extension.internal.loader.java.type.ComponentElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.ConnectionProviderElement;
-import org.mule.runtime.module.extension.internal.loader.java.type.FunctionContainerElement;
+import org.mule.runtime.module.extension.internal.loader.java.type.ComponentElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.OperationContainerElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.SourceElement;
 
@@ -54,19 +53,6 @@ abstract class ComponentWrapper extends TypeWrapper implements ComponentElement 
     final Optional<Operations> optionalOperations = this.getAnnotation(Operations.class);
     if (optionalOperations.isPresent()) {
       return stream(optionalOperations.get().value()).map(OperationContainerWrapper::new).collect(toList());
-    }
-    return emptyList();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public List<FunctionContainerElement> getFunctionContainers() {
-
-    final Optional<ExpressionFunctions> functions = this.getAnnotation(ExpressionFunctions.class);
-    if (functions.isPresent()) {
-      return stream(functions.get().value()).map(FunctionContainerWrapper::new).collect(toList());
     }
     return emptyList();
   }

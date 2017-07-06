@@ -13,14 +13,12 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.metadata.DataType.STRING;
-import org.mule.runtime.api.el.Binding;
+
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ExpressionModule;
 import org.mule.runtime.api.el.ModuleNamespace;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-
-import java.util.Collection;
 
 import org.junit.Test;
 
@@ -44,8 +42,7 @@ public class DefaultBindingContextBuilderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void addsBindings() {
-    ExpressionModule module =
-        ExpressionModule.builder(namespace).addBinding(ID, typedValue).build();
+    ExpressionModule module = ExpressionModule.builder(namespace).addBinding("id", typedValue).build();
     BindingContext previousContext =
         BindingContext.builder()
             .addBinding(ID, typedValue)
@@ -63,9 +60,6 @@ public class DefaultBindingContextBuilderTestCase extends AbstractMuleTestCase {
 
     assertThat(context.modules(), hasSize(1));
     assertThat(context.modules(), hasItems(module));
-    Collection<Binding> moduleBindings = context.modules().iterator().next().bindings();
-    assertThat(moduleBindings, hasSize(1));
-    assertThat(moduleBindings.iterator().next().identifier(), is(ID));
   }
 
 

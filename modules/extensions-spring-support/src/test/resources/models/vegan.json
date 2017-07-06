@@ -40,7 +40,6 @@
       "operations": [],
       "connectionProviders": [],
       "messageSources": [],
-      "functions": [],
       "name": "PearConfig",
       "description": "",
       "modelProperties": {}
@@ -2043,7 +2042,6 @@
           "kind": "source"
         }
       ],
-      "functions": [],
       "name": "apple-config",
       "description": "",
       "modelProperties": {}
@@ -3650,7 +3648,6 @@
           "kind": "source"
         }
       ],
-      "functions": [],
       "name": "banana-config",
       "description": "",
       "modelProperties": {}
@@ -3948,7 +3945,6 @@
         }
       ],
       "messageSources": [],
-      "functions": [],
       "name": "grape",
       "description": "",
       "modelProperties": {}
@@ -4212,7 +4208,6 @@
         }
       ],
       "messageSources": [],
-      "functions": [],
       "name": "kiwi-config",
       "description": "",
       "modelProperties": {}
@@ -4691,7 +4686,6 @@
           "kind": "source"
         }
       ],
-      "functions": [],
       "name": "peach-config",
       "description": "",
       "modelProperties": {}
@@ -6232,7 +6226,6 @@
       "kind": "operation"
     }
   ],
-  "functions": [],
   "connectionProviders": [],
   "messageSources": [],
   "errors": [

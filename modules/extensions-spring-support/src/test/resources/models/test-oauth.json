@@ -1605,14 +1605,12 @@
         }
       ],
       "messageSources": [],
-      "functions": [],
       "name": "config",
       "description": "Default configuration",
       "modelProperties": {}
     }
   ],
   "operations": [],
-  "functions": [],
   "connectionProviders": [
     {
       "connectionManagementType": "NONE",

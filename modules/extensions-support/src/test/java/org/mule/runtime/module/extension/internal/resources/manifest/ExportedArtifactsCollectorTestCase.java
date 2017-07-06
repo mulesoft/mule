@@ -15,7 +15,7 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getApiMethods;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getOperationMethods;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockParameters;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -69,7 +69,7 @@ public class ExportedArtifactsCollectorTestCase {
 
     OutputModel appleList = mockOutputModel(new TypeToken<List<Apple>>() {}.getType());
     OperationModel firstOperation = mockOperationModel(appleList, mockOutputModel(List.class));
-    withMethod(firstOperation, getApiMethods(HeisenbergOperations.class).stream()
+    withMethod(firstOperation, getOperationMethods(HeisenbergOperations.class).stream()
         .filter(m -> m.getName().equals("callGusFring"))
         .findFirst());
 
