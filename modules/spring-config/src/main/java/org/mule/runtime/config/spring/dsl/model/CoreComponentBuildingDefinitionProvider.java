@@ -198,7 +198,6 @@ import org.mule.runtime.core.transformer.simple.BeanToMap;
 import org.mule.runtime.core.transformer.simple.ByteArrayToHexString;
 import org.mule.runtime.core.transformer.simple.ByteArrayToObject;
 import org.mule.runtime.core.transformer.simple.ByteArrayToSerializable;
-import org.mule.runtime.core.transformer.simple.CombineCollectionsTransformer;
 import org.mule.runtime.core.transformer.simple.CopyPropertiesProcessor;
 import org.mule.runtime.core.transformer.simple.HexStringToByteArray;
 import org.mule.runtime.core.transformer.simple.MapToBean;
@@ -978,12 +977,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .build());
     transformerComponentBuildingDefinitions.add(getTransformerBaseBuilder(BeanToMap.class)
         .withIdentifier("bean-to-map-transformer")
-        .build());
-    transformerComponentBuildingDefinitions.add(baseDefinition
-
-        .withIdentifier("combine-collections-transformer")
-        .withTypeDefinition(fromType(CombineCollectionsTransformer.class))
-        .asPrototype()
         .build());
     transformerComponentBuildingDefinitions.add(getMuleMessageTransformerBaseBuilder()
         .withIdentifier("append-string-transformer")
