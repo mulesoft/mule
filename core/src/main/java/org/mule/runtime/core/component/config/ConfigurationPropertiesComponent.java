@@ -17,8 +17,6 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
@@ -67,34 +65,21 @@ public class ConfigurationPropertiesComponent extends AbstractAnnotatedObject
   @Override
   public void initialise() throws InitialisationException {
     if (!fileLocation.endsWith(PROPERTIES_EXTENSION) && !fileLocation.endsWith(YAML_EXTENSION)) {
-      throw new ConfigurationPropertiesException(createStaticMessage(format("Configuration properties file %s must end with yaml or properties extension",
+      throw new ConfigurationPropertiesException(createStaticMessage(
+                                                                     format("Configuration properties file %s must end with yaml or properties extension",
                                                                             fileLocation)),
                                                  this);
     }
 
-    InputStream is = null;
-
-    try {
-      is = resourceProvider.getResourceAsStream(fileLocation);
+    try (InputStream is = resourceProvider.getResourceAsStream(fileLocation)) {
       if (is == null) {
-        File attributesFile = new File(fileLocation);
-        if (attributesFile.exists()) {
-          is = new FileInputStream(attributesFile);
-        }
+        throw new ConfigurationPropertiesException(createStaticMessage(
+                                                                       String.format(
+                                                                                     "Couldn't find configuration properties file %s neither on classpath or in file system",
+                                                                                     fileLocation)),
+                                                   this);
       }
-    } catch (Exception e) {
-      // ignore, will detect if is is null
-    }
 
-    if (is == null) {
-      throw new ConfigurationPropertiesException(createStaticMessage(
-                                                                     String.format(
-                                                                                   "Couldn't find configuration properties file %s neither on classpath or in file system",
-                                                                                   fileLocation)),
-                                                 this);
-    }
-
-    try {
       if (fileLocation.endsWith(PROPERTIES_EXTENSION)) {
         Properties properties = new Properties();
         properties.load(is);

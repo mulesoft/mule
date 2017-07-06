@@ -11,6 +11,7 @@ import static java.util.Optional.of;
 
 import org.mule.runtime.core.api.util.IOUtils;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
 
@@ -32,14 +33,14 @@ public class FileConfigurationPropertiesProvider implements ConfigurationPropert
   public Optional<ConfigurationProperty> getConfigurationProperty(String configurationAttributeKey) {
     if (configurationAttributeKey.startsWith(FILE_PREFIX)) {
       String path = configurationAttributeKey.substring(FILE_PREFIX.length());
-      InputStream is = resourceProvider.getResourceAsStream(path);
-      if (is == null) {
-        return empty();
+      try (InputStream is = resourceProvider.getResourceAsStream(path)) {
+        if (is != null) {
+          String value = IOUtils.toString(is);
+          return of(new ConfigurationProperty(this, configurationAttributeKey, value));
+        }
+      } catch (IOException e) {
+        // ignore close exception
       }
-      String value = IOUtils.toString(is);
-      IOUtils.closeQuietly(is);
-
-      return of(new ConfigurationProperty(this, configurationAttributeKey, value));
     }
 
     return empty();
