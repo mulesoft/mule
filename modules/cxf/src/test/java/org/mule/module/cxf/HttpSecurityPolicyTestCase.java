@@ -8,6 +8,7 @@ package org.mule.module.cxf;
 
 import static com.google.common.net.MediaType.PLAIN_TEXT_UTF_8;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Arrays.asList;
 import static org.apache.commons.httpclient.HttpStatus.SC_INTERNAL_SERVER_ERROR;
 import static org.apache.commons.httpclient.HttpStatus.SC_OK;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -15,7 +16,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.mule.tck.junit4.rule.DynamicPort;
 
-import java.util.Arrays;
 import java.util.Collection;
 
 import org.apache.commons.httpclient.HttpClient;
@@ -26,9 +26,8 @@ import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
 /**
- * This is a simple test where it is verified that the SSLSession is propagated
- * and the properties defined in a JAX-WS service are respected so that the
- * WS-Service-Policy assertions are honored.
+ * This is a simple test where it is verified that the SSLSession is propagated and the properties defined in a JAX-WS
+ * service are respected so that the WS-Service-Policy assertions are honored.
  */
 public class HttpSecurityPolicyTestCase extends AbstractHttpSecurityTestCase
 {
@@ -113,8 +112,7 @@ public class HttpSecurityPolicyTestCase extends AbstractHttpSecurityTestCase
     public void testSSLSessionPropagationWithIncorrectPassword() throws Exception
     {
         HttpClient client = new HttpClient();
-        PostMethod
-        method = new PostMethod("https://localhost:" + dynamicPort2.getNumber() + "/echo");
+        PostMethod method = new PostMethod("https://localhost:" + dynamicPort2.getNumber() + "/echo");
         sendRequest(false, client, method, soapPropertyUsernameWrongPasswordToken);
         assertThat(client.executeMethod(method), equalTo(SC_INTERNAL_SERVER_ERROR));
         assertThat(method.getResponseBodyAsString(), equalTo(SOAP_RESPONSE_NOT_AUTHENTICATED));
@@ -129,8 +127,8 @@ public class HttpSecurityPolicyTestCase extends AbstractHttpSecurityTestCase
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][] {
-                                             {ConfigVariant.FLOW, "jax-ws-security-policy.xml"}
+        return asList(new Object[][] {
+                                      {ConfigVariant.FLOW, "jax-ws-security-policy.xml"}
         });
     }
 

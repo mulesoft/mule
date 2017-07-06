@@ -21,10 +21,9 @@ public class TestCallbackHandler implements CallbackHandler
     @Override
     public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException
     {
-        for (int i = 0; i < callbacks.length; i++)
+        for (Callback callback : callbacks)
         {
-            WSPasswordCallback pc = (WSPasswordCallback) callbacks[0];
-            pc.setPassword(PASSWORD);
+            ((WSPasswordCallback) callback).setPassword(PASSWORD);
         }
     }
 }
