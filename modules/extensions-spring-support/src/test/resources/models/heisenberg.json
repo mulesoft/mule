@@ -2377,6 +2377,13 @@
                               "annotations": {
                                 "description": {
                                   "value": "The password used to protect the trust store."
+                                },
+                                "layout": {
+                                  "layoutModel": {
+                                    "password": true,
+                                    "text": false,
+                                    "query": false
+                                  }
                                 }
                               }
                             },
@@ -2441,7 +2448,7 @@
                               },
                               "annotations": {
                                 "description": {
-                                  "value": "If true, no certificate validations will be performed."
+                                  "value": "If true, no certificate validations will be performed, rendering connections vulnerable to attacks. Use at your own risk."
                                 }
                               }
                             }
@@ -2541,6 +2548,13 @@
                               "annotations": {
                                 "description": {
                                   "value": "The password used to protect the private key."
+                                },
+                                "layout": {
+                                  "layoutModel": {
+                                    "password": true,
+                                    "text": false,
+                                    "query": false
+                                  }
                                 }
                               }
                             },
@@ -2557,6 +2571,13 @@
                               "annotations": {
                                 "description": {
                                   "value": "The password used to protect the key store."
+                                },
+                                "layout": {
+                                  "layoutModel": {
+                                    "password": true,
+                                    "text": false,
+                                    "query": false
+                                  }
                                 }
                               }
                             },
@@ -11445,6 +11466,13 @@
                           "annotations": {
                             "description": {
                               "value": "The password used to protect the trust store."
+                            },
+                            "layout": {
+                              "layoutModel": {
+                                "password": true,
+                                "text": false,
+                                "query": false
+                              }
                             }
                           }
                         },
@@ -11509,7 +11537,7 @@
                           },
                           "annotations": {
                             "description": {
-                              "value": "If true, no certificate validations will be performed."
+                              "value": "If true, no certificate validations will be performed, rendering connections vulnerable to attacks. Use at your own risk."
                             }
                           }
                         }
@@ -11609,6 +11637,13 @@
                           "annotations": {
                             "description": {
                               "value": "The password used to protect the private key."
+                            },
+                            "layout": {
+                              "layoutModel": {
+                                "password": true,
+                                "text": false,
+                                "query": false
+                              }
                             }
                           }
                         },
@@ -11625,6 +11660,13 @@
                           "annotations": {
                             "description": {
                               "value": "The password used to protect the key store."
+                            },
+                            "layout": {
+                              "layoutModel": {
+                                "password": true,
+                                "text": false,
+                                "query": false
+                              }
                             }
                           }
                         },
