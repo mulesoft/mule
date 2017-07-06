@@ -234,7 +234,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
           .flatMap(parentComponentModel -> ofNullable(parentComponentModel.getIdentifier()));
       if (!beanDefinitionFactory.hasDefinition(componentModel.getIdentifier(), parentIdentifierOptional)) {
         componentNotSupportedByNewParsers.add(componentModel.getIdentifier());
-        throw new RuntimeException(String.format("Invalid config '%s'", componentModel.getIdentifier()));
+        throw new RuntimeException(format("Invalid config '%s'", componentModel.getIdentifier()));
       }
     });
   }
