@@ -46,6 +46,9 @@ public class FirstSuccessfulRoutingStrategy extends AbstractRoutingStrategy {
 
     boolean failed = true;
     Exception failExceptionCause = null;
+
+    validateMessageIsNotConsumable(event.getMessage());
+
     for (Processor mp : messageProcessors) {
       try {
         returnEvent = processor.processRoute(mp, event);
