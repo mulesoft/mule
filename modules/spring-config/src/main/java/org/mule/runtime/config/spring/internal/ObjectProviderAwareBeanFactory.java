@@ -12,17 +12,17 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.ioc.ObjectProvider;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
 
-import com.google.common.collect.ImmutableMap;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import com.google.common.collect.ImmutableMap;
 
 /**
  * {@link org.springframework.beans.factory.ListableBeanFactory} implementation that will resolve beans using a list of
@@ -103,6 +103,16 @@ public class ObjectProviderAwareBeanFactory extends DefaultListableBeanFactory {
     return builder.build();
   }
 
+  @Override
+  public <T> Map<String, T> getBeansOfType(Class<T> type, boolean includeNonSingletons, boolean allowEagerInit)
+      throws BeansException {
+    ImmutableMap.Builder<String, T> objectsMap = ImmutableMap.builder();
+    objectsMap.putAll(super.getBeansOfType(type, includeNonSingletons, allowEagerInit));
+    for (ObjectProvider objectProvider : objectProviders) {
+      objectsMap.putAll(objectProvider.getObjectsByType(type));
+    }
+    return objectsMap.build();
+  }
 
   private <T> Optional<T> doWithFallbackInObjectProvider(CheckedSupplier<T> thisSupplier,
                                                          Function<ObjectProvider, Optional<T>> fallbackFunction)
