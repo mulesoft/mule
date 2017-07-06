@@ -80,7 +80,6 @@
             <xsd:element ref="abstract-extension"/>
             <xsd:element ref="abstract-shared-extension"/>
             <xsd:element ref="abstract-mixed-content-extension"/>
-            <xsd:element ref="abstract-agent"/>
             <xsd:element ref="abstract-security-manager"/>
             <xsd:element ref="abstract-transaction-manager"/>
             <xsd:element ref="abstract-shared-transaction-manager"/>
@@ -273,47 +272,7 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-
-    <!-- Agents -->
-    <xsd:element name="abstract-agent" abstract="true" type="abstractAgentType">
-        <xsd:annotation>
-            <xsd:documentation>
-                A placeholder for agent elements. Are used to run processes as part of the server instance.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
-    <xsd:complexType name="abstractAgentType">
-        <xsd:complexContent>
-            <xsd:extension base="annotatedType"/>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="custom-agent" type="customAgentType" substitutionGroup="abstract-agent"/>
-    <xsd:complexType name="customAgentType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractAgentType">
-                <xsd:sequence>
-                    <xsd:group ref="propertiesGroup">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                Properties to be set on the created object.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:group>
-                </xsd:sequence>
-                <xsd:attribute name="class" type="substitutableClass" use="required"/>
-                <xsd:attribute name="name" type="substitutableName" use="required">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Identifies the agent in the registry.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
+  
     <!-- Message Processors -->
     <xsd:element name="abstract-message-processor" abstract="true" type="abstractMessageProcessorType">
         <xsd:annotation>
