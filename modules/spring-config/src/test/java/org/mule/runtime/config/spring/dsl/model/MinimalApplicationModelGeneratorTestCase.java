@@ -19,24 +19,27 @@ import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.component.location.Location.builder;
 import static org.mule.runtime.config.spring.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
+
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.config.spring.XmlConfigurationDocumentLoader;
+import org.mule.runtime.core.component.config.ClassLoaderResourceProvider;
 import org.mule.runtime.config.spring.dsl.processor.ArtifactConfig;
 import org.mule.runtime.config.spring.dsl.processor.ConfigFile;
 import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
 import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationParser;
+import org.mule.runtime.core.component.config.ResourceProvider;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCase {
 
@@ -228,9 +231,11 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
     final ArtifactConfig.Builder builder = new ArtifactConfig.Builder();
     configFiles.stream().forEach(configFile -> builder.addConfigFile(configFile));
     final ArtifactConfig artifactConfig = builder.build();
+    ResourceProvider externalResourceProvider = new ClassLoaderResourceProvider(Thread.currentThread().getContextClassLoader());
     return new MinimalApplicationModelGenerator(new ApplicationModel(artifactConfig, new ArtifactDeclaration(), emptySet(),
                                                                      emptyMap(), empty(),
-                                                                     Optional.of(componentBuildingDefinitionRegistry), true),
+                                                                     Optional.of(componentBuildingDefinitionRegistry), true,
+                                                                     externalResourceProvider),
                                                 componentBuildingDefinitionRegistry);
   }
 

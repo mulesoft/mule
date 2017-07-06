@@ -11,8 +11,10 @@ import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.test.allure.AllureConstants.ConfigurationProperties.CONFIGURATION_PROPERTIES;
 import static org.mule.test.allure.AllureConstants.ConfigurationProperties.ComponentConfigurationAttributesStory.COMPONENT_CONFIGURATION_YAML_STORY;
+
 import org.mule.runtime.api.lifecycle.InitialisationException;
 
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -27,12 +29,18 @@ public class YamlConfigurationPropertiesComponentTestCase {
   @Rule
   public ExpectedException expectedException = none();
 
+  private ResourceProvider externalResourceProvider;
   private ConfigurationPropertiesComponent configurationComponent;
+
+  @Before
+  public void setUp() {
+    externalResourceProvider = new ClassLoaderResourceProvider(Thread.currentThread().getContextClassLoader());
+  }
 
   @Description("Validates the values obtained for the different types in the properties")
   @Test
   public void validConfig() throws InitialisationException {
-    configurationComponent = new ConfigurationPropertiesComponent("properties.yaml");
+    configurationComponent = new ConfigurationPropertiesComponent("properties.yaml", externalResourceProvider);
     configurationComponent.initialise();
     assertThat(configurationComponent.getConfigurationProperty("number").get().getRawValue(), is("34843"));
     assertThat(configurationComponent.getConfigurationProperty("float").get().getRawValue(), is("2392.00"));
@@ -47,7 +55,7 @@ public class YamlConfigurationPropertiesComponentTestCase {
   @Description("Validates that a list of complex objects is not valid")
   @Test
   public void complexListOfObjectsNotSuported() throws InitialisationException {
-    configurationComponent = new ConfigurationPropertiesComponent("complex-list-object.yaml");
+    configurationComponent = new ConfigurationPropertiesComponent("complex-list-object.yaml", externalResourceProvider);
     expectedException
         .expectMessage("Configuration properties does not support type a list of complex types. Complex type keys are: complex");
     expectedException.expect(ConfigurationPropertiesException.class);
@@ -58,7 +66,7 @@ public class YamlConfigurationPropertiesComponentTestCase {
   @Description("Validates that a only string types are supported")
   @Test
   public void unsupportedType() throws InitialisationException {
-    configurationComponent = new ConfigurationPropertiesComponent("unsupported-type.yaml");
+    configurationComponent = new ConfigurationPropertiesComponent("unsupported-type.yaml", externalResourceProvider);
     expectedException
         .expectMessage("YAML configuration properties only supports string values, make sure to wrap the value with \" so you force the value to be an string. Offending property is integer with value 1235");
     expectedException.expect(ConfigurationPropertiesException.class);
