@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.policy;
 
+import org.mule.runtime.core.api.policy.PolicyChain;
+
 /**
  * This class represents a policy injection.
  * <p>

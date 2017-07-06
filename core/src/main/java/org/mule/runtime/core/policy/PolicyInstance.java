@@ -8,6 +8,7 @@ package org.mule.runtime.core.policy;
 
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.core.api.policy.PolicyChain;
 
 import java.util.Optional;
 

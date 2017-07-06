@@ -16,7 +16,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.policy.DefaultPolicyInstance;
+import org.mule.runtime.core.api.policy.DefaultPolicyInstance;
 import org.mule.runtime.core.policy.Policy;
 import org.mule.runtime.core.policy.PolicyInstance;
 import org.mule.runtime.core.policy.PolicyParametrization;

@@ -13,6 +13,8 @@ import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.policy.PolicyChain;
+import org.mule.runtime.core.api.policy.PolicyNextActionMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.Optional;

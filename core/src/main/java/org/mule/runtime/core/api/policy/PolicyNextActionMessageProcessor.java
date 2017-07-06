@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.policy;
+package org.mule.runtime.core.api.policy;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
@@ -17,6 +17,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.policy.PolicyStateHandler;
 
 import javax.inject.Inject;
 
