@@ -6,8 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.runtime;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
@@ -76,4 +78,14 @@ public interface ExecutionContextAdapter<M extends ComponentModel> extends Event
    * @return The application's {@link StreamingManager}
    */
   StreamingManager getStreamingManager();
+
+  /**
+   * @return The {@link Flow} that contains the executing component
+   */
+  Flow getFlow();
+
+  /**
+   * @return The {@link ComponentLocation} of the executing component
+   */
+  ComponentLocation getComponentLocation();
 }

@@ -32,6 +32,7 @@ import org.mule.tck.size.SmallTest;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.commons.lang3.NotImplementedException;
 import org.junit.After;
@@ -90,17 +91,26 @@ public class QueueManagerLifecycleOrderTestCase extends AbstractMuleTestCase {
 
     @Override
     public QueueSession getQueueSession() {
-      throw new NotImplementedException("This is test code");
+      throw notImplementedException();
     }
 
     @Override
     public void setDefaultQueueConfiguration(QueueConfiguration config) {
-      throw new NotImplementedException("This is test code");
+      throw notImplementedException();
     }
 
     @Override
     public void setQueueConfiguration(String queueName, QueueConfiguration config) {
-      throw new NotImplementedException("This is test code");
+      throw notImplementedException();
+    }
+
+    @Override
+    public Optional<QueueConfiguration> getQueueConfiguration(String queueName) {
+      throw notImplementedException();
+    }
+
+    private NotImplementedException notImplementedException() {
+      return new NotImplementedException("This is test code");
     }
   }
 

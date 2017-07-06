@@ -8,9 +8,7 @@ package org.mule.runtime.core.el.mvel;
 
 import static java.lang.String.format;
 import static org.mule.runtime.core.el.mvel.MVELExpressionLanguageContext.MULE_EVENT_INTERNAL_VARIABLE;
-import static org.mule.runtime.dsl.api.component.config.ComponentLocationUtils.getFlowNameFrom;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.mvel2.ParserConfiguration;
 import org.mule.mvel2.integration.VariableResolver;
 import org.mule.mvel2.integration.VariableResolverFactory;
@@ -31,7 +29,7 @@ public class EventVariableResolverFactory extends MessageVariableResolverFactory
   public EventVariableResolverFactory(ParserConfiguration parserConfiguration, MuleContext muleContext, Event event,
                                       Event.Builder eventBuilder, ComponentLocation componentLocation) {
     super(parserConfiguration, muleContext, event, eventBuilder);
-    this.flowName = componentLocation != null ? getFlowNameFrom(componentLocation) : null;
+    this.flowName = componentLocation != null ? componentLocation.getRootContainerName() : null;
   }
 
   /**

@@ -14,10 +14,8 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mule.functional.api.component.FlowAssert.addAssertion;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setFlowConstructIfNeeded;
-import static org.mule.runtime.dsl.api.component.config.ComponentLocationUtils.getFlowNameFrom;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
-
 import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -30,12 +28,11 @@ import org.mule.runtime.core.api.expression.InvalidExpressionException;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 
+import com.eaio.uuid.UUID;
+
 import java.util.concurrent.CountDownLatch;
 
 import org.reactivestreams.Publisher;
-
-import com.eaio.uuid.UUID;
-
 import reactor.core.publisher.Flux;
 
 public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
@@ -62,7 +59,7 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
       throw new InvalidExpressionException(expression, result.errorMessage().orElse("Invalid expression"));
     }
     responseLatch = new CountDownLatch(responseCount);
-    addAssertion(getFlowNameFrom(getLocation()), this);
+    addAssertion(getLocation().getRootContainerName(), this);
   }
 
   @Override

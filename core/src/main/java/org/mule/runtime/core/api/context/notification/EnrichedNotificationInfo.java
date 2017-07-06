@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.api.context.notification;
 
-import static org.mule.runtime.dsl.api.component.config.ComponentLocationUtils.getFlowNameFrom;
-
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.AnnotatedObject;
@@ -60,7 +58,8 @@ public class EnrichedNotificationInfo {
       notificationInfo =
           new EnrichedNotificationInfo(event.getContext().getId(), event.getCorrelationId(), event.getGroupCorrelation(),
                                        event.getMessage(), event.getError(), component, e, createVariablesMap(event),
-                                       getFlowNameFrom(event.getContext().getOriginatingLocation()), event.getFlowCallStack());
+                                       event.getContext().getOriginatingLocation().getRootContainerName(),
+                                       event.getFlowCallStack());
       notificationInfo.event = event;
       return notificationInfo;
     } else if (e != null) {

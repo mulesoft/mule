@@ -9,11 +9,11 @@ package org.mule.runtime.container.internal;
 
 import static java.io.File.createTempFile;
 import static java.lang.String.format;
-import static org.apache.commons.io.FileUtils.write;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.mule.runtime.core.api.util.FileUtils.stringToFile;
 import static org.mule.runtime.core.api.util.PropertiesUtils.discoverProperties;
-import org.mule.runtime.module.artifact.classloader.ExportedService;
 import org.mule.runtime.container.api.MuleModule;
+import org.mule.runtime.module.artifact.classloader.ExportedService;
 
 import java.io.File;
 import java.io.IOException;
@@ -105,7 +105,7 @@ public class ClasspathModuleDiscoverer implements ModuleDiscoverer {
       URL resource;
       try {
         File serviceFile = createTempFile(serviceInterface, "tmp");
-        write(serviceFile, serviceImplementation);
+        stringToFile(serviceFile.getAbsolutePath(), serviceImplementation);
         resource = serviceFile.toURI().toURL();
       } catch (IOException e) {
         throw new IllegalStateException(format("Error creating temporary service provider file for '%s'", serviceInterface), e);

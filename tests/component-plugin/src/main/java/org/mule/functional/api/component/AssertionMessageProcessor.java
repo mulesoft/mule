@@ -7,8 +7,6 @@
 package org.mule.functional.api.component;
 
 import static org.junit.Assert.fail;
-import static org.mule.runtime.dsl.api.component.config.ComponentLocationUtils.getFlowNameFrom;
-
 import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -52,7 +50,7 @@ public class AssertionMessageProcessor extends AbstractAnnotatedObject implement
       throw new InvalidExpressionException(expression, result.errorMessage().orElse("Invalid exception"));
     }
     latch = new CountDownLatch(count);
-    FlowAssert.addAssertion(getFlowNameFrom(getLocation()), this);
+    FlowAssert.addAssertion(getLocation().getRootContainerName(), this);
   }
 
   @Override

@@ -86,6 +86,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Implement
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterResolverTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.TypedValueTypeModelProperty;
+
 import com.google.common.collect.ImmutableList;
 
 import java.beans.IntrospectionException;
@@ -680,10 +681,24 @@ public final class IntrospectionUtils {
 
   public static List<Field> getFields(Class<?> clazz) {
     try {
-      return getDescendingHierarchy(clazz).stream().flatMap(type -> stream(type.getDeclaredFields())).collect(toImmutableList());
+      return getFieldsStream(clazz).collect(toImmutableList());
     } catch (Throwable e) {
       throw new RuntimeException(e);
     }
+  }
+
+  private static Stream<Field> getFieldsStream(Class<?> clazz) {
+    try {
+      return getDescendingHierarchy(clazz).stream().flatMap(type -> stream(type.getDeclaredFields()));
+    } catch (Throwable e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public static List<Field> getFieldsOfType(Class<?> introspectedType, Class fieldType) {
+    return getFieldsStream(introspectedType)
+        .filter(f -> fieldType.isAssignableFrom(f.getType()))
+        .collect(toList());
   }
 
   /**
