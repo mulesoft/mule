@@ -4,18 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.policy;
+package org.mule.runtime.core.api.policy;
 
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.policy.PolicyChain;
-import org.mule.runtime.core.api.policy.PolicyNextActionMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.internal.policy.PolicyEventConverter;
 
 import java.util.Optional;
 
@@ -75,7 +73,7 @@ public class OperationPolicyProcessor implements Processor {
       policyStateHandler.updateState(policyStateId, variablesProviderEvent);
       Event policyEvent = policyEventConverter.createEvent(operationEvent, variablesProviderEvent);
       Processor operationCall = buildOperationExecutionWithPolicyFunction(nextProcessor, operationEvent);
-      policyStateHandler.updateNextOperation(policyStateId.getExecutionIndentifier(), operationCall);
+      policyStateHandler.updateNextOperation(policyStateId.getExecutionIdentifier(), operationCall);
       return executePolicyChain(operationEvent, policyStateId, policyEvent);
     });
   }

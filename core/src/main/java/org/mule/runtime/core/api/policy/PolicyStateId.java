@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.policy;
+package org.mule.runtime.core.api.policy;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
@@ -19,7 +19,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
  */
 public class PolicyStateId {
 
-  private String executionIndentifier;
+  private String executionIdentifier;
   private String policyId;
 
   /**
@@ -31,15 +31,15 @@ public class PolicyStateId {
   public PolicyStateId(String executionIdentifier, String policyId) {
     checkArgument(!isEmpty(executionIdentifier), "executionIdentifier cannot be null or empty");
     checkArgument(!isEmpty(executionIdentifier), "policyId cannot be null or empty");
-    this.executionIndentifier = executionIdentifier;
+    this.executionIdentifier = executionIdentifier;
     this.policyId = policyId;
   }
 
   /**
    * @return the identifier of the execution
    */
-  public String getExecutionIndentifier() {
-    return executionIndentifier;
+  public String getExecutionIdentifier() {
+    return executionIdentifier;
   }
 
   /**
@@ -60,8 +60,8 @@ public class PolicyStateId {
 
     PolicyStateId that = (PolicyStateId) o;
 
-    if (executionIndentifier != null ? !executionIndentifier.equals(that.executionIndentifier)
-        : that.executionIndentifier != null) {
+    if (executionIdentifier != null ? !executionIdentifier.equals(that.executionIdentifier)
+        : that.executionIdentifier != null) {
       return false;
     }
     return policyId != null ? policyId.equals(that.policyId) : that.policyId == null;
@@ -70,7 +70,7 @@ public class PolicyStateId {
 
   @Override
   public int hashCode() {
-    int result = executionIndentifier != null ? executionIndentifier.hashCode() : 0;
+    int result = executionIdentifier != null ? executionIdentifier.hashCode() : 0;
     result = 31 * result + (policyId != null ? policyId.hashCode() : 0);
     return result;
   }

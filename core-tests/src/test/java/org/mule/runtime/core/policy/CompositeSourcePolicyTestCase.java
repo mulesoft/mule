@@ -38,7 +38,7 @@ import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.policy.CompositeSourcePolicy;
 import org.mule.runtime.core.internal.policy.MessageSourceResponseParametersProcessor;
-import org.mule.runtime.core.internal.policy.Policy;
+import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.internal.policy.SourcePolicyFailureResult;
 import org.mule.runtime.core.internal.policy.SourcePolicyProcessorFactory;
 import org.mule.runtime.core.internal.policy.SourcePolicySuccessResult;

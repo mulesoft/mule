@@ -7,7 +7,7 @@
 package org.mule.runtime.core.policy;
 
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.internal.policy.OperationPolicyProcessor;
+import org.mule.runtime.core.api.policy.OperationPolicyProcessor;
 
 public class OperationPolicyProcessorTestCase extends AbstractPolicyProcessorTestCase {
 

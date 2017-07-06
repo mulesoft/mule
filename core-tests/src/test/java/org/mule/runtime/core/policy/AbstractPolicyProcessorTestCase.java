@@ -25,8 +25,8 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.session.DefaultMuleSession;
 import org.mule.runtime.core.internal.policy.DefaultPolicyStateHandler;
-import org.mule.runtime.core.internal.policy.Policy;
-import org.mule.runtime.core.internal.policy.PolicyStateHandler;
+import org.mule.runtime.core.api.policy.Policy;
+import org.mule.runtime.core.api.policy.PolicyStateHandler;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.message.StringAttributes;
 

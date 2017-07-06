@@ -9,6 +9,8 @@ package org.mule.runtime.core.internal.policy;
 import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.policy.PolicyStateHandler;
+import org.mule.runtime.core.api.policy.PolicyStateId;
 import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.Collection;
@@ -38,7 +40,7 @@ public class DefaultPolicyStateHandler implements PolicyStateHandler {
 
   public void updateState(PolicyStateId identifier, Event lastStateEvent) {
     stateMap.put(identifier, lastStateEvent);
-    policyStateIdsByExecutionIdentifier.put(identifier.getExecutionIndentifier(), identifier);
+    policyStateIdsByExecutionIdentifier.put(identifier.getExecutionIdentifier(), identifier);
   }
 
   public void destroyState(String identifier) {

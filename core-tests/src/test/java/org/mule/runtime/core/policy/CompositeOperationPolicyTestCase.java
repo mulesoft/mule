@@ -35,7 +35,7 @@ import org.mule.runtime.core.internal.policy.CompositeOperationPolicy;
 import org.mule.runtime.core.internal.policy.OperationExecutionFunction;
 import org.mule.runtime.core.internal.policy.OperationParametersProcessor;
 import org.mule.runtime.core.internal.policy.OperationPolicyProcessorFactory;
-import org.mule.runtime.core.internal.policy.Policy;
+import org.mule.runtime.core.api.policy.Policy;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.Optional;

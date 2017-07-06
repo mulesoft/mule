@@ -24,9 +24,9 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.core.internal.policy.Policy;
+import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyInstance;
-import org.mule.runtime.core.internal.policy.PolicyProvider;
+import org.mule.runtime.core.api.policy.PolicyProvider;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 
 import java.util.List;
