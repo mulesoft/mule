@@ -221,7 +221,7 @@ public class ComponentModel {
   }
 
   /**
-   * Setter used for components that should be created eagerly without going throw spring. This is the case of models contributing
+   * Setter used for components that should be created eagerly without going through spring. This is the case of models contributing
    * to IoC {@link org.mule.runtime.api.ioc.ObjectProvider} interface that require to be created before the application components
    * so they can be referenced.
    * 

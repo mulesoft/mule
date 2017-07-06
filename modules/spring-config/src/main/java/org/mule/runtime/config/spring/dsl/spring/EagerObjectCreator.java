@@ -56,7 +56,7 @@ public class EagerObjectCreator extends BeanDefinitionCreator {
         instance = type.newInstance();
       } catch (Exception e) {
         throw new MuleRuntimeException(I18nMessageFactory.createStaticMessage(
-                                                                              "Could not create an instance of %s using default constructor. Early created objet must have a default constructor",
+                                                                              "Could not create an instance of '%s' using default constructor. Early created object must have a default constructor",
                                                                               type.getName()));
       }
       componentBuildingDefinition.getSetterParameterDefinitions().forEach(attributeDefinition -> {
@@ -76,7 +76,7 @@ public class EagerObjectCreator extends BeanDefinitionCreator {
 
           @Override
           protected void doOnOperation(String operation) {
-            throw new MuleRuntimeException(createStaticMessage(format("Attribute definition with operation %s is not supported for earlyCreationObjects",
+            throw new MuleRuntimeException(createStaticMessage(format("Attribute definition with operation '%s' is not supported for earlyCreationObjects",
                                                                       operation)));
           }
         });

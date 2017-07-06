@@ -101,6 +101,7 @@ public class ApplicationModel {
   // TODO MULE-9692 move this logic elsewhere. This are here just for the language rules and those should be processed elsewhere.
   public static final String MULE_ROOT_ELEMENT = "mule";
   public static final String MULE_DOMAIN_ROOT_ELEMENT = "mule-domain";
+  public static final String IMPORT_ELEMENT = "import";
   public static final String POLICY_ROOT_ELEMENT = "policy";
   public static final String ANNOTATIONS = "annotations";
   public static final String ERROR_HANDLER = "error-handler";
@@ -109,7 +110,6 @@ public class ApplicationModel {
   public static final String WHEN_CHOICE_ES_ATTRIBUTE = "when";
   public static final String TYPE_ES_ATTRIBUTE = "type";
   public static final String EXCEPTION_STRATEGY_REFERENCE_ELEMENT = "exception-strategy";
-  public static final String SPRING_CONTEXT_NAMESPACE = "context";
   public static final String PROPERTY_ELEMENT = "property";
   public static final String NAME_ATTRIBUTE = "name";
   public static final String REFERENCE_ATTRIBUTE = "ref";
@@ -150,10 +150,6 @@ public class ApplicationModel {
   public static final String GLOBAL_PROPERTY = "global-property";
   public static final String SECURITY_MANAGER = "security-manager";
   public static final String CONFIGURATION_PROPERTIES_ELEMENT = "configuration-properties";
-  public static final String SPRING_ENTRY_ELEMENT = "entry";
-  public static final String SPRING_LIST_ELEMENT = "list";
-  public static final String SPRING_MAP_ELEMENT = "map";
-  public static final String SPRING_VALUE_ELEMENT = "value";
   public static final String PROTOTYPE_OBJECT_ELEMENT = "prototype-object";
   public static final String SINGLETON_OBJECT_ELEMENT = "singleton-object";
   public static final String OBJECT_ELEMENT = "object";
@@ -220,6 +216,8 @@ public class ApplicationModel {
       builder().withNamespace(CORE_PREFIX).withName(CONFIGURATION_PROPERTIES_ELEMENT).build();
   public static final ComponentIdentifier MODULE_OPERATION_CHAIN =
       builder().withNamespace(CORE_PREFIX).withName(MODULE_OPERATION_CHAIN_ELEMENT).build();
+
+  public static final String CLASS_ATTRIBUTE = "class";
 
   private static ImmutableSet<ComponentIdentifier> ignoredNameValidationComponentList =
       ImmutableSet.<ComponentIdentifier>builder()
@@ -444,13 +442,14 @@ public class ApplicationModel {
         componentModel.setType(typeDefinitionVisitor.getType());
         return definition;
       }).orElseGet(() -> {
-        String classParameter = componentModel.getParameters().get("class");
+        String classParameter = componentModel.getParameters().get(CLASS_ATTRIBUTE);
         if (classParameter != null) {
           try {
             componentModel.setType(ClassUtils.getClass(classParameter));
           } catch (ClassNotFoundException e) {
             throw new RuntimeConfigurationException(I18nMessageFactory.createStaticMessage(String
-                .format("Could not resolve class %s for component %s", classParameter, componentModel.getComponentLocation())));
+                .format("Could not resolve class '%s' for component '%s'", classParameter,
+                        componentModel.getComponentLocation())));
           }
         }
         return null;

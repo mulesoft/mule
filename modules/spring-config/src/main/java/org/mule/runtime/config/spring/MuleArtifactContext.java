@@ -14,11 +14,11 @@ import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.ArrayUtils.addAll;
-import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.config.spring.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.CONFIGURATION_IDENTIFIER;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.IMPORT_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.spring.BeanDefinitionFactory.SPRING_SINGLETON_OBJECT;
 import static org.mule.runtime.config.spring.parsers.generic.AutoIdUtils.uniqueValue;
@@ -52,6 +52,8 @@ import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationParser;
 import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationServiceRegistry;
 import org.mule.runtime.config.spring.dsl.spring.BeanDefinitionFactory;
 import org.mule.runtime.config.spring.editors.MulePropertyEditorRegistrar;
+import org.mule.runtime.config.spring.internal.ImmutableObjectProviderConfiguration;
+import org.mule.runtime.config.spring.internal.ObjectProviderAwareBeanFactory;
 import org.mule.runtime.config.spring.processors.ComponentLocatorCreatePostProcessor;
 import org.mule.runtime.config.spring.processors.ContextExclusiveInjectorProcessor;
 import org.mule.runtime.config.spring.processors.DiscardedOptionalBeanPostProcessor;
@@ -120,7 +122,6 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(MuleArtifactContext.class);
 
-  private static final ThreadLocal<MuleContext> currentMuleContext = new ThreadLocal<>();
   public static final String INNER_BEAN_PREFIX = "(inner bean)";
 
   protected final ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry =
@@ -233,7 +234,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
           .flatMap(parentComponentModel -> ofNullable(parentComponentModel.getIdentifier()));
       if (!beanDefinitionFactory.hasDefinition(componentModel.getIdentifier(), parentIdentifierOptional)) {
         componentNotSupportedByNewParsers.add(componentModel.getIdentifier());
-        throw new RuntimeException("Invalid config " + componentModel.getIdentifier());
+        throw new RuntimeException(String.format("Invalid config '%s'", componentModel.getIdentifier()));
       }
     });
   }
@@ -301,12 +302,13 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
       List<ConfigLine> rootConfigLines = configFile.getConfigLines();
       ConfigLine muleRootElementConfigLine = rootConfigLines.get(0);
       importedFiles.addAll(muleRootElementConfigLine.getChildren().stream()
-          .filter(configLine -> configLine.getNamespace().equals(CORE_PREFIX) && configLine.getIdentifier().equals("import"))
+          .filter(configLine -> configLine.getNamespace().equals(CORE_PREFIX)
+              && configLine.getIdentifier().equals(IMPORT_ELEMENT))
           .map(configLine -> {
             SimpleConfigAttribute fileConfigAttribute = configLine.getConfigAttributes().get("file");
             if (fileConfigAttribute == null) {
               throw new RuntimeConfigurationException(
-                                                      createStaticMessage(format("<import> does not have a file attribute defined. At file %s, at line %s",
+                                                      createStaticMessage(format("<import> does not have a file attribute defined. At file '%s', at line %s",
                                                                                  configFile.getFilename(),
                                                                                  configLine.getLineNumber())));
             }
@@ -328,7 +330,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
         .map(importedFileName -> {
           InputStream resourceAsStream = muleContext.getExecutionClassLoader().getResourceAsStream(importedFileName);
           if (resourceAsStream == null) {
-            throw new RuntimeConfigurationException(createStaticMessage(format("Could not find imported resource %s",
+            throw new RuntimeConfigurationException(createStaticMessage(format("Could not find imported resource '%s'",
                                                                                importedFileName)));
           }
           return (Pair<String, InputStream>) new Pair(importedFileName, resourceAsStream);
@@ -579,10 +581,6 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
 
   protected OptionalObjectsController getOptionalObjectsController() {
     return optionalObjectsController;
-  }
-
-  public static ThreadLocal<MuleContext> getCurrentMuleContext() {
-    return currentMuleContext;
   }
 
   public void initializeComponent(Location location) {

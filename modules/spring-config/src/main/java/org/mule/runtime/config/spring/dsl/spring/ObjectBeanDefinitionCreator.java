@@ -38,12 +38,12 @@ public class ObjectBeanDefinitionCreator extends BeanDefinitionCreator {
     String refParameterValue = componentModel.getParameters().get(REF_PARAMETER);
     String classParameterValue = componentModel.getParameters().get(CLASS_PARAMETER);
     if (refParameterValue != null && classParameterValue != null) {
-      throw new RuntimeConfigurationException(createStaticMessage(format("Object cannot contain both %s and %s parameter. Offending resource is %s",
+      throw new RuntimeConfigurationException(createStaticMessage(format("Object cannot contain both '%s' and '%s' parameter. Offending resource is '%s'",
                                                                          refParameterValue, classParameterValue,
                                                                          componentModel.getComponentLocation())));
     }
     if (refParameterValue == null && classParameterValue == null) {
-      throw new RuntimeConfigurationException(createStaticMessage(format("Object cannot contain both %s and %s parameter empty. Offending resource is %s",
+      throw new RuntimeConfigurationException(createStaticMessage(format("Object cannot contain both '%s' and '%s' parameter empty. Offending resource is '%s'",
                                                                          refParameterValue, classParameterValue,
                                                                          componentModel.getComponentLocation())));
     }
