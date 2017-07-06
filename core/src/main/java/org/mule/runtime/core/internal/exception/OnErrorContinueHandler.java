@@ -78,6 +78,10 @@ public class OnErrorContinueHandler extends TemplateOnErrorHandler {
 
   @Override
   public boolean accept(Event event) {
-    return !sourceErrorMatcher.match(event.getError().get().getErrorType()) && super.accept(event);
+    return !sourceError(event) && super.accept(event);
+  }
+
+  private boolean sourceError(Event event) {
+    return event.getError().filter(error -> sourceErrorMatcher.match(event.getError().get().getErrorType())).isPresent();
   }
 }
