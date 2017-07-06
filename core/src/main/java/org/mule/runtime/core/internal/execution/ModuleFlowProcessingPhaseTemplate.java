@@ -13,7 +13,7 @@ import org.mule.runtime.core.api.execution.MessageProcessTemplate;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.exception.MessagingException;
-import org.mule.runtime.core.policy.MessageSourceResponseParametersProcessor;
+import org.mule.runtime.core.internal.policy.MessageSourceResponseParametersProcessor;
 
 import java.util.Map;
 

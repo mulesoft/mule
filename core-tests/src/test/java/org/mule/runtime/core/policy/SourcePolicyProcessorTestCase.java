@@ -7,6 +7,7 @@
 package org.mule.runtime.core.policy;
 
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.internal.policy.SourcePolicyProcessor;
 
 public class SourcePolicyProcessorTestCase extends AbstractPolicyProcessorTestCase {
 

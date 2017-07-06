@@ -11,6 +11,8 @@ import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.internal.policy.DefaultPolicyStateHandler;
+import org.mule.runtime.core.internal.policy.PolicyStateId;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;

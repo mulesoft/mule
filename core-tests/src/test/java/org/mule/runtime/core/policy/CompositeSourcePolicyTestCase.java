@@ -36,6 +36,12 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.internal.policy.CompositeSourcePolicy;
+import org.mule.runtime.core.internal.policy.MessageSourceResponseParametersProcessor;
+import org.mule.runtime.core.internal.policy.Policy;
+import org.mule.runtime.core.internal.policy.SourcePolicyFailureResult;
+import org.mule.runtime.core.internal.policy.SourcePolicyProcessorFactory;
+import org.mule.runtime.core.internal.policy.SourcePolicySuccessResult;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.Optional;
@@ -45,7 +51,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 

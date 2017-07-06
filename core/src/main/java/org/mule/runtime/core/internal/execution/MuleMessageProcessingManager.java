@@ -13,7 +13,7 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.execution.MessageProcessContext;
 import org.mule.runtime.core.api.execution.MessageProcessTemplate;
 import org.mule.runtime.core.api.execution.MessageProcessingManager;
-import org.mule.runtime.core.policy.PolicyManager;
+import org.mule.runtime.core.internal.policy.PolicyManager;
 
 import java.util.ArrayList;
 import java.util.Collection;
