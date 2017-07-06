@@ -25,7 +25,7 @@ import ru.yandex.qatools.allure.annotations.Stories;
 
 @Features(CONFIGURATION_PROPERTIES)
 @Stories(CONFIGURATION_PROPERTIES_RESOLVER_STORY)
-public class FileConfigurationPropertiesProviderTest extends AbstractMuleTestCase {
+public class FileConfigurationPropertiesProviderTestCase extends AbstractMuleTestCase {
 
   private DefaultConfigurationPropertiesResolver resolver;
 

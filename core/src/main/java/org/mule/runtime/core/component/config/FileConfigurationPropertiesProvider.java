@@ -37,6 +37,7 @@ public class FileConfigurationPropertiesProvider implements ConfigurationPropert
         return empty();
       }
       String value = IOUtils.toString(is);
+      IOUtils.closeQuietly(is);
 
       return of(new ConfigurationProperty(this, configurationAttributeKey, value));
     }
