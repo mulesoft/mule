@@ -1,0 +1,3 @@
+Git does not allow versioning of an empty folder so we add this file here to create the folder in git.
+
+This file is ignored by the assembly plugin.
