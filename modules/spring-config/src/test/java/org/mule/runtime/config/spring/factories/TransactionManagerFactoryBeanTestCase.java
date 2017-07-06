@@ -40,34 +40,4 @@ public class TransactionManagerFactoryBeanTestCase extends AbstractMuleTestCase 
     assertThat(transactionManager, not(is(IsNull.nullValue())));
   }
 
-  @Test
-  public void registerCustomTransactionManager() throws Exception {
-    DefaultMuleContext context =
-        (DefaultMuleContext) new DefaultMuleContextFactory().createMuleContext(new TestServicesConfigurationBuilder(),
-                                                                               new DefaultsConfigurationBuilder());
-
-    TransactionManagerFactoryBean txMgrFB = new TransactionManagerFactoryBean();
-    txMgrFB.setMuleContext(context);
-    TransactionManager txMgr = mock(TransactionManager.class);
-    txMgrFB.setCustomTxManager(txMgr);
-    TransactionManager transactionManager = txMgrFB.getObject();
-    assertThat(transactionManager, sameInstance(txMgr));
-  }
-
-  @Test
-  public void ignoreCustomTransactionManager() throws Exception {
-    DefaultMuleContext context =
-        (DefaultMuleContext) new DefaultMuleContextFactory().createMuleContext(new TestServicesConfigurationBuilder(),
-                                                                               new DefaultsConfigurationBuilder());
-
-    TransactionManagerFactoryBean txMgrFB = new TransactionManagerFactoryBean();
-    txMgrFB.setMuleContext(context);
-    txMgrFB.setTxManagerFactory(new TestTransactionManagerFactory());
-    TransactionManager txMgr = mock(TransactionManager.class);
-    txMgrFB.setCustomTxManager(txMgr);
-    TransactionManager transactionManager = txMgrFB.getObject();
-    assertThat(transactionManager, not(nullValue()));
-    assertThat(transactionManager, not(sameInstance(txMgr)));
-  }
-
 }

@@ -35,9 +35,6 @@ public class TransactionManagerFactoryBean implements FactoryBean<TransactionMan
   @Autowired(required = false)
   private TransactionManagerFactory txManagerFactory;
 
-  @Autowired(required = false)
-  private TransactionManager customTxManager;
-
   private MuleContext muleContext;
 
   @Override
@@ -53,9 +50,8 @@ public class TransactionManagerFactoryBean implements FactoryBean<TransactionMan
       } catch (Exception e) {
         throw new MuleRuntimeException(failedToCreate("transaction manager"), e);
       }
-    } else {
-      return customTxManager;
     }
+    return null;
   }
 
   @Override
@@ -70,10 +66,6 @@ public class TransactionManagerFactoryBean implements FactoryBean<TransactionMan
 
   public void setTxManagerFactory(TransactionManagerFactory txManagerFactory) {
     this.txManagerFactory = txManagerFactory;
-  }
-
-  public void setCustomTxManager(TransactionManager customTxManager) {
-    this.customTxManager = customTxManager;
   }
 
   @Override

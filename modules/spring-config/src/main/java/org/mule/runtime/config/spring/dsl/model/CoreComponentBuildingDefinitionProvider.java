@@ -125,7 +125,6 @@ import org.mule.runtime.core.api.processor.LoggerMessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.RetryNotifier;
-import org.mule.runtime.core.api.retry.policy.ConnectNotifier;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.security.EncryptionStrategy;
@@ -1577,16 +1576,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .asPrototype()
         .build());
 
-    buildingDefinitions.add(baseDefinition.copy().withIdentifier("reconnect-notifier")
-        .withTypeDefinition(fromType(ConnectNotifier.class))
-        .build());
-
-    buildingDefinitions.add(baseDefinition.copy()
-        .withIdentifier("reconnect-custom-notifier")
-        .withTypeDefinition(fromConfigurationAttribute(CLASS_ATTRIBUTE))
-        .asPrototype()
-        .build());
-
     return buildingDefinitions;
   }
 
@@ -1596,21 +1585,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     buildingDefinitions.add(baseDefinition.copy().withIdentifier("xa-transaction")
         .withTypeDefinition(fromType(MuleTransactionConfig.class))
         .withSetterParameterDefinition("factory", fromFixedValue(new XaTransactionFactory()).build())
-        .withSetterParameterDefinition("timeout", fromSimpleParameter("timeout").build())
-        .withSetterParameterDefinition("actionAsString", fromSimpleParameter("action").build())
-        .withSetterParameterDefinition("interactWithExternal", fromSimpleParameter("interactWithExternal").build())
-        .build());
-
-    buildingDefinitions.add(baseDefinition.copy().withIdentifier("custom-transaction")
-        .withTypeDefinition(fromType(MuleTransactionConfig.class))
-        .withSetterParameterDefinition("factory", fromSimpleReferenceParameter("factory-ref").build())
-        .withSetterParameterDefinition("factory", fromSimpleParameter("factory-class", o -> {
-          try {
-            return ClassUtils.instantiateClass((String) o);
-          } catch (Exception e) {
-            return null;
-          }
-        }).build())
         .withSetterParameterDefinition("timeout", fromSimpleParameter("timeout").build())
         .withSetterParameterDefinition("actionAsString", fromSimpleParameter("action").build())
         .withSetterParameterDefinition("interactWithExternal", fromSimpleParameter("interactWithExternal").build())
