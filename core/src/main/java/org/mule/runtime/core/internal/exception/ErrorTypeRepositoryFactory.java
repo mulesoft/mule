@@ -61,8 +61,8 @@ public class ErrorTypeRepositoryFactory {
     final ErrorType sourceErrorType = errorTypeRepository.getSourceErrorType();
     errorTypeRepository.addErrorType(SOURCE_RESPONSE_GENERATE, errorTypeRepository.getSourceResponseErrorType());
     errorTypeRepository.addErrorType(SOURCE_RESPONSE_SEND, errorTypeRepository.getSourceResponseErrorType());
-    errorTypeRepository.addErrorType(SOURCE_ERROR_RESPONSE_GENERATE, sourceErrorType);
-    errorTypeRepository.addErrorType(SOURCE_ERROR_RESPONSE_SEND, sourceErrorType);
+    errorTypeRepository.addInternalErrorType(SOURCE_ERROR_RESPONSE_GENERATE, sourceErrorType);
+    errorTypeRepository.addInternalErrorType(SOURCE_ERROR_RESPONSE_SEND, sourceErrorType);
 
     return errorTypeRepository;
   }
