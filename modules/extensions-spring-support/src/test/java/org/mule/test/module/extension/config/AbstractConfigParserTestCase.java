@@ -13,16 +13,16 @@ import org.mule.runtime.core.api.Event;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.model.HealthStatus;
 import org.mule.test.heisenberg.extension.model.Ricin;
-import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
+import org.mule.test.module.extension.AbstractHeisenbergConfigTestCase;
+
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.ArrayUtils;
-
-public abstract class AbstractConfigParserTestCase extends AbstractExtensionFunctionalTestCase {
+public abstract class AbstractConfigParserTestCase extends AbstractHeisenbergConfigTestCase {
 
   protected static final String HEISENBERG_BYNAME = "heisenberg";
   protected static final String HEISENBERG_EXPRESSION = "expressionHeisenberg";
