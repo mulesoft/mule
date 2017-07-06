@@ -7,7 +7,6 @@
 package org.mule.runtime.core.internal.exception;
 
 import static java.lang.String.format;
-import static java.util.Arrays.stream;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.i18n.I18nMessage;
@@ -43,25 +42,22 @@ public class OnErrorContinueHandler extends TemplateOnErrorHandler {
     sourceErrorMatcher = new SingleErrorTypeMatcher(errorTypeRepository.getSourceResponseErrorType());
 
     if (errorType != null) {
-      // Since the partial initialisation was successful, we know this error ids are safe
       String[] errors = errorType.split(",");
-      if (hasSourceError(errorTypeRepository, errors)) {
-        throw new InitialisationException(getInitialisationError(), this);
+      for (String error : errors) {
+        // Since the partial initialisation was successful, we know this error ids are safe
+        String sanitizedError = error.trim();
+        ErrorType errorType = errorTypeRepository.lookupErrorType(buildFromStringRepresentation(sanitizedError)).get();
+        if (sourceErrorMatcher.match(errorType)) {
+          throw new InitialisationException(getInitialisationError(sanitizedError), this);
+        }
       }
     }
 
   }
 
-  private boolean hasSourceError(ErrorTypeRepository errorTypeRepository, String[] errors) {
-    return stream(errors).anyMatch(error -> {
-      ErrorType errorType = errorTypeRepository.lookupErrorType(buildFromStringRepresentation(error.trim())).get();
-      return sourceErrorMatcher.match(errorType);
-    });
-  }
-
-  private I18nMessage getInitialisationError() {
+  private I18nMessage getInitialisationError(String type) {
     return createStaticMessage(format("Source errors are not allowed in 'on-error-continue' handlers. Offending type is '%s'.",
-                                      errorType));
+                                      type));
   }
 
   @Override
