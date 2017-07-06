@@ -12,6 +12,7 @@ import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
+import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT_SERIALIZER_NAME;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.ANNOTATIONS_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.CONFIGURATION_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.CONFIGURATION_PROPERTIES;
@@ -26,11 +27,8 @@ import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_IDE
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_PROPERTIES_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_PROPERTY_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.NAME_ATTRIBUTE;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.OBJECT_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SECURITY_MANAGER_IDENTIFIER;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SPRING_ENTRY_IDENTIFIER;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SPRING_LIST_IDENTIFIER;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SPRING_MAP_IDENTIFIER;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SPRING_VALUE_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.from;
 import static org.mule.runtime.config.spring.dsl.spring.CommonBeanDefinitionCreator.adaptFilterBeanDefinitions;
 import static org.mule.runtime.config.spring.dsl.spring.CommonBeanDefinitionCreator.areMatchingTypes;
@@ -61,7 +59,11 @@ import org.mule.runtime.dsl.api.component.AttributeDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
 
-import com.google.common.collect.ImmutableSet;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.BeanReference;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.w3c.dom.Element;
 
 import java.util.HashMap;
 import java.util.List;
@@ -72,11 +74,7 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.config.BeanReference;
-import org.springframework.beans.factory.support.AbstractBeanDefinition;
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-import org.w3c.dom.Element;
+import com.google.common.collect.ImmutableSet;
 
 /**
  * The {@code BeanDefinitionFactory} is the one that knows how to convert a {@code ComponentModel} to an actual
@@ -116,11 +114,8 @@ public class BeanDefinitionFactory {
       ImmutableSet.<ComponentIdentifier>builder()
           .add(MULE_PROPERTIES_IDENTIFIER)
           .add(MULE_PROPERTY_IDENTIFIER)
-          .add(SPRING_ENTRY_IDENTIFIER)
-          .add(SPRING_LIST_IDENTIFIER)
-          .add(SPRING_MAP_IDENTIFIER)
-          .add(SPRING_VALUE_IDENTIFIER)
           .add(INTERCEPTOR_STACK_IDENTIFIER)
+          .add(OBJECT_IDENTIFIER)
           .build();
 
 
@@ -139,6 +134,12 @@ public class BeanDefinitionFactory {
     this.componentBuildingDefinitionRegistry = componentBuildingDefinitionRegistry;
     this.errorTypeRepository = errorTypeRepository;
     this.componentModelProcessor = buildComponentModelProcessorChainOfResponsability();
+  }
+
+  public void resolveEagerCreationObjects(ComponentModel parentComponentModel, ComponentModel componentModel,
+                                          BeanDefinitionRegistry registry,
+                                          BiConsumer<ComponentModel, BeanDefinitionRegistry> componentModelPostProcessor) {
+
   }
 
   /**
@@ -250,7 +251,13 @@ public class BeanDefinitionFactory {
           expressionLanguage.set(childComponentModel.getBeanDefinition());
         }
       });
-
+      String defaultObjectSerializer = componentModel.getParameters().get("defaultObjectSerializer-ref");
+      if (defaultObjectSerializer != null) {
+        if (defaultObjectSerializer != DEFAULT_OBJECT_SERIALIZER_NAME) {
+          registry.removeBeanDefinition(DEFAULT_OBJECT_SERIALIZER_NAME);
+          registry.registerAlias(defaultObjectSerializer, DEFAULT_OBJECT_SERIALIZER_NAME);
+        }
+      }
       if (defaultRetryPolicyTemplate.get() != null) {
         registry.registerBeanDefinition(OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE, defaultRetryPolicyTemplate.get());
       }
@@ -314,6 +321,8 @@ public class BeanDefinitionFactory {
   }
 
   private BeanDefinitionCreator buildComponentModelProcessorChainOfResponsability() {
+    EagerObjectCreator eagerObjectCreator = new EagerObjectCreator();
+    ObjectBeanDefinitionCreator objectBeanDefinitionCreator = new ObjectBeanDefinitionCreator();
     ExceptionStrategyRefBeanDefinitionCreator exceptionStrategyRefBeanDefinitionCreator =
         new ExceptionStrategyRefBeanDefinitionCreator();
     PropertiesMapBeanDefinitionCreator propertiesMapBeanDefinitionCreator = new PropertiesMapBeanDefinitionCreator();
@@ -326,6 +335,8 @@ public class BeanDefinitionFactory {
     MapBeanDefinitionCreator mapBeanDefinitionCreator = new MapBeanDefinitionCreator();
     CommonBeanDefinitionCreator commonComponentModelProcessor = new CommonBeanDefinitionCreator(objectFactoryClassRepository);
 
+    eagerObjectCreator.setNext(objectBeanDefinitionCreator);
+    objectBeanDefinitionCreator.setNext(propertiesMapBeanDefinitionCreator);
     propertiesMapBeanDefinitionCreator.setNext(interceptorStackBeanDefinitionCreator);
     interceptorStackBeanDefinitionCreator.setNext(exceptionStrategyRefBeanDefinitionCreator);
     exceptionStrategyRefBeanDefinitionCreator.setNext(filterReferenceBeanDefinitionCreator);
@@ -335,7 +346,7 @@ public class BeanDefinitionFactory {
     collectionBeanDefinitionCreator.setNext(mapEntryBeanDefinitionCreator);
     mapEntryBeanDefinitionCreator.setNext(mapBeanDefinitionCreator);
     mapBeanDefinitionCreator.setNext(commonComponentModelProcessor);
-    return propertiesMapBeanDefinitionCreator;
+    return eagerObjectCreator;
   }
 
   /**

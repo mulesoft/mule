@@ -2,7 +2,6 @@
 <xsd:schema xmlns="http://www.mulesoft.org/schema/mule/domain"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:mule="http://www.mulesoft.org/schema/mule/core"
-            xmlns:spring="http://www.springframework.org/schema/beans"
             targetNamespace="http://www.mulesoft.org/schema/mule/domain"
             attributeFormDefault="unqualified"
             elementFormDefault="qualified">
@@ -10,12 +9,6 @@
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
                 schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule.xsd"/>
-    <xsd:import namespace="http://www.springframework.org/schema/beans"
-                schemaLocation="http://www.springframework.org/schema/beans/spring-beans-current.xsd"/>
-    <xsd:import namespace="http://www.springframework.org/schema/context"
-                schemaLocation="http://www.springframework.org/schema/context/spring-context-current.xsd"/>
-
-
 
     <xsd:element name="mule-domain" type="muleDomainType">
         <xsd:annotation>
@@ -46,20 +39,6 @@
 
     <xsd:group name="sharedElements">
         <xsd:choice>
-            <xsd:element ref="spring:beans">
-                <xsd:annotation>
-                    <xsd:documentation>
-                        Allows the embedding of any Spring elements.
-                    </xsd:documentation>
-                </xsd:annotation>
-            </xsd:element>
-            <xsd:element ref="spring:bean">
-                <xsd:annotation>
-                    <xsd:documentation>
-                        Allows Spring beans to be defined alongside Mule elements.
-                    </xsd:documentation>
-                </xsd:annotation>
-            </xsd:element>
             <xsd:element ref="mule:global-property"/>
             <xsd:element ref="mule:configuration-properties"/>
             <xsd:element ref="mule:abstract-shared-connector"/>

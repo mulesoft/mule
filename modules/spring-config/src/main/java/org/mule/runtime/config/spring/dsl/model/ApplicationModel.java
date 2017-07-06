@@ -35,6 +35,7 @@ import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -44,6 +45,7 @@ import org.mule.runtime.config.spring.dsl.processor.ConfigFile;
 import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
 import org.mule.runtime.config.spring.dsl.processor.ObjectTypeVisitor;
 import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.config.RuntimeConfigurationException;
 import org.mule.runtime.core.component.config.CompositeConfigurationPropertiesProvider;
 import org.mule.runtime.core.component.config.ConfigurationPropertiesComponent;
 import org.mule.runtime.core.component.config.ConfigurationPropertiesProvider;
@@ -59,8 +61,9 @@ import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
+import org.apache.commons.lang3.ClassUtils;
+import org.springframework.core.env.ConfigurablePropertyResolver;
+import org.w3c.dom.Node;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -71,12 +74,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 import javax.xml.namespace.QName;
 
-import org.springframework.core.env.ConfigurablePropertyResolver;
-import org.w3c.dom.Node;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 
 /**
  * An {@code ApplicationModel} holds a representation of all the artifact configuration using an abstract model to represent any
@@ -97,6 +101,7 @@ public class ApplicationModel {
   // TODO MULE-9692 move this logic elsewhere. This are here just for the language rules and those should be processed elsewhere.
   public static final String MULE_ROOT_ELEMENT = "mule";
   public static final String MULE_DOMAIN_ROOT_ELEMENT = "mule-domain";
+  public static final String IMPORT_ELEMENT = "import";
   public static final String POLICY_ROOT_ELEMENT = "policy";
   public static final String ANNOTATIONS = "annotations";
   public static final String ERROR_HANDLER = "error-handler";
@@ -105,8 +110,6 @@ public class ApplicationModel {
   public static final String WHEN_CHOICE_ES_ATTRIBUTE = "when";
   public static final String TYPE_ES_ATTRIBUTE = "type";
   public static final String EXCEPTION_STRATEGY_REFERENCE_ELEMENT = "exception-strategy";
-  public static final String SPRING_NAMESPACE = "spring";
-  public static final String SPRING_CONTEXT_NAMESPACE = "context";
   public static final String PROPERTY_ELEMENT = "property";
   public static final String NAME_ATTRIBUTE = "name";
   public static final String REFERENCE_ATTRIBUTE = "ref";
@@ -147,12 +150,9 @@ public class ApplicationModel {
   public static final String GLOBAL_PROPERTY = "global-property";
   public static final String SECURITY_MANAGER = "security-manager";
   public static final String CONFIGURATION_PROPERTIES_ELEMENT = "configuration-properties";
-  public static final String SPRING_ENTRY_ELEMENT = "entry";
-  public static final String SPRING_LIST_ELEMENT = "list";
-  public static final String SPRING_MAP_ELEMENT = "map";
-  public static final String SPRING_VALUE_ELEMENT = "value";
   public static final String PROTOTYPE_OBJECT_ELEMENT = "prototype-object";
   public static final String SINGLETON_OBJECT_ELEMENT = "singleton-object";
+  public static final String OBJECT_ELEMENT = "object";
   public static final String INTERCEPTOR_STACK_ELEMENT = "interceptor-stack";
 
   public static final ComponentIdentifier ERROR_HANDLER_IDENTIFIER =
@@ -170,8 +170,6 @@ public class ApplicationModel {
       builder().withNamespace(EE_DOMAIN_PREFIX).withName(MULE_DOMAIN_ROOT_ELEMENT).build();
   public static final ComponentIdentifier POLICY_IDENTIFIER =
       builder().withNamespace(POLICY_ROOT_ELEMENT).withName(POLICY_ROOT_ELEMENT).build();
-  public static final ComponentIdentifier SPRING_PROPERTY_IDENTIFIER =
-      builder().withNamespace(SPRING_NAMESPACE).withName(PROPERTY_ELEMENT).build();
   public static final ComponentIdentifier MULE_PROPERTY_IDENTIFIER =
       builder().withNamespace(CORE_PREFIX).withName(PROPERTY_ELEMENT).build();
   public static final ComponentIdentifier MULE_PROPERTIES_IDENTIFIER =
@@ -194,18 +192,12 @@ public class ApplicationModel {
       builder().withNamespace(CORE_PREFIX).withName(DESCRIPTION_ELEMENT).build();
   public static final ComponentIdentifier ANNOTATIONS_IDENTIFIER =
       builder().withNamespace(CORE_PREFIX).withName(ANNOTATIONS).build();
-  public static final ComponentIdentifier SPRING_ENTRY_IDENTIFIER =
-      builder().withNamespace(SPRING_NAMESPACE).withName(SPRING_ENTRY_ELEMENT).build();
-  public static final ComponentIdentifier SPRING_LIST_IDENTIFIER =
-      builder().withNamespace(SPRING_NAMESPACE).withName(SPRING_LIST_ELEMENT).build();
-  public static final ComponentIdentifier SPRING_MAP_IDENTIFIER =
-      builder().withNamespace(SPRING_NAMESPACE).withName(SPRING_MAP_ELEMENT).build();
-  public static final ComponentIdentifier SPRING_VALUE_IDENTIFIER =
-      builder().withNamespace(SPRING_NAMESPACE).withName(SPRING_VALUE_ELEMENT).build();
   public static final ComponentIdentifier PROTOTYPE_OBJECT_IDENTIFIER =
       builder().withNamespace(CORE_PREFIX).withName(PROTOTYPE_OBJECT_ELEMENT).build();
   public static final ComponentIdentifier SINGLETON_OBJECT_IDENTIFIER =
       builder().withNamespace(CORE_PREFIX).withName(SINGLETON_OBJECT_ELEMENT).build();
+  public static final ComponentIdentifier OBJECT_IDENTIFIER =
+      builder().withNamespace(CORE_PREFIX).withName(OBJECT_ELEMENT).build();
   public static final ComponentIdentifier INTERCEPTOR_STACK_IDENTIFIER =
       builder().withNamespace(CORE_PREFIX).withName(INTERCEPTOR_STACK_ELEMENT).build();
   public static final ComponentIdentifier FLOW_IDENTIFIER =
@@ -224,6 +216,8 @@ public class ApplicationModel {
       builder().withNamespace(CORE_PREFIX).withName(CONFIGURATION_PROPERTIES_ELEMENT).build();
   public static final ComponentIdentifier MODULE_OPERATION_CHAIN =
       builder().withNamespace(CORE_PREFIX).withName(MODULE_OPERATION_CHAIN_ELEMENT).build();
+
+  public static final String CLASS_ATTRIBUTE = "class";
 
   private static ImmutableSet<ComponentIdentifier> ignoredNameValidationComponentList =
       ImmutableSet.<ComponentIdentifier>builder()
@@ -247,8 +241,6 @@ public class ApplicationModel {
           .add(builder().withNamespace(MULE_ROOT_ELEMENT).withName("security-manager").build())
           .add(builder().withNamespace(TEST_NAMESPACE).withName("queue").build())
           .add(builder().withNamespace(TEST_NAMESPACE).withName("invocation-counter").build())
-          .add(builder().withNamespace(SPRING_NAMESPACE).withName("property").build())
-          .add(builder().withNamespace(SPRING_NAMESPACE).withName("bean").build())
           .add(builder().withNamespace(SPRING_SECURITY_NAMESPACE).withName("user").build())
           .add(builder().withNamespace(MULE_SECURITY_NAMESPACE)
               .withName("delegate-security-provider")
@@ -291,7 +283,6 @@ public class ApplicationModel {
 
   private final Optional<ComponentBuildingDefinitionRegistry> componentBuildingDefinitionRegistry;
   private List<ComponentModel> muleComponentModels = new LinkedList<>();
-  private List<ComponentModel> springComponentModels = new LinkedList<>();
   private PropertiesResolverConfigurationProperties configurationProperties;
 
   /**
@@ -445,10 +436,23 @@ public class ApplicationModel {
     executeOnEveryComponentTree(componentModel -> {
       Optional<ComponentBuildingDefinition<?>> buildingDefinition =
           componentBuildingDefinitionRegistry.get().getBuildingDefinition(componentModel.getIdentifier());
-      buildingDefinition.ifPresent(definition -> {
+      buildingDefinition.map(definition -> {
         ObjectTypeVisitor typeDefinitionVisitor = new ObjectTypeVisitor(componentModel);
         definition.getTypeDefinition().visit(typeDefinitionVisitor);
         componentModel.setType(typeDefinitionVisitor.getType());
+        return definition;
+      }).orElseGet(() -> {
+        String classParameter = componentModel.getParameters().get(CLASS_ATTRIBUTE);
+        if (classParameter != null) {
+          try {
+            componentModel.setType(ClassUtils.getClass(classParameter));
+          } catch (ClassNotFoundException e) {
+            throw new RuntimeConfigurationException(I18nMessageFactory.createStaticMessage(String
+                .format("Could not resolve class '%s' for component '%s'", classParameter,
+                        componentModel.getComponentLocation())));
+          }
+        }
+        return null;
       });
     });
   }
@@ -485,8 +489,13 @@ public class ApplicationModel {
           .getDefault(DslResolvingContext.getDefault(extensionModels));
 
       ComponentModel rootComponent = new ComponentModel.Builder()
-          .setIdentifier(ComponentIdentifier.builder().withNamespace(CORE_PREFIX).withName(CORE_PREFIX).build()).build();
-      this.muleComponentModels.add(rootComponent);
+          .setIdentifier(ComponentIdentifier.builder()
+              .withNamespace(CORE_PREFIX)
+              .withName(CORE_PREFIX)
+              .build())
+          .build();
+
+      AtomicBoolean atLeastOneComponentAdded = new AtomicBoolean(false);
 
       artifactDeclaration.getGlobalElements().stream()
           .map(e -> elementFactory.create((ElementDeclaration) e))
@@ -494,10 +503,15 @@ public class ApplicationModel {
           .map(e -> e.get().getConfiguration())
           .forEach(config -> config
               .ifPresent(c -> {
+                atLeastOneComponentAdded.set(true);
                 ComponentModel componentModel = convertComponentConfiguration(c, true);
                 componentModel.setParent(rootComponent);
                 rootComponent.getInnerComponents().add(componentModel);
               }));
+
+      if (atLeastOneComponentAdded.get()) {
+        this.muleComponentModels.add(rootComponent);
+      }
     }
   }
 
@@ -566,34 +580,15 @@ public class ApplicationModel {
     configFiles.stream().forEach(configFile -> {
       ComponentModel componentModel =
           componentModelReader.extractComponentDefinitionModel(configFile.getConfigLines().get(0), configFile.getFilename());
-      if (isMuleConfigFile(configFile)) {
-        if (muleComponentModels.isEmpty()) {
-          muleComponentModels.add(componentModel);
-        } else {
-          // Only one componentModel as Root should be set, therefore componentModel is merged
-          final ComponentModel rootComponentModel = muleComponentModels.get(0);
-          muleComponentModels.set(0, new ComponentModel.Builder(rootComponentModel).merge(componentModel).build());
-        }
+      if (muleComponentModels.isEmpty()) {
+        muleComponentModels.add(componentModel);
       } else {
-        springComponentModels.add(componentModel);
+        // Only one componentModel as Root should be set, therefore componentModel is merged
+        final ComponentModel rootComponentModel = muleComponentModels.get(0);
+        muleComponentModels.set(0, new ComponentModel.Builder(rootComponentModel).merge(componentModel).build());
       }
     });
 
-  }
-
-  private boolean isMuleConfigFile(final ConfigFile configFile) {
-    if (configFile.getConfigLines().isEmpty()) {
-      return false;
-    }
-    return !isSpringFile(configFile);
-  }
-
-  private boolean isSpringFile(ConfigFile configFile) {
-    return SPRING_NAMESPACE.equals(configFile.getConfigLines().get(0).getNamespace());
-  }
-
-  public boolean hasSpringConfig() {
-    return !springComponentModels.isEmpty();
   }
 
   private void validateModel(Optional<ComponentBuildingDefinitionRegistry> componentBuildingDefinitionRegistry)
@@ -622,7 +617,7 @@ public class ApplicationModel {
           String listOrPojoChildName = hyphenize(parameterName);
           Optional<ComponentModel> childOptional =
               findRelatedChildForParameter(componentModel.getInnerComponents(), mapChildName, listOrPojoChildName);
-          if (childOptional.isPresent() && !childOptional.get().getIdentifier().equals(SPRING_PROPERTY_IDENTIFIER)) {
+          if (childOptional.isPresent()) {
             throw new MuleRuntimeException(createStaticMessage(
                                                                format("Component %s has a child element %s which is used for the same purpose of the configuration parameter %s. "
                                                                    + "Only one must be used.", componentModel.getIdentifier(),
@@ -741,7 +736,7 @@ public class ApplicationModel {
       throws ConfigurationException {
     try {
       List<ComponentModel> topLevelComponents = muleComponentModels.get(0).getInnerComponents();
-      topLevelComponents.stream().filter(this::isMuleComponent).forEach(topLevelComponent -> {
+      topLevelComponents.stream().forEach(topLevelComponent -> {
         final ComponentIdentifier identifier = topLevelComponent.getIdentifier();
         componentBuildingDefinitionRegistry.getBuildingDefinition(identifier).filter(ComponentBuildingDefinition::isNamed)
             .ifPresent(buildingDefinition -> {
@@ -756,42 +751,40 @@ public class ApplicationModel {
     }
   }
 
-  private boolean isMuleComponent(ComponentModel componentModel) {
-    return !componentModel.getIdentifier().getNamespace().equals(ApplicationModel.SPRING_NAMESPACE);
-  }
-
   public void executeOnEveryComponentTree(final Consumer<ComponentModel> task) {
     for (ComponentModel componentModel : muleComponentModels) {
-      executeOnComponentTree(componentModel, task, false);
+      executeOnComponentTree(componentModel, task);
     }
   }
 
   public void executeOnEveryMuleComponentTree(final Consumer<ComponentModel> task) {
     for (ComponentModel componentModel : muleComponentModels) {
-      executeOnComponentTree(componentModel, task, true);
+      executeOnComponentTree(componentModel, task);
     }
   }
 
-  public void executeOnEveryFlow(final Consumer<ComponentModel> task) {
+
+  public void executeOnEveryRootElement(final Consumer<ComponentModel> task) {
     for (ComponentModel muleComponentModel : muleComponentModels) {
       for (ComponentModel componentModel : muleComponentModel.getInnerComponents()) {
-        if (ApplicationModel.FLOW_IDENTIFIER.equals(componentModel.getIdentifier())) {
-          task.accept(componentModel);
-        }
+        task.accept(componentModel);
       }
     }
   }
 
-  private void executeOnComponentTree(final ComponentModel component, final Consumer<ComponentModel> task,
-                                      boolean avoidSpringElements)
+  public void executeOnEveryFlow(final Consumer<ComponentModel> task) {
+    executeOnEveryRootElement(componentModel -> {
+      if (ApplicationModel.FLOW_IDENTIFIER.equals(componentModel.getIdentifier())) {
+        task.accept(componentModel);
+      }
+    });
+  }
+
+  private void executeOnComponentTree(final ComponentModel component, final Consumer<ComponentModel> task)
       throws MuleRuntimeException {
-    if (component.getIdentifier().getNamespace().equals(SPRING_NAMESPACE) && avoidSpringElements) {
-      // TODO MULE-9648: for now do no process beans inside spring
-      return;
-    }
     task.accept(component);
     component.getInnerComponents().forEach((innerComponent) -> {
-      executeOnComponentTree(innerComponent, task, avoidSpringElements);
+      executeOnComponentTree(innerComponent, task);
     });
   }
 

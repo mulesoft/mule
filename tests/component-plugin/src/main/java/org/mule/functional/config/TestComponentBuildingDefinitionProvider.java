@@ -16,9 +16,11 @@ import static org.mule.runtime.dsl.api.component.CommonTypeConverters.stringToCl
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromConfigurationAttribute;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import org.mule.functional.api.component.AssertionMessageProcessor;
+import org.mule.functional.api.component.DependencyInjectionObject;
 import org.mule.functional.api.component.EventCallback;
 import org.mule.functional.api.component.FunctionalTestProcessor;
 import org.mule.functional.api.component.InvocationCountMessageProcessor;
+import org.mule.functional.api.component.LifecycleObject;
 import org.mule.functional.api.component.ResponseAssertionMessageProcessor;
 import org.mule.functional.api.component.SharedConfig;
 import org.mule.functional.api.component.SharedSource;
@@ -146,6 +148,18 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
     componentBuildingDefinitions.add(baseDefinition.copy()
         .withIdentifier("shared-config")
         .withTypeDefinition(fromType(SharedConfig.class))
+        .build());
+
+    componentBuildingDefinitions.add(baseDefinition.copy()
+        .withIdentifier("dependency-injection-object")
+        .withTypeDefinition(fromType(DependencyInjectionObject.class))
+        .build());
+
+    componentBuildingDefinitions.add(baseDefinition.copy()
+        .withIdentifier("lifecycle-object")
+        .withTypeDefinition(fromType(LifecycleObject.class))
+        .withSetterParameterDefinition("otherLifecycleObject", fromSimpleReferenceParameter("otherLifecycleObject").build())
+        .withSetterParameterDefinition("failurePhase", fromSimpleParameter("failurePhase").build())
         .build());
 
     return componentBuildingDefinitions;

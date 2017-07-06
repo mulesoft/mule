@@ -31,11 +31,6 @@ public abstract class AbstractScriptConfigBuilderTestCase extends MuleArtifactFu
   }
 
   @Test
-  public void testManagerConfig() throws Exception {
-    assertNotNull(muleContext.getTransactionManager());
-  }
-
-  @Test
   @Ignore("MULE-10724")
   public void testTransformerConfig() {
     Transformer t = muleContext.getRegistry().lookupTransformer("TestCompressionTransformer");

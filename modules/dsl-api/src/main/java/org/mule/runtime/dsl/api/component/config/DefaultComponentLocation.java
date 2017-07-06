@@ -300,7 +300,7 @@ public class DefaultComponentLocation implements ComponentLocation, Serializable
     return "DefaultComponentLocation{" +
         "name='" + name + '\'' +
         ", parts=" + parts +
-        ", location='" + location + '\'' +
+        ", location='" + getLocation() + '\'' +
         '}';
   }
 }

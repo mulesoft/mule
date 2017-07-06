@@ -18,14 +18,12 @@ import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_PRO
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_PROPERTY_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROTOTYPE_OBJECT_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SINGLETON_OBJECT_IDENTIFIER;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SPRING_PROPERTY_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.from;
 import static org.mule.runtime.config.spring.dsl.spring.BeanDefinitionFactory.SPRING_PROTOTYPE_OBJECT;
 import static org.mule.runtime.config.spring.dsl.spring.PropertyComponentUtils.getPropertyValueFromPropertyComponent;
 import static org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader.resolveContextArtifactPluginClassLoaders;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.rootBeanDefinition;
-
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.AnnotatedObject;
@@ -40,7 +38,13 @@ import org.mule.runtime.core.processor.SecurityFilterMessageProcessor;
 import org.mule.runtime.core.routing.MessageFilter;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 
-import com.google.common.collect.ImmutableSet;
+import org.springframework.beans.PropertyValue;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.RootBeanDefinition;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -52,13 +56,7 @@ import java.util.stream.Collectors;
 
 import javax.xml.namespace.QName;
 
-import org.springframework.beans.PropertyValue;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.support.AbstractBeanDefinition;
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.support.RootBeanDefinition;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
+import com.google.common.collect.ImmutableSet;
 
 /**
  * Processor in the chain of responsibility that knows how to handle a generic {@code ComponentBuildingDefinition}.
@@ -77,7 +75,7 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
           .add(MULE_IDENTIFIER)
           .build();
 
-  private Set<ComponentIdentifier> genericPropertiesCustomProcessingIdentifiers =
+  private static Set<ComponentIdentifier> genericPropertiesCustomProcessingIdentifiers =
       ImmutableSet.<ComponentIdentifier>builder()
           .add(SINGLETON_OBJECT_IDENTIFIER)
           .add(PROTOTYPE_OBJECT_IDENTIFIER)
@@ -231,7 +229,7 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
         .stream()
         .filter(innerComponent -> {
           ComponentIdentifier childIdentifier = innerComponent.getIdentifier();
-          return childIdentifier.equals(SPRING_PROPERTY_IDENTIFIER) || childIdentifier.equals(MULE_PROPERTY_IDENTIFIER);
+          return childIdentifier.equals(MULE_PROPERTY_IDENTIFIER);
         })
         .collect(Collectors.toMap(springComponent -> getPropertyValueFromPropertyComponent(springComponent).getName(),
                                   springComponent -> getPropertyValueFromPropertyComponent(springComponent).getValue()));
@@ -242,7 +240,7 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
                                                final BeanDefinitionBuilder beanDefinitionBuilder) {
     processObjectConstructionParameters(componentModel, componentBuildingDefinition,
                                         new BeanDefinitionBuilderHelper(beanDefinitionBuilder));
-    processSpringOrMuleProperties(componentModel, beanDefinitionBuilder);
+    processMuleProperties(componentModel, beanDefinitionBuilder);
     if (componentBuildingDefinition.isPrototype()) {
       beanDefinitionBuilder.setScope(SPRING_PROTOTYPE_OBJECT);
     }
@@ -255,8 +253,7 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
     componentModel.setBeanDefinition(wrappedBeanDefinition);
   }
 
-  // TODO MULE-9638 Remove once we don't mix spring beans with mule beans.
-  private void processSpringOrMuleProperties(ComponentModel componentModel, BeanDefinitionBuilder beanDefinitionBuilder) {
+  static void processMuleProperties(ComponentModel componentModel, BeanDefinitionBuilder beanDefinitionBuilder) {
     // for now we skip custom-transformer since requires injection by the object factory.
     if (genericPropertiesCustomProcessingIdentifiers.contains(componentModel.getIdentifier())) {
       return;
@@ -265,7 +262,7 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
         .stream()
         .filter(innerComponent -> {
           ComponentIdentifier identifier = innerComponent.getIdentifier();
-          return identifier.equals(SPRING_PROPERTY_IDENTIFIER) || identifier.equals(MULE_PROPERTY_IDENTIFIER)
+          return identifier.equals(MULE_PROPERTY_IDENTIFIER)
               || identifier.equals(MULE_PROPERTIES_IDENTIFIER);
         })
         .forEach(propertyComponentModel -> {

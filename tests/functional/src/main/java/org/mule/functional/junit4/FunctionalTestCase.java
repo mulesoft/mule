@@ -8,7 +8,6 @@ package org.mule.functional.junit4;
 
 import static java.util.Collections.emptyMap;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
-
 import org.mule.functional.api.component.FlowAssert;
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
@@ -21,12 +20,12 @@ import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import org.junit.After;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
-
-import org.junit.After;
 
 /**
  * A base test case for tests that initialize Mule using a configuration file. The default configuration builder used is
