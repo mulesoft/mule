@@ -114,7 +114,6 @@
             <xsd:element ref="abstract-extension"/>
             <xsd:element ref="abstract-shared-extension"/>
             <xsd:element ref="abstract-mixed-content-extension"/>
-            <xsd:element ref="abstract-agent"/>
             <xsd:element ref="abstract-security-manager"/>
             <xsd:element ref="abstract-transaction-manager"/>
             <xsd:element ref="abstract-shared-transaction-manager"/>
@@ -283,21 +282,6 @@
                     </xsd:annotation>
                 </xsd:attribute>
             </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <!-- Agents -->
-    <xsd:element name="abstract-agent" abstract="true" type="abstractAgentType">
-        <xsd:annotation>
-            <xsd:documentation>
-                A placeholder for agent elements. Are used to run processes as part of the server instance.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
-    <xsd:complexType name="abstractAgentType">
-        <xsd:complexContent>
-            <xsd:extension base="annotatedType"/>
         </xsd:complexContent>
     </xsd:complexType>
 
