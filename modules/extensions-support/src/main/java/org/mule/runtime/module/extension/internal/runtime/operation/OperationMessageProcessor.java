@@ -177,7 +177,7 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
           // create the MessagingException in ReactorCompletionCallback where Mono.error is used but we don't have a reference
           // to the processor there.
           return doProcess(operationEvent, operationContext).onErrorMap(e -> !(e instanceof MessagingException),
-                                                                        e -> new MessagingException(event, e, this));
+                                                                        e -> new MessagingException(event, e));
         };
       }
       if (getLocation() != null) {
