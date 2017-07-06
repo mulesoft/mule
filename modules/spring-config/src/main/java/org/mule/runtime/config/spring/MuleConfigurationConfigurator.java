@@ -79,7 +79,7 @@ public class MuleConfigurationConfigurator extends AbstractAnnotatedObjectFactor
       MessagingExceptionHandler messagingExceptionHandler = muleContext.getRegistry().lookupObject(defaultErrorHandler);
       if (messagingExceptionHandler == null) {
         throw new MuleRuntimeException(CoreMessages.createStaticMessage(String
-            .format("No global error handler defined with name %s.", defaultErrorHandler)));
+            .format("No global error handler defined with name '%s'.", defaultErrorHandler)));
       }
       if (messagingExceptionHandler instanceof MessagingExceptionHandlerAcceptor) {
         MessagingExceptionHandlerAcceptor messagingExceptionHandlerAcceptor =

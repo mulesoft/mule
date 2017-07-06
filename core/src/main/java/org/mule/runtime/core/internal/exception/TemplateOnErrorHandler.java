@@ -248,7 +248,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     List<ErrorTypeMatcher> matchers = stream(errorTypeIdentifiers).map((identifier) -> {
       String parsedIdentifier = identifier.trim();
       return new SingleErrorTypeMatcher(errorTypeRepository.lookupErrorType(buildFromStringRepresentation(parsedIdentifier))
-          .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not found ErrorType for the given identifier: '%s'",
+          .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find ErrorType for the given identifier: '%s'",
                                                                           parsedIdentifier))));
     }).collect(toList());
     return new DisjunctiveErrorTypeMatcher(matchers);

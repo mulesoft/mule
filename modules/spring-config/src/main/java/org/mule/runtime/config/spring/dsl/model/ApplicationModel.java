@@ -675,15 +675,15 @@ public class ApplicationModel {
       if (!errorMappings.isEmpty()) {
         List<ComponentModel> anyMappings = errorMappings.stream().filter(this::isErrorMappingWithSourceAny).collect(toList());
         if (anyMappings.size() > 1) {
-          throw new MuleRuntimeException(createStaticMessage("Only one mapping for ANY or an empty source type is allowed."));
+          throw new MuleRuntimeException(createStaticMessage("Only one mapping for 'ANY' or an empty source type is allowed."));
         } else if (anyMappings.size() == 1 && !isErrorMappingWithSourceAny(errorMappings.get(errorMappings.size() - 1))) {
-          throw new MuleRuntimeException(createStaticMessage("Only the last error mapping can have ANY or an empty source type."));
+          throw new MuleRuntimeException(createStaticMessage("Only the last error mapping can have 'ANY' or an empty source type."));
         }
         List<String> sources = errorMappings.stream().map(model -> model.getParameters().get(SOURCE_TYPE)).collect(toList());
         List<String> distinctSources = sources.stream().distinct().collect(toList());
         if (sources.size() != distinctSources.size()) {
-          throw new MuleRuntimeException(createStaticMessage(format("Repeated source types are not allowed. Offending types are %s.",
-                                                                    on(", ").join(disjunction(sources, distinctSources)))));
+          throw new MuleRuntimeException(createStaticMessage(format("Repeated source types are not allowed. Offending types are '%s'.",
+                                                                    on("', '").join(disjunction(sources, distinctSources)))));
         }
       }
     });
@@ -718,7 +718,7 @@ public class ApplicationModel {
       Map<String, String> parameters = innerComponents.get(i).getParameters();
       if (parameters.get(WHEN_CHOICE_ES_ATTRIBUTE) == null && parameters.get(TYPE_ES_ATTRIBUTE) == null) {
         throw new MuleRuntimeException(createStaticMessage(
-                                                           "Every handler (except for the last one) within an error-handler must specify the when or type attribute"));
+                                                           "Every handler (except for the last one) within an 'error-handler' must specify a 'when' or 'type' attribute."));
       }
     }
   }
