@@ -10,12 +10,10 @@ import static org.mule.runtime.api.message.Message.of;
 import static org.mule.test.heisenberg.extension.model.types.WeaponType.FIRE_WEAPON;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getConfigurationFromRegistry;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.model.HealthStatus;
-import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 import org.mule.test.heisenberg.extension.model.Ricin;
-import org.mule.test.module.extension.AbstractHazelcastConfigTestCase;
+import org.mule.test.module.extension.AbstractHeisenbergConfigTestCase;
 
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -24,11 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-
-public abstract class AbstractConfigParserTestCase extends AbstractHazelcastConfigTestCase {
+public abstract class AbstractConfigParserTestCase extends AbstractHeisenbergConfigTestCase {
 
   protected static final String HEISENBERG_BYNAME = "heisenberg";
   protected static final String HEISENBERG_EXPRESSION = "expressionHeisenberg";

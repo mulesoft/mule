@@ -19,7 +19,7 @@ import com.google.common.collect.ImmutableSet;
 /**
  * Base class for tests using heisenberg-config.xml configuration.
  */
-public abstract class AbstractHazelcastConfigTestCase extends AbstractExtensionFunctionalTestCase {
+public abstract class AbstractHeisenbergConfigTestCase extends AbstractExtensionFunctionalTestCase {
 
   @Override
   protected void doSetUp() throws Exception {

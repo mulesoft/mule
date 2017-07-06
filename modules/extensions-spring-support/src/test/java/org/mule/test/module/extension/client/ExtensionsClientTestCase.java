@@ -20,7 +20,6 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.NullAttributes;
-import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.client.OperationParameters;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -29,8 +28,7 @@ import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.heisenberg.extension.model.Weapon;
 import org.mule.test.heisenberg.extension.model.types.IntegerAttributes;
-import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
-import org.mule.test.module.extension.AbstractHazelcastConfigTestCase;
+import org.mule.test.module.extension.AbstractHeisenbergConfigTestCase;
 import org.mule.test.vegan.extension.VeganPolicy;
 
 import org.junit.After;
@@ -41,14 +39,11 @@ import org.junit.rules.ExpectedException;
 import java.util.Collection;
 import java.util.List;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 
 @Features("EXTENSIONS_CLIENT")
-public abstract class ExtensionsClientTestCase extends AbstractHazelcastConfigTestCase {
+public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigTestCase {
 
   @Rule
   public ExpectedException exception = ExpectedException.none();
