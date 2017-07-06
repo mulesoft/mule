@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.mule.distributions</groupId>
         <artifactId>mule-embedded</artifactId>
-        <version>4.0.0-BETA.2-SNAPSHOT</version>
+        <version>4.0.0-BETA.x-SNAPSHOT</version>
     </parent>
     <artifactId>mule-embedded-distribution</artifactId>
     <packaging>pom</packaging>
