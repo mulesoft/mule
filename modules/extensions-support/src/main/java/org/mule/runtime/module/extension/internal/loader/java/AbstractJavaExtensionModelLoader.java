@@ -37,6 +37,7 @@ import org.mule.runtime.module.extension.internal.loader.enricher.JavaOAuthDecla
 import org.mule.runtime.module.extension.internal.loader.enricher.JavaXmlDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ParameterLayoutOrderDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.SubTypesDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.enricher.ValueProvidersParameterDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.validation.ConfigurationModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.ConnectionProviderModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.ExportedTypesModelValidator;
@@ -48,6 +49,7 @@ import org.mule.runtime.module.extension.internal.loader.validation.OperationPar
 import org.mule.runtime.module.extension.internal.loader.validation.OperationReturnTypeModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.ParameterGroupModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.ParameterTypeModelValidator;
+import org.mule.runtime.module.extension.internal.loader.validation.ValueProviderModelValidator;
 
 import java.util.Collection;
 import java.util.List;
@@ -68,7 +70,8 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
                                                                                          new OperationParametersTypeModelValidator(),
                                                                                          new ParameterGroupModelValidator(),
                                                                                          new ParameterTypeModelValidator(),
-                                                                                         new OAuthConnectionProviderModelValidator()));
+                                                                                         new OAuthConnectionProviderModelValidator(),
+                                                                                         new ValueProviderModelValidator()));
 
   private final List<DeclarationEnricher> customDeclarationEnrichers = unmodifiableList(asList(
                                                                                                new JavaXmlDeclarationEnricher(),
@@ -86,6 +89,7 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
                                                                                                new JavaOAuthDeclarationEnricher(),
                                                                                                new SubTypesDeclarationEnricher(),
                                                                                                new ExtensionDescriptionsEnricher(),
+                                                                                               new ValueProvidersParameterDeclarationEnricher(),
                                                                                                new ParameterLayoutOrderDeclarationEnricher()));
 
   private final String id;

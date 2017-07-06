@@ -10,7 +10,6 @@ import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_DOMAIN_ROOT_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_ROOT_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.POLICY_ROOT_ELEMENT;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SPRING_PROPERTY_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.VALUE_ATTRIBUTE;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.from;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.to;
@@ -57,15 +56,7 @@ public class ComponentModelReader {
     List<ComponentModel> componentModels = configLine.getChildren().stream()
         .map(childConfigLine -> extractComponentDefinitionModel(childConfigLine, configFileName))
         .collect(Collectors.toList());
-    componentModels.stream().forEach(componentDefinitionModel -> {
-      if (SPRING_PROPERTY_IDENTIFIER.equals(componentDefinitionModel.getIdentifier())) {
-        String value = componentDefinitionModel.getParameters().get(VALUE_ATTRIBUTE);
-        if (value != null) {
-          builder.addParameter(componentDefinitionModel.getNameAttribute(), resolveValueIfIsPlaceHolder(value), false);
-        }
-      }
-      builder.addChildComponentModel(componentDefinitionModel);
-    });
+    componentModels.stream().forEach(componentDefinitionModel -> builder.addChildComponentModel(componentDefinitionModel));
     ConfigLine parent = configLine.getParent();
     if (parent != null && isConfigurationTopComponent(parent)) {
       builder.markAsRootComponent();

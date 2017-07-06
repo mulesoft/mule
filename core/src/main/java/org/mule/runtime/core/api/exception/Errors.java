@@ -21,7 +21,11 @@ import static org.mule.runtime.core.api.exception.Errors.Identifiers.ROUTING_ERR
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.SECURITY_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.SERVER_SECURITY_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.SOURCE_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.api.exception.Errors.Identifiers.SOURCE_ERROR_RESPONSE_GENERATE_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.api.exception.Errors.Identifiers.SOURCE_ERROR_RESPONSE_SEND_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.SOURCE_RESPONSE_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.api.exception.Errors.Identifiers.SOURCE_RESPONSE_GENERATE_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.api.exception.Errors.Identifiers.SOURCE_RESPONSE_SEND_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.STREAM_MAXIMUM_SIZE_EXCEEDED_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.TRANSFORMATION_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
@@ -97,6 +101,21 @@ public abstract class Errors {
     public static final String SERVER_SECURITY_ERROR_IDENTIFIER = "SERVER_SECURITY";
 
     /**
+     * Indicates that an error occurred in the source of the flow processing a successful response.
+     */
+    public static final String SOURCE_RESPONSE_ERROR_IDENTIFIER = "SOURCE_RESPONSE";
+
+    /**
+     * Indicates that an error occurred in the source of the flow sending a successful response.
+     */
+    public static final String SOURCE_RESPONSE_SEND_ERROR_IDENTIFIER = "SOURCE_RESPONSE_SEND";
+
+    /**
+     * Indicates that an error occurred in the source of the flow generating the parameters of a successful response.
+     */
+    public static final String SOURCE_RESPONSE_GENERATE_ERROR_IDENTIFIER = "SOURCE_RESPONSE_GENERATE";
+
+    /**
      * Wild card that matches with any error
      */
     public static final String ANY_IDENTIFIER = "ANY";
@@ -116,9 +135,14 @@ public abstract class Errors {
     public static final String SOURCE_ERROR_IDENTIFIER = "SOURCE";
 
     /**
-     * Indicates that an error occurred in the source of the flow processing a successful response.
+     * Indicates that an error occurred in the source of the flow sending an error response.
      */
-    public static final String SOURCE_RESPONSE_ERROR_IDENTIFIER = "SOURCE_RESPONSE";
+    public static final String SOURCE_ERROR_RESPONSE_SEND_ERROR_IDENTIFIER = "SOURCE_ERROR_RESPONSE_SEND";
+
+    /**
+     * Indicates that an error occurred in the source of the flow generating the parameters of an error response.
+     */
+    public static final String SOURCE_ERROR_RESPONSE_GENERATE_ERROR_IDENTIFIER = "SOURCE_ERROR_RESPONSE_GENERATE";
 
     /**
      * Indicates that a severe error occurred. Cannot be handled. Other unhandleable errors should go under it.
@@ -172,13 +196,13 @@ public abstract class Errors {
     public static final ComponentIdentifier SOURCE_RESPONSE =
         builder().withNamespace(CORE_NAMESPACE_NAME).withName(SOURCE_RESPONSE_ERROR_IDENTIFIER).build();
     public static final ComponentIdentifier SOURCE_RESPONSE_GENERATE =
-        builder().withNamespace(CORE_NAMESPACE_NAME).withName("SOURCE_RESPONSE_GENERATE").build();
+        builder().withNamespace(CORE_NAMESPACE_NAME).withName(SOURCE_RESPONSE_GENERATE_ERROR_IDENTIFIER).build();
     public static final ComponentIdentifier SOURCE_RESPONSE_SEND =
-        builder().withNamespace(CORE_NAMESPACE_NAME).withName("SOURCE_RESPONSE_SEND").build();
+        builder().withNamespace(CORE_NAMESPACE_NAME).withName(SOURCE_RESPONSE_SEND_ERROR_IDENTIFIER).build();
     public static final ComponentIdentifier SOURCE_ERROR_RESPONSE_GENERATE =
-        builder().withNamespace(CORE_NAMESPACE_NAME).withName("SOURCE_ERROR_RESPONSE_GENERATE").build();
+        builder().withNamespace(CORE_NAMESPACE_NAME).withName(SOURCE_ERROR_RESPONSE_GENERATE_ERROR_IDENTIFIER).build();
     public static final ComponentIdentifier SOURCE_ERROR_RESPONSE_SEND =
-        builder().withNamespace(CORE_NAMESPACE_NAME).withName("SOURCE_ERROR_RESPONSE_SEND").build();
+        builder().withNamespace(CORE_NAMESPACE_NAME).withName(SOURCE_ERROR_RESPONSE_SEND_ERROR_IDENTIFIER).build();
 
     public static final ComponentIdentifier STREAM_MAXIMUM_SIZE_EXCEEDED =
         builder().withNamespace(CORE_NAMESPACE_NAME).withName(STREAM_MAXIMUM_SIZE_EXCEEDED_ERROR_IDENTIFIER).build();

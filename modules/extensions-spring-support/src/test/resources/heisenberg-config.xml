@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg"
-      xmlns:util="http://www.springframework.org/schema/util"
-      xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/heisenberg http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd
-               http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-current.xsd">
+               http://www.mulesoft.org/schema/mule/heisenberg http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd">
 
     <configuration-properties file="heisenberg.properties"/>
 
@@ -191,53 +188,6 @@
                        knownAddresses="#[[]]">
         <heisenberg:first-endevour><![CDATA[Gray Matter Technologies]]></heisenberg:first-endevour>
     </heisenberg:config>
-
-
-    <spring:beans>
-        <util:map id="recipes" value-type="java.lang.Long">
-            <spring:entry key="methylamine" value="75"/>
-            <spring:entry key="pseudoephedrine" value="0"/>
-            <spring:entry key="P2P" value="25"/>
-        </util:map>
-
-        <util:map id="deathsBySeasons" value-type="java.util.List">
-            <spring:entry key="s01">
-                <util:list id="deaths-by-season" value-type="java.lang.String">
-                    <spring:value type="java.lang.String">emilio</spring:value>
-                    <spring:value type="java.lang.String">domingo</spring:value>
-                </util:list>
-            </spring:entry>
-            <spring:entry key="s02">
-                <util:list id="deaths-by-season2" value-type="java.lang.String">
-                    <spring:value type="java.lang.String">tuco</spring:value>
-                    <spring:value type="java.lang.String">tortuga</spring:value>
-                </util:list>
-            </spring:entry>
-        </util:map>
-
-        <util:map id="labeledRicins" value-type="org.mule.test.heisenberg.extension.Ricin">
-            <spring:entry key="pojo" value-ref="ricin"/>
-        </util:map>
-
-        <util:list id="monthlyIncomes" value-type="java.lang.Long">
-            <spring:value>12000</spring:value>
-            <spring:value>500</spring:value>
-        </util:list>
-
-        <util:map id="candidateDoors">
-            <spring:entry key="skyler" value-ref="skylerDoor"/>
-            <spring:entry key="saul" value-ref="saulDoor"/>
-        </util:map>
-
-        <util:list id="enemies">
-            <spring:value>Gustavo Fring</spring:value>
-            <spring:value>Hank</spring:value>
-        </util:list>
-
-        <util:set id="ricinPacks">
-            <spring:ref bean="ricin"/>
-        </util:set>
-    </spring:beans>
 
     <heisenberg:door victim="Gustavo Fring" address="pollos hermanos" name="door">
         <heisenberg:previous victim="Krazy-8" address="Jesse's"/>

@@ -64,8 +64,8 @@ public class PetStoreConnectionPoolingTestCase extends PetStoreConnectionTestCas
   }
 
   @Override
-  protected String getConfigFile() {
-    return "petstore-pooling-connection.xml";
+  protected String[] getConfigFiles() {
+    return new String[] {"petstore-pooling-connection.xml", "petstore.xml"};
   }
 
   @Override

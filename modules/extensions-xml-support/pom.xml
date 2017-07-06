@@ -151,12 +151,6 @@
             <classifier>mule-plugin</classifier>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>javax.jms</groupId>
-            <artifactId>javax.jms-api</artifactId>
-            <version>${javaxJmsApiVersion}</version>
-            <scope>test</scope>
-        </dependency>
 
         <!-- ActiveMQ Dependencies-->
         <dependency>

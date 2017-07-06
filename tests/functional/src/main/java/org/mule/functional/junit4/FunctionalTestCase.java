@@ -7,34 +7,25 @@
 package org.mule.functional.junit4;
 
 import static java.util.Collections.emptyMap;
-import static org.junit.Assert.fail;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
-
 import org.mule.functional.api.component.FlowAssert;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.component.Component;
-import org.mule.runtime.core.api.component.JavaComponent;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
-import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.runtime.core.component.AbstractJavaComponent;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import org.junit.After;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
-
-import org.junit.After;
 
 /**
  * A base test case for tests that initialize Mule using a configuration file. The default configuration builder used is
@@ -99,42 +90,6 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
     return null;
   }
 
-  /**
-   * Returns an instance of the service's component object. Note that depending on the type of ObjectFactory used for the
-   * component, this may create a new instance of the object. If you plan to set properties on the returned object, make sure your
-   * component is declared as a singleton, otherwise this will not work.
-   */
-  protected Object getComponent(String serviceName) throws Exception {
-    final FlowConstruct flowConstruct = muleContext.getRegistry().lookupObject(serviceName);
-
-    if (flowConstruct != null) {
-      return getComponent(flowConstruct);
-    } else {
-      throw new RegistrationException(I18nMessageFactory
-          .createStaticMessage("Service " + serviceName + " not found in Registry"));
-    }
-  }
-
-  /**
-   * Returns an instance of the service's component object. Note that depending on the type of ObjectFactory used for the
-   * component, this may create a new instance of the object. If you plan to set properties on the returned object, make sure your
-   * component is declared as a singleton, otherwise this will not work.
-   */
-  protected Object getComponent(FlowConstruct flowConstruct) throws Exception {
-    if (flowConstruct instanceof Pipeline) {
-      Pipeline flow = (Pipeline) flowConstruct;
-      // Retrieve the first component
-      for (Processor processor : flow.getProcessors()) {
-        if (processor instanceof Component) {
-          return getComponentObject(((Component) processor));
-        }
-      }
-    }
-
-    throw new RegistrationException(I18nMessageFactory
-        .createStaticMessage("Can't get component from flow construct " + flowConstruct.getName()));
-  }
-
   protected FlowConstruct getFlowConstruct(String flowName) throws Exception {
     return muleContext.getRegistry().lookupFlowConstruct(flowName);
   }
@@ -166,15 +121,6 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
 
   protected InputStream loadResource(String resourceName) throws IOException {
     return IOUtils.getResourceAsStream(resourceName, getClass());
-  }
-
-  private Object getComponentObject(Component component) throws Exception {
-    if (component instanceof JavaComponent) {
-      return ((AbstractJavaComponent) component).getObjectFactory().getInstance(muleContext);
-    } else {
-      fail("Component is not a JavaComponent and therefore has no component object instance");
-      return null;
-    }
   }
 
   protected void stopFlowConstruct(String flowName) throws Exception {

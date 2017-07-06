@@ -8,14 +8,13 @@ package org.mule.functional.junit4;
 
 import static java.util.Collections.emptyMap;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
-
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
-import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.DefaultMuleContextBuilder;
 import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
+import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
 
 import java.util.ArrayList;

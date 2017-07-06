@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.streaming.bytes;
 
+import static org.mule.runtime.extension.api.ExtensionConstants.DEFAULT_BYTES_STREAMING_MAX_BUFFER_SIZE;
+import static org.mule.runtime.extension.api.ExtensionConstants.DEFAULT_BYTE_STREAMING_BUFFER_DATA_UNIT;
 import org.mule.runtime.api.util.DataSize;
 import org.mule.runtime.core.internal.streaming.bytes.InputStreamBuffer;
 
@@ -17,6 +19,14 @@ import org.mule.runtime.core.internal.streaming.bytes.InputStreamBuffer;
 public final class FileStoreCursorStreamConfig {
 
   private final DataSize maxInMemorySize;
+
+  /**
+   * @return A new instance configured with default settings
+   */
+  public static FileStoreCursorStreamConfig getDefault() {
+    return new FileStoreCursorStreamConfig(new DataSize(DEFAULT_BYTES_STREAMING_MAX_BUFFER_SIZE,
+                                                        DEFAULT_BYTE_STREAMING_BUFFER_DATA_UNIT));
+  }
 
   /**
    * Creates a new instance

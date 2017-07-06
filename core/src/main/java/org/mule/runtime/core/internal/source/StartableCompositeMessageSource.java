@@ -21,7 +21,6 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.source.ClusterizableMessageSource;
 import org.mule.runtime.core.api.source.CompositeMessageSource;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
@@ -61,10 +60,6 @@ public class StartableCompositeMessageSource extends AbstractAnnotatedObject
   @Override
   public void addSource(MessageSource source) throws MuleException {
     MessageSource messageSource = source;
-
-    if (messageSource instanceof ClusterizableMessageSource) {
-      messageSource = new ClusterizableMessageSourceWrapper((ClusterizableMessageSource) messageSource);
-    }
 
     synchronized (sources) {
       sources.add(messageSource);

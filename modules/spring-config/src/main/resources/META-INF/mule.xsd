@@ -1,16 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <xsd:schema xmlns="http://www.mulesoft.org/schema/mule/core"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-            xmlns:spring="http://www.springframework.org/schema/beans"
-            xmlns:spring-context="http://www.springframework.org/schema/context"
             targetNamespace="http://www.mulesoft.org/schema/mule/core"
             attributeFormDefault="unqualified"
             elementFormDefault="qualified">
-
-    <xsd:import namespace="http://www.springframework.org/schema/beans"
-                schemaLocation="http://www.springframework.org/schema/beans/spring-beans-4.1.xsd"/>
-    <xsd:import namespace="http://www.springframework.org/schema/context"
-                schemaLocation="http://www.springframework.org/schema/context/spring-context-4.1.xsd"/>
 
     <!--==============================================================-->
     <!--   Structure                                                  -->
@@ -72,39 +65,12 @@
                         </xsd:annotation>
                     </xsd:element>
                     <xsd:choice minOccurs="0" maxOccurs="unbounded">
-                        <xsd:group ref="springRootElements"/>
                         <xsd:group ref="muleRootElements"/>
                     </xsd:choice>
                 </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-
-    <xsd:group name="springRootElements">
-        <xsd:choice>
-            <xsd:element ref="spring:beans">
-                <xsd:annotation>
-                    <xsd:documentation>
-                        Allows the embedding of any Spring elements.
-                    </xsd:documentation>
-                </xsd:annotation>
-            </xsd:element>
-            <xsd:element ref="spring:bean">
-                <xsd:annotation>
-                    <xsd:documentation>
-                        Allows Spring beans to be defined alongside Mule elements.
-                    </xsd:documentation>
-                </xsd:annotation>
-            </xsd:element>
-            <xsd:element ref="spring:ref">
-                <xsd:annotation>
-                    <xsd:documentation>
-                        Allows to reference Spring beans alongside Mule elements.
-                    </xsd:documentation>
-                </xsd:annotation>
-            </xsd:element>
-        </xsd:choice>
-    </xsd:group>
 
     <xsd:group name="muleRootElements">
         <xsd:choice>
@@ -140,6 +106,28 @@
     <xsd:complexType name="descriptionType">
         <xsd:complexContent mixed="true">
             <xsd:extension base="xsd:anyType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="import" type="importType" substitutionGroup="abstract-shared-extension">
+        <xsd:annotation>
+            <xsd:documentation>
+                References a file with configuration to import. It will be loaded from the classpath of the artifact.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="importType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractExtensionType">
+                <xsd:attribute name="file" type="substitutableString" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The location of the file with the mule configuration to use. It may be a location in the classpath or an absolute location.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
@@ -284,7 +272,7 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-
+  
     <!-- Message Processors -->
     <xsd:element name="abstract-message-processor" abstract="true" type="abstractMessageProcessorType">
         <xsd:annotation>
@@ -397,7 +385,7 @@
         <xsd:complexContent>
             <xsd:extension base="abstractMessageProcessorType">
                 <xsd:sequence>
-                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:group ref="propertiesGroup"/>
                 </xsd:sequence>
                 <xsd:attribute name="name" type="substitutableName" use="optional">
                     <xsd:annotation>
@@ -474,6 +462,46 @@
                     <xsd:annotation>
                         <xsd:documentation>
                             Identifies the message processor in the registry.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="object" type="objectType" substitutionGroup="abstract-shared-extension">
+        <xsd:annotation>
+            <xsd:documentation>
+                Element to declare a java object. Objects declared globally can be referenced from other parts of the configuration or recovered programmatically
+                through org.mule.runtime.api.artifact.ServiceDiscoverer.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="objectType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractExtensionType">
+                <xsd:sequence>
+                    <xsd:group ref="propertiesGroup"/>
+                </xsd:sequence>
+                <xsd:attribute name="ref" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Reference to another object defined in the mule configuration or any other provider of objects.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="name" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Name to use to reference this object.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="class" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Creates an instance of the class provided as argument.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -1174,7 +1202,6 @@
             <xsd:enumeration value="SECURITY"/>
             <xsd:enumeration value="ASYNC-MESSAGE"/>
             <xsd:enumeration value="CONNECTOR-MESSAGE"/>
-            <xsd:enumeration value="COMPONENT-MESSAGE"/>
             <xsd:enumeration value="PIPELINE-MESSAGE"/>
             <xsd:enumeration value="MANAGEMENT"/>
             <xsd:enumeration value="MESSAGE-PROCESSOR"/>
@@ -1256,13 +1283,7 @@
         <xsd:complexContent>
             <xsd:extension base="abstractEntryPointResolverSetType">
                 <xsd:sequence>
-                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                Spring-style property element for custom configuration.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
+                    <xsd:group ref="propertiesGroup"/>
                 </xsd:sequence>
                 <xsd:attribute name="class" type="substitutableClass" use="required">
                     <xsd:annotation>
@@ -1304,13 +1325,7 @@
         <xsd:complexContent>
             <xsd:extension base="abstractEntryPointResolverType">
                 <xsd:sequence>
-                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                Spring-style property element for custom configuration.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
+                    <xsd:group ref="propertiesGroup"/>
                 </xsd:sequence>
                 <xsd:attribute name="class" type="substitutableClass" use="required">
                     <xsd:annotation>
@@ -2004,7 +2019,7 @@
         <xsd:complexContent>
             <xsd:extension base="processingStrategyType">
                 <xsd:sequence>
-                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:group ref="propertiesGroup"/>
                 </xsd:sequence>
                 <xsd:attribute name="class" type="substitutableClass" use="required">
                     <xsd:annotation>
@@ -2267,13 +2282,7 @@
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
-                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                Spring-style property element for custom configuration.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
+                    <xsd:group ref="propertiesGroup"/>
                 </xsd:sequence>
                 <xsd:attribute name="class" type="substitutableClass" use="required">
                     <xsd:annotation>
@@ -2678,13 +2687,7 @@
         <xsd:complexContent>
             <xsd:extension base="abstractFilterType">
                 <xsd:sequence>
-                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                Spring-style property element for custom configuration.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
+                    <xsd:group ref="propertiesGroup"/>
                 </xsd:sequence>
                 <xsd:attribute name="class" type="substitutableClass">
                     <xsd:annotation>
@@ -2789,13 +2792,7 @@
         <xsd:complexContent>
             <xsd:extension base="abstractInterceptorType">
                 <xsd:sequence>
-                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                Spring-style property element for custom configuration.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
+                    <xsd:group ref="propertiesGroup"/>
                 </xsd:sequence>
                 <xsd:attribute name="class" type="substitutableClass" use="required">
                     <xsd:annotation>
@@ -2878,13 +2875,7 @@
         <xsd:complexContent>
             <xsd:extension base="abstractTransformerType">
                 <xsd:sequence>
-                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                Spring-style property element for custom configuration.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
+                   <xsd:group ref="propertiesGroup"/>
                 </xsd:sequence>
                 <xsd:attribute name="class" type="substitutableClass" use="required">
                     <xsd:annotation>
@@ -3502,13 +3493,7 @@
         <xsd:complexContent>
             <xsd:extension base="securityProviderType">
                 <xsd:sequence>
-                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                Spring-style property element for custom configuration.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
+                    <xsd:group ref="propertiesGroup"/>
                 </xsd:sequence>
                 <xsd:attribute name="provider-ref" type="xsd:string" use="required">
                     <xsd:annotation>
@@ -3525,7 +3510,7 @@
         <xsd:complexContent>
             <xsd:extension base="encryptionStrategyType">
                 <xsd:sequence>
-                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:group ref="propertiesGroup"/>
                 </xsd:sequence>
                 <xsd:attribute name="strategy-ref" type="xsd:string" use="required">
                     <xsd:annotation>
@@ -4479,13 +4464,7 @@
         <xsd:complexContent>
             <xsd:extension base="abstractLifecycleAdapterFactory">
                 <xsd:sequence>
-                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                Spring-style property element for custom configuration.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
+                    <xsd:group ref="propertiesGroup"/>
                 </xsd:sequence>
                 <xsd:attribute name="class" type="substitutableClass" use="required">
                     <xsd:annotation>
@@ -5039,11 +5018,7 @@
     <!-- mapType has ref attribute to allow decoupling from spring, using
          mule 4 parsing mechanism -->
     <xsd:complexType name="mapType">
-        <xsd:complexContent>
-            <xsd:extension base="spring:mapType">
-                <xsd:attribute name="ref" type="xsd:string" />
-            </xsd:extension>
-        </xsd:complexContent>
+        <xsd:attribute name="ref" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:group name="propertiesGroup">
@@ -5060,12 +5035,6 @@
             </xsd:choice>
         </xsd:sequence>
     </xsd:group>
-
-    <xsd:complexType name="listOrSetType">
-        <xsd:complexContent>
-            <xsd:extension base="spring:listOrSetType"/>
-        </xsd:complexContent>
-    </xsd:complexType>
 
     <xsd:complexType name="referenceType">
         <xsd:attribute name="ref" type="xsd:string"/>

@@ -174,7 +174,6 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase {
   public void avoidCreateMessageEventToGetExceptionListener() throws Exception {
     doExpiredGroupMonitoringTest(true);
 
-    verify(mockFlowConstruct, times(1)).getExceptionListener();
     verify(mockEventGroup, times(1)).getMessageCollectionEvent();
   }
 

@@ -7,15 +7,14 @@
 package org.mule.runtime.core.internal.util.splash;
 
 import static org.apache.commons.lang3.StringUtils.defaultString;
+
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.agent.Agent;
 import org.mule.runtime.core.api.config.MuleManifest;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.util.NetworkUtils;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Collection;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
@@ -66,21 +65,4 @@ public class ServerStartupSplashScreen extends SplashScreen {
     header.add(" ");
   }
 
-  @Override
-  protected void doFooter(MuleContext context) {
-    // Mule Agents
-    if (!body.isEmpty()) {
-      footer.add(" ");
-    }
-    // List agents
-    Collection<Agent> agents = context.getRegistry().lookupObjects(Agent.class);
-    if (agents.size() == 0) {
-      footer.add(CoreMessages.agentsRunning().getMessage() + " " + CoreMessages.none().getMessage());
-    } else {
-      footer.add(CoreMessages.agentsRunning().getMessage());
-      for (Agent agent : agents) {
-        footer.add("  " + agent.getDescription());
-      }
-    }
-  }
 }

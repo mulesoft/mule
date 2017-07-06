@@ -55,10 +55,11 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   private MessageProcessorChain configuredMessageProcessors;
   private Processor replyToMessageProcessor = new ReplyToPropertyRequestReplyReplier();
 
-  private String errorType = null;
-  private ErrorTypeMatcher errorTypeMatcher = null;
   private String when;
   private boolean handleException;
+
+  protected String errorType = null;
+  protected ErrorTypeMatcher errorTypeMatcher = null;
 
   @Override
   final public Event handleException(MessagingException exception, Event event) {
@@ -247,7 +248,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     List<ErrorTypeMatcher> matchers = stream(errorTypeIdentifiers).map((identifier) -> {
       String parsedIdentifier = identifier.trim();
       return new SingleErrorTypeMatcher(errorTypeRepository.lookupErrorType(buildFromStringRepresentation(parsedIdentifier))
-          .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not found ErrorType for the given identifier: '%s'",
+          .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find ErrorType for the given identifier: '%s'",
                                                                           parsedIdentifier))));
     }).collect(toList());
     return new DisjunctiveErrorTypeMatcher(matchers);

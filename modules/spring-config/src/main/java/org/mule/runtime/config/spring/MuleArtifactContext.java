@@ -6,16 +6,19 @@
  */
 package org.mule.runtime.config.spring;
 
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
+import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.ArrayUtils.addAll;
-import static org.apache.commons.lang3.StringUtils.join;
-import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.config.spring.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.CONFIGURATION_IDENTIFIER;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.IMPORT_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.spring.BeanDefinitionFactory.SPRING_SINGLETON_OBJECT;
 import static org.mule.runtime.config.spring.parsers.generic.AutoIdUtils.uniqueValue;
@@ -23,6 +26,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTIVIT
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_METADATA_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static org.springframework.context.annotation.AnnotationConfigUtils.AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
@@ -33,6 +37,7 @@ import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.ioc.ObjectProvider;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.config.spring.dsl.model.ApplicationModel;
@@ -42,10 +47,13 @@ import org.mule.runtime.config.spring.dsl.model.MinimalApplicationModelGenerator
 import org.mule.runtime.config.spring.dsl.processor.ArtifactConfig;
 import org.mule.runtime.config.spring.dsl.processor.ConfigFile;
 import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
+import org.mule.runtime.config.spring.dsl.processor.SimpleConfigAttribute;
 import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationParser;
 import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationServiceRegistry;
 import org.mule.runtime.config.spring.dsl.spring.BeanDefinitionFactory;
 import org.mule.runtime.config.spring.editors.MulePropertyEditorRegistrar;
+import org.mule.runtime.config.spring.internal.ImmutableObjectProviderConfiguration;
+import org.mule.runtime.config.spring.internal.ObjectProviderAwareBeanFactory;
 import org.mule.runtime.config.spring.processors.ComponentLocatorCreatePostProcessor;
 import org.mule.runtime.config.spring.processors.ContextExclusiveInjectorProcessor;
 import org.mule.runtime.config.spring.processors.DiscardedOptionalBeanPostProcessor;
@@ -55,6 +63,8 @@ import org.mule.runtime.config.spring.processors.PostRegistrationActionsPostProc
 import org.mule.runtime.config.spring.util.LaxInstantiationStrategyWrapper;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigResource;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.config.RuntimeConfigurationException;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.core.api.extension.ExtensionManager;
@@ -62,17 +72,14 @@ import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.core.api.registry.TransformerResolver;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.util.IOUtils;
+import org.mule.runtime.core.api.util.Pair;
+import org.mule.runtime.core.component.config.DefaultConfigurationPropertiesResolver;
+import org.mule.runtime.core.component.config.SystemPropertiesConfigurationProvider;
+import org.mule.runtime.core.internal.registry.DefaultServiceDiscoverer;
 import org.mule.runtime.core.registry.MuleRegistryHelper;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.module.extension.internal.config.ExtensionBuildingDefinitionProvider;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,7 +89,6 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.support.BeanDefinitionReader;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.CglibSubclassingInstantiationStrategy;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
@@ -96,6 +102,18 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.w3c.dom.Document;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+
 /**
  * <code>MuleArtifactContext</code> is a simple extension application context that allows resources to be loaded from the
  * Classpath of file system using the MuleBeanDefinitionReader.
@@ -104,7 +122,6 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(MuleArtifactContext.class);
 
-  private static final ThreadLocal<MuleContext> currentMuleContext = new ThreadLocal<>();
   public static final String INNER_BEAN_PREFIX = "(inner bean)";
 
   protected final ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry =
@@ -114,17 +131,17 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
   private final ArtifactDeclaration artifactDeclaration;
   private final XmlConfigurationDocumentLoader xmlConfigurationDocumentLoader;
   private final Optional<ConfigurationProperties> parentConfigurationProperties;
+  private final DefaultServiceDiscoverer serviceDiscoverer;
   protected ApplicationModel applicationModel;
   protected MuleContext muleContext;
   private Resource[] artifactConfigResources;
   protected BeanDefinitionFactory beanDefinitionFactory;
-  private MuleXmlBeanDefinitionReader beanDefinitionReader;
   private final ServiceRegistry serviceRegistry = new SpiServiceRegistry();
-  protected boolean useNewParsingMechanism = true;
   protected final XmlApplicationParser xmlApplicationParser;
   private ArtifactType artifactType;
   private List<ComponentIdentifier> componentNotSupportedByNewParsers = new ArrayList<>();
   private SpringConfigurationComponentLocator componentLocator = new SpringConfigurationComponentLocator();
+  private List<ObjectProvider> objectProviders = new ArrayList<>();
 
   /**
    * Parses configuration files creating a spring ApplicationContext which is used as a parent registry using the SpringRegistry
@@ -164,6 +181,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
     this.artifactDeclaration = artifactDeclaration;
     this.parentConfigurationProperties = parentConfigurationProperties;
     this.xmlConfigurationDocumentLoader = newXmlConfigurationDocumentLoader();
+    this.serviceDiscoverer = new DefaultServiceDiscoverer(muleContext);
 
     serviceRegistry.lookupProviders(ComponentBuildingDefinitionProvider.class, MuleArtifactContext.class.getClassLoader())
         .forEach(componentBuildingDefinitionProvider -> {
@@ -211,44 +229,114 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
   }
 
   private void determineIfOnlyNewParsingMechanismCanBeUsed() {
-    if (applicationModel.hasSpringConfig()) {
-      componentNotSupportedByNewParsers.add(buildFromStringRepresentation("spring:springConfig"));
-      useNewParsingMechanism = false;
-      return;
-    }
     applicationModel.executeOnEveryComponentTree(componentModel -> {
       Optional<ComponentIdentifier> parentIdentifierOptional = ofNullable(componentModel.getParent())
           .flatMap(parentComponentModel -> ofNullable(parentComponentModel.getIdentifier()));
       if (!beanDefinitionFactory.hasDefinition(componentModel.getIdentifier(), parentIdentifierOptional)) {
         componentNotSupportedByNewParsers.add(componentModel.getIdentifier());
-        useNewParsingMechanism = false;
+        throw new RuntimeException(format("Invalid config '%s'", componentModel.getIdentifier()));
       }
     });
   }
 
   private void createApplicationModel() {
     try {
-      ArtifactConfig.Builder applicationConfigBuilder = new ArtifactConfig.Builder();
-      applicationConfigBuilder.setArtifactProperties(this.artifactProperties);
-      for (Resource springResource : artifactConfigResources) {
-        Document document =
-            xmlConfigurationDocumentLoader.loadDocument(muleContext.getExtensionManager() == null ? emptySet()
-                : muleContext.getExtensionManager().getExtensions(),
-                                                        springResource.getFilename(),
-                                                        springResource.getInputStream());
-        ConfigLine mainConfigLine = xmlApplicationParser.parse(document.getDocumentElement()).get();
-        applicationConfigBuilder.addConfigFile(new ConfigFile(getFilename(springResource), asList(mainConfigLine)));
-      }
-      applicationConfigBuilder.setApplicationName(muleContext.getConfiguration().getId());
+      ArtifactConfig artifactConfig = resolveArtifactConfig();
       Set<ExtensionModel> extensions =
           muleContext.getExtensionManager() != null ? muleContext.getExtensionManager().getExtensions() : emptySet();
-      applicationModel = new ApplicationModel(applicationConfigBuilder.build(), artifactDeclaration, extensions,
+      applicationModel = new ApplicationModel(artifactConfig, artifactDeclaration, extensions,
                                               artifactProperties, parentConfigurationProperties,
                                               of(componentBuildingDefinitionRegistry),
                                               true);
     } catch (Exception e) {
       throw new MuleRuntimeException(e);
     }
+  }
+
+  private ArtifactConfig resolveArtifactConfig() throws IOException {
+    ArtifactConfig.Builder applicationConfigBuilder = new ArtifactConfig.Builder();
+    applicationConfigBuilder.setArtifactProperties(this.artifactProperties);
+
+    List<Pair<String, InputStream>> initialConfigFiles = new ArrayList<>();
+    for (Resource artifactConfigResource : artifactConfigResources) {
+      initialConfigFiles.add(new Pair<>(getFilename(artifactConfigResource), artifactConfigResource.getInputStream()));
+    }
+
+    List<ConfigFile> configFiles = new ArrayList<>();
+    recursivelyResolveConfigFiles(initialConfigFiles, configFiles).stream()
+        .forEach(applicationConfigBuilder::addConfigFile);
+
+    applicationConfigBuilder.setApplicationName(muleContext.getConfiguration().getId());
+    return applicationConfigBuilder.build();
+  }
+
+  private List<ConfigFile> recursivelyResolveConfigFiles(List<Pair<String, InputStream>> configFilesToResolve,
+                                                         List<ConfigFile> alreadyResolvedConfigFiles) {
+
+    DefaultConfigurationPropertiesResolver propertyResolver =
+        new DefaultConfigurationPropertiesResolver(empty(), new SystemPropertiesConfigurationProvider());
+
+    ImmutableList.Builder<ConfigFile> resolvedConfigFilesBuilder =
+        ImmutableList.<ConfigFile>builder().addAll(alreadyResolvedConfigFiles);
+    configFilesToResolve.stream()
+        .filter(fileNameInputStreamPair -> !alreadyResolvedConfigFiles.stream()
+            .anyMatch(configFile -> configFile.getFilename().equals(fileNameInputStreamPair.getFirst())))
+        .forEach(fileNameInputStreamPair -> {
+          Document document =
+              xmlConfigurationDocumentLoader.loadDocument(muleContext.getExtensionManager() == null ? emptySet()
+                  : muleContext.getExtensionManager().getExtensions(),
+                                                          fileNameInputStreamPair.getFirst(),
+                                                          fileNameInputStreamPair.getSecond());
+          ConfigLine mainConfigLine = xmlApplicationParser.parse(document.getDocumentElement()).get();
+          ConfigFile configFile = new ConfigFile(fileNameInputStreamPair.getFirst(), asList(mainConfigLine));
+          resolvedConfigFilesBuilder.add(configFile);
+          try {
+            fileNameInputStreamPair.getSecond().close();
+          } catch (IOException e) {
+            throw new MuleRuntimeException(e);
+          }
+        });
+
+    ImmutableSet.Builder<String> importedFiles = ImmutableSet.builder();
+    for (ConfigFile configFile : resolvedConfigFilesBuilder.build()) {
+      List<ConfigLine> rootConfigLines = configFile.getConfigLines();
+      ConfigLine muleRootElementConfigLine = rootConfigLines.get(0);
+      importedFiles.addAll(muleRootElementConfigLine.getChildren().stream()
+          .filter(configLine -> configLine.getNamespace().equals(CORE_PREFIX)
+              && configLine.getIdentifier().equals(IMPORT_ELEMENT))
+          .map(configLine -> {
+            SimpleConfigAttribute fileConfigAttribute = configLine.getConfigAttributes().get("file");
+            if (fileConfigAttribute == null) {
+              throw new RuntimeConfigurationException(
+                                                      createStaticMessage(format("<import> does not have a file attribute defined. At file '%s', at line %s",
+                                                                                 configFile.getFilename(),
+                                                                                 configLine.getLineNumber())));
+            }
+            return fileConfigAttribute.getValue();
+          })
+          .map(value -> (String) propertyResolver.resolveValue(value))
+          .filter(fileName -> !alreadyResolvedConfigFiles.stream()
+              .anyMatch(solvedConfigFile -> solvedConfigFile.getFilename().equals(fileName)))
+          .collect(toList()));
+    }
+
+    Set<String> importedConfigurationFiles = importedFiles.build();
+
+    if (importedConfigurationFiles.isEmpty()) {
+      return resolvedConfigFilesBuilder.build();
+    }
+
+    List<Pair<String, InputStream>> newConfigFilesToResolved = importedConfigurationFiles.stream()
+        .map(importedFileName -> {
+          InputStream resourceAsStream = muleContext.getExecutionClassLoader().getResourceAsStream(importedFileName);
+          if (resourceAsStream == null) {
+            throw new RuntimeConfigurationException(createStaticMessage(format("Could not find imported resource '%s'",
+                                                                               importedFileName)));
+          }
+          return (Pair<String, InputStream>) new Pair(importedFileName, resourceAsStream);
+        }).collect(toList());
+
+    return recursivelyResolveConfigFiles(newConfigFilesToResolved, resolvedConfigFilesBuilder.build());
   }
 
   private String getFilename(Resource resource) {
@@ -264,6 +352,8 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
 
     registerEditors(beanFactory);
 
+    registerAnnotationConfigProcessors((BeanDefinitionRegistry) beanFactory);
+
     addBeanPostProcessors(beanFactory,
                           new MuleContextPostProcessor(muleContext),
                           new GlobalNamePostProcessor(),
@@ -274,6 +364,41 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
                           new ComponentLocatorCreatePostProcessor(componentLocator));
 
     beanFactory.registerSingleton(OBJECT_MULE_CONTEXT, muleContext);
+
+    prepareObjectProviders();
+  }
+
+
+
+  private void prepareObjectProviders() {
+    ImmutableObjectProviderConfiguration providerConfiguration =
+        new ImmutableObjectProviderConfiguration(ImmutableMap.<String, Object>builder()
+            .put(MuleProperties.OBJECT_SERVICE_DISCOVERER, serviceDiscoverer).build(),
+                                                 applicationModel.getConfigurationProperties());
+    for (ObjectProvider objectProvider : objectProviders) {
+      objectProvider.configure(providerConfiguration);
+    }
+  }
+
+  /**
+   * Process all the {@link ObjectProvider}s from the {@link ApplicationModel} to get their beans and register them inside the
+   * spring bean factory so they can be used for dependency injection.
+   *
+   * @param beanFactory the spring bean factory where the objects will be registered.
+   */
+  private void registerObjectFromObjectProviders(ConfigurableListableBeanFactory beanFactory) {
+    this.objectProviders.addAll(lookObjectProviders());
+    ((ObjectProviderAwareBeanFactory) beanFactory).setObjectProviders(objectProviders);
+  }
+
+  private List<ObjectProvider> lookObjectProviders() {
+    List<ObjectProvider> objectProviders = new ArrayList<>();
+    applicationModel.executeOnEveryRootElement(componentModel -> {
+      if (componentModel.getType() != null && ObjectProvider.class.isAssignableFrom(componentModel.getType())) {
+        objectProviders.add((ObjectProvider) componentModel.getObjectInstance());
+      }
+    });
+    return objectProviders;
   }
 
   private void registerEditors(ConfigurableListableBeanFactory beanFactory) {
@@ -318,27 +443,11 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
 
   @Override
   protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws IOException {
-    BeanDefinitionReader beanDefinitionReader = createBeanDefinitionReader(beanFactory);
-    // Communicate mule context to parsers
-    try {
-      currentMuleContext.set(muleContext);
-      createInitialApplicationComponents(beanFactory, beanDefinitionReader);
-    } finally {
-      currentMuleContext.remove();
-    }
+    createInitialApplicationComponents(beanFactory);
   }
 
-  protected void createInitialApplicationComponents(DefaultListableBeanFactory beanFactory,
-                                                    BeanDefinitionReader beanDefinitionReader) {
-    if (useNewParsingMechanism) {
-      createApplicationComponents(beanFactory, applicationModel, true);
-    } else {
-      // TODO MULE-9638 - Remove log line
-      LOGGER
-          .warn("Using mixed mechanism to load configuration since there are some components that were not yet migrated to the new mechanism: "
-              + getOldParsingMechanismComponentIdentifiers());
-      beanDefinitionReader.loadBeanDefinitions(getConfigResources());
-    }
+  protected void createInitialApplicationComponents(DefaultListableBeanFactory beanFactory) {
+    createApplicationComponents(beanFactory, applicationModel, true);
   }
 
   protected List<String> createApplicationComponents(DefaultListableBeanFactory beanFactory, ApplicationModel applicationModel,
@@ -376,19 +485,15 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
                                                           }, null);
       }
     });
+    registerObjectFromObjectProviders(beanFactory);
     return createdComponentModels;
-  }
-
-  protected String getOldParsingMechanismComponentIdentifiers() {
-    return join(componentNotSupportedByNewParsers.stream().map(comp -> comp.getNamespace() + ":" + comp.getName()).toArray(),
-                ",");
   }
 
   @Override
   protected void customizeBeanFactory(DefaultListableBeanFactory beanFactory) {
     super.customizeBeanFactory(beanFactory);
     new SpringMuleContextServiceConfigurator(muleContext, applicationModel.getConfigurationProperties(), artifactType,
-                                             optionalObjectsController, beanFactory, componentLocator)
+                                             optionalObjectsController, beanFactory, componentLocator, serviceDiscoverer)
                                                  .createArtifactServices();
   }
 
@@ -404,38 +509,11 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
                                                   genericBeanDefinition(MuleConfigurationConfigurator.class).getBeanDefinition());
   }
 
-  protected BeanDefinitionReader createBeanDefinitionReader(DefaultListableBeanFactory beanFactory) {
-    beanDefinitionReader =
-        new MuleXmlBeanDefinitionReader(beanFactory, createBeanDefinitionDocumentReader(beanDefinitionFactory));
-    // annotate parsed elements with metadata
-    beanDefinitionReader.setDocumentLoader(createLoader());
-    // hook in our custom hierarchical reader
-    beanDefinitionReader.setDocumentReaderClass(getBeanDefinitionDocumentReaderClass());
-    // add error reporting
-    beanDefinitionReader.setProblemReporter(new MissingParserProblemReporter());
-    registerAnnotationConfigProcessors(beanDefinitionReader.getRegistry(), null);
-
-    return beanDefinitionReader;
-  }
-
-  protected MuleBeanDefinitionDocumentReader createBeanDefinitionDocumentReader(BeanDefinitionFactory beanDefinitionFactory) {
-    if (artifactType.equals(ArtifactType.DOMAIN)) {
-      return new MuleDomainBeanDefinitionDocumentReader(beanDefinitionFactory, xmlApplicationParser,
-                                                        componentBuildingDefinitionRegistry, this.artifactProperties);
-    }
-    return new MuleBeanDefinitionDocumentReader(beanDefinitionFactory, xmlApplicationParser, componentBuildingDefinitionRegistry,
-                                                this.artifactProperties);
-  }
-
-  protected MuleDocumentLoader createLoader() {
-    return new MuleDocumentLoader();
-  }
-
-  private void registerAnnotationConfigProcessors(BeanDefinitionRegistry registry, Object source) {
+  private void registerAnnotationConfigProcessors(BeanDefinitionRegistry registry) {
     registerAnnotationConfigProcessor(registry, CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME,
-                                      ConfigurationClassPostProcessor.class, source);
+                                      ConfigurationClassPostProcessor.class, null);
     registerAnnotationConfigProcessor(registry, REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME,
-                                      RequiredAnnotationBeanPostProcessor.class, source);
+                                      RequiredAnnotationBeanPostProcessor.class, null);
     registerInjectorProcessor(registry);
   }
 
@@ -460,17 +538,10 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
     registry.registerBeanDefinition(beanName, definition);
   }
 
-  protected Class<? extends MuleBeanDefinitionDocumentReader> getBeanDefinitionDocumentReaderClass() {
-    if (artifactType.equals(ArtifactType.DOMAIN)) {
-      return MuleDomainBeanDefinitionDocumentReader.class;
-    }
-    return MuleBeanDefinitionDocumentReader.class;
-  }
-
   @Override
   protected DefaultListableBeanFactory createBeanFactory() {
     // Copy all postProcessors defined in the defaultMuleConfig so that they get applied to the child container
-    DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory(getInternalParentBeanFactory());
+    DefaultListableBeanFactory beanFactory = new ObjectProviderAwareBeanFactory(getInternalParentBeanFactory());
     beanFactory.setAutowireCandidateResolver(new ContextAnnotationAutowireCandidateResolver());
     beanFactory.setInstantiationStrategy(new LaxInstantiationStrategyWrapper(new CglibSubclassingInstantiationStrategy(),
                                                                              optionalObjectsController));
@@ -510,10 +581,6 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
 
   protected OptionalObjectsController getOptionalObjectsController() {
     return optionalObjectsController;
-  }
-
-  public static ThreadLocal<MuleContext> getCurrentMuleContext() {
-    return currentMuleContext;
   }
 
   public void initializeComponent(Location location) {

@@ -13,7 +13,6 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static org.mule.runtime.core.api.context.notification.RoutingNotification.CORRELATION_TIMEOUT;
 import static org.mule.runtime.core.api.context.notification.RoutingNotification.MISSED_AGGREGATION_GROUP_EVENT;
-import static org.mule.runtime.core.api.execution.ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate;
 import static org.mule.runtime.core.api.message.GroupCorrelation.NOT_SET;
 import static org.mule.runtime.core.api.util.StringMessageUtils.truncate;
 
@@ -411,15 +410,10 @@ public class EventCorrelator implements Startable, Stoppable {
         logger.warn("expiry failed dues to ObjectStoreException " + e);
       }
       for (final EventGroup group : expired) {
-        ExecutionTemplate<Event> executionTemplate =
-            createErrorHandlingExecutionTemplate(muleContext, flowConstruct, flowConstruct.getExceptionListener());
         try {
-          executionTemplate.execute(() -> {
-            handleGroupExpiry(group);
-            return null;
-          });
+          handleGroupExpiry(group);
         } catch (MessagingException e) {
-          // Already handled by TransactionTemplate
+          flowConstruct.getExceptionListener().handleException(e, e.getEvent());
         } catch (Exception e) {
           muleContext.getExceptionListener().handleException(e);
         }

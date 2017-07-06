@@ -12,6 +12,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.DefaultEventContext;
@@ -20,12 +21,11 @@ import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.session.DefaultMuleSession;
 import org.mule.runtime.core.routing.correlation.CorrelationSequenceComparator;
 import org.mule.runtime.core.routing.correlation.EventCorrelatorCallback;
 import org.mule.runtime.core.routing.correlation.ResequenceMessagesCorrelatorCallback;
-import org.mule.runtime.core.api.session.DefaultMuleSession;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.tck.testmodels.fruit.Apple;
 
 import java.util.Comparator;
 
@@ -41,7 +41,7 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase {
   @Test
   public void testMessageResequencer() throws Exception {
     MuleSession session = new DefaultMuleSession();
-    Flow flow = getTestFlowWithComponent("test", Apple.class);
+    Flow flow = getNamedTestFlow("test");
     assertNotNull(flow);
 
     TestEventResequencer router = new TestEventResequencer(3);
@@ -75,7 +75,7 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase {
   @Test
   public void testMessageResequencerWithComparator() throws Exception {
     MuleSession session = new DefaultMuleSession();
-    Flow flow = getTestFlowWithComponent("test", Apple.class);
+    Flow flow = getNamedTestFlow("test");
     assertNotNull(flow);
 
     TestEventResequencer router = new TestEventResequencer(3);

@@ -6,7 +6,8 @@
  */
 package org.mule;
 
-import static org.mule.runtime.core.api.config.i18n.CoreMessages.agentsRunning;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.versionNotSet;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.DefaultMuleException;
 
@@ -24,13 +25,13 @@ public class MessagingExceptionBenchmark extends AbstractBenchmark {
   @Benchmark
   @Threads(1)
   public MuleException messageSingleThead() {
-    return new DefaultMuleException(agentsRunning());
+    return new DefaultMuleException(versionNotSet());
   }
 
   @Benchmark
   @Threads(4)
   public MuleException messageMultiThread() {
-    return new DefaultMuleException(agentsRunning());
+    return new DefaultMuleException(versionNotSet());
   }
 
   @Benchmark

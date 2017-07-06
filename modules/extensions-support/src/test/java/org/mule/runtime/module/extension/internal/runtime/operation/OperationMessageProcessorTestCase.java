@@ -15,6 +15,7 @@ import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
@@ -23,10 +24,12 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
+import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
 import static org.mule.runtime.api.meta.model.ExecutionType.BLOCKING;
 import static org.mule.runtime.api.meta.model.ExecutionType.CPU_INTENSIVE;
 import static org.mule.runtime.api.meta.model.ExecutionType.CPU_LITE;
@@ -54,7 +57,6 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
-import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.Event;
@@ -307,7 +309,8 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
 
   @Test
   public void executeWithPolicy() throws Exception {
-
+    // In order to execute policies, operation processor must have a component location
+    messageProcessor.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
     messageProcessor.process(event);
 
     verify(mockPolicyManager).createOperationPolicy(eq(messageProcessor.getLocation()), same(event), any(Map.class),
@@ -316,7 +319,16 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
   }
 
   @Test
-  public void getMetadataKeyIdObjectValue() throws MetadataResolvingException, MuleException, ValueResolvingException {
+  public void skipPolicyWithNoComponentLocation() throws Exception {
+    messageProcessor.process(event);
+
+    assertThat(mockOperationPolicy, is(nullValue()));
+    verify(mockPolicyManager, never()).createOperationPolicy(eq(messageProcessor.getLocation()), same(event), any(Map.class),
+                                                             any(OperationExecutionFunction.class));
+  }
+
+  @Test
+  public void getMetadataKeyIdObjectValue() throws MuleException, ValueResolvingException {
     setUpValueResolvers();
     final Object metadataKeyValue = messageProcessor.getParameterValueResolver().getParameterValue(SOME_PARAM_NAME);
     assertThat(metadataKeyValue, is("person"));

@@ -235,6 +235,13 @@
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
+            <artifactId>mule-values-extension</artifactId>
+            <version>${project.version}</version>
+            <classifier>mule-plugin</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.tests</groupId>
             <artifactId>mule-football-soap-extension</artifactId>
             <version>${project.version}</version>
             <classifier>mule-plugin</classifier>
@@ -285,7 +292,6 @@
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
-        
         <dependency>
             <groupId>org.mule.tests.plugin</groupId>
             <artifactId>mule-tests-component-plugin</artifactId>

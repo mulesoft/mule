@@ -7,20 +7,21 @@
 package org.mule.runtime.core.api.config.i18n;
 
 import static org.apache.commons.lang3.StringUtils.defaultString;
+
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.runtime.core.api.config.MuleManifest;
+import org.mule.runtime.core.api.context.notification.ListenerSubscriptionPair;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.api.config.MuleManifest;
-import org.mule.runtime.core.api.context.notification.ListenerSubscriptionPair;
-import org.mule.runtime.core.internal.util.DateUtils;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.api.util.StringMessageUtils;
+import org.mule.runtime.core.internal.util.DateUtils;
 
 import java.lang.reflect.Method;
 import java.util.Date;
@@ -42,10 +43,6 @@ public class CoreMessages extends I18nMessageFactory {
 
   public static I18nMessage serverShutdownAt(Date date) {
     return factory.createMessage(BUNDLE_PATH, 3, date);
-  }
-
-  public static I18nMessage agentsRunning() {
-    return factory.createMessage(BUNDLE_PATH, 4);
   }
 
   public static I18nMessage notSet() {

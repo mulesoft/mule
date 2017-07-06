@@ -111,6 +111,10 @@ public abstract class HttpHeaders {
      */
     public static final String CONTENT_LANGUAGE = "Content-Language";
     /**
+     * {@value "Content-Id"}
+     */
+    public static final String CONTENT_ID = "Content-Id";
+    /**
      * {@value "Content-Length"}
      */
     public static final String CONTENT_LENGTH = "Content-Length";

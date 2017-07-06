@@ -161,7 +161,11 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
    */
   @Override
   public <T> T lookupObject(String key) {
-    return (T) lookupObject(key, true);
+    try {
+      return (T) lookupObject(key, true);
+    } catch (NoSuchBeanDefinitionException e) {
+      return null;
+    }
   }
 
   /**

@@ -11,6 +11,7 @@ import static java.util.Collections.emptyList;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.isNull;
 import static org.mule.runtime.config.spring.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
@@ -63,7 +64,7 @@ public class XmlConfigurationDocumentLoaderTestCase extends AbstractMuleTestCase
     } catch (MuleRuntimeException e) {
       // We want to be sure that the line and column are properly picked up
       assertThat(getStackTrace(e),
-                 StringContains.containsString("Can't resolve  http://www.mulesoft.org/schema/mule/co"));
+                 containsString("Can't resolve  http://www.mulesoft.org/schema/mule/co"));
     }
   }
 
@@ -75,7 +76,7 @@ public class XmlConfigurationDocumentLoaderTestCase extends AbstractMuleTestCase
     } catch (MuleRuntimeException e) {
       // We want to be sure that the line and column are properly picked up
       assertThat(getStackTrace(e),
-                 StringContains.containsString("Can't resolve  http://www.springframework.org/schema/beans/sprind"));
+                 containsString("Invalid content was found starting with element 'ext:whatever'"));
     }
   }
 
@@ -87,7 +88,7 @@ public class XmlConfigurationDocumentLoaderTestCase extends AbstractMuleTestCase
     } catch (MuleRuntimeException e) {
       // We want to be sure that the line and column are properly picked up
       assertThat(e.getMessage(),
-                 StringContains.containsString("lineNumber: " + LINE_NUMBER_ERROR + "; columnNumber: " + COLUMN_NUMBER_ERROR));
+                 containsString("lineNumber: " + LINE_NUMBER_ERROR + "; columnNumber: " + COLUMN_NUMBER_ERROR));
     }
   }
 

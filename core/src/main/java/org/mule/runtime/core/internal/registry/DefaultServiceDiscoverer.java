@@ -6,16 +6,14 @@
  */
 package org.mule.runtime.core.internal.registry;
 
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import org.mule.runtime.api.artifact.ServiceDiscoverer;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.registry.RegistrationException;
 
 import java.util.Collection;
 import java.util.Optional;
-
-import javax.inject.Inject;
 
 /**
  * Default implementation for {@link ServiceDiscoverer}.
@@ -24,16 +22,24 @@ import javax.inject.Inject;
  */
 public class DefaultServiceDiscoverer implements ServiceDiscoverer {
 
-  @Inject
   private MuleContext muleContext;
+
+  public DefaultServiceDiscoverer(MuleContext muleContext) {
+    this.muleContext = muleContext;
+  }
 
   @Override
   public <T> Optional<T> lookup(Class<T> serviceType) {
     try {
-      return of(muleContext.getRegistry().lookupObject(serviceType));
+      return ofNullable(muleContext.getRegistry().lookupObject(serviceType));
     } catch (RegistrationException e) {
-      return empty();
+      throw new MuleRuntimeException(e);
     }
+  }
+
+  @Override
+  public <T> Optional<T> lookupByName(String name) {
+    return ofNullable(muleContext.getRegistry().lookupObject(name));
   }
 
   @Override
