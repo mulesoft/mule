@@ -177,15 +177,13 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
           // create the MessagingException in ReactorCompletionCallback where Mono.error is used but we don't have a reference
           // to the processor there.
           return doProcess(operationEvent, operationContext)
-              .onErrorMap(
+              .onErrorMap(e -> !(e instanceof MessagingException),
                           e -> {
                             // MULE-13009 Inconsistent error propagation in extension operations depending on operation type
-                            if (operationModel.isBlocking() && !(e instanceof MessagingException)) {
+                            if (operationModel.isBlocking()) {
                               return new MessagingException(event, e);
-                            } else if (!operationModel.isBlocking() && !(e instanceof MuleException)) {
-                              return new DefaultMuleException(e);
                             } else {
-                              return e;
+                              return new MessagingException(event, e, this);
                             }
                           });
         };
