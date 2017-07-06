@@ -20,38 +20,66 @@ import java.util.Optional;
 public class AbstractAttributeDefinitionVisitor implements AttributeDefinitionVisitor {
 
   @Override
-  public void onReferenceObject(Class<?> objectType) {}
+  public void onReferenceObject(Class<?> objectType) {
+    doOnOperation("onReferenceObject");
+  }
 
   @Override
-  public void onReferenceSimpleParameter(String reference) {}
+  public void onReferenceSimpleParameter(String reference) {
+    doOnOperation("onReferenceSimpleParameter");
+  }
 
   @Override
-  public void onReferenceFixedParameter(String reference) {}
+  public void onReferenceFixedParameter(String reference) {
+    doOnOperation("onReferenceFixedParameter");
+  }
 
   @Override
-  public void onFixedValue(Object value) {}
+  public void onFixedValue(Object value) {
+    doOnOperation("onFixedValue");
+  }
 
   @Override
-  public void onConfigurationParameter(String parameterName, Object defaultValue, Optional<TypeConverter> typeConverter) {}
+  public void onConfigurationParameter(String parameterName, Object defaultValue, Optional<TypeConverter> typeConverter) {
+    doOnOperation("onConfigurationParameter");
+  }
 
   @Override
-  public void onUndefinedSimpleParameters() {}
+  public void onUndefinedSimpleParameters() {
+    doOnOperation("onUndefinedSimpleParameters");
+  }
 
   @Override
-  public void onUndefinedComplexParameters() {}
+  public void onUndefinedComplexParameters() {
+    doOnOperation("onUndefinedComplexParameters");
+  }
 
   @Override
-  public void onComplexChildCollection(Class<?> type, Optional<String> wrapperIdentifier) {}
+  public void onComplexChildCollection(Class<?> type, Optional<String> wrapperIdentifier) {
+    doOnOperation("onComplexChildCollection");
+  }
 
   @Override
-  public void onComplexChildMap(Class<?> keyType, Class<?> valueType, String wrapperIdentifier) {}
+  public void onComplexChildMap(Class<?> keyType, Class<?> valueType, String wrapperIdentifier) {
+    doOnOperation("onComplexChildMap");
+  }
 
   @Override
-  public void onComplexChild(Class<?> type, Optional<String> wrapperIdentifier, Optional<String> childIdentifier) {}
+  public void onComplexChild(Class<?> type, Optional<String> wrapperIdentifier, Optional<String> childIdentifier) {
+    doOnOperation("onComplexChild");
+  }
 
   @Override
-  public void onValueFromTextContent() {}
+  public void onValueFromTextContent() {
+    doOnOperation("onReferenceSimpleParameter");
+  }
 
   @Override
-  public void onMultipleValues(KeyAttributeDefinitionPair[] definitions) {}
+  public void onMultipleValues(KeyAttributeDefinitionPair[] definitions) {
+    doOnOperation("onReferenceSimpleParameter");
+  }
+
+  protected void doOnOperation(String operation) {
+    // Do nothing.
+  }
 }

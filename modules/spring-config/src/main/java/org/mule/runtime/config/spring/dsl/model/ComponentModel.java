@@ -60,6 +60,7 @@ public class ComponentModel {
   // TODO MULE-9688 Remove this attributes since should not be part of this class. This class should be immutable.
   private BeanReference beanReference;
   private BeanDefinition beanDefinition;
+  private Object objectInstance;
   private Class<?> type;
   private Integer lineNumber;
   private String configFileName;
@@ -210,6 +211,24 @@ public class ComponentModel {
    */
   public void setBeanReference(BeanReference beanReference) {
     this.beanReference = beanReference;
+  }
+
+  /**
+   * @return the object instance already created for this model
+   */
+  public Object getObjectInstance() {
+    return objectInstance;
+  }
+
+  /**
+   * Setter used for components that should be created eagerly without going throw spring. This is the case of models contributing
+   * to IoC {@link org.mule.runtime.api.ioc.ObjectProvider} interface that require to be created before the application components
+   * so they can be referenced.
+   * 
+   * @param objectInstance the object instance created from this model.
+   */
+  public void setObjectInstance(Object objectInstance) {
+    this.objectInstance = objectInstance;
   }
 
   /**

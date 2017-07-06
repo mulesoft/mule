@@ -14,14 +14,13 @@ import static org.hamcrest.object.IsCompatibleType.typeCompatibleWith;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLASSLOADER_REPOSITORY;
 import static org.mule.test.runner.utils.AnnotationUtils.getAnnotationAttributeFrom;
-
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.classloader.net.MuleArtifactUrlStreamHandler;
@@ -92,6 +91,9 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
     MuleUrlStreamHandlerFactory.installUrlStreamHandlerFactory();
     MuleArtifactUrlStreamHandler.register();
   }
+
+  public static final String SPRING_CONFIG_FILES_PROPERTIES = "spring.config.files";
+  public static final String MULE_SPRING_CONFIG_FILE = "mule-spring-config.xml";
 
   private static List<ArtifactClassLoader> pluginClassLoaders;
   private static List<ArtifactClassLoader> serviceClassLoaders;

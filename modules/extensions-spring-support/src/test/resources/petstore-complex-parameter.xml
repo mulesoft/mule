@@ -1,25 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore"
-      xmlns:spring="http://www.springframework.org/schema/beans"
-      xmlns:util="http://www.springframework.org/schema/util"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/petstore http://www.mulesoft.org/schema/mule/petstore/current/mule-petstore.xsd
-               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
-               http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
-
-    <spring:beans>
-        <util:map id="birds" value-type="java.lang.Integer">
-            <spring:entry key="mockingjay" value="15"/>
-            <spring:entry key="mockingbird" value="10"/>
-        </util:map>
-
-        <util:list id="ammenities">
-            <spring:value type="java.lang.String">spinning wheel</spring:value>
-            <spring:value type="java.lang.String">food can</spring:value>
-        </util:list>
-    </spring:beans>
+               http://www.mulesoft.org/schema/mule/petstore http://www.mulesoft.org/schema/mule/petstore/current/mule-petstore.xsd">
 
     <petstore:config name="configWithReferences" cashierName="jim" >
         <petstore:connection username="john" password="doe"/>

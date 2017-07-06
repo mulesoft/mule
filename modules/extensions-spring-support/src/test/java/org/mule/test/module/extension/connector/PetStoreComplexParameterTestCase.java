@@ -12,16 +12,31 @@ import static org.junit.Assert.assertThat;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import org.mule.test.petstore.extension.PetCage;
 
+import org.junit.Test;
+
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Test;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 public class PetStoreComplexParameterTestCase extends AbstractExtensionFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {
     return "petstore-complex-parameter.xml";
+  }
+
+  @Override
+  protected void doSetUp() throws Exception {
+    muleContext.getRegistry().registerObject("birds", ImmutableMap.<String, Integer>builder()
+        .put("mockingjay", 15)
+        .put("mockingbird", 10)
+        .build());
+    muleContext.getRegistry().registerObject("ammenities", ImmutableList.<String>builder()
+        .add("spinning wheel")
+        .add("food can")
+        .build());
   }
 
   @Override

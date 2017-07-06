@@ -31,6 +31,11 @@ public class KnockeableDoor {
     this.victim = victim;
   }
 
+  public KnockeableDoor(String victim, String address) {
+    this.victim = victim;
+    this.address = address;
+  }
+
   public static String knock(String value) {
     return "Knocked on " + value;
   }

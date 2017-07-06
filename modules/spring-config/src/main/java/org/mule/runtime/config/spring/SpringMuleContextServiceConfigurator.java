@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.spring;
 
+import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT_SERIALIZER_NAME;
 import static org.mule.runtime.config.spring.InjectParamsFromContextServiceProxy.createInjectProviderParamsServiceProxy;
 import static org.mule.runtime.core.api.config.MuleProperties.DEFAULT_LOCAL_TRANSIENT_USER_OBJECT_STORE_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.DEFAULT_LOCAL_USER_OBJECT_STORE_NAME;
@@ -34,7 +35,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCK_FACTOR
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCK_PROVIDER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MESSAGE_PROCESSING_FLOW_TRACE_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_METADATA_SERVICE;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_NOTIFICATION_HANDLER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_NOTIFICATION_MANAGER;
@@ -47,7 +47,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_QUEUE_MANAG
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SCHEDULER_BASE_CONFIG;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SCHEDULER_POOLS_CONFIG;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SERIALIZER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SERVICE_DISCOVERER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME;
@@ -58,9 +57,11 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSACTION
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSFORMATION_SERVICE;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
+import org.mule.runtime.api.artifact.ServiceDiscoverer;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.config.spring.NotificationConfig.EnabledNotificationConfig;
 import org.mule.runtime.config.spring.factories.ConstantFactoryBean;
@@ -68,8 +69,6 @@ import org.mule.runtime.config.spring.factories.ExtensionManagerFactoryBean;
 import org.mule.runtime.config.spring.factories.TransactionManagerFactoryBean;
 import org.mule.runtime.config.spring.internal.SpringRegistryBootstrap;
 import org.mule.runtime.config.spring.processors.MuleObjectNameProcessor;
-import org.mule.runtime.config.spring.processors.ParentContextPropertyPlaceholderProcessor;
-import org.mule.runtime.config.spring.processors.PropertyPlaceholderProcessor;
 import org.mule.runtime.core.api.DefaultTransformationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
@@ -94,7 +93,6 @@ import org.mule.runtime.core.api.context.notification.TransactionNotificationLis
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.scheduler.SchedulerContainerPoolsConfig;
 import org.mule.runtime.core.api.time.TimeSupplier;
-import org.mule.runtime.core.internal.util.queue.TransactionalQueueManager;
 import org.mule.runtime.core.component.state.DefaultComponentInitialStateManager;
 import org.mule.runtime.core.el.DefaultExpressionManager;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
@@ -111,21 +109,22 @@ import org.mule.runtime.core.internal.lock.MuleLockFactory;
 import org.mule.runtime.core.internal.lock.SingleServerLockProvider;
 import org.mule.runtime.core.internal.management.stats.DefaultProcessingTimeWatcher;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
-import org.mule.runtime.core.internal.registry.DefaultServiceDiscoverer;
 import org.mule.runtime.core.internal.streaming.DefaultStreamingManager;
 import org.mule.runtime.core.internal.transformer.DynamicDataTypeConversionResolver;
 import org.mule.runtime.core.internal.util.DefaultStreamCloserService;
+import org.mule.runtime.core.internal.util.queue.TransactionalQueueManager;
+import org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean;
+import org.mule.runtime.core.internal.util.store.MuleObjectStoreManager;
 import org.mule.runtime.core.policy.DefaultPolicyManager;
 import org.mule.runtime.core.policy.DefaultPolicyStateHandler;
 import org.mule.runtime.core.processor.interceptor.DefaultProcessorInterceptorManager;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.core.security.DefaultMuleSecurityManager;
-import org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean;
-import org.mule.runtime.core.internal.util.store.MuleObjectStoreManager;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.RuntimeBeanReference;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
 import java.util.Map;
 import java.util.Optional;
@@ -133,10 +132,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
 
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.config.RuntimeBeanReference;
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 
 /**
  * This class configured all the services available in a {@code MuleContext}.
@@ -183,9 +181,6 @@ class SpringMuleContextServiceConfigurator {
       .put(OBJECT_POLICY_MANAGER, getBeanDefinition(DefaultPolicyManager.class))
       .put(OBJECT_PROCESSOR_INTERCEPTOR_MANAGER, getBeanDefinition(DefaultProcessorInterceptorManager.class))
       .put(OBJECT_POLICY_MANAGER_STATE_HANDLER, getBeanDefinition(DefaultPolicyStateHandler.class))
-      .put(OBJECT_SERIALIZER,
-           getBeanDefinitionBuilder(DefaultObjectSerializerFactoryBean.class).addDependsOn(OBJECT_MULE_CONFIGURATION)
-               .getBeanDefinition())
       .put(OBJECT_NOTIFICATION_MANAGER, createNotificationManagerBeanDefinition())
       .put(OBJECT_STORE_DEFAULT_IN_MEMORY_NAME,
            getBeanDefinitionBuilder(ConstantFactoryBean.class).addConstructorArgReference(OBJECT_LOCAL_STORE_IN_MEMORY)
@@ -212,7 +207,6 @@ class SpringMuleContextServiceConfigurator {
            getBeanDefinitionBuilder(ConstantFactoryBean.class).addConstructorArgReference(OBJECT_LOCAL_QUEUE_MANAGER)
                .getBeanDefinition())
       .put(OBJECT_LOCAL_QUEUE_MANAGER, getBeanDefinition(TransactionalQueueManager.class))
-      .put("_muleParentContextPropertyPlaceholderProcessor", getBeanDefinition(ParentContextPropertyPlaceholderProcessor.class))
       .put(OBJECT_SECURITY_MANAGER, getBeanDefinition(DefaultMuleSecurityManager.class))
       .put(OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER, getBeanDefinition(MuleMessageProcessingManager.class))
       .put(OBJECT_MULE_STREAM_CLOSER_SERVICE, getBeanDefinition(DefaultStreamCloserService.class))
@@ -229,19 +223,20 @@ class SpringMuleContextServiceConfigurator {
       .put(OBJECT_TRANSFORMATION_SERVICE, getBeanDefinition(DefaultTransformationService.class))
       .put(OBJECT_SCHEDULER_POOLS_CONFIG, getConstantObjectBeanDefinition(SchedulerContainerPoolsConfig.getInstance()))
       .put(OBJECT_SCHEDULER_BASE_CONFIG, getBeanDefinition(SchedulerBaseConfigFactory.class))
-      .put(OBJECT_SERVICE_DISCOVERER, getBeanDefinition(DefaultServiceDiscoverer.class))
       .put(OBJECT_CLUSTER_SERVICE, getBeanDefinition(DefaultClusterService.class))
       .build();
 
   private final SpringConfigurationComponentLocator componentLocator;
   private final ConfigurationProperties configurationProperties;
+  private final ServiceDiscoverer serviceDiscoverer;
 
   public SpringMuleContextServiceConfigurator(MuleContext muleContext,
                                               ConfigurationProperties configurationProperties,
                                               ArtifactType artifactType,
                                               OptionalObjectsController optionalObjectsController,
                                               BeanDefinitionRegistry beanDefinitionRegistry,
-                                              SpringConfigurationComponentLocator componentLocator) {
+                                              SpringConfigurationComponentLocator componentLocator,
+                                              ServiceDiscoverer serviceDiscoverer) {
     this.muleContext = muleContext;
     this.configurationProperties = configurationProperties;
     this.customServiceRegistry = (CustomServiceRegistry) muleContext.getCustomizationService();
@@ -249,14 +244,16 @@ class SpringMuleContextServiceConfigurator {
     this.optionalObjectsController = optionalObjectsController;
     this.beanDefinitionRegistry = beanDefinitionRegistry;
     this.componentLocator = componentLocator;
+    this.serviceDiscoverer = serviceDiscoverer;
   }
 
   void createArtifactServices() {
-    registerPropertyPlaceholder();
+    registerBeanDefinition(DEFAULT_OBJECT_SERIALIZER_NAME, getConstantObjectBeanDefinition(muleContext.getObjectSerializer()));
     registerBeanDefinition(OBJECT_CONFIGURATION_PROPERTIES,
                            getConstantObjectBeanDefinition(configurationProperties));
     registerBeanDefinition(OBJECT_CONFIGURATION_COMPONENT_LOCATOR, getConstantObjectBeanDefinition(componentLocator));
     registerBeanDefinition(OBJECT_NOTIFICATION_HANDLER, getConstantObjectBeanDefinition(muleContext.getNotificationManager()));
+    registerBeanDefinition(OBJECT_SERVICE_DISCOVERER, getConstantObjectBeanDefinition(serviceDiscoverer));
     loadServiceConfigurators();
 
     defaultContextServices.entrySet().stream()
@@ -268,10 +265,6 @@ class SpringMuleContextServiceConfigurator {
     createLocalLockFactoryBeanDefinitions();
     createQueueManagerBeanDefinitions();
     createCustomServices();
-  }
-
-  private void registerPropertyPlaceholder() {
-    registerBeanDefinition("_mulePropertyPlaceholderProcessor", createMulePropertyPlaceholderBeanDefinition());
   }
 
   private void loadServiceConfigurators() {
@@ -321,12 +314,6 @@ class SpringMuleContextServiceConfigurator {
       throw new IllegalStateException("A custom service must define a service class or instance");
     }
     return beanDefinition;
-  }
-
-  private BeanDefinition createMulePropertyPlaceholderBeanDefinition() {
-    BeanDefinitionBuilder mulePropertyPlaceholderProcessor = getBeanDefinitionBuilder(PropertyPlaceholderProcessor.class);
-    return mulePropertyPlaceholderProcessor.addPropertyValue("configurationProperties", configurationProperties)
-        .addPropertyValue("ignoreUnresolvablePlaceholders", true).getBeanDefinition();
   }
 
   private void createQueueManagerBeanDefinitions() {

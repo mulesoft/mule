@@ -60,10 +60,6 @@ final public class MuleDocumentLoader implements DocumentLoader {
   private final DocumentLoader defaultLoader = new DefaultDocumentLoader();
   private final XmlMetadataAnnotationsFactory metadataFactory;
 
-  public MuleDocumentLoader(XmlMetadataAnnotationsFactory metadataFactory) {
-    this.metadataFactory = metadataFactory;
-  }
-
   public MuleDocumentLoader() {
     this.metadataFactory = new DefaultXmlMetadataFactory();
   }

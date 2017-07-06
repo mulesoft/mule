@@ -8,6 +8,7 @@
 package org.mule.runtime.config.spring;
 
 import static java.util.Collections.emptyMap;
+import static java.util.Optional.empty;
 import static org.junit.Assert.assertSame;
 import static org.mule.runtime.core.DefaultMuleContext.LOCAL_OBJECT_STORE_MANAGER_KEY;
 import static org.mule.runtime.core.DefaultMuleContext.LOCAL_PERSISTENT_OBJECT_STORE_KEY;

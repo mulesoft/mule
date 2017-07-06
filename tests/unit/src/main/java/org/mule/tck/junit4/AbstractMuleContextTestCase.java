@@ -27,6 +27,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.DefaultEventContext;
+import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.DefaultTransformationService;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
@@ -197,7 +198,15 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
 
     muleContext.start();
 
+    if (doTestClassInjection()) {
+      muleContext.getInjector().inject(this);
+    }
+
     contextStartedLatch.get().await(20, SECONDS);
+  }
+
+  protected boolean doTestClassInjection() {
+    return false;
   }
 
   /**

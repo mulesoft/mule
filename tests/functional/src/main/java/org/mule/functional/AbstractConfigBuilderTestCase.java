@@ -33,13 +33,6 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     return true;
   }
 
-  @Override
-  public void testManagerConfig() throws Exception {
-    super.testManagerConfig();
-
-    assertNotNull(muleContext.getTransactionManager());
-  }
-
   @Test
   public void testExceptionStrategy2() {
     Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("appleComponent");
