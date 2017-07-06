@@ -37,7 +37,6 @@
         <module>parameter-resolver-extension</module>
         <module>mule-soap-extension</module>
         <module>rick-and-morty-extension</module>
-        <module>weave-function-extension</module>
         <module>values-extension</module>
     </modules>
 

@@ -86,6 +86,19 @@ final class ExtensionRegistry {
    */
   void registerExtension(String name, ExtensionModel extensionModel) {
     extensions.put(new ExtensionEntityKey(name), extensionModel);
+    getParameterClasses(extensionModel, getClassLoader(extensionModel)).stream()
+        .filter(type -> Enum.class.isAssignableFrom(type))
+        .forEach(type -> {
+          final Class<Enum> enumClass = (Class<Enum>) type;
+          if (enumClasses.add(enumClass)) {
+            try {
+              registry.registerTransformer(new StringToEnum(enumClass));
+            } catch (MuleException e) {
+              throw new MuleRuntimeException(createStaticMessage("Could not register transformer for enum "
+                  + enumClass.getName()), e);
+            }
+          }
+        });
   }
 
   /**

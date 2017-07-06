@@ -73,8 +73,7 @@ public interface ExtensionManager {
   /**
    * Returns a {@link ConfigurationInstance} for the given {@code extensionModel} and {@code componentModel}.
    * <p>
-   * Because no {@link ConfigurationProvider} is specified, the following algorithm will be applied to
-   * try and determine the
+   * Because no {@link ConfigurationProvider} is specified, the following algorithm will be applied to try and determine the
    * instance to be returned:
    * <ul>
    * <li>If <b>one</b> (and only one) {@link ConfigurationProvider} is registered, capable of handing configurations of the given

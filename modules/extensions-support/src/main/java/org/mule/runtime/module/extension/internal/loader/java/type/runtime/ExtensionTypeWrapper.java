@@ -8,9 +8,8 @@ package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getApiMethods;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getOperationMethods;
 import org.mule.runtime.extension.api.annotation.Configurations;
-import org.mule.runtime.extension.api.annotation.ExpressionFunctions;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.module.extension.internal.loader.java.type.ConfigurationElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionElement;
@@ -51,20 +50,7 @@ public class ExtensionTypeWrapper<T> extends ComponentWrapper implements Extensi
   public List<MethodElement> getOperations() {
     return getAnnotation(Operations.class)
         .map(classes -> Stream.of(classes.value())
-            .flatMap(clazz -> getApiMethods(clazz).stream())
-            .map(clazz -> (MethodElement) new MethodWrapper(clazz))
-            .collect(toList()))
-        .orElse(emptyList());
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public List<MethodElement> getFunctions() {
-    return getAnnotation(ExpressionFunctions.class)
-        .map(classes -> Stream.of(classes.value())
-            .flatMap(clazz -> getApiMethods(clazz).stream())
+            .flatMap(clazz -> getOperationMethods(clazz).stream())
             .map(clazz -> (MethodElement) new MethodWrapper(clazz))
             .collect(toList()))
         .orElse(emptyList());

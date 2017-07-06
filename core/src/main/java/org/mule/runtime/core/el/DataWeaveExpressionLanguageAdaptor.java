@@ -105,7 +105,7 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
   }
 
   private boolean isPayloadExpression(String sanitized) {
-    return sanitized.equals(PAYLOAD);
+    return sanitized.equals("payload");
   }
 
   @Override
@@ -134,8 +134,7 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
                              BindingContext context) {
     String sanitized = sanitize(expression);
     if (isPayloadExpression(sanitized)) {
-      return event != null ? event.getMessage().getPayload()
-          : context != null ? context.lookup(PAYLOAD).orElse(null) : null;
+      return event.getMessage().getPayload();
     } else {
       BindingContext.Builder contextBuilder = bindingContextBuilderFor(event, context);
       addFlowBindings(flowConstruct, contextBuilder);
