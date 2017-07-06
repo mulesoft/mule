@@ -20,7 +20,6 @@ import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.DESCRIPT
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.DOC_DESCRIPTION_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.ERROR_MAPPING_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.GLOBAL_PROPERTY_IDENTIFIER;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.INTERCEPTOR_STACK_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_DOMAIN_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_EE_DOMAIN_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_IDENTIFIER;
@@ -41,6 +40,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_
 import static org.mule.runtime.core.component.ComponentAnnotations.ANNOTATION_NAME;
 import static org.mule.runtime.core.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
 import static org.mule.runtime.core.internal.exception.ErrorMapping.ANNOTATION_ERROR_MAPPINGS;
+
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.ErrorType;
@@ -114,7 +114,6 @@ public class BeanDefinitionFactory {
       ImmutableSet.<ComponentIdentifier>builder()
           .add(MULE_PROPERTIES_IDENTIFIER)
           .add(MULE_PROPERTY_IDENTIFIER)
-          .add(INTERCEPTOR_STACK_IDENTIFIER)
           .add(OBJECT_IDENTIFIER)
           .build();
 
@@ -326,7 +325,6 @@ public class BeanDefinitionFactory {
     ExceptionStrategyRefBeanDefinitionCreator exceptionStrategyRefBeanDefinitionCreator =
         new ExceptionStrategyRefBeanDefinitionCreator();
     PropertiesMapBeanDefinitionCreator propertiesMapBeanDefinitionCreator = new PropertiesMapBeanDefinitionCreator();
-    InterceptorStackBeanDefinitionCreator interceptorStackBeanDefinitionCreator = new InterceptorStackBeanDefinitionCreator();
     FilterReferenceBeanDefinitionCreator filterReferenceBeanDefinitionCreator = new FilterReferenceBeanDefinitionCreator();
     ReferenceBeanDefinitionCreator referenceBeanDefinitionCreator = new ReferenceBeanDefinitionCreator();
     SimpleTypeBeanDefinitionCreator simpleTypeBeanDefinitionCreator = new SimpleTypeBeanDefinitionCreator();
@@ -337,8 +335,7 @@ public class BeanDefinitionFactory {
 
     eagerObjectCreator.setNext(objectBeanDefinitionCreator);
     objectBeanDefinitionCreator.setNext(propertiesMapBeanDefinitionCreator);
-    propertiesMapBeanDefinitionCreator.setNext(interceptorStackBeanDefinitionCreator);
-    interceptorStackBeanDefinitionCreator.setNext(exceptionStrategyRefBeanDefinitionCreator);
+    propertiesMapBeanDefinitionCreator.setNext(exceptionStrategyRefBeanDefinitionCreator);
     exceptionStrategyRefBeanDefinitionCreator.setNext(filterReferenceBeanDefinitionCreator);
     filterReferenceBeanDefinitionCreator.setNext(referenceBeanDefinitionCreator);
     referenceBeanDefinitionCreator.setNext(simpleTypeBeanDefinitionCreator);

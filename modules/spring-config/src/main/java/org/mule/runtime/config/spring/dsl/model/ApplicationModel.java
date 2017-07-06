@@ -17,7 +17,6 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections.CollectionUtils.disjunction;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
-import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.from;
@@ -28,11 +27,13 @@ import static org.mule.runtime.extension.api.util.NameUtils.pluralize;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.DOMAIN_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.EE_DOMAIN_PREFIX;
+
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.app.declaration.ElementDeclaration;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
+import org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
@@ -153,7 +154,6 @@ public class ApplicationModel {
   public static final String PROTOTYPE_OBJECT_ELEMENT = "prototype-object";
   public static final String SINGLETON_OBJECT_ELEMENT = "singleton-object";
   public static final String OBJECT_ELEMENT = "object";
-  public static final String INTERCEPTOR_STACK_ELEMENT = "interceptor-stack";
 
   public static final ComponentIdentifier ERROR_HANDLER_IDENTIFIER =
       builder().withNamespace(CORE_PREFIX).withName(ERROR_HANDLER).build();
@@ -198,8 +198,6 @@ public class ApplicationModel {
       builder().withNamespace(CORE_PREFIX).withName(SINGLETON_OBJECT_ELEMENT).build();
   public static final ComponentIdentifier OBJECT_IDENTIFIER =
       builder().withNamespace(CORE_PREFIX).withName(OBJECT_ELEMENT).build();
-  public static final ComponentIdentifier INTERCEPTOR_STACK_IDENTIFIER =
-      builder().withNamespace(CORE_PREFIX).withName(INTERCEPTOR_STACK_ELEMENT).build();
   public static final ComponentIdentifier FLOW_IDENTIFIER =
       builder().withNamespace(CORE_PREFIX).withName(FLOW_ELEMENT).build();
   public static final ComponentIdentifier FLOW_REF_IDENTIFIER =

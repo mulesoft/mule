@@ -9,15 +9,13 @@ package org.mule.functional;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.component.PooledJavaComponent;
-import org.mule.runtime.core.interceptor.InterceptorStack;
-import org.mule.runtime.core.interceptor.LoggingInterceptor;
-import org.mule.runtime.core.interceptor.TimerInterceptor;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
 
 import org.junit.Test;
@@ -69,16 +67,6 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     assertEquals(10, muleContext.getConfiguration().getDefaultResponseTimeout());
     assertEquals(20, muleContext.getConfiguration().getDefaultTransactionTimeout());
     assertEquals(30, muleContext.getConfiguration().getShutdownTimeout());
-  }
-
-  @Test
-  public void testGlobalInterceptorStack() {
-    InterceptorStack interceptorStack = (InterceptorStack) muleContext.getRegistry().lookupObject("testInterceptorStack");
-    assertNotNull(interceptorStack);
-    assertEquals(3, interceptorStack.getInterceptors().size());
-    assertEquals(LoggingInterceptor.class, interceptorStack.getInterceptors().get(0).getClass());
-    assertEquals(TimerInterceptor.class, interceptorStack.getInterceptors().get(1).getClass());
-    assertEquals(LoggingInterceptor.class, interceptorStack.getInterceptors().get(2).getClass());
   }
 
 }
