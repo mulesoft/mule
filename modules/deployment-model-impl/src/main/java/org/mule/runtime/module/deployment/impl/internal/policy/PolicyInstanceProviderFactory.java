@@ -7,7 +7,7 @@
 
 package org.mule.runtime.module.deployment.impl.internal.policy;
 
-import org.mule.runtime.core.policy.PolicyParametrization;
+import org.mule.runtime.core.api.policy.PolicyParametrization;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplate;
 

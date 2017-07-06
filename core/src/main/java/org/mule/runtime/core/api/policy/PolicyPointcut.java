@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.core.policy;
+package org.mule.runtime.core.api.policy;
 
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 

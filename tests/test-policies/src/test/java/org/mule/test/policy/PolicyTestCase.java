@@ -25,7 +25,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.policy.Policy;
-import org.mule.runtime.core.policy.PolicyInstance;
+import org.mule.runtime.core.api.policy.PolicyInstance;
 import org.mule.runtime.core.policy.PolicyProvider;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 

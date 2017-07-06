@@ -21,8 +21,8 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.deployment.impl.internal.application.MuleApplicationPolicyProvider.createPolicyRegistrationError;
 
 import org.mule.runtime.core.policy.Policy;
-import org.mule.runtime.core.policy.PolicyParametrization;
-import org.mule.runtime.core.policy.PolicyPointcut;
+import org.mule.runtime.core.api.policy.PolicyParametrization;
+import org.mule.runtime.core.api.policy.PolicyPointcut;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.policy.PolicyRegistrationException;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplate;

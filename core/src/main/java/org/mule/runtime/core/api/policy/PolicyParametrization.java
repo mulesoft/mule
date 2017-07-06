@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.core.policy;
+package org.mule.runtime.core.api.policy;
 
 import static java.util.Collections.unmodifiableMap;
 import static org.apache.commons.lang3.StringUtils.isEmpty;

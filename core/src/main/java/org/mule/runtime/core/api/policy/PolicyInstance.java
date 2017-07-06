@@ -4,11 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.policy;
+package org.mule.runtime.core.api.policy;
 
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Startable;
-import org.mule.runtime.core.api.policy.PolicyChain;
 
 import java.util.Optional;
 
