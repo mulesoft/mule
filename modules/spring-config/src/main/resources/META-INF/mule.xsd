@@ -90,7 +90,6 @@
             <xsd:element ref="abstract-flow-construct" />
             <xsd:element ref="flow" />
             <xsd:element ref="sub-flow" />
-            <xsd:element ref="abstract-interceptor-stack"/>
             <xsd:element ref="abstract-filter"/>
             <xsd:element ref="abstract-transformer"/>
             <xsd:element ref="processor-chain"/>
@@ -2600,31 +2599,6 @@
     <!--==============================================================-->
     <!--   Interceptor elements                                       -->
     <!--==============================================================-->
-    <xsd:element name="abstract-interceptor-stack" abstract="true" type="abstractInterceptorStackType">
-        <xsd:annotation>
-            <xsd:documentation>
-                A placeholder for interceptor stack elements.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="abstractInterceptorStackType">
-        <xsd:complexContent>
-            <xsd:extension base="annotatedType">
-                <xsd:sequence maxOccurs="unbounded">
-                    <xsd:element ref="abstract-interceptor"/>
-                </xsd:sequence>
-                <xsd:attribute name="name" type="nonBlankString" use="required">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The name used to identify this interceptor stack.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-    <xsd:element name="interceptor-stack" type="abstractInterceptorStackType" substitutionGroup="abstract-interceptor-stack"/>
-
 
     <xsd:element name="abstract-interceptor" abstract="true" type="abstractInterceptorType" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
@@ -2643,26 +2617,9 @@
         <xsd:sequence>
             <xsd:choice maxOccurs="unbounded">
                 <xsd:element ref="abstract-interceptor"/>
-                <xsd:element name="interceptor-stack" type="refInterceptorStackType">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            A reference to a stack of intereceptors defined globally.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:element>
             </xsd:choice>
         </xsd:sequence>
     </xsd:group>
-
-    <xsd:complexType name="refInterceptorStackType">
-        <xsd:attribute name="ref" type="xsd:string" use="required">
-            <xsd:annotation>
-                <xsd:documentation>
-                    The name of the interceptor stack to use.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-    </xsd:complexType>
 
     <xsd:element name="timer-interceptor" type="abstractInterceptorType" substitutionGroup="abstract-interceptor">
         <xsd:annotation>
@@ -2678,30 +2635,6 @@
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    <xsd:element name="custom-interceptor" type="customInterceptorType" substitutionGroup="abstract-interceptor">
-        <xsd:annotation>
-            <xsd:documentation>
-                A user-implemented interceptor.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="customInterceptorType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractInterceptorType">
-                <xsd:sequence>
-                    <xsd:group ref="propertiesGroup"/>
-                </xsd:sequence>
-                <xsd:attribute name="class" type="substitutableClass" use="required">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            An implementation of the Interceptor interface.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
 
     <!-- security filters -->
 
