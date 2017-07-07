@@ -31,12 +31,13 @@ public class InfrastructureFieldContributor implements ParameterDeclarerContribu
   @Override
   public void contribute(ExtensionParameter parameter, ParameterDeclarer declarer,
                          ParameterDeclarationContext declarationContext) {
-    String name = InfrastructureTypeMapping.getMap().get(parameter.getType().getDeclaringClass());
-    if (!isBlank(name)) {
-      declarer.withModelProperty(new InfrastructureParameterModelProperty());
+    InfrastructureTypeMapping.InfrastructureType infrastructureType =
+        InfrastructureTypeMapping.getMap().get(parameter.getType().getDeclaringClass());
+    if (infrastructureType != null && !isBlank(infrastructureType.getName())) {
+      declarer.withModelProperty(new InfrastructureParameterModelProperty(infrastructureType.getSequence()));
       declarer.withExpressionSupport(NOT_SUPPORTED);
-      InfrastructureTypeMapping.getQName(name).ifPresent(declarer::withModelProperty);
-      InfrastructureTypeMapping.getDslConfiguration(name).ifPresent(declarer::withDsl);
+      InfrastructureTypeMapping.getQName(infrastructureType.getName()).ifPresent(declarer::withModelProperty);
+      InfrastructureTypeMapping.getDslConfiguration(infrastructureType.getName()).ifPresent(declarer::withDsl);
     }
   }
 }

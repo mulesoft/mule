@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 
 import static java.lang.String.format;
+import static java.util.Optional.ofNullable;
 import static org.springframework.core.ResolvableType.forField;
 import org.mule.runtime.module.extension.internal.loader.java.type.FieldElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.InfrastructureTypeMapping;
@@ -57,7 +58,7 @@ public class FieldWrapper implements FieldElement {
    */
   @Override
   public <A extends Annotation> Optional<A> getAnnotation(Class<A> annotationClass) {
-    return Optional.ofNullable(field.getAnnotation(annotationClass));
+    return ofNullable(field.getAnnotation(annotationClass));
   }
 
   /**
@@ -81,7 +82,8 @@ public class FieldWrapper implements FieldElement {
    */
   @Override
   public String getAlias() {
-    return InfrastructureTypeMapping.getMap().getOrDefault(field.getType(), FieldElement.super.getAlias());
+    return ofNullable(InfrastructureTypeMapping.getMap().get(field.getType()))
+        .map(InfrastructureTypeMapping.InfrastructureType::getName).orElse(FieldElement.super.getAlias());
   }
 
   /**

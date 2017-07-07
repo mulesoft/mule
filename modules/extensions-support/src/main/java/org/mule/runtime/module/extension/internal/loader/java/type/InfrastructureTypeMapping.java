@@ -32,10 +32,10 @@ import javax.xml.namespace.QName;
  */
 public final class InfrastructureTypeMapping {
 
-  private static Map<Class<?>, String> MAPPING = ImmutableMap.<Class<?>, String>builder()
-      .put(TlsContextFactory.class, TLS_PARAMETER_NAME)
-      .put(SourceTransactionalAction.class, TRANSACTIONAL_ACTION_PARAMETER_NAME)
-      .put(OperationTransactionalAction.class, TRANSACTIONAL_ACTION_PARAMETER_NAME)
+  private static Map<Class<?>, InfrastructureType> MAPPING = ImmutableMap.<Class<?>, InfrastructureType>builder()
+      .put(TlsContextFactory.class, new InfrastructureType(TLS_PARAMETER_NAME, 8))
+      .put(SourceTransactionalAction.class, new InfrastructureType(TRANSACTIONAL_ACTION_PARAMETER_NAME, 6))
+      .put(OperationTransactionalAction.class, new InfrastructureType(TRANSACTIONAL_ACTION_PARAMETER_NAME, 7))
       .build();
 
   private static Map<String, QNameModelProperty> QNAMES = ImmutableMap.<String, QNameModelProperty>builder()
@@ -61,9 +61,9 @@ public final class InfrastructureTypeMapping {
           .build();
 
   private static Map<String, String> nameMap = MAPPING.entrySet().stream()
-      .collect(toImmutableMap(e -> e.getKey().getName(), Map.Entry::getValue));
+      .collect(toImmutableMap(e -> e.getKey().getName(), e -> e.getValue().getName()));
 
-  public static Map<Class<?>, String> getMap() {
+  public static Map<Class<?>, InfrastructureType> getMap() {
     return MAPPING;
   }
 
@@ -80,4 +80,23 @@ public final class InfrastructureTypeMapping {
   }
 
   private InfrastructureTypeMapping() {}
+
+  public static class InfrastructureType {
+
+    private final String name;
+    private final int sequence;
+
+    InfrastructureType(String name, int sequence) {
+      this.name = name;
+      this.sequence = sequence;
+    }
+
+    public String getName() {
+      return name;
+    }
+
+    public int getSequence() {
+      return sequence;
+    }
+  }
 }
