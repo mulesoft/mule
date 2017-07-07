@@ -78,4 +78,4 @@ propertiesDeps=("muleMetadataExtensionTestVersion"
                 "muleMarvelExtensionTestVersion"
                 "mulePetstoreExtensionTestVersion")
 
-updatePropertiesVersion "$VERSION_TO_MULE" distributions/pom.xml propertiesDeps[@]
+updatePropertiesVersion "$VERSION_TO_MULE" pom.xml propertiesDeps[@]
