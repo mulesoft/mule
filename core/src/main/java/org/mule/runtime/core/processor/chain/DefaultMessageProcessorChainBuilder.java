@@ -134,9 +134,10 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
     protected List<Processor> getProcessorsToExecute() {
       return processors;
     }
+
   }
 
-  static class DefaultMessageProcessorChain extends AbstractMessageProcessorChain {
+  protected static class DefaultMessageProcessorChain extends AbstractMessageProcessorChain {
 
     private Processor head;
     private List<Processor> processorsForLifecycle;

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.processor;
 
+import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
 import static org.mule.runtime.core.internal.util.rx.Operators.nullSafeMap;
 import static reactor.core.Exceptions.propagate;
@@ -13,6 +14,7 @@ import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.processor.MessageProcessors;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.exception.MessagingException;
 
@@ -37,22 +39,7 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
 
   @Override
   public Event process(Event event) throws MuleException {
-
-    MessagingException exception = null;
-    Event response = null;
-    try {
-      response = processResponse(processNext(processRequest(event)));
-      return response;
-    } catch (MessagingException e) {
-      exception = e;
-      return processCatch(event, e);
-    } finally {
-      if (response == null) {
-        processFinally(event, exception);
-      } else {
-        processFinally(response, exception);
-      }
-    }
+    return processToApply(event, this);
   }
 
   @Override

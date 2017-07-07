@@ -17,6 +17,7 @@ import static org.mule.runtime.core.api.context.notification.EnrichedNotificatio
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.UNKNOWN;
 import static org.mule.runtime.core.component.ComponentAnnotations.ANNOTATION_NAME;
 import static org.mule.runtime.core.internal.exception.ErrorMapping.ANNOTATION_ERROR_MAPPINGS;
+import static reactor.core.publisher.Mono.error;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -34,11 +35,13 @@ import org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo;
 import org.mule.runtime.core.api.exception.ErrorTypeLocator;
 import org.mule.runtime.core.api.exception.ErrorTypeRepository;
 import org.mule.runtime.core.api.exception.MessagingException;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.api.exception.TypedException;
 import org.mule.runtime.core.api.exception.WrapperErrorMessageAwareException;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.message.ErrorBuilder;
+import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.exception.ErrorMapping;
 
@@ -48,12 +51,31 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 
+import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
+import reactor.core.publisher.Mono;
 
 /**
  * Mule exception utilities.
  */
 public class ExceptionUtils {
+
+
+  /**
+   * Null {@link MessagingExceptionHandler} which can we used to configure a {@link MessageProcessorChain} to not handle errors.
+   */
+  public static final MessagingExceptionHandler NULL_ERROR_HANDLER = new MessagingExceptionHandler() {
+
+    @Override
+    public Event handleException(MessagingException exception, Event event) {
+      throw new RuntimeException(exception);
+    }
+
+    @Override
+    public Publisher<Event> apply(MessagingException exception) {
+      return error(exception);
+    }
+  };
 
   /**
    * This method returns true if the throwable contains a {@link Throwable} that matches the specified class or subclass in the

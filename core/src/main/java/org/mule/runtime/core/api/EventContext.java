@@ -9,6 +9,8 @@ package org.mule.runtime.core.api;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
+import org.mule.runtime.core.api.exception.MessagingException;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.management.stats.ProcessingTime;
 
 import java.time.OffsetTime;
@@ -93,6 +95,9 @@ public interface EventContext {
    * @param throwable the throwable.
    */
   void error(Throwable throwable);
+
+
+  Publisher<Void> error(MessagingException messagingException, MessagingExceptionHandler handler);
 
   /**
    * @returns information about the times spent processing the events for this context (so far).

@@ -7,8 +7,6 @@
 package org.mule.runtime.core.interceptor;
 
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.management.stats.ProcessingTime;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,8 +38,4 @@ public class LoggingInterceptor extends AbstractEnvelopeInterceptor {
     return event;
   }
 
-  @Override
-  public Event last(Event event, ProcessingTime time, long startTime, boolean exceptionWasThrown) throws MuleException {
-    return event;
-  }
 }

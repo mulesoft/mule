@@ -186,18 +186,6 @@ public class AssertionMessageProcessorTestCase extends AbstractMuleTestCase {
     assertThat(asp.countFailOrNullEvent(), is(false));
   }
 
-  @Test
-  public void processNullEvent() throws Exception {
-    AssertionMessageProcessor asp = createAssertionMessageProcessor();
-    asp.setFlowConstruct(flowConstruct);
-    asp.setExpression(TRUE_EXPRESSION);
-    asp.setCount(5);
-    asp.start();
-    asp.process(null);
-    assertThat(asp.expressionFailed(), is(false));
-    assertThat(asp.countFailOrNullEvent(), is(true));
-  }
-
   protected AssertionMessageProcessor createAssertionMessageProcessor() {
     return new AssertionMessageProcessor();
   }

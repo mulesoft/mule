@@ -8,7 +8,9 @@ package org.mule.tck.processor;
 
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
 import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
+import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static reactor.core.publisher.Flux.from;
+import static reactor.core.publisher.Flux.just;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -20,6 +22,7 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
 
 import org.reactivestreams.Publisher;
 
@@ -48,7 +51,13 @@ public class TestNonBlockingProcessor implements Processor, Initialisable, Dispo
 
   @Override
   public Publisher<Event> apply(Publisher<Event> publisher) {
-    return from(publisher).publishOn(fromExecutorService(customScheduler));
+    return from(publisher).flatMap(event -> {
+      if (isTransactionActive()) {
+        return publisher;
+      } else {
+        return just(event).publishOn(fromExecutorService(customScheduler));
+      }
+    });
   }
 
   @Override

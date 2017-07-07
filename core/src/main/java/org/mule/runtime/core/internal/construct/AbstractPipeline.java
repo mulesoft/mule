@@ -29,6 +29,7 @@ import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.connector.ConnectException;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.management.stats.ProcessingTime;
 import org.mule.runtime.core.api.processor.InternalMessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
@@ -317,15 +318,22 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
           .fireNotification(new PipelineMessageNotification(createInfo(event, null, AbstractPipeline.this), AbstractPipeline.this,
                                                             PROCESS_START));
 
+      long startTime = System.currentTimeMillis();
+      ProcessingTime time = event.getContext().getProcessingTime();
+
       // Fire COMPLETE notification on async response
       Mono.from(event.getContext().getBeforeResponsePublisher())
-          .doOnNext(result -> fireCompleteNotification(result, null))
+          .doOnSuccess(result -> fireCompleteNotification(result, null))
           .doOnError(MessagingException.class, messagingException -> fireCompleteNotification(null, messagingException))
           .doOnError(UNEXPECTED_EXCEPTION_PREDICATE,
                      throwable -> fireCompleteNotification(null, new MessagingException(event, throwable,
                                                                                         this instanceof Processor ? this : null))
 
-          ).subscribe(requestUnbounded());
+          ).doOnTerminate((result, throwable) -> {
+            if (time != null)
+              time.addFlowExecutionBranchTime(startTime);
+          })
+          .subscribe(requestUnbounded());
 
       return event;
     }
