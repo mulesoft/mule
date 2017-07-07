@@ -9,14 +9,14 @@ package org.mule.module.http.functional.listener;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
+import org.mule.api.MuleEvent;
 import org.mule.api.config.MuleProperties;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 
 public class HttpListenerDisableTimeoutsConfigTestCase extends FunctionalTestCase
 {
@@ -35,13 +35,7 @@ public class HttpListenerDisableTimeoutsConfigTestCase extends FunctionalTestCas
     @Test
     public void httpListenerResponseTimeout() throws Exception
     {
-        final DefaultMuleMessage muleMessage = new DefaultMuleMessage("hi", muleContext);
-
-        final MuleClient client = muleContext.getClient();
-        final MuleMessage message = client.send("vm://httpTimeout", muleMessage);
-
-        assertNotNull(message);
-        assertEquals("hi folks", message.getPayload());
-        assertNull(message.getExceptionPayload());
+        final MuleEvent muleEvent = runFlow("httpFlow", new DefaultMuleMessage("hi", muleContext));
+        assertThat(muleEvent.getMessageAsString(), is("hi folks"));
     }
 }
