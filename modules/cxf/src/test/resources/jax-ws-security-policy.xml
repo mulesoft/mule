@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+	xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking"
+	xmlns:ws="http://www.mulesoft.org/schema/mule/ws" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ws http://www.mulesoft.org/schema/mule/ws/current/mule-ws.xsd
+http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd">
+
+	<http:listener-config name="listenerConfig"
+		protocol="HTTPS" host="localhost" port="${port2}">
+		<tls:context>
+			<tls:key-store path="serverKeystore" keyPassword="mulepassword"
+				password="mulepassword" />
+		</tls:context>
+	</http:listener-config>
+
+
+	<flow name="ServiceFlow">
+		<http:listener config-ref="listenerConfig" path="/echo" />
+		<cxf:jaxws-service
+			serviceClass="org.mule.module.cxf.testmodels.EchoWithWSSecurityPolicy">
+			<cxf:properties>
+				<spring:entry key="ws-security.callback-handler"
+					value-ref="myPasswordCallback" />
+			</cxf:properties>
+		</cxf:jaxws-service>
+	</flow>
+	
+	<spring:bean id="myPasswordCallback" class="org.mule.module.cxf.handler.TestCallbackHandler"/>
+
+</mule>

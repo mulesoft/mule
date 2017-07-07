@@ -12,7 +12,11 @@ import static org.mule.module.cxf.HttpRequestPropertyManager.getScheme;
 import static org.mule.transport.http.HttpConnector.HTTP_STATUS_PROPERTY;
 import static org.mule.transport.http.HttpConstants.HEADER_CONTENT_TYPE;
 import static org.mule.transport.http.HttpConstants.SC_INTERNAL_SERVER_ERROR;
+<<<<<<< HEAD
 import static org.mule.transport.http.HttpConstants.SC_OK;
+=======
+import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_CLIENT_SSL_SESSION;
+>>>>>>> 5467653... MULE-12995: SSLSession is not being propagated to jaxws service. (#5177)
 
 import org.mule.DefaultMuleEvent;
 import org.mule.NonBlockingVoidMuleEvent;
@@ -35,6 +39,7 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.module.cxf.support.DelegatingOutputStream;
 import org.mule.module.cxf.transport.MuleUniversalDestination;
+import org.mule.module.http.api.HttpConstants;
 import org.mule.module.xml.stax.StaxSource;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.transformer.types.DataTypeFactory;
@@ -53,6 +58,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.net.ssl.SSLSession;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
@@ -69,6 +75,7 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -314,6 +321,13 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
         final MessageImpl m = new MessageImpl();
         m.setExchange(exchange);
         final MuleMessage muleReqMsg = event.getMessage();
+        
+        if (muleReqMsg.getInboundProperty(HTTP_CLIENT_SSL_SESSION) != null)
+        {
+            SSLSession session = muleReqMsg.getInboundProperty(HTTP_CLIENT_SSL_SESSION); 
+            TLSSessionInfo tlsinfo = new TLSSessionInfo(session.getCipherSuite(), session, session.getLocalCertificates());
+            m.put(TLSSessionInfo.class, tlsinfo);
+        }
         String method = muleReqMsg.getInboundProperty(HttpConnector.HTTP_METHOD_PROPERTY);
 
         String ct = muleReqMsg.getInboundProperty(HEADER_CONTENT_TYPE);

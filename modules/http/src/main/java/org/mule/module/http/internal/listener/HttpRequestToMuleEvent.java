@@ -64,15 +64,15 @@ public class HttpRequestToMuleEvent
             }
         }
 
-        new HttpMessagePropertiesResolver()
-                .setMethod(request.getMethod())
-                .setProtocol(request.getProtocol().asString())
-                .setUri(request.getUri())
-                .setListenerPath(listenerPath)
-                .setRemoteHostAddress(resolveRemoteHostAddress(requestContext))
-                .setScheme(requestContext.getScheme())
-                .setClientCertificate(requestContext.getClientConnection().getClientCertificate())
-                .addPropertiesTo(inboundProperties);
+        new HttpMessagePropertiesResolver().setMethod(request.getMethod())
+                                           .setProtocol(request.getProtocol().asString())
+                                           .setUri(request.getUri())
+                                           .setListenerPath(listenerPath)
+                                           .setRemoteHostAddress(resolveRemoteHostAddress(requestContext))
+                                           .setScheme(requestContext.getScheme())
+                                           .setClientCertificate(requestContext.getClientConnection().getClientCertificate())
+                                           .setSslSession(requestContext.getClientConnection().getSslSession())
+                                           .addPropertiesTo(inboundProperties);
 
         final Map<String, DataHandler> inboundAttachments = new HashMap<>();
         Object payload = NullPayload.getInstance();

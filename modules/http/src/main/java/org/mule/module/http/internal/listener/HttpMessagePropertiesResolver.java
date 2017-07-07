@@ -14,6 +14,8 @@ import java.security.cert.Certificate;
 import java.util.Collections;
 import java.util.Map;
 
+import javax.net.ssl.SSLSession;
+
 public class HttpMessagePropertiesResolver
 {
 
@@ -24,6 +26,7 @@ public class HttpMessagePropertiesResolver
     private ListenerPath listenerPath;
     private String scheme;
     private Certificate clientCertificate;
+    private SSLSession sslSession;
 
     public HttpMessagePropertiesResolver setUri(String uri)
     {
@@ -52,6 +55,12 @@ public class HttpMessagePropertiesResolver
     public HttpMessagePropertiesResolver setListenerPath(ListenerPath listenerPath)
     {
         this.listenerPath = listenerPath;
+        return this;
+    }
+    
+    public HttpMessagePropertiesResolver setSslSession(SSLSession sslSession)
+    {
+        this.sslSession = sslSession;
         return this;
     }
 
@@ -84,6 +93,7 @@ public class HttpMessagePropertiesResolver
         propertiesMap.put(HttpConstants.RequestProperties.HTTP_LISTENER_PATH, resolvedListenerPath);
         propertiesMap.put(HttpConstants.RequestProperties.HTTP_RELATIVE_PATH, listenerPath.getRelativePath(path));
         propertiesMap.put(HttpConstants.RequestProperties.HTTP_SCHEME, scheme);
+        propertiesMap.put(HttpConstants.RequestProperties.HTTP_CLIENT_SSL_SESSION, sslSession);
         if (clientCertificate != null)
         {
             propertiesMap.put(HttpConstants.RequestProperties.HTTP_CLIENT_CERTIFICATE, clientCertificate);
