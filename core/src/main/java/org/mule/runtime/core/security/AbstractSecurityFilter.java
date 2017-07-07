@@ -6,46 +6,44 @@
  */
 package org.mule.runtime.core.security;
 
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
+import org.mule.runtime.api.artifact.ServiceDiscoverer;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.api.security.SecurityProviderNotFoundException;
 import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.security.CryptoFailureException;
 import org.mule.runtime.core.api.security.EncryptionStrategyNotFoundException;
 import org.mule.runtime.core.api.security.SecurityFilter;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.security.SecurityProvider;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.util.StringUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
+
 /**
  * <code>AbstractSecurityFilter</code> provides basic initialisation for all security filters, namely configuring the
  * SecurityManager for this instance
  */
-public abstract class AbstractSecurityFilter implements MuleContextAware, SecurityFilter {
+public abstract class AbstractSecurityFilter implements SecurityFilter {
 
   protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
   protected SecurityManager securityManager;
-  protected MuleContext muleContext;
+  @Inject
+  protected ServiceDiscoverer serviceDiscoverer;
 
   private String securityProviders;
 
   @Override
-  public void setMuleContext(MuleContext context) {
-    this.muleContext = context;
-  }
-
-  @Override
   public final void initialise() throws InitialisationException {
     if (securityManager == null) {
-      securityManager = muleContext.getSecurityManager();
+      securityManager = (SecurityManager) serviceDiscoverer.lookupByName(OBJECT_SECURITY_MANAGER).get();
     }
 
     if (securityManager == null) {
