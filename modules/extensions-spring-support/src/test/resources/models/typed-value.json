@@ -45,6 +45,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "stringTypedValue",
               "description": "",
               "modelProperties": {}
@@ -70,6 +71,7 @@
                 "query": false,
                 "order": 2
               },
+              "elementReferences": [],
               "name": "differedDoor",
               "description": "",
               "modelProperties": {}
@@ -137,6 +139,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -214,6 +217,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "stringValue",
                   "description": "",
                   "modelProperties": {}
@@ -251,6 +255,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -356,6 +361,7 @@
                 "query": false,
                 "order": 3
               },
+              "elementReferences": [],
               "name": "stringNotWrapped",
               "description": "",
               "modelProperties": {}
@@ -384,6 +390,7 @@
                 "query": false,
                 "order": 4
               },
+              "elementReferences": [],
               "name": "wrappedString",
               "description": "",
               "modelProperties": {}
@@ -409,6 +416,7 @@
                 "query": false,
                 "order": 5
               },
+              "elementReferences": [],
               "name": "complexTypedValue",
               "description": "",
               "modelProperties": {}
@@ -434,6 +442,7 @@
                 "query": false,
                 "order": 6
               },
+              "elementReferences": [],
               "name": "complexNotWrapped",
               "description": "",
               "modelProperties": {}
@@ -496,6 +505,7 @@
                 "query": false,
                 "order": 7
               },
+              "elementReferences": [],
               "name": "mapOfComplexValues",
               "description": "",
               "modelProperties": {}
@@ -558,6 +568,7 @@
                 "query": false,
                 "order": 8
               },
+              "elementReferences": [],
               "name": "mapOfComplexTypedValues",
               "description": "",
               "modelProperties": {}
@@ -595,6 +606,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "user",
               "description": "",
               "modelProperties": {}
@@ -623,6 +635,7 @@
                 "query": false,
                 "order": 2
               },
+              "elementReferences": [],
               "name": "pass",
               "description": "",
               "modelProperties": {}
@@ -665,6 +678,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -742,6 +756,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "inputStream",
               "description": "",
               "modelProperties": {}
@@ -934,6 +949,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "streamingStrategy",
               "description": "Configure if repeatable streams should be used and their behaviour",
               "modelProperties": {
@@ -980,6 +996,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -1085,6 +1102,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "objectTypedValue",
               "description": "",
               "modelProperties": {}
@@ -1122,6 +1140,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -1192,6 +1211,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "differedDoor",
               "description": "",
               "modelProperties": {}
@@ -1229,6 +1249,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -1311,6 +1332,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "doorValues",
               "description": "",
               "modelProperties": {}
@@ -1348,6 +1370,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -1458,6 +1481,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "doorMapValues",
               "description": "",
               "modelProperties": {}
@@ -1495,6 +1519,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -1565,6 +1590,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "doorValue",
               "description": "",
               "modelProperties": {}
@@ -1602,6 +1628,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -1676,6 +1703,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "description",
               "description": "",
               "modelProperties": {}
@@ -1704,6 +1732,7 @@
                 "query": false,
                 "order": 2
               },
+              "elementReferences": [],
               "name": "brandName",
               "description": "",
               "modelProperties": {}
@@ -1732,6 +1761,7 @@
                 "query": false,
                 "order": 3
               },
+              "elementReferences": [],
               "name": "weight",
               "description": "",
               "modelProperties": {}
@@ -1774,6 +1804,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -1862,6 +1893,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "stringValues",
               "description": "",
               "modelProperties": {}
@@ -1899,6 +1931,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -2027,6 +2060,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "doorMapListValues",
               "description": "",
               "modelProperties": {}
@@ -2064,6 +2098,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -2180,6 +2215,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "stringMapValues",
               "description": "",
               "modelProperties": {}
@@ -2217,6 +2253,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -2294,6 +2331,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "stringDescription",
               "description": "",
               "modelProperties": {}
@@ -2331,6 +2369,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -2384,6 +2423,7 @@
                   "query": false,
                   "order": 1
                 },
+                "elementReferences": [],
                 "name": "stringValue",
                 "description": "",
                 "modelProperties": {}
@@ -2599,6 +2639,7 @@
                 "query": false,
                 "tabName": "Redelivery"
               },
+              "elementReferences": [],
               "name": "redeliveryPolicy",
               "description": "Defines a policy for processing the redelivery of the same message",
               "modelProperties": {
@@ -2743,6 +2784,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "reconnectionStrategy",
               "description": "A retry strategy in case of connectivity errors",
               "modelProperties": {

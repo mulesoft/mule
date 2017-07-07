@@ -108,6 +108,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "transactionalAction",
                   "description": "The type of joining action that operations can take regarding transactions.",
                   "modelProperties": {}
@@ -145,6 +146,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -263,6 +265,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "action",
                   "description": "The type of joining action that operations can take regarding transactions.",
                   "modelProperties": {}
@@ -300,6 +303,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -407,6 +411,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "transactionalAction",
                   "description": "The type of joining action that operations can take regarding transactions.",
                   "modelProperties": {}
@@ -500,6 +505,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "transactionalConnection",
                   "description": "",
                   "modelProperties": {}
@@ -537,6 +543,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "transactionalAction",
                   "description": "The type of joining action that operations can take regarding transactions.",
                   "modelProperties": {}
@@ -641,6 +648,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "transactionalAction",
                   "description": "The type of joining action that operations can take regarding transactions.",
                   "modelProperties": {}
@@ -745,6 +753,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "transactionalAction",
                   "description": "The type of joining action that operations can take regarding transactions.",
                   "modelProperties": {}
@@ -849,6 +858,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "transactionalAction",
                   "description": "The type of joining action that operations can take regarding transactions.",
                   "modelProperties": {}
@@ -899,6 +909,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "useXa",
                   "description": "",
                   "modelProperties": {}
@@ -1034,6 +1045,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -1071,6 +1083,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "disableValidation",
                   "description": "Disables connection validation",
                   "modelProperties": {
@@ -1263,6 +1276,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "poolingProfile",
                   "description": "Characteristics of the connection pool",
                   "modelProperties": {
@@ -1319,6 +1333,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "useXa",
                   "description": "",
                   "modelProperties": {}
@@ -1454,6 +1469,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -1635,6 +1651,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "transactionalAction",
                   "description": "The type of beginning action that sources can take regarding transactions.",
                   "modelProperties": {}
@@ -1751,6 +1768,7 @@
                     "query": false,
                     "tabName": "Redelivery"
                   },
+                  "elementReferences": [],
                   "name": "redeliveryPolicy",
                   "description": "Defines a policy for processing the redelivery of the same message",
                   "modelProperties": {
@@ -1895,6 +1913,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -2010,6 +2029,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "transactionalAction",
                   "description": "The type of beginning action that sources can take regarding transactions.",
                   "modelProperties": {
@@ -2128,6 +2148,7 @@
                     "query": false,
                     "tabName": "Redelivery"
                   },
+                  "elementReferences": [],
                   "name": "redeliveryPolicy",
                   "description": "Defines a policy for processing the redelivery of the same message",
                   "modelProperties": {
@@ -2272,6 +2293,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -2408,6 +2430,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "transactionalAction",
               "description": "The type of joining action that operations can take regarding transactions.",
               "modelProperties": {}
@@ -2574,6 +2597,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "streamingStrategy",
               "description": "Configure if repeatable streams should be used and their behaviour",
               "modelProperties": {
@@ -2620,6 +2644,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -2673,6 +2698,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "useXa",
               "description": "",
               "modelProperties": {}
@@ -2808,6 +2834,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "reconnectionStrategy",
               "description": "A retry strategy in case of connectivity errors",
               "modelProperties": {
@@ -2845,6 +2872,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "disableValidation",
               "description": "Disables connection validation",
               "modelProperties": {
@@ -3037,6 +3065,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "poolingProfile",
               "description": "Characteristics of the connection pool",
               "modelProperties": {
@@ -3093,6 +3122,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "useXa",
               "description": "",
               "modelProperties": {}
@@ -3228,6 +3258,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "reconnectionStrategy",
               "description": "A retry strategy in case of connectivity errors",
               "modelProperties": {

@@ -27,6 +27,7 @@ import org.mule.runtime.module.extension.internal.loader.enricher.ConnectionDecl
 import org.mule.runtime.module.extension.internal.loader.enricher.DataTypeDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.DisplayDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.DynamicMetadataDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.enricher.ElementReferenceDeclarionEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ErrorsDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ExtensionDescriptionsEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ExtensionsErrorsDeclarationEnricher;
@@ -90,6 +91,7 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
                                                                                                new SubTypesDeclarationEnricher(),
                                                                                                new ExtensionDescriptionsEnricher(),
                                                                                                new ValueProvidersParameterDeclarationEnricher(),
+                                                                                               new ElementReferenceDeclarionEnricher(),
                                                                                                new ParameterLayoutOrderDeclarationEnricher()));
 
   private final String id;

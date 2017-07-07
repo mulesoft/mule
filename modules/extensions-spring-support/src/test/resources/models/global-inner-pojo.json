@@ -251,6 +251,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "requiredPojoExpressionRequired",
               "description": "",
               "modelProperties": {}
@@ -485,6 +486,7 @@
                 "query": false,
                 "order": 2
               },
+              "elementReferences": [],
               "name": "requiredPojoDefault",
               "description": "",
               "modelProperties": {}

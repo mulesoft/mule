@@ -103,6 +103,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "data",
               "description": "",
               "modelProperties": {}
@@ -132,6 +133,7 @@
                 "query": false,
                 "order": 2
               },
+              "elementReferences": [],
               "name": "dataWithDefault",
               "description": "",
               "modelProperties": {}
@@ -228,6 +230,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "type",
                   "description": "",
                   "modelProperties": {
@@ -274,6 +277,7 @@
                     "query": false,
                     "order": 2
                   },
+                  "elementReferences": [],
                   "name": "content",
                   "description": "",
                   "modelProperties": {}
@@ -311,6 +315,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -437,6 +442,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "type",
                   "description": "",
                   "modelProperties": {
@@ -483,6 +489,7 @@
                     "query": false,
                     "order": 2
                   },
+                  "elementReferences": [],
                   "name": "content",
                   "description": "",
                   "modelProperties": {}
@@ -520,6 +527,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -646,6 +654,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "type",
                   "description": "",
                   "modelProperties": {
@@ -692,6 +701,7 @@
                     "query": false,
                     "order": 2
                   },
+                  "elementReferences": [],
                   "name": "content",
                   "description": "",
                   "modelProperties": {}
@@ -729,6 +739,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -869,6 +880,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "content",
                   "description": "",
                   "modelProperties": {}
@@ -906,6 +918,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -1021,6 +1034,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "type",
                   "description": "",
                   "modelProperties": {
@@ -1067,6 +1081,7 @@
                     "query": false,
                     "order": 2
                   },
+                  "elementReferences": [],
                   "name": "content",
                   "description": "",
                   "modelProperties": {}
@@ -1104,6 +1119,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -1244,6 +1260,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "content",
                   "description": "",
                   "modelProperties": {}
@@ -1281,6 +1298,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -1379,6 +1397,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "type",
                   "description": "",
                   "modelProperties": {
@@ -1425,6 +1444,7 @@
                     "query": false,
                     "order": 2
                   },
+                  "elementReferences": [],
                   "name": "content",
                   "description": "",
                   "modelProperties": {}
@@ -1548,6 +1568,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "type",
                   "description": "",
                   "modelProperties": {
@@ -1594,6 +1615,7 @@
                     "query": false,
                     "order": 2
                   },
+                  "elementReferences": [],
                   "name": "content",
                   "description": "",
                   "modelProperties": {}
@@ -1631,6 +1653,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -1740,6 +1763,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "type",
                   "description": "",
                   "modelProperties": {
@@ -1786,6 +1810,7 @@
                     "query": false,
                     "order": 2
                   },
+                  "elementReferences": [],
                   "name": "content",
                   "description": "",
                   "modelProperties": {}
@@ -1911,6 +1936,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "type",
                   "description": "",
                   "modelProperties": {
@@ -1957,6 +1983,7 @@
                     "query": false,
                     "order": 2
                   },
+                  "elementReferences": [],
                   "name": "content",
                   "description": "",
                   "modelProperties": {}
@@ -1994,6 +2021,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -2128,6 +2156,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "type",
                   "description": "",
                   "modelProperties": {
@@ -2174,6 +2203,7 @@
                     "query": false,
                     "order": 2
                   },
+                  "elementReferences": [],
                   "name": "content",
                   "description": "",
                   "modelProperties": {}
@@ -2211,6 +2241,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -2337,6 +2368,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "type",
                   "description": "",
                   "modelProperties": {
@@ -2383,6 +2415,7 @@
                     "query": false,
                     "order": 2
                   },
+                  "elementReferences": [],
                   "name": "content",
                   "description": "",
                   "modelProperties": {}
@@ -2420,6 +2453,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -2529,6 +2563,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "type",
                   "description": "",
                   "modelProperties": {
@@ -2657,6 +2692,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "type",
                   "description": "",
                   "modelProperties": {
@@ -2703,6 +2739,7 @@
                     "query": false,
                     "order": 2
                   },
+                  "elementReferences": [],
                   "name": "content",
                   "description": "",
                   "modelProperties": {}
@@ -2740,6 +2777,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -2866,6 +2904,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "type",
                   "description": "",
                   "modelProperties": {
@@ -2907,6 +2946,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -3033,6 +3073,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "type",
                   "description": "",
                   "modelProperties": {
@@ -3079,6 +3120,7 @@
                     "query": false,
                     "order": 2
                   },
+                  "elementReferences": [],
                   "name": "firstPerson",
                   "description": "",
                   "modelProperties": {}
@@ -3121,6 +3163,7 @@
                     "query": false,
                     "order": 3
                   },
+                  "elementReferences": [],
                   "name": "otherPerson",
                   "description": "",
                   "modelProperties": {}
@@ -3158,6 +3201,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -3284,6 +3328,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "type",
                   "description": "",
                   "modelProperties": {
@@ -3330,6 +3375,7 @@
                     "query": false,
                     "order": 2
                   },
+                  "elementReferences": [],
                   "name": "content",
                   "description": "",
                   "modelProperties": {}
@@ -3367,6 +3413,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -3507,6 +3554,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "content",
                   "description": "",
                   "modelProperties": {}
@@ -3544,6 +3592,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -3659,6 +3708,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "type",
                   "description": "",
                   "modelProperties": {
@@ -3700,6 +3750,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -3826,6 +3877,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "type",
                   "description": "",
                   "modelProperties": {
@@ -3867,6 +3919,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -3976,6 +4029,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "type",
                   "description": "",
                   "modelProperties": {
@@ -4022,6 +4076,7 @@
                     "query": false,
                     "order": 2
                   },
+                  "elementReferences": [],
                   "name": "content",
                   "description": "",
                   "modelProperties": {}
@@ -4128,6 +4183,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "type",
                   "description": "",
                   "modelProperties": {
@@ -4174,6 +4230,7 @@
                     "query": false,
                     "order": 2
                   },
+                  "elementReferences": [],
                   "name": "content",
                   "description": "",
                   "modelProperties": {}
@@ -4297,6 +4354,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "type",
                   "description": "",
                   "modelProperties": {
@@ -4343,6 +4401,7 @@
                     "query": false,
                     "order": 2
                   },
+                  "elementReferences": [],
                   "name": "content",
                   "description": "",
                   "modelProperties": {}
@@ -4380,6 +4439,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -4503,6 +4563,7 @@
                     "query": false,
                     "order": 4
                   },
+                  "elementReferences": [],
                   "name": "content",
                   "description": "",
                   "modelProperties": {}
@@ -4541,6 +4602,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "continent",
                   "description": "",
                   "modelProperties": {
@@ -4574,6 +4636,7 @@
                     "query": false,
                     "order": 2
                   },
+                  "elementReferences": [],
                   "name": "country",
                   "description": "",
                   "modelProperties": {
@@ -4607,6 +4670,7 @@
                     "query": false,
                     "order": 3
                   },
+                  "elementReferences": [],
                   "name": "city",
                   "displayModel": {
                     "displayName": "State | City"
@@ -4656,6 +4720,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -4814,6 +4879,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -4930,6 +4996,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "type",
                   "description": "",
                   "modelProperties": {
@@ -5050,6 +5117,7 @@
                     "query": false,
                     "tabName": "Redelivery"
                   },
+                  "elementReferences": [],
                   "name": "redeliveryPolicy",
                   "description": "Defines a policy for processing the redelivery of the same message",
                   "modelProperties": {
@@ -5194,6 +5262,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -5297,6 +5366,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "contents",
               "description": "",
               "modelProperties": {}
@@ -5402,6 +5472,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "mapContent",
               "description": "",
               "modelProperties": {}
@@ -5469,6 +5540,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "animalContent",
               "description": "",
               "modelProperties": {}
@@ -5542,6 +5614,7 @@
                 "query": true,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "query",
               "description": "",
               "modelProperties": {
@@ -5583,6 +5656,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -5696,6 +5770,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "type",
               "description": "",
               "modelProperties": {
@@ -5737,6 +5812,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -5853,6 +5929,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -5943,6 +6020,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "type",
               "description": "",
               "modelProperties": {
@@ -5984,6 +6062,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -6068,6 +6147,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -6141,6 +6221,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -6231,6 +6312,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "type",
               "description": "",
               "modelProperties": {
@@ -6272,6 +6354,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -6359,6 +6442,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "animal",
               "description": "",
               "modelProperties": {}
@@ -6525,6 +6609,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "streamingStrategy",
               "description": "Configure if repeatable streams should be used and their behaviour",
               "modelProperties": {
@@ -6571,6 +6656,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -6658,6 +6744,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "content",
               "description": "",
               "modelProperties": {}
@@ -6686,6 +6773,7 @@
                 "query": false,
                 "order": 2
               },
+              "elementReferences": [],
               "name": "type",
               "description": "",
               "modelProperties": {
@@ -6788,6 +6876,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "type",
               "description": "",
               "modelProperties": {
@@ -6829,6 +6918,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -6913,6 +7003,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "plainShape",
               "description": "",
               "modelProperties": {}
@@ -6938,6 +7029,7 @@
                 "query": false,
                 "order": 2
               },
+              "elementReferences": [],
               "name": "rectangleSubtype",
               "description": "",
               "modelProperties": {}
@@ -6963,6 +7055,7 @@
                 "query": false,
                 "order": 3
               },
+              "elementReferences": [],
               "name": "animal",
               "description": "",
               "modelProperties": {}
@@ -7000,6 +7093,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -7150,6 +7244,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "reconnectionStrategy",
               "description": "A retry strategy in case of connectivity errors",
               "modelProperties": {
@@ -7354,6 +7449,7 @@
                 "query": false,
                 "tabName": "Redelivery"
               },
+              "elementReferences": [],
               "name": "redeliveryPolicy",
               "description": "Defines a policy for processing the redelivery of the same message",
               "modelProperties": {
@@ -7401,6 +7497,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "continent",
               "description": "",
               "modelProperties": {
@@ -7434,6 +7531,7 @@
                 "query": false,
                 "order": 2
               },
+              "elementReferences": [],
               "name": "country",
               "description": "",
               "modelProperties": {
@@ -7467,6 +7565,7 @@
                 "query": false,
                 "order": 3
               },
+              "elementReferences": [],
               "name": "city",
               "displayModel": {
                 "displayName": "State | City"
@@ -7614,6 +7713,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "reconnectionStrategy",
               "description": "A retry strategy in case of connectivity errors",
               "modelProperties": {

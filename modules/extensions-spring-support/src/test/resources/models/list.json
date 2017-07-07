@@ -65,6 +65,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "requiredListObjectsDefaults",
               "description": "",
               "modelProperties": {}
@@ -113,6 +114,7 @@
                 "query": false,
                 "order": 2
               },
+              "elementReferences": [],
               "name": "requiredListObjectsNoExpressions",
               "description": "",
               "modelProperties": {}
@@ -161,6 +163,7 @@
                 "query": false,
                 "order": 3
               },
+              "elementReferences": [],
               "name": "requiredListObjectsExpressionRequireds",
               "description": "",
               "modelProperties": {}
@@ -209,6 +212,7 @@
                 "query": false,
                 "order": 4
               },
+              "elementReferences": [],
               "name": "requiredListObjectsExpressionSupporteds",
               "description": "",
               "modelProperties": {}
@@ -449,6 +453,7 @@
                 "query": false,
                 "order": 5
               },
+              "elementReferences": [],
               "name": "requiredListDefaults",
               "description": "",
               "modelProperties": {}
@@ -689,6 +694,7 @@
                 "query": false,
                 "order": 6
               },
+              "elementReferences": [],
               "name": "requiredListNoExpressions",
               "description": "",
               "modelProperties": {}
@@ -929,6 +935,7 @@
                 "query": false,
                 "order": 7
               },
+              "elementReferences": [],
               "name": "requiredListExpressionRequireds",
               "description": "",
               "modelProperties": {}
@@ -1169,6 +1176,7 @@
                 "query": false,
                 "order": 8
               },
+              "elementReferences": [],
               "name": "requiredListExpressionSupporteds",
               "description": "",
               "modelProperties": {}
@@ -1217,6 +1225,7 @@
                 "query": false,
                 "order": 9
               },
+              "elementReferences": [],
               "name": "optionalListDefaults",
               "description": "",
               "modelProperties": {}
@@ -1265,6 +1274,7 @@
                 "query": false,
                 "order": 10
               },
+              "elementReferences": [],
               "name": "optionalListNoExpressions",
               "description": "",
               "modelProperties": {}
@@ -1313,6 +1323,7 @@
                 "query": false,
                 "order": 11
               },
+              "elementReferences": [],
               "name": "optionalListExpressionRequireds",
               "description": "",
               "modelProperties": {}
@@ -1361,6 +1372,7 @@
                 "query": false,
                 "order": 12
               },
+              "elementReferences": [],
               "name": "optionalListExpressionSupporteds",
               "description": "",
               "modelProperties": {}

@@ -393,6 +393,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "service",
                   "description": "",
                   "modelProperties": {
@@ -422,6 +423,7 @@
                     "query": false,
                     "order": 2
                   },
+                  "elementReferences": [],
                   "name": "operation",
                   "description": "",
                   "modelProperties": {
@@ -464,6 +466,7 @@
                     "query": false,
                     "order": 3
                   },
+                  "elementReferences": [],
                   "name": "body",
                   "displayModel": {
                     "summary": "The XML body to include in the SOAP message, with all the required parameters."
@@ -495,6 +498,7 @@
                     "query": false,
                     "order": 4
                   },
+                  "elementReferences": [],
                   "name": "headers",
                   "displayModel": {
                     "displayName": "Headers",
@@ -534,6 +538,7 @@
                     "query": false,
                     "order": 5
                   },
+                  "elementReferences": [],
                   "name": "attachments",
                   "displayModel": {
                     "summary": "The attachments to include in the SOAP request."
@@ -588,6 +593,7 @@
                     "order": 2,
                     "tabName": "Transport"
                   },
+                  "elementReferences": [],
                   "name": "transportHeaders",
                   "displayModel": {
                     "displayName": "Headers",
@@ -635,6 +641,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -742,6 +749,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "leaguesAddress",
                   "description": "",
                   "modelProperties": {}
@@ -770,6 +778,7 @@
                     "query": false,
                     "order": 2
                   },
+                  "elementReferences": [],
                   "name": "laLigaAddress",
                   "description": "",
                   "modelProperties": {}
@@ -905,6 +914,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -942,6 +952,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "disableValidation",
                   "description": "Disables connection validation",
                   "modelProperties": {
@@ -1134,6 +1145,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "poolingProfile",
                   "description": "Characteristics of the connection pool",
                   "modelProperties": {
@@ -1287,6 +1299,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -1324,6 +1337,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "disableValidation",
                   "description": "Disables connection validation",
                   "modelProperties": {
@@ -1516,6 +1530,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "poolingProfile",
                   "description": "Characteristics of the connection pool",
                   "modelProperties": {
@@ -1571,6 +1586,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "firstDivision",
                   "description": "",
                   "modelProperties": {}
@@ -1599,6 +1615,7 @@
                     "query": false,
                     "order": 2
                   },
+                  "elementReferences": [],
                   "name": "secondDivision",
                   "description": "",
                   "modelProperties": {}
@@ -1627,6 +1644,7 @@
                     "query": false,
                     "order": 3
                   },
+                  "elementReferences": [],
                   "name": "wsdlLocation",
                   "description": "",
                   "modelProperties": {}
@@ -1762,6 +1780,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -1799,6 +1818,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "disableValidation",
                   "description": "Disables connection validation",
                   "modelProperties": {
@@ -1991,6 +2011,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "poolingProfile",
                   "description": "Characteristics of the connection pool",
                   "modelProperties": {

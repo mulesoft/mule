@@ -10,11 +10,15 @@ import static java.lang.String.format;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.springframework.util.ClassUtils.isPrimitiveWrapper;
+
 import org.mule.metadata.api.model.BooleanType;
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.parameter.ElementReference;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
@@ -39,12 +43,35 @@ public final class ParameterTypeModelValidator implements ExtensionModelValidato
 
       @Override
       protected void onParameter(ParameterizedModel owner, ParameterGroupModel groupModel, ParameterModel model) {
-        validateParameter(model, problemsReporter);
+        validateParameterType(model, problemsReporter);
+        validateParameterWithReferencesType(model, problemsReporter);
       }
     }.walk(extensionModel);
   }
 
-  private void validateParameter(ParameterModel parameter, ProblemsReporter problemsReporter) {
+  private void validateParameterWithReferencesType(ParameterModel parameter, ProblemsReporter problemsReporter) {
+    if (!parameter.getElementReferences().isEmpty()) {
+      parameter.getType().accept(new MetadataTypeVisitor() {
+
+        @Override
+        public void visitString(StringType stringType) {
+          // avoid
+        }
+
+        @Override
+        protected void defaultVisit(MetadataType metadataType) {
+          ElementReference ref = parameter.getElementReferences().get(0);
+          problemsReporter.addError(new Problem(parameter, format(
+                                                                  "Parameter '%s' that a contains reference to a [%s] should be of "
+                                                                      + "type String but is of type %s",
+                                                                  parameter.getName(),
+                                                                  ref.getType(), metadataType.toString())));
+        }
+      });
+    }
+  }
+
+  private void validateParameterType(ParameterModel parameter, ProblemsReporter problemsReporter) {
     parameter.getType().accept(new MetadataTypeVisitor() {
 
       @Override
@@ -54,7 +81,8 @@ public final class ParameterTypeModelValidator implements ExtensionModelValidato
               .filter(classInformation -> !classInformation.getGenericTypes().isEmpty())
               .filter(classInformation -> !Objects.equals(classInformation.getGenericTypes().get(0), String.class.getName()))
               .ifPresent(classInformation -> problemsReporter.addError(new Problem(parameter,
-                                                                                   format("Parameter '%s' is of type '%s' and its key type is not %s ",
+                                                                                   format(
+                                                                                          "Parameter '%s' is of type '%s' and its key type is not %s ",
                                                                                           parameter.getName(),
                                                                                           getType(objectType).getName(),
                                                                                           String.class.getName()))));
