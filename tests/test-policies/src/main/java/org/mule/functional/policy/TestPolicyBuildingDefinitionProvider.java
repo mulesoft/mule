@@ -12,9 +12,9 @@ import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fro
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.policy.DefaultPolicyInstance;
-import org.mule.runtime.core.policy.PolicyChain;
-import org.mule.runtime.core.policy.PolicyNextActionMessageProcessor;
+import org.mule.runtime.core.api.policy.DefaultPolicyInstance;
+import org.mule.runtime.core.api.policy.PolicyChain;
+import org.mule.runtime.core.api.policy.PolicyNextActionMessageProcessor;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 

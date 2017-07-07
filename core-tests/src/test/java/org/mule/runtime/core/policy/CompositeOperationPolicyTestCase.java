@@ -31,6 +31,11 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.internal.policy.CompositeOperationPolicy;
+import org.mule.runtime.core.internal.policy.OperationExecutionFunction;
+import org.mule.runtime.core.internal.policy.OperationParametersProcessor;
+import org.mule.runtime.core.internal.policy.OperationPolicyProcessorFactory;
+import org.mule.runtime.core.api.policy.Policy;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.Optional;

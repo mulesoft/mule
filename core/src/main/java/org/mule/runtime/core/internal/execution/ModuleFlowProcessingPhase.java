@@ -51,10 +51,10 @@ import org.mule.runtime.core.api.exception.ErrorTypeRepository;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.api.execution.MessageProcessContext;
-import org.mule.runtime.core.policy.SourcePolicyFailureResult;
-import org.mule.runtime.core.policy.PolicyManager;
-import org.mule.runtime.core.policy.SourcePolicy;
-import org.mule.runtime.core.policy.SourcePolicySuccessResult;
+import org.mule.runtime.core.internal.policy.SourcePolicyFailureResult;
+import org.mule.runtime.core.internal.policy.PolicyManager;
+import org.mule.runtime.core.internal.policy.SourcePolicy;
+import org.mule.runtime.core.internal.policy.SourcePolicySuccessResult;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.util.Collection;

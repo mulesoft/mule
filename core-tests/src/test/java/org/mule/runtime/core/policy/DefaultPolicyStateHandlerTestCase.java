@@ -11,6 +11,8 @@ import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.internal.policy.DefaultPolicyStateHandler;
+import org.mule.runtime.core.api.policy.PolicyStateId;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;
@@ -56,9 +58,9 @@ public class DefaultPolicyStateHandlerTestCase extends AbstractMuleTestCase {
   @Test
   public void destroyState() {
     PolicyStateId policyStateExecutionId = new PolicyStateId(TEST_EXECUTION_ID, TEST_POLICY_ID);
-    defaultPolicyStateHandler.destroyState(policyStateExecutionId.getExecutionIndentifier());
+    defaultPolicyStateHandler.destroyState(policyStateExecutionId.getExecutionIdentifier());
     assertThat(defaultPolicyStateHandler.getLatestState(policyStateExecutionId).isPresent(), is(false));
-    assertThat(defaultPolicyStateHandler.retrieveNextOperation(policyStateExecutionId.getExecutionIndentifier()), nullValue());
+    assertThat(defaultPolicyStateHandler.retrieveNextOperation(policyStateExecutionId.getExecutionIdentifier()), nullValue());
   }
 
 }
