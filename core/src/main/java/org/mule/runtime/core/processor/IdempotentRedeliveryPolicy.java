@@ -14,6 +14,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.ObjectStoreManager;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
@@ -153,7 +154,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
       }
 
       try {
-        Event returnEvent = processNext(event);
+        Event returnEvent = processNext(Event.builder(DefaultEventContext.child(event.getContext()), event).build());
         counter = findCounter(messageId);
         if (counter != null) {
           resetCounter(messageId);

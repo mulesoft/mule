@@ -82,7 +82,7 @@ public class CompositeSourcePolicy extends
   @Override
   protected Publisher<Event> processNextOperation(Event event) {
     return just(event)
-        .then(request -> from(processWithChildContext(request, flowExecutionProcessor)))
+        .then(request -> from(processWithChildContext(request, flowExecutionProcessor, null)))
         .map(flowExecutionResponse -> {
           originalResponseParameters =
               getParametersProcessor().getSuccessfulExecutionResponseParametersFunction().apply(flowExecutionResponse);

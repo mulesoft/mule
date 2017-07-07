@@ -19,7 +19,6 @@ import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.utils.MetadataTypeUtils;
 import org.mule.runtime.api.el.BindingContext;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -48,8 +47,9 @@ import org.reactivestreams.Publisher;
  * to the child processors.
  *
  * <p>
- * Taking the following sample where the current event passed to {@link ModuleOperationProcessorChain#doProcess(Event)} has a flow
- * variable under "person" with a value of "stranger!", the result of executing the above processor will be "howdy stranger!":
+ * Taking the following sample where the current event is processed using {@link ModuleOperationProcessorChain#apply(Publisher)},
+ * has a flow variable under "person" with a value of "stranger!", the result of executing the above processor will be "howdy
+ * stranger!":
  * 
  * <pre>
  *  <module-operation-chain moduleName="a-module-name" moduleOperation="an-operation-name">
@@ -126,8 +126,9 @@ public class ModuleOperationMessageProcessorChainBuilder extends ExplicitMessage
     }
 
     /**
-     * To properly feed the {@link ExpressionManager#evaluate(String, DataType, BindingContext, Event)} we need to store the {@link MetadataType}
-     * per parameter, so that the {@link DataType} can be generated.
+     * To properly feed the {@link ExpressionManager#evaluate(String, DataType, BindingContext, Event)} we need to store the
+     * {@link MetadataType} per parameter, so that the {@link DataType} can be generated.
+     * 
      * @param parameters list of parameters taken from the XML
      * @param parameterModels collection of elements taken from the matching {@link ExtensionModel}
      * @return a collection of parameters to be later consumed in {@link #getEvaluatedValue(Event, String, MetadataType)}
@@ -146,20 +147,10 @@ public class ModuleOperationMessageProcessorChainBuilder extends ExplicitMessage
       return result;
     }
 
-    /**
+    /*
      * Given an {@code event}, it will consume from it ONLY the defined properties and parameters that were set when initializing
      * this class to provide scoping for the inner list of processors.
-     *
-     * @param event parameter to consume elements from
-     * @return a modified {@link Event} if the output of the operation was not void, the same event otherwise.
-     * @throws MuleException
      */
-    @Override
-    protected Event doProcess(Event event) throws MuleException {
-      Event eventResponse = super.doProcess(createEventWithParameters(event));
-      return processResult(event, eventResponse);
-    }
-
     @Override
     public Publisher<Event> apply(Publisher<Event> publisher) {
       return from(publisher)

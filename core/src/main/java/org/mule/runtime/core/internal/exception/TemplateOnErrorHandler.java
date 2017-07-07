@@ -15,6 +15,7 @@ import static org.mule.runtime.core.api.context.notification.EnrichedNotificatio
 import static org.mule.runtime.core.api.context.notification.ErrorHandlerNotification.PROCESS_END;
 import static org.mule.runtime.core.api.context.notification.ErrorHandlerNotification.PROCESS_START;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
+import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContext;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
@@ -108,25 +109,20 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
 
         @Override
         public Event process(Event event) throws MuleException {
-          if (!getMessageProcessors().isEmpty()) {
-            Event newEvent = Event.builder(event)
-                .message(InternalMessage.builder(event.getMessage()).exceptionPayload(new DefaultExceptionPayload(exception))
-                    .build())
-                .build();
-            return configuredMessageProcessors.process(newEvent);
-          } else {
-            return event;
-          }
+          return processToApply(event, this);
         }
 
         @Override
         public Publisher<Event> apply(Publisher<Event> publisher) {
-          // TODO MULE-11023 Migrate transaction execution template mechanism to use non-blocking API
-          // Use child context if HandleExceptionInterceptor is being used to avoid response being completed twice.
-          // TODO MULE-12720 This code makes processCatch/processFinally work for this particular
-          // AbstractRequestResponseMessageProcessor, others don't work
-          return Mono.from(publisher).flatMapMany(event -> processWithChildContext(event, p -> from(p)
-              .flatMapMany(childEvent -> Mono.from(routeAsync(childEvent, exception)))));
+          if (!getMessageProcessors().isEmpty()) {
+            // Use child context if HandleExceptionInterceptor is being used to avoid response being completed twice.
+            // TODO MULE-12720 This code makes processCatch/processFinally work for this particular
+            // AbstractRequestResponseMessageProcessor, others don't work
+            return Mono.from(publisher).flatMapMany(event -> processWithChildContext(event, p -> from(p)
+                .flatMapMany(childEvent -> Mono.from(routeAsync(childEvent, exception))), getLocation()));
+          } else {
+            return publisher;
+          }
         }
       };
 

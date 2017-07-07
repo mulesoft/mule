@@ -7,6 +7,8 @@
 package org.mule.runtime.core.routing;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.DefaultEventContext.child;
+import static org.mule.runtime.core.api.Event.builder;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
@@ -51,7 +53,7 @@ public class FirstSuccessfulRoutingStrategy extends AbstractRoutingStrategy {
 
     for (Processor mp : messageProcessors) {
       try {
-        returnEvent = processor.processRoute(mp, event);
+        returnEvent = processor.processRoute(mp, builder(child(event.getContext()), event).build());
 
         if (returnEvent == null) {
           failed = false;
@@ -79,7 +81,7 @@ public class FirstSuccessfulRoutingStrategy extends AbstractRoutingStrategy {
       }
     }
 
-    return returnEvent;
+    return returnEvent != null ? builder(event.getContext(), returnEvent).build() : null;
   }
 
   interface RouteProcessor {

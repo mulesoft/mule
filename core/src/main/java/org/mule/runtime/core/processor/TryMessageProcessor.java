@@ -13,7 +13,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setFlowConstruc
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
-import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContext;
+import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContextHandleErrors;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_INDIFFERENT;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.errorInvokingMessageProcessorWithinTransaction;
@@ -75,7 +75,8 @@ public class TryMessageProcessor extends AbstractMessageProcessorOwner implement
     } else if (isTransactionActive() || transactionConfig.getAction() != ACTION_INDIFFERENT) {
       return Processor.super.apply(publisher);
     } else {
-      return from(publisher).flatMap(event -> processWithChildContext(event, p -> from(p).transform(nestedChain)));
+      return from(publisher)
+          .flatMap(event -> processWithChildContextHandleErrors(event, p -> from(p).transform(nestedChain), getLocation()));
     }
   }
 

@@ -31,6 +31,7 @@ import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
+import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
 import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.BLOCKING;
 import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.NON_BLOCKING;
@@ -898,16 +899,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
 
     @Override
     public Event process(Event event) throws MuleException {
-      if (stopProcessing) {
-        return event;
-      }
-
-      Event result = processNext(appendBefore(event));
-      if (result != null) {
-        return appendAfter(result);
-      } else {
-        return result;
-      }
+      return processToApply(event, this);
     }
 
     @Override

@@ -150,7 +150,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
 
   private Event asyncEvent(Event event) {
     // Clone event, make it async and remove ReplyToHandler
-    return Event.builder(DefaultEventContext.child(event.getContext()), event)
+    return Event.builder(DefaultEventContext.child(event.getContext(), getLocation(), true), event)
         .replyToHandler(null)
         .session(new DefaultMuleSession(event.getSession())).build();
   }

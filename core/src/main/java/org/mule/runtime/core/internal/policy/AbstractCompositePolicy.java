@@ -67,7 +67,7 @@ public abstract class AbstractCompositePolicy<ParametersTransformer, ParametersP
    */
   public final Publisher<Event> processPolicies(Event operationEvent) {
     return just(operationEvent)
-        .flatMapMany(event -> processWithChildContext(event, new AbstractCompositePolicy.NextOperationCall()));
+        .flatMapMany(event -> processWithChildContext(event, new AbstractCompositePolicy.NextOperationCall(), null));
   }
 
   /**

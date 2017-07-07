@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.processor;
 
+import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
@@ -41,18 +42,7 @@ public abstract class AbstractFilteringMessageProcessor extends AbstractIntercep
 
   @Override
   public Event process(Event event) throws MuleException {
-    boolean accepted;
-    Builder builder = Event.builder(event);
-    try {
-      accepted = accept(event, builder);
-    } catch (Exception ex) {
-      throw filterFailureException(builder.build(), ex);
-    }
-    if (accepted) {
-      return processNext(builder.build());
-    } else {
-      return handleUnaccepted(builder.build());
-    }
+    return processToApply(event, this);
   }
 
   @Override
@@ -96,26 +86,12 @@ public abstract class AbstractFilteringMessageProcessor extends AbstractIntercep
 
   protected abstract boolean accept(Event event, Event.Builder builder);
 
-  protected Event handleUnaccepted(Event event) throws MuleException {
-    if (unacceptedMessageProcessor != null) {
-      return unacceptedMessageProcessor.process(event);
-    } else if (isThrowOnUnaccepted()) {
-      throw filterUnacceptedException(event);
-    } else {
-      return null;
-    }
-  }
-
   protected MessagingException filterFailureException(Event event, Exception ex) {
     return new MessagingException(event, ex, this);
   }
 
   protected MuleException filterUnacceptedException(Event event) {
     return new FilterUnacceptedException(CoreMessages.messageRejectedByFilter());
-  }
-
-  public Processor getUnacceptedMessageProcessor() {
-    return unacceptedMessageProcessor;
   }
 
   public void setUnacceptedMessageProcessor(Processor unacceptedMessageProcessor) {

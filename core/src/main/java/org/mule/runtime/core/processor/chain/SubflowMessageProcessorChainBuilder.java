@@ -43,17 +43,6 @@ public class SubflowMessageProcessorChainBuilder extends ExplicitMessageProcesso
       this.subFlowName = name;
     }
 
-    @Override
-    public Event process(Event event) throws MuleException {
-      pushSubFlowFlowStackElement().accept(event);
-
-      try {
-        return super.process(event);
-      } finally {
-        popSubFlowFlowStackElement().accept(event);
-      }
-    }
-
     private Consumer<Event> pushSubFlowFlowStackElement() {
       return event -> ((DefaultFlowCallStack) event.getFlowCallStack()).push(new FlowStackElement(getSubFlowName(), null));
     }
