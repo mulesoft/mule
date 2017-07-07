@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.core.processor;
 
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.security.SecurityFilter;
 
 import org.reactivestreams.Publisher;
@@ -38,7 +38,12 @@ public class SecurityFilterMessageProcessor extends AbstractInterceptingMessageP
 
   @Override
   public void initialise() throws InitialisationException {
-    LifecycleUtils.initialiseIfNeeded(filter, muleContext);
+    try {
+      muleContext.getInjector().inject(filter);
+      initialiseIfNeeded(filter, muleContext);
+    } catch (MuleException e) {
+      throw new InitialisationException(e, this);
+    }
   }
 
   public SecurityFilterMessageProcessor(SecurityFilter filter) {
