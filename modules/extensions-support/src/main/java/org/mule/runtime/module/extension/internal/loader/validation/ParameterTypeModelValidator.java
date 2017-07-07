@@ -12,13 +12,11 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isM
 import static org.springframework.util.ClassUtils.isPrimitiveWrapper;
 
 import org.mule.metadata.api.model.BooleanType;
-import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.meta.model.parameter.ElementReference;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
@@ -26,7 +24,6 @@ import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
-
 import java.util.Objects;
 
 /**
@@ -50,24 +47,12 @@ public final class ParameterTypeModelValidator implements ExtensionModelValidato
   }
 
   private void validateParameterWithReferencesType(ParameterModel parameter, ProblemsReporter problemsReporter) {
-    if (!parameter.getElementReferences().isEmpty()) {
-      parameter.getType().accept(new MetadataTypeVisitor() {
-
-        @Override
-        public void visitString(StringType stringType) {
-          // avoid
-        }
-
-        @Override
-        protected void defaultVisit(MetadataType metadataType) {
-          ElementReference ref = parameter.getElementReferences().get(0);
-          problemsReporter.addError(new Problem(parameter, format(
-                                                                  "Parameter '%s' that a contains reference to a [%s] should be of "
-                                                                      + "type String but is of type %s",
-                                                                  parameter.getName(),
-                                                                  ref.getType(), metadataType.toString())));
-        }
-      });
+    if (!parameter.getElementReferences().isEmpty() && !(parameter.getType() instanceof StringType)) {
+      problemsReporter.addError(new Problem(parameter, format(
+                                                              "Parameter '%s' that a contains reference to a [%s] should be of type String but is of type %s",
+                                                              parameter.getName(),
+                                                              parameter.getElementReferences().get(0).getType(),
+                                                              parameter.getType())));
     }
   }
 
