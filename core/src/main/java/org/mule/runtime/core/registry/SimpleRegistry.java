@@ -19,6 +19,7 @@ import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 import java.lang.reflect.Field;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 /**
  * A very simple implementation of {@link LifecycleRegistry}. Useful for starting really lightweight contexts which don't depend
@@ -129,9 +130,15 @@ public class SimpleRegistry extends TransientRegistry implements LifecycleRegist
   private <T> T injectInto(T object) {
     for (Field field : getAllFields(object.getClass(), withAnnotation(Inject.class))) {
       Class<?> dependencyType = field.getType();
+      Named nameAnnotation = field.getAnnotation(Named.class);
+      Object dependency;
       try {
         field.setAccessible(true);
-        Object dependency = lookupObject(dependencyType);
+        if (nameAnnotation != null) {
+          dependency = lookupObject(nameAnnotation.value());
+        } else {
+          dependency = lookupObject(dependencyType);
+        }
         if (dependency == null && MuleContext.class.isAssignableFrom(dependencyType)) {
           dependency = muleContext;
         }
@@ -144,7 +151,6 @@ public class SimpleRegistry extends TransientRegistry implements LifecycleRegist
                                    e);
       }
     }
-
     return object;
   }
 }
