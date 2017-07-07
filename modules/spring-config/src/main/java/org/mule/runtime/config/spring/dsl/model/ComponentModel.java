@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanReference;
@@ -248,7 +249,18 @@ public class ComponentModel {
    */
   public void setEnabled(boolean enabled) {
     this.enabled = enabled;
-    this.getInnerComponents().stream().forEach(innerComponent -> innerComponent.setEnabled(enabled));
+  }
+
+  /**
+   * Executes the task on every inner component associated to this componentModel.
+   *
+   * @param task to be executed on inner components.
+   */
+  public void executedOnEveryInnerComponent(final Consumer<ComponentModel> task) {
+    for (ComponentModel componentModel : innerComponents) {
+      task.accept(componentModel);
+      componentModel.executedOnEveryInnerComponent(task);
+    }
   }
 
   /**

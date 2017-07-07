@@ -83,19 +83,24 @@ public class MinimalApplicationModelGenerator {
       ComponentModel componentModel = iterator.next();
       if (componentModel.getNameAttribute() == null || !allRequiredComponentModels.contains(componentModel.getNameAttribute())) {
         componentModel.setEnabled(false);
+        componentModel.executedOnEveryInnerComponent(component -> component.setEnabled(false));
       }
     }
-    ComponentModel parentModel = requestedComponentModel.getParent();
+    ComponentModel currentComponentModel = requestedComponentModel;
+    ComponentModel parentModel = currentComponentModel.getParent();
     while (parentModel != null && parentModel.getParent() != null) {
       parentModel.setEnabled(true);
       for (ComponentModel innerComponent : parentModel.getInnerComponents()) {
-        if (!innerComponent.equals(requestedComponentModel)) {
+        if (!innerComponent.equals(currentComponentModel)) {
           innerComponent.setEnabled(false);
+          innerComponent.executedOnEveryInnerComponent(component -> component.setEnabled(false));
         }
       }
-      requestedComponentModel = parentModel;
+      currentComponentModel = parentModel;
       parentModel = parentModel.getParent();
     }
+    // Finally we set the requested componentModel as enabled as it could have been disabled when traversing dependencies
+    requestedComponentModel.setEnabled(true);
     return applicationModel;
   }
 
