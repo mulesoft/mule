@@ -53,14 +53,16 @@ public class OperationDefinitionParser extends ExtensionDefinitionParser {
   }
 
   @Override
-  protected void doParse(Builder definitionBuilder) throws ConfigurationException {
-    definitionBuilder.withIdentifier(operationDsl.getElementName()).withTypeDefinition(fromType(OperationMessageProcessor.class))
+  protected Builder doParse(Builder definitionBuilder) throws ConfigurationException {
+    Builder finalBuilder = definitionBuilder.withIdentifier(operationDsl.getElementName())
+        .withTypeDefinition(fromType(OperationMessageProcessor.class))
         .withObjectFactoryType(OperationMessageProcessorObjectFactory.class)
         .withConstructorParameterDefinition(fromFixedValue(extensionModel).build())
         .withConstructorParameterDefinition(fromFixedValue(operationModel).build())
         .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
         .withConstructorParameterDefinition(fromReferenceObject(PolicyManager.class).build())
-        .withSetterParameterDefinition(TARGET_PARAMETER_NAME, fromSimpleParameter(TARGET_PARAMETER_NAME).build())
+        .withSetterParameterDefinition(TARGET_PARAMETER_NAME,
+                                       fromSimpleParameter(TARGET_PARAMETER_NAME).build())
         .withSetterParameterDefinition(CONFIG_PROVIDER_ATTRIBUTE_NAME,
                                        fromSimpleReferenceParameter(CONFIG_ATTRIBUTE_NAME).build())
         .withSetterParameterDefinition(CURSOR_PROVIDER_FACTORY_FIELD_NAME,
@@ -73,5 +75,7 @@ public class OperationDefinitionParser extends ExtensionDefinitionParser {
     for (ParameterGroupModel group : inlineGroups) {
       parseInlineParameterGroup(group);
     }
+
+    return finalBuilder;
   }
 }

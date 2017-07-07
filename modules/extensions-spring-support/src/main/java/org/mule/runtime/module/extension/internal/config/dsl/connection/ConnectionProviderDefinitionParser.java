@@ -47,8 +47,8 @@ public final class ConnectionProviderDefinitionParser extends ExtensionDefinitio
   }
 
   @Override
-  protected void doParse(Builder definitionBuilder) throws ConfigurationException {
-    definitionBuilder.withIdentifier(connectionDsl.getElementName())
+  protected Builder doParse(Builder definitionBuilder) throws ConfigurationException {
+    Builder finalBuilder = definitionBuilder.withIdentifier(connectionDsl.getElementName())
         .withTypeDefinition(fromType(ConnectionProviderResolver.class))
         .withObjectFactoryType(ConnectionProviderObjectFactory.class)
         .withConstructorParameterDefinition(fromFixedValue(providerModel).build())
@@ -56,9 +56,12 @@ public final class ConnectionProviderDefinitionParser extends ExtensionDefinitio
         .withConstructorParameterDefinition(fromReferenceObject(ExtensionsOAuthManager.class).build())
         .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
         .withSetterParameterDefinition("disableValidation", fromSimpleParameter("disableValidation").build())
-        .withSetterParameterDefinition("retryPolicyTemplate", fromChildConfiguration(RetryPolicyTemplate.class).build())
+        .withSetterParameterDefinition("retryPolicyTemplate",
+                                       fromChildConfiguration(RetryPolicyTemplate.class).build())
         .withSetterParameterDefinition("poolingProfile", fromChildConfiguration(PoolingProfile.class).build());
 
     parseParameters(providerModel);
+
+    return finalBuilder;
   }
 }

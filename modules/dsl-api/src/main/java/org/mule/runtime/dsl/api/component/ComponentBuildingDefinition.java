@@ -160,8 +160,9 @@ public class ComponentBuildingDefinition<T> {
      * @return {@code this} builder
      */
     public Builder<T> withConstructorParameterDefinition(AttributeDefinition attributeDefinition) {
-      definition.constructorAttributeDefinition.add(attributeDefinition);
-      return this;
+      Builder<T> next = copy();
+      next.definition.constructorAttributeDefinition.add(attributeDefinition);
+      return next;
     }
 
     /**
@@ -172,8 +173,9 @@ public class ComponentBuildingDefinition<T> {
      * @return {@code this} builder
      */
     public Builder<T> withSetterParameterDefinition(String fieldName, AttributeDefinition attributeDefinition) {
-      definition.setterParameterDefinitions.add(new SetterAttributeDefinition(fieldName, attributeDefinition));
-      return this;
+      Builder<T> next = copy();
+      next.definition.setterParameterDefinitions.add(new SetterAttributeDefinition(fieldName, attributeDefinition));
+      return next;
     }
 
     /**
@@ -184,8 +186,9 @@ public class ComponentBuildingDefinition<T> {
      * @return {@code this} builder
      */
     public Builder<T> withIdentifier(String identifier) {
-      this.identifier = identifier;
-      return this;
+      Builder<T> next = copy();
+      next.identifier = identifier;
+      return next;
     }
 
     /**
@@ -196,8 +199,9 @@ public class ComponentBuildingDefinition<T> {
      * @return {@code this} builder
      */
     public Builder<T> withNamespace(String namespace) {
-      this.namespace = namespace;
-      return this;
+      Builder<T> next = copy();
+      next.namespace = namespace;
+      return next;
     }
 
     /**
@@ -209,8 +213,9 @@ public class ComponentBuildingDefinition<T> {
      * @return {@code this} builder
      */
     public Builder<T> withTypeDefinition(TypeDefinition<T> typeDefinition) {
-      definition.typeDefinition = typeDefinition;
-      return this;
+      Builder<T> next = copy();
+      next.definition.typeDefinition = typeDefinition;
+      return next;
     }
 
     /**
@@ -224,8 +229,9 @@ public class ComponentBuildingDefinition<T> {
      * @return
      */
     public Builder<T> withTypeConverter(TypeConverter typeConverter) {
-      definition.typeConverter = of(typeConverter);
-      return this;
+      Builder<T> next = copy();
+      next.definition.typeConverter = of(typeConverter);
+      return next;
     }
 
     /**
@@ -239,8 +245,9 @@ public class ComponentBuildingDefinition<T> {
      * @return
      */
     public Builder<T> withKeyTypeConverter(TypeConverter typeConverter) {
-      definition.keyTypeConverter = of(typeConverter);
-      return this;
+      Builder<T> next = copy();
+      next.definition.keyTypeConverter = of(typeConverter);
+      return next;
     }
 
     /**
@@ -249,8 +256,9 @@ public class ComponentBuildingDefinition<T> {
      * @return {@code this} builder
      */
     public Builder<T> asScope() {
-      definition.scope = true;
-      return this;
+      Builder<T> next = copy();
+      next.definition.scope = true;
+      return next;
     }
 
     /**
@@ -259,8 +267,9 @@ public class ComponentBuildingDefinition<T> {
      * @return {@code this} builder
      */
     public Builder<T> asNamed() {
-      definition.named = true;
-      return this;
+      Builder<T> next = copy();
+      next.definition.named = true;
+      return next;
     }
 
     /**
@@ -271,8 +280,9 @@ public class ComponentBuildingDefinition<T> {
      * @return {@code this} builder
      */
     public Builder<T> withObjectFactoryType(Class<? extends ObjectFactory<T>> objectFactoryType) {
-      definition.objectFactoryType = objectFactoryType;
-      return this;
+      Builder<T> next = copy();
+      next.definition.objectFactoryType = objectFactoryType;
+      return next;
     }
 
     /**
@@ -284,16 +294,20 @@ public class ComponentBuildingDefinition<T> {
      * @return {@code this} builder.
      */
     public Builder<T> withIgnoredConfigurationParameter(String parameterName) {
-      definition.ignoredConfigurationParameters.add(parameterName);
-      return this;
+      Builder<T> next = copy();
+      next.definition.ignoredConfigurationParameters.add(parameterName);
+      return next;
     }
 
     /**
      * Makes a deep copy of the builder so it's current configuration can be reused.
      *
+     * This is called automatically on each method to make sure users don't accidentally modify
+     * the original when intending to refactor common cases.
+     *
      * @return a {@code Builder} copy.
      */
-    public Builder<T> copy() {
+    private Builder<T> copy() {
       Builder<T> builder = new Builder<>();
       builder.definition.typeDefinition = this.definition.typeDefinition;
       builder.definition.setterParameterDefinitions = new ArrayList<>(this.definition.setterParameterDefinitions);
@@ -349,8 +363,9 @@ public class ComponentBuildingDefinition<T> {
     // Ideally this can be inferred by the language itself. e.g.: Global message processors are always reusable components and do
     // not define entities by them self.
     public Builder<T> asPrototype() {
-      definition.prototype = true;
-      return this;
+      Builder<T> next = copy();
+      next.definition.prototype = true;
+      return next;
     }
 
     private Optional<Class> getType() {

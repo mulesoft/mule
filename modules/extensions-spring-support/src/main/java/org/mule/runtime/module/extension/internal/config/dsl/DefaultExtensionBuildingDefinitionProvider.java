@@ -13,7 +13,7 @@ import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fro
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionXmlNamespaceInfo.EXTENSION_NAMESPACE;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
-import com.google.common.collect.ImmutableList;
+
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
@@ -56,6 +56,8 @@ import org.mule.runtime.module.extension.internal.config.dsl.parameter.ObjectTyp
 import org.mule.runtime.module.extension.internal.config.dsl.source.SourceDefinitionParser;
 import org.mule.runtime.module.extension.internal.runtime.DynamicConfigPolicy;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
+
+import com.google.common.collect.ImmutableList;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -104,12 +106,12 @@ public class DefaultExtensionBuildingDefinitionProvider implements ExtensionBuil
     Builder baseDefinition =
         new Builder().withNamespace(EXTENSION_NAMESPACE);
     definitions.add(
-                    baseDefinition.copy().withIdentifier("extensions-config").withTypeDefinition(fromType(ExtensionConfig.class))
+                    baseDefinition.withIdentifier("extensions-config").withTypeDefinition(fromType(ExtensionConfig.class))
                         .withObjectFactoryType(ExtensionConfigObjectFactory.class)
                         .withSetterParameterDefinition("dynamicConfigurationExpiration",
                                                        fromChildConfiguration(DynamicConfigurationExpiration.class).build())
                         .build());
-    definitions.add(baseDefinition.copy().withIdentifier("dynamic-configuration-expiration")
+    definitions.add(baseDefinition.withIdentifier("dynamic-configuration-expiration")
         .withTypeDefinition(fromType(DynamicConfigurationExpiration.class))
         .withObjectFactoryType(DynamicConfigurationExpirationObjectFactory.class)
         .withConstructorParameterDefinition(fromSimpleParameter("frequency").build())
@@ -117,13 +119,13 @@ public class DefaultExtensionBuildingDefinitionProvider implements ExtensionBuil
                                             fromSimpleParameter("timeUnit", value -> TimeUnit.valueOf((String) value)).build())
         .build());
 
-    definitions.add(baseDefinition.copy().withIdentifier("dynamic-config-policy")
+    definitions.add(baseDefinition.withIdentifier("dynamic-config-policy")
         .withTypeDefinition(fromType(DynamicConfigPolicy.class))
         .withObjectFactoryType(DynamicConfigPolicyObjectFactory.class)
         .withSetterParameterDefinition("expirationPolicy", fromChildConfiguration(ExpirationPolicy.class).build())
         .build());
 
-    definitions.add(baseDefinition.copy().withIdentifier("expiration-policy").withTypeDefinition(fromType(ExpirationPolicy.class))
+    definitions.add(baseDefinition.withIdentifier("expiration-policy").withTypeDefinition(fromType(ExpirationPolicy.class))
         .withObjectFactoryType(ExpirationPolicyObjectFactory.class)
         .withSetterParameterDefinition("maxIdleTime", fromSimpleParameter("maxIdleTime").build())
         .withSetterParameterDefinition("timeUnit",
@@ -279,7 +281,7 @@ public class DefaultExtensionBuildingDefinitionProvider implements ExtensionBuil
 
       @Override
       public void visitArrayType(ArrayType arrayType) {
-        registerTopLevelParameter(arrayType.getType(), definitionBuilder.copy(), extensionClassLoader, dslSyntaxResolver,
+        registerTopLevelParameter(arrayType.getType(), definitionBuilder, extensionClassLoader, dslSyntaxResolver,
                                   parsingContext);
       }
 

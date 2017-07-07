@@ -38,7 +38,7 @@ public class TestPolicyBuildingDefinitionProvider implements ComponentBuildingDe
   public List<ComponentBuildingDefinition> getComponentBuildingDefinitions() {
     ArrayList<ComponentBuildingDefinition> definitions = new ArrayList<>();
 
-    definitions.add(baseDefinition.copy().withIdentifier("proxy")
+    definitions.add(baseDefinition.withIdentifier("proxy")
         .asPrototype()
         .withTypeDefinition(fromType(DefaultPolicyInstance.class))
         .withSetterParameterDefinition("sourcePolicyChain",
@@ -47,15 +47,15 @@ public class TestPolicyBuildingDefinitionProvider implements ComponentBuildingDe
                                        fromChildConfiguration(PolicyChain.class).withWrapperIdentifier("operation").build())
         .build());
 
-    definitions.add(baseDefinition.copy().withIdentifier("source")
+    definitions.add(baseDefinition.withIdentifier("source")
         .withTypeDefinition(fromType(PolicyChain.class))
         .withSetterParameterDefinition("processors", fromChildCollectionConfiguration(Processor.class).build()).build());
 
-    definitions.add(baseDefinition.copy().withIdentifier("operation")
+    definitions.add(baseDefinition.withIdentifier("operation")
         .withTypeDefinition(fromType(PolicyChain.class))
         .withSetterParameterDefinition("processors", fromChildCollectionConfiguration(Processor.class).build()).build());
 
-    definitions.add(baseDefinition.copy().withIdentifier("execute-next")
+    definitions.add(baseDefinition.withIdentifier("execute-next")
         .withTypeDefinition(fromType(PolicyNextActionMessageProcessor.class)).build());
 
     return definitions;
