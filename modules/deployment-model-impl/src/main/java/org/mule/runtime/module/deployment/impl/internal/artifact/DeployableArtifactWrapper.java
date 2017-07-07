@@ -9,6 +9,7 @@ package org.mule.runtime.module.deployment.impl.internal.artifact;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 
 import org.mule.runtime.api.metadata.MetadataService;
+import org.mule.runtime.api.values.ValueProviderService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
@@ -62,6 +63,11 @@ public class DeployableArtifactWrapper<T extends DeployableArtifact<D>, D extend
   @Override
   public MetadataService getMetadataService() {
     return getDelegate().getMetadataService();
+  }
+
+  @Override
+  public ValueProviderService getValueProviderService() {
+    return getDelegate().getValueProviderService();
   }
 
   @Override

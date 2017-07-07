@@ -7,6 +7,7 @@
 package org.mule.runtime.deployment.model.api.artifact;
 
 import org.mule.runtime.api.metadata.MetadataService;
+import org.mule.runtime.api.values.ValueProviderService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
 
@@ -34,4 +35,5 @@ public interface ArtifactContext {
    */
   MetadataService getMetadataService();
 
+  ValueProviderService getValueProviderService();
 }

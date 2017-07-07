@@ -7,6 +7,7 @@
 package org.mule.runtime.config.spring.artifact;
 
 import org.mule.runtime.api.metadata.MetadataService;
+import org.mule.runtime.api.values.ValueProviderService;
 import org.mule.runtime.config.spring.MuleArtifactContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
@@ -55,5 +56,10 @@ public class SpringArtifactContext implements ArtifactContext {
    */
   public MetadataService getMetadataService() {
     return muleArtifactContext.getMetadataService();
+  }
+
+  @Override
+  public ValueProviderService getValueProviderService() {
+    return muleArtifactContext.getValueProviderService();
   }
 }

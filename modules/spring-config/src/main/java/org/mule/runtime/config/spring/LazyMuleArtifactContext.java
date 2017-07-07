@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static org.mule.runtime.config.spring.XmlConfigurationDocumentLoader.noValidationDocumentLoader;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTIVITY_TESTING_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_METADATA_SERVICE;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_VALUE_PROVIDER_SERVICE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
@@ -19,6 +20,7 @@ import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.MetadataService;
+import org.mule.runtime.api.values.ValueProviderService;
 import org.mule.runtime.config.spring.dsl.model.ApplicationModel;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.model.MinimalApplicationModelGenerator;
@@ -26,7 +28,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigResource;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -48,6 +49,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
   private static final Logger LOGGER = LoggerFactory.getLogger(LazyMuleArtifactContext.class);
 
   private ConnectivityTestingService lazyConnectivityTestingService;
+  private ValueProviderService valueProviderService;
   private MetadataService metadataService;
 
   /**
@@ -155,4 +157,11 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
     return metadataService;
   }
 
+  @Override
+  public ValueProviderService getValueProviderService() {
+    if (valueProviderService == null) {
+      valueProviderService = new LazyValueProviderService(this, muleContext.getRegistry().get(OBJECT_VALUE_PROVIDER_SERVICE));
+    }
+    return valueProviderService;
+  }
 }

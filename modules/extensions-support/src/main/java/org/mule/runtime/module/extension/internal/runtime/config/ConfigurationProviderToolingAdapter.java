@@ -35,7 +35,7 @@ import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.api.util.Reference;
-import org.mule.runtime.extension.api.values.ConfigurationParameterValuesProvider;
+import org.mule.runtime.extension.api.values.ConfigurationParameterValueProvider;
 import org.mule.runtime.api.values.Value;
 import org.mule.runtime.extension.api.values.ValueResolvingException;
 import org.mule.runtime.core.api.Event;
@@ -59,14 +59,14 @@ import java.util.Set;
  * So sar the capabilities are:
  * <ul>
  * <li>{@link MetadataKeyProvider}, to resolve {@link MetadataKey metadata keys} associated to a configuration</li>
- * <li>{@link ConfigurationParameterValuesProvider}, to resolve {@link Value values} associated to a configuration and
+ * <li>{@link ConfigurationParameterValueProvider}, to resolve {@link Value values} associated to a configuration and
  * their related connection</li>
  * </ul>
  *
  * @since 4.0
  */
 public final class ConfigurationProviderToolingAdapter extends StaticConfigurationProvider
-    implements MetadataKeyProvider, ConfigurationParameterValuesProvider {
+    implements MetadataKeyProvider, ConfigurationParameterValueProvider {
 
   private final MuleMetadataService metadataService;
   protected final ConnectionManager connectionManager;

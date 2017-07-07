@@ -158,6 +158,7 @@ public class MuleProperties {
   public static final String OBJECT_TIME_SUPPLIER = "_muleTimeSupplier";
   public static final String OBJECT_CONNECTION_MANAGER = "_muleConnectionManager";
   public static final String OBJECT_METADATA_SERVICE = "_muleMetadataService";
+  public static final String OBJECT_VALUE_PROVIDER_SERVICE = "_muleValueProviderService";
   public static final String OBJECT_EXCEPTION_LOCATION_PROVIDER = "_muleExceptionLocationProvider";
   public static final String OBJECT_MESSAGE_PROCESSING_FLOW_TRACE_MANAGER = "_muleMessageProcessingFlowTraceManager";
   public static final String OBJECT_CONNECTIVITY_TESTING_SERVICE = "_muleConnectivityTestingService";
