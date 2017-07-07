@@ -10,12 +10,18 @@ import static java.lang.System.identityHashCode;
 import static java.time.OffsetTime.now;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
+import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
+import org.mule.runtime.core.api.exception.MessagingException;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.internal.context.notification.DefaultProcessorsTrace;
 import org.mule.runtime.core.api.management.stats.ProcessingTime;
 
@@ -24,6 +30,7 @@ import java.time.OffsetTime;
 import java.util.Optional;
 
 import org.reactivestreams.Publisher;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -80,7 +87,22 @@ public final class DefaultEventContext extends AbstractEventContext implements S
    * @return a new child context
    */
   public static EventContext child(EventContext parent) {
-    EventContext child = new ChildEventContext(parent);
+    return child(parent, null, false);
+  }
+
+  /**
+   * Builds a new child execution context from a parent context. A child context delegates all getters to the parent context but
+   * has it's own completion lifecycle. Completion of the child context will not cause the parent context to complete. This is
+   * typically used in {@code flow-ref} type scenarios where a the referenced Flow should complete the child context, but should
+   * not complete the parent context
+   *
+   * @param parent the parent context
+   * @param componentLocation the location of the component that creates the child context and operates on result.
+   * @param handleErrors if the {@link MessagingExceptionHandler} should be used to handle errors.
+   * @return a new child context
+   */
+  public static EventContext child(EventContext parent, ComponentLocation componentLocation, boolean handleErrors) {
+    EventContext child = new ChildEventContext(parent, componentLocation, handleErrors);
     if (parent instanceof AbstractEventContext) {
       ((AbstractEventContext) parent).addChildContext(child);
     }
@@ -190,10 +212,14 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     private static final long serialVersionUID = 1054412872901205234L;
 
     private final EventContext parent;
+    private final ComponentLocation componentLocation;
+    private final boolean handleErrors;
 
-    private ChildEventContext(EventContext parent) {
+    private ChildEventContext(EventContext parent, ComponentLocation componentLocation, boolean handleErrors) {
       super(Mono.empty());
       this.parent = parent;
+      this.componentLocation = componentLocation;
+      this.handleErrors = handleErrors;
     }
 
     @Override
@@ -249,7 +275,8 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     @Override
     public String toString() {
       return getClass().getSimpleName() + " { id: " + parent.getId() + "; correlationId: " + parent.getCorrelationId()
-          + "; flowName: " + parent.getOriginatingFlowName() + " }";
+          + "; flowName: " + parent.getOriginatingFlowName() + "; commponentLocation: "
+          + componentLocation != null ? componentLocation.getLocation() : EMPTY + " }";
     }
 
     @Override
@@ -257,6 +284,15 @@ public final class DefaultEventContext extends AbstractEventContext implements S
       return of(parent);
     }
 
+    @Override
+    public Publisher<Void> error(MessagingException messagingException, MessagingExceptionHandler handler) {
+      if (handleErrors) {
+        return super.error(messagingException, handler);
+      } else {
+        error(messagingException);
+        return Flux.empty();
+      }
+    }
   }
 
 }

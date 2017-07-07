@@ -183,10 +183,6 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase {
       return event;
     }
 
-    @Override
-    public Event last(Event event, ProcessingTime time, long startTime, boolean exceptionWasThrown) throws MuleException {
-      return event;
-    }
   }
 
   private Flow flow;

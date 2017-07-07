@@ -12,9 +12,10 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAU
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
-import static org.mule.runtime.core.internal.util.rx.Operators.echoOnNullMap;
+import static org.mule.runtime.core.internal.util.rx.Operators.nullSafeMap;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -159,7 +160,7 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
 
   @Override
   public Publisher<Event> apply(Publisher<Event> publisher) {
-    return from(publisher).handle(echoOnNullMap(checkedFunction(event -> process(event))));
+    return from(publisher).handle(nullSafeMap(checkedFunction(event -> process(event))));
   }
 
   @Override

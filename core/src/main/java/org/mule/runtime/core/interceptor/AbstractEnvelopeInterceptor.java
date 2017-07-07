@@ -6,16 +6,26 @@
  */
 package org.mule.runtime.core.interceptor;
 
+import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
+import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
+import static org.mule.runtime.core.internal.util.rx.Operators.nullSafeMap;
+import static reactor.core.publisher.Flux.from;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.interceptor.Interceptor;
 import org.mule.runtime.core.api.management.stats.ProcessingTime;
+import org.mule.runtime.core.api.processor.MessageProcessors;
+import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 import org.mule.runtime.core.processor.AbstractRequestResponseMessageProcessor;
+
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Flux;
 
 /**
  * <code>EnvelopeInterceptor</code> is an intercepter that will fire before and after an event is received.
  */
-public abstract class AbstractEnvelopeInterceptor extends AbstractRequestResponseMessageProcessor
+public abstract class AbstractEnvelopeInterceptor extends AbstractInterceptingMessageProcessor
     implements Interceptor {
 
   /**
@@ -28,25 +38,14 @@ public abstract class AbstractEnvelopeInterceptor extends AbstractRequestRespons
    */
   public abstract Event after(Event event) throws MuleException;
 
-  /**
-   * This method is always invoked after the event has been processed,
-   */
-  public abstract Event last(Event event, ProcessingTime time, long startTime, boolean exceptionWasThrown)
-      throws MuleException;
-
   @Override
   public Event process(Event event) throws MuleException {
-    long startTime = System.currentTimeMillis();
-    ProcessingTime time = event.getContext().getProcessingTime();
-    boolean exceptionWasThrown = true;
-    Event resultEvent = event;
-    try {
-      resultEvent = after(processNext(before(resultEvent)));
-      exceptionWasThrown = false;
-    } finally {
-      resultEvent = last(resultEvent, time, startTime, exceptionWasThrown);
-    }
-    return resultEvent;
+    return processToApply(event, this);
   }
 
+  @Override
+  public Publisher<Event> apply(Publisher<Event> publisher) {
+    return from(publisher).handle(nullSafeMap(checkedFunction(event -> before(event)))).transform(applyNext())
+        .handle(nullSafeMap(checkedFunction(event -> after(event))));
+  }
 }

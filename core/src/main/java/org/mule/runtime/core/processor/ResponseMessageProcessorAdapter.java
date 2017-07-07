@@ -8,6 +8,7 @@ package org.mule.runtime.core.processor;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setFlowConstructIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
+import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContext;
 import static org.mule.runtime.core.api.execution.MessageProcessorExecutionTemplate.createExecutionTemplate;
 import static reactor.core.publisher.Flux.from;
@@ -51,24 +52,7 @@ public class ResponseMessageProcessorAdapter extends AbstractInterceptingMessage
 
   @Override
   public Event process(Event event) throws MuleException {
-    Event response = processNext(event);
-    if (responseProcessor == null || !isEventValid(response)) {
-      return response;
-    } else {
-      return resolveReturnEvent(responseProcessor.process(response), response);
-    }
-  }
-
-  private Event resolveReturnEvent(Event result, Event original) {
-    if (result == null) {
-      // If <response> returns null then it acts as an implicit branch like in flows, the different
-      // here is that what's next, it's not another message processor that follows this one in the
-      // configuration file but rather the response phase of the inbound endpoint, or optionally
-      // other response processing on the way back to the inbound endpoint.
-      return original;
-    } else {
-      return result;
-    }
+    return processToApply(event, this);
   }
 
   @Override

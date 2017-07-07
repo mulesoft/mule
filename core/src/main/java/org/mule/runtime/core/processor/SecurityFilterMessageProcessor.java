@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.processor;
 
+import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
 import org.mule.runtime.core.api.Event;
@@ -51,10 +52,7 @@ public class SecurityFilterMessageProcessor extends AbstractInterceptingMessageP
 
   @Override
   public Event process(Event event) throws MuleException {
-    if (filter != null) {
-      event = filter.doFilter(event);
-    }
-    return processNext(event);
+    return processToApply(event, this);
   }
 
   @Override

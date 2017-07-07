@@ -142,4 +142,18 @@ public class MessageProcessors {
         .doOnError(MessagingException.class, me -> me.setProcessedEvent(builder(event.getContext(), me.getEvent()).build()));
   }
 
+  public static Publisher<Event> processWithChildContextHandleErrors(Event event, ReactiveProcessor processor) {
+    EventContext child = child(event.getContext(), null, true);
+    just(Event.builder(child, event).build())
+        .transform(processor)
+        .subscribe(response -> {
+          if (!(from(child.getResponsePublisher()).toFuture().isDone())) {
+            child.success(response);
+          }
+        }, child::error);
+    return from(child.getResponsePublisher())
+        .map(result -> Event.builder(event.getContext(), result).build())
+        .doOnError(MessagingException.class, me -> me.setProcessedEvent(builder(event.getContext(), me.getEvent()).build()));
+  }
+
 }

@@ -11,6 +11,7 @@ import static org.mule.runtime.core.api.Event.builder;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
+import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContext;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
 import static reactor.core.publisher.Flux.from;
@@ -62,8 +63,7 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements Pr
 
   @Override
   public Event process(Event event) throws MuleException {
-    return enrich(enrichmentProcessor.process(builder(event).session(new DefaultMuleSession(event.getSession())).build()),
-                  event);
+    return processToApply(event, this);
   }
 
   protected Event enrich(Event currentEvent,

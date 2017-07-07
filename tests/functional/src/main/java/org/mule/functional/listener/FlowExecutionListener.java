@@ -47,19 +47,15 @@ public class FlowExecutionListener {
 
   private void createFlowExecutionListener(MuleContext muleContext) {
     try {
-      muleContext.registerListener(new PipelineMessageNotificationListener<PipelineMessageNotification>() {
-
-        @Override
-        public void onNotification(PipelineMessageNotification notification) {
-          if (flowName != null && !notification.getResourceIdentifier().equals(flowName)) {
-            return;
+      muleContext.registerListener((PipelineMessageNotificationListener<PipelineMessageNotification>) notification -> {
+        if (flowName != null && !notification.getResourceIdentifier().equals(flowName)) {
+          return;
+        }
+        if (notification.getAction() == PipelineMessageNotification.PROCESS_COMPLETE) {
+          for (Callback<EnrichedNotificationInfo> callback : callbacks) {
+            callback.execute(notification.getInfo());
           }
-          if (notification.getAction() == PipelineMessageNotification.PROCESS_COMPLETE) {
-            for (Callback<EnrichedNotificationInfo> callback : callbacks) {
-              callback.execute(notification.getInfo());
-            }
-            flowExecutedLatch.countDown();
-          }
+          flowExecutedLatch.countDown();
         }
       });
     } catch (NotificationException e) {
