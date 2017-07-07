@@ -121,12 +121,10 @@ public class MessageProcessors {
   }
 
   /**
-   * Process a {@link ReactiveProcessor} using a child {@link EventContext}. This is useful if it is necessary to performing
-   * processing in a scope and handle an empty result rather than complete the response for the whole Flow. The
-   * {@link MessagingExceptionHandler} configured on {@link MessageProcessorChain} or {@link FlowConstruct} will not be used to
-   * handle errors.
-   *
-   * Completion of the child {@link EventContext} with
+   * Process a {@link ReactiveProcessor} using a child {@link EventContext}. This is useful if it is necessary to perform
+   * processing in a scope and handle an empty result or error locally rather than complete the response for the whole Flow.
+   * <p>
+   * No error-handling will be performed when errors occur.
    *
    * @param event the event to process.
    * @param processor the processor to process.
@@ -144,10 +142,11 @@ public class MessageProcessors {
   }
 
   /**
-   * Process a {@link ReactiveProcessor} using a child {@link EventContext}. This is useful if it is necessary to performing
-   * processing in a scope and handle an empty result rather than complete the response for the whole Flow. The
-   * {@link MessagingExceptionHandler} configured on {@link MessageProcessorChain} or {@link FlowConstruct} will be used to handle
-   * errors.
+   * Process a {@link ReactiveProcessor} using a child {@link EventContext}. This is useful if it is necessary to perform
+   * processing in a scope and handle an empty result or error locally rather than complete the response for the whole Flow.
+   * <p>
+   * The {@link MessagingExceptionHandler} configured on {@link MessageProcessorChain} or {@link FlowConstruct} will be used to
+   * handle any errors that occur.
    *
    * @param event the event to process.
    * @param processor the processor to process.
@@ -156,7 +155,7 @@ public class MessageProcessors {
    */
   public static Publisher<Event> processWithChildContextHandleErrors(Event event, ReactiveProcessor processor,
                                                                      ComponentLocation componentLocation) {
-    EventContext child = child(event.getContext(), null, true);
+    EventContext child = child(event.getContext(), componentLocation, true);
     return just(builder(child, event).build())
         .transform(processor)
         .switchIfEmpty(from(child.getResponsePublisher()))

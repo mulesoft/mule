@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.processor;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
@@ -21,6 +22,7 @@ import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedConsumer;
 import static reactor.core.publisher.Mono.error;
+import static reactor.core.publisher.Mono.from;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -80,10 +82,10 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
         .thenAnswer(invocation -> error(new RuntimeException("failing"))
             .doOnError(e -> count.getAndIncrement()));
     when(mockWaitingMessageProcessor.apply(any(Publisher.class))).thenAnswer(invocationOnMock -> {
-      Mono<Event> mono = Mono.from(invocationOnMock.getArgumentAt(0, Publisher.class));
+      Mono<Event> mono = from(invocationOnMock.getArgumentAt(0, Publisher.class));
       return mono.doOnNext(checkedConsumer(event1 -> {
         waitingMessageProcessorExecutionLatch.countDown();
-        waitLatch.await(2000, TimeUnit.MILLISECONDS);
+        waitLatch.await(2000, MILLISECONDS);
       })).transform(mockFailingMessageProcessor);
     });
     MuleLockFactory muleLockFactory = new MuleLockFactory();
@@ -144,7 +146,7 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
     firstIrpExecutionThread.start();
     ExecuteIrpThread threadCausingRedeliveryException = new ExecuteIrpThread();
     threadCausingRedeliveryException.start();
-    waitingMessageProcessorExecutionLatch.await(5000, TimeUnit.MILLISECONDS);
+    waitingMessageProcessorExecutionLatch.await(5000, MILLISECONDS);
     waitLatch.release();
     firstIrpExecutionThread.join();
     threadCausingRedeliveryException.join();

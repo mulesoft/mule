@@ -48,7 +48,7 @@ import org.reactivestreams.Publisher;
  *
  * <p>
  * Taking the following sample where the current event is processed using {@link ModuleOperationProcessorChain#apply(Publisher)},
- * has a flow variable under "person" with a value of "stranger!", the result of executing the above processor will be "howdy
+ * has a variable under "person" with a value of "stranger!", the result of executing the above processor will be "howdy
  * stranger!":
  * 
  * <pre>
@@ -147,7 +147,7 @@ public class ModuleOperationMessageProcessorChainBuilder extends ExplicitMessage
       return result;
     }
 
-    /*
+    /**
      * Given an {@code event}, it will consume from it ONLY the defined properties and parameters that were set when initializing
      * this class to provide scoping for the inner list of processors.
      */

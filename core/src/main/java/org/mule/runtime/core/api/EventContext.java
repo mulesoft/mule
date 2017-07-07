@@ -97,7 +97,7 @@ public interface EventContext {
   void error(Throwable throwable);
 
   /**
-   * Allows handling of {@link MessagingException} using supplied {@link MessagingExceptionHandler} before completion
+   * Allows handling of {@link MessagingException} using supplied {@link MessagingExceptionHandler} before completing this
    * {@link EventContext} with {@link #success(Event)} or {@link #error(Throwable)} based on the result of handling.
    * Implementation may decide not to perform error handling based on specific needs.
    *
