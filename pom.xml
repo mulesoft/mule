@@ -2123,7 +2123,6 @@
         <profile>
             <id>distributions</id>
             <properties>
-                <skipIntegrationTests>true</skipIntegrationTests>
                 <skipVerifications>false</skipVerifications>
                 <skipInstalls>false</skipInstalls>
             </properties>
