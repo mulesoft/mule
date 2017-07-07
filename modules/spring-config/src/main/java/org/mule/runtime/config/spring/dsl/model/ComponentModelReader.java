@@ -10,10 +10,10 @@ import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_DOMAIN_ROOT_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_ROOT_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.POLICY_ROOT_ELEMENT;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.VALUE_ATTRIBUTE;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.from;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.to;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+
 import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
 import org.mule.runtime.config.spring.dsl.processor.SimpleConfigAttribute;
 import org.mule.runtime.core.component.config.ConfigurationPropertiesResolver;
@@ -44,7 +44,7 @@ public class ComponentModelReader {
             .withNamespace(namespace)
             .withName(configLine.getIdentifier())
             .build())
-        .setTextContent(configLine.getTextContent())
+        .setTextContent(resolveValueIfIsPlaceHolder(configLine.getTextContent()))
         .setConfigFileName(configFileName)
         .setLineNumber(configLine.getLineNumber());
     to(builder).addNode(from(configLine).getNode());
