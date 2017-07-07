@@ -1591,12 +1591,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withConstructorParameterDefinition(fromSimpleReferenceParameter("ref").build())
         .build());
 
-    buildingDefinitions.add(baseDefinition.copy()
-        .withIdentifier("custom-transaction-manager")
-        .withTypeDefinition(fromConfigurationAttribute(CLASS_ATTRIBUTE))
-        .withSetterParameterDefinition("environment", fromChildConfiguration(Map.class).build())
-        .build());
-
     return buildingDefinitions;
   }
 
