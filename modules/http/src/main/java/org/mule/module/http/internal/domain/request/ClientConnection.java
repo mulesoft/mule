@@ -62,9 +62,9 @@ public class ClientConnection
     {
         try
         {
-            if (sslSession != null)
+            if (getSslSession() != null)
             {
-                Certificate[] peerCertificates = sslSession.getPeerCertificates();
+                Certificate[] peerCertificates = getSslSession().getPeerCertificates();
                 if (peerCertificates.length > 0)
                 {
                     return peerCertificates[0];
@@ -79,6 +79,11 @@ public class ClientConnection
             }
         }
         return null;
+    }
+
+    public SSLSession getSslSession()
+    {
+        return sslSession;
     }
 
 }
