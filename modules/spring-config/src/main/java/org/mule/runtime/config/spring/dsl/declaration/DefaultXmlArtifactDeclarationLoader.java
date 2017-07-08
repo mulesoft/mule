@@ -32,10 +32,9 @@ import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NA
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.NON_REPEATABLE_BYTE_STREAM_ALIAS;
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_FILE_STORE_BYTES_STREAM_ALIAS;
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_IN_MEMORY_BYTES_STREAM_ALIAS;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isInfrastructure;
-import static org.mule.runtime.extension.internal.dsl.syntax.DslSyntaxUtils.getId;
-import static org.mule.runtime.extension.internal.dsl.syntax.DslSyntaxUtils.isExtensible;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.EE_PREFIX;
@@ -96,6 +95,7 @@ import org.mule.runtime.config.spring.dsl.processor.SimpleConfigAttribute;
 import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationParser;
 import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationServiceRegistry;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
+import org.mule.runtime.extension.api.declaration.type.annotation.ExtensibleTypeAnnotation;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 
@@ -647,8 +647,7 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
           .ifPresent(subType -> createObjectValueFromType(subType, objectValue, wrappedConfig,
                                                           wrappedElementResolver.resolve(subType).get()));
 
-      // TODO MULE-12002: Revisit DslSyntaxUtils as part of the API
-    } else if (isExtensible(objectType)) {
+    } else if (objectType.getAnnotation(ExtensibleTypeAnnotation.class).isPresent()) {
       createObjectValueFromType(objectType, objectValue, wrappedConfig, wrappedElementResolver.resolve(objectType).get());
     }
   }
@@ -656,7 +655,6 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
   private void createObjectValueFromType(ObjectType objectType, ParameterObjectValue.Builder objectValue, ConfigLine config,
                                          DslElementSyntax paramDsl) {
 
-    // TODO MULE-12002: Revisit DslSyntaxUtils as part of the API
     objectValue.ofType(getId(objectType));
     copyExplicitAttributes(config.getConfigAttributes(), objectValue);
 

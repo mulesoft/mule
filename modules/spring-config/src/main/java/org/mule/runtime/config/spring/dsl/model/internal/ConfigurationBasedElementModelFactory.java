@@ -33,7 +33,6 @@ import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isInfrastructure;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isRequired;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isText;
-import static org.mule.runtime.extension.internal.dsl.syntax.DslSyntaxUtils.isFlattened;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.EE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
@@ -62,6 +61,7 @@ import org.mule.runtime.config.spring.dsl.model.DslElementModel;
 import org.mule.runtime.config.spring.dsl.model.DslElementModelFactory;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.api.declaration.type.annotation.FlattenedTypeAnnotation;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 
@@ -189,7 +189,7 @@ class ConfigurationBasedElementModelFactory {
                                     DslElementModel.Builder typeBuilder) {
     type.getFields().forEach(field -> {
 
-      if (isFlattened(field, field.getValue())) {
+      if (field.getValue() instanceof ObjectType && field.getAnnotation(FlattenedTypeAnnotation.class).isPresent()) {
         ((ObjectType) field.getValue()).getFields().forEach(nested -> {
           final String name = getLocalPart(nested);
           final DslElementSyntax fieldDsl = typeDsl.getContainedElement(name).get();
