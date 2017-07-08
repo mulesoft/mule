@@ -2191,7 +2191,9 @@
                         "prefix": "mule"
                       }
                     },
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 2
+                    }
                   }
                 }
               ],
@@ -2642,7 +2644,9 @@
                   "name": "tlsContext",
                   "description": "",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {},
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 8
+                    },
                     "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
@@ -2793,7 +2797,9 @@
                         "prefix": "mule"
                       }
                     },
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 3
+                    }
                   }
                 }
               ],
@@ -4000,7 +4006,9 @@
                         "prefix": "mule"
                       }
                     },
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 1
+                    }
                   }
                 },
                 {
@@ -4201,7 +4209,9 @@
                         "prefix": "mule"
                       }
                     },
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 2
+                    }
                   }
                 }
               ],
@@ -4345,7 +4355,9 @@
                         "prefix": "mule"
                       }
                     },
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 3
+                    }
                   }
                 }
               ],
@@ -5551,7 +5563,9 @@
                         "prefix": "mule"
                       }
                     },
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 1
+                    }
                   }
                 },
                 {
@@ -5752,7 +5766,9 @@
                         "prefix": "mule"
                       }
                     },
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 2
+                    }
                   }
                 }
               ],
@@ -5896,7 +5912,9 @@
                         "prefix": "mule"
                       }
                     },
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 3
+                    }
                   }
                 }
               ],
@@ -6840,7 +6858,9 @@
                     "prefix": "mule"
                   }
                 },
-                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                  "sequence": 2
+                }
               }
             }
           ],
@@ -7138,7 +7158,9 @@
                     "prefix": "mule"
                   }
                 },
-                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                  "sequence": 2
+                }
               }
             }
           ],
@@ -8253,7 +8275,9 @@
                     "prefix": "mule"
                   }
                 },
-                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                  "sequence": 2
+                }
               }
             }
           ],
@@ -10161,7 +10185,9 @@
                     "prefix": "mule"
                   }
                 },
-                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                  "sequence": 2
+                }
               }
             }
           ],
@@ -11269,7 +11295,9 @@
                     "prefix": "mule"
                   }
                 },
-                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                  "sequence": 2
+                }
               }
             }
           ],
@@ -11752,7 +11780,9 @@
               "name": "tlsContext",
               "description": "",
               "modelProperties": {
-                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {},
+                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                  "sequence": 8
+                },
                 "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                   "value": {
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
@@ -11903,7 +11933,9 @@
                     "prefix": "mule"
                   }
                 },
-                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                  "sequence": 3
+                }
               }
             }
           ],
@@ -12153,7 +12185,9 @@
                     "prefix": "mule"
                   }
                 },
-                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                  "sequence": 1
+                }
               }
             }
           ],
@@ -12297,7 +12331,9 @@
                     "prefix": "mule"
                   }
                 },
-                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                  "sequence": 3
+                }
               }
             }
           ],

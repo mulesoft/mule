@@ -4824,7 +4824,9 @@
                         "prefix": "mule"
                       }
                     },
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 3
+                    }
                   }
                 }
               ],
@@ -5060,7 +5062,9 @@
                         "prefix": "mule"
                       }
                     },
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 1
+                    }
                   }
                 }
               ],
@@ -5204,7 +5208,9 @@
                         "prefix": "mule"
                       }
                     },
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 3
+                    }
                   }
                 }
               ],
@@ -6535,7 +6541,9 @@
                     "prefix": "mule"
                   }
                 },
-                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                  "sequence": 2
+                }
               }
             }
           ],
@@ -7160,7 +7168,9 @@
                     "prefix": "mule"
                   }
                 },
-                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                  "sequence": 3
+                }
               }
             }
           ],
@@ -7364,7 +7374,9 @@
                     "prefix": "mule"
                   }
                 },
-                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                  "sequence": 1
+                }
               }
             }
           ],
@@ -7624,7 +7636,9 @@
                     "prefix": "mule"
                   }
                 },
-                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                  "sequence": 3
+                }
               }
             }
           ],

@@ -1044,7 +1044,9 @@
                         "prefix": "mule"
                       }
                     },
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 3
+                    }
                   }
                 },
                 {
@@ -1074,7 +1076,9 @@
                   "name": "disableValidation",
                   "description": "Disables connection validation",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 4
+                    }
                   }
                 },
                 {
@@ -1273,7 +1277,9 @@
                         "prefix": "mule"
                       }
                     },
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 5
+                    }
                   }
                 }
               ],
@@ -1464,7 +1470,9 @@
                         "prefix": "mule"
                       }
                     },
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 3
+                    }
                   }
                 }
               ],
@@ -1761,7 +1769,9 @@
                         "prefix": "mule"
                       }
                     },
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 1
+                    }
                   }
                 }
               ],
@@ -1905,7 +1915,9 @@
                         "prefix": "mule"
                       }
                     },
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 3
+                    }
                   }
                 }
               ],
@@ -2013,7 +2025,9 @@
                   "name": "transactionalAction",
                   "description": "The type of beginning action that sources can take regarding transactions.",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 6
+                    }
                   }
                 },
                 {
@@ -2138,7 +2152,9 @@
                         "prefix": "mule"
                       }
                     },
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 1
+                    }
                   }
                 }
               ],
@@ -2282,7 +2298,9 @@
                         "prefix": "mule"
                       }
                     },
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 3
+                    }
                   }
                 }
               ],
@@ -2584,7 +2602,9 @@
                     "prefix": "mule"
                   }
                 },
-                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                  "sequence": 2
+                }
               }
             }
           ],
@@ -2818,7 +2838,9 @@
                     "prefix": "mule"
                   }
                 },
-                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                  "sequence": 3
+                }
               }
             },
             {
@@ -2848,7 +2870,9 @@
               "name": "disableValidation",
               "description": "Disables connection validation",
               "modelProperties": {
-                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                  "sequence": 4
+                }
               }
             },
             {
@@ -3047,7 +3071,9 @@
                     "prefix": "mule"
                   }
                 },
-                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                  "sequence": 5
+                }
               }
             }
           ],
@@ -3238,7 +3264,9 @@
                     "prefix": "mule"
                   }
                 },
-                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                  "sequence": 3
+                }
               }
             }
           ],

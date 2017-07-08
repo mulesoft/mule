@@ -91,6 +91,7 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Un
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
@@ -675,28 +676,18 @@ public final class SchemaBuilder {
   }
 
   void addInfrastructureParameters(ExtensionType extensionType, ParameterizedModel model, ExplicitGroup sequence) {
-    // TODO MULE-11608 (alegmarra): remove this TLS custom handling
     model.getAllParameterModels().stream()
         .filter(p -> p.getModelProperty(InfrastructureParameterModelProperty.class).isPresent())
-        .filter(p -> !p.getName().equals(TLS_PARAMETER_NAME))
-        .forEach(parameter -> parameter.getModelProperty(QNameModelProperty.class)
-            .map(QNameModelProperty::getValue)
-            .ifPresent(qName -> sequence.getParticle()
-                .add(objectFactory.createElement(createRefElement(qName, false)))));
-
-
-    model.getAllParameterModels().stream()
-        .filter(p -> p.getModelProperty(InfrastructureParameterModelProperty.class).isPresent())
-        .filter(p -> p.getName().equals(TLS_PARAMETER_NAME))
-        .findFirst()
-        .ifPresent(p -> {
-          p.getModelProperty(QNameModelProperty.class).map(QNameModelProperty::getValue)
+        .sorted(Comparator.comparing(p -> p.getModelProperty(InfrastructureParameterModelProperty.class).get().getSequence()))
+        .forEach(parameter -> {
+          parameter.getModelProperty(QNameModelProperty.class)
+              .map(QNameModelProperty::getValue)
               .ifPresent(qName -> sequence.getParticle()
                   .add(objectFactory.createElement(createRefElement(qName, false))));
-
-          addTlsSupport(extensionType);
+          if (parameter.getName().equals(TLS_PARAMETER_NAME)) {
+            addTlsSupport(extensionType);
+          }
         });
-
   }
 
   void addInlineParameterGroup(ParameterGroupModel group, ExplicitGroup parentSequence) {

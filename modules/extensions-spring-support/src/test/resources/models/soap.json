@@ -915,7 +915,9 @@
                         "prefix": "mule"
                       }
                     },
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 3
+                    }
                   }
                 },
                 {
@@ -945,7 +947,9 @@
                   "name": "disableValidation",
                   "description": "Disables connection validation",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 4
+                    }
                   }
                 },
                 {
@@ -1144,7 +1148,9 @@
                         "prefix": "mule"
                       }
                     },
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 5
+                    }
                   }
                 }
               ],
@@ -1297,7 +1303,9 @@
                         "prefix": "mule"
                       }
                     },
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 3
+                    }
                   }
                 },
                 {
@@ -1327,7 +1335,9 @@
                   "name": "disableValidation",
                   "description": "Disables connection validation",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 4
+                    }
                   }
                 },
                 {
@@ -1526,7 +1536,9 @@
                         "prefix": "mule"
                       }
                     },
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 5
+                    }
                   }
                 }
               ],
@@ -1772,7 +1784,9 @@
                         "prefix": "mule"
                       }
                     },
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 3
+                    }
                   }
                 },
                 {
@@ -1802,7 +1816,9 @@
                   "name": "disableValidation",
                   "description": "Disables connection validation",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 4
+                    }
                   }
                 },
                 {
@@ -2001,7 +2017,9 @@
                         "prefix": "mule"
                       }
                     },
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 5
+                    }
                   }
                 }
               ],

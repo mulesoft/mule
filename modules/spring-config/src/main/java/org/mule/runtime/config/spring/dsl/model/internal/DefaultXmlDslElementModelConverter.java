@@ -218,7 +218,8 @@ public class DefaultXmlDslElementModelConverter implements XmlDslElementModelCon
 
   private void populateInfrastructureConfiguration(Element element, DslElementModel<?> elementModel) {
     elementModel.getContainedElements().stream()
-        .filter(this::isInfrastructure).forEach(e -> {
+        .filter(this::isInfrastructure)
+        .forEach(e -> {
           if (e.getContainedElements().isEmpty() && e.getValue().isPresent()) {
             element.setAttribute(e.getDsl().getAttributeName(), (String) e.getValue().get());
           } else {
