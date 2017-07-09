@@ -165,6 +165,7 @@ public interface AllureConstants {
       String NTLM = "NTLM";
       String URL_ENCODED = "URL encoded body";
       String MULTIPART = "Multipart body";
+      String HTTPS = "HTTPS";
     }
 
   }
