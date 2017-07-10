@@ -13,12 +13,11 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.extension.internal.loader.validator.PrivilegedApiValidator.NO_PRIVILEGED_ARTIFACTS_ERROR;
-import static org.mule.runtime.extension.internal.loader.validator.PrivilegedApiValidator.NO_PRIVILEGED_PACKAGES_ERROR;
+import static org.mule.runtime.module.extension.internal.loader.validation.PrivilegedApiValidator.NO_PRIVILEGED_ARTIFACTS_ERROR;
+import static org.mule.runtime.module.extension.internal.loader.validation.PrivilegedApiValidator.NO_PRIVILEGED_PACKAGES_ERROR;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.validate;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.extension.internal.loader.validator.PrivilegedApiValidator;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
