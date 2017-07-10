@@ -101,6 +101,7 @@ public class MinimalApplicationModelGenerator {
     }
     // Finally we set the requested componentModel as enabled as it could have been disabled when traversing dependencies
     requestedComponentModel.setEnabled(true);
+    requestedComponentModel.executedOnEveryInnerComponent(componentModel -> componentModel.setEnabled(true));
     return applicationModel;
   }
 
