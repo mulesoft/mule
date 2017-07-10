@@ -18,7 +18,52 @@
   "importedTypes": [],
   "configurations": [
     {
-      "parameterGroupModels": [],
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "java.lang.String"
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
+              "elementReferences": [
+                {
+                  "namespace": "Marvel",
+                  "name": "iron-man",
+                  "type": "CONFIG"
+                }
+              ],
+              "name": "ironManConfig",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
       "externalLibraryModels": [],
       "operations": [
         {
@@ -123,6 +168,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "stream",
                   "description": "",
                   "modelProperties": {}
@@ -160,6 +206,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -274,6 +321,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "values",
                   "description": "",
                   "modelProperties": {}
@@ -303,6 +351,7 @@
                     "query": false,
                     "order": 2
                   },
+                  "elementReferences": [],
                   "name": "fetchSize",
                   "description": "",
                   "modelProperties": {}
@@ -469,6 +518,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "streamingStrategy",
                   "description": "Configure if repeatable streams should be used and their behaviour",
                   "modelProperties": {
@@ -517,6 +567,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -594,6 +645,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "stream",
                   "description": "",
                   "modelProperties": {}
@@ -623,6 +675,7 @@
                     "query": false,
                     "order": 2
                   },
+                  "elementReferences": [],
                   "name": "position",
                   "description": "",
                   "modelProperties": {}
@@ -660,6 +713,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -737,6 +791,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "data",
                   "description": "",
                   "modelProperties": {}
@@ -929,6 +984,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "streamingStrategy",
                   "description": "Configure if repeatable streams should be used and their behaviour",
                   "modelProperties": {
@@ -977,6 +1033,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -996,6 +1053,83 @@
           "description": "",
           "modelProperties": {},
           "kind": "operation"
+        },
+        {
+          "blocking": true,
+          "executionType": "CPU_LITE",
+          "errors": [],
+          "output": {
+            "type": {
+              "format": "java",
+              "type": "Void"
+            },
+            "hasDynamicType": false,
+            "description": "",
+            "modelProperties": {}
+          },
+          "outputAttributes": {
+            "type": {
+              "format": "java",
+              "type": "Void"
+            },
+            "hasDynamicType": false,
+            "description": "",
+            "modelProperties": {}
+          },
+          "transactional": false,
+          "requiresConnection": false,
+          "supportsStreaming": false,
+          "stereotypes": [],
+          "parameterGroupModels": [
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 1
+                  },
+                  "elementReferences": [
+                    {
+                      "namespace": "mule",
+                      "name": "flow",
+                      "type": "FLOW"
+                    }
+                  ],
+                  "name": "flowRef",
+                  "description": "",
+                  "modelProperties": {}
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "showInDsl": false,
+              "name": "General",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "name": "withFlowReference",
+          "description": "",
+          "modelProperties": {},
+          "kind": "operation"
         }
       ],
       "connectionProviders": [
@@ -1003,6 +1137,55 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "parameterGroupModels": [
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 1
+                  },
+                  "elementReferences": [
+                    {
+                      "namespace": "Heisenberg",
+                      "name": "config",
+                      "type": "CONFIG"
+                    },
+                    {
+                      "namespace": "Marvel",
+                      "name": "iron-man",
+                      "type": "CONFIG"
+                    }
+                  ],
+                  "name": "multipleConfig",
+                  "description": "",
+                  "modelProperties": {}
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "showInDsl": false,
+              "name": "General",
+              "description": "",
+              "modelProperties": {}
+            },
             {
               "parameters": [
                 {
@@ -1127,6 +1310,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -1231,6 +1415,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "castFrequencyInMillis",
                   "description": "",
                   "modelProperties": {}
@@ -1259,6 +1444,7 @@
                     "query": false,
                     "order": 2
                   },
+                  "elementReferences": [],
                   "name": "spell",
                   "description": "",
                   "modelProperties": {}
@@ -1289,6 +1475,7 @@
                     "query": false,
                     "order": 3
                   },
+                  "elementReferences": [],
                   "name": "spellSize",
                   "description": "",
                   "modelProperties": {}
@@ -1405,6 +1592,7 @@
                     "query": false,
                     "tabName": "Redelivery"
                   },
+                  "elementReferences": [],
                   "name": "redeliveryPolicy",
                   "description": "Defines a policy for processing the redelivery of the same message",
                   "modelProperties": {
@@ -1608,6 +1796,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "streamingStrategy",
                   "description": "Configure if repeatable streams should be used and their behaviour",
                   "modelProperties": {
@@ -1754,6 +1943,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -1815,6 +2005,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "ironManConfigFile",
               "displayModel": {
                 "pathModel": {
@@ -1984,6 +2175,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "at",
                   "description": "",
                   "modelProperties": {}
@@ -2021,6 +2213,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -2073,6 +2266,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "missileConfigurationDirectory",
                   "displayModel": {
                     "pathModel": {
@@ -2215,6 +2409,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -2272,6 +2467,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "missileConfigurationDirectory",
                   "displayModel": {
                     "pathModel": {
@@ -2414,6 +2610,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -2505,6 +2702,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "instructionsFile",
               "displayModel": {
                 "pathModel": {
@@ -2551,6 +2749,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -2640,6 +2839,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "iteratorValues",
               "description": "",
               "modelProperties": {}
@@ -2677,6 +2877,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"

@@ -88,6 +88,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "request",
                   "description": "",
                   "modelProperties": {}
@@ -130,6 +131,7 @@
                     "query": false,
                     "order": 2
                   },
+                  "elementReferences": [],
                   "name": "state",
                   "description": "",
                   "modelProperties": {}
@@ -225,6 +227,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -374,6 +377,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "resourceOwnerId",
                   "description": "The id of the resource owner which access should be invalidated",
                   "modelProperties": {}
@@ -424,6 +428,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "apiVersion",
                   "description": "",
                   "modelProperties": {}
@@ -452,6 +457,7 @@
                     "query": false,
                     "order": 2
                   },
+                  "elementReferences": [],
                   "name": "display",
                   "description": "",
                   "modelProperties": {}
@@ -481,6 +487,7 @@
                     "query": false,
                     "order": 3
                   },
+                  "elementReferences": [],
                   "name": "immediate",
                   "description": "",
                   "modelProperties": {}
@@ -510,6 +517,7 @@
                     "query": false,
                     "order": 4
                   },
+                  "elementReferences": [],
                   "name": "prompt",
                   "description": "",
                   "modelProperties": {}
@@ -645,6 +653,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -687,6 +696,7 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
+                  "elementReferences": [],
                   "name": "consumerKey",
                   "description": "The OAuth consumerKey as registered with the service provider",
                   "modelProperties": {}
@@ -709,6 +719,7 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
+                  "elementReferences": [],
                   "name": "consumerSecret",
                   "description": "The OAuth consumerSecret as registered with the service provider",
                   "modelProperties": {}
@@ -732,6 +743,7 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
+                  "elementReferences": [],
                   "name": "authorizationUrl",
                   "description": "The service provider\u0027s authorization endpoint URL",
                   "modelProperties": {}
@@ -755,6 +767,7 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
+                  "elementReferences": [],
                   "name": "accessTokenUrl",
                   "description": "The service provider\u0027s accessToken endpoint URL",
                   "modelProperties": {}
@@ -778,6 +791,7 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
+                  "elementReferences": [],
                   "name": "scopes",
                   "description": "The OAuth scopes to be requested during the dance. If not provided, it will default to those in the annotation",
                   "modelProperties": {}
@@ -800,6 +814,7 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
+                  "elementReferences": [],
                   "name": "resourceOwnerId",
                   "description": "The resourceOwnerId which each component should use if it doesn\u0027t reference otherwise.",
                   "modelProperties": {}
@@ -822,6 +837,7 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
+                  "elementReferences": [],
                   "name": "before",
                   "description": "The name of a flow to be executed right before starting the OAuth dance",
                   "modelProperties": {}
@@ -844,6 +860,7 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
+                  "elementReferences": [],
                   "name": "after",
                   "description": "The name of a flow to be executed right after an accessToken has been received",
                   "modelProperties": {}
@@ -875,6 +892,7 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
+                  "elementReferences": [],
                   "name": "listenerConfig",
                   "description": "A reference to a \u003chttp:listener-config /\u003e to be used in order to create the listener that will catch the access token callback endpoint.",
                   "modelProperties": {}
@@ -897,6 +915,7 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
+                  "elementReferences": [],
                   "name": "callbackPath",
                   "description": "The path of the access token callback endpoint",
                   "modelProperties": {}
@@ -919,6 +938,7 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
+                  "elementReferences": [],
                   "name": "authorizePath",
                   "description": "The path of the local http endpoint which triggers the OAuth dance",
                   "modelProperties": {}
@@ -941,6 +961,7 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
+                  "elementReferences": [],
                   "name": "externalCallbackUrl",
                   "description": "If the callback endpoint is behind a proxy or should be accessed through a non direct URL, use this parameter to tell the OAuth provider the URL it should use to access the callback",
                   "modelProperties": {}
@@ -972,6 +993,7 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
+                  "elementReferences": [],
                   "name": "objectStore",
                   "description": "A reference to the object store that should be used to store each resource owner id\u0027s data. If not specified, runtime will automatically provision the default one.",
                   "modelProperties": {}
@@ -1032,6 +1054,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "apiVersion",
                   "description": "",
                   "modelProperties": {}
@@ -1060,6 +1083,7 @@
                     "query": false,
                     "order": 2
                   },
+                  "elementReferences": [],
                   "name": "display",
                   "description": "",
                   "modelProperties": {}
@@ -1089,6 +1113,7 @@
                     "query": false,
                     "order": 3
                   },
+                  "elementReferences": [],
                   "name": "immediate",
                   "description": "",
                   "modelProperties": {}
@@ -1118,6 +1143,7 @@
                     "query": false,
                     "order": 4
                   },
+                  "elementReferences": [],
                   "name": "prompt",
                   "description": "",
                   "modelProperties": {}
@@ -1253,6 +1279,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -1295,6 +1322,7 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
+                  "elementReferences": [],
                   "name": "consumerKey",
                   "description": "The OAuth consumerKey as registered with the service provider",
                   "modelProperties": {}
@@ -1317,6 +1345,7 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
+                  "elementReferences": [],
                   "name": "consumerSecret",
                   "description": "The OAuth consumerSecret as registered with the service provider",
                   "modelProperties": {}
@@ -1340,6 +1369,7 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
+                  "elementReferences": [],
                   "name": "authorizationUrl",
                   "description": "The service provider\u0027s authorization endpoint URL",
                   "modelProperties": {}
@@ -1363,6 +1393,7 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
+                  "elementReferences": [],
                   "name": "accessTokenUrl",
                   "description": "The service provider\u0027s accessToken endpoint URL",
                   "modelProperties": {}
@@ -1385,6 +1416,7 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
+                  "elementReferences": [],
                   "name": "scopes",
                   "description": "The OAuth scopes to be requested during the dance. If not provided, it will default to those in the annotation",
                   "modelProperties": {}
@@ -1407,6 +1439,7 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
+                  "elementReferences": [],
                   "name": "resourceOwnerId",
                   "description": "The resourceOwnerId which each component should use if it doesn\u0027t reference otherwise.",
                   "modelProperties": {}
@@ -1429,6 +1462,7 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
+                  "elementReferences": [],
                   "name": "before",
                   "description": "The name of a flow to be executed right before starting the OAuth dance",
                   "modelProperties": {}
@@ -1451,6 +1485,7 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
+                  "elementReferences": [],
                   "name": "after",
                   "description": "The name of a flow to be executed right after an accessToken has been received",
                   "modelProperties": {}
@@ -1482,6 +1517,7 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
+                  "elementReferences": [],
                   "name": "listenerConfig",
                   "description": "A reference to a \u003chttp:listener-config /\u003e to be used in order to create the listener that will catch the access token callback endpoint.",
                   "modelProperties": {}
@@ -1504,6 +1540,7 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
+                  "elementReferences": [],
                   "name": "callbackPath",
                   "description": "The path of the access token callback endpoint",
                   "modelProperties": {}
@@ -1526,6 +1563,7 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
+                  "elementReferences": [],
                   "name": "authorizePath",
                   "description": "The path of the local http endpoint which triggers the OAuth dance",
                   "modelProperties": {}
@@ -1548,6 +1586,7 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
+                  "elementReferences": [],
                   "name": "externalCallbackUrl",
                   "description": "If the callback endpoint is behind a proxy or should be accessed through a non direct URL, use this parameter to tell the OAuth provider the URL it should use to access the callback",
                   "modelProperties": {}
@@ -1579,6 +1618,7 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
+                  "elementReferences": [],
                   "name": "objectStore",
                   "description": "A reference to the object store that should be used to store each resource owner id\u0027s data. If not specified, runtime will automatically provision the default one.",
                   "modelProperties": {}
@@ -1647,6 +1687,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "apiVersion",
               "description": "",
               "modelProperties": {}
@@ -1675,6 +1716,7 @@
                 "query": false,
                 "order": 2
               },
+              "elementReferences": [],
               "name": "display",
               "description": "",
               "modelProperties": {}
@@ -1704,6 +1746,7 @@
                 "query": false,
                 "order": 3
               },
+              "elementReferences": [],
               "name": "immediate",
               "description": "",
               "modelProperties": {}
@@ -1733,6 +1776,7 @@
                 "query": false,
                 "order": 4
               },
+              "elementReferences": [],
               "name": "prompt",
               "description": "",
               "modelProperties": {}
@@ -1868,6 +1912,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "reconnectionStrategy",
               "description": "A retry strategy in case of connectivity errors",
               "modelProperties": {
@@ -1910,6 +1955,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
+              "elementReferences": [],
               "name": "consumerKey",
               "description": "The OAuth consumerKey as registered with the service provider",
               "modelProperties": {}
@@ -1932,6 +1978,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
+              "elementReferences": [],
               "name": "consumerSecret",
               "description": "The OAuth consumerSecret as registered with the service provider",
               "modelProperties": {}
@@ -1955,6 +2002,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
+              "elementReferences": [],
               "name": "authorizationUrl",
               "description": "The service provider\u0027s authorization endpoint URL",
               "modelProperties": {}
@@ -1978,6 +2026,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
+              "elementReferences": [],
               "name": "accessTokenUrl",
               "description": "The service provider\u0027s accessToken endpoint URL",
               "modelProperties": {}
@@ -2001,6 +2050,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
+              "elementReferences": [],
               "name": "scopes",
               "description": "The OAuth scopes to be requested during the dance. If not provided, it will default to those in the annotation",
               "modelProperties": {}
@@ -2023,6 +2073,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
+              "elementReferences": [],
               "name": "resourceOwnerId",
               "description": "The resourceOwnerId which each component should use if it doesn\u0027t reference otherwise.",
               "modelProperties": {}
@@ -2045,6 +2096,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
+              "elementReferences": [],
               "name": "before",
               "description": "The name of a flow to be executed right before starting the OAuth dance",
               "modelProperties": {}
@@ -2067,6 +2119,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
+              "elementReferences": [],
               "name": "after",
               "description": "The name of a flow to be executed right after an accessToken has been received",
               "modelProperties": {}
@@ -2098,6 +2151,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
+              "elementReferences": [],
               "name": "listenerConfig",
               "description": "A reference to a \u003chttp:listener-config /\u003e to be used in order to create the listener that will catch the access token callback endpoint.",
               "modelProperties": {}
@@ -2120,6 +2174,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
+              "elementReferences": [],
               "name": "callbackPath",
               "description": "The path of the access token callback endpoint",
               "modelProperties": {}
@@ -2142,6 +2197,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
+              "elementReferences": [],
               "name": "authorizePath",
               "description": "The path of the local http endpoint which triggers the OAuth dance",
               "modelProperties": {}
@@ -2164,6 +2220,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
+              "elementReferences": [],
               "name": "externalCallbackUrl",
               "description": "If the callback endpoint is behind a proxy or should be accessed through a non direct URL, use this parameter to tell the OAuth provider the URL it should use to access the callback",
               "modelProperties": {}
@@ -2195,6 +2252,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
+              "elementReferences": [],
               "name": "objectStore",
               "description": "A reference to the object store that should be used to store each resource owner id\u0027s data. If not specified, runtime will automatically provision the default one.",
               "modelProperties": {}
@@ -2255,6 +2313,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "apiVersion",
               "description": "",
               "modelProperties": {}
@@ -2283,6 +2342,7 @@
                 "query": false,
                 "order": 2
               },
+              "elementReferences": [],
               "name": "display",
               "description": "",
               "modelProperties": {}
@@ -2312,6 +2372,7 @@
                 "query": false,
                 "order": 3
               },
+              "elementReferences": [],
               "name": "immediate",
               "description": "",
               "modelProperties": {}
@@ -2341,6 +2402,7 @@
                 "query": false,
                 "order": 4
               },
+              "elementReferences": [],
               "name": "prompt",
               "description": "",
               "modelProperties": {}
@@ -2476,6 +2538,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "reconnectionStrategy",
               "description": "A retry strategy in case of connectivity errors",
               "modelProperties": {
@@ -2518,6 +2581,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
+              "elementReferences": [],
               "name": "consumerKey",
               "description": "The OAuth consumerKey as registered with the service provider",
               "modelProperties": {}
@@ -2540,6 +2604,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
+              "elementReferences": [],
               "name": "consumerSecret",
               "description": "The OAuth consumerSecret as registered with the service provider",
               "modelProperties": {}
@@ -2563,6 +2628,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
+              "elementReferences": [],
               "name": "authorizationUrl",
               "description": "The service provider\u0027s authorization endpoint URL",
               "modelProperties": {}
@@ -2586,6 +2652,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
+              "elementReferences": [],
               "name": "accessTokenUrl",
               "description": "The service provider\u0027s accessToken endpoint URL",
               "modelProperties": {}
@@ -2608,6 +2675,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
+              "elementReferences": [],
               "name": "scopes",
               "description": "The OAuth scopes to be requested during the dance. If not provided, it will default to those in the annotation",
               "modelProperties": {}
@@ -2630,6 +2698,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
+              "elementReferences": [],
               "name": "resourceOwnerId",
               "description": "The resourceOwnerId which each component should use if it doesn\u0027t reference otherwise.",
               "modelProperties": {}
@@ -2652,6 +2721,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
+              "elementReferences": [],
               "name": "before",
               "description": "The name of a flow to be executed right before starting the OAuth dance",
               "modelProperties": {}
@@ -2674,6 +2744,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
+              "elementReferences": [],
               "name": "after",
               "description": "The name of a flow to be executed right after an accessToken has been received",
               "modelProperties": {}
@@ -2705,6 +2776,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
+              "elementReferences": [],
               "name": "listenerConfig",
               "description": "A reference to a \u003chttp:listener-config /\u003e to be used in order to create the listener that will catch the access token callback endpoint.",
               "modelProperties": {}
@@ -2727,6 +2799,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
+              "elementReferences": [],
               "name": "callbackPath",
               "description": "The path of the access token callback endpoint",
               "modelProperties": {}
@@ -2749,6 +2822,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
+              "elementReferences": [],
               "name": "authorizePath",
               "description": "The path of the local http endpoint which triggers the OAuth dance",
               "modelProperties": {}
@@ -2771,6 +2845,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
+              "elementReferences": [],
               "name": "externalCallbackUrl",
               "description": "If the callback endpoint is behind a proxy or should be accessed through a non direct URL, use this parameter to tell the OAuth provider the URL it should use to access the callback",
               "modelProperties": {}
@@ -2802,6 +2877,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
+              "elementReferences": [],
               "name": "objectStore",
               "description": "A reference to the object store that should be used to store each resource owner id\u0027s data. If not specified, runtime will automatically provision the default one.",
               "modelProperties": {}

@@ -6,6 +6,8 @@
  */
 package org.mule.test.marvel;
 
+import static org.mule.test.marvel.MarvelExtension.MARVEL_EXTENSION;
+
 import org.mule.runtime.extension.api.annotation.Configurations;
 import org.mule.runtime.extension.api.annotation.Export;
 import org.mule.runtime.extension.api.annotation.Extension;
@@ -14,10 +16,11 @@ import org.mule.test.marvel.drstrange.DrStrange;
 import org.mule.test.marvel.drstrange.DrStrangeErrorTypeDefinition;
 import org.mule.test.marvel.ironman.IronMan;
 
-@Extension(name = "Marvel")
+@Extension(name = MARVEL_EXTENSION)
 @Configurations({IronMan.class, DrStrange.class})
 @ErrorTypes(DrStrangeErrorTypeDefinition.class)
 @Export(classes = org.mule.test.marvel.ironman.IronMan.class)
 public class MarvelExtension {
 
+  public static final String MARVEL_EXTENSION = "Marvel";
 }

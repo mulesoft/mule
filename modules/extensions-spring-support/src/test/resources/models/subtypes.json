@@ -340,6 +340,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "abstractShape",
               "description": "",
               "modelProperties": {}
@@ -365,6 +366,7 @@
                 "query": false,
                 "order": 2
               },
+              "elementReferences": [],
               "name": "doorInterface",
               "description": "",
               "modelProperties": {}
@@ -390,6 +392,7 @@
                 "query": false,
                 "order": 3
               },
+              "elementReferences": [],
               "name": "explicitSquare",
               "description": "",
               "modelProperties": {}
@@ -415,6 +418,7 @@
                 "query": false,
                 "order": 4
               },
+              "elementReferences": [],
               "name": "finalPojo",
               "description": "",
               "modelProperties": {}
@@ -440,6 +444,7 @@
                 "query": false,
                 "order": 5
               },
+              "elementReferences": [],
               "name": "ricin",
               "description": "",
               "modelProperties": {}
@@ -465,6 +470,7 @@
                 "query": false,
                 "order": 6
               },
+              "elementReferences": [],
               "name": "extensibleWeapon",
               "description": "",
               "modelProperties": {}
@@ -490,6 +496,7 @@
                 "query": false,
                 "order": 7
               },
+              "elementReferences": [],
               "name": "triangle",
               "description": "",
               "modelProperties": {}
@@ -515,6 +522,7 @@
                 "query": false,
                 "order": 8
               },
+              "elementReferences": [],
               "name": "pojoWithExtension",
               "description": "",
               "modelProperties": {}
@@ -546,6 +554,7 @@
                 "query": false,
                 "order": 9
               },
+              "elementReferences": [],
               "name": "onePojos",
               "description": "",
               "modelProperties": {}
@@ -577,6 +586,7 @@
                 "query": false,
                 "order": 10
               },
+              "elementReferences": [],
               "name": "twoPojos",
               "description": "",
               "modelProperties": {}
@@ -608,6 +618,7 @@
                 "query": false,
                 "order": 11
               },
+              "elementReferences": [],
               "name": "weapons",
               "description": "",
               "modelProperties": {}
@@ -653,6 +664,7 @@
                 "query": false,
                 "order": 12
               },
+              "elementReferences": [],
               "name": "weaponMap",
               "description": "",
               "modelProperties": {}
@@ -720,6 +732,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -818,6 +831,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -867,6 +881,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "abstractShape",
                   "description": "",
                   "modelProperties": {}
@@ -892,6 +907,7 @@
                     "query": false,
                     "order": 2
                   },
+                  "elementReferences": [],
                   "name": "doorInterface",
                   "description": "",
                   "modelProperties": {}
@@ -923,6 +939,7 @@
                     "query": false,
                     "order": 3
                   },
+                  "elementReferences": [],
                   "name": "doors",
                   "description": "",
                   "modelProperties": {}
@@ -1058,6 +1075,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -1143,6 +1161,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "door",
               "description": "",
               "modelProperties": {}
@@ -1180,6 +1199,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -1250,6 +1270,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "noGlobalPojo",
               "description": "",
               "modelProperties": {}
@@ -1287,6 +1308,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -1397,6 +1419,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "door",
               "description": "",
               "modelProperties": {}
@@ -1442,6 +1465,7 @@
                 "query": false,
                 "order": 2
               },
+              "elementReferences": [],
               "name": "doorRegistry",
               "description": "",
               "modelProperties": {}
@@ -1479,6 +1503,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -1549,6 +1574,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "shape",
               "description": "",
               "modelProperties": {}
@@ -1586,6 +1612,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -1679,6 +1706,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "baseShape",
               "description": "",
               "modelProperties": {}
@@ -1704,6 +1732,7 @@
                 "query": false,
                 "order": 2
               },
+              "elementReferences": [],
               "name": "door",
               "description": "",
               "modelProperties": {}
@@ -1729,6 +1758,7 @@
                 "query": false,
                 "order": 3
               },
+              "elementReferences": [],
               "name": "finalPojo",
               "description": "",
               "modelProperties": {}
@@ -1754,6 +1784,7 @@
                 "query": false,
                 "order": 4
               },
+              "elementReferences": [],
               "name": "cookBook",
               "description": "",
               "modelProperties": {}
@@ -1779,6 +1810,7 @@
                 "query": false,
                 "order": 5
               },
+              "elementReferences": [],
               "name": "squareShape",
               "description": "",
               "modelProperties": {}
@@ -1804,6 +1836,7 @@
                 "query": false,
                 "order": 6
               },
+              "elementReferences": [],
               "name": "triangle",
               "description": "",
               "modelProperties": {}
@@ -1829,6 +1862,7 @@
                 "query": false,
                 "order": 7
               },
+              "elementReferences": [],
               "name": "noRef",
               "description": "",
               "modelProperties": {}
@@ -1866,6 +1900,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -1915,6 +1950,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "abstractShape",
               "description": "",
               "modelProperties": {}
@@ -1940,6 +1976,7 @@
                 "query": false,
                 "order": 2
               },
+              "elementReferences": [],
               "name": "doorInterface",
               "description": "",
               "modelProperties": {}
@@ -1971,6 +2008,7 @@
                 "query": false,
                 "order": 3
               },
+              "elementReferences": [],
               "name": "doors",
               "description": "",
               "modelProperties": {}
@@ -2106,6 +2144,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "reconnectionStrategy",
               "description": "A retry strategy in case of connectivity errors",
               "modelProperties": {
@@ -2187,6 +2226,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "doorParam",
               "description": "",
               "modelProperties": {}
@@ -2303,6 +2343,7 @@
                 "query": false,
                 "tabName": "Redelivery"
               },
+              "elementReferences": [],
               "name": "redeliveryPolicy",
               "description": "Defines a policy for processing the redelivery of the same message",
               "modelProperties": {
@@ -2449,6 +2490,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "reconnectionStrategy",
               "description": "A retry strategy in case of connectivity errors",
               "modelProperties": {

@@ -85,6 +85,7 @@
                 "query": false,
                 "order": 8
               },
+              "elementReferences": [],
               "name": "familyInformations",
               "description": "",
               "modelProperties": {}
@@ -119,6 +120,7 @@
                 "query": false,
                 "order": 9
               },
+              "elementReferences": [],
               "name": "enemies",
               "description": "",
               "modelProperties": {}
@@ -153,6 +155,7 @@
                 "query": false,
                 "order": 10
               },
+              "elementReferences": [],
               "name": "monthlyIncomes",
               "description": "",
               "modelProperties": {}
@@ -182,6 +185,7 @@
                 "query": false,
                 "order": 11
               },
+              "elementReferences": [],
               "name": "cancer",
               "description": "",
               "modelProperties": {}
@@ -230,6 +234,7 @@
                 "query": false,
                 "order": 12
               },
+              "elementReferences": [],
               "name": "recipe",
               "description": "",
               "modelProperties": {}
@@ -284,6 +289,7 @@
                 "query": false,
                 "order": 13
               },
+              "elementReferences": [],
               "name": "deathsBySeasons",
               "description": "",
               "modelProperties": {}
@@ -312,6 +318,7 @@
                 "query": false,
                 "order": 14
               },
+              "elementReferences": [],
               "name": "money",
               "description": "",
               "modelProperties": {}
@@ -337,6 +344,7 @@
                 "query": false,
                 "order": 15
               },
+              "elementReferences": [],
               "name": "weapon",
               "description": "",
               "modelProperties": {}
@@ -368,6 +376,7 @@
                 "query": false,
                 "order": 16
               },
+              "elementReferences": [],
               "name": "wildCardWeapons",
               "description": "",
               "modelProperties": {}
@@ -416,6 +425,7 @@
                 "query": false,
                 "order": 17
               },
+              "elementReferences": [],
               "name": "wildCards",
               "description": "",
               "modelProperties": {}
@@ -461,6 +471,7 @@
                 "query": false,
                 "order": 18
               },
+              "elementReferences": [],
               "name": "weaponValueMap",
               "displayModel": {
                 "displayName": "Parameter Custom Display Name"
@@ -509,6 +520,7 @@
                 "query": false,
                 "order": 19
               },
+              "elementReferences": [],
               "name": "candidateDoors",
               "description": "",
               "modelProperties": {}
@@ -546,6 +558,7 @@
                 "query": false,
                 "order": 20
               },
+              "elementReferences": [],
               "name": "initialHealth",
               "description": "",
               "modelProperties": {}
@@ -582,6 +595,7 @@
                 "query": false,
                 "order": 21
               },
+              "elementReferences": [],
               "name": "finalHealth",
               "description": "",
               "modelProperties": {}
@@ -610,6 +624,7 @@
                 "query": false,
                 "order": 22
               },
+              "elementReferences": [],
               "name": "labAddress",
               "displayModel": {
                 "example": "308 Negra Arroyo Lane, Albuquerque, New Mexico, 87104"
@@ -641,6 +656,7 @@
                 "query": false,
                 "order": 23
               },
+              "elementReferences": [],
               "name": "firstEndevour",
               "description": "",
               "modelProperties": {}
@@ -683,6 +699,7 @@
                 "query": false,
                 "order": 24
               },
+              "elementReferences": [],
               "name": "healthProgressions",
               "description": "",
               "modelProperties": {}
@@ -738,6 +755,7 @@
                 "order": 1,
                 "tabName": "General"
               },
+              "elementReferences": [],
               "name": "labeledRicin",
               "description": "",
               "modelProperties": {}
@@ -763,6 +781,7 @@
                 "query": false,
                 "order": 25
               },
+              "elementReferences": [],
               "name": "nextDoor",
               "description": "",
               "modelProperties": {}
@@ -795,6 +814,7 @@
                 "order": 2,
                 "tabName": "General"
               },
+              "elementReferences": [],
               "name": "ricinPacks",
               "displayModel": {
                 "summary": "A set of ricin packs"
@@ -842,6 +862,7 @@
                 "order": 1,
                 "tabName": "General"
               },
+              "elementReferences": [],
               "name": "myName",
               "description": "",
               "modelProperties": {}
@@ -872,6 +893,7 @@
                 "order": 2,
                 "tabName": "General"
               },
+              "elementReferences": [],
               "name": "age",
               "description": "",
               "modelProperties": {}
@@ -901,6 +923,7 @@
                 "order": 3,
                 "tabName": "General"
               },
+              "elementReferences": [],
               "name": "dateOfConception",
               "description": "",
               "modelProperties": {}
@@ -930,6 +953,7 @@
                 "order": 4,
                 "tabName": "General"
               },
+              "elementReferences": [],
               "name": "dateOfBirth",
               "description": "",
               "modelProperties": {}
@@ -959,6 +983,7 @@
                 "order": 5,
                 "tabName": "General"
               },
+              "elementReferences": [],
               "name": "dateOfDeath",
               "displayModel": {
                 "displayName": "Date of decease"
@@ -991,6 +1016,7 @@
                 "order": 6,
                 "tabName": "General"
               },
+              "elementReferences": [],
               "name": "dateOfGraduation",
               "description": "",
               "modelProperties": {}
@@ -1026,6 +1052,7 @@
                 "order": 7,
                 "tabName": "General"
               },
+              "elementReferences": [],
               "name": "knownAddresses",
               "description": "",
               "modelProperties": {}
@@ -1069,6 +1096,7 @@
                 "query": false,
                 "order": 26
               },
+              "elementReferences": [],
               "name": "fullyBald",
               "description": "",
               "modelProperties": {}
@@ -1105,6 +1133,7 @@
                 "query": false,
                 "order": 27
               },
+              "elementReferences": [],
               "name": "beardTrimming",
               "description": "",
               "modelProperties": {}
@@ -1148,6 +1177,7 @@
                 "query": false,
                 "order": 28
               },
+              "elementReferences": [],
               "name": "worksAtDEA",
               "description": "",
               "modelProperties": {}
@@ -1177,6 +1207,7 @@
                 "query": false,
                 "order": 29
               },
+              "elementReferences": [],
               "name": "lovesMinerals",
               "description": "",
               "modelProperties": {}
@@ -1285,6 +1316,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -1422,6 +1454,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -1495,6 +1528,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -1573,6 +1607,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "index",
                   "description": "",
                   "modelProperties": {}
@@ -1602,6 +1637,7 @@
                     "order": 2,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
                   "modelProperties": {}
@@ -1631,6 +1667,7 @@
                     "order": 3,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "outputEncoding",
                   "description": "The encoding of the payload that this operation outputs.",
                   "modelProperties": {}
@@ -1668,6 +1705,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -1769,6 +1807,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -1846,6 +1885,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "amount",
                   "description": "",
                   "modelProperties": {}
@@ -1883,6 +1923,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -1960,6 +2001,7 @@
                     "order": 1,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
                   "modelProperties": {}
@@ -1989,6 +2031,7 @@
                     "order": 2,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "outputEncoding",
                   "description": "The encoding of the payload that this operation outputs.",
                   "modelProperties": {}
@@ -2181,6 +2224,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "streamingStrategy",
                   "description": "Configure if repeatable streams should be used and their behaviour",
                   "modelProperties": {
@@ -2229,6 +2273,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -2290,6 +2335,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "saulPhoneNumber",
                   "description": "",
                   "modelProperties": {}
@@ -2641,6 +2687,7 @@
                     "query": false,
                     "order": 2
                   },
+                  "elementReferences": [],
                   "name": "tlsContext",
                   "description": "",
                   "modelProperties": {
@@ -2787,6 +2834,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -2847,6 +2895,7 @@
                       "query": false,
                       "order": 10
                     },
+                    "elementReferences": [],
                     "name": "payment",
                     "description": "",
                     "modelProperties": {}
@@ -2875,6 +2924,7 @@
                       "query": false,
                       "order": 11
                     },
+                    "elementReferences": [],
                     "name": "sameNameParameter",
                     "description": "",
                     "modelProperties": {}
@@ -2904,6 +2954,7 @@
                       "query": false,
                       "order": 12
                     },
+                    "elementReferences": [],
                     "name": "fail",
                     "description": "",
                     "modelProperties": {}
@@ -2959,6 +3010,7 @@
                       "order": 1,
                       "tabName": "General"
                     },
+                    "elementReferences": [],
                     "name": "labeledRicin",
                     "description": "",
                     "modelProperties": {}
@@ -2984,6 +3036,7 @@
                       "query": false,
                       "order": 13
                     },
+                    "elementReferences": [],
                     "name": "nextDoor",
                     "description": "",
                     "modelProperties": {}
@@ -3016,6 +3069,7 @@
                       "order": 2,
                       "tabName": "General"
                     },
+                    "elementReferences": [],
                     "name": "ricinPacks",
                     "displayModel": {
                       "summary": "A set of ricin packs"
@@ -3063,6 +3117,7 @@
                       "order": 1,
                       "tabName": "General"
                     },
+                    "elementReferences": [],
                     "name": "myName",
                     "description": "",
                     "modelProperties": {}
@@ -3093,6 +3148,7 @@
                       "order": 2,
                       "tabName": "General"
                     },
+                    "elementReferences": [],
                     "name": "age",
                     "description": "",
                     "modelProperties": {}
@@ -3122,6 +3178,7 @@
                       "order": 3,
                       "tabName": "General"
                     },
+                    "elementReferences": [],
                     "name": "dateOfConception",
                     "description": "",
                     "modelProperties": {}
@@ -3151,6 +3208,7 @@
                       "order": 4,
                       "tabName": "General"
                     },
+                    "elementReferences": [],
                     "name": "dateOfBirth",
                     "description": "",
                     "modelProperties": {}
@@ -3180,6 +3238,7 @@
                       "order": 5,
                       "tabName": "General"
                     },
+                    "elementReferences": [],
                     "name": "dateOfDeath",
                     "displayModel": {
                       "displayName": "Date of decease"
@@ -3212,6 +3271,7 @@
                       "order": 6,
                       "tabName": "General"
                     },
+                    "elementReferences": [],
                     "name": "dateOfGraduation",
                     "description": "",
                     "modelProperties": {}
@@ -3247,6 +3307,7 @@
                       "order": 7,
                       "tabName": "General"
                     },
+                    "elementReferences": [],
                     "name": "knownAddresses",
                     "description": "",
                     "modelProperties": {}
@@ -3296,6 +3357,7 @@
                       "query": false,
                       "order": 14
                     },
+                    "elementReferences": [],
                     "name": "sameNameParameter",
                     "description": "",
                     "modelProperties": {}
@@ -3321,6 +3383,7 @@
                       "query": false,
                       "order": 15
                     },
+                    "elementReferences": [],
                     "name": "methylamine",
                     "description": "",
                     "modelProperties": {}
@@ -3350,6 +3413,7 @@
                       "query": false,
                       "order": 16
                     },
+                    "elementReferences": [],
                     "name": "propagateError",
                     "description": "",
                     "modelProperties": {}
@@ -3405,6 +3469,7 @@
                       "order": 1,
                       "tabName": "General"
                     },
+                    "elementReferences": [],
                     "name": "labeledRicin",
                     "description": "",
                     "modelProperties": {}
@@ -3430,6 +3495,7 @@
                       "query": false,
                       "order": 17
                     },
+                    "elementReferences": [],
                     "name": "nextDoor",
                     "description": "",
                     "modelProperties": {}
@@ -3462,6 +3528,7 @@
                       "order": 2,
                       "tabName": "General"
                     },
+                    "elementReferences": [],
                     "name": "ricinPacks",
                     "displayModel": {
                       "summary": "A set of ricin packs"
@@ -3509,6 +3576,7 @@
                       "order": 1,
                       "tabName": "General"
                     },
+                    "elementReferences": [],
                     "name": "myName",
                     "description": "",
                     "modelProperties": {}
@@ -3539,6 +3607,7 @@
                       "order": 2,
                       "tabName": "General"
                     },
+                    "elementReferences": [],
                     "name": "age",
                     "description": "",
                     "modelProperties": {}
@@ -3568,6 +3637,7 @@
                       "order": 3,
                       "tabName": "General"
                     },
+                    "elementReferences": [],
                     "name": "dateOfConception",
                     "description": "",
                     "modelProperties": {}
@@ -3597,6 +3667,7 @@
                       "order": 4,
                       "tabName": "General"
                     },
+                    "elementReferences": [],
                     "name": "dateOfBirth",
                     "description": "",
                     "modelProperties": {}
@@ -3626,6 +3697,7 @@
                       "order": 5,
                       "tabName": "General"
                     },
+                    "elementReferences": [],
                     "name": "dateOfDeath",
                     "displayModel": {
                       "displayName": "Date of decease"
@@ -3658,6 +3730,7 @@
                       "order": 6,
                       "tabName": "General"
                     },
+                    "elementReferences": [],
                     "name": "dateOfGraduation",
                     "description": "",
                     "modelProperties": {}
@@ -3693,6 +3766,7 @@
                       "order": 7,
                       "tabName": "General"
                     },
+                    "elementReferences": [],
                     "name": "knownAddresses",
                     "description": "",
                     "modelProperties": {}
@@ -3850,6 +3924,7 @@
                     "query": false,
                     "order": 8
                   },
+                  "elementReferences": [],
                   "name": "initialBatchNumber",
                   "description": "",
                   "modelProperties": {}
@@ -3880,6 +3955,7 @@
                     "query": false,
                     "order": 9
                   },
+                  "elementReferences": [],
                   "name": "corePoolSize",
                   "description": "",
                   "modelProperties": {}
@@ -3996,6 +4072,7 @@
                     "query": false,
                     "tabName": "Redelivery"
                   },
+                  "elementReferences": [],
                   "name": "redeliveryPolicy",
                   "description": "Defines a policy for processing the redelivery of the same message",
                   "modelProperties": {
@@ -4199,6 +4276,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "streamingStrategy",
                   "description": "Configure if repeatable streams should be used and their behaviour",
                   "modelProperties": {
@@ -4345,6 +4423,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -4404,6 +4483,7 @@
                       "query": false,
                       "order": 10
                     },
+                    "elementReferences": [],
                     "name": "payment",
                     "description": "",
                     "modelProperties": {}
@@ -4432,6 +4512,7 @@
                       "query": false,
                       "order": 11
                     },
+                    "elementReferences": [],
                     "name": "sameNameParameter",
                     "description": "",
                     "modelProperties": {}
@@ -4461,6 +4542,7 @@
                       "query": false,
                       "order": 12
                     },
+                    "elementReferences": [],
                     "name": "fail",
                     "description": "",
                     "modelProperties": {}
@@ -4516,6 +4598,7 @@
                       "order": 1,
                       "tabName": "General"
                     },
+                    "elementReferences": [],
                     "name": "labeledRicin",
                     "description": "",
                     "modelProperties": {}
@@ -4541,6 +4624,7 @@
                       "query": false,
                       "order": 13
                     },
+                    "elementReferences": [],
                     "name": "nextDoor",
                     "description": "",
                     "modelProperties": {}
@@ -4573,6 +4657,7 @@
                       "order": 2,
                       "tabName": "General"
                     },
+                    "elementReferences": [],
                     "name": "ricinPacks",
                     "displayModel": {
                       "summary": "A set of ricin packs"
@@ -4620,6 +4705,7 @@
                       "order": 1,
                       "tabName": "General"
                     },
+                    "elementReferences": [],
                     "name": "myName",
                     "description": "",
                     "modelProperties": {}
@@ -4650,6 +4736,7 @@
                       "order": 2,
                       "tabName": "General"
                     },
+                    "elementReferences": [],
                     "name": "age",
                     "description": "",
                     "modelProperties": {}
@@ -4679,6 +4766,7 @@
                       "order": 3,
                       "tabName": "General"
                     },
+                    "elementReferences": [],
                     "name": "dateOfConception",
                     "description": "",
                     "modelProperties": {}
@@ -4708,6 +4796,7 @@
                       "order": 4,
                       "tabName": "General"
                     },
+                    "elementReferences": [],
                     "name": "dateOfBirth",
                     "description": "",
                     "modelProperties": {}
@@ -4737,6 +4826,7 @@
                       "order": 5,
                       "tabName": "General"
                     },
+                    "elementReferences": [],
                     "name": "dateOfDeath",
                     "displayModel": {
                       "displayName": "Date of decease"
@@ -4769,6 +4859,7 @@
                       "order": 6,
                       "tabName": "General"
                     },
+                    "elementReferences": [],
                     "name": "dateOfGraduation",
                     "description": "",
                     "modelProperties": {}
@@ -4804,6 +4895,7 @@
                       "order": 7,
                       "tabName": "General"
                     },
+                    "elementReferences": [],
                     "name": "knownAddresses",
                     "description": "",
                     "modelProperties": {}
@@ -4853,6 +4945,7 @@
                       "query": false,
                       "order": 14
                     },
+                    "elementReferences": [],
                     "name": "sameNameParameter",
                     "description": "",
                     "modelProperties": {}
@@ -4878,6 +4971,7 @@
                       "query": false,
                       "order": 15
                     },
+                    "elementReferences": [],
                     "name": "methylamine",
                     "description": "",
                     "modelProperties": {}
@@ -4907,6 +5001,7 @@
                       "query": false,
                       "order": 16
                     },
+                    "elementReferences": [],
                     "name": "propagateError",
                     "description": "",
                     "modelProperties": {}
@@ -4962,6 +5057,7 @@
                       "order": 1,
                       "tabName": "General"
                     },
+                    "elementReferences": [],
                     "name": "labeledRicin",
                     "description": "",
                     "modelProperties": {}
@@ -4987,6 +5083,7 @@
                       "query": false,
                       "order": 17
                     },
+                    "elementReferences": [],
                     "name": "nextDoor",
                     "description": "",
                     "modelProperties": {}
@@ -5019,6 +5116,7 @@
                       "order": 2,
                       "tabName": "General"
                     },
+                    "elementReferences": [],
                     "name": "ricinPacks",
                     "displayModel": {
                       "summary": "A set of ricin packs"
@@ -5066,6 +5164,7 @@
                       "order": 1,
                       "tabName": "General"
                     },
+                    "elementReferences": [],
                     "name": "myName",
                     "description": "",
                     "modelProperties": {}
@@ -5096,6 +5195,7 @@
                       "order": 2,
                       "tabName": "General"
                     },
+                    "elementReferences": [],
                     "name": "age",
                     "description": "",
                     "modelProperties": {}
@@ -5125,6 +5225,7 @@
                       "order": 3,
                       "tabName": "General"
                     },
+                    "elementReferences": [],
                     "name": "dateOfConception",
                     "description": "",
                     "modelProperties": {}
@@ -5154,6 +5255,7 @@
                       "order": 4,
                       "tabName": "General"
                     },
+                    "elementReferences": [],
                     "name": "dateOfBirth",
                     "description": "",
                     "modelProperties": {}
@@ -5183,6 +5285,7 @@
                       "order": 5,
                       "tabName": "General"
                     },
+                    "elementReferences": [],
                     "name": "dateOfDeath",
                     "displayModel": {
                       "displayName": "Date of decease"
@@ -5215,6 +5318,7 @@
                       "order": 6,
                       "tabName": "General"
                     },
+                    "elementReferences": [],
                     "name": "dateOfGraduation",
                     "description": "",
                     "modelProperties": {}
@@ -5250,6 +5354,7 @@
                       "order": 7,
                       "tabName": "General"
                     },
+                    "elementReferences": [],
                     "name": "knownAddresses",
                     "description": "",
                     "modelProperties": {}
@@ -5407,6 +5512,7 @@
                     "query": false,
                     "order": 8
                   },
+                  "elementReferences": [],
                   "name": "initialBatchNumber",
                   "description": "",
                   "modelProperties": {}
@@ -5437,6 +5543,7 @@
                     "query": false,
                     "order": 9
                   },
+                  "elementReferences": [],
                   "name": "corePoolSize",
                   "description": "",
                   "modelProperties": {}
@@ -5553,6 +5660,7 @@
                     "query": false,
                     "tabName": "Redelivery"
                   },
+                  "elementReferences": [],
                   "name": "redeliveryPolicy",
                   "description": "Defines a policy for processing the redelivery of the same message",
                   "modelProperties": {
@@ -5756,6 +5864,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "streamingStrategy",
                   "description": "Configure if repeatable streams should be used and their behaviour",
                   "modelProperties": {
@@ -5902,6 +6011,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -5993,6 +6103,7 @@
                 "query": false,
                 "order": 8
               },
+              "elementReferences": [],
               "name": "greeting",
               "displayModel": {
                 "example": "Hello my friend!"
@@ -6035,6 +6146,7 @@
                 "order": 1,
                 "tabName": "General"
               },
+              "elementReferences": [],
               "name": "myName",
               "description": "",
               "modelProperties": {}
@@ -6065,6 +6177,7 @@
                 "order": 2,
                 "tabName": "General"
               },
+              "elementReferences": [],
               "name": "age",
               "description": "",
               "modelProperties": {}
@@ -6094,6 +6207,7 @@
                 "order": 3,
                 "tabName": "General"
               },
+              "elementReferences": [],
               "name": "dateOfConception",
               "description": "",
               "modelProperties": {}
@@ -6123,6 +6237,7 @@
                 "order": 4,
                 "tabName": "General"
               },
+              "elementReferences": [],
               "name": "dateOfBirth",
               "description": "",
               "modelProperties": {}
@@ -6152,6 +6267,7 @@
                 "order": 5,
                 "tabName": "General"
               },
+              "elementReferences": [],
               "name": "dateOfDeath",
               "displayModel": {
                 "displayName": "Date of decease"
@@ -6184,6 +6300,7 @@
                 "order": 6,
                 "tabName": "General"
               },
+              "elementReferences": [],
               "name": "dateOfGraduation",
               "description": "",
               "modelProperties": {}
@@ -6219,6 +6336,7 @@
                 "order": 7,
                 "tabName": "General"
               },
+              "elementReferences": [],
               "name": "knownAddresses",
               "description": "",
               "modelProperties": {}
@@ -6261,6 +6379,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -6331,6 +6450,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "investment",
               "description": "",
               "modelProperties": {}
@@ -6356,6 +6476,7 @@
                 "query": false,
                 "order": 2
               },
+              "elementReferences": [],
               "name": "recursivePojo",
               "description": "",
               "modelProperties": {}
@@ -6381,6 +6502,7 @@
                 "query": false,
                 "order": 3
               },
+              "elementReferences": [],
               "name": "recursiveChainB",
               "description": "",
               "modelProperties": {}
@@ -6406,6 +6528,7 @@
                 "query": false,
                 "order": 4
               },
+              "elementReferences": [],
               "name": "recursiveChainA",
               "description": "",
               "modelProperties": {}
@@ -6443,6 +6566,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -6519,6 +6643,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -6628,6 +6753,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -6848,6 +6974,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "streamingStrategy",
               "description": "Configure if repeatable streams should be used and their behaviour",
               "modelProperties": {
@@ -6896,6 +7023,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -7148,6 +7276,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "streamingStrategy",
               "description": "Configure if repeatable streams should be used and their behaviour",
               "modelProperties": {
@@ -7196,6 +7325,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -7299,6 +7429,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "grams",
               "description": "",
               "modelProperties": {}
@@ -7336,6 +7467,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -7426,6 +7558,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -7500,6 +7633,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "fullyBald",
               "description": "",
               "modelProperties": {}
@@ -7536,6 +7670,7 @@
                 "query": false,
                 "order": 2
               },
+              "elementReferences": [],
               "name": "beardTrimming",
               "description": "",
               "modelProperties": {}
@@ -7578,6 +7713,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -7653,6 +7789,7 @@
                 "order": 1,
                 "tabName": "General"
               },
+              "elementReferences": [],
               "name": "myName",
               "description": "",
               "modelProperties": {}
@@ -7683,6 +7820,7 @@
                 "order": 2,
                 "tabName": "General"
               },
+              "elementReferences": [],
               "name": "age",
               "description": "",
               "modelProperties": {}
@@ -7712,6 +7850,7 @@
                 "order": 3,
                 "tabName": "General"
               },
+              "elementReferences": [],
               "name": "dateOfConception",
               "description": "",
               "modelProperties": {}
@@ -7741,6 +7880,7 @@
                 "order": 4,
                 "tabName": "General"
               },
+              "elementReferences": [],
               "name": "dateOfBirth",
               "description": "",
               "modelProperties": {}
@@ -7770,6 +7910,7 @@
                 "order": 5,
                 "tabName": "General"
               },
+              "elementReferences": [],
               "name": "dateOfDeath",
               "displayModel": {
                 "displayName": "Date of decease"
@@ -7802,6 +7943,7 @@
                 "order": 6,
                 "tabName": "General"
               },
+              "elementReferences": [],
               "name": "dateOfGraduation",
               "description": "",
               "modelProperties": {}
@@ -7837,6 +7979,7 @@
                 "order": 7,
                 "tabName": "General"
               },
+              "elementReferences": [],
               "name": "knownAddresses",
               "description": "",
               "modelProperties": {}
@@ -7879,6 +8022,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -8011,6 +8155,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "healthByYear",
               "description": "",
               "modelProperties": {}
@@ -8048,6 +8193,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -8265,6 +8411,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "streamingStrategy",
               "description": "Configure if repeatable streams should be used and their behaviour",
               "modelProperties": {
@@ -8313,6 +8460,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -8390,6 +8538,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "victim",
               "description": "",
               "modelProperties": {}
@@ -8418,6 +8567,7 @@
                 "query": false,
                 "order": 2
               },
+              "elementReferences": [],
               "name": "goodbyeMessage",
               "description": "",
               "modelProperties": {}
@@ -8455,6 +8605,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -8584,6 +8735,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "killOperations",
               "description": "",
               "modelProperties": {}
@@ -8612,6 +8764,7 @@
                 "query": false,
                 "order": 2
               },
+              "elementReferences": [],
               "name": "reason",
               "description": "",
               "modelProperties": {}
@@ -8649,6 +8802,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -8739,6 +8893,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "killOperation",
               "description": "",
               "modelProperties": {}
@@ -8767,6 +8922,7 @@
                 "query": false,
                 "order": 2
               },
+              "elementReferences": [],
               "name": "reason",
               "description": "",
               "modelProperties": {}
@@ -8804,6 +8960,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -8882,6 +9039,7 @@
                 "order": 1,
                 "tabName": "General"
               },
+              "elementReferences": [],
               "name": "victim",
               "description": "",
               "modelProperties": {}
@@ -8911,6 +9069,7 @@
                 "order": 2,
                 "tabName": "General"
               },
+              "elementReferences": [],
               "name": "goodbyeMessage",
               "description": "",
               "modelProperties": {}
@@ -8953,6 +9112,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -9038,6 +9198,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "wildCardWeapons",
               "description": "",
               "modelProperties": {}
@@ -9075,6 +9236,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -9161,6 +9323,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "weapons",
               "description": "",
               "modelProperties": {}
@@ -9198,6 +9361,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -9281,6 +9445,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "ricins",
               "description": "",
               "modelProperties": {}
@@ -9318,6 +9483,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -9391,6 +9557,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "weapon",
               "description": "",
               "modelProperties": {}
@@ -9426,6 +9593,7 @@
                 "query": false,
                 "order": 2
               },
+              "elementReferences": [],
               "name": "type",
               "description": "",
               "modelProperties": {}
@@ -9451,6 +9619,7 @@
                 "query": false,
                 "order": 3
               },
+              "elementReferences": [],
               "name": "attributesOfWeapon",
               "description": "",
               "modelProperties": {}
@@ -9488,6 +9657,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -9561,6 +9731,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "knockedDoor",
               "description": "",
               "modelProperties": {}
@@ -9598,6 +9769,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -9683,6 +9855,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "doors",
               "displayModel": {
                 "summary": "List of Knockeable Doors"
@@ -9723,6 +9896,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -9799,6 +9973,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "literalExpression",
               "description": "",
               "modelProperties": {}
@@ -9836,6 +10011,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -9913,6 +10089,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "inputStreamContent",
               "description": "",
               "modelProperties": {}
@@ -9955,6 +10132,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -10175,6 +10353,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "streamingStrategy",
               "description": "Configure if repeatable streams should be used and their behaviour",
               "modelProperties": {
@@ -10223,6 +10402,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -10311,6 +10491,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "phoneNumbers",
               "description": "",
               "modelProperties": {}
@@ -10348,6 +10529,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -10458,6 +10640,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "sales",
               "description": "",
               "modelProperties": {}
@@ -10495,6 +10678,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -10565,6 +10749,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "weapon",
               "description": "",
               "modelProperties": {}
@@ -10602,6 +10787,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -10684,6 +10870,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "weapons",
               "description": "",
               "modelProperties": {}
@@ -10721,6 +10908,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -10804,6 +10992,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "weapons",
               "description": "",
               "modelProperties": {}
@@ -10841,6 +11030,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -10912,6 +11102,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "weapon",
               "description": "",
               "modelProperties": {}
@@ -10949,6 +11140,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -11025,6 +11217,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "literalExpression",
               "displayModel": {
                 "displayName": "Custom overrided display name"
@@ -11065,6 +11258,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -11285,6 +11479,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "streamingStrategy",
               "description": "Configure if repeatable streams should be used and their behaviour",
               "modelProperties": {
@@ -11333,6 +11528,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -11426,6 +11622,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "saulPhoneNumber",
               "description": "",
               "modelProperties": {}
@@ -11777,6 +11974,7 @@
                 "query": false,
                 "order": 2
               },
+              "elementReferences": [],
               "name": "tlsContext",
               "description": "",
               "modelProperties": {
@@ -11923,6 +12121,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "reconnectionStrategy",
               "description": "A retry strategy in case of connectivity errors",
               "modelProperties": {
@@ -12175,6 +12374,7 @@
                 "query": false,
                 "tabName": "Redelivery"
               },
+              "elementReferences": [],
               "name": "redeliveryPolicy",
               "description": "Defines a policy for processing the redelivery of the same message",
               "modelProperties": {
@@ -12321,6 +12521,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "reconnectionStrategy",
               "description": "A retry strategy in case of connectivity errors",
               "modelProperties": {

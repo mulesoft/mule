@@ -79,6 +79,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "requiredMapDefaults",
               "description": "",
               "modelProperties": {}
@@ -141,6 +142,7 @@
                 "query": false,
                 "order": 2
               },
+              "elementReferences": [],
               "name": "requiredMapNoExpressions",
               "description": "",
               "modelProperties": {}
@@ -203,6 +205,7 @@
                 "query": false,
                 "order": 3
               },
+              "elementReferences": [],
               "name": "requiredMapExpressionRequireds",
               "description": "",
               "modelProperties": {}
@@ -265,6 +268,7 @@
                 "query": false,
                 "order": 4
               },
+              "elementReferences": [],
               "name": "requiredMapExpressionSupporteds",
               "description": "",
               "modelProperties": {}
@@ -327,6 +331,7 @@
                 "query": false,
                 "order": 5
               },
+              "elementReferences": [],
               "name": "optionalMapDefaults",
               "description": "",
               "modelProperties": {}
@@ -389,6 +394,7 @@
                 "query": false,
                 "order": 6
               },
+              "elementReferences": [],
               "name": "optionalMapNoExpressions",
               "description": "",
               "modelProperties": {}
@@ -451,6 +457,7 @@
                 "query": false,
                 "order": 7
               },
+              "elementReferences": [],
               "name": "optionalMapExpressionRequireds",
               "description": "",
               "modelProperties": {}
@@ -513,6 +520,7 @@
                 "query": false,
                 "order": 8
               },
+              "elementReferences": [],
               "name": "optionalMapExpressionSupporteds",
               "description": "",
               "modelProperties": {}

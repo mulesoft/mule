@@ -7,32 +7,38 @@
 package org.mule.runtime.module.extension.internal.loader.validation;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.meta.model.parameter.ElementReference.ElementType.CONFIG;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_LOADER;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockParameters;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.validate;
+
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.ElementReference;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-
 import com.google.gson.reflect.TypeToken;
-
-import java.lang.reflect.Type;
-import java.util.Map;
-
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import java.lang.reflect.Type;
+import java.util.Map;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
 public class ParameterTypeModelValidatorTestCase extends AbstractMuleTestCase {
+
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
 
   @Mock(answer = RETURNS_DEEP_STUBS)
   private ExtensionModel extensionModel;
@@ -53,12 +59,13 @@ public class ParameterTypeModelValidatorTestCase extends AbstractMuleTestCase {
   @Before
   public void before() {
     when(extensionModel.getOperationModels()).thenReturn(asList(operationModel));
-    when(parameter.getName()).thenReturn("mapParameter");
+    when(parameter.getName()).thenReturn("parameter");
     mockParameters(operationModel, parameter);
   }
 
-  @Test(expected = IllegalModelDefinitionException.class)
+  @Test
   public void objectKey() {
+    expectedException.expect(IllegalModelDefinitionException.class);
     when(parameter.getType()).thenReturn(TYPE_LOADER.load(objectKey));
     validate(extensionModel, validator);
   }
@@ -69,8 +76,9 @@ public class ParameterTypeModelValidatorTestCase extends AbstractMuleTestCase {
     validate(extensionModel, validator);
   }
 
-  @Test(expected = IllegalModelDefinitionException.class)
+  @Test
   public void wildcardMap() {
+    expectedException.expect(IllegalModelDefinitionException.class);
     when(parameter.getType()).thenReturn(TYPE_LOADER.load(wildcardMap));
     validate(extensionModel, validator);
   }
@@ -81,8 +89,9 @@ public class ParameterTypeModelValidatorTestCase extends AbstractMuleTestCase {
     validate(extensionModel, validator);
   }
 
-  @Test(expected = IllegalModelDefinitionException.class)
+  @Test
   public void boxedBoolean() {
+    expectedException.expect(IllegalModelDefinitionException.class);
     when(parameter.getType()).thenReturn(TYPE_LOADER.load(Boolean.class));
     validate(extensionModel, validator);
   }
@@ -90,6 +99,16 @@ public class ParameterTypeModelValidatorTestCase extends AbstractMuleTestCase {
   @Test
   public void primitiveBoolean() {
     when(parameter.getType()).thenReturn(TYPE_LOADER.load(boolean.class));
+    validate(extensionModel, validator);
+  }
+
+  @Test
+  public void withElementReferenceOnlyString() {
+    expectedException.expect(IllegalModelDefinitionException.class);
+    expectedException
+        .expectMessage("Parameter 'parameter' that a contains reference to a [CONFIG] should be of type String but is of type java.lang.Object");
+    when(parameter.getType()).thenReturn(TYPE_LOADER.load(Object.class));
+    when(parameter.getElementReferences()).thenReturn(singletonList(new ElementReference("test", "config", CONFIG)));
     validate(extensionModel, validator);
   }
 }

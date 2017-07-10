@@ -53,6 +53,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "channel",
               "description": "",
               "modelProperties": {}
@@ -81,6 +82,7 @@
                 "query": false,
                 "order": 2
               },
+              "elementReferences": [],
               "name": "required1",
               "description": "",
               "modelProperties": {}
@@ -109,6 +111,7 @@
                 "query": false,
                 "order": 3
               },
+              "elementReferences": [],
               "name": "required2",
               "description": "",
               "modelProperties": {}
@@ -154,6 +157,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "someParameter",
                   "description": "",
                   "modelProperties": {}
@@ -289,6 +293,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -357,6 +362,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "valueParam",
               "description": "",
               "modelProperties": {}
@@ -399,6 +405,7 @@
                 "query": false,
                 "order": 2
               },
+              "elementReferences": [],
               "name": "channels",
               "description": "",
               "modelProperties": {}
@@ -427,6 +434,7 @@
                 "query": false,
                 "order": 3
               },
+              "elementReferences": [],
               "name": "anyParameter",
               "description": "",
               "modelProperties": {}
@@ -477,6 +485,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "someParameter",
                   "description": "",
                   "modelProperties": {}
@@ -612,6 +621,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -680,6 +690,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "valueParam",
               "description": "",
               "modelProperties": {}
@@ -722,6 +733,7 @@
                 "query": false,
                 "order": 2
               },
+              "elementReferences": [],
               "name": "channels",
               "description": "",
               "modelProperties": {}
@@ -750,6 +762,7 @@
                 "query": false,
                 "order": 3
               },
+              "elementReferences": [],
               "name": "anyParameter",
               "description": "",
               "modelProperties": {}
@@ -800,6 +813,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "someParameter",
                   "description": "",
                   "modelProperties": {}
@@ -935,6 +949,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -997,6 +1012,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "data",
               "description": "",
               "modelProperties": {}
@@ -1031,6 +1047,7 @@
                 "query": false,
                 "order": 2
               },
+              "elementReferences": [],
               "name": "configValues",
               "description": "",
               "modelProperties": {}
@@ -1128,6 +1145,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "channels",
                   "description": "",
                   "modelProperties": {}
@@ -1228,6 +1246,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "channels",
                   "description": "",
                   "modelProperties": {}
@@ -1285,6 +1304,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "channel",
                   "description": "",
                   "modelProperties": {}
@@ -1313,6 +1333,7 @@
                     "query": false,
                     "order": 2
                   },
+                  "elementReferences": [],
                   "name": "required1",
                   "description": "",
                   "modelProperties": {}
@@ -1341,6 +1362,7 @@
                     "query": false,
                     "order": 3
                   },
+                  "elementReferences": [],
                   "name": "required2",
                   "description": "",
                   "modelProperties": {}
@@ -1476,6 +1498,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -1540,6 +1563,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "valueParam",
                   "description": "",
                   "modelProperties": {}
@@ -1582,6 +1606,7 @@
                     "query": false,
                     "order": 2
                   },
+                  "elementReferences": [],
                   "name": "channels",
                   "description": "",
                   "modelProperties": {}
@@ -1610,6 +1635,7 @@
                     "query": false,
                     "order": 3
                   },
+                  "elementReferences": [],
                   "name": "anyParameter",
                   "description": "",
                   "modelProperties": {}
@@ -1750,6 +1776,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -1814,6 +1841,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "valueParam",
                   "description": "",
                   "modelProperties": {}
@@ -1856,6 +1884,7 @@
                     "query": false,
                     "order": 2
                   },
+                  "elementReferences": [],
                   "name": "channels",
                   "description": "",
                   "modelProperties": {}
@@ -1884,6 +1913,7 @@
                     "query": false,
                     "order": 3
                   },
+                  "elementReferences": [],
                   "name": "anyParameter",
                   "description": "",
                   "modelProperties": {}
@@ -2024,6 +2054,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -2081,6 +2112,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "someParameter",
                   "description": "",
                   "modelProperties": {}
@@ -2216,6 +2248,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -2278,6 +2311,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "channel",
                   "description": "",
                   "modelProperties": {}
@@ -2413,6 +2447,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -2505,6 +2540,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "channel",
                   "description": "",
                   "modelProperties": {}
@@ -2621,6 +2657,7 @@
                     "query": false,
                     "tabName": "Redelivery"
                   },
+                  "elementReferences": [],
                   "name": "redeliveryPolicy",
                   "description": "Defines a policy for processing the redelivery of the same message",
                   "modelProperties": {
@@ -2767,6 +2804,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -2858,6 +2896,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "channel",
                   "description": "",
                   "modelProperties": {}
@@ -2974,6 +3013,7 @@
                     "query": false,
                     "tabName": "Redelivery"
                   },
+                  "elementReferences": [],
                   "name": "redeliveryPolicy",
                   "description": "Defines a policy for processing the redelivery of the same message",
                   "modelProperties": {
@@ -3120,6 +3160,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -3186,6 +3227,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "channel",
               "description": "",
               "modelProperties": {}
@@ -3231,6 +3273,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "someParameter",
                   "description": "",
                   "modelProperties": {}
@@ -3366,6 +3409,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -3455,6 +3499,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "required",
               "description": "",
               "modelProperties": {}
@@ -3489,6 +3534,7 @@
                 "query": false,
                 "order": 2
               },
+              "elementReferences": [],
               "name": "continent",
               "description": "",
               "modelProperties": {}
@@ -3523,6 +3569,7 @@
                 "query": false,
                 "order": 3
               },
+              "elementReferences": [],
               "name": "country",
               "description": "",
               "modelProperties": {}
@@ -3557,6 +3604,7 @@
                 "query": false,
                 "order": 4
               },
+              "elementReferences": [],
               "name": "city",
               "displayModel": {
                 "displayName": "State | City"
@@ -3640,6 +3688,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "channel",
               "description": "",
               "modelProperties": {}
@@ -3715,6 +3764,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "channels",
               "description": "",
               "modelProperties": {}
@@ -3790,6 +3840,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "channels",
               "description": "",
               "modelProperties": {}
@@ -3818,6 +3869,7 @@
                 "query": false,
                 "order": 2
               },
+              "elementReferences": [],
               "name": "anyParameter",
               "description": "",
               "modelProperties": {}
@@ -3900,6 +3952,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "values",
               "description": "",
               "modelProperties": {}
@@ -3942,6 +3995,7 @@
                 "query": false,
                 "order": 2
               },
+              "elementReferences": [],
               "name": "channels",
               "description": "",
               "modelProperties": {}
@@ -3970,6 +4024,7 @@
                 "query": false,
                 "order": 3
               },
+              "elementReferences": [],
               "name": "anyParameter",
               "description": "",
               "modelProperties": {}
@@ -4055,6 +4110,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "channels",
               "description": "",
               "modelProperties": {}
@@ -4083,6 +4139,7 @@
                 "query": false,
                 "order": 2
               },
+              "elementReferences": [],
               "name": "requiredString",
               "description": "",
               "modelProperties": {}
@@ -4112,6 +4169,7 @@
                 "query": false,
                 "order": 3
               },
+              "elementReferences": [],
               "name": "requiredBoolean",
               "description": "",
               "modelProperties": {}
@@ -4141,6 +4199,7 @@
                 "query": false,
                 "order": 4
               },
+              "elementReferences": [],
               "name": "requiredInteger",
               "description": "",
               "modelProperties": {}
@@ -4175,6 +4234,7 @@
                 "query": false,
                 "order": 5
               },
+              "elementReferences": [],
               "name": "strings",
               "description": "",
               "modelProperties": {}
@@ -4245,6 +4305,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "superString",
               "description": "",
               "modelProperties": {}
@@ -4280,6 +4341,7 @@
                 "query": false,
                 "order": 2
               },
+              "elementReferences": [],
               "name": "channels",
               "description": "",
               "modelProperties": {}
@@ -4362,6 +4424,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "values",
               "description": "",
               "modelProperties": {}
@@ -4404,6 +4467,7 @@
                 "query": false,
                 "order": 2
               },
+              "elementReferences": [],
               "name": "channels",
               "description": "",
               "modelProperties": {}
@@ -4432,6 +4496,7 @@
                 "query": false,
                 "order": 3
               },
+              "elementReferences": [],
               "name": "anyParameter",
               "description": "",
               "modelProperties": {}
@@ -4520,6 +4585,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "channel",
               "description": "",
               "modelProperties": {}
@@ -4636,6 +4702,7 @@
                 "query": false,
                 "tabName": "Redelivery"
               },
+              "elementReferences": [],
               "name": "redeliveryPolicy",
               "description": "Defines a policy for processing the redelivery of the same message",
               "modelProperties": {
@@ -4782,6 +4849,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "reconnectionStrategy",
               "description": "A retry strategy in case of connectivity errors",
               "modelProperties": {
@@ -4956,6 +5024,7 @@
                 "query": false,
                 "tabName": "Redelivery"
               },
+              "elementReferences": [],
               "name": "redeliveryPolicy",
               "description": "Defines a policy for processing the redelivery of the same message",
               "modelProperties": {
@@ -5005,6 +5074,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "required",
               "description": "",
               "modelProperties": {}
@@ -5039,6 +5109,7 @@
                 "query": false,
                 "order": 2
               },
+              "elementReferences": [],
               "name": "continent",
               "description": "",
               "modelProperties": {}
@@ -5073,6 +5144,7 @@
                 "query": false,
                 "order": 3
               },
+              "elementReferences": [],
               "name": "country",
               "description": "",
               "modelProperties": {}
@@ -5107,6 +5179,7 @@
                 "query": false,
                 "order": 4
               },
+              "elementReferences": [],
               "name": "city",
               "displayModel": {
                 "displayName": "State | City"
@@ -5250,6 +5323,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "reconnectionStrategy",
               "description": "A retry strategy in case of connectivity errors",
               "modelProperties": {
@@ -5343,6 +5417,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "values",
               "description": "",
               "modelProperties": {}
@@ -5459,6 +5534,7 @@
                 "query": false,
                 "tabName": "Redelivery"
               },
+              "elementReferences": [],
               "name": "redeliveryPolicy",
               "description": "Defines a policy for processing the redelivery of the same message",
               "modelProperties": {
@@ -5512,6 +5588,7 @@
                 "query": false,
                 "order": 2
               },
+              "elementReferences": [],
               "name": "channels",
               "description": "",
               "modelProperties": {}
@@ -5540,6 +5617,7 @@
                 "query": false,
                 "order": 3
               },
+              "elementReferences": [],
               "name": "anyParameter",
               "description": "",
               "modelProperties": {}
@@ -5680,6 +5758,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "reconnectionStrategy",
               "description": "A retry strategy in case of connectivity errors",
               "modelProperties": {
@@ -5854,6 +5933,7 @@
                 "query": false,
                 "tabName": "Redelivery"
               },
+              "elementReferences": [],
               "name": "redeliveryPolicy",
               "description": "Defines a policy for processing the redelivery of the same message",
               "modelProperties": {
@@ -5902,6 +5982,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "superString",
               "description": "",
               "modelProperties": {}
@@ -5937,6 +6018,7 @@
                 "query": false,
                 "order": 2
               },
+              "elementReferences": [],
               "name": "channels",
               "description": "",
               "modelProperties": {}
@@ -6077,6 +6159,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "reconnectionStrategy",
               "description": "A retry strategy in case of connectivity errors",
               "modelProperties": {
@@ -6251,6 +6334,7 @@
                 "query": false,
                 "tabName": "Redelivery"
               },
+              "elementReferences": [],
               "name": "redeliveryPolicy",
               "description": "Defines a policy for processing the redelivery of the same message",
               "modelProperties": {
@@ -6304,6 +6388,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "channels",
               "description": "",
               "modelProperties": {}
@@ -6332,6 +6417,7 @@
                 "query": false,
                 "order": 2
               },
+              "elementReferences": [],
               "name": "anyParameter",
               "description": "",
               "modelProperties": {}
@@ -6472,6 +6558,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "reconnectionStrategy",
               "description": "A retry strategy in case of connectivity errors",
               "modelProperties": {
@@ -6568,6 +6655,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "channels",
               "description": "",
               "modelProperties": {}
@@ -6596,6 +6684,7 @@
                 "query": false,
                 "order": 2
               },
+              "elementReferences": [],
               "name": "requiredString",
               "description": "",
               "modelProperties": {}
@@ -6625,6 +6714,7 @@
                 "query": false,
                 "order": 3
               },
+              "elementReferences": [],
               "name": "requiredBoolean",
               "description": "",
               "modelProperties": {}
@@ -6654,6 +6744,7 @@
                 "query": false,
                 "order": 4
               },
+              "elementReferences": [],
               "name": "requiredInteger",
               "description": "",
               "modelProperties": {}
@@ -6688,6 +6779,7 @@
                 "query": false,
                 "order": 5
               },
+              "elementReferences": [],
               "name": "strings",
               "description": "",
               "modelProperties": {}
@@ -6804,6 +6896,7 @@
                 "query": false,
                 "tabName": "Redelivery"
               },
+              "elementReferences": [],
               "name": "redeliveryPolicy",
               "description": "Defines a policy for processing the redelivery of the same message",
               "modelProperties": {
@@ -6950,6 +7043,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "reconnectionStrategy",
               "description": "A retry strategy in case of connectivity errors",
               "modelProperties": {

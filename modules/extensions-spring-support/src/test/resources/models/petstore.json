@@ -51,6 +51,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "pets",
               "description": "",
               "modelProperties": {}
@@ -76,6 +77,7 @@
                 "query": false,
                 "order": 3
               },
+              "elementReferences": [],
               "name": "cage",
               "description": "",
               "modelProperties": {}
@@ -107,6 +109,7 @@
                 "query": false,
                 "order": 4
               },
+              "elementReferences": [],
               "name": "cages",
               "description": "",
               "modelProperties": {}
@@ -458,6 +461,7 @@
                 "query": false,
                 "order": 2
               },
+              "elementReferences": [],
               "name": "tlsContext",
               "description": "",
               "modelProperties": {
@@ -506,6 +510,7 @@
                 "query": false,
                 "order": 5
               },
+              "elementReferences": [],
               "name": "cashierName",
               "description": "",
               "modelProperties": {}
@@ -534,6 +539,7 @@
                 "query": false,
                 "order": 6
               },
+              "elementReferences": [],
               "name": "rothIRA",
               "description": "",
               "modelProperties": {}
@@ -562,6 +568,7 @@
                 "query": false,
                 "order": 7
               },
+              "elementReferences": [],
               "name": "pensionPlan",
               "description": "",
               "modelProperties": {}
@@ -590,6 +597,7 @@
                 "query": false,
                 "order": 8
               },
+              "elementReferences": [],
               "name": "cash",
               "description": "",
               "modelProperties": {}
@@ -618,6 +626,7 @@
                 "query": false,
                 "order": 9
               },
+              "elementReferences": [],
               "name": "debt",
               "description": "",
               "modelProperties": {}
@@ -728,6 +737,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -829,6 +839,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -930,6 +941,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -1003,6 +1015,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -1101,6 +1114,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -1213,6 +1227,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "countDownLatch",
                   "description": "",
                   "modelProperties": {}
@@ -1255,6 +1270,7 @@
                     "query": false,
                     "order": 2
                   },
+                  "elementReferences": [],
                   "name": "latch",
                   "description": "",
                   "modelProperties": {}
@@ -1292,6 +1308,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -1399,6 +1416,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "ownerName",
                   "description": "",
                   "modelProperties": {}
@@ -1436,6 +1454,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -1488,6 +1507,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "username",
                   "description": "",
                   "modelProperties": {}
@@ -1516,6 +1536,7 @@
                     "query": false,
                     "order": 2
                   },
+                  "elementReferences": [],
                   "name": "password",
                   "description": "",
                   "modelProperties": {}
@@ -1544,6 +1565,7 @@
                     "query": false,
                     "order": 4
                   },
+                  "elementReferences": [],
                   "name": "openingDate",
                   "description": "",
                   "modelProperties": {}
@@ -1578,6 +1600,7 @@
                     "query": false,
                     "order": 5
                   },
+                  "elementReferences": [],
                   "name": "closedForHolidays",
                   "description": "",
                   "modelProperties": {}
@@ -1612,6 +1635,7 @@
                     "query": false,
                     "order": 6
                   },
+                  "elementReferences": [],
                   "name": "discountDates",
                   "description": "",
                   "modelProperties": {}
@@ -1963,6 +1987,7 @@
                     "query": false,
                     "order": 3
                   },
+                  "elementReferences": [],
                   "name": "tlsContext",
                   "description": "",
                   "modelProperties": {
@@ -2109,6 +2134,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -2148,6 +2174,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "disableValidation",
                   "description": "Disables connection validation",
                   "modelProperties": {
@@ -2198,6 +2225,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "username",
                   "description": "",
                   "modelProperties": {}
@@ -2226,6 +2254,7 @@
                     "query": false,
                     "order": 2
                   },
+                  "elementReferences": [],
                   "name": "password",
                   "description": "",
                   "modelProperties": {}
@@ -2254,6 +2283,7 @@
                     "query": false,
                     "order": 4
                   },
+                  "elementReferences": [],
                   "name": "openingDate",
                   "description": "",
                   "modelProperties": {}
@@ -2288,6 +2318,7 @@
                     "query": false,
                     "order": 5
                   },
+                  "elementReferences": [],
                   "name": "closedForHolidays",
                   "description": "",
                   "modelProperties": {}
@@ -2322,6 +2353,7 @@
                     "query": false,
                     "order": 6
                   },
+                  "elementReferences": [],
                   "name": "discountDates",
                   "description": "",
                   "modelProperties": {}
@@ -2673,6 +2705,7 @@
                     "query": false,
                     "order": 3
                   },
+                  "elementReferences": [],
                   "name": "tlsContext",
                   "description": "",
                   "modelProperties": {
@@ -2819,6 +2852,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -2876,6 +2910,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "username",
                   "description": "",
                   "modelProperties": {}
@@ -2904,6 +2939,7 @@
                     "query": false,
                     "order": 2
                   },
+                  "elementReferences": [],
                   "name": "password",
                   "description": "",
                   "modelProperties": {}
@@ -2932,6 +2968,7 @@
                     "query": false,
                     "order": 4
                   },
+                  "elementReferences": [],
                   "name": "openingDate",
                   "description": "",
                   "modelProperties": {}
@@ -2966,6 +3003,7 @@
                     "query": false,
                     "order": 5
                   },
+                  "elementReferences": [],
                   "name": "closedForHolidays",
                   "description": "",
                   "modelProperties": {}
@@ -3000,6 +3038,7 @@
                     "query": false,
                     "order": 6
                   },
+                  "elementReferences": [],
                   "name": "discountDates",
                   "description": "",
                   "modelProperties": {}
@@ -3351,6 +3390,7 @@
                     "query": false,
                     "order": 3
                   },
+                  "elementReferences": [],
                   "name": "tlsContext",
                   "description": "",
                   "modelProperties": {
@@ -3497,6 +3537,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -3536,6 +3577,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "disableValidation",
                   "description": "Disables connection validation",
                   "modelProperties": {
@@ -3730,6 +3772,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "poolingProfile",
                   "description": "Characteristics of the connection pool",
                   "modelProperties": {
@@ -3787,6 +3830,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "username",
                   "description": "",
                   "modelProperties": {}
@@ -3815,6 +3859,7 @@
                     "query": false,
                     "order": 2
                   },
+                  "elementReferences": [],
                   "name": "password",
                   "description": "",
                   "modelProperties": {}
@@ -3843,6 +3888,7 @@
                     "query": false,
                     "order": 4
                   },
+                  "elementReferences": [],
                   "name": "openingDate",
                   "description": "",
                   "modelProperties": {}
@@ -3877,6 +3923,7 @@
                     "query": false,
                     "order": 5
                   },
+                  "elementReferences": [],
                   "name": "closedForHolidays",
                   "description": "",
                   "modelProperties": {}
@@ -3911,6 +3958,7 @@
                     "query": false,
                     "order": 6
                   },
+                  "elementReferences": [],
                   "name": "discountDates",
                   "description": "",
                   "modelProperties": {}
@@ -4262,6 +4310,7 @@
                     "query": false,
                     "order": 3
                   },
+                  "elementReferences": [],
                   "name": "tlsContext",
                   "description": "",
                   "modelProperties": {
@@ -4408,6 +4457,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -4465,6 +4515,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "username",
                   "description": "",
                   "modelProperties": {}
@@ -4493,6 +4544,7 @@
                     "query": false,
                     "order": 2
                   },
+                  "elementReferences": [],
                   "name": "password",
                   "description": "",
                   "modelProperties": {}
@@ -4521,6 +4573,7 @@
                     "query": false,
                     "order": 4
                   },
+                  "elementReferences": [],
                   "name": "openingDate",
                   "description": "",
                   "modelProperties": {}
@@ -4555,6 +4608,7 @@
                     "query": false,
                     "order": 5
                   },
+                  "elementReferences": [],
                   "name": "closedForHolidays",
                   "description": "",
                   "modelProperties": {}
@@ -4589,6 +4643,7 @@
                     "query": false,
                     "order": 6
                   },
+                  "elementReferences": [],
                   "name": "discountDates",
                   "description": "",
                   "modelProperties": {}
@@ -4940,6 +4995,7 @@
                     "query": false,
                     "order": 3
                   },
+                  "elementReferences": [],
                   "name": "tlsContext",
                   "description": "",
                   "modelProperties": {
@@ -5086,6 +5142,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -5190,6 +5247,7 @@
                     "query": false,
                     "order": 1
                   },
+                  "elementReferences": [],
                   "name": "failOnStart",
                   "description": "",
                   "modelProperties": {}
@@ -5219,6 +5277,7 @@
                     "query": false,
                     "order": 2
                   },
+                  "elementReferences": [],
                   "name": "failOnException",
                   "description": "",
                   "modelProperties": {}
@@ -5335,6 +5394,7 @@
                     "query": false,
                     "tabName": "Redelivery"
                   },
+                  "elementReferences": [],
                   "name": "redeliveryPolicy",
                   "description": "Defines a policy for processing the redelivery of the same message",
                   "modelProperties": {
@@ -5481,6 +5541,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
+                  "elementReferences": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -5586,6 +5647,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "animal",
               "description": "",
               "modelProperties": {}
@@ -5623,6 +5685,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -5719,6 +5782,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "petNames",
               "description": "",
               "modelProperties": {}
@@ -5756,6 +5820,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -5829,6 +5894,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "mammals",
               "description": "",
               "modelProperties": {}
@@ -5857,6 +5923,7 @@
                 "query": false,
                 "order": 2
               },
+              "elementReferences": [],
               "name": "birds",
               "description": "",
               "modelProperties": {}
@@ -5907,6 +5974,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -5980,6 +6048,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "cashierName",
               "description": "",
               "modelProperties": {}
@@ -6008,6 +6077,7 @@
                 "query": false,
                 "order": 2
               },
+              "elementReferences": [],
               "name": "rothIRA",
               "description": "",
               "modelProperties": {}
@@ -6036,6 +6106,7 @@
                 "query": false,
                 "order": 3
               },
+              "elementReferences": [],
               "name": "pensionPlan",
               "description": "",
               "modelProperties": {}
@@ -6064,6 +6135,7 @@
                 "query": false,
                 "order": 4
               },
+              "elementReferences": [],
               "name": "cash",
               "description": "",
               "modelProperties": {}
@@ -6092,6 +6164,7 @@
                 "query": false,
                 "order": 5
               },
+              "elementReferences": [],
               "name": "debt",
               "description": "",
               "modelProperties": {}
@@ -6144,6 +6217,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -6221,6 +6295,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "usePhoneNumber",
               "description": "",
               "modelProperties": {}
@@ -6246,6 +6321,7 @@
                 "query": false,
                 "order": 2
               },
+              "elementReferences": [],
               "name": "phoneNumber",
               "description": "",
               "modelProperties": {}
@@ -6274,6 +6350,7 @@
                 "query": false,
                 "order": 3
               },
+              "elementReferences": [],
               "name": "encoding",
               "description": "",
               "modelProperties": {}
@@ -6311,6 +6388,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -6388,6 +6466,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "river",
               "description": "",
               "modelProperties": {}
@@ -6416,6 +6495,7 @@
                 "query": false,
                 "order": 2
               },
+              "elementReferences": [],
               "name": "pollutedStream",
               "description": "",
               "modelProperties": {}
@@ -6453,6 +6533,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -6557,6 +6638,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "forbiddenPets",
               "description": "",
               "modelProperties": {}
@@ -6594,6 +6676,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -6664,6 +6747,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "phoneNumber",
               "description": "",
               "modelProperties": {}
@@ -6740,6 +6824,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "providers",
               "description": "",
               "modelProperties": {}
@@ -6768,6 +6853,7 @@
                 "query": false,
                 "order": 2
               },
+              "elementReferences": [],
               "name": "user",
               "description": "",
               "modelProperties": {}
@@ -6796,6 +6882,7 @@
                 "query": false,
                 "order": 3
               },
+              "elementReferences": [],
               "name": "pass",
               "description": "",
               "modelProperties": {}
@@ -6845,6 +6932,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "username",
               "description": "",
               "modelProperties": {}
@@ -6873,6 +6961,7 @@
                 "query": false,
                 "order": 2
               },
+              "elementReferences": [],
               "name": "password",
               "description": "",
               "modelProperties": {}
@@ -6901,6 +6990,7 @@
                 "query": false,
                 "order": 4
               },
+              "elementReferences": [],
               "name": "openingDate",
               "description": "",
               "modelProperties": {}
@@ -6935,6 +7025,7 @@
                 "query": false,
                 "order": 5
               },
+              "elementReferences": [],
               "name": "closedForHolidays",
               "description": "",
               "modelProperties": {}
@@ -6969,6 +7060,7 @@
                 "query": false,
                 "order": 6
               },
+              "elementReferences": [],
               "name": "discountDates",
               "description": "",
               "modelProperties": {}
@@ -7320,6 +7412,7 @@
                 "query": false,
                 "order": 3
               },
+              "elementReferences": [],
               "name": "tlsContext",
               "description": "",
               "modelProperties": {
@@ -7466,6 +7559,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "reconnectionStrategy",
               "description": "A retry strategy in case of connectivity errors",
               "modelProperties": {
@@ -7505,6 +7599,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "disableValidation",
               "description": "Disables connection validation",
               "modelProperties": {
@@ -7555,6 +7650,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "username",
               "description": "",
               "modelProperties": {}
@@ -7583,6 +7679,7 @@
                 "query": false,
                 "order": 2
               },
+              "elementReferences": [],
               "name": "password",
               "description": "",
               "modelProperties": {}
@@ -7611,6 +7708,7 @@
                 "query": false,
                 "order": 4
               },
+              "elementReferences": [],
               "name": "openingDate",
               "description": "",
               "modelProperties": {}
@@ -7645,6 +7743,7 @@
                 "query": false,
                 "order": 5
               },
+              "elementReferences": [],
               "name": "closedForHolidays",
               "description": "",
               "modelProperties": {}
@@ -7679,6 +7778,7 @@
                 "query": false,
                 "order": 6
               },
+              "elementReferences": [],
               "name": "discountDates",
               "description": "",
               "modelProperties": {}
@@ -8030,6 +8130,7 @@
                 "query": false,
                 "order": 3
               },
+              "elementReferences": [],
               "name": "tlsContext",
               "description": "",
               "modelProperties": {
@@ -8176,6 +8277,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "reconnectionStrategy",
               "description": "A retry strategy in case of connectivity errors",
               "modelProperties": {
@@ -8233,6 +8335,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "username",
               "description": "",
               "modelProperties": {}
@@ -8261,6 +8364,7 @@
                 "query": false,
                 "order": 2
               },
+              "elementReferences": [],
               "name": "password",
               "description": "",
               "modelProperties": {}
@@ -8289,6 +8393,7 @@
                 "query": false,
                 "order": 4
               },
+              "elementReferences": [],
               "name": "openingDate",
               "description": "",
               "modelProperties": {}
@@ -8323,6 +8428,7 @@
                 "query": false,
                 "order": 5
               },
+              "elementReferences": [],
               "name": "closedForHolidays",
               "description": "",
               "modelProperties": {}
@@ -8357,6 +8463,7 @@
                 "query": false,
                 "order": 6
               },
+              "elementReferences": [],
               "name": "discountDates",
               "description": "",
               "modelProperties": {}
@@ -8708,6 +8815,7 @@
                 "query": false,
                 "order": 3
               },
+              "elementReferences": [],
               "name": "tlsContext",
               "description": "",
               "modelProperties": {
@@ -8854,6 +8962,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "reconnectionStrategy",
               "description": "A retry strategy in case of connectivity errors",
               "modelProperties": {
@@ -8893,6 +9002,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "disableValidation",
               "description": "Disables connection validation",
               "modelProperties": {
@@ -9087,6 +9197,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "poolingProfile",
               "description": "Characteristics of the connection pool",
               "modelProperties": {
@@ -9144,6 +9255,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "username",
               "description": "",
               "modelProperties": {}
@@ -9172,6 +9284,7 @@
                 "query": false,
                 "order": 2
               },
+              "elementReferences": [],
               "name": "password",
               "description": "",
               "modelProperties": {}
@@ -9200,6 +9313,7 @@
                 "query": false,
                 "order": 4
               },
+              "elementReferences": [],
               "name": "openingDate",
               "description": "",
               "modelProperties": {}
@@ -9234,6 +9348,7 @@
                 "query": false,
                 "order": 5
               },
+              "elementReferences": [],
               "name": "closedForHolidays",
               "description": "",
               "modelProperties": {}
@@ -9268,6 +9383,7 @@
                 "query": false,
                 "order": 6
               },
+              "elementReferences": [],
               "name": "discountDates",
               "description": "",
               "modelProperties": {}
@@ -9619,6 +9735,7 @@
                 "query": false,
                 "order": 3
               },
+              "elementReferences": [],
               "name": "tlsContext",
               "description": "",
               "modelProperties": {
@@ -9765,6 +9882,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "reconnectionStrategy",
               "description": "A retry strategy in case of connectivity errors",
               "modelProperties": {
@@ -9822,6 +9940,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "username",
               "description": "",
               "modelProperties": {}
@@ -9850,6 +9969,7 @@
                 "query": false,
                 "order": 2
               },
+              "elementReferences": [],
               "name": "password",
               "description": "",
               "modelProperties": {}
@@ -9878,6 +9998,7 @@
                 "query": false,
                 "order": 4
               },
+              "elementReferences": [],
               "name": "openingDate",
               "description": "",
               "modelProperties": {}
@@ -9912,6 +10033,7 @@
                 "query": false,
                 "order": 5
               },
+              "elementReferences": [],
               "name": "closedForHolidays",
               "description": "",
               "modelProperties": {}
@@ -9946,6 +10068,7 @@
                 "query": false,
                 "order": 6
               },
+              "elementReferences": [],
               "name": "discountDates",
               "description": "",
               "modelProperties": {}
@@ -10297,6 +10420,7 @@
                 "query": false,
                 "order": 3
               },
+              "elementReferences": [],
               "name": "tlsContext",
               "description": "",
               "modelProperties": {
@@ -10443,6 +10567,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "reconnectionStrategy",
               "description": "A retry strategy in case of connectivity errors",
               "modelProperties": {
@@ -10634,6 +10759,7 @@
                 "query": false,
                 "tabName": "Redelivery"
               },
+              "elementReferences": [],
               "name": "redeliveryPolicy",
               "description": "Defines a policy for processing the redelivery of the same message",
               "modelProperties": {
@@ -10682,6 +10808,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "mammals",
               "description": "",
               "modelProperties": {}
@@ -10710,6 +10837,7 @@
                 "query": false,
                 "order": 2
               },
+              "elementReferences": [],
               "name": "birds",
               "description": "",
               "modelProperties": {}
@@ -10858,6 +10986,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "reconnectionStrategy",
               "description": "A retry strategy in case of connectivity errors",
               "modelProperties": {
