@@ -15,6 +15,7 @@ import static org.mule.runtime.http.api.HttpConstants.Method.POST;
 
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
+import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.core.api.util.Pair;
 import org.mule.runtime.extension.api.client.DefaultOperationParametersBuilder;
 import org.mule.runtime.extension.api.client.ExtensionsClient;
@@ -73,7 +74,7 @@ public final class ReflectiveHttpConfigBasedRequester {
     DefaultOperationParametersBuilder params = builder().configName(configName)
         .addParameter("method", method)
         .addParameter("url", url)
-        .addParameter("headers", headers);
+        .addParameter("headers", new MultiMap<>(headers));
 
     if (body != null) {
       params.addParameter("body", new TypedValue<>(body, INPUT_STREAM));
