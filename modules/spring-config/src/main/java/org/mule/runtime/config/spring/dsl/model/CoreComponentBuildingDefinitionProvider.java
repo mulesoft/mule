@@ -1564,12 +1564,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("retryNotifier", fromChildConfiguration(RetryNotifier.class).build())
         .withSetterParameterDefinition("count", fromSimpleParameter("count").build()).build());
 
-    buildingDefinitions.add(baseDefinition.copy()
-        .withIdentifier("reconnect-custom-strategy")
-        .withTypeDefinition(fromConfigurationAttribute(CLASS_ATTRIBUTE))
-        .asPrototype()
-        .build());
-
     return buildingDefinitions;
   }
 
