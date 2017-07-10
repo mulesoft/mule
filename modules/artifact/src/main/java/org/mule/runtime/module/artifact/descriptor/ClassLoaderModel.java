@@ -158,7 +158,7 @@ public class ClassLoaderModel {
                     "Both packages and artifactIds must be empty or non empty simultaneously");
 
       this.privilegedExportedPackages.addAll(packages);
-      this.privilegedArtifacts = artifactIds;
+      this.privilegedArtifacts.addAll(artifactIds);
 
       return this;
     }
