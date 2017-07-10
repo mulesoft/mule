@@ -7,6 +7,7 @@
 package org.mule.runtime.module.deployment.impl.internal.domain;
 
 import org.mule.runtime.api.metadata.MetadataService;
+import org.mule.runtime.api.value.ValueProviderService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
@@ -52,6 +53,11 @@ public class TestDomainWrapper implements Domain {
   @Override
   public MetadataService getMetadataService() {
     return delegate.getMetadataService();
+  }
+
+  @Override
+  public ValueProviderService getValueProviderService() {
+    return delegate.getValueProviderService();
   }
 
   @Override

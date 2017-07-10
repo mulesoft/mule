@@ -22,7 +22,7 @@ import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import org.mule.metadata.api.ClassTypeLoader;
-import org.mule.runtime.api.values.Value;
+import org.mule.runtime.api.value.Value;
 import org.mule.runtime.api.resolving.ExtensionResolvingContext;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
@@ -39,7 +39,7 @@ import org.mule.runtime.api.metadata.MetadataProvider;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
-import org.mule.runtime.extension.api.values.ComponentValuesProvider;
+import org.mule.runtime.extension.api.values.ComponentValueProvider;
 import org.mule.runtime.extension.api.values.ValueResolvingException;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -63,7 +63,7 @@ import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.internal.metadata.MetadataMediator;
-import org.mule.runtime.module.extension.internal.values.ValuesProviderMediator;
+import org.mule.runtime.module.extension.internal.value.ValueProviderMediator;
 import org.mule.runtime.module.extension.internal.runtime.config.DynamicConfigurationProvider;
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
@@ -86,7 +86,7 @@ import java.util.function.Function;
  * @since 4.0
  */
 public abstract class ExtensionComponent<T extends ComponentModel> extends AbstractAnnotatedObject
-    implements MuleContextAware, MetadataKeyProvider, MetadataProvider<T>, ComponentValuesProvider, FlowConstructAware,
+    implements MuleContextAware, MetadataKeyProvider, MetadataProvider<T>, ComponentValueProvider, FlowConstructAware,
     Lifecycle {
 
   private final static Logger LOGGER = LoggerFactory.getLogger(ExtensionComponent.class);
@@ -97,7 +97,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   private final T componentModel;
   private final AtomicReference<ConfigurationProvider> configurationProvider = new AtomicReference<>();
   private final MetadataMediator<T> metadataMediator;
-  private final ValuesProviderMediator<T> valuesProviderMediator;
+  private final ValueProviderMediator<T> valueProviderMediator;
   private final ClassTypeLoader typeLoader;
   private final LazyValue<Boolean> requiresConfig = new LazyValue<>(this::computeRequiresConfig);
 
@@ -128,7 +128,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     this.extensionManager = extensionManager;
     this.cursorProviderFactory = cursorProviderFactory;
     this.metadataMediator = new MetadataMediator<>(componentModel);
-    this.valuesProviderMediator = new ValuesProviderMediator<>(componentModel, muleContext);
+    this.valueProviderMediator = new ValueProviderMediator<>(componentModel, muleContext);
     this.typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(classLoader);
   }
 
@@ -140,7 +140,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
    */
   @Override
   public final void initialise() throws InitialisationException {
-    valuesProviderMediator.setMuleContext(muleContext);
+    valueProviderMediator.setMuleContext(muleContext);
     if (cursorProviderFactory == null) {
       cursorProviderFactory = componentModel.getModelProperty(PagedOperationModelProperty.class)
           .map(p -> (CursorProviderFactory) streamingManager.forObjects().getDefaultCursorProviderFactory())
@@ -288,7 +288,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   public Set<Value> getValues(String parameterName) throws ValueResolvingException {
     try {
       return runWithValueProvidersContext(context -> withContextClassLoader(getClassLoader(this.extensionModel),
-                                                                            () -> valuesProviderMediator
+                                                                            () -> valueProviderMediator
                                                                                 .getValues(parameterName,
                                                                                            getParameterValueResolver(),
                                                                                            (CheckedSupplier<Object>) () -> context

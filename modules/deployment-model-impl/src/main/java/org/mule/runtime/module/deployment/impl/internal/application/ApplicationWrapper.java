@@ -7,6 +7,7 @@
 package org.mule.runtime.module.deployment.impl.internal.application;
 
 import org.mule.runtime.api.metadata.MetadataService;
+import org.mule.runtime.api.value.ValueProviderService;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
@@ -76,5 +77,10 @@ public class ApplicationWrapper extends DeployableArtifactWrapper<Application, A
   @Override
   public MetadataService getMetadataService() {
     return getDelegate().getMetadataService();
+  }
+
+  @Override
+  public ValueProviderService getValueProviderService() {
+    return getDelegate().getValueProviderService();
   }
 }

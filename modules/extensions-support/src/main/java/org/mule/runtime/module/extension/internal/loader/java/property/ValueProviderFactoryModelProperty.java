@@ -11,11 +11,11 @@ import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
-import org.mule.runtime.api.values.Value;
+import org.mule.runtime.api.value.Value;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.values.ValueProvider;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
-import org.mule.runtime.module.extension.internal.values.ValuesProviderFactory;
+import org.mule.runtime.module.extension.internal.value.ValueProviderFactory;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -120,10 +120,10 @@ public final class ValueProviderFactoryModelProperty implements ModelProperty {
     return configField != null;
   }
 
-  public ValuesProviderFactory createFactory(ParameterValueResolver parameterValueResolver, Supplier<Object> connectionSupplier,
-                                             Supplier<Object> configurationSupplier, MuleContext muleContext) {
-    return new ValuesProviderFactory(this, parameterValueResolver, connectionSupplier, configurationSupplier, connectionField,
-                                     configField, muleContext);
+  public ValueProviderFactory createFactory(ParameterValueResolver parameterValueResolver, Supplier<Object> connectionSupplier,
+                                            Supplier<Object> configurationSupplier, MuleContext muleContext) {
+    return new ValueProviderFactory(this, parameterValueResolver, connectionSupplier, configurationSupplier, connectionField,
+                                    configField, muleContext);
   }
 
   /**

@@ -4,23 +4,23 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.values;
+package org.mule.runtime.module.extension.internal.value;
 
 import static java.util.stream.Collectors.toMap;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
-import org.mule.runtime.api.values.Value;
+import org.mule.runtime.api.value.Value;
 import org.mule.runtime.extension.api.values.ValueBuilder;
 
 import java.util.List;
 import java.util.Map;
 
 /**
- * Utility class for {@link ValuesProviderMediator}
+ * Utility class for {@link ValueProviderMediator}
  *
  * @since 4.0
  */
-class ValuesProviderMediatorUtils {
+class ValueProviderMediatorUtils {
 
   /**
    * Given a {@link Value}, this is navigated recursively cloning each {@link Value} of the tree structure creating a

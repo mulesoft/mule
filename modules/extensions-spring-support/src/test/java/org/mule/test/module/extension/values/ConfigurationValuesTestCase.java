@@ -8,7 +8,7 @@ package org.mule.test.module.extension.values;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import org.mule.runtime.api.values.Value;
+import org.mule.runtime.api.value.Value;
 import org.junit.Test;
 
 import java.util.Set;

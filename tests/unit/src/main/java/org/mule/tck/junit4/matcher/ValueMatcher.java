@@ -10,7 +10,7 @@ import static java.lang.String.format;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.joining;
 import static org.hamcrest.core.IsCollectionContaining.hasItems;
-import org.mule.runtime.api.values.Value;
+import org.mule.runtime.api.value.Value;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;

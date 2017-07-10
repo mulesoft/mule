@@ -10,18 +10,26 @@ import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toSet;
 import static org.hamcrest.core.IsCollectionContaining.hasItems;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
-import org.mule.runtime.api.values.Value;
-import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
-import org.mule.runtime.module.extension.internal.runtime.config.ConfigurationProviderToolingAdapter;
+import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.value.Value;
+import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.internal.value.MuleValueProviderService;
 import org.mule.tck.junit4.matcher.ValueMatcher;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 import org.hamcrest.Matcher;
+import org.junit.Before;
 
 import java.util.Set;
 
 @ArtifactClassLoaderRunnerConfig(sharedRuntimeLibs = {"org.mule.tests:mule-tests-unit"})
 public abstract class AbstractValuesTestCase extends MuleArtifactFunctionalTestCase {
+
+  private MuleValueProviderService valueProviderService;
+
+  @Before
+  public void setUp() throws RegistrationException {
+    valueProviderService = muleContext.getRegistry().lookupObject(MuleValueProviderService.class);
+  }
 
   @Override
   protected boolean isDisposeContextPerClass() {
@@ -39,31 +47,24 @@ public abstract class AbstractValuesTestCase extends MuleArtifactFunctionalTestC
     return hasItems(valuesMatchers);
   }
 
-  private ExtensionComponent<?> getProcessorFromFlow(String flowName) throws Exception {
-    Flow flow = (Flow) getFlowConstruct(flowName);
-    return (ExtensionComponent) flow.getProcessors().get(0);
-  }
-
-  private ExtensionComponent<?> getSourceFromFlow(String flowName) throws Exception {
-    Flow flow = (Flow) getFlowConstruct(flowName);
-    return (ExtensionComponent) flow.getSource();
-  }
-
   Set<Value> getValuesFromSource(String flowName, String parameterName) throws Exception {
-    return getSourceFromFlow(flowName).getValues(parameterName);
+    return valueProviderService.getComponentValues(Location.builder().globalName(flowName).addSourcePart().build(), parameterName)
+        .getValues();
   }
 
   Set<Value> getValues(String flowName, String parameterName) throws Exception {
-    return getProcessorFromFlow(flowName).getValues(parameterName);
+    Location location = Location.builder().globalName(flowName).addProcessorsPart().addIndexPart(0).build();
+    return valueProviderService.getComponentValues(location, parameterName)
+        .getValues();
   }
 
   Set<Value> getValuesFromConfig(String configName, String parameterName) throws Exception {
-    ConfigurationProviderToolingAdapter config = muleContext.getRegistry().get(configName);
-    return config.getConfigValues(parameterName);
+    return valueProviderService.getConfigurationValues(Location.builder().globalName(configName).build(), parameterName)
+        .getValues();
   }
 
   Set<Value> getValuesFromConnection(String configName, String parameterName) throws Exception {
-    ConfigurationProviderToolingAdapter config = muleContext.getRegistry().get(configName);
-    return config.getConnectionValues(parameterName);
+    return valueProviderService.getConnectionProviderValues(Location.builder().globalName(configName).build(), parameterName)
+        .getValues();
   }
 }

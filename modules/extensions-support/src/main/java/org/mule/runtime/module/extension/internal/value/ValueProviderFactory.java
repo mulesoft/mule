@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.values;
+package org.mule.runtime.module.extension.internal.value;
 
 import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -25,7 +25,7 @@ import java.util.function.Supplier;
  *
  * @since 4.0
  */
-public class ValuesProviderFactory {
+public class ValueProviderFactory {
 
   private final ValueProviderFactoryModelProperty factoryModelProperty;
   private final ParameterValueResolver parameterValueResolver;
@@ -35,10 +35,10 @@ public class ValuesProviderFactory {
   private final Field configField;
   private final MuleContext muleContext;
 
-  public ValuesProviderFactory(ValueProviderFactoryModelProperty factoryModelProperty,
-                               ParameterValueResolver parameterValueResolver, Supplier<Object> connectionSupplier,
-                               Supplier<Object> configurationSupplier, Field connectionField, Field configField,
-                               MuleContext muleContext) {
+  public ValueProviderFactory(ValueProviderFactoryModelProperty factoryModelProperty,
+                              ParameterValueResolver parameterValueResolver, Supplier<Object> connectionSupplier,
+                              Supplier<Object> configurationSupplier, Field connectionField, Field configField,
+                              MuleContext muleContext) {
     this.factoryModelProperty = factoryModelProperty;
     this.parameterValueResolver = parameterValueResolver;
     this.connectionSupplier = connectionSupplier;

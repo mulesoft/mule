@@ -35,8 +35,8 @@ import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.api.util.Reference;
-import org.mule.runtime.extension.api.values.ConfigurationParameterValuesProvider;
-import org.mule.runtime.api.values.Value;
+import org.mule.runtime.extension.api.values.ConfigurationParameterValueProvider;
+import org.mule.runtime.api.value.Value;
 import org.mule.runtime.extension.api.values.ValueResolvingException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
@@ -48,7 +48,7 @@ import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFacto
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ObjectBasedParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
-import org.mule.runtime.module.extension.internal.values.ValuesProviderMediator;
+import org.mule.runtime.module.extension.internal.value.ValueProviderMediator;
 
 import java.util.List;
 import java.util.Set;
@@ -59,14 +59,14 @@ import java.util.Set;
  * So sar the capabilities are:
  * <ul>
  * <li>{@link MetadataKeyProvider}, to resolve {@link MetadataKey metadata keys} associated to a configuration</li>
- * <li>{@link ConfigurationParameterValuesProvider}, to resolve {@link Value values} associated to a configuration and
+ * <li>{@link ConfigurationParameterValueProvider}, to resolve {@link Value values} associated to a configuration and
  * their related connection</li>
  * </ul>
  *
  * @since 4.0
  */
 public final class ConfigurationProviderToolingAdapter extends StaticConfigurationProvider
-    implements MetadataKeyProvider, ConfigurationParameterValuesProvider {
+    implements MetadataKeyProvider, ConfigurationParameterValueProvider {
 
   private final MuleMetadataService metadataService;
   protected final ConnectionManager connectionManager;
@@ -129,11 +129,11 @@ public final class ConfigurationProviderToolingAdapter extends StaticConfigurati
   public Set<Value> getConfigValues(String parameterName) throws ValueResolvingException {
     Reference<Set<Value>> options = new Reference<>();
     ConfigurationModel configurationModel = getConfigurationModel();
-    ValuesProviderMediator<ConfigurationModel> valuesProviderMediator =
-        new ValuesProviderMediator<>(configurationModel, muleContext);
+    ValueProviderMediator<ConfigurationModel> valueProviderMediator =
+        new ValueProviderMediator<>(configurationModel, muleContext);
     options
-        .set(valuesProviderMediator.getValues(parameterName,
-                                              getParameterValueResolver(configuration.getValue(), configurationModel)));
+        .set(valueProviderMediator.getValues(parameterName,
+                                             getParameterValueResolver(configuration.getValue(), configurationModel)));
     return options.get();
   }
 
@@ -153,10 +153,10 @@ public final class ConfigurationProviderToolingAdapter extends StaticConfigurati
             .orElseThrow(() -> new ValueResolvingException("Internal error. Unable to obtain the Connection Provider Model",
                                                            UNKNOWN));
 
-    ValuesProviderMediator<ConnectionProviderModel> valuesProviderMediator =
-        new ValuesProviderMediator<>(connectionProviderModel, muleContext);
+    ValueProviderMediator<ConnectionProviderModel> valueProviderMediator =
+        new ValueProviderMediator<>(connectionProviderModel, muleContext);
 
-    options.set(valuesProviderMediator.getValues(parameterName, getParameterValueResolver(unwrap, connectionProviderModel)));
+    options.set(valueProviderMediator.getValues(parameterName, getParameterValueResolver(unwrap, connectionProviderModel)));
 
     return options.get();
   }
