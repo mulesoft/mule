@@ -17,7 +17,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.MetadataService;
-import org.mule.runtime.api.values.ValueProviderService;
+import org.mule.runtime.api.value.ValueProviderService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;

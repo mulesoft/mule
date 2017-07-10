@@ -7,16 +7,16 @@
 package org.mule.runtime.core.internal.value;
 
 import static java.lang.String.format;
-import static org.mule.runtime.api.values.ResolvingFailure.Builder.newFailure;
-import static org.mule.runtime.api.values.ValueResult.resultFrom;
+import static org.mule.runtime.api.value.ResolvingFailure.Builder.newFailure;
+import static org.mule.runtime.api.value.ValueResult.resultFrom;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.INVALID_LOCATION;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.NOT_VALUE_PROVIDER_ENABLED;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
-import org.mule.runtime.api.values.ResolvingFailure;
-import org.mule.runtime.api.values.Value;
-import org.mule.runtime.api.values.ValueProviderService;
-import org.mule.runtime.api.values.ValueResult;
+import org.mule.runtime.api.value.ResolvingFailure;
+import org.mule.runtime.api.value.Value;
+import org.mule.runtime.api.value.ValueProviderService;
+import org.mule.runtime.api.value.ValueResult;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.values.ComponentValueProvider;
 import org.mule.runtime.extension.api.values.ConfigurationParameterValueProvider;

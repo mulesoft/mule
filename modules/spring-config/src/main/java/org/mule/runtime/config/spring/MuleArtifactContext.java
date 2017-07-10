@@ -41,7 +41,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.ioc.ObjectProvider;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.metadata.MetadataService;
-import org.mule.runtime.api.values.ValueProviderService;
+import org.mule.runtime.api.value.ValueProviderService;
 import org.mule.runtime.config.spring.dsl.model.ApplicationModel;
 import org.mule.runtime.config.spring.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;

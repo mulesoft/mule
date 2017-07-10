@@ -11,7 +11,7 @@ import static java.util.stream.Collectors.toSet;
 import static org.hamcrest.core.IsCollectionContaining.hasItems;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.component.location.Location;
-import org.mule.runtime.api.values.Value;
+import org.mule.runtime.api.value.Value;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.internal.value.MuleValueProviderService;
 import org.mule.tck.junit4.matcher.ValueMatcher;

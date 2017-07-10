@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.values;
+package org.mule.runtime.module.extension.internal.value;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
@@ -16,7 +16,7 @@ import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
-import org.mule.runtime.api.values.Value;
+import org.mule.runtime.api.value.Value;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.values.ValueBuilder;
 import org.mule.runtime.extension.api.values.ValueProvider;
@@ -34,7 +34,7 @@ import java.util.function.Supplier;
  *
  * @since 4.0
  */
-public final class ValuesProviderMediator<T extends ParameterizedModel & EnrichableModel> {
+public final class ValueProviderMediator<T extends ParameterizedModel & EnrichableModel> {
 
   private T containerModel;
   private MuleContext muleContext;
@@ -46,7 +46,7 @@ public final class ValuesProviderMediator<T extends ParameterizedModel & Enricha
    * @param containerModel container model which is a {@link ParameterizedModel} and {@link EnrichableModel}
    * @param muleContext context to be able to initialize {@link ValueProvider} if necessary
    */
-  public ValuesProviderMediator(T containerModel, MuleContext muleContext) {
+  public ValueProviderMediator(T containerModel, MuleContext muleContext) {
     this.containerModel = containerModel;
     this.muleContext = muleContext;
   }
@@ -122,7 +122,7 @@ public final class ValuesProviderMediator<T extends ParameterizedModel & Enricha
     Set<Value> valueSet = valueProvider.resolve();
 
     return valueSet.stream()
-        .map(option -> ValuesProviderMediatorUtils.cloneAndEnrichValue(option, parameters))
+        .map(option -> ValueProviderMediatorUtils.cloneAndEnrichValue(option, parameters))
         .map(ValueBuilder::build)
         .collect(toSet());
   }

@@ -18,7 +18,7 @@ import static org.mule.runtime.module.deployment.impl.internal.artifact.Artifact
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.metadata.MetadataService;
-import org.mule.runtime.api.values.ValueProviderService;
+import org.mule.runtime.api.value.ValueProviderService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;

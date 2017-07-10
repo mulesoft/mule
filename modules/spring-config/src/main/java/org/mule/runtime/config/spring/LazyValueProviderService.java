@@ -8,11 +8,11 @@ package org.mule.runtime.config.spring;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static org.mule.runtime.api.values.ResolvingFailure.Builder.newFailure;
-import static org.mule.runtime.api.values.ValueResult.resultFrom;
+import static org.mule.runtime.api.value.ResolvingFailure.Builder.newFailure;
+import static org.mule.runtime.api.value.ValueResult.resultFrom;
 import org.mule.runtime.api.component.location.Location;
-import org.mule.runtime.api.values.ValueProviderService;
-import org.mule.runtime.api.values.ValueResult;
+import org.mule.runtime.api.value.ValueProviderService;
+import org.mule.runtime.api.value.ValueResult;
 
 import java.util.Optional;
 

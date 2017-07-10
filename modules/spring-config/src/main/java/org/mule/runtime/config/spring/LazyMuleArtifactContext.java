@@ -20,7 +20,7 @@ import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.MetadataService;
-import org.mule.runtime.api.values.ValueProviderService;
+import org.mule.runtime.api.value.ValueProviderService;
 import org.mule.runtime.config.spring.dsl.model.ApplicationModel;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.model.MinimalApplicationModelGenerator;

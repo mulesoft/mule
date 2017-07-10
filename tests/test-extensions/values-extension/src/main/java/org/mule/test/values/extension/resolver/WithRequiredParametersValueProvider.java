@@ -7,7 +7,7 @@
 package org.mule.test.values.extension.resolver;
 
 import static org.mule.runtime.extension.api.values.ValueBuilder.getValuesFor;
-import org.mule.runtime.api.values.Value;
+import org.mule.runtime.api.value.Value;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.values.ValueProvider;
 
