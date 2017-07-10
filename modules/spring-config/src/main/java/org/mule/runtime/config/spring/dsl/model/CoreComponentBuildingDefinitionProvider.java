@@ -785,7 +785,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
 
     componentBuildingDefinitions.addAll(getTransformersBuildingDefinitions());
 
-    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier(POOLING_PROFILE_ELEMENT_IDENTIFIER)
+    componentBuildingDefinitions.add(baseDefinition.withIdentifier(POOLING_PROFILE_ELEMENT_IDENTIFIER)
         .withTypeDefinition(fromType(PoolingProfile.class))
         .withConstructorParameterDefinition(fromSimpleParameter("maxActive").withDefaultValue(DEFAULT_MAX_POOL_ACTIVE).build())
         .withConstructorParameterDefinition(fromSimpleParameter("maxIdle").withDefaultValue(DEFAULT_MAX_POOL_IDLE).build())
