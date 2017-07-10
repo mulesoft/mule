@@ -31,14 +31,13 @@ import org.mule.test.heisenberg.extension.model.types.IntegerAttributes;
 import org.mule.test.module.extension.AbstractHeisenbergConfigTestCase;
 import org.mule.test.vegan.extension.VeganPolicy;
 
+import java.util.Collection;
+import java.util.List;
+
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-
-import java.util.Collection;
-import java.util.List;
-
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 

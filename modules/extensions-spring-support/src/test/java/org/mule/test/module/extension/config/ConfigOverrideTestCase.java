@@ -20,10 +20,10 @@ import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import org.mule.test.vegan.extension.AppleConfig;
 import org.mule.test.vegan.extension.HealthyFood;
 
-import org.junit.Test;
-
 import java.util.List;
 import java.util.Map;
+
+import org.junit.Test;
 
 public class ConfigOverrideTestCase extends AbstractExtensionFunctionalTestCase {
 

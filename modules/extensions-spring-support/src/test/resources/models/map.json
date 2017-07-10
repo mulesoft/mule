@@ -537,6 +537,7 @@
       "operations": [],
       "connectionProviders": [],
       "messageSources": [],
+      "functions": [],
       "name": "config",
       "description": "Default configuration",
       "modelProperties": {}
@@ -576,6 +577,7 @@
       "kind": "operation"
     }
   ],
+  "functions": [],
   "connectionProviders": [],
   "messageSources": [],
   "errors": [

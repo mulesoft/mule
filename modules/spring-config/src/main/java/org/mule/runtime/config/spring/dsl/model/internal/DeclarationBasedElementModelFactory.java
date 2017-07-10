@@ -164,8 +164,8 @@ class DeclarationBasedElementModelFactory {
     }.walk(currentExtension);
 
     if (LOGGER.isDebugEnabled() && elementModel.get() == null) {
-      LOGGER.debug(String.format("No model found with name [%s] of type [%s] for extension [%s]",
-                                 declaration.getName(), declaration.getClass().getName(), declaration.getDeclaringExtension()));
+      LOGGER.debug(format("No model found with name [%s] of type [%s] for extension [%s]",
+                          declaration.getName(), declaration.getClass().getName(), declaration.getDeclaringExtension()));
     }
 
     return Optional.ofNullable(elementModel.get());
@@ -294,7 +294,11 @@ class DeclarationBasedElementModelFactory {
   }
 
   private void setupCurrentExtensionContext(String extension) {
-    this.currentExtension = context.getExtension(extension).orElseThrow(() -> new IllegalArgumentException());
+    this.currentExtension = context.getExtension(extension)
+        .orElseThrow(() -> new IllegalArgumentException(format("Extension [%s] is not present in the current context. Available extensions are: %s",
+                                                               extension,
+                                                               context.getExtensions().stream().map(NamedObject::getName)
+                                                                   .collect(toList()))));
     this.dsl = resolvers.get(currentExtension);
   }
 

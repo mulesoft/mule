@@ -27,17 +27,17 @@ import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.ExternalLib;
 import org.mule.runtime.extension.api.annotation.ExternalLibs;
 import org.mule.runtime.extension.api.annotation.Operations;
-import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Config;
+import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
+import org.mule.runtime.extension.internal.property.LiteralModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.contributor.InfrastructureFieldContributor;
 import org.mule.runtime.module.extension.internal.loader.java.contributor.ParameterDeclarerContributor;
 import org.mule.runtime.module.extension.internal.loader.java.contributor.ParameterTypeUnwrapperContributor;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
-import org.mule.runtime.extension.internal.property.LiteralModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterResolverTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.TypedValueTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionElement;
@@ -66,6 +66,7 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
 
   private final ConfigModelLoaderDelegate configLoaderDelegate = new ConfigModelLoaderDelegate(this);
   private final OperationModelLoaderDelegate operationLoaderDelegate = new OperationModelLoaderDelegate(this);
+  private final FunctionModelLoaderDelegate functionModelLoaderDelegate = new FunctionModelLoaderDelegate(this);
   private final SourceModelLoaderDelegate sourceModelLoaderDelegate = new SourceModelLoaderDelegate(this);
   private final ConnectionProviderModelLoaderDelegate connectionProviderModelLoaderDelegate =
       new ConnectionProviderModelLoaderDelegate(this);
@@ -123,6 +124,10 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
     if (!isEmpty(extensionElement.getConfigurations())) {
       operationLoaderDelegate
           .declareOperations(declarer, declarer, null, extensionElement.getOperations(), false);
+
+      functionModelLoaderDelegate
+          .declareFunctions(declarer, declarer, null, extensionElement.getFunctions());
+
       extensionElement.getSources()
           .forEach(source -> sourceModelLoaderDelegate.declareMessageSource(declarer, declarer, source, false));
     }
@@ -194,6 +199,10 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
 
   OperationModelLoaderDelegate getOperationLoaderDelegate() {
     return operationLoaderDelegate;
+  }
+
+  FunctionModelLoaderDelegate getFunctionModelLoaderDelegate() {
+    return functionModelLoaderDelegate;
   }
 
   SourceModelLoaderDelegate getSourceModelLoaderDelegate() {

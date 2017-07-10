@@ -5571,6 +5571,7 @@
           "kind": "source"
         }
       ],
+      "functions": [],
       "name": "config",
       "description": "Default configuration",
       "modelProperties": {}
@@ -6901,6 +6902,7 @@
       "kind": "operation"
     }
   ],
+  "functions": [],
   "connectionProviders": [
     {
       "connectionManagementType": "CACHED",

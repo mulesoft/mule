@@ -22,12 +22,12 @@ import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.heisenberg.extension.model.Weapon;
 
+import java.util.Optional;
+
 import org.hamcrest.Matcher;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-
-import java.util.Optional;
 
 public class ParameterResolverOperationExecutionTestCase extends AbstractParameterResolverTestCase {
 

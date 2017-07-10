@@ -12,13 +12,13 @@ import static org.junit.Assert.assertThat;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import org.mule.test.petstore.extension.PetCage;
 
-import org.junit.Test;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
+import org.junit.Test;
 
 public class PetStoreComplexParameterTestCase extends AbstractExtensionFunctionalTestCase {
 

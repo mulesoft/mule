@@ -67,8 +67,6 @@ import org.mule.test.metadata.extension.model.shapes.Shape;
 import org.mule.test.metadata.extension.resolver.TestThreadContextClassLoaderResolver;
 import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 
-import org.junit.Test;
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -76,6 +74,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
+
+import org.junit.Test;
 
 public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase {
 

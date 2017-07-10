@@ -1973,6 +1973,7 @@
           "kind": "source"
         }
       ],
+      "functions": [],
       "name": "dr-strange",
       "description": "",
       "modelProperties": {}
@@ -2640,6 +2641,7 @@
         }
       ],
       "messageSources": [],
+      "functions": [],
       "name": "iron-man",
       "description": "",
       "modelProperties": {}
@@ -2899,6 +2901,7 @@
       "kind": "operation"
     }
   ],
+  "functions": [],
   "connectionProviders": [],
   "messageSources": [],
   "errors": [
