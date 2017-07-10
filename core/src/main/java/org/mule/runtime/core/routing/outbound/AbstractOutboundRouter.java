@@ -6,10 +6,11 @@
  */
 package org.mule.runtime.core.routing.outbound;
 
+import static com.google.common.cache.CacheBuilder.newBuilder;
 import static java.util.Collections.emptyList;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
-import static org.mule.runtime.core.api.execution.MessageProcessorExecutionTemplate.createNotificationExecutionTemplate;
 import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
+import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.api.util.StringMessageUtils.truncate;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -27,11 +28,13 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.exception.MessagingException;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
-import org.mule.runtime.core.api.execution.MessageProcessorExecutionTemplate;
 import org.mule.runtime.core.api.management.stats.RouterStatistics;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
+import org.mule.runtime.core.api.processor.MessageProcessors;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.OutboundRouter;
 import org.mule.runtime.core.api.routing.RouterResultsHandler;
@@ -40,8 +43,12 @@ import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.routing.DefaultRouterResultsHandler;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
@@ -70,7 +77,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
   protected AtomicBoolean initialised = new AtomicBoolean(false);
   protected AtomicBoolean started = new AtomicBoolean(false);
 
-  private MessageProcessorExecutionTemplate notificationTemplate = createNotificationExecutionTemplate();
+  private Cache<Processor, MessageProcessorChain> processorChainCache = newBuilder().build();
 
   @Override
   public Event process(final Event event) throws MuleException {
@@ -152,15 +159,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
   @Override
   public synchronized void addRoute(Processor route) throws MuleException {
     if (initialised.get()) {
-      if (route instanceof MuleContextAware) {
-        ((MuleContextAware) route).setMuleContext(muleContext);
-      }
-      if (route instanceof FlowConstructAware) {
-        ((FlowConstructAware) route).setFlowConstruct(flowConstruct);
-      }
-      if (route instanceof Initialisable) {
-        ((Initialisable) route).initialise();
-      }
+      initialiseObject(route);
     }
     if (started.get()) {
       if (route instanceof Startable) {
@@ -168,6 +167,21 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
       }
     }
     routes.add(route);
+  }
+
+  private void initialiseObject(Processor route) throws InitialisationException {
+    if (route instanceof MessagingExceptionHandlerAware) {
+      ((MessagingExceptionHandlerAware) route).setMessagingExceptionHandler(messagingExceptionHandler);
+    }
+    if (route instanceof MuleContextAware) {
+      ((MuleContextAware) route).setMuleContext(muleContext);
+    }
+    if (route instanceof FlowConstructAware) {
+      ((FlowConstructAware) route).setFlowConstruct(flowConstruct);
+    }
+    if (route instanceof Initialisable) {
+      ((Initialisable) route).initialise();
+    }
   }
 
   @Override
@@ -194,11 +208,6 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
     this.transactionConfig = transactionConfig;
   }
 
-  @Override
-  public boolean isDynamicRoutes() {
-    return false;
-  }
-
   public RouterResultsHandler getResultsHandler() {
     return resultsHandler;
   }
@@ -217,11 +226,18 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
     return doProcessRoute(route, event);
   }
 
-  protected Event doProcessRoute(Processor route, Event event) throws MuleException, MessagingException {
+  protected Event doProcessRoute(Processor route, Event event) throws MuleException {
     if (route instanceof MessageProcessorChain) {
       return route.process(event);
     } else {
-      return notificationTemplate.execute(route, event);
+      // MULE-13028 All routers should use processor chains rather than processors as their routes
+      MessageProcessorChain chain = processorChainCache.getIfPresent(route);
+      if (chain == null) {
+        chain = newChain(route);
+        initialiseObject(chain);
+        processorChainCache.put(route, chain);
+      }
+      return chain.process(event);
     }
   }
 
@@ -280,13 +296,11 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
   @Override
   public void setMuleContext(MuleContext context) {
     super.setMuleContext(context);
-    notificationTemplate.setMuleContext(context);
   }
 
   @Override
   public void setFlowConstruct(FlowConstruct flowConstruct) {
     super.setFlowConstruct(flowConstruct);
-    notificationTemplate.setFlowConstruct(flowConstruct);
   }
 
 }

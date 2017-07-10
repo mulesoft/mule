@@ -12,6 +12,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import org.mule.runtime.api.exception.MuleException;
@@ -30,6 +31,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Test;
+import org.reactivestreams.Publisher;
 
 public class RoundRobinTestCase extends AbstractMuleContextTestCase {
 
@@ -72,8 +74,10 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase {
     roundRobin.setMuleContext(muleContext);
     List<Processor> routes = new ArrayList<>(2);
     Processor route1 = mock(Processor.class, "route1");
+    when(route1.apply(any(Publisher.class))).then(invocation -> invocation.getArguments()[0]);
     routes.add(route1);
     Processor route2 = mock(Processor.class, "route2");
+    when(route2.apply(any(Publisher.class))).then(invocation -> invocation.getArguments()[0]);
     routes.add(route2);
     roundRobin.setRoutes(new ArrayList<>(routes));
 
@@ -81,8 +85,8 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase {
 
     roundRobin.process(eventBuilder().message(message).build());
 
-    verify(route1).process(any(Event.class));
-    verify(route2, never()).process(any(Event.class));
+    verify(route1).apply(any(Publisher.class));
+    verify(route2, never()).apply(any(Publisher.class));
   }
 
   class TestDriver implements Runnable {

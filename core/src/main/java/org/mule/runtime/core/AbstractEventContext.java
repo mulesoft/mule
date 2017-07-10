@@ -156,6 +156,7 @@ abstract class AbstractEventContext implements EventContext {
     return from(handler.apply(messagingException))
         .doOnSuccess(handled -> success(handled))
         .doOnError(rethrown -> error(rethrown))
+        .onErrorResume(t -> empty())
         .then();
   }
 

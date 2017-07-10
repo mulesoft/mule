@@ -8,13 +8,14 @@ package org.mule.runtime.core.internal.execution;
 
 import static org.mule.runtime.core.api.context.notification.ConnectorMessageNotification.MESSAGE_ERROR_RESPONSE;
 import static org.mule.runtime.core.api.context.notification.ConnectorMessageNotification.MESSAGE_RESPONSE;
-import static org.mule.runtime.core.api.execution.TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate;
+import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.execution.MessageProcessTemplate;
-import org.mule.runtime.core.api.execution.TransactionalErrorHandlingExecutionTemplate;
+import org.mule.runtime.core.api.execution.TransactionalExecutionTemplate;
 import org.mule.runtime.core.api.scheduler.SchedulerBusyException;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
@@ -50,11 +51,9 @@ public class FlowProcessingPhase extends NotificationFiringProcessingPhase<FlowP
       try {
         try {
           final AtomicReference exceptionThrownDuringFlowProcessing = new AtomicReference();
-          TransactionalErrorHandlingExecutionTemplate transactionTemplate =
-              createMainExecutionTemplate(messageProcessContext.getFlowConstruct().getMuleContext(),
-                                          messageProcessContext.getFlowConstruct(),
-                                          messageProcessContext.getTransactionConfig().orElse(new MuleTransactionConfig()),
-                                          messageProcessContext.getFlowConstruct().getExceptionListener());
+          TransactionalExecutionTemplate<Event> transactionTemplate =
+              createTransactionalExecutionTemplate(messageProcessContext.getFlowConstruct()
+                  .getMuleContext(), messageProcessContext.getTransactionConfig().orElse(new MuleTransactionConfig()));
           Event response = transactionTemplate.execute(() -> {
             try {
               Object message = flowProcessingPhaseTemplate.getOriginalMessage();

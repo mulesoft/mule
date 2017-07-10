@@ -110,10 +110,12 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
   @Test
   public void testHandleExceptionWithNoConfig() throws Exception {
     configureXaTransactionAndSingleResourceTransaction();
+    when(mockException.handled()).thenReturn(true);
 
     Event resultEvent = onErrorContinueHandler.handleException(mockException, muleEvent);
     assertThat(resultEvent.getMessage().getPayload().getValue(), equalTo(muleEvent.getMessage().getPayload().getValue()));
 
+    verify(mockException).setHandled(true);
     verify(mockTransaction, times(0)).setRollbackOnly();
     verify(mockTransaction, times(0)).commit();
     verify(mockTransaction, times(0)).rollback();
@@ -125,8 +127,10 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
     onErrorContinueHandler
         .setMessageProcessors(asList(createSetStringMessageProcessor("A"), createSetStringMessageProcessor("B")));
     onErrorContinueHandler.initialise();
+    when(mockException.handled()).thenReturn(true);
     final Event result = onErrorContinueHandler.handleException(mockException, muleEvent);
 
+    verify(mockException).setHandled(true);
     assertThat(result.getMessage().getPayload().getValue(), is("B"));
     assertThat(result.getError().isPresent(), is(false));
   }
@@ -139,7 +143,10 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
             .build()),
                                      createChagingEventMessageProcessor(lastEventCreated)));
     onErrorContinueHandler.initialise();
+    when(mockException.handled()).thenReturn(true);
     Event exceptionHandlingResult = onErrorContinueHandler.handleException(mockException, muleEvent);
+
+    verify(mockException).setHandled(true);
     assertThat(exceptionHandlingResult.getCorrelationId(), is(lastEventCreated.getCorrelationId()));
   }
 

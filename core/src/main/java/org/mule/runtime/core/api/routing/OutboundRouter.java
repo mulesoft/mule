@@ -9,6 +9,7 @@ package org.mule.runtime.core.api.routing;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 
@@ -18,19 +19,12 @@ import java.util.List;
  * <code>OutboundRouter</code> is used to control outbound routing behaviour for an event. One or more Outbound routers can be
  * associated with an <code>OutboundRouterCollection</code> and will be selected based on the filters set on the individual
  * Outbound Router.
- * 
- * @see OutboundRouterCollection
  */
 public interface OutboundRouter
-    extends MatchableMessageRouter, RouterStatisticsRecorder, Lifecycle, MuleContextAware, FlowConstructAware {
+    extends MatchableMessageRouter, RouterStatisticsRecorder, Lifecycle, MuleContextAware, FlowConstructAware,
+    MessagingExceptionHandlerAware {
 
   void setTransactionConfig(TransactionConfig transactionConfig);
-
-  /**
-   * Determines whether this router supports dynamic route. i.e. routes that are not configured at design time. routes might be
-   * pulled from the message or payload.
-   */
-  boolean isDynamicRoutes();
 
   /**
    * Gets a list of MessageProcessor instances associated with this router

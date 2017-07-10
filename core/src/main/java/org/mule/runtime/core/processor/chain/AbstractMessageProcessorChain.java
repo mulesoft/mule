@@ -55,6 +55,7 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.logging.Level;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
@@ -184,18 +185,14 @@ abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObject imp
     interceptors.add((processor, next) -> stream -> from(stream).concatMap(event -> just(event)
         .transform(next)
         .onErrorResume(RejectedExecutionException.class,
-                       throwable -> {
-                         from(event.getContext()
-                             .error(updateMessagingExceptionWithError(new MessagingException(event, throwable, processor),
-                                                                      processor, flowConstruct),
-                                    getMessagingExceptionHandler())).subscribe();
-                         return empty();
-                       })
+                       throwable -> Mono.from(event.getContext()
+                           .error(updateMessagingExceptionWithError(new MessagingException(event, throwable, processor),
+                                                                    processor, flowConstruct),
+                                  getMessagingExceptionHandler()))
+                           .then(Mono.empty()))
         .onErrorResume(MessagingException.class,
-                       throwable -> {
-                         from(event.getContext().error(throwable, getMessagingExceptionHandler())).subscribe();
-                         return empty();
-                       })));
+                       throwable -> Mono.from(event.getContext().error(throwable, getMessagingExceptionHandler()))
+                           .then(Mono.empty()))));
 
     return interceptors;
   }

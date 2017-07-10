@@ -10,8 +10,8 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setFlowConstruc
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContext;
-import static org.mule.runtime.core.api.execution.MessageProcessorExecutionTemplate.createExecutionTemplate;
 import static reactor.core.publisher.Flux.from;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -25,14 +25,11 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.execution.MessageProcessorExecutionTemplate;
 
 import org.reactivestreams.Publisher;
 
 public class ResponseMessageProcessorAdapter extends AbstractInterceptingMessageProcessor
     implements Lifecycle, FlowConstructAware {
-
-  private MessageProcessorExecutionTemplate messageProcessorExecutionTemplate = createExecutionTemplate();
 
   protected Processor responseProcessor;
 
@@ -105,13 +102,11 @@ public class ResponseMessageProcessorAdapter extends AbstractInterceptingMessage
   public void setFlowConstruct(FlowConstruct flowConstruct) {
     super.setFlowConstruct(flowConstruct);
     setFlowConstructIfNeeded(responseProcessor, flowConstruct);
-    messageProcessorExecutionTemplate.setFlowConstruct(flowConstruct);
   }
 
   @Override
   public void setMuleContext(MuleContext muleContext) {
     super.setMuleContext(muleContext);
     setMuleContextIfNeeded(responseProcessor, muleContext);
-    messageProcessorExecutionTemplate.setMuleContext(muleContext);
   }
 }

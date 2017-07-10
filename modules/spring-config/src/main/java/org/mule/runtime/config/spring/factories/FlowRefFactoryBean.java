@@ -184,12 +184,8 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
         if (referencedProcessor instanceof Flow) {
           return just(event)
               .flatMap(request -> Mono
-                  .from(processWithChildContextHandleErrors(request, referencedProcessor, FlowRefFactoryBean.this.getLocation()))
-                  .doOnSuccess(result -> {
-                    if (result == null) {
-                      event.getContext().success();
-                    }
-                  }));
+                  .from(processWithChildContextHandleErrors(request, referencedProcessor,
+                                                            FlowRefFactoryBean.this.getLocation())));
         } else {
           return just(event).transform(referencedProcessor);
         }

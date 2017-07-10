@@ -133,12 +133,7 @@ public class MessageProcessors {
    */
   public static Publisher<Event> processWithChildContext(Event event, ReactiveProcessor processor,
                                                          ComponentLocation componentLocation) {
-    EventContext child = child(event.getContext(), componentLocation, false);
-    return just(builder(child, event).build())
-        .transform(processor)
-        .switchIfEmpty(from(child.getResponsePublisher()))
-        .map(result -> builder(event.getContext(), result).build())
-        .doOnError(MessagingException.class, me -> me.setProcessedEvent(builder(event.getContext(), me.getEvent()).build()));
+    return internalProcessWithChildContext(event, processor, child(event.getContext(), componentLocation, false));
   }
 
   /**
@@ -155,12 +150,25 @@ public class MessageProcessors {
    */
   public static Publisher<Event> processWithChildContextHandleErrors(Event event, ReactiveProcessor processor,
                                                                      ComponentLocation componentLocation) {
-    EventContext child = child(event.getContext(), componentLocation, true);
+    return internalProcessWithChildContext(event, processor, child(event.getContext(), componentLocation, true));
+  }
+
+  private static Publisher<Event> internalProcessWithChildContext(Event event, ReactiveProcessor processor, EventContext child) {
     return just(builder(child, event).build())
         .transform(processor)
+        .doOnNext(result -> {
+          if (!(from(child.getResponsePublisher()).toFuture().isDone())) {
+            child.success(result);
+          }
+        })
         .switchIfEmpty(from(child.getResponsePublisher()))
         .map(result -> builder(event.getContext(), result).build())
-        .doOnError(MessagingException.class, me -> me.setProcessedEvent(builder(event.getContext(), me.getEvent()).build()));
+        .doOnError(MessagingException.class, me -> me.setProcessedEvent(builder(event.getContext(), me.getEvent()).build()))
+        .doOnSuccess(result -> {
+          if (result == null) {
+            event.getContext().success();
+          }
+        });
   }
 
 }
