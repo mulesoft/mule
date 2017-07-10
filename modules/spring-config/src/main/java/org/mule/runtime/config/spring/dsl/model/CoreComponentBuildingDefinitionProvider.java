@@ -71,16 +71,12 @@ import org.mule.runtime.config.spring.dsl.processor.AddVariablePropertyConfigura
 import org.mule.runtime.config.spring.dsl.processor.CustomSecurityFilterObjectFactory;
 import org.mule.runtime.config.spring.dsl.processor.EncryptionSecurityFilterObjectFactory;
 import org.mule.runtime.config.spring.dsl.processor.EnvironmentPropertyObjectFactory;
-import org.mule.runtime.config.spring.dsl.processor.ExplicitMethodEntryPointResolverObjectFactory;
-import org.mule.runtime.config.spring.dsl.processor.MethodEntryPoint;
-import org.mule.runtime.config.spring.dsl.processor.NoArgumentsEntryPointResolverObjectFactory;
 import org.mule.runtime.config.spring.dsl.processor.RetryPolicyTemplateObjectFactory;
 import org.mule.runtime.config.spring.dsl.processor.TransformerConfigurator;
 import org.mule.runtime.config.spring.dsl.processor.UsernamePasswordFilterObjectFactory;
 import org.mule.runtime.config.spring.dsl.processor.factory.MessageEnricherObjectFactory;
 import org.mule.runtime.config.spring.dsl.spring.ConfigurableInstanceFactory;
 import org.mule.runtime.config.spring.dsl.spring.ConfigurableObjectFactory;
-import org.mule.runtime.config.spring.dsl.spring.ExcludeDefaultObjectMethods;
 import org.mule.runtime.config.spring.factories.AsyncMessageProcessorsFactoryBean;
 import org.mule.runtime.config.spring.factories.ChoiceRouterFactoryBean;
 import org.mule.runtime.config.spring.factories.DefaultFlowFactoryBean;
@@ -103,15 +99,6 @@ import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.context.notification.ListenerSubscriptionPair;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
-import org.mule.runtime.core.api.model.EntryPointResolver;
-import org.mule.runtime.core.api.model.resolvers.ArrayEntryPointResolver;
-import org.mule.runtime.core.api.model.resolvers.CallableEntryPointResolver;
-import org.mule.runtime.core.api.model.resolvers.DefaultEntryPointResolverSet;
-import org.mule.runtime.core.api.model.resolvers.ExplicitMethodEntryPointResolver;
-import org.mule.runtime.core.api.model.resolvers.LegacyEntryPointResolverSet;
-import org.mule.runtime.core.api.model.resolvers.MethodHeaderPropertyEntryPointResolver;
-import org.mule.runtime.core.api.model.resolvers.NoArgumentsEntryPointResolver;
-import org.mule.runtime.core.api.model.resolvers.ReflectionEntryPointResolver;
 import org.mule.runtime.core.api.object.ObjectFactory;
 import org.mule.runtime.core.api.processor.AbstractProcessor;
 import org.mule.runtime.core.api.processor.LoggerMessageProcessor;
@@ -798,7 +785,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("disabled", fromSimpleParameter("disabled").build())
         .build());
 
-    componentBuildingDefinitions.addAll(getEntryPointResolversDefinitions());
     componentBuildingDefinitions.addAll(getStreamingDefinitions());
     componentBuildingDefinitions.addAll(getFiltersDefinitions());
     componentBuildingDefinitions.addAll(getReconnectionDefinitions());
@@ -1340,101 +1326,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withObjectFactoryType(NullCursorIteratorProviderObjectFactory.class)
         .build());
 
-    return buildingDefinitions;
-  }
-
-  private List<ComponentBuildingDefinition> getEntryPointResolversDefinitions() {
-    List<ComponentBuildingDefinition> buildingDefinitions = new ArrayList<>();
-    buildingDefinitions.add(baseDefinition
-
-        .withIdentifier("custom-entry-point-resolver-set")
-        .withTypeDefinition(fromConfigurationAttribute(CLASS_ATTRIBUTE))
-        .withSetterParameterDefinition("entryPointResolvers", fromChildCollectionConfiguration(EntryPointResolver.class).build())
-        .build());
-    buildingDefinitions.add(baseDefinition
-
-        .withIdentifier("entry-point-resolver-set")
-        .withTypeDefinition(fromType(DefaultEntryPointResolverSet.class))
-        .withSetterParameterDefinition("entryPointResolvers", fromChildCollectionConfiguration(EntryPointResolver.class).build())
-        .build());
-    buildingDefinitions.add(baseDefinition
-
-        .withIdentifier("legacy-entry-point-resolver-set")
-        .withTypeDefinition(fromType(LegacyEntryPointResolverSet.class))
-        .withSetterParameterDefinition("entryPointResolvers", fromChildCollectionConfiguration(EntryPointResolver.class).build())
-        .build());
-    buildingDefinitions.add(baseDefinition
-
-        .withIdentifier("custom-entry-point-resolver")
-        .withTypeDefinition(fromConfigurationAttribute(CLASS_ATTRIBUTE))
-        .build());
-    buildingDefinitions.add(baseDefinition
-
-        .withIdentifier("callable-entry-point-resolver")
-        .withTypeDefinition(fromType(CallableEntryPointResolver.class))
-        .build());
-    buildingDefinitions.add(baseDefinition
-
-        .withIdentifier("method-entry-point-resolver")
-        .withTypeDefinition(fromType(ExplicitMethodEntryPointResolver.class))
-        .withObjectFactoryType(ExplicitMethodEntryPointResolverObjectFactory.class)
-        .withSetterParameterDefinition("methodEntryPoints", fromChildCollectionConfiguration(MethodEntryPoint.class).build())
-        .withSetterParameterDefinition("acceptVoidMethods", fromSimpleParameter("acceptVoidMethods").build())
-        .build());
-    buildingDefinitions.add(baseDefinition
-
-        .withIdentifier("include-entry-point")
-        .withTypeDefinition(fromType(MethodEntryPoint.class))
-        .withSetterParameterDefinition("enabled", fromFixedValue(true).build())
-        .withSetterParameterDefinition("method", fromSimpleParameter("method").build())
-        .build());
-    buildingDefinitions.add(baseDefinition
-
-        .withIdentifier("exclude-entry-point")
-        .withTypeDefinition(fromType(MethodEntryPoint.class))
-        .withSetterParameterDefinition("enabled", fromFixedValue(false).build())
-        .withSetterParameterDefinition("method", fromSimpleParameter("method").build())
-        .build());
-    buildingDefinitions.add(baseDefinition
-
-        .withIdentifier("property-entry-point-resolver")
-        .withTypeDefinition(fromType(MethodHeaderPropertyEntryPointResolver.class))
-        .withSetterParameterDefinition("methodProperty", fromSimpleParameter("property").build())
-        .build());
-    buildingDefinitions.add(baseDefinition
-
-        .withIdentifier("property-entry-point-resolver")
-        .withTypeDefinition(fromType(MethodHeaderPropertyEntryPointResolver.class))
-        .withSetterParameterDefinition("methodProperty", fromSimpleParameter("property").build())
-        .build());
-    buildingDefinitions.add(baseDefinition
-
-        .withIdentifier("reflection-entry-point-resolver")
-        .withTypeDefinition(fromType(ReflectionEntryPointResolver.class))
-        .withSetterParameterDefinition("ignoredMethods",
-                                       fromChildConfiguration(List.class).withIdentifier("exclude-object-methods").build())
-        .withSetterParameterDefinition("ignoredMethods",
-                                       fromChildConfiguration(List.class).withIdentifier("exclude-entry-point").build())
-        .build());
-    buildingDefinitions.add(baseDefinition
-
-        .withIdentifier("exclude-object-methods")
-        .withTypeDefinition(fromType(ExcludeDefaultObjectMethods.class))
-        .build());
-    buildingDefinitions.add(baseDefinition
-
-        .withIdentifier("no-arguments-entry-point-resolver")
-        .withTypeDefinition(fromType(NoArgumentsEntryPointResolver.class))
-        .withObjectFactoryType(NoArgumentsEntryPointResolverObjectFactory.class)
-        .withSetterParameterDefinition("excludeDefaultObjectMethods",
-                                       fromChildConfiguration(ExcludeDefaultObjectMethods.class).build())
-        .withSetterParameterDefinition("methodEntryPoints", fromChildCollectionConfiguration(MethodEntryPoint.class).build())
-        .build());
-    buildingDefinitions.add(baseDefinition
-
-        .withIdentifier("array-entry-point-resolver")
-        .withTypeDefinition(fromType(ArrayEntryPointResolver.class))
-        .build());
     return buildingDefinitions;
   }
 

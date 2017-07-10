@@ -18,8 +18,6 @@
         </ss:authentication-provider>
     </ss:authentication-manager>
 
-    <bean name="testComponent" class="org.mule.test.module.spring.security.TestComponent"/>
-
     <!-- this sets the same provider three times, once through spring-security's provider and twice
          through a custom provider.  in normal use it should be set just once, through
          the spring-security schema - this is just for extra test coverage -->

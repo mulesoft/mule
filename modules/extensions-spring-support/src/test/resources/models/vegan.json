@@ -6478,9 +6478,7 @@
           "isAbstract": false,
           "isFinal": false,
           "implementedInterfaces": [
-            "org.mule.tck.testmodels.fruit.Fruit",
-            "org.mule.runtime.core.api.lifecycle.Callable",
-            "org.mule.runtime.core.api.context.MuleContextAware"
+            "org.mule.tck.testmodels.fruit.Fruit"
           ],
           "parent": "",
           "genericTypes": []
@@ -6524,33 +6522,6 @@
             "annotations": {
               "typeId": "boolean"
             }
-          }
-        },
-        {
-          "key": {
-            "name": "muleContext"
-          },
-          "model": {
-            "type": "Object",
-            "annotations": {
-              "typeId": "org.mule.runtime.core.api.MuleContext",
-              "classInformation": {
-                "hasDefaultConstructor": false,
-                "isInterface": true,
-                "isInstantiable": false,
-                "isAbstract": true,
-                "isFinal": false,
-                "implementedInterfaces": [
-                  "org.mule.runtime.api.lifecycle.Lifecycle"
-                ],
-                "parent": "",
-                "genericTypes": []
-              },
-              "typeAlias": {
-                "value": "MuleContext"
-              }
-            },
-            "fields": []
           }
         },
         {
