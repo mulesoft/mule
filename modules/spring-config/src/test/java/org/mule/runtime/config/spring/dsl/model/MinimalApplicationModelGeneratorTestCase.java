@@ -261,6 +261,23 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
         .getNameAttribute().equals("asyncName"), is(true));
   }
 
+  @Test
+  public void propagateEnableTrueOnRequestedComponentAndInnerComponents() throws Exception {
+    MinimalApplicationModelGenerator generator = createGeneratorForConfig("low-level-name-attribute-config.xml");
+    ApplicationModel minimalModel =
+        generator
+            .getMinimalModel(builder().globalName("flowWithLowLevelNameAttribute").addProcessorsPart().addIndexPart(0).build());
+    assertThat(minimalModel.findTopLevelNamedComponent("flowWithLowLevelNameAttribute").isPresent(), is(true));
+    assertThat(minimalModel.findTopLevelNamedComponent("flowWithLowLevelNameAttribute").get().isEnabled(), is(true));
+    ComponentModel asyncComponent =
+        minimalModel.findTopLevelNamedComponent("flowWithLowLevelNameAttribute").get().getInnerComponents().get(0);
+    assertThat(asyncComponent.getNameAttribute(), is("asyncName"));
+    assertThat(asyncComponent.isEnabled(), is(true));
+    assertThat(asyncComponent.getInnerComponents().size(), is(1));
+    assertThat(asyncComponent.getInnerComponents().get(0).isEnabled(), is(true));
+  }
+
+
   private MinimalApplicationModelGenerator createGeneratorForConfig(String... configFileName) throws Exception {
     List<ConfigFile> configFiles = new ArrayList<>();
     for (String configFile : configFileName) {
