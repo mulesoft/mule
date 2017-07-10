@@ -12,7 +12,6 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import org.mule.runtime.extension.api.annotation.Ignore;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 import org.mule.test.parameter.resolver.extension.extension.ParameterResolverExtension;

@@ -57,6 +57,10 @@ abstract class AbstractModelLoaderDelegate {
     return loader.getOperationLoaderDelegate();
   }
 
+  FunctionModelLoaderDelegate getFunctionModelLoaderDelegate() {
+    return loader.getFunctionModelLoaderDelegate();
+  }
+
   ClassTypeLoader getTypeLoader() {
     return loader.getTypeLoader();
   }

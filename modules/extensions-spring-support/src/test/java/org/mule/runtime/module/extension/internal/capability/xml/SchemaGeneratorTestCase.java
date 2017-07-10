@@ -38,6 +38,7 @@ import org.mule.runtime.module.extension.internal.runtime.connectivity.basic.Tes
 import org.mule.runtime.module.extension.soap.internal.loader.SoapExtensionModelLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+import org.mule.test.function.extension.WeaveFunctionExtension;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.marvel.MarvelExtension;
 import org.mule.test.metadata.extension.MetadataExtension;
@@ -50,10 +51,6 @@ import org.mule.test.transactional.TransactionalExtension;
 import org.mule.test.typed.value.extension.extension.TypedValueExtension;
 import org.mule.test.values.extension.ValuesExtension;
 import org.mule.test.vegan.extension.VeganExtension;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -65,6 +62,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 @SmallTest
 @RunWith(Parameterized.class)
@@ -139,6 +141,9 @@ public class SchemaGeneratorTestCase extends AbstractMuleTestCase {
                                                                    new SchemaGeneratorTestUnit(javaLoader,
                                                                                                TestOAuthExtension.class,
                                                                                                "test-oauth.xsd"),
+                                                                   new SchemaGeneratorTestUnit(javaLoader,
+                                                                                               WeaveFunctionExtension.class,
+                                                                                               "test-fn.xsd"),
                                                                    new SchemaGeneratorTestUnit(javaLoader,
                                                                                                ValuesExtension.class,
                                                                                                "values.xsd"));

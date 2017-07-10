@@ -2589,6 +2589,7 @@
       "modelProperties": {}
     }
   ],
+  "functions": [],
   "connectionProviders": [],
   "messageSources": [
     {

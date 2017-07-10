@@ -482,6 +482,11 @@ public class DefaultDataTypeBuilder
     }
 
     built = true;
+    Class<?> type = this.typeRef.get();
+    if (ExpressionFunction.class.isAssignableFrom(type)) {
+      return new DefaultFunctionDataType(type, returnType, parametersType != null ? parametersType : newArrayList(), mediaType,
+                                         isConsumable(type));
+    }
     return dataTypeCache.getUnchecked(this);
   }
 
@@ -490,9 +495,6 @@ public class DefaultDataTypeBuilder
     if (Collection.class.isAssignableFrom(type) || Iterator.class.isAssignableFrom(type)) {
       return new DefaultCollectionDataType(type, itemTypeBuilder != null ? itemTypeBuilder.build() : DataType.OBJECT, mediaType,
                                            isConsumable(type));
-    } else if (ExpressionFunction.class.isAssignableFrom(type)) {
-      return new DefaultFunctionDataType(type, returnType, parametersType != null ? parametersType : newArrayList(), mediaType,
-                                         isConsumable(type));
     } else if (Map.class.isAssignableFrom(type)) {
       return new DefaultMapDataType(type, keyTypeBuilder != null ? keyTypeBuilder.build() : DataType.OBJECT,
                                     valueTypeBuilder != null ? valueTypeBuilder.build() : DataType.OBJECT, mediaType,
