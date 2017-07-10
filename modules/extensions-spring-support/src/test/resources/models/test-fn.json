@@ -115,6 +115,7 @@
                 "query": false,
                 "order": 1
               },
+              "elementReferences": [],
               "name": "payload",
               "description": "",
               "modelProperties": {}
@@ -152,6 +153,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
+              "elementReferences": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -213,6 +215,7 @@
                 "text": false,
                 "query": false
               },
+              "elementReferences": [],
               "name": "echo",
               "description": "",
               "modelProperties": {}
@@ -269,6 +272,7 @@
                 "text": false,
                 "query": false
               },
+              "elementReferences": [],
               "name": "bool",
               "description": "",
               "modelProperties": {}
@@ -297,6 +301,7 @@
                 "text": false,
                 "query": false
               },
+              "elementReferences": [],
               "name": "number",
               "description": "",
               "modelProperties": {}
@@ -324,6 +329,7 @@
                 "text": false,
                 "query": false
               },
+              "elementReferences": [],
               "name": "doubles",
               "description": "",
               "modelProperties": {}
@@ -351,6 +357,7 @@
                 "text": false,
                 "query": false
               },
+              "elementReferences": [],
               "name": "floats",
               "description": "",
               "modelProperties": {}
@@ -379,6 +386,7 @@
                 "text": false,
                 "query": false
               },
+              "elementReferences": [],
               "name": "longs",
               "description": "",
               "modelProperties": {}
@@ -406,6 +414,7 @@
                 "text": false,
                 "query": false
               },
+              "elementReferences": [],
               "name": "shorts",
               "description": "",
               "modelProperties": {}
@@ -491,6 +500,7 @@
                 "text": false,
                 "query": false
               },
+              "elementReferences": [],
               "name": "payload",
               "description": "",
               "modelProperties": {}
@@ -519,6 +529,7 @@
                 "text": false,
                 "query": false
               },
+              "elementReferences": [],
               "name": "prefix",
               "description": "",
               "modelProperties": {}
@@ -648,6 +659,7 @@
                 "text": false,
                 "query": false
               },
+              "elementReferences": [],
               "name": "pojo",
               "description": "",
               "modelProperties": {}
@@ -718,6 +730,7 @@
                 "text": false,
                 "query": false
               },
+              "elementReferences": [],
               "name": "expression",
               "description": "",
               "modelProperties": {}
@@ -728,8 +741,8 @@
                 "type": "Binary",
                 "annotations": {
                   "typeId": "java.io.InputStream"
-                  }
-                },
+                }
+              },
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
@@ -746,6 +759,7 @@
                 "text": false,
                 "query": false
               },
+              "elementReferences": [],
               "name": "item",
               "description": "",
               "modelProperties": {}
@@ -773,6 +787,7 @@
                 "text": false,
                 "query": false
               },
+              "elementReferences": [],
               "name": "returnType",
               "description": "",
               "modelProperties": {}
