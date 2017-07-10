@@ -49,15 +49,18 @@ public class DefaultRegionPluginClassLoadersFactoryTestCase extends AbstractMule
 
   private static final String REGION_ID = "regionId";
   private static final String PRIVILEGED_PACKAGE = "org.foo.privileged";
+  private static final String GROUP_ID = "org.mule.test";
   private static final String PLUGIN_ID2 = "plugin2";
+  private static final String PLUGIN_ARTIFACT_ID2 = GROUP_ID + ":" + PLUGIN_ID2;
   private static final String PLUGIN_ID1 = "plugin1";
+  private static final String PLUGIN_ARTIFACT_ID1 = GROUP_ID + ":" + PLUGIN_ID1;
   private static final BundleDescriptor PLUGIN1_BUNDLE_DESCRIPTOR =
-      new BundleDescriptor.Builder().setGroupId("test").setArtifactId(
-                                                                      PLUGIN_ID1)
+      new BundleDescriptor.Builder().setGroupId(GROUP_ID).setArtifactId(
+                                                                        PLUGIN_ID1)
           .setVersion("1.0").setClassifier("mule-plugin").build();
   private static final BundleDescriptor PLUGIN2_BUNDLE_DESCRIPTOR =
-      new BundleDescriptor.Builder().setGroupId("test").setArtifactId(
-                                                                      PLUGIN_ID2)
+      new BundleDescriptor.Builder().setGroupId(GROUP_ID).setArtifactId(
+                                                                        PLUGIN_ID2)
           .setVersion("1.0").setClassifier("mule-plugin").build();
 
   private final ArtifactClassLoaderFactory pluginClassLoaderFactory = mock(ArtifactClassLoaderFactory.class);
@@ -156,7 +159,7 @@ public class DefaultRegionPluginClassLoadersFactoryTestCase extends AbstractMule
   @Test
   public void createsPluginWithPrivilegedContainerAccess() throws Exception {
     MuleModule privilegedModule = mock(MuleModule.class);
-    when(privilegedModule.getPrivilegedArtifacts()).thenReturn(singleton(PLUGIN_ID1));
+    when(privilegedModule.getPrivilegedArtifacts()).thenReturn(singleton(PLUGIN_ARTIFACT_ID1));
     when(privilegedModule.getPrivilegedExportedPackages()).thenReturn(singleton(PRIVILEGED_PACKAGE));
     when(moduleRepository.getModules()).thenReturn(singletonList(privilegedModule));
 
@@ -176,7 +179,7 @@ public class DefaultRegionPluginClassLoadersFactoryTestCase extends AbstractMule
   @Test
   public void createsPluginWithPrivilegedPluginAccess() throws Exception {
     ClassLoaderModel plugin1ClassLoaderModel = new ClassLoaderModel.ClassLoaderModelBuilder()
-        .exportingPrivilegedPackages(singleton(PRIVILEGED_PACKAGE), singleton(PLUGIN_ID2)).build();
+        .exportingPrivilegedPackages(singleton(PRIVILEGED_PACKAGE), singleton(PLUGIN_ARTIFACT_ID2)).build();
     plugin1Descriptor.setClassLoaderModel(plugin1ClassLoaderModel);
 
     BundleDependency pluginDependency = new BundleDependency.Builder().setScope(BundleScope.COMPILE).setDescriptor(
