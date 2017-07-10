@@ -93,7 +93,6 @@
             <xsd:element ref="processor-chain"/>
             <xsd:element ref="top-level-processor"/>
             <xsd:element ref="abstract-global-intercepting-message-processor"/>
-            <xsd:element ref="abstract-processing-strategy" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:choice>
     </xsd:group>
 
@@ -1626,53 +1625,6 @@
                     </xsd:simpleType>
                 </xsd:attribute>
            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <!--  Processing Strategies -->
-    
-    <xsd:element name="abstract-processing-strategy" type="processingStrategyType" abstract="true">
-        <xsd:annotation>
-            <xsd:documentation>
-                The processing strategy to be used for processing a pipeline of message processors (e.g. in a Flow)
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="processingStrategyType">
-        <xsd:complexContent>
-            <xsd:extension base="annotatedType">
-                <xsd:attribute name="name" type="nonBlankString" use="required">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The name used to identify the processing strategy.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-    
-    <xsd:element name="custom-processing-strategy" type="customProcessingStrategy" substitutionGroup="abstract-processing-strategy">
-        <xsd:annotation>
-            <xsd:documentation>
-                Allows for the configuration of a custom processing strategy.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="customProcessingStrategy">
-        <xsd:complexContent>
-            <xsd:extension base="processingStrategyType">
-                <xsd:sequence>
-                    <xsd:group ref="propertiesGroup"/>
-                </xsd:sequence>
-                <xsd:attribute name="class" type="substitutableClass" use="required">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Custom processing strategy factory fully qualified class name.  Custom processing strategy factories should implement 'org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory'.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
     
