@@ -9,6 +9,7 @@ package org.mule.runtime.module.deployment.internal;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginClassLoaderFactory;
+import org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory;
 import org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderFactory;
 import org.mule.runtime.deployment.model.internal.plugin.BundlePluginDependenciesResolver;
 import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
@@ -51,8 +52,9 @@ public class TestDomainFactory extends DefaultDomainFactory {
 
     DomainClassLoaderBuilderFactory domainClassLoaderBuilderFactory =
         new DomainClassLoaderBuilderFactory(containerClassLoader, domainClassLoaderFactory,
-                                            new TrackingArtifactClassLoaderFactory<>(artifactClassLoaderManager,
-                                                                                     new ArtifactPluginClassLoaderFactory(moduleRepository)));
+                                            new DefaultRegionPluginClassLoadersFactory(new TrackingArtifactClassLoaderFactory<>(artifactClassLoaderManager,
+                                                                                                                                new ArtifactPluginClassLoaderFactory()),
+                                                                                       moduleRepository));
 
     return new TestDomainFactory(artifactClassLoaderManager, serviceRepository, domainDescriptorFactory,
                                  pluginDependenciesResolver,

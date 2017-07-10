@@ -36,7 +36,6 @@ import org.mockito.ArgumentCaptor;
 public class PluginLookPolicyFactoryTestCase extends AbstractMuleTestCase {
 
   private static final String BAR_PLUGIN_ID = "org.foo:bar:1.0-SNAPSHOT";
-
   private static final String FOO_PLUGIN_ID = "org.bar:foo:1.0-SNAPSHOT";
   private static final String FOO_PACKAGE = "org.bar.foo";
 
@@ -47,7 +46,8 @@ public class PluginLookPolicyFactoryTestCase extends AbstractMuleTestCase {
   public void setUp() {
     factory = new PluginLookPolicyFactory();
     fooPluginClassification =
-        new PluginUrlClassification(FOO_PLUGIN_ID, emptyList(), emptyList(), emptyList(), newHashSet(FOO_PACKAGE), emptySet());
+        new PluginUrlClassification(FOO_PLUGIN_ID, emptyList(), emptyList(), emptyList(), newHashSet(FOO_PACKAGE), emptySet(),
+                                    emptySet(), emptySet());
   }
 
   @Test
@@ -58,7 +58,7 @@ public class PluginLookPolicyFactoryTestCase extends AbstractMuleTestCase {
     ClassLoaderLookupPolicy parentLookupPolicies = getParentClassLoaderLookupPolicy();
 
     ClassLoaderLookupPolicy pluginPolicy =
-        factory.createLookupPolicy(barPluginClassification, pluginClassifications, parentLookupPolicies);
+        factory.createLookupPolicy(barPluginClassification, pluginClassifications, parentLookupPolicies, null);
     assertThat(pluginPolicy.getClassLookupStrategy(FOO_PACKAGE), sameInstance(PARENT_FIRST));
   }
 
@@ -70,7 +70,7 @@ public class PluginLookPolicyFactoryTestCase extends AbstractMuleTestCase {
     ClassLoaderLookupPolicy parentLookupPolicies = getParentClassLoaderLookupPolicy();
 
     ClassLoaderLookupPolicy pluginPolicy =
-        factory.createLookupPolicy(barPluginClassification, pluginClassifications, parentLookupPolicies);
+        factory.createLookupPolicy(barPluginClassification, pluginClassifications, parentLookupPolicies, null);
     assertThat(pluginPolicy.getClassLookupStrategy(FOO_PACKAGE), is(nullValue()));
   }
 

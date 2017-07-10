@@ -44,6 +44,8 @@ final public class ExportedArtifactsCollector {
 
   private final ExtensionModel extensionModel;
   private final Set<Class<?>> exportedClasses = new LinkedHashSet<>();
+  private final Set<String> privilegedExportedPackages = new LinkedHashSet<>();
+  private final Set<String> privilegedArtifacts = new LinkedHashSet<>();
   private final ImmutableSet.Builder<String> exportedResources = ImmutableSet.builder();
   private final ClassLoader extensionClassloader;
 
@@ -82,6 +84,24 @@ final public class ExportedArtifactsCollector {
 
     return filterExportedPackages(exportedPackages);
   }
+
+  /**
+   * @return The {@link Set} of Java package names that the extension should export on the privileged API
+   */
+  public Set<String> getPrivilegedExportedPackages() {
+    privilegedExportedPackages.addAll(extensionModel.getPrivilegedPackages());
+    return filterExportedPackages(privilegedExportedPackages);
+  }
+
+  /**
+   * @return The {@link Set} of artifact IDs that the extension should grant access to the privileged API. Each artifact is defined using Maven's groupId:artifactId
+   */
+  public Set<String> getPrivilegedArtifacts() {
+    privilegedArtifacts.addAll(extensionModel.getPrivilegedArtifacts());
+
+    return privilegedArtifacts;
+  }
+
 
   private void collectXmlSupportResources() {
     XmlDslModel languageModel = extensionModel.getXmlDslModel();

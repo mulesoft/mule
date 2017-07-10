@@ -16,8 +16,8 @@ import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBuilder;
+import org.mule.runtime.deployment.model.internal.RegionPluginClassLoadersFactory;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.classloader.DeployableArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.LookupStrategy;
@@ -46,11 +46,11 @@ public class ApplicationClassLoaderBuilder extends AbstractArtifactClassLoaderBu
    * {@code artifactClassLoaderBuilder} is used for building the common parts of artifacts.
    *
    * @param artifactClassLoaderFactory factory for the classloader specific to the artifact resource and classes
-   * @param artifactPluginClassLoaderFactory creates artifact plugin class loaders.
+   * @param pluginClassLoadersFactory creates the class loaders for the plugins included in the application's region. Non null
    */
   public ApplicationClassLoaderBuilder(DeployableArtifactClassLoaderFactory<ApplicationDescriptor> artifactClassLoaderFactory,
-                                       ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory) {
-    super(artifactPluginClassLoaderFactory);
+                                       RegionPluginClassLoadersFactory pluginClassLoadersFactory) {
+    super(pluginClassLoadersFactory);
 
     this.artifactClassLoaderFactory = artifactClassLoaderFactory;
   }

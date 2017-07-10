@@ -60,6 +60,8 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_RESOURCE_PROPERTY;
+import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.PRIVILEGED_ARTIFACTS_PROPERTY;
+import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.PRIVILEGED_EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.config.bootstrap.ClassLoaderRegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
@@ -203,11 +205,11 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   private static final String BAZ_POLICY_NAME = "bazPolicy";
   private static final String FOO_POLICY_ID = "fooPolicy";
   private static final String BAR_POLICY_ID = "barPolicy";
-  private static final String BAZ_POLICY_ID = "bazPolicy";
   private static final String MIN_MULE_VERSION = "4.0.0";
   private static final String POLICY_PROPERTY_VALUE = "policyPropertyValue";
   private static final String POLICY_PROPERTY_KEY = "policyPropertyKey";
-  public static final String PRIVILEGED_EXTENSION_ARTIFACT_ID = "privilegedExtensionPlugin";
+  private static final String PRIVILEGED_EXTENSION_ARTIFACT_ID = "privilegedExtensionPlugin";
+  private static final String PRIVILEGED_EXTENSION_ARTIFACT_FULL_ID = "org.mule.test:" + PRIVILEGED_EXTENSION_ARTIFACT_ID;
 
   private DefaultClassLoaderManager artifactClassLoaderManager;
   private ModuleRepository moduleRepository;
@@ -492,7 +494,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     applicationDeploymentListener = mock(DeploymentListener.class);
     domainDeploymentListener = mock(DeploymentListener.class);
-    moduleDiscoverer = new TestContainerModuleDiscoverer(singletonList(PRIVILEGED_EXTENSION_ARTIFACT_ID));
+    moduleDiscoverer = new TestContainerModuleDiscoverer(singletonList(PRIVILEGED_EXTENSION_ARTIFACT_FULL_ID));
     moduleRepository = new DefaultModuleRepository(moduleDiscoverer);
     MuleArtifactResourcesRegistry muleArtifactResourcesRegistry =
         new MuleArtifactResourcesRegistry.Builder().moduleRepository(moduleRepository).build();
@@ -1977,6 +1979,29 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
   @Test
   public void deploysApplicationWithPluginDependingOnPlugin() throws Exception {
+
+    ArtifactPluginFileBuilder dependantPlugin =
+        new ArtifactPluginFileBuilder("dependantPlugin").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo.echo")
+            .containingClass(pluginEcho3TestClassFile, "org/foo/echo/Plugin3Echo.class")
+            .dependingOn(echoPlugin);
+
+    final TestArtifactDescriptor artifactFileBuilder = new ApplicationFileBuilder("plugin-depending-on-plugin-app")
+        .definedBy("plugin-depending-on-plugin-app-config.xml").dependingOn(dependantPlugin);
+    addPackedAppFromBuilder(artifactFileBuilder);
+
+    startDeployment();
+
+    assertDeploymentSuccess(applicationDeploymentListener, artifactFileBuilder.getId());
+
+    executeApplicationFlow("main");
+  }
+
+  @Test
+  public void deploysApplicationWithPrivilegedPluginDependingOnPlugin() throws Exception {
+    ArtifactPluginFileBuilder echoPlugin = new ArtifactPluginFileBuilder("echoPlugin")
+        .configuredWith(PRIVILEGED_EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo")
+        .configuredWith(PRIVILEGED_ARTIFACTS_PROPERTY, "org.mule.test:dependantPlugin")
+        .dependingOn(new JarFileBuilder("echoTestJar", echoTestJarFile));
 
     ArtifactPluginFileBuilder dependantPlugin =
         new ArtifactPluginFileBuilder("dependantPlugin").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo.echo")

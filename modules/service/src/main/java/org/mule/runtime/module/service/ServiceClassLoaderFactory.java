@@ -35,7 +35,7 @@ public class ServiceClassLoaderFactory implements ArtifactClassLoaderFactory<Ser
    */
   @Override
   public ArtifactClassLoader create(String artifactId, ServiceDescriptor descriptor, ClassLoader parent,
-                                    ClassLoaderLookupPolicy baseLookupPolicy) {
+                                    ClassLoaderLookupPolicy lookupPolicy) {
     File rootFolder = descriptor.getRootFolder();
     if (rootFolder == null || !rootFolder.exists()) {
       throw new IllegalArgumentException("Service folder does not exists: " + (rootFolder != null ? rootFolder.getName() : null));
@@ -43,7 +43,7 @@ public class ServiceClassLoaderFactory implements ArtifactClassLoaderFactory<Ser
 
     List<URL> urls = getServiceUrls(rootFolder);
 
-    return new MuleArtifactClassLoader(artifactId, descriptor, urls.toArray(new URL[0]), parent, baseLookupPolicy);
+    return new MuleArtifactClassLoader(artifactId, descriptor, urls.toArray(new URL[0]), parent, lookupPolicy);
   }
 
   private List<URL> getServiceUrls(File rootFolder) {

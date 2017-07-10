@@ -7,8 +7,8 @@
 
 package org.mule.runtime.module.deployment.impl.internal.policy;
 
+import org.mule.runtime.deployment.model.internal.RegionPluginClassLoadersFactory;
 import org.mule.runtime.deployment.model.internal.policy.PolicyTemplateClassLoaderBuilder;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.DeployableArtifactClassLoaderFactory;
 
 /**
@@ -17,24 +17,23 @@ import org.mule.runtime.module.artifact.classloader.DeployableArtifactClassLoade
 public class ApplicationPolicyTemplateClassLoaderBuilderFactory implements PolicyTemplateClassLoaderBuilderFactory {
 
   private final DeployableArtifactClassLoaderFactory artifactClassLoaderFactory;
-  private final ArtifactClassLoaderFactory artifactPluginClassLoaderFactory;
+  private final RegionPluginClassLoadersFactory pluginClassLoadersFactory;
 
   /**
    * Creates a new factory instance
-   *
-   * @param artifactClassLoaderFactory factory for the classloader specific to the artifact resource and classes. Must be not
+   *  @param artifactClassLoaderFactory factory for the classloader specific to the artifact resource and classes. Must be not
    *        null.
-   * @param artifactPluginClassLoaderFactory factory to create class loaders for each used plugin. Non be not null.
+   * @param pluginClassLoadersFactory creates the class loaders for the plugins included in the application's region. Non null
    */
   public ApplicationPolicyTemplateClassLoaderBuilderFactory(DeployableArtifactClassLoaderFactory artifactClassLoaderFactory,
-                                                            ArtifactClassLoaderFactory artifactPluginClassLoaderFactory) {
+                                                            RegionPluginClassLoadersFactory pluginClassLoadersFactory) {
+
     this.artifactClassLoaderFactory = artifactClassLoaderFactory;
-    this.artifactPluginClassLoaderFactory = artifactPluginClassLoaderFactory;
+    this.pluginClassLoadersFactory = pluginClassLoadersFactory;
   }
 
   @Override
   public PolicyTemplateClassLoaderBuilder createArtifactClassLoaderBuilder() {
-    return new PolicyTemplateClassLoaderBuilder(artifactClassLoaderFactory,
-                                                artifactPluginClassLoaderFactory);
+    return new PolicyTemplateClassLoaderBuilder(artifactClassLoaderFactory, pluginClassLoadersFactory);
   }
 }

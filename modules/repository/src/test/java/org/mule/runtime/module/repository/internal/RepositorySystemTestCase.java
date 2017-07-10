@@ -33,7 +33,7 @@ public class RepositorySystemTestCase extends AbstractMuleTestCase {
   private static final BundleDescriptor VALID_BUNDLE_DESCRIPTOR =
       new BundleDescriptor.Builder().setGroupId("ant").setArtifactId("ant-antlr").setVersion("1.6").build();
   private static final BundleDependency VALID_BUNDLE =
-      new BundleDependency.Builder().sedBundleDescriptor(VALID_BUNDLE_DESCRIPTOR).build();
+      new BundleDependency.Builder().setDescriptor(VALID_BUNDLE_DESCRIPTOR).build();
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
@@ -59,7 +59,7 @@ public class RepositorySystemTestCase extends AbstractMuleTestCase {
           new BundleDescriptor.Builder().setGroupId("no").setArtifactId("existent").setVersion("bundle").build();
       expectedException.expect(BundleNotFoundException.class);
       defaultRepositoryService
-          .lookupBundle(new BundleDependency.Builder().sedBundleDescriptor(bundleDescriptor).build());
+          .lookupBundle(new BundleDependency.Builder().setDescriptor(bundleDescriptor).build());
     });
   }
 

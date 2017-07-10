@@ -52,7 +52,6 @@ public class BundleDependency {
 
 
     private static final String BUNDLE_DESCRIPTOR = "bundle descriptor";
-    private static final String REQUIRED_FIELD_NOT_FOUND_TEMPLATE = "bundle cannot be created with null or empty %s";
     private static final String REQUIRED_FIELD_IS_NULL = "bundle cannot be created with null %s";
 
     private BundleDependency bundleDependency = new BundleDependency();
@@ -83,19 +82,6 @@ public class BundleDependency {
       return this;
     }
 
-    /**
-     * Sets the descriptor of the bundle.
-     *
-     * @param descriptor describes the bundle which is dependent on. Cannot be null
-     * @return the builder
-     */
-    public Builder sedBundleDescriptor(BundleDescriptor descriptor) {
-      validateIsNotNull(descriptor, BUNDLE_DESCRIPTOR);
-      this.bundleDependency.descriptor = descriptor;
-
-      return this;
-    }
-
     public Builder setBundleUri(URI bundleUri) {
       validateIsNotNull(bundleUri, "Bundle URI cannot be null");
       this.bundleDependency.bundleUri = bundleUri;
@@ -111,20 +97,8 @@ public class BundleDependency {
       return this.bundleDependency;
     }
 
-    private String getEmptyFieldMessage(String field) {
-      return format(REQUIRED_FIELD_NOT_FOUND_TEMPLATE, field);
-    }
-
     private String getNullFieldMessage(String field) {
       return format(REQUIRED_FIELD_IS_NULL, field);
-    }
-
-    private void validateIsNotEmpty(String value, String fieldId) {
-      checkState(!isEmpty(value), getEmptyFieldMessage(fieldId));
-    }
-
-    private static boolean isEmpty(String value) {
-      return value == null || value.equals("");
     }
 
     private void validateIsNotNull(Object value, String fieldId) {

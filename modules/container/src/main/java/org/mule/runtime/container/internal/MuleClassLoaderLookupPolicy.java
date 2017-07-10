@@ -117,6 +117,10 @@ public class MuleClassLoaderLookupPolicy implements ClassLoaderLookupPolicy {
 
   @Override
   public ClassLoaderLookupPolicy extend(Map<String, LookupStrategy> lookupStrategies) {
+    //LookupStrategy lookupStrategy = lookupStrategies.get("org.mule.extension.ftp.internal");
+    //if (lookupStrategy != null) {
+    //  System.out.println("MONCHO: " + lookupStrategy);
+    //}
     validateLookupPolicies(lookupStrategies);
     final Map<String, LookupStrategy> newLookupStrategies = new HashMap<>(this.configuredLookupStrategies);
 

@@ -37,7 +37,7 @@ public class MuleModule {
    * @param exportedPackages java packages exported by this module. Not null.
    * @param exportedPaths java resources exported by this module. Not null;
    * @param privilegedExportedPackages java packages exported by this module to privileged artifacts only. Not null.
-   * @param privilegedArtifacts name of the artifacts with privileged access to the API. Non null.
+   * @param privilegedArtifacts artifacts with privileged access to the API. Each artifact is defined using the artifact's Maven groupId:artifactId. Non null.
    * @param exportedServices contains the definition of service implementations that must be accessible to artifacts via SPI. Non null.
    */
   public MuleModule(String name, Set<String> exportedPackages, Set<String> exportedPaths, Set<String> privilegedExportedPackages,

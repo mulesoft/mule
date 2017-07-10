@@ -9,32 +9,31 @@ package org.mule.runtime.module.deployment.impl.internal.domain;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
+import org.mule.runtime.deployment.model.internal.RegionPluginClassLoadersFactory;
 import org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderBuilder;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.DeployableArtifactClassLoaderFactory;
 
 public class DomainClassLoaderBuilderFactory {
 
   private final DeployableArtifactClassLoaderFactory<DomainDescriptor> domainClassLoaderFactory;
-  private final ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory;
   private final ArtifactClassLoader parentClassLoader;
+  private final RegionPluginClassLoadersFactory pluginClassLoadersFactory;
 
   /**
    * Creates an {@code DomainClassLoaderBuilderFactory} to create {@code DomainClassLoaderBuilder} instances.
    *
    * @param parentClassLoader classloader that will be the parent of the created classloaders. Non null
    * @param domainClassLoaderFactory factory for the class loader of the artifact resources and classes
-   * @param artifactPluginClassLoaderFactory creates artifact plugin class loaders. Non null.
+   * @param pluginClassLoadersFactory creates the class loaders for the plugins included in the domain's region. Non null
    */
   public DomainClassLoaderBuilderFactory(ArtifactClassLoader parentClassLoader,
                                          DeployableArtifactClassLoaderFactory<DomainDescriptor> domainClassLoaderFactory,
-                                         ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory) {
+                                         RegionPluginClassLoadersFactory pluginClassLoadersFactory) {
+    checkArgument(pluginClassLoadersFactory != null, "pluginClassLoadersFactory cannot be null");
     this.parentClassLoader = parentClassLoader;
-    checkArgument(artifactPluginClassLoaderFactory != null, "artifactPluginClassLoaderFactory cannot be null");
+    this.pluginClassLoadersFactory = pluginClassLoadersFactory;
     this.domainClassLoaderFactory = domainClassLoaderFactory;
-    this.artifactPluginClassLoaderFactory = artifactPluginClassLoaderFactory;
   }
 
   /**
@@ -43,7 +42,7 @@ public class DomainClassLoaderBuilderFactory {
    * @return a {@code DomainClassLoaderBuilder} instance.
    */
   public DomainClassLoaderBuilder createArtifactClassLoaderBuilder() {
-    return new DomainClassLoaderBuilder(parentClassLoader, domainClassLoaderFactory, artifactPluginClassLoaderFactory);
+    return new DomainClassLoaderBuilder(parentClassLoader, domainClassLoaderFactory, pluginClassLoadersFactory);
   }
 
 }

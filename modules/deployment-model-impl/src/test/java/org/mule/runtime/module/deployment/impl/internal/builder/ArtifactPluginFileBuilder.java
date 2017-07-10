@@ -15,6 +15,8 @@ import static org.apache.commons.io.FileUtils.writeStringToFile;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_RESOURCE_PROPERTY;
+import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.PRIVILEGED_ARTIFACTS_PROPERTY;
+import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.PRIVILEGED_EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_ARTIFACT_FOLDER;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_ARTIFACT_PATH_INSIDE_JAR;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
@@ -22,6 +24,8 @@ import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescrip
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.EXPORTED_PACKAGES;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.EXPORTED_RESOURCES;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MAVEN;
+import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.PRIVILEGED_ARTIFACTS_IDS;
+import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.PRIVILEGED_EXPORTED_PACKAGES;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
@@ -118,6 +122,14 @@ public class ArtifactPluginFileBuilder extends AbstractArtifactFileBuilder<Artif
       if (properties.containsKey(EXPORTED_CLASS_PACKAGES_PROPERTY)) {
         classLoaderModelDescriber.addProperty(EXPORTED_PACKAGES,
                                               ((String) properties.get(EXPORTED_CLASS_PACKAGES_PROPERTY)).split(","));
+      }
+      if (properties.containsKey(PRIVILEGED_EXPORTED_CLASS_PACKAGES_PROPERTY)) {
+        classLoaderModelDescriber.addProperty(PRIVILEGED_EXPORTED_PACKAGES,
+                                              ((String) properties.get(PRIVILEGED_EXPORTED_CLASS_PACKAGES_PROPERTY)).split(","));
+      }
+      if (properties.containsKey(PRIVILEGED_ARTIFACTS_PROPERTY)) {
+        classLoaderModelDescriber.addProperty(PRIVILEGED_ARTIFACTS_IDS,
+                                              ((String) properties.get(PRIVILEGED_ARTIFACTS_PROPERTY)).split(","));
       }
       if (properties.containsKey(EXPORTED_RESOURCE_PROPERTY)) {
         classLoaderModelDescriber.addProperty(EXPORTED_RESOURCES,

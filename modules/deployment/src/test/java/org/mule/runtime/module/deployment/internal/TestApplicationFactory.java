@@ -10,6 +10,7 @@ import static org.mockito.Mockito.mock;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginClassLoaderFactory;
+import org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory;
 import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoaderFactory;
 import org.mule.runtime.deployment.model.internal.plugin.BundlePluginDependenciesResolver;
 import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
@@ -73,7 +74,9 @@ public class TestApplicationFactory extends DefaultApplicationFactory {
     ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory =
         new ApplicationClassLoaderBuilderFactory(applicationClassLoaderFactory,
                                                  new TrackingArtifactClassLoaderFactory<>(artifactClassLoaderManager,
-                                                                                          new ArtifactPluginClassLoaderFactory(moduleRepository)));
+                                                                                          new ArtifactPluginClassLoaderFactory()),
+                                                 new DefaultRegionPluginClassLoadersFactory(new ArtifactPluginClassLoaderFactory(),
+                                                                                            moduleRepository));
 
     return new TestApplicationFactory(applicationClassLoaderBuilderFactory, applicationDescriptorFactory,
                                       domainManager, serviceRepository,

@@ -182,6 +182,8 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
   private ClassLoaderModelBuilder createBuilderWithoutExportedPackages(ClassLoaderModel originalClassLoaderModel) {
     ClassLoaderModelBuilder classLoaderModelBuilder = new ClassLoaderModelBuilder()
         .dependingOn(originalClassLoaderModel.getDependencies())
+        .exportingPrivilegedPackages(originalClassLoaderModel.getPrivilegedExportedPackages(),
+                                     originalClassLoaderModel.getPrivilegedArtifacts())
         .exportingResources(originalClassLoaderModel.getExportedResources());
     for (URL url : originalClassLoaderModel.getUrls()) {
       classLoaderModelBuilder.containing(url);
