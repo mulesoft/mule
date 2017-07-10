@@ -1627,7 +1627,7 @@
            </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-    
+
     <xsd:element name="flow-ref" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
