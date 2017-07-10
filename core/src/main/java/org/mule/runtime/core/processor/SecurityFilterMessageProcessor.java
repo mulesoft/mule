@@ -39,8 +39,10 @@ public class SecurityFilterMessageProcessor extends AbstractInterceptingMessageP
   @Override
   public void initialise() throws InitialisationException {
     try {
-      muleContext.getInjector().inject(filter);
-      initialiseIfNeeded(filter, muleContext);
+      if (filter != null) {
+        muleContext.getInjector().inject(filter);
+        initialiseIfNeeded(filter, muleContext);
+      }
     } catch (MuleException e) {
       throw new InitialisationException(e, this);
     }
