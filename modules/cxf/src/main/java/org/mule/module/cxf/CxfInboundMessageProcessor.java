@@ -12,11 +12,8 @@ import static org.mule.module.cxf.HttpRequestPropertyManager.getScheme;
 import static org.mule.transport.http.HttpConnector.HTTP_STATUS_PROPERTY;
 import static org.mule.transport.http.HttpConstants.HEADER_CONTENT_TYPE;
 import static org.mule.transport.http.HttpConstants.SC_INTERNAL_SERVER_ERROR;
-<<<<<<< HEAD
 import static org.mule.transport.http.HttpConstants.SC_OK;
-=======
 import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_CLIENT_SSL_SESSION;
->>>>>>> 5467653... MULE-12995: SSLSession is not being propagated to jaxws service. (#5177)
 
 import org.mule.DefaultMuleEvent;
 import org.mule.NonBlockingVoidMuleEvent;
