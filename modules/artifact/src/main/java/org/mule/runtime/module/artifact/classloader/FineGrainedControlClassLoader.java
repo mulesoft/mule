@@ -61,9 +61,6 @@ public class FineGrainedControlClassLoader extends URLClassLoader
 
   @Override
   protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-    //if (this.getClass().getName().equals("org.mule.runtime.module.artifact.classloader.MuleArtifactClassLoader") && this.toString().contains("-ftps")) {
-    //  System.out.println("MONCHO LOADING CLASS: " + name);
-    //}
     Class<?> result = findLoadedClass(name);
 
     if (result != null) {

@@ -15,6 +15,8 @@ import java.util.List;
 
 /**
  * Creates the class loaders for the plugins included in a given region.
+ *
+ * @since 4.0
  */
 public interface RegionPluginClassLoadersFactory {
 

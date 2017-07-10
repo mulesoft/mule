@@ -33,6 +33,8 @@ import java.util.Set;
 
 /**
  * Creates the class loaders for plugins that are contained in a given region
+ *
+ * @since 4.0
  */
 public class DefaultRegionPluginClassLoadersFactory implements RegionPluginClassLoadersFactory {
 
@@ -166,13 +168,13 @@ public class DefaultRegionPluginClassLoadersFactory implements RegionPluginClass
 
   private LookupStrategy getClassLoaderLookupStrategy(ArtifactPluginDescriptor descriptor,
                                                       ArtifactPluginDescriptor dependencyPluginDescriptor) {
-    final LookupStrategy parentFirst;
+    final LookupStrategy lookupStrategy;
     if (isDependencyPlugin(descriptor.getClassLoaderModel().getDependencies(), dependencyPluginDescriptor)) {
-      parentFirst = PARENT_FIRST;
+      lookupStrategy = PARENT_FIRST;
     } else {
-      parentFirst = CHILD_ONLY;
+      lookupStrategy = CHILD_ONLY;
     }
-    return parentFirst;
+    return lookupStrategy;
   }
 
   private boolean isDependencyPlugin(Set<BundleDependency> pluginDependencies,
