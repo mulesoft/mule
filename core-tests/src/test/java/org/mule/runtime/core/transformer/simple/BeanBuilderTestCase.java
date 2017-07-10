@@ -7,11 +7,11 @@
 package org.mule.runtime.core.transformer.simple;
 
 import org.mule.runtime.core.internal.message.InternalMessage;
+import org.mule.runtime.core.privileged.object.PrototypeObjectFactory;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.expression.ExpressionConfig;
 import org.mule.runtime.core.expression.transformers.BeanBuilderTransformer;
 import org.mule.runtime.core.expression.transformers.ExpressionArgument;
-import org.mule.runtime.core.object.PrototypeObjectFactory;
 import org.mule.tck.core.transformer.AbstractTransformerTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
 

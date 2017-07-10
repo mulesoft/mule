@@ -25,8 +25,6 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROCESSING_STRATEGY_ATTRIBUTE;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROCESSING_STRATEGY_FACTORY_ATTRIBUTE;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROTOTYPE_OBJECT_ELEMENT;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SINGLETON_OBJECT_ELEMENT;
 import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STARTED;
 import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
 import static org.mule.runtime.core.routing.outbound.AbstractOutboundRouter.DEFAULT_FAILURE_EXPRESSION;
@@ -60,6 +58,7 @@ import static org.mule.runtime.internal.dsl.DslConstants.POOLING_PROFILE_ELEMENT
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
+
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.DataUnit;
@@ -79,16 +78,13 @@ import org.mule.runtime.config.spring.dsl.processor.RetryPolicyTemplateObjectFac
 import org.mule.runtime.config.spring.dsl.processor.TransformerConfigurator;
 import org.mule.runtime.config.spring.dsl.processor.UsernamePasswordFilterObjectFactory;
 import org.mule.runtime.config.spring.dsl.processor.factory.MessageEnricherObjectFactory;
-import org.mule.runtime.config.spring.dsl.spring.ComponentObjectFactory;
 import org.mule.runtime.config.spring.dsl.spring.ConfigurableInstanceFactory;
 import org.mule.runtime.config.spring.dsl.spring.ConfigurableObjectFactory;
 import org.mule.runtime.config.spring.dsl.spring.ExcludeDefaultObjectMethods;
-import org.mule.runtime.config.spring.dsl.spring.PooledComponentObjectFactory;
 import org.mule.runtime.config.spring.factories.AsyncMessageProcessorsFactoryBean;
 import org.mule.runtime.config.spring.factories.ChoiceRouterFactoryBean;
 import org.mule.runtime.config.spring.factories.DefaultFlowFactoryBean;
 import org.mule.runtime.config.spring.factories.FlowRefFactoryBean;
-import org.mule.runtime.config.spring.factories.processor.MessageProcessorChainFactoryBean;
 import org.mule.runtime.config.spring.factories.MessageProcessorFilterPairFactoryBean;
 import org.mule.runtime.config.spring.factories.ModuleOperationMessageProcessorChainFactoryBean;
 import org.mule.runtime.config.spring.factories.ResponseMessageProcessorsFactoryBean;
@@ -96,21 +92,18 @@ import org.mule.runtime.config.spring.factories.ScatterGatherRouterFactoryBean;
 import org.mule.runtime.config.spring.factories.SchedulingMessageSourceFactoryBean;
 import org.mule.runtime.config.spring.factories.SubflowMessageProcessorChainFactoryBean;
 import org.mule.runtime.config.spring.factories.TryProcessorFactoryBean;
+import org.mule.runtime.config.spring.factories.processor.MessageProcessorChainFactoryBean;
 import org.mule.runtime.config.spring.factories.streaming.InMemoryCursorIteratorProviderObjectFactory;
 import org.mule.runtime.config.spring.factories.streaming.InMemoryCursorStreamProviderObjectFactory;
 import org.mule.runtime.config.spring.factories.streaming.NullCursorIteratorProviderObjectFactory;
 import org.mule.runtime.config.spring.factories.streaming.NullCursorStreamProviderObjectFactory;
-import org.mule.runtime.config.spring.util.SpringBeanLookup;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.component.LifecycleAdapterFactory;
 import org.mule.runtime.core.api.config.ConfigurationExtension;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.context.notification.ListenerSubscriptionPair;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
-import org.mule.runtime.core.api.interceptor.Interceptor;
 import org.mule.runtime.core.api.model.EntryPointResolver;
-import org.mule.runtime.core.api.model.EntryPointResolverSet;
 import org.mule.runtime.core.api.model.resolvers.ArrayEntryPointResolver;
 import org.mule.runtime.core.api.model.resolvers.CallableEntryPointResolver;
 import org.mule.runtime.core.api.model.resolvers.DefaultEntryPointResolverSet;
@@ -131,14 +124,14 @@ import org.mule.runtime.core.api.security.EncryptionStrategy;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.security.SecurityProvider;
 import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.api.source.polling.CronScheduler;
+import org.mule.runtime.core.api.source.polling.FixedFrequencyScheduler;
 import org.mule.runtime.core.api.source.polling.PeriodicScheduler;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionType;
 import org.mule.runtime.core.api.transaction.xa.XaTransactionFactory;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.runtime.core.component.DefaultJavaComponent;
-import org.mule.runtime.core.component.PooledJavaComponent;
 import org.mule.runtime.core.el.ExpressionLanguageComponent;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.el.mvel.configuration.AliasEntry;
@@ -150,8 +143,6 @@ import org.mule.runtime.core.expression.transformers.AbstractExpressionTransform
 import org.mule.runtime.core.expression.transformers.BeanBuilderTransformer;
 import org.mule.runtime.core.expression.transformers.ExpressionArgument;
 import org.mule.runtime.core.expression.transformers.ExpressionTransformer;
-import org.mule.runtime.core.interceptor.LoggingInterceptor;
-import org.mule.runtime.core.interceptor.TimerInterceptor;
 import org.mule.runtime.core.internal.enricher.MessageEnricher;
 import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.internal.exception.OnErrorContinueHandler;
@@ -159,8 +150,6 @@ import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.internal.exception.RedeliveryExceeded;
 import org.mule.runtime.core.internal.source.StartableCompositeMessageSource;
 import org.mule.runtime.core.internal.source.scheduler.DefaultSchedulerMessageSource;
-import org.mule.runtime.core.api.source.polling.CronScheduler;
-import org.mule.runtime.core.api.source.polling.FixedFrequencyScheduler;
 import org.mule.runtime.core.internal.transformer.codec.XmlEntityDecoder;
 import org.mule.runtime.core.internal.transformer.codec.XmlEntityEncoder;
 import org.mule.runtime.core.internal.transformer.compression.GZipCompressTransformer;
@@ -170,8 +159,6 @@ import org.mule.runtime.core.internal.transformer.encryption.DecryptionTransform
 import org.mule.runtime.core.internal.transformer.encryption.EncryptionTransformer;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToString;
-import org.mule.runtime.core.object.PrototypeObjectFactory;
-import org.mule.runtime.core.object.SingletonObjectFactory;
 import org.mule.runtime.core.processor.AnnotatedProcessor;
 import org.mule.runtime.core.processor.AsyncDelegateMessageProcessor;
 import org.mule.runtime.core.processor.IdempotentRedeliveryPolicy;
@@ -240,7 +227,6 @@ import org.mule.runtime.dsl.api.component.TypeConverter;
 import com.google.common.collect.ImmutableMap;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -739,18 +725,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("objectStore", fromSimpleReferenceParameter("object-store-ref").build())
         .build());
 
-    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("singleton-object")
-        .withTypeDefinition(fromType(SingletonObjectFactory.class))
-        .withConstructorParameterDefinition(fromSimpleParameter(CLASS_ATTRIBUTE).build())
-        .withConstructorParameterDefinition(fromChildConfiguration(Map.class).withDefaultValue(new HashMap<>()).build())
-        .build());
-
-    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("prototype-object")
-        .withTypeDefinition(fromType(PrototypeObjectFactory.class))
-        .withConstructorParameterDefinition(fromSimpleParameter(CLASS_ATTRIBUTE).build())
-        .withConstructorParameterDefinition(fromChildConfiguration(Map.class).withDefaultValue(new HashMap<>()).build())
-        .build());
-
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("pooling-profile")
         .withTypeDefinition(fromType(PoolingProfile.class))
         .withSetterParameterDefinition("maxActive", fromSimpleParameter("maxActive").build())
@@ -810,7 +784,20 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .build());
 
     componentBuildingDefinitions.addAll(getTransformersBuildingDefinitions());
-    componentBuildingDefinitions.addAll(getComponentsDefinitions());
+
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier(POOLING_PROFILE_ELEMENT_IDENTIFIER)
+        .withTypeDefinition(fromType(PoolingProfile.class))
+        .withConstructorParameterDefinition(fromSimpleParameter("maxActive").withDefaultValue(DEFAULT_MAX_POOL_ACTIVE).build())
+        .withConstructorParameterDefinition(fromSimpleParameter("maxIdle").withDefaultValue(DEFAULT_MAX_POOL_IDLE).build())
+        .withConstructorParameterDefinition(fromSimpleParameter("maxWait", value -> Long.valueOf((String) value))
+            .withDefaultValue(valueOf(DEFAULT_MAX_POOL_WAIT)).build())
+        .withConstructorParameterDefinition(fromSimpleParameter("exhaustedAction", POOL_EXHAUSTED_ACTIONS::get)
+            .withDefaultValue(valueOf(DEFAULT_POOL_EXHAUSTED_ACTION)).build())
+        .withConstructorParameterDefinition(fromSimpleParameter("initialisationPolicy", POOL_INITIALISATION_POLICIES::get)
+            .withDefaultValue(valueOf(DEFAULT_POOL_INITIALISATION_POLICY)).build())
+        .withSetterParameterDefinition("disabled", fromSimpleParameter("disabled").build())
+        .build());
+
     componentBuildingDefinitions.addAll(getEntryPointResolversDefinitions());
     componentBuildingDefinitions.addAll(getStreamingDefinitions());
     componentBuildingDefinitions.addAll(getFiltersDefinitions());
@@ -1284,103 +1271,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
                                            .build())
         .asPrototype()
         .copy();
-  }
-
-
-  private List<ComponentBuildingDefinition> getComponentsDefinitions() {
-    List<ComponentBuildingDefinition> buildingDefinitions = new ArrayList<>();
-
-    final ComponentBuildingDefinition.Builder componentDefinition = baseDefinition.copy()
-        .withSetterParameterDefinition("clazz", fromSimpleParameter("class").build())
-        .withSetterParameterDefinition("objectFactory",
-                                       fromChildConfiguration(org.mule.runtime.core.api.object.ObjectFactory.class).build())
-        .withSetterParameterDefinition("entryPointResolverSet", fromChildConfiguration(EntryPointResolverSet.class).build())
-        .withSetterParameterDefinition("entryPointResolver", fromChildConfiguration(EntryPointResolver.class).build())
-        .withSetterParameterDefinition("lifecycleAdapterFactory", fromChildConfiguration(LifecycleAdapterFactory.class).build())
-        .withSetterParameterDefinition("interceptors", fromChildCollectionConfiguration(Interceptor.class).build());
-
-    buildingDefinitions.add(componentDefinition
-        .copy()
-        .withIdentifier("component")
-        .withTypeDefinition(fromType(DefaultJavaComponent.class))
-        .withObjectFactoryType(ComponentObjectFactory.class)
-        .build());
-
-    buildingDefinitions.add(componentDefinition
-        .copy()
-        .withIdentifier("pooled-component")
-        .withTypeDefinition(fromType(PooledJavaComponent.class))
-        .withObjectFactoryType(PooledComponentObjectFactory.class)
-        .withSetterParameterDefinition("poolingProfile", fromChildConfiguration(PoolingProfile.class).build())
-        .build());
-
-    buildingDefinitions.add(baseDefinition
-        .copy()
-        .withIdentifier("custom-interceptor")
-        .withTypeDefinition(fromConfigurationAttribute(CLASS_ATTRIBUTE))
-        .build());
-
-    buildingDefinitions.add(baseDefinition
-        .copy()
-        .withIdentifier("timer-interceptor")
-        .withTypeDefinition(fromType(TimerInterceptor.class))
-        .build());
-
-    buildingDefinitions.add(baseDefinition
-        .copy()
-        .withIdentifier("logging-interceptor")
-        .withTypeDefinition(fromType(LoggingInterceptor.class))
-        .build());
-
-    buildingDefinitions.add(baseDefinition
-        .copy()
-        .withIdentifier(POOLING_PROFILE_ELEMENT_IDENTIFIER)
-        .withTypeDefinition(fromType(PoolingProfile.class))
-        .withConstructorParameterDefinition(fromSimpleParameter("maxActive").withDefaultValue(DEFAULT_MAX_POOL_ACTIVE).build())
-        .withConstructorParameterDefinition(fromSimpleParameter("maxIdle").withDefaultValue(DEFAULT_MAX_POOL_IDLE).build())
-        .withConstructorParameterDefinition(fromSimpleParameter("maxWait", value -> Long.valueOf((String) value))
-            .withDefaultValue(valueOf(DEFAULT_MAX_POOL_WAIT)).build())
-        .withConstructorParameterDefinition(fromSimpleParameter("exhaustedAction", POOL_EXHAUSTED_ACTIONS::get)
-            .withDefaultValue(valueOf(DEFAULT_POOL_EXHAUSTED_ACTION)).build())
-        .withConstructorParameterDefinition(fromSimpleParameter("initialisationPolicy", POOL_INITIALISATION_POLICIES::get)
-            .withDefaultValue(valueOf(DEFAULT_POOL_INITIALISATION_POLICY)).build())
-        .withSetterParameterDefinition("disabled", fromSimpleParameter("disabled").build())
-        .build());
-
-    buildingDefinitions.add(baseDefinition
-        .copy()
-        .withIdentifier("return-data")
-        .withTypeDefinition(fromType(String.class))
-        .build());
-
-
-
-    buildingDefinitions.add(baseDefinition.copy()
-        .withIdentifier(SINGLETON_OBJECT_ELEMENT)
-        .withTypeDefinition(fromType(SingletonObjectFactory.class))
-        .withConstructorParameterDefinition(fromSimpleParameter(CLASS_ATTRIBUTE, stringToClassConverter()).build())
-        .withConstructorParameterDefinition(fromChildConfiguration(Map.class).withDefaultValue(new HashMap<>()).build())
-        .build());
-
-    buildingDefinitions.add(baseDefinition.copy()
-        .withIdentifier(PROTOTYPE_OBJECT_ELEMENT)
-        .withTypeDefinition(fromType(PrototypeObjectFactory.class))
-        .withConstructorParameterDefinition(fromSimpleParameter(CLASS_ATTRIBUTE, stringToClassConverter()).build())
-        .withConstructorParameterDefinition(fromChildConfiguration(Map.class).withDefaultValue(new HashMap<>()).build())
-        .build());
-
-    buildingDefinitions.add(baseDefinition.copy()
-        .withIdentifier("spring-object")
-        .withTypeDefinition(fromType(SpringBeanLookup.class))
-        .withSetterParameterDefinition("bean", fromSimpleParameter("bean").build())
-        .build());
-
-    buildingDefinitions.add(baseDefinition.copy()
-        .withIdentifier("custom-lifecycle-adapter-factory")
-        .withTypeDefinition(fromConfigurationAttribute(CLASS_ATTRIBUTE))
-        .build());
-
-    return buildingDefinitions;
   }
 
   private List<ComponentBuildingDefinition> getStreamingDefinitions() {

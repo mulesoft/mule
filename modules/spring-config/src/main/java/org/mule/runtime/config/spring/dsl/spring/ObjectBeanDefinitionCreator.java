@@ -11,6 +11,7 @@ import static org.mule.runtime.api.component.ComponentIdentifier.buildFromString
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.config.spring.dsl.spring.CommonBeanDefinitionCreator.processMuleProperties;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.rootBeanDefinition;
+
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.core.api.config.RuntimeConfigurationException;
 
@@ -53,7 +54,7 @@ public class ObjectBeanDefinitionCreator extends BeanDefinitionCreator {
     }
     if (classParameterValue != null) {
       BeanDefinitionBuilder beanDefinitionBuilder = rootBeanDefinition(classParameterValue);
-      processMuleProperties(componentModel, beanDefinitionBuilder);
+      processMuleProperties(componentModel, beanDefinitionBuilder, null);
       componentModel.setBeanDefinition(beanDefinitionBuilder.getBeanDefinition());
     }
     return true;

@@ -10,8 +10,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
-import org.mule.runtime.core.internal.context.notification.OptimisedNotificationHandler;
+
 import org.mule.runtime.core.internal.context.notification.Policy;
+import org.mule.runtime.core.privileged.context.notification.OptimisedNotificationHandler;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

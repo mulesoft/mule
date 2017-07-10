@@ -45,7 +45,6 @@ import org.mule.runtime.config.spring.dsl.processor.ArtifactConfig;
 import org.mule.runtime.config.spring.dsl.processor.ConfigFile;
 import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
 import org.mule.runtime.config.spring.dsl.processor.ObjectTypeVisitor;
-import org.mule.runtime.core.component.config.ResourceProvider;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.RuntimeConfigurationException;
 import org.mule.runtime.core.component.config.CompositeConfigurationPropertiesProvider;
@@ -58,15 +57,15 @@ import org.mule.runtime.core.component.config.FileConfigurationPropertiesProvide
 import org.mule.runtime.core.component.config.GlobalPropertyConfigurationPropertiesProvider;
 import org.mule.runtime.core.component.config.MapConfigurationPropertiesProvider;
 import org.mule.runtime.core.component.config.PropertiesResolverConfigurationProperties;
+import org.mule.runtime.core.component.config.ResourceProvider;
 import org.mule.runtime.core.component.config.SystemPropertiesConfigurationProvider;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 
-import org.apache.commons.lang3.ClassUtils;
-import org.springframework.core.env.ConfigurablePropertyResolver;
-import org.w3c.dom.Node;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -82,8 +81,9 @@ import java.util.function.Consumer;
 
 import javax.xml.namespace.QName;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
+import org.apache.commons.lang3.ClassUtils;
+import org.springframework.core.env.ConfigurablePropertyResolver;
+import org.w3c.dom.Node;
 
 /**
  * An {@code ApplicationModel} holds a representation of all the artifact configuration using an abstract model to represent any
@@ -153,8 +153,6 @@ public class ApplicationModel {
   public static final String GLOBAL_PROPERTY = "global-property";
   public static final String SECURITY_MANAGER = "security-manager";
   public static final String CONFIGURATION_PROPERTIES_ELEMENT = "configuration-properties";
-  public static final String PROTOTYPE_OBJECT_ELEMENT = "prototype-object";
-  public static final String SINGLETON_OBJECT_ELEMENT = "singleton-object";
   public static final String OBJECT_ELEMENT = "object";
 
   public static final ComponentIdentifier ERROR_HANDLER_IDENTIFIER =
@@ -194,10 +192,6 @@ public class ApplicationModel {
       builder().withNamespace(CORE_PREFIX).withName(DESCRIPTION_ELEMENT).build();
   public static final ComponentIdentifier ANNOTATIONS_IDENTIFIER =
       builder().withNamespace(CORE_PREFIX).withName(ANNOTATIONS).build();
-  public static final ComponentIdentifier PROTOTYPE_OBJECT_IDENTIFIER =
-      builder().withNamespace(CORE_PREFIX).withName(PROTOTYPE_OBJECT_ELEMENT).build();
-  public static final ComponentIdentifier SINGLETON_OBJECT_IDENTIFIER =
-      builder().withNamespace(CORE_PREFIX).withName(SINGLETON_OBJECT_ELEMENT).build();
   public static final ComponentIdentifier OBJECT_IDENTIFIER =
       builder().withNamespace(CORE_PREFIX).withName(OBJECT_ELEMENT).build();
   public static final ComponentIdentifier FLOW_IDENTIFIER =

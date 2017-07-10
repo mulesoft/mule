@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.connectivity;
 import static java.lang.Thread.currentThread;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.MuleException;
@@ -21,7 +22,6 @@ import org.mule.runtime.core.api.connectivity.ConnectivityTestingStrategy;
 import org.mule.runtime.core.api.connectivity.UnsupportedConnectivityTestingObjectException;
 import org.mule.runtime.core.api.exception.ObjectNotFoundException;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
-import org.mule.runtime.core.component.AbstractComponent;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 
 import java.util.Collection;

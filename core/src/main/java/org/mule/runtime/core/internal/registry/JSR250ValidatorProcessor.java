@@ -8,8 +8,8 @@ package org.mule.runtime.core.internal.registry;
 
 import org.mule.runtime.core.api.registry.InjectProcessor;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
-import org.mule.runtime.core.internal.util.annotation.AnnotationMetaData;
-import org.mule.runtime.core.internal.util.annotation.AnnotationUtils;
+import org.mule.runtime.core.privileged.util.annotation.AnnotationMetaData;
+import org.mule.runtime.core.privileged.util.annotation.AnnotationUtils;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
