@@ -343,8 +343,8 @@ public final class MetadataMediator<T extends ComponentModel> {
                                         parameterModel.getDisplayModel().orElse(null),
                                         parameterModel.getLayoutModel().orElse(null),
                                         parameterModel.getValueProviderModel().orElse(null),
-                                        parameterModel.getModelProperties(),
-                                        parameterModel.getElementReferences());
+                                        parameterModel.getElementReferences(),
+                                        parameterModel.getModelProperties());
         parameters.add(typedParameterModel);
       });
 
