@@ -64,14 +64,17 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser {
   }
 
   @Override
-  protected void doParse(Builder definitionBuilder) throws ConfigurationException {
-    definitionBuilder.withIdentifier(name).withNamespace(namespace).asNamed().withTypeDefinition(fromType(ValueResolver.class))
+  protected Builder doParse(Builder definitionBuilder) throws ConfigurationException {
+    Builder finalBuilder = definitionBuilder.withIdentifier(name).withNamespace(namespace).asNamed()
+        .withTypeDefinition(fromType(ValueResolver.class))
         .withObjectFactoryType(TopLevelParameterObjectFactory.class)
         .withConstructorParameterDefinition(fromFixedValue(type).build())
         .withConstructorParameterDefinition(fromFixedValue(classLoader).build())
         .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build());
 
     parseFields(type, typeDsl);
+
+    return finalBuilder;
   }
 
 

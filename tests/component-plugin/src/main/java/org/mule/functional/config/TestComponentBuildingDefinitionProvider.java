@@ -54,7 +54,7 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
   @Override
   public List<ComponentBuildingDefinition> getComponentBuildingDefinitions() {
     List<ComponentBuildingDefinition> componentBuildingDefinitions = new ArrayList<>();
-    componentBuildingDefinitions.add(baseDefinition.copy()
+    componentBuildingDefinitions.add(baseDefinition
         .withIdentifier("queue")
         .withTypeDefinition(fromType(QueueWriterMessageProcessor.class))
         .withSetterParameterDefinition("name", fromSimpleParameter("name").build())
@@ -64,12 +64,12 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
                                            .build())
         .build());
 
-    componentBuildingDefinitions.add(baseDefinition.copy()
+    componentBuildingDefinitions.add(baseDefinition
         .withIdentifier("content")
         .withTypeDefinition(fromType(String.class))
         .build());
 
-    ComponentBuildingDefinition.Builder baseComponentDefinition = baseDefinition.copy()
+    ComponentBuildingDefinition.Builder baseComponentDefinition = baseDefinition
         .withSetterParameterDefinition("eventCallback", fromChildConfiguration(EventCallback.class).build())
         .withSetterParameterDefinition("returnData", fromChildConfiguration(Object.class).build())
         .withSetterParameterDefinition("throwException", fromSimpleParameter("throwException").build())
@@ -83,19 +83,19 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("id", fromSimpleParameter("id").build())
         .withSetterParameterDefinition("muleContext", fromReferenceObject(MuleContext.class).build());
 
-    componentBuildingDefinitions.add(baseComponentDefinition.copy()
+    componentBuildingDefinitions.add(baseComponentDefinition
         .withIdentifier("processor")
         .withTypeDefinition(fromType(FunctionalTestProcessor.class))
         .build());
 
-    componentBuildingDefinitions.add(baseDefinition.copy()
+    componentBuildingDefinitions.add(baseDefinition
         .withIdentifier("throw")
         .withTypeDefinition(fromType(ThrowProcessor.class))
         .withSetterParameterDefinition("exception", fromSimpleParameter("exception").build())
         .withSetterParameterDefinition("error", fromSimpleParameter("error").build())
         .build());
 
-    componentBuildingDefinitions.add(baseDefinition.copy()
+    componentBuildingDefinitions.add(baseDefinition
         .withIdentifier("return-data")
         .withTypeDefinition(fromType(Object.class))
         .withObjectFactoryType(ReturnDataObjectFactory.class)
@@ -103,11 +103,11 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("content", fromTextContent().build())
         .build());
 
-    componentBuildingDefinitions.add(baseDefinition.copy()
+    componentBuildingDefinitions.add(baseDefinition
         .withIdentifier("callback")
         .withTypeDefinition(fromConfigurationAttribute("class")).build());
 
-    componentBuildingDefinitions.add(baseDefinition.copy()
+    componentBuildingDefinitions.add(baseDefinition
         .withIdentifier("assert")
         .withTypeDefinition(fromType(AssertionMessageProcessor.class))
         .withSetterParameterDefinition("expression", fromSimpleParameter("expression").build())
@@ -115,13 +115,13 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("count", fromSimpleParameter("count").build())
         .build());
 
-    componentBuildingDefinitions.add(baseDefinition.copy()
+    componentBuildingDefinitions.add(baseDefinition
         .withIdentifier("invocation-counter")
         .withTypeDefinition(fromType(InvocationCountMessageProcessor.class))
         .withSetterParameterDefinition("name", fromSimpleParameter("name").build())
         .build());
 
-    componentBuildingDefinitions.add(baseDefinition.copy()
+    componentBuildingDefinitions.add(baseDefinition
         .withIdentifier("assert-intercepting")
         .withTypeDefinition(fromType(ResponseAssertionMessageProcessor.class))
         .withSetterParameterDefinition("responseExpression", fromSimpleParameter("responseExpression").build())
@@ -129,33 +129,33 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("responseSameTask", fromSimpleParameter("responseSameTask").build())
         .build());
 
-    componentBuildingDefinitions.add(baseDefinition.copy()
+    componentBuildingDefinitions.add(baseDefinition
         .withIdentifier("non-blocking-processor")
         .withTypeDefinition(fromType(TestNonBlockingProcessor.class))
         .build());
 
-    componentBuildingDefinitions.add(baseDefinition.copy()
+    componentBuildingDefinitions.add(baseDefinition
         .withIdentifier("skeleton-source")
         .withTypeDefinition(fromType(SkeletonSource.class))
         .build());
 
-    componentBuildingDefinitions.add(baseDefinition.copy()
+    componentBuildingDefinitions.add(baseDefinition
         .withIdentifier("shared-source")
         .withSetterParameterDefinition("config", fromSimpleReferenceParameter("config-ref").build())
         .withTypeDefinition(fromType(SharedSource.class))
         .build());
 
-    componentBuildingDefinitions.add(baseDefinition.copy()
+    componentBuildingDefinitions.add(baseDefinition
         .withIdentifier("shared-config")
         .withTypeDefinition(fromType(SharedConfig.class))
         .build());
 
-    componentBuildingDefinitions.add(baseDefinition.copy()
+    componentBuildingDefinitions.add(baseDefinition
         .withIdentifier("dependency-injection-object")
         .withTypeDefinition(fromType(DependencyInjectionObject.class))
         .build());
 
-    componentBuildingDefinitions.add(baseDefinition.copy()
+    componentBuildingDefinitions.add(baseDefinition
         .withIdentifier("lifecycle-object")
         .withTypeDefinition(fromType(LifecycleObject.class))
         .withSetterParameterDefinition("otherLifecycleObject", fromSimpleReferenceParameter("otherLifecycleObject").build())

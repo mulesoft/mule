@@ -12,11 +12,12 @@ import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fro
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getConnectedComponents;
+
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
@@ -37,7 +38,7 @@ public final class ConfigurationDefinitionParser extends ExtensionDefinitionPars
   private final ConfigurationModel configurationModel;
   private final DslElementSyntax configDsl;
 
-  public ConfigurationDefinitionParser(ComponentBuildingDefinition.Builder definition, ExtensionModel extensionModel,
+  public ConfigurationDefinitionParser(Builder definition, ExtensionModel extensionModel,
                                        ConfigurationModel configurationModel,
                                        DslSyntaxResolver dslResolver,
                                        ExtensionParsingContext parsingContext) {
@@ -48,24 +49,29 @@ public final class ConfigurationDefinitionParser extends ExtensionDefinitionPars
   }
 
   @Override
-  protected void doParse(ComponentBuildingDefinition.Builder definitionBuilder) throws ConfigurationException {
-    definitionBuilder.withIdentifier(configDsl.getElementName()).withTypeDefinition(fromType(ConfigurationProvider.class))
-        .withObjectFactoryType(ConfigurationProviderObjectFactory.class)
-        .withConstructorParameterDefinition(fromSimpleParameter("name").build())
-        .withConstructorParameterDefinition(fromFixedValue(extensionModel).build())
-        .withConstructorParameterDefinition(fromFixedValue(configurationModel).build())
-        .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
-        .withSetterParameterDefinition("dynamicConfigPolicy", fromChildConfiguration(DynamicConfigPolicy.class).build());
+  protected Builder doParse(Builder definitionBuilder) throws ConfigurationException {
+    Builder finalBuilder =
+        definitionBuilder.withIdentifier(configDsl.getElementName()).withTypeDefinition(fromType(ConfigurationProvider.class))
+            .withObjectFactoryType(ConfigurationProviderObjectFactory.class)
+            .withConstructorParameterDefinition(fromSimpleParameter("name").build())
+            .withConstructorParameterDefinition(fromFixedValue(extensionModel).build())
+            .withConstructorParameterDefinition(fromFixedValue(configurationModel).build())
+            .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
+            .withSetterParameterDefinition("dynamicConfigPolicy", fromChildConfiguration(DynamicConfigPolicy.class).build());
 
     parseParameters(configurationModel);
-    parseConnectionProvider(definitionBuilder);
+    finalBuilder = parseConnectionProvider(finalBuilder);
+
+    return finalBuilder;
   }
 
-  private void parseConnectionProvider(ComponentBuildingDefinition.Builder definitionBuilder) {
+  private Builder parseConnectionProvider(Builder definitionBuilder) {
     if (!getConnectedComponents(extensionModel, configurationModel).isEmpty()) {
-      definitionBuilder.withSetterParameterDefinition("requiresConnection", fromFixedValue(true).build());
-      definitionBuilder.withSetterParameterDefinition("connectionProviderResolver",
-                                                      fromChildConfiguration(ConnectionProviderResolver.class).build());
+      return definitionBuilder.withSetterParameterDefinition("requiresConnection", fromFixedValue(true).build())
+          .withSetterParameterDefinition("connectionProviderResolver",
+                                         fromChildConfiguration(ConnectionProviderResolver.class).build());
+    } else {
+      return definitionBuilder;
     }
   }
 

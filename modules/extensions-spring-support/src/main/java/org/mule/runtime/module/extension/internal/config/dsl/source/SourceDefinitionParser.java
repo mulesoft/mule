@@ -12,6 +12,7 @@ import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fro
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleReferenceParameter;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
+
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
@@ -19,7 +20,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.streaming.CursorProviderFactory;
-import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser;
@@ -40,7 +41,7 @@ public class SourceDefinitionParser extends ExtensionDefinitionParser {
   private final SourceModel sourceModel;
   private final DslElementSyntax sourceDsl;
 
-  public SourceDefinitionParser(ComponentBuildingDefinition.Builder definition, ExtensionModel extensionModel,
+  public SourceDefinitionParser(Builder definition, ExtensionModel extensionModel,
                                 SourceModel sourceModel, DslSyntaxResolver dslSyntaxResolver,
                                 ExtensionParsingContext parsingContext) {
     super(definition, dslSyntaxResolver, parsingContext);
@@ -50,17 +51,18 @@ public class SourceDefinitionParser extends ExtensionDefinitionParser {
   }
 
   @Override
-  protected void doParse(ComponentBuildingDefinition.Builder definitionBuilder) throws ConfigurationException {
-    definitionBuilder.withIdentifier(sourceDsl.getElementName()).withTypeDefinition(fromType(ExtensionMessageSource.class))
-        .withObjectFactoryType(ExtensionSourceObjectFactory.class)
-        .withConstructorParameterDefinition(fromFixedValue(extensionModel).build())
-        .withConstructorParameterDefinition(fromFixedValue(sourceModel).build())
-        .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
-        .withSetterParameterDefinition("retryPolicyTemplate", fromChildConfiguration(RetryPolicyTemplate.class).build())
-        .withSetterParameterDefinition(CONFIG_PROVIDER_ATTRIBUTE_NAME,
-                                       fromSimpleReferenceParameter(CONFIG_ATTRIBUTE_NAME).build())
-        .withSetterParameterDefinition(CURSOR_PROVIDER_FACTORY_FIELD_NAME,
-                                       fromChildConfiguration(CursorProviderFactory.class).build());
+  protected Builder doParse(Builder definitionBuilder) throws ConfigurationException {
+    Builder finalBuilder =
+        definitionBuilder.withIdentifier(sourceDsl.getElementName()).withTypeDefinition(fromType(ExtensionMessageSource.class))
+            .withObjectFactoryType(ExtensionSourceObjectFactory.class)
+            .withConstructorParameterDefinition(fromFixedValue(extensionModel).build())
+            .withConstructorParameterDefinition(fromFixedValue(sourceModel).build())
+            .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
+            .withSetterParameterDefinition("retryPolicyTemplate", fromChildConfiguration(RetryPolicyTemplate.class).build())
+            .withSetterParameterDefinition(CONFIG_PROVIDER_ATTRIBUTE_NAME,
+                                           fromSimpleReferenceParameter(CONFIG_ATTRIBUTE_NAME).build())
+            .withSetterParameterDefinition(CURSOR_PROVIDER_FACTORY_FIELD_NAME,
+                                           fromChildConfiguration(CursorProviderFactory.class).build());
 
     List<ParameterGroupModel> inlineGroups = getInlineGroups(sourceModel);
     sourceModel.getErrorCallback().ifPresent(cb -> inlineGroups.addAll(getInlineGroups(cb)));
@@ -71,5 +73,7 @@ public class SourceDefinitionParser extends ExtensionDefinitionParser {
     for (ParameterGroupModel group : inlineGroups) {
       parseInlineParameterGroup(group);
     }
+
+    return finalBuilder;
   }
 }

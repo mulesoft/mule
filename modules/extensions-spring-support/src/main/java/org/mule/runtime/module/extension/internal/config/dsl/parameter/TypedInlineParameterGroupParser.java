@@ -13,12 +13,13 @@ import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fro
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromReferenceObject;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory.getDefault;
+
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingContext;
@@ -35,7 +36,7 @@ public class TypedInlineParameterGroupParser extends ParameterGroupParser {
 
   private final ObjectType metadataType;
 
-  public TypedInlineParameterGroupParser(ComponentBuildingDefinition.Builder definition,
+  public TypedInlineParameterGroupParser(Builder definition,
                                          ParameterGroupModel group,
                                          ParameterGroupDescriptor groupDescriptor,
                                          ClassLoader classLoader, DslElementSyntax groupDsl,
@@ -51,13 +52,16 @@ public class TypedInlineParameterGroupParser extends ParameterGroupParser {
 
 
   @Override
-  protected void doParse(ComponentBuildingDefinition.Builder definitionBuilder) throws ConfigurationException {
-    definitionBuilder.withIdentifier(name).withNamespace(namespace).asNamed().withTypeDefinition(fromType(ValueResolver.class))
+  protected Builder doParse(Builder definitionBuilder) throws ConfigurationException {
+    Builder finalBuilder = definitionBuilder.withIdentifier(name).withNamespace(namespace).asNamed()
+        .withTypeDefinition(fromType(ValueResolver.class))
         .withObjectFactoryType(InlineParameterGroupObjectFactory.class)
         .withConstructorParameterDefinition(fromFixedValue(metadataType).build())
         .withConstructorParameterDefinition(fromFixedValue(classLoader).build())
         .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build());
 
     parseFields(metadataType, groupDsl);
+
+    return finalBuilder;
   }
 }

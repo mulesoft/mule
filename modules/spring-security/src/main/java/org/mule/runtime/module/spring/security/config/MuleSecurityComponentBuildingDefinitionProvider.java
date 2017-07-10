@@ -44,13 +44,13 @@ public class MuleSecurityComponentBuildingDefinitionProvider implements Componen
     ComponentBuildingDefinition.Builder baseDefinition =
         new ComponentBuildingDefinition.Builder().withNamespace(MULE_SS_NAMESPACE);
 
-    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("security-manager")
+    componentBuildingDefinitions.add(baseDefinition.withIdentifier("security-manager")
         .withTypeDefinition(fromType(SecurityManager.class)).withObjectFactoryType(MuleSecurityManagerConfigurator.class)
         .withSetterParameterDefinition("muleContext", fromReferenceObject(MuleContext.class).build())
         .withSetterParameterDefinition("name", fromSimpleParameter("name").build())
         .withSetterParameterDefinition("providers", fromChildCollectionConfiguration(SecurityProvider.class).build()).build());
 
-    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("delegate-security-provider")
+    componentBuildingDefinitions.add(baseDefinition.withIdentifier("delegate-security-provider")
         .withTypeDefinition(fromType(SpringProviderAdapter.class))
         .withSetterParameterDefinition("name", fromSimpleParameter("name").build())
         .withSetterParameterDefinition("securityProperties", fromChildCollectionConfiguration(SecurityProperty.class).build())
@@ -60,11 +60,11 @@ public class MuleSecurityComponentBuildingDefinitionProvider implements Componen
         .build());
 
     componentBuildingDefinitions
-        .add(baseDefinition.copy().withIdentifier("security-property").withTypeDefinition(fromType(SecurityProperty.class))
+        .add(baseDefinition.withIdentifier("security-property").withTypeDefinition(fromType(SecurityProperty.class))
             .withConstructorParameterDefinition(fromSimpleParameter("name").build())
             .withConstructorParameterDefinition(fromSimpleParameter("value").build()).build());
 
-    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("authorization-filter")
+    componentBuildingDefinitions.add(baseDefinition.withIdentifier("authorization-filter")
         .withTypeDefinition(fromType(SecurityFilterMessageProcessor.class))
         .withObjectFactoryType(AuthorizationFilterObjectFactory.class)
         .withConstructorParameterDefinition(fromSimpleParameter("requiredAuthorities",

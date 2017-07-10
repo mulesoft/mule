@@ -41,23 +41,23 @@ public class TlsComponentBuildingDefinitionProvider implements ComponentBuilding
   public List<ComponentBuildingDefinition> getComponentBuildingDefinitions() {
     LinkedList<ComponentBuildingDefinition> componentBuildingDefinitions = new LinkedList<>();
 
-    ComponentBuildingDefinition.Builder baseStore = baseDefinition.copy()
+    ComponentBuildingDefinition.Builder baseStore = baseDefinition
         .withSetterParameterDefinition("path", fromSimpleParameter("path").build())
         .withSetterParameterDefinition("password", fromSimpleParameter("password").build())
         .withSetterParameterDefinition("type", fromSimpleParameter("type").build())
         .withSetterParameterDefinition("algorithm", fromSimpleParameter("algorithm").build());
 
     componentBuildingDefinitions
-        .add(baseStore.copy().withIdentifier(KEYSTORE).withTypeDefinition(fromType(KeyStoreConfig.class))
+        .add(baseStore.withIdentifier(KEYSTORE).withTypeDefinition(fromType(KeyStoreConfig.class))
             .withSetterParameterDefinition("alias", fromSimpleParameter("alias").build())
             .withSetterParameterDefinition("keyPassword", fromSimpleParameter("keyPassword").build()).build());
 
     componentBuildingDefinitions
-        .add(baseStore.copy().withIdentifier(TRUSTSTORE).withTypeDefinition(fromType(TrustStoreConfig.class))
+        .add(baseStore.withIdentifier(TRUSTSTORE).withTypeDefinition(fromType(TrustStoreConfig.class))
             .withSetterParameterDefinition("insecure", fromSimpleParameter("insecure").build()).build());
 
     componentBuildingDefinitions
-        .add(baseDefinition.copy().withIdentifier(CONTEXT).withTypeDefinition(fromType(DefaultTlsContextFactory.class))
+        .add(baseDefinition.withIdentifier(CONTEXT).withTypeDefinition(fromType(DefaultTlsContextFactory.class))
             .withObjectFactoryType(DefaultTlsContextFactoryObjectFactory.class)
             .withSetterParameterDefinition("enabledProtocols", fromSimpleParameter("enabledProtocols").build())
             .withSetterParameterDefinition("enabledCipherSuites", fromSimpleParameter("enabledCipherSuites").build())
