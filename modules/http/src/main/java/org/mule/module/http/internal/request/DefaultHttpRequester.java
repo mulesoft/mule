@@ -451,6 +451,10 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
 
     private int resolveResponseTimeout(MuleEvent muleEvent)
     {
+        if (muleEvent.getMuleContext().getConfiguration().isDisableTimeouts())
+        {
+            return MuleEvent.TIMEOUT_WAIT_FOREVER;
+        }
         if (responseTimeout.getRawValue() == null)
         {
             return muleEvent.getTimeout();

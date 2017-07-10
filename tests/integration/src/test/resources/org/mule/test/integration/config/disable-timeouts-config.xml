@@ -17,25 +17,26 @@
     <configuration defaultResponseTimeout="100"/>
 
     <!-- HTTP OutboundEndpoint timeout -->
-    <flow name="HttpTimeout">
-        <vm:inbound-endpoint path="httpTimeout" exchange-pattern="request-response"/>
+    <flow name="HttpOutboundTimeoutFlow1">
+        <vm:inbound-endpoint path="httpOutboundTimeout" exchange-pattern="request-response"/>
         <http:outbound-endpoint address="http://localhost:${port1}/service"
                                 exchange-pattern="request-response" responseTimeout="100"/>
+        <byte-array-to-string-transformer/>
     </flow>
 
-    <flow name="HttpService">
+    <flow name="HttpOutboundTimeoutFlow2">
         <http:inbound-endpoint address="http://localhost:${port1}/service" exchange-pattern="request-response"/>
         <test:component waitTime="200" appendString=" processed"/>
     </flow>
 
     <!-- TCP socket read timeout -->
-    <flow name="Test1Flow1">
+    <flow name="TcpTimeoutFlow1">
         <vm:inbound-endpoint path="tcpTimeout" exchange-pattern="request-response"/>
         <tcp:outbound-endpoint address="tcp://localhost:${port2}" exchange-pattern="request-response"/>
         <byte-array-to-string-transformer/>
     </flow>
 
-    <flow name="Test1Flow2">
+    <flow name="TcpTimeoutFlow2">
         <tcp:inbound-endpoint host="localhost" port="${port2}" exchange-pattern="request-response"/>
         <test:component waitTime="200" appendString="ho"/>
     </flow>

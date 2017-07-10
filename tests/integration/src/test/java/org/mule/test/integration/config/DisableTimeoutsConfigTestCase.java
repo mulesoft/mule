@@ -41,8 +41,9 @@ public class DisableTimeoutsConfigTestCase extends FunctionalTestCase
     public void httpOutboundEndpointResponseTimeout() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage result = client.send("vm://httpTimeout", "hi", null);
+        MuleMessage result = client.send("vm://httpOutboundTimeout", "hi", null);
         assertNotNull(result);
+        assertEquals("hi processed", result.getPayload());
         assertNull(result.getExceptionPayload());
     }
 
