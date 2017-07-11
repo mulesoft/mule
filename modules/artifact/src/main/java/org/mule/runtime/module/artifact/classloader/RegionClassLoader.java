@@ -14,6 +14,7 @@ import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.ClassUtils.getPackageName;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
 import org.mule.runtime.module.artifact.classloader.exception.ClassNotFoundInRegionException;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 
@@ -24,6 +25,9 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import sun.misc.CompoundEnumeration;
 
@@ -50,6 +54,10 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
   static {
     registerAsParallelCapable();
   }
+
+  private final ReadWriteLock innerStateRWLock = new ReentrantReadWriteLock();
+  private final Lock innerStateReadLock = innerStateRWLock.readLock();
+  private final Lock innerStateWriteLock = innerStateRWLock.writeLock();
 
   private final List<RegionMemberClassLoader> registeredClassLoaders = new ArrayList<>();
   private final Map<String, ArtifactClassLoader> packageMapping = new HashMap<>();
@@ -81,40 +89,46 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
    * @param filter filter used to provide access to the added classloader. Non null
    * @throws IllegalArgumentException if the class loader is already a region member.
    */
-  public synchronized void addClassLoader(ArtifactClassLoader artifactClassLoader, ArtifactClassLoaderFilter filter) {
+  public void addClassLoader(ArtifactClassLoader artifactClassLoader, ArtifactClassLoaderFilter filter) {
     checkArgument(artifactClassLoader != null, "artifactClassLoader cannot be null");
     checkArgument(filter != null, "filter cannot be null");
-    RegionMemberClassLoader registeredClassLoader = findRegisteredClassLoader(artifactClassLoader);
-    if (artifactClassLoader == ownerClassLoader || registeredClassLoader != null) {
-      throw new IllegalArgumentException(createClassLoaderAlreadyInRegionError(artifactClassLoader.getArtifactId()));
-    }
 
-    if (ownerClassLoader == null) {
-      ownerClassLoader = artifactClassLoader;
-    } else {
-      registeredClassLoaders.add(new RegionMemberClassLoader(artifactClassLoader, filter));
-    }
+    innerStateWriteLock.lock();
+    try {
+      RegionMemberClassLoader registeredClassLoader = findRegisteredClassLoader(artifactClassLoader);
+      if (artifactClassLoader == ownerClassLoader || registeredClassLoader != null) {
+        throw new IllegalArgumentException(createClassLoaderAlreadyInRegionError(artifactClassLoader.getArtifactId()));
+      }
 
-    filter.getExportedClassPackages().forEach(p -> {
-      LookupStrategy packageLookupStrategy = getClassLoaderLookupPolicy().getPackageLookupStrategy(p);
-      if (!(packageLookupStrategy instanceof ChildFirstLookupStrategy)) {
-        throw new IllegalStateException(illegalPackageMappingError(p, packageLookupStrategy));
-      } else if (packageMapping.containsKey(p)) {
-        throw new IllegalStateException(duplicatePackageMappingError(p));
+      if (ownerClassLoader == null) {
+        ownerClassLoader = artifactClassLoader;
       } else {
-        packageMapping.put(p, artifactClassLoader);
-      }
-    });
-
-    for (String exportedResource : filter.getExportedResources()) {
-      List<ArtifactClassLoader> classLoaders = resourceMapping.get(exportedResource);
-
-      if (classLoaders == null) {
-        classLoaders = new ArrayList<>();
-        resourceMapping.put(exportedResource, classLoaders);
+        registeredClassLoaders.add(new RegionMemberClassLoader(artifactClassLoader, filter));
       }
 
-      classLoaders.add(artifactClassLoader);
+      filter.getExportedClassPackages().forEach(p -> {
+        LookupStrategy packageLookupStrategy = getClassLoaderLookupPolicy().getPackageLookupStrategy(p);
+        if (!(packageLookupStrategy instanceof ChildFirstLookupStrategy)) {
+          throw new IllegalStateException(illegalPackageMappingError(p, packageLookupStrategy));
+        } else if (packageMapping.containsKey(p)) {
+          throw new IllegalStateException(duplicatePackageMappingError(p));
+        } else {
+          packageMapping.put(p, artifactClassLoader);
+        }
+      });
+
+      for (String exportedResource : filter.getExportedResources()) {
+        List<ArtifactClassLoader> classLoaders = resourceMapping.get(exportedResource);
+
+        if (classLoaders == null) {
+          classLoaders = new ArrayList<>();
+          resourceMapping.put(exportedResource, classLoaders);
+        }
+
+        classLoaders.add(artifactClassLoader);
+      }
+    } finally {
+      innerStateWriteLock.unlock();
     }
   }
 
@@ -148,32 +162,38 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
    * @throws IllegalArgumentException if the class loader is the region owner or is a regiion member that exports packages or
    *         resources.
    */
-  public synchronized boolean removeClassLoader(ArtifactClassLoader artifactClassLoader) {
+  public boolean removeClassLoader(ArtifactClassLoader artifactClassLoader) {
     checkArgument(artifactClassLoader != null, "artifactClassLoader cannot be null");
     if (ownerClassLoader == artifactClassLoader) {
       throw new IllegalArgumentException(REGION_OWNER_CANNOT_BE_REMOVED_ERROR);
     }
 
-    RegionMemberClassLoader registeredClassLoader = findRegisteredClassLoader(artifactClassLoader);
+    innerStateWriteLock.lock();
+    try {
+      RegionMemberClassLoader registeredClassLoader = findRegisteredClassLoader(artifactClassLoader);
 
-    int index = registeredClassLoaders.indexOf(registeredClassLoader);
-    if (index < 0) {
-      return false;
+      int index = registeredClassLoaders.indexOf(registeredClassLoader);
+      if (index < 0) {
+        return false;
+      }
+
+      if (!registeredClassLoader.filter.getExportedClassPackages().isEmpty()
+          || !registeredClassLoader.filter.getExportedResources().isEmpty()) {
+        throw new IllegalArgumentException(createCannotRemoveClassLoaderError(artifactClassLoader.getArtifactId()));
+      }
+
+      registeredClassLoaders.remove(index);
+
+      return true;
+    } finally {
+      innerStateWriteLock.unlock();
     }
-
-    if (!registeredClassLoader.filter.getExportedClassPackages().isEmpty()
-        || !registeredClassLoader.filter.getExportedResources().isEmpty()) {
-      throw new IllegalArgumentException(createCannotRemoveClassLoaderError(artifactClassLoader.getArtifactId()));
-    }
-
-    registeredClassLoaders.remove(index);
-
-    return true;
   }
 
   @Override
   public Class<?> findLocalClass(String name) throws ClassNotFoundException {
-    synchronized (getClassLoadingLock(name)) {
+    innerStateReadLock.lock();
+    try {
       final String packageName = getPackageName(name);
 
       final ArtifactClassLoader artifactClassLoader = packageMapping.get(packageName);
@@ -186,6 +206,8 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
       } else {
         throw new ClassNotFoundInRegionException(name, getArtifactId());
       }
+    } finally {
+      innerStateReadLock.unlock();
     }
   }
 
