@@ -93,6 +93,7 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
   protected ReactiveProcessor processRequest() {
     return stream -> from(stream).map(event -> {
       try {
+        Event.setCurrentEvent(event);
         return processRequest(event);
       } catch (MuleException e) {
         throw propagate(e);

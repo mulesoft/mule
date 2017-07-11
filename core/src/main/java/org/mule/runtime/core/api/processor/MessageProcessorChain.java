@@ -17,7 +17,7 @@ import org.mule.runtime.api.lifecycle.Lifecycle;
 import java.util.List;
 
 /**
- * A chain of {@link Processor}'s. All implementioans should propagate {@link MuleContext}, {@link FlowConstruct} and lifecycle to
+ * A chain of {@link Processor}'s. All implementations should propagate {@link MuleContext}, {@link FlowConstruct} and lifecycle to
  * {@link Processor}'s in the chains. Message processor chains are also {@link MessageProcessorContainer}'s and responsible for
  * adding the correct {@link MessageProcessorPathElement}'s to their parent {@link MessageProcessorPathElement}.
  */

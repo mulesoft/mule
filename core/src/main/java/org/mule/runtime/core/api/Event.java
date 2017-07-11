@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
+import org.apache.logging.log4j.ThreadContext;
 
 /**
  * Represents any data event occurring in the Mule environment. All data sent or received within the mule environment will be
@@ -502,6 +503,10 @@ public interface Event extends Serializable {
    */
   static void setCurrentEvent(Event event) {
     CurrentEventHolder.currentEvent.set(event);
+    if (event != null) {
+      ThreadContext.put("correlationId", event.getCorrelationId());
+      ThreadContext.put("originatingFlowName", event.getContext().getOriginatingFlowName());
+    }
   }
 
 }
