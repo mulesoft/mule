@@ -78,9 +78,10 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
       return error(exception);
     } else {
       Event event = addExceptionPayload(exception, exception.getEvent());
+      exception.setProcessedEvent(event);
       for (MessagingExceptionHandlerAcceptor exceptionListener : exceptionListeners) {
         if (exceptionListener.accept(event)) {
-          return exceptionListener.apply(new MessagingException(event, exception));
+          return exceptionListener.apply(exception);
         }
       }
       return error(new MuleRuntimeException(createStaticMessage(MUST_ACCEPT_ANY_EVENT_MESSAGE)));

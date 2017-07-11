@@ -7,7 +7,8 @@
 package org.mule.runtime.core.api.util;
 
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
-import static reactor.core.Exceptions.unwrap;
+import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.streaming.Cursor;

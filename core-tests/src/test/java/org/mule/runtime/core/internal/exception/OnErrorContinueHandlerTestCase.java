@@ -73,8 +73,6 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
   private Message muleMessage = of("");
 
   @Mock
-  private StreamCloserService mockStreamCloserService;
-  @Mock
   private StreamingManager mockStreamingManager;
   @Spy
   private TestTransaction mockTransaction = new TestTransaction(mockMuleContext);
@@ -99,7 +97,6 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
     onErrorContinueHandler = new OnErrorContinueHandler();
     onErrorContinueHandler.setMuleContext(mockMuleContext);
     onErrorContinueHandler.setFlowConstruct(flow);
-    when(mockMuleContext.getStreamCloserService()).thenReturn(mockStreamCloserService);
     final MuleRegistry registry = mockMuleContext.getRegistry();
     doReturn(mockStreamingManager).when(registry).lookupObject(StreamingManager.class);
 
@@ -119,7 +116,6 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
     verify(mockTransaction, times(0)).setRollbackOnly();
     verify(mockTransaction, times(0)).commit();
     verify(mockTransaction, times(0)).rollback();
-    verify(mockStreamCloserService).closeStream(any(Object.class));
   }
 
   @Test

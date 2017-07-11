@@ -15,7 +15,6 @@ import static org.mule.runtime.core.api.context.notification.SecurityNotificatio
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.GlobalNameableObject;
@@ -117,15 +116,6 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
 
   private Throwable getCause(Exception ex) {
     return ex.getCause() instanceof TypedException ? ex.getCause().getCause() : ex.getCause();
-  }
-
-  protected void closeStream(Message message) {
-    if (muleContext == null || muleContext.isDisposing() || muleContext.isDisposed()) {
-      return;
-    }
-    if (message != null) {
-      muleContext.getStreamCloserService().closeStream(message.getPayload().getValue());
-    }
   }
 
   /**

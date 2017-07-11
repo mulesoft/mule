@@ -272,9 +272,9 @@ public final class DefaultEventContext extends AbstractEventContext implements S
 
     @Override
     public String toString() {
-      return getClass().getSimpleName() + " { id: " + parent.getId() + "; correlationId: " + parent.getCorrelationId()
+      return getClass().getSimpleName() + " { id: " + getId() + "; correlationId: " + parent.getCorrelationId()
           + "; flowName: " + parent.getOriginatingFlowName() + "; commponentLocation: "
-          + (componentLocation != null ? componentLocation.getLocation() : EMPTY) + " }";
+          + (componentLocation != null ? componentLocation.getLocation() : EMPTY) + "; handleErrors: " + handleErrors + " }";
     }
 
     @Override

@@ -24,6 +24,7 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
+import org.mule.runtime.core.api.rx.Exceptions;
 import org.mule.runtime.core.api.util.Pair;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.api.util.TemplateParser;
@@ -39,7 +40,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ExpressionVal
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
-import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
 import java.util.LinkedHashMap;
@@ -83,7 +83,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient {
     OperationMessageProcessor processor = createProcessor(extension, operation, parameters);
     Mono<Result<T, A>> resultMono = from(processor.apply(just(getInitialiserEvent(muleContext))))
         .map(event -> Result.<T, A>builder(event.getMessage()).build())
-        .mapError(Exceptions::unwrap)
+        .onErrorMap(Exceptions::unwrap)
         .doAfterTerminate((r, t) -> disposeProcessor(processor));
     return resultMono.toFuture();
   }

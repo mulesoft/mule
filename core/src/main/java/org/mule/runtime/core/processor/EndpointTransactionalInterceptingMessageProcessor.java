@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.processor;
 
+import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createScopeTransactionalExecutionTemplate;
+
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
@@ -33,15 +35,8 @@ public class EndpointTransactionalInterceptingMessageProcessor extends AbstractI
     if (next == null) {
       return event;
     } else {
-      ExecutionTemplate<Event> executionTemplate =
-          TransactionalExecutionTemplate.createTransactionalExecutionTemplate(muleContext, transactionConfig);
-      ExecutionCallback<Event> processingCallback = new ExecutionCallback<Event>() {
-
-        @Override
-        public Event process() throws Exception {
-          return processNext(event);
-        }
-      };
+      ExecutionTemplate<Event> executionTemplate = createScopeTransactionalExecutionTemplate(muleContext, transactionConfig);
+      ExecutionCallback<Event> processingCallback = () -> processNext(event);
 
       try {
         return executionTemplate.execute(processingCallback);

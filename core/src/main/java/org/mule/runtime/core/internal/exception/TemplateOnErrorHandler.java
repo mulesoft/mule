@@ -16,7 +16,7 @@ import static org.mule.runtime.core.api.context.notification.ErrorHandlerNotific
 import static org.mule.runtime.core.api.context.notification.ErrorHandlerNotification.PROCESS_START;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContext;
-import static reactor.core.Exceptions.unwrap;
+import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
@@ -83,6 +83,8 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
           fireNotification(exception, request);
           logException(exception, request);
           processStatistics();
+          // Reset this flag to handle situation where a error-handler exception is handled in a parent error-handler.
+          exception.setInErrorHandler(false);
           markExceptionAsHandledIfRequired(exception);
         })
         .map(request -> beforeRouting(exception, request))
@@ -92,7 +94,6 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
           response = afterRouting(exception, response);
           if (response != null) {
             response = processReplyTo(response, exception);
-            closeStream(response.getMessage());
             return nullifyExceptionPayloadIfRequired(response);
           }
           return response;

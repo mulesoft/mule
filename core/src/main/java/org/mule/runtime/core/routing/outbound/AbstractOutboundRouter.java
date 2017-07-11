@@ -197,6 +197,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
       }
     }
     routes.remove(route);
+    processorChainCache.invalidate(route);
   }
 
   public TransactionConfig getTransactionConfig() {
@@ -255,6 +256,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
       super.dispose();
       routes = emptyList();
       initialised.set(false);
+      processorChainCache.invalidateAll();;
     }
   }
 

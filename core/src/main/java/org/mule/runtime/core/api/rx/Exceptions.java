@@ -8,7 +8,6 @@ package org.mule.runtime.core.api.rx;
 
 import static reactor.core.Exceptions.isBubbling;
 import static reactor.core.Exceptions.propagate;
-import static reactor.core.Exceptions.unwrap;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -35,6 +34,7 @@ import java.util.function.Predicate;
 public class Exceptions {
 
   public static Predicate<Throwable> UNEXPECTED_EXCEPTION_PREDICATE = throwable -> !(throwable instanceof MessagingException);
+  private static final String REACTIVE_EXCEPTION_CLASS_NAME = "reactor.core.Exceptions$ReactiveException";
 
   /**
    * Adapt a {@link CheckedConsumer} to a {@link Consumer} propagating any exceptions thrown by the {@link CheckedConsumer} using
@@ -155,6 +155,19 @@ public class Exceptions {
     } else {
       throw new DefaultMuleException(throwable);
     }
+  }
+
+  /**
+   * Unwrap a particular {@code Throwable}.
+   * 
+   * @param throwable the exception to wrap
+   * @return the unwrapped exception
+   */
+  public static Throwable unwrap(Throwable throwable) {
+    while (throwable.getClass().getName().equals(REACTIVE_EXCEPTION_CLASS_NAME)) {
+      throwable = throwable.getCause();
+    }
+    return throwable;
   }
 
   /**

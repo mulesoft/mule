@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.processor.strategy;
 
+import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.api.rx.Exceptions.wrapFatal;
-import static reactor.core.Exceptions.unwrap;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.just;
 
