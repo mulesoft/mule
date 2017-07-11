@@ -320,7 +320,7 @@ public class ComponentBuildingDefinition<T> {
       builder.definition.objectFactoryType = this.definition.objectFactoryType;
 
       if (definition.isNamed()) {
-        builder.asNamed();
+        builder.definition.named = true;
       }
 
       return builder;
