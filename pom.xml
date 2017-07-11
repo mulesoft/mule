@@ -2120,16 +2120,6 @@
                 <skipSystemTests>false</skipSystemTests>
             </properties>
         </profile>
-        <profile>
-            <id>distributions</id>
-            <properties>
-                <skipVerifications>false</skipVerifications>
-                <skipInstalls>false</skipInstalls>
-            </properties>
-            <modules>
-                <module>distributions</module>
-            </modules>
-        </profile>
 		<profile>
             <id>release</id>
             <properties>

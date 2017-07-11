@@ -18,7 +18,7 @@ else
 fi
 
 # Clean everything
-mvn -Ptests,distributions clean
+mvn -Ptests clean
 
 # Build all modules
 mvn -Dmaven.test.skip.exec=true -Ptests install
@@ -35,9 +35,9 @@ mvn -Dmaven.test.failure.ignore=true test
 # Generate javadocs
 mvn -Dmaven.test.skip.exec=true -Ptests -Daggregate=true javadoc:javadoc
 
-# Generate all distributions (-DperformRelease=true to generate source bundles,
+# Generate all modules (-DperformRelease=true to generate source bundles,
 # will be repackaged by the full distro script into a single source zip)
-mvn -Dmaven.test.skip.exec=true -Pdistributions -DperformRelease=true install
+mvn -Dmaven.test.skip.exec=true -DperformRelease=true install
 
 # Upload all modules, javadocs, and sources to the public repository
 # mvn -Dmaven.test.skip.exec=true -Ptests -DperformRelease=true deploy

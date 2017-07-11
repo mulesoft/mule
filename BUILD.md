@@ -30,10 +30,8 @@ The following table lists common goals to execute for building Mule. These goals
 |:----------|:-------------|
 | `mvn clean`	 | purges any built artifacts or intermediate files (such as .class) from the target directory |
 | `mvn install` | installs all modules but the distributions to your local repository, will run all tests but the ones that have external dependencies. |
-| `mvn install -Pdistributions` | installs all modules and distributions to your local repository. |
 | `mvn install -Prelease` | same as `mvn install` including sources, tests, javadocs and GPG signatures. |
 | `mvn install -Prelease -DskipGpg=true` | same as `mvn install -Prelease` without GPG signatures. |
-| `mvn install -Pdistributions,release` | installs all jars, distributions including sources, tests, javadocs and GPG signatures. |
 | `mvn test`    | runs any unit tests for this sub-project |
 | `mvn -DskipTests install` |	By default, Maven runs all unit tests for each project for each build which, depending on the project, can take a long time to complete. If you wish, you can skip the tests using this command.|
  
@@ -70,21 +68,6 @@ The following list shows the Mule's build profiles:
 | `release`                 | Won't execute any tests and will create the distributable files.|
 
 To set these profiles,  we should pass them in the maven command line as `-PprofileName`. Therefore, to skip the integration tests we can `-DskipIntegrationTests`.
-
-#### Distributions
-
-When you package Mule for distribution, all distributions and related resources are located in the distributions sub-project. 
-
-For performance's sake, the distributions are *not* built from the project's top-level directory by default. To build distributions include appropriate profile `-P distributionsYou` to your Maven command line or may either build a distribution from its own directory.
-
-The table below offers a brief description of each type distribution.
-
-|Type                           | Sub-project	                   |Description       |
-|:------------------------------|:-------------------------------|:-----------------|
-| Full Standalone Server        | `/distributions/standalone`   | Packages Mule as a stand-alone server application. Includes all transports, extras and all dependencies. Includes the [Java Service Wrapper](http://wrapper.tanukisoftware.org/) for starting/stopping/restarting Mule from the native OS. |
-| Custom Standalone Server      | `/distributions/standalone-light` | Packages Mule as a standalone server application without any source or javadoc files |
-| Embedded (Composite) JAR File | `/distribution/embedded` | Packages Mule as a single JAR file containing all Mule classes, including all transports and extras). This distribution is useful when embedding Mule into another application, or when using Mule with a non-Maven-based build. Note that when you use this approach, you are responsible for providing any needed Mule dependencies, as described in the next section. |
- 
 
 ### Troubleshooting Maven
 
