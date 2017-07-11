@@ -101,7 +101,7 @@
 # /lib/mule
 #
 /mule-standalone-${productVersion}/lib/mule
-/mule-standalone-${productVersion}/lib/mule/mule-api-1.0.0-SNAPSHOT.jar
+/mule-standalone-${productVersion}/lib/mule/mule-api-1.0.0-rc.aquaman.jar
 /mule-standalone-${productVersion}/lib/mule/mule-core-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-extensions-api-1.0.0-rc.aquaman.jar
 /mule-standalone-${productVersion}/lib/mule/mule-extensions-soap-api-1.0.0-rc.aquaman.jar
