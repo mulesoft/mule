@@ -21,7 +21,7 @@ import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFacto
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 
 /**
- * Enriches the delcaration with the types which are manually exported through {@link Export}
+ * Enriches the declaration with the types which are manually exported through {@link Export}
  *
  * @since 4.0
  */

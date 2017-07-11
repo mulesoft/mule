@@ -34,8 +34,8 @@ public class ArtifactPluginDescriptor extends DeployableArtifactDescriptor {
   public static final String MULE_PLUGIN_JSON = "mule-plugin.json";
   public static final String MULE_PLUGIN_POM = "pom.xml";
 
-  private Set<ArtifactPluginDescriptor> artifactPluginDescriptors = new HashSet<>();
   private Optional<LoaderDescriber> extensionModelDescriptorProperty = empty();
+  private Set<String> privilegedArtifacts = new HashSet<>();
 
   /**
    * Creates a new artifact plugin descriptor
@@ -44,14 +44,6 @@ public class ArtifactPluginDescriptor extends DeployableArtifactDescriptor {
    */
   public ArtifactPluginDescriptor(String name) {
     super(name);
-  }
-
-  public Set<ArtifactPluginDescriptor> getArtifactPluginDescriptors() {
-    return artifactPluginDescriptors;
-  }
-
-  public void setArtifactPluginDescriptors(Set<ArtifactPluginDescriptor> pluginDependencyDescriptors) {
-    this.artifactPluginDescriptors = pluginDependencyDescriptors;
   }
 
   /**

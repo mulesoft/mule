@@ -10,8 +10,8 @@ package org.mule.runtime.deployment.model.internal.policy;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBuilder;
+import org.mule.runtime.deployment.model.internal.RegionPluginClassLoadersFactory;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.DeployableArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.RegionClassLoader;
@@ -32,11 +32,11 @@ public class PolicyTemplateClassLoaderBuilder extends AbstractArtifactClassLoade
    * 
    * @param artifactClassLoaderFactory factory for the classloader specific to the artifact resource and classes. Must be not
    *        null.
-   * @param artifactPluginClassLoaderFactory factory to create class loaders for each used plugin. Non be not null.
+   * @param pluginClassLoadersFactory creates the class loaders for the plugins included in the policy's region. Non null
    */
   public PolicyTemplateClassLoaderBuilder(DeployableArtifactClassLoaderFactory artifactClassLoaderFactory,
-                                          ArtifactClassLoaderFactory artifactPluginClassLoaderFactory) {
-    super(artifactPluginClassLoaderFactory);
+                                          RegionPluginClassLoadersFactory pluginClassLoadersFactory) {
+    super(pluginClassLoadersFactory);
     this.artifactClassLoaderFactory = artifactClassLoaderFactory;
   }
 

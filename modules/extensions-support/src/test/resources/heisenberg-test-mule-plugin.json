@@ -11,6 +11,8 @@
   "classLoaderModelLoaderDescriptor": {
     "id": "maven",
     "attributes": {
+      "privilegedExportedPackages": [],
+      "privilegedArtifactIds": [],
       "exportedPackages": [
         "org.mule.test.heisenberg.extension.model.types",
         "org.mule.test.heisenberg.extension.exception",

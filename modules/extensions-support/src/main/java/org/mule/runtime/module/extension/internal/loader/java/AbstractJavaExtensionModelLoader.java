@@ -35,6 +35,7 @@ import org.mule.runtime.module.extension.internal.loader.enricher.ImportedTypesD
 import org.mule.runtime.module.extension.internal.loader.enricher.JavaConfigurationDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.JavaExportedTypesDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.JavaOAuthDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.enricher.JavaPrivilegedExportedTypesDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.JavaXmlDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ParameterLayoutOrderDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.SubTypesDeclarationEnricher;
@@ -50,6 +51,7 @@ import org.mule.runtime.module.extension.internal.loader.validation.OperationPar
 import org.mule.runtime.module.extension.internal.loader.validation.OperationReturnTypeModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.ParameterGroupModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.ParameterTypeModelValidator;
+import org.mule.runtime.module.extension.internal.loader.validation.PrivilegedApiValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.ValueProviderModelValidator;
 
 import java.util.Collection;
@@ -72,7 +74,8 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
                                                                                          new ParameterGroupModelValidator(),
                                                                                          new ParameterTypeModelValidator(),
                                                                                          new OAuthConnectionProviderModelValidator(),
-                                                                                         new ValueProviderModelValidator()));
+                                                                                         new ValueProviderModelValidator(),
+                                                                                         new PrivilegedApiValidator()));
 
   private final List<DeclarationEnricher> customDeclarationEnrichers = unmodifiableList(asList(
                                                                                                new JavaXmlDeclarationEnricher(),
@@ -87,6 +90,7 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
                                                                                                new ImportedTypesDeclarationEnricher(),
                                                                                                new JavaConfigurationDeclarationEnricher(),
                                                                                                new JavaExportedTypesDeclarationEnricher(),
+                                                                                               new JavaPrivilegedExportedTypesDeclarationEnricher(),
                                                                                                new JavaOAuthDeclarationEnricher(),
                                                                                                new SubTypesDeclarationEnricher(),
                                                                                                new ExtensionDescriptionsEnricher(),

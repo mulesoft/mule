@@ -17,7 +17,7 @@ import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.mule.runtime.container.internal.ContainerClassLoaderFactory.SYSTEM_PACKAGES;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_VERBOSE_CLASSLOADING;
-import static org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBuilder.getArtifactPluginId;
+import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.getArtifactPluginId;
 import static org.mule.runtime.module.artifact.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -153,7 +153,8 @@ public class IsolatedClassLoaderFactory {
                                           pluginLookupPolicyGenerator.createLookupPolicy(pluginUrlClassification,
                                                                                          artifactsUrlClassification
                                                                                              .getPluginUrlClassifications(),
-                                                                                         pluginLookupPolicy));
+                                                                                         pluginLookupPolicy,
+                                                                                         pluginsArtifactClassLoaders));
           pluginsArtifactClassLoaders.add(pluginCL);
 
           ArtifactClassLoaderFilter filter =
@@ -214,7 +215,7 @@ public class IsolatedClassLoaderFactory {
 
   private boolean hasPrivilegedApiAccess(PluginUrlClassification pluginUrlClassification, MuleModule module) {
     return module.getPrivilegedArtifacts().stream()
-        .filter(artifact -> pluginUrlClassification.getName().contains(":" + artifact + ":")).findFirst().isPresent();
+        .filter(artifact -> pluginUrlClassification.getName().startsWith(artifact + ":")).findFirst().isPresent();
   }
 
   /**

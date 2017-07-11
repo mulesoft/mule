@@ -8,14 +8,12 @@ package org.mule.runtime.deployment.model.internal;
 
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toSet;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.module.artifact.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter;
 import org.mule.runtime.module.artifact.classloader.ChildFirstLookupStrategy;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
@@ -45,11 +43,9 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtifactClassLoaderBuilder> {
 
-  public static final String PLUGIN_CLASSLOADER_IDENTIFIER = "/plugin/";
-
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());
-  protected final ArtifactClassLoaderFactory artifactPluginClassLoaderFactory;
-  private Set<ArtifactPluginDescriptor> artifactPluginDescriptors = new HashSet<>();
+  private final RegionPluginClassLoadersFactory pluginClassLoadersFactory;
+  private List<ArtifactPluginDescriptor> artifactPluginDescriptors = new LinkedList<>();
   private String artifactId = UUID.getUUID();
   protected ArtifactDescriptor artifactDescriptor;
   private ArtifactClassLoader parentClassLoader;
@@ -58,12 +54,11 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
   /**
    * Creates an {@link AbstractArtifactClassLoaderBuilder}.
    *
-   * @param artifactPluginClassLoaderFactory factory to create class loaders for each used plugin. Non be not null.
+   * @param pluginClassLoadersFactory creates the class loaders for the plugins included in the artifact's region. Non null
    */
-  public AbstractArtifactClassLoaderBuilder(ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory) {
-    checkArgument(artifactPluginClassLoaderFactory != null, "artifactPluginClassLoaderFactory cannot be null");
-
-    this.artifactPluginClassLoaderFactory = artifactPluginClassLoaderFactory;
+  public AbstractArtifactClassLoaderBuilder(RegionPluginClassLoadersFactory pluginClassLoadersFactory) {
+    checkArgument(pluginClassLoadersFactory != null, "pluginClassLoadersFactory cannot be null");
+    this.pluginClassLoadersFactory = pluginClassLoadersFactory;
   }
 
   /**
@@ -128,9 +123,10 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
     Map<String, LookupStrategy> appAdditionalLookupStrategy = new HashMap<>();
     artifactClassLoaderFilter.getExportedClassPackages().stream().forEach(p -> appAdditionalLookupStrategy.put(p, PARENT_FIRST));
 
-    final List<ArtifactClassLoader> pluginClassLoaders =
-        createPluginClassLoaders(artifactId, regionClassLoader, artifactPluginDescriptors,
-                                 regionClassLoader.getClassLoaderLookupPolicy().extend(appAdditionalLookupStrategy));
+    artifactPluginClassLoaders =
+        pluginClassLoadersFactory.createPluginClassLoaders(regionClassLoader, artifactPluginDescriptors,
+                                                           regionClassLoader.getClassLoaderLookupPolicy()
+                                                               .extend(appAdditionalLookupStrategy));
 
     final ArtifactClassLoader artifactClassLoader = createArtifactClassLoader(artifactId, regionClassLoader);
 
@@ -141,7 +137,7 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
       final ArtifactClassLoaderFilter classLoaderFilter =
           createPluginClassLoaderFilter(artifactPluginDescriptor, artifactDescriptor.getClassLoaderModel().getExportedPackages(),
                                         parentLookupPolicy);
-      regionClassLoader.addClassLoader(pluginClassLoaders.get(artifactPluginIndex), classLoaderFilter);
+      regionClassLoader.addClassLoader(artifactPluginClassLoaders.get(artifactPluginIndex), classLoaderFilter);
       artifactPluginIndex++;
     }
     return artifactClassLoader;
@@ -206,36 +202,4 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
   }
 
   protected abstract String getArtifactId(ArtifactDescriptor artifactDescriptor);
-
-  private List<ArtifactClassLoader> createPluginClassLoaders(String artifactId, ArtifactClassLoader parent,
-                                                             Set<ArtifactPluginDescriptor> artifactPluginDescriptors,
-                                                             ClassLoaderLookupPolicy appExportedPackagesLookupPolicy) {
-    List<ArtifactClassLoader> classLoaders = new LinkedList<>();
-
-    for (ArtifactPluginDescriptor artifactPluginDescriptor : artifactPluginDescriptors) {
-      artifactPluginDescriptor.setArtifactPluginDescriptors(artifactPluginDescriptors);
-
-      final String pluginArtifactId = getArtifactPluginId(artifactId, artifactPluginDescriptor.getName());
-
-      final ArtifactClassLoader artifactClassLoader =
-          artifactPluginClassLoaderFactory.create(pluginArtifactId, artifactPluginDescriptor, parent.getClassLoader(),
-                                                  appExportedPackagesLookupPolicy);
-      artifactPluginClassLoaders.add(artifactClassLoader);
-      classLoaders.add(artifactClassLoader);
-    }
-    return classLoaders;
-  }
-
-  /**
-   * @param parentArtifactId identifier of the artifact that owns the plugin. Non empty.
-   * @param pluginName name of the plugin. Non empty.
-   * @return the unique identifier for the plugin inside the parent artifact.
-   */
-  public static String getArtifactPluginId(String parentArtifactId, String pluginName) {
-    checkArgument(!isEmpty(parentArtifactId), "parentArtifactId cannot be empty");
-    checkArgument(!isEmpty(pluginName), "pluginName cannot be empty");
-
-    return parentArtifactId + PLUGIN_CLASSLOADER_IDENTIFIER + pluginName;
-  }
-
 }

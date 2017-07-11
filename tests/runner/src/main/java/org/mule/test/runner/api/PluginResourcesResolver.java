@@ -13,6 +13,8 @@ import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescrip
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_JSON;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.EXPORTED_PACKAGES;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.EXPORTED_RESOURCES;
+import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.PRIVILEGED_ARTIFACTS_IDS;
+import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.PRIVILEGED_EXPORTED_PACKAGES;
 import static org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor.META_INF;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.deployment.persistence.MulePluginModelJsonSerializer;
@@ -48,6 +50,8 @@ public class PluginResourcesResolver {
   public PluginUrlClassification resolvePluginResourcesFor(PluginUrlClassification pluginUrlClassification) {
     final Set<String> exportPackages = newHashSet();
     final Set<String> exportResources = newHashSet();
+    final Set<String> privilegedExportedPackages = newHashSet();
+    final Set<String> privilegedArtifacts = newHashSet();
 
     try (URLClassLoader classLoader = new URLClassLoader(pluginUrlClassification.getUrls().toArray(new URL[0]), null)) {
       logger.debug("Loading plugin '{}' descriptor", pluginUrlClassification.getName());
@@ -78,11 +82,24 @@ public class PluginResourcesResolver {
                                                                             .addAll((List<String>) classLoaderModelDescriptor
                                                                                 .getAttributes().getOrDefault(EXPORTED_RESOURCES,
                                                                                                               new ArrayList<>()));
+
+                                                                        privilegedExportedPackages
+                                                                            .addAll((List<String>) classLoaderModelDescriptor
+                                                                                .getAttributes()
+                                                                                .getOrDefault(PRIVILEGED_EXPORTED_PACKAGES,
+                                                                                              new ArrayList<>()));
+
+                                                                        privilegedArtifacts
+                                                                            .addAll((List<String>) classLoaderModelDescriptor
+                                                                                .getAttributes()
+                                                                                .getOrDefault(PRIVILEGED_ARTIFACTS_IDS,
+                                                                                              new ArrayList<>()));
                                                                       });
 
       return new PluginUrlClassification(pluginUrlClassification.getName(), pluginUrlClassification.getUrls(),
                                          pluginUrlClassification.getExportClasses(),
-                                         pluginUrlClassification.getPluginDependencies(), exportPackages, exportResources);
+                                         pluginUrlClassification.getPluginDependencies(), exportPackages, exportResources,
+                                         privilegedExportedPackages, privilegedArtifacts);
     } catch (IOException e) {
       throw new UncheckedIOException(e);
     }

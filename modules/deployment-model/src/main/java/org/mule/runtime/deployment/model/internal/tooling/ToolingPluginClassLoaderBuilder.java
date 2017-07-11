@@ -13,9 +13,9 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBuilder;
+import org.mule.runtime.deployment.model.internal.RegionPluginClassLoadersFactory;
 import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.DeployableArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.DisposableClassLoader;
 import org.mule.runtime.module.artifact.classloader.RegionClassLoader;
@@ -51,15 +51,17 @@ public class ToolingPluginClassLoaderBuilder extends AbstractArtifactClassLoader
   /**
    * {@inheritDoc}
    *
+   * @param artifactClassLoaderFactory factory for the classloader specific to the artifact resource and classes
    * @param artifactPluginDescriptor desired plugin to generate an {@link ArtifactClassLoader} for.
    * @param pluginDependenciesResolver resolver for the plugins on which the {@code artifactPluginDescriptor} declares it depends.
+   * @param pluginClassLoadersFactory creates the class loaders for the plugins included in the policy's region. Non null
    * @see #build()
    */
   public ToolingPluginClassLoaderBuilder(DeployableArtifactClassLoaderFactory artifactClassLoaderFactory,
-                                         ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory,
                                          PluginDependenciesResolver pluginDependenciesResolver,
-                                         ArtifactPluginDescriptor artifactPluginDescriptor) {
-    super(artifactPluginClassLoaderFactory);
+                                         ArtifactPluginDescriptor artifactPluginDescriptor,
+                                         RegionPluginClassLoadersFactory pluginClassLoadersFactory) {
+    super(pluginClassLoadersFactory);
     this.artifactPluginDescriptor = artifactPluginDescriptor;
     this.artifactClassLoaderFactory = artifactClassLoaderFactory;
     this.pluginDependenciesResolver = pluginDependenciesResolver;

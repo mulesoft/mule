@@ -31,6 +31,8 @@
       ]
     }
   ],
+  "privilegedPackages": [],
+  "privilegedArtifacts": [],
   "externalLibraries": [],
   "importedTypes": [],
   "configurations": [

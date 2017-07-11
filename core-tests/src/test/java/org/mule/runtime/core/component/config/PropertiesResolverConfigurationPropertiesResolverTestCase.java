@@ -123,21 +123,21 @@ public class PropertiesResolverConfigurationPropertiesResolverTestCase extends A
   @Test
   public void parentKeyCannotReferenceChildKey() {
     expectedException
-        .expectMessage(is("Couldn't not find configuration property value for key ${child-key1} from properties provider parent resolver - within resolver child resolver trying to process key parent-key-referencing-child"));
+        .expectMessage(is("Couldn't find configuration property value for key ${child-key1} from properties provider parent resolver - within resolver child resolver trying to process key parent-key-referencing-child"));
     resolver.resolveValue("${parent-key-referencing-child}");
   }
 
   @Test
   public void resolveInvalidKey() {
     expectedException
-        .expectMessage(is("Couldn't not find configuration property value for key ${nonExistentKey} from properties provider parent resolver - within resolver child resolver trying to process key nonExistentKey"));
+        .expectMessage(is("Couldn't find configuration property value for key ${nonExistentKey} from properties provider parent resolver - within resolver child resolver trying to process key nonExistentKey"));
     resolver.resolveValue("${invalid-key1}");
   }
 
   @Test
   public void unresolvedNestedKey() {
     expectedException
-        .expectMessage(is("Couldn't not find configuration property value for key ${child-key3} from properties provider parent resolver - within resolver child resolver trying to process key child-key3"));
+        .expectMessage(is("Couldn't find configuration property value for key ${child-key3} from properties provider parent resolver - within resolver child resolver trying to process key child-key3"));
     resolver.resolveValue("${unresolved-nested-key}");
   }
 

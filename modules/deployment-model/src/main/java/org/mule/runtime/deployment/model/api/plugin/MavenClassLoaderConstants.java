@@ -28,6 +28,10 @@ public final class MavenClassLoaderConstants {
    */
   public static final String EXPORTED_PACKAGES = "exportedPackages";
 
+  public static final String PRIVILEGED_EXPORTED_PACKAGES = "privilegedExportedPackages";
+
+  public static final String PRIVILEGED_ARTIFACTS_IDS = "privilegedArtifactIds";
+
   /**
    * Property to fill the {@link MuleArtifactLoaderDescriptor#getAttributes()} which defines the exported resources of the
    * current plugin.

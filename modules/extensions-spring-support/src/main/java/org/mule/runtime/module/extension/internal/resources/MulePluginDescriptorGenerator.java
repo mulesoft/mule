@@ -13,6 +13,8 @@ import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescrip
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.EXPORTED_PACKAGES;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.EXPORTED_RESOURCES;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MAVEN;
+import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.PRIVILEGED_ARTIFACTS_IDS;
+import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.PRIVILEGED_EXPORTED_PACKAGES;
 import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
 import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapExtensionModelLoader.SOAP_LOADER_ID;
@@ -55,7 +57,9 @@ public class MulePluginDescriptorGenerator implements GeneratedResourceFactory {
     builder.withClassLoaderModelDescriber()
         .setId(MAVEN)
         .addProperty(EXPORTED_PACKAGES, exportCollector.getExportedPackages())
-        .addProperty(EXPORTED_RESOURCES, exportCollector.getExportedResources());
+        .addProperty(EXPORTED_RESOURCES, exportCollector.getExportedResources())
+        .addProperty(PRIVILEGED_EXPORTED_PACKAGES, exportCollector.getPrivilegedExportedPackages())
+        .addProperty(PRIVILEGED_ARTIFACTS_IDS, exportCollector.getPrivilegedArtifacts());
     builder.withExtensionModelDescriber()
         .setId(getLoaderId(extensionModel))
         .addProperty(TYPE_PROPERTY_NAME, typeProperty.get().getType().getName())

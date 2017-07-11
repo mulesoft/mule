@@ -10,10 +10,9 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBuilder;
+import org.mule.runtime.deployment.model.internal.RegionPluginClassLoadersFactory;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.DeployableArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.RegionClassLoader;
@@ -36,12 +35,12 @@ public class DomainClassLoaderBuilder extends AbstractArtifactClassLoaderBuilder
    *
    * @param parentClassLoader classloader that will be the parent of the created classloaders. Non null
    * @param artifactClassLoaderFactory factory for the classloader specific to the artifact resource and classes
-   * @param artifactPluginClassLoaderFactory creates artifact plugin class loaders.
+   * @param pluginClassLoadersFactory creates the class loaders for the plugins included in the domain's region. Non null
    */
   public DomainClassLoaderBuilder(ArtifactClassLoader parentClassLoader,
                                   DeployableArtifactClassLoaderFactory<DomainDescriptor> artifactClassLoaderFactory,
-                                  ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory) {
-    super(artifactPluginClassLoaderFactory);
+                                  RegionPluginClassLoadersFactory pluginClassLoadersFactory) {
+    super(pluginClassLoadersFactory);
     this.parentClassLoader = parentClassLoader;
     this.artifactClassLoaderFactory = artifactClassLoaderFactory;
   }

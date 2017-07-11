@@ -25,19 +25,24 @@ public class ClassLoaderModel {
    * Defines a {@link ClassLoaderModel} with empty configuration
    */
   public static final ClassLoaderModel NULL_CLASSLOADER_MODEL =
-      new ClassLoaderModel(new URL[0], new HashSet<>(), new HashSet<>(), new HashSet<>());
+      new ClassLoaderModel(new URL[0], new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>());
 
   private final URL[] urls;
   private final Set<String> exportedPackages;
   private final Set<String> exportedResources;
   private final Set<BundleDependency> dependencies;
+  private final Set<String> privilegedExportedPackages;
+  private final Set<String> privilegedArtifacts;
 
   private ClassLoaderModel(URL[] urls, Set<String> exportedPackages, Set<String> exportedResources,
-                           Set<BundleDependency> dependencies) {
+                           Set<BundleDependency> dependencies, Set<String> privilegedExportedPackages,
+                           Set<String> privilegedArtifacts) {
     this.urls = urls;
     this.exportedPackages = exportedPackages;
     this.exportedResources = exportedResources;
     this.dependencies = dependencies;
+    this.privilegedExportedPackages = privilegedExportedPackages;
+    this.privilegedArtifacts = privilegedArtifacts;
   }
 
   /**
@@ -69,6 +74,20 @@ public class ClassLoaderModel {
   }
 
   /**
+   * @return the Java package names to be exported as privileged API on the {@link ClassLoader}. Non null
+   */
+  public Set<String> getPrivilegedExportedPackages() {
+    return privilegedExportedPackages;
+  }
+
+  /**
+   * @return the artifact IDs that have access to the privileged API defined on the {@link ClassLoader}. Each artifact is defined using Maven's groupId:artifactId. Non null
+   */
+  public Set<String> getPrivilegedArtifacts() {
+    return privilegedArtifacts;
+  }
+
+  /**
    * Builds a {@link ClassLoaderModel}
    */
   public static class ClassLoaderModelBuilder {
@@ -77,6 +96,8 @@ public class ClassLoaderModel {
     private Set<String> resources = new HashSet<>();
     private List<URL> urls = new ArrayList<>();
     private Set<BundleDependency> dependencies = new HashSet<>();
+    private Set<String> privilegedExportedPackages = new HashSet<>();
+    private Set<String> privilegedArtifacts = new HashSet<>();
 
     /**
      * Creates an empty builder.
@@ -95,6 +116,8 @@ public class ClassLoaderModel {
       this.resources.addAll(source.exportedResources);
       this.urls = new ArrayList<>(asList(source.urls));
       this.dependencies.addAll(source.dependencies);
+      this.privilegedExportedPackages.addAll(source.privilegedExportedPackages);
+      this.privilegedArtifacts.addAll(source.privilegedArtifacts);
     }
 
     /**
@@ -118,6 +141,25 @@ public class ClassLoaderModel {
     public ClassLoaderModelBuilder exportingResources(Set<String> resources) {
       checkArgument(resources != null, "resources cannot be null");
       this.resources.addAll(resources);
+      return this;
+    }
+
+    /**
+     * Indicates which Java packages are exported as privileged API on the model.
+     *
+     * @param packages Java packages names to export. No null.
+     * @param artifactIds artifact IDs that have access to the privileged API. No null.
+     * @return same builder instance.
+     */
+    public ClassLoaderModelBuilder exportingPrivilegedPackages(Set<String> packages, Set<String> artifactIds) {
+      checkArgument(packages != null, "packages cannot be null");
+      checkArgument(artifactIds != null, "artifactIds cannot be null");
+      checkArgument(packages.isEmpty() == artifactIds.isEmpty(),
+                    "Both packages and artifactIds must be empty or non empty simultaneously");
+
+      this.privilegedExportedPackages.addAll(packages);
+      this.privilegedArtifacts.addAll(artifactIds);
+
       return this;
     }
 
@@ -150,7 +192,8 @@ public class ClassLoaderModel {
      * @return a non null {@link ClassLoaderModel}
      */
     public ClassLoaderModel build() {
-      return new ClassLoaderModel(urls.toArray(new URL[0]), packages, resources, dependencies);
+      return new ClassLoaderModel(urls.toArray(new URL[0]), packages, resources, dependencies, privilegedExportedPackages,
+                                  privilegedArtifacts);
     }
   }
 }

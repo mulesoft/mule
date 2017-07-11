@@ -59,6 +59,8 @@
       ]
     }
   ],
+  "privilegedPackages": [],
+  "privilegedArtifacts": [],
   "externalLibraries": [],
   "importedTypes": [
     {

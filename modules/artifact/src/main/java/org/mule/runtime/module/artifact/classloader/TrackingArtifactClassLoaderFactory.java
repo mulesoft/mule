@@ -34,8 +34,8 @@ public class TrackingArtifactClassLoaderFactory<T extends ArtifactDescriptor> im
 
   @Override
   public ArtifactClassLoader create(String artifactId, T descriptor, ClassLoader parent,
-                                    ClassLoaderLookupPolicy baseLookupPolicy) {
-    ArtifactClassLoader artifactClassLoader = artifactClassLoaderFactory.create(artifactId, descriptor, parent, baseLookupPolicy);
+                                    ClassLoaderLookupPolicy lookupPolicy) {
+    ArtifactClassLoader artifactClassLoader = artifactClassLoaderFactory.create(artifactId, descriptor, parent, lookupPolicy);
 
     track(artifactClassLoader);
     return artifactClassLoader;

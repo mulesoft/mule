@@ -43,7 +43,7 @@ public class PropertyNotFoundException extends MuleRuntimeException {
   }
 
   private static String createMessageForLeakKey(Pair<String, String> resolverKeyPair) {
-    return format("Couldn't not find configuration property value for key %s from properties provider %s",
+    return format("Couldn't find configuration property value for key %s from properties provider %s",
                   PLACEHOLDER_PREFIX + resolverKeyPair.getSecond() + PLACEHOLDER_SUFFIX, resolverKeyPair.getFirst());
   }
 
