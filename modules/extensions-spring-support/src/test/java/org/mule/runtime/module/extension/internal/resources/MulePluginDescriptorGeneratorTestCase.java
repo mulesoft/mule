@@ -43,7 +43,7 @@ public class MulePluginDescriptorGeneratorTestCase extends AbstractGeneratedReso
 
   @Test
   public void generate() throws Exception {
-    InputStream in = getClass().getResourceAsStream("/heisenberg-test-mule-plugin.json");
+    InputStream in = getClass().getResourceAsStream("/heisenberg-test-mule-artifact.json");
     assertThat(in, is(notNullValue()));
     String expectedDescriptor = IOUtils.toString(in);
     Optional<GeneratedResource> resource = generator.generateResource(extensionModel);

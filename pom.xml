@@ -1753,7 +1753,7 @@
                     <extensions>true</extensions>
                 </plugin>
                 <plugin>
-                    <groupId>org.mule.runtime</groupId>
+                    <groupId>org.mule.runtime.plugins</groupId>
                     <artifactId>mule-app-plugins-maven-plugin</artifactId>
                     <version>${mule.app.plugins.maven.plugin.version}</version>
                     <extensions>true</extensions>

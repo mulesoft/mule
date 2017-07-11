@@ -9,12 +9,12 @@ package org.mule.runtime.module.extension.internal.resources;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_JSON;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.EXPORTED_PACKAGES;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.EXPORTED_RESOURCES;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MAVEN;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.PRIVILEGED_ARTIFACTS_IDS;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.PRIVILEGED_EXPORTED_PACKAGES;
+import static org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR;
 import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
 import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapExtensionModelLoader.SOAP_LOADER_ID;
@@ -63,12 +63,13 @@ public class MulePluginDescriptorGenerator implements GeneratedResourceFactory {
     builder.withExtensionModelDescriber()
         .setId(getLoaderId(extensionModel))
         .addProperty(TYPE_PROPERTY_NAME, typeProperty.get().getType().getName())
-        //TODO(fernandezlautaro): MULE-11136 remove this property when the manifest is dropped as generating an extension model should not require version
+        // TODO(fernandezlautaro): MULE-11136 remove this property when the manifest is dropped as generating an extension model
+        // should not require version
         .addProperty("version", extensionModel.getVersion());
 
     builder.withBundleDescriptorLoader(new MuleArtifactLoaderDescriptor(MAVEN, emptyMap()));
     final String descriptorJson = new MulePluginModelJsonSerializer().serialize(builder.build());
-    return of(new GeneratedResource(MULE_PLUGIN_JSON, descriptorJson.getBytes()));
+    return of(new GeneratedResource(MULE_ARTIFACT_JSON_DESCRIPTOR, descriptorJson.getBytes()));
   }
 
   private String getLoaderId(ExtensionModel extensionModel) {

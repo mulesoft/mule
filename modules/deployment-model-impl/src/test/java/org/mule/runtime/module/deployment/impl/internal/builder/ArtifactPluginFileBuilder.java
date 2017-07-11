@@ -20,12 +20,12 @@ import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.PRIV
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_ARTIFACT_FOLDER;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_ARTIFACT_PATH_INSIDE_JAR;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
-import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_JSON;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.EXPORTED_PACKAGES;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.EXPORTED_RESOURCES;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MAVEN;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.PRIVILEGED_ARTIFACTS_IDS;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.PRIVILEGED_EXPORTED_PACKAGES;
+import static org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
@@ -83,7 +83,8 @@ public class ArtifactPluginFileBuilder extends AbstractArtifactFileBuilder<Artif
    * Adds a describer into the plugin describer file.
    *
    * @param mulePluginModel the describer to store under
-   *        {@link ArtifactPluginDescriptor#MULE_ARTIFACT_FOLDER}/{@link ArtifactPluginDescriptor#MULE_PLUGIN_JSON} file
+   *        {@link ArtifactPluginDescriptor#MULE_ARTIFACT_FOLDER}/{@link org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor#MULE_ARTIFACT_JSON_DESCRIPTOR}
+   *        file
    * @return the same builder instance
    */
   public ArtifactPluginFileBuilder describedBy(MulePluginModel mulePluginModel) {
@@ -142,7 +143,7 @@ public class ArtifactPluginFileBuilder extends AbstractArtifactFileBuilder<Artif
     }
 
     if (mulePluginModel != null) {
-      final File jsonDescriptorFile = new File(getTempFolder(), MULE_ARTIFACT_FOLDER + separator + MULE_PLUGIN_JSON);
+      final File jsonDescriptorFile = new File(getTempFolder(), MULE_ARTIFACT_FOLDER + separator + MULE_ARTIFACT_JSON_DESCRIPTOR);
       jsonDescriptorFile.deleteOnExit();
 
       String jsonDescriber = new MulePluginModelJsonSerializer().serialize(mulePluginModel);
@@ -152,7 +153,8 @@ public class ArtifactPluginFileBuilder extends AbstractArtifactFileBuilder<Artif
         throw new IllegalStateException("There was an issue generating the JSON file for " + this.getId(), e);
       }
       customResources
-          .add(new ZipResource(jsonDescriptorFile.getAbsolutePath(), MULE_ARTIFACT_PATH_INSIDE_JAR + "/" + MULE_PLUGIN_JSON));
+          .add(new ZipResource(jsonDescriptorFile.getAbsolutePath(),
+                               MULE_ARTIFACT_PATH_INSIDE_JAR + "/" + MULE_ARTIFACT_JSON_DESCRIPTOR));
     }
 
     return customResources;

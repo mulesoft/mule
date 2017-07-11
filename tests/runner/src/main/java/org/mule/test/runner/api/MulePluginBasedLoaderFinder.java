@@ -24,7 +24,7 @@ import java.util.Map;
 
 public class MulePluginBasedLoaderFinder {
 
-  static final String META_INF_MULE_PLUGIN = "META-INF/mule-plugin.json";
+  static final String META_INF_MULE_PLUGIN = "META-INF/mule-artifact.json";
 
   private static final MulePluginModelJsonSerializer mulePluginSerializer = new MulePluginModelJsonSerializer();
   private final MulePluginModel mulePlugin;

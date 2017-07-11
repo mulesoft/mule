@@ -23,7 +23,6 @@ public class DomainDescriptor extends DeployableArtifactDescriptor {
   public static final String DEFAULT_CONFIGURATION_RESOURCE = "mule-domain-config.xml";
   public static final String DEFAULT_CONFIGURATION_RESOURCE_LOCATION =
       Paths.get("mule", DEFAULT_CONFIGURATION_RESOURCE).toString();
-  public static final String MULE_DOMAIN_JSON_LOCATION = Paths.get("META-INF", "mule-artifact", "mule-domain.json").toString();
 
   /**
    * Creates a new domain descriptor

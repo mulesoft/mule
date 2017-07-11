@@ -25,7 +25,6 @@ public class PolicyTemplateDescriptor extends ArtifactDescriptor {
   public static final String DEFAULT_POLICY_CONFIGURATION_RESOURCE = "policy.xml";
   public static final String META_INF = "META-INF";
   public static final String MULE_ARTIFACT = "mule-artifact";
-  public static final String MULE_POLICY_JSON = "mule-policy.json";
   protected static final String POLICY_EXPORTED_PACKAGES_ERROR = "A policy template artifact cannot export packages";
   protected static final String POLICY_EXPORTED_RESOURCE_ERROR = "A policy template artifact cannot export resources";
 
