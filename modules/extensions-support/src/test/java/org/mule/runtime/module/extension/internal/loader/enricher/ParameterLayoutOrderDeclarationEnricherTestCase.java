@@ -11,6 +11,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.runtime.module.extension.internal.loader.enricher.EnricherTestUtils.getNamedObject;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.loadExtension;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
@@ -34,14 +35,13 @@ import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.tck.size.SmallTest;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
+import org.mule.tck.testmodels.fruit.Apple;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @RunWith(Parameterized.class)
 @SmallTest
@@ -86,12 +86,13 @@ public class ParameterLayoutOrderDeclarationEnricherTestCase {
     assertParameterOrder(parameterizedModel, "paramThree", 3);
   }
 
-  private void assertParameterOrder(ParameterizedModel parameterizedModel, String parameterName, int position) {
+  private void assertParameterOrder(ParameterizedModel parameterizedModel, String parameterName, int expectedOrder) {
     ParameterModel paramOne = getNamedObject(parameterizedModel.getAllParameterModels(), parameterName);
     Optional<LayoutModel> layoutModel = paramOne.getLayoutModel();
     assertThat(layoutModel.isPresent(), is(true));
     LayoutModel layoutModel1 = layoutModel.get();
-    assertThat(layoutModel1.getOrder().orElse(null), is(position));
+    Integer order = layoutModel1.getOrder().orElse(null);
+    assertThat("expecting parameter at position [" + expectedOrder + "] but was at [" + order + "]", order, is(expectedOrder));
   }
 
   @Operations(OrderedOperations.class)
@@ -368,7 +369,7 @@ public class ParameterLayoutOrderDeclarationEnricherTestCase {
     }
 
   }
-  public static class MixedSourceOrderWithCallbacks extends Source<String, Attributes> {
+  public static class MixedSourceOrderWithCallbacks extends Source<Apple, Attributes> {
 
     @Parameter
     String paramOne;
