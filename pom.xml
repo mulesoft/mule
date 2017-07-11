@@ -221,7 +221,7 @@
         <muleHttpPolicyApiVersion>1.0.0-rc.aquaman</muleHttpPolicyApiVersion>
         <muleMavenClientApi>1.0.0-rc.aquaman</muleMavenClientApi>
         <muleMavenClientImpl>1.0.0-rc.aquaman</muleMavenClientImpl>
-        <muleMavenClientTest>1.0.0-SNAPSHOT</muleMavenClientTest>
+        <muleMavenClientTest>1.0.0-rc.aquaman</muleMavenClientTest>
         <mulePolicyApiVersion>1.0.0-rc.aquaman</mulePolicyApiVersion>
         <muleApiVersion>1.0.0-rc.aquaman</muleApiVersion>
         <muleMetadataModelVersion>1.0.0-rc.aquaman</muleMetadataModelVersion>
@@ -239,12 +239,12 @@
         <muleSchedulerServiceTestVersion>1.0.0-SNAPSHOT</muleSchedulerServiceTestVersion>
 
         <!-- Test Extensions -->
-        <muleMetadataExtensionTestVersion>4.0.0-SNAPSHOT</muleMetadataExtensionTestVersion>
-        <muleVeganExtensionTestVersion>4.0.0-SNAPSHOT</muleVeganExtensionTestVersion>
-        <muleHeisenbergExtensionTestVersion>4.0.0-SNAPSHOT</muleHeisenbergExtensionTestVersion>
-        <muleMarvelExtensionTestVersion>4.0.0-SNAPSHOT</muleMarvelExtensionTestVersion>
-        <mulePetstoreExtensionTestVersion>4.0.0-SNAPSHOT</mulePetstoreExtensionTestVersion>
-        <muleSubtypesExtensionTestVersion>4.0.0-SNAPSHOT</muleSubtypesExtensionTestVersion>
+        <muleMetadataExtensionTestVersion>4.0.0-rc.aquaman</muleMetadataExtensionTestVersion>
+        <muleVeganExtensionTestVersion>4.0.0-rc.aquaman</muleVeganExtensionTestVersion>
+        <muleHeisenbergExtensionTestVersion>4.0.0-rc.aquaman</muleHeisenbergExtensionTestVersion>
+        <muleMarvelExtensionTestVersion>4.0.0-rc.aquaman</muleMarvelExtensionTestVersion>
+        <mulePetstoreExtensionTestVersion>4.0.0-rc.aquaman</mulePetstoreExtensionTestVersion>
+        <muleSubtypesExtensionTestVersion>4.0.0-rc.aquaman</muleSubtypesExtensionTestVersion>
 
         <!--Maven plugins versions-->
         <dependency.plugin.version>2.10</dependency.plugin.version>
@@ -276,9 +276,9 @@
         <maven.surefire.plugin.version>2.19.1</maven.surefire.plugin.version>
         <maven.enforcer.plugin.version>1.4.1</maven.enforcer.plugin.version>
 
-        <mule.module.maven.plugin.version>1.0.0-SNAPSHOT</mule.module.maven.plugin.version>
-        <mule.extensions.maven.plugin.version>1.0.0-SNAPSHOT</mule.extensions.maven.plugin.version>
-        <mule.app.plugins.maven.plugin.version>1.0.0-SNAPSHOT</mule.app.plugins.maven.plugin.version>
+        <mule.module.maven.plugin.version>1.0.0-rc.aquaman</mule.module.maven.plugin.version>
+        <mule.extensions.maven.plugin.version>1.0.0-rc.aquaman</mule.extensions.maven.plugin.version>
+        <mule.app.plugins.maven.plugin.version>1.0.0-rc.aquaman</mule.app.plugins.maven.plugin.version>
         <mule.jmh.elasticsearch.maven.plugin.version>1.0.0-SNAPSHOT</mule.jmh.elasticsearch.maven.plugin.version>
 
         <maven.replacer.plugin>1.5.3</maven.replacer.plugin>
