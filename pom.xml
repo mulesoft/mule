@@ -216,7 +216,7 @@
         <allureJunitVersion>1.4.23.HOTFIX1</allureJunitVersion>
 
         <!-- Mule Snapshot Dependencies -->
-        <muleDslApiVersion>1.0.0-SNAPSHOT</muleDslApiVersion>
+        <muleDslApiVersion>1.0.0-rc.aquaman</muleDslApiVersion>
         <muleExtensionsApiVersion>1.0.0-rc.aquaman</muleExtensionsApiVersion>
         <muleHttpPolicyApiVersion>1.0.0-SNAPSHOT</muleHttpPolicyApiVersion>
         <muleMavenClientApi>1.0.0-SNAPSHOT</muleMavenClientApi>
