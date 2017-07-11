@@ -6,30 +6,18 @@
  */
 package org.mule.tck.testmodels.fruit;
 
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.lifecycle.Callable;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-public class Orange implements Callable, OrangeInterface, MuleContextAware {
+public class Orange implements OrangeInterface {
 
   /**
    * Serial version
    */
   private static final long serialVersionUID = 2556604671068150589L;
-
-  /**
-   * logger used by this class
-   */
-  private static final Logger logger = LoggerFactory.getLogger(Orange.class);
 
   private boolean bitten = false;
   private Integer segments = new Integer(10);
@@ -43,8 +31,6 @@ public class Orange implements Callable, OrangeInterface, MuleContextAware {
   private List listProperties;
 
   private List arrayProperties;
-
-  private MuleContext muleContext;
 
   public Orange() {
     super();
@@ -71,13 +57,6 @@ public class Orange implements Callable, OrangeInterface, MuleContextAware {
   @Override
   public boolean isBitten() {
     return bitten;
-  }
-
-  @Override
-  public Object onCall(MuleEventContext context) throws MuleException {
-    logger.debug("Orange received an event in Callable.onEvent! MuleEvent says: " + context.getMessageAsString(muleContext));
-    bite();
-    return null;
   }
 
   @Override
@@ -226,11 +205,5 @@ public class Orange implements Callable, OrangeInterface, MuleContextAware {
       return false;
     }
     return true;
-  }
-
-
-  @Override
-  public void setMuleContext(MuleContext context) {
-    this.muleContext = context;
   }
 }
