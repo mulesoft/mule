@@ -6,11 +6,13 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.maven;
 
+import static com.google.common.io.Files.createTempDir;
 import static java.lang.Boolean.getBoolean;
 import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toSet;
+import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.mule.maven.client.api.model.BundleScope.PROVIDED;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getMuleHomeFolder;
@@ -19,7 +21,6 @@ import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConst
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.EXPORTED_RESOURCES;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MAVEN;
 import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.isStandalone;
-
 import org.mule.maven.client.api.LocalRepositorySupplierFactory;
 import org.mule.maven.client.api.MavenClient;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
@@ -119,19 +120,25 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
                                                                                               localMavenRepositoryLocation),
                               localRepositorySupplierFactory.fixedFolderSupplier(localMavenRepositoryLocation));
     File mavenRepository = compositeRepoLocationSupplier.get();
-    List<org.mule.maven.client.api.model.BundleDependency> dependencies =
-        mavenClient.resolveArtifactDependencies(artifactFile, enabledTestDependencies(), of(mavenRepository),
-                                                of(new File(mavenRepository, ".mule")));
-    final ClassLoaderModel.ClassLoaderModelBuilder classLoaderModelBuilder = new ClassLoaderModel.ClassLoaderModelBuilder();
-    classLoaderModelBuilder
-        .exportingPackages(new HashSet<>(getAttribute(attributes, EXPORTED_PACKAGES)))
-        .exportingResources(new HashSet<>(getAttribute(attributes, EXPORTED_RESOURCES)));
-    Set<BundleDependency> bundleDependencies =
-        dependencies.stream().filter(mavenClientDependency -> !mavenClientDependency.getScope().equals(PROVIDED))
-            .map(mavenClientDependency -> convertBundleDependency(mavenClientDependency)).collect(toSet());
-    loadUrls(artifactFile, classLoaderModelBuilder, bundleDependencies);
-    classLoaderModelBuilder.dependingOn(bundleDependencies);
-    return classLoaderModelBuilder.build();
+
+    File temporaryDirectory = createTempDir();
+    try {
+      List<org.mule.maven.client.api.model.BundleDependency> dependencies =
+          mavenClient.resolveArtifactDependencies(artifactFile, enabledTestDependencies(), of(mavenRepository),
+                                                  of(temporaryDirectory));
+      final ClassLoaderModel.ClassLoaderModelBuilder classLoaderModelBuilder = new ClassLoaderModel.ClassLoaderModelBuilder();
+      classLoaderModelBuilder
+          .exportingPackages(new HashSet<>(getAttribute(attributes, EXPORTED_PACKAGES)))
+          .exportingResources(new HashSet<>(getAttribute(attributes, EXPORTED_RESOURCES)));
+      Set<BundleDependency> bundleDependencies =
+          dependencies.stream().filter(mavenClientDependency -> !mavenClientDependency.getScope().equals(PROVIDED))
+              .map(mavenClientDependency -> convertBundleDependency(mavenClientDependency)).collect(toSet());
+      loadUrls(artifactFile, classLoaderModelBuilder, bundleDependencies);
+      classLoaderModelBuilder.dependingOn(bundleDependencies);
+      return classLoaderModelBuilder.build();
+    } finally {
+      deleteQuietly(temporaryDirectory);
+    }
   }
 
   protected BundleDependency convertBundleDependency(org.mule.maven.client.api.model.BundleDependency mavenClientDependency) {
