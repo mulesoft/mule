@@ -10,6 +10,7 @@ package org.mule.module.launcher;
 import org.mule.module.launcher.application.Application;
 import org.mule.module.launcher.domain.Domain;
 import org.mule.module.launcher.util.ObservableList;
+import org.mule.util.concurrent.WaitPolicy;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +35,7 @@ public class ParallelDeploymentDirectoryWatcher extends DeploymentDirectoryWatch
     public ParallelDeploymentDirectoryWatcher(ArchiveDeployer<Domain> domainArchiveDeployer, ArchiveDeployer<Application> applicationArchiveDeployer, ObservableList<Domain> domains, ObservableList<Application> applications, ReentrantLock deploymentLock)
     {
         super(domainArchiveDeployer, applicationArchiveDeployer, domains, applications, deploymentLock);
-        this.threadPoolExecutor = new ThreadPoolExecutor(0, 20, 5, TimeUnit.SECONDS, new SynchronousQueue(), new ThreadPoolExecutor.CallerRunsPolicy());
+        this.threadPoolExecutor = new ThreadPoolExecutor(0, 20, 5, TimeUnit.SECONDS, new SynchronousQueue(), new WaitPolicy());
     }
 
     @Override
