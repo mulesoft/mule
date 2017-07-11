@@ -204,7 +204,7 @@
 /mule-standalone-${productVersion}/lib/opt/maven-repository-metadata-3.3.9.jar
 /mule-standalone-${productVersion}/lib/opt/maven-settings-3.3.9.jar
 /mule-standalone-${productVersion}/lib/opt/maven-settings-builder-3.3.9.jar
-/mule-standalone-${productVersion}/lib/opt/mule-maven-client-api-1.0.0-+
+/mule-standalone-${productVersion}/lib/opt/mule-maven-client-api-1.0.0-rc.aquaman.jar
 /mule-standalone-${productVersion}/lib/opt/mule-maven-client-impl-1.0.0-+
 /mule-standalone-${productVersion}/lib/opt/org.everit.json.schema-1.1.0.jar
 /mule-standalone-${productVersion}/lib/opt/org.everit.osgi.bundles.org.json-1.0.0-v20140107.jar

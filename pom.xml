@@ -219,7 +219,7 @@
         <muleDslApiVersion>1.0.0-rc.aquaman</muleDslApiVersion>
         <muleExtensionsApiVersion>1.0.0-rc.aquaman</muleExtensionsApiVersion>
         <muleHttpPolicyApiVersion>1.0.0-rc.aquaman</muleHttpPolicyApiVersion>
-        <muleMavenClientApi>1.0.0-SNAPSHOT</muleMavenClientApi>
+        <muleMavenClientApi>1.0.0-rc.aquaman</muleMavenClientApi>
         <muleMavenClientImpl>1.0.0-SNAPSHOT</muleMavenClientImpl>
         <muleMavenClientTest>1.0.0-SNAPSHOT</muleMavenClientTest>
         <mulePolicyApiVersion>1.0.0-rc.aquaman</mulePolicyApiVersion>
