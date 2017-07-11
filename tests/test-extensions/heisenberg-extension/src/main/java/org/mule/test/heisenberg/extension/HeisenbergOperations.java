@@ -10,12 +10,12 @@ import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.meta.model.ExecutionType.CPU_INTENSIVE;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
+
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.NestedProcessor;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.runtime.extension.api.annotation.DataTypeParameters;
 import org.mule.runtime.extension.api.annotation.Ignore;
 import org.mule.runtime.extension.api.annotation.OnException;
 import org.mule.runtime.extension.api.annotation.RestrictedTo;
@@ -50,14 +50,12 @@ import org.mule.test.heisenberg.extension.model.SaleInfo;
 import org.mule.test.heisenberg.extension.model.Weapon;
 import org.mule.test.heisenberg.extension.model.types.IntegerAttributes;
 import org.mule.test.heisenberg.extension.model.types.WeaponType;
-
+import javax.inject.Inject;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import javax.inject.Inject;
 
 
 public class HeisenbergOperations implements Disposable {
@@ -81,7 +79,6 @@ public class HeisenbergOperations implements Disposable {
   @Inject
   private ExtensionManager extensionManager;
 
-  @DataTypeParameters
   @Streaming
   public String sayMyName(@Config HeisenbergExtension config) {
     return config.getPersonalInfo().getName();
@@ -91,7 +88,6 @@ public class HeisenbergOperations implements Disposable {
     config.setEndingHealth(HealthStatus.DEAD);
   }
 
-  @DataTypeParameters
   public Result<String, IntegerAttributes> getEnemy(@Config HeisenbergExtension config,
                                                     @Optional(defaultValue = "0") int index) {
     Charset lastSupportedEncoding = Charset.availableCharsets().values().stream().reduce((first, last) -> last).get();
