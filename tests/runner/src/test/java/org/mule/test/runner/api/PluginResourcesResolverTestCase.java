@@ -17,10 +17,10 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
-import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_JSON;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.EXPORTED_PACKAGES;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.EXPORTED_RESOURCES;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MAVEN;
+import static org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.deployment.meta.MulePluginModel.MulePluginModelBuilder;
@@ -58,7 +58,7 @@ public class PluginResourcesResolverTestCase extends AbstractMuleTestCase {
     PluginUrlClassification mulePluginClassification = newPluginUrlClassification(Collections.<URL>emptyList());
     PluginResourcesResolver resolver = new PluginResourcesResolver();
     expectedException.expect(IllegalStateException.class);
-    expectedException.expectMessage(Matchers.contains(MULE_PLUGIN_JSON + " couldn't be found for plugin"));
+    expectedException.expectMessage(Matchers.contains(MULE_ARTIFACT_JSON_DESCRIPTOR + " couldn't be found for plugin"));
     resolver.resolvePluginResourcesFor(mulePluginClassification);
   }
 
@@ -78,7 +78,7 @@ public class PluginResourcesResolverTestCase extends AbstractMuleTestCase {
     String mulePluginModelJson = new MulePluginModelJsonSerializer().serialize(mulePluginModel);
 
     File pluginPropertiesFile =
-        new File(new File(new File(temporaryFolder.getRoot(), "META-INF"), "mule-artifact"), MULE_PLUGIN_JSON);
+        new File(new File(new File(temporaryFolder.getRoot(), "META-INF"), "mule-artifact"), MULE_ARTIFACT_JSON_DESCRIPTOR);
     writeStringToFile(pluginPropertiesFile, mulePluginModelJson);
     URL classPathUrl = temporaryFolder.getRoot().toURI().toURL();
     List<URL> urls = newArrayList(classPathUrl);

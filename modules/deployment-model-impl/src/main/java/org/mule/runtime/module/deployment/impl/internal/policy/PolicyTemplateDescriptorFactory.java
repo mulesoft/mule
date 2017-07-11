@@ -14,8 +14,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor.META_INF;
 import static org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor.MULE_ARTIFACT;
-import static org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor.MULE_POLICY_JSON;
-
+import static org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MulePolicyModel;
 import org.mule.runtime.api.deployment.persistence.MulePolicyModelJsonSerializer;
@@ -50,7 +49,8 @@ import org.apache.commons.io.IOUtils;
  */
 public class PolicyTemplateDescriptorFactory implements ArtifactDescriptorFactory<PolicyTemplateDescriptor> {
 
-  protected static final String MISSING_POLICY_DESCRIPTOR_ERROR = "Policy must contain a " + MULE_POLICY_JSON + " file";
+  protected static final String MISSING_POLICY_DESCRIPTOR_ERROR =
+      "Policy must contain a " + MULE_ARTIFACT_JSON_DESCRIPTOR + " file";
 
   private final ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader;
   private final DescriptorLoaderRepository descriptorLoaderRepository;
@@ -81,7 +81,8 @@ public class PolicyTemplateDescriptorFactory implements ArtifactDescriptorFactor
 
   @Override
   public PolicyTemplateDescriptor create(File artifactFolder) throws ArtifactDescriptorCreateException {
-    final File policyJsonFile = new File(artifactFolder, META_INF + separator + MULE_ARTIFACT + separator + MULE_POLICY_JSON);
+    final File policyJsonFile =
+        new File(artifactFolder, META_INF + separator + MULE_ARTIFACT + separator + MULE_ARTIFACT_JSON_DESCRIPTOR);
     if (!policyJsonFile.exists()) {
       throw new ArtifactDescriptorCreateException(MISSING_POLICY_DESCRIPTOR_ERROR);
     }

@@ -28,9 +28,6 @@ public class ApplicationDescriptor extends DeployableArtifactDescriptor {
   public static final String DEFAULT_CONFIGURATION_RESOURCE = "mule-config.xml";
   public static final String DEFAULT_CONFIGURATION_RESOURCE_LOCATION = Paths.get("mule", "mule-config.xml").toString();
   public static final String REPOSITORY_FOLDER = "repository";
-  public static final String MULE_APPLICATION_JSON = "mule-application.json";
-  public static final String MULE_APPLICATION_JSON_LOCATION =
-      Paths.get("META-INF", "mule-artifact", "mule-application.json").toString();
   public static final String PROPERTY_DOMAIN = "domain";
 
   private String encoding;

@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
  */
 public class IsolatedClassLoaderExtensionsManagerConfigurationBuilder extends AbstractConfigurationBuilder {
 
-  private static final String META_INF_MULE_ARTIFACT_MULE_PLUGIN = "META-INF/mule-artifact/mule-plugin.json";
+  private static final String META_INF_MULE_ARTIFACT_MULE_PLUGIN = "META-INF/mule-artifact/mule-artifact.json";
   private static Logger LOGGER = LoggerFactory.getLogger(IsolatedClassLoaderExtensionsManagerConfigurationBuilder.class);
 
   private final ExtensionManagerFactory extensionManagerFactory;
@@ -124,7 +124,7 @@ public class IsolatedClassLoaderExtensionsManagerConfigurationBuilder extends Ab
                          artifactName);
             }
           } else {
-            LOGGER.debug("Discarding plugin with artifactName '{}' as it doesn't have a mule-plugin.json", artifactName);
+            LOGGER.debug("Discarding plugin with artifactName '{}' as it doesn't have a mule-artifact.json", artifactName);
           }
         });
 

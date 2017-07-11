@@ -115,7 +115,7 @@ public class ExtensionModelDiscoverer {
   }
 
   /**
-   * Looks for an extension using the mule-plugin.json file, where if available it will parse it
+   * Looks for an extension using the mule-artifact.json file, where if available it will parse it
    * using the {@link ExtensionModelLoader} which {@link ExtensionModelLoader#getId() ID} matches the plugin's
    * descriptor ID.
    *

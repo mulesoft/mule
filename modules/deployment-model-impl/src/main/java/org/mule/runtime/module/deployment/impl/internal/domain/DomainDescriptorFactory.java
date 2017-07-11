@@ -9,6 +9,7 @@ package org.mule.runtime.module.deployment.impl.internal.domain;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_CONFIGURATION_RESOURCE_LOCATION;
+import static org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR;
 import org.mule.runtime.api.deployment.meta.MuleDomainModel;
 import org.mule.runtime.api.deployment.persistence.MuleDomainModelJsonSerializer;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
@@ -27,8 +28,6 @@ import org.apache.commons.io.IOUtils;
  */
 public class DomainDescriptorFactory extends AbstractDeployableDescriptorFactory<MuleDomainModel, DomainDescriptor> {
 
-  private static final String MULE_DOMAIN_JSON = "mule-domain.json";
-
   public DomainDescriptorFactory(ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader,
                                  DescriptorLoaderRepository descriptorLoaderRepository) {
     super(artifactPluginDescriptorLoader, descriptorLoaderRepository);
@@ -36,7 +35,7 @@ public class DomainDescriptorFactory extends AbstractDeployableDescriptorFactory
 
   @Override
   protected String getDescriptorFileName() {
-    return MULE_DOMAIN_JSON;
+    return MULE_ARTIFACT_JSON_DESCRIPTOR;
   }
 
   @Override

@@ -9,11 +9,9 @@ package org.mule.test.runner.api;
 
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
-import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_JSON;
 import static org.mule.test.runner.api.ArtifactClassificationType.APPLICATION;
 import static org.mule.test.runner.api.ArtifactClassificationType.MODULE;
 import static org.mule.test.runner.api.ArtifactClassificationType.PLUGIN;
-
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 
 import java.io.IOException;
@@ -60,7 +58,7 @@ public class ArtifactClassificationTypeResolver {
    */
   public ArtifactClassificationType resolveArtifactClassificationType(Artifact artifact) {
     try (URLClassLoader artifactClassLoader = createArtifactClassLoader(artifact)) {
-      if (isMulePlugin(artifact, artifactClassLoader)) {
+      if (isMulePlugin(artifact)) {
         return PLUGIN;
       }
       if (isMuleModule(artifactClassLoader)) {
@@ -74,13 +72,12 @@ public class ArtifactClassificationTypeResolver {
 
   /**
    * @param artifact {@link Artifact} to check if it is a plugin
-   * @param artifactClassLoader {@link ClassLoader} for the given artifact
-   * @return true if it is classified as {@value ArtifactPluginDescriptor#MULE_PLUGIN_CLASSIFIER} or {@value #MULE_EXTENSION_CLASSIFIER} or it has a
-   *         {@value ArtifactPluginDescriptor#MULE_PLUGIN_JSON} file.
+   * @return true if it is classified as {@value ArtifactPluginDescriptor#MULE_PLUGIN_CLASSIFIER} or
+   *         {@value #MULE_EXTENSION_CLASSIFIER} or it has a
+   *         {@value org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor#MULE_ARTIFACT_JSON_DESCRIPTOR} file.
    */
-  private boolean isMulePlugin(Artifact artifact, ClassLoader artifactClassLoader) {
-    return artifact.getExtension().equals(MULE_PLUGIN_CLASSIFIER) || artifact.getExtension().equals(MULE_EXTENSION_CLASSIFIER)
-        || hasResource(artifactClassLoader, MULE_PLUGIN_JSON);
+  private boolean isMulePlugin(Artifact artifact) {
+    return artifact.getExtension().equals(MULE_PLUGIN_CLASSIFIER) || artifact.getExtension().equals(MULE_EXTENSION_CLASSIFIER);
   }
 
   /**

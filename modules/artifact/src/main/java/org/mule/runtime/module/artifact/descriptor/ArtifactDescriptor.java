@@ -11,12 +11,16 @@ import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.artifact.descriptor.ClassLoaderModel.NULL_CLASSLOADER_MODEL;
-
 import org.mule.runtime.api.meta.MuleVersion;
 
 import java.io.File;
+import java.nio.file.Paths;
 
 public class ArtifactDescriptor {
+
+  public static final String MULE_ARTIFACT_JSON_DESCRIPTOR = "mule-artifact.json";
+  public static final String MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION =
+      Paths.get("META-INF", "mule-artifact", MULE_ARTIFACT_JSON_DESCRIPTOR).toString();
 
   private final String name;
   private File rootFolder;
