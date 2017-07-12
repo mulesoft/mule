@@ -8,30 +8,29 @@ package org.mule.runtime.config.spring.dsl.spring;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.FLOW_IDENTIFIER;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SUBFLOW_IDENTIFIER;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
-import org.mule.runtime.core.api.processor.MessageRouter;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.routing.OutboundRouter;
-import org.mule.runtime.core.api.routing.SelectiveRouter;
+import org.mule.runtime.core.api.processor.Router;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.internal.exception.TemplateOnErrorHandler;
+import org.mule.runtime.core.api.processor.Scope;
 import org.mule.runtime.core.routing.AbstractSelectiveRouter;
-import org.mule.runtime.core.internal.source.scheduler.DefaultSchedulerMessageSource;
+import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
+
+import org.springframework.beans.PropertyValue;
+import org.springframework.beans.factory.config.BeanDefinition;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 import javax.xml.namespace.QName;
-
-import org.springframework.beans.PropertyValue;
-import org.springframework.beans.factory.config.BeanDefinition;
 
 public class ComponentModelHelper {
 
@@ -51,10 +50,14 @@ public class ComponentModelHelper {
     } else if (isFlow(componentModel)) {
       return TypedComponentIdentifier.ComponentType.FLOW;
     } else if (isProcessor(componentModel)) {
-      if (isInterceptingProcessor(componentModel)) {
+      if (isOperationMessageProcessor(componentModel)) {
+        return OPERATION;
+      } else if (isInterceptingProcessor(componentModel)) {
         return TypedComponentIdentifier.ComponentType.INTERCEPTING;
       } else if (isRouterProcessor(componentModel)) {
         return TypedComponentIdentifier.ComponentType.ROUTER;
+      } else if (isScopeProcessor(componentModel)) {
+        return TypedComponentIdentifier.ComponentType.SCOPE;
       } else {
         return TypedComponentIdentifier.ComponentType.PROCESSOR;
       }
@@ -62,13 +65,20 @@ public class ComponentModelHelper {
     return TypedComponentIdentifier.ComponentType.UNKNOWN;
   }
 
+  private static boolean isOperationMessageProcessor(ComponentModel componentModel) {
+    return isOfType(componentModel, OperationMessageProcessor.class);
+  }
+
   public static boolean isAnnotatedObject(ComponentModel componentModel) {
     return isOfType(componentModel, AnnotatedObject.class);
   }
 
+  private static boolean isScopeProcessor(ComponentModel componentModel) {
+    return isOfType(componentModel, Scope.class);
+  }
+
   private static boolean isRouterProcessor(ComponentModel componentModel) {
-    return isOfType(componentModel, OutboundRouter.class) || isOfType(componentModel, SelectiveRouter.class)
-        || isOfType(componentModel, MessageRouter.class);
+    return isOfType(componentModel, Router.class);
   }
 
   private static boolean isInterceptingProcessor(ComponentModel componentModel) {
@@ -76,10 +86,6 @@ public class ComponentModelHelper {
   }
 
   public static boolean isProcessor(ComponentModel componentModel) {
-    if (componentModel.getIdentifier().getName().equals("flow-ref")) {
-      // this condition is required until flow-ref is migrated to the new parsing mechanism.
-      return true;
-    }
     return isOfType(componentModel, Processor.class) || isOfType(componentModel, InterceptingMessageProcessor.class);
   }
 
@@ -91,20 +97,12 @@ public class ComponentModelHelper {
     return isOfType(componentModel, ErrorHandler.class);
   }
 
-  public static boolean isPoll(ComponentModel componentModel) {
-    return isOfType(componentModel, DefaultSchedulerMessageSource.class);
-  }
-
   public static boolean isTemplateOnErrorHandler(ComponentModel componentModel) {
     return isOfType(componentModel, TemplateOnErrorHandler.class);
   }
 
   public static boolean isFlow(ComponentModel componentModel) {
     return componentModel.getIdentifier().equals(FLOW_IDENTIFIER);
-  }
-
-  public static boolean isSubflow(ComponentModel componentModel) {
-    return componentModel.getIdentifier().equals(SUBFLOW_IDENTIFIER);
   }
 
   private static boolean isOfType(ComponentModel componentModel, Class type) {
@@ -154,6 +152,6 @@ public class ComponentModelHelper {
   }
 
   public static boolean isRouter(ComponentModel componentModel) {
-    return isOfType(componentModel, MessageRouter.class) || isOfType(componentModel, AbstractSelectiveRouter.class);
+    return isOfType(componentModel, Router.class) || isOfType(componentModel, AbstractSelectiveRouter.class);
   }
 }

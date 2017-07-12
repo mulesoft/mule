@@ -12,7 +12,7 @@ import static java.lang.System.lineSeparator;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
-import org.mule.runtime.core.api.processor.MessageRouter;
+import org.mule.runtime.core.api.processor.Router;
 import org.mule.runtime.core.internal.config.ExceptionHelper;
 import org.mule.runtime.core.api.exception.MessagingException;
 
@@ -22,7 +22,7 @@ import java.util.Map.Entry;
 
 /**
  * This is a {@link MessagingException} used to aggregate exceptions thrown by several routes in the context of a single
- * {@link MessageRouter} Exceptions are correlated to each route through a sequential id
+ * {@link Router} Exceptions are correlated to each route through a sequential id
  * 
  * @since 3.5.0
  */

@@ -13,7 +13,7 @@ import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.NAME_ATTRIBUTE;
 import org.mule.runtime.api.component.ComponentIdentifier;
-import org.mule.runtime.core.api.processor.MessageRouter;
+import org.mule.runtime.core.api.processor.Router;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 
@@ -172,7 +172,7 @@ public class ComponentModel {
    */
   public boolean isScope() {
     // TODO MULE-9691 : Define a clear mechanism to realize if the object to be build is an scope. For now this works.
-    return MessageRouter.class.isAssignableFrom(type);
+    return Router.class.isAssignableFrom(type);
   }
 
   public void setParent(ComponentModel parent) {

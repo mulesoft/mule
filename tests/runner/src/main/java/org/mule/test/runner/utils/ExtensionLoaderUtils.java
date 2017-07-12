@@ -6,23 +6,22 @@
  */
 package org.mule.test.runner.utils;
 
+import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
-import org.mule.runtime.module.extension.internal.loader.java.CraftedExtensionModelLoader;
-import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader;
-import org.mule.runtime.module.extension.soap.internal.loader.SoapExtensionModelLoader;
+
+import java.util.Collection;
 
 public class ExtensionLoaderUtils {
 
   public static ExtensionModelLoader getLoaderById(String id) {
-    switch (id) {
-      case SoapExtensionModelLoader.SOAP_LOADER_ID:
-        return new SoapExtensionModelLoader();
-      case CraftedExtensionModelLoader.CRAFTED_LOADER_ID:
-        return new CraftedExtensionModelLoader();
-      case DefaultJavaExtensionModelLoader.JAVA_LOADER_ID:
-        return new DefaultJavaExtensionModelLoader();
-      default:
-        throw new RuntimeException("No loader found for id:{" + id + "}");
-    }
+    final SpiServiceRegistry spiServiceRegistry = new SpiServiceRegistry();
+    final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+    final Collection<ExtensionModelLoader> extensionModelLoaders =
+        spiServiceRegistry.lookupProviders(ExtensionModelLoader.class, classLoader);
+    return extensionModelLoaders.stream()
+        .filter(extensionModelLoader -> extensionModelLoader.getId().equals(id))
+        .findAny()
+        .orElseThrow(() -> new RuntimeException("No loader found for id:{" + id + "}"));
   }
+
 }

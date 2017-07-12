@@ -11,6 +11,7 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.processor.Router;
 import org.mule.runtime.core.routing.correlation.CorrelationSequenceComparator;
 import org.mule.runtime.core.routing.correlation.EventCorrelatorCallback;
 import org.mule.runtime.core.routing.correlation.ResequenceMessagesCorrelatorCallback;
@@ -24,7 +25,7 @@ import java.util.Comparator;
  * <p>
  * <b>EIP Reference:</b> <a href="http://www.eaipatterns.com/Resequencer.html">http:// www.eaipatterns.com/Resequencer.html<a/>
  */
-public class Resequencer extends AbstractAggregator {
+public class Resequencer extends AbstractAggregator implements Router {
 
   protected Comparator eventComparator;
 

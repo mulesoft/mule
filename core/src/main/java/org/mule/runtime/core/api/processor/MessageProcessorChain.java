@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.core.api.processor;
 
+import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
-import org.mule.runtime.api.lifecycle.Lifecycle;
 
 import java.util.List;
 
@@ -23,7 +23,7 @@ import java.util.List;
  */
 public interface MessageProcessorChain
     extends Processor, Lifecycle, FlowConstructAware, MuleContextAware,
-    MessagingExceptionHandlerAware, AnnotatedObject {
+    MessagingExceptionHandlerAware, AnnotatedObject, Scope {
 
   /**
    * Obtain the list of {@link Processor}'s that this chains was created from. Note that this is the linear view of all processors

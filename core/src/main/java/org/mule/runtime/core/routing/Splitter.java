@@ -7,12 +7,12 @@
 package org.mule.runtime.core.routing;
 
 import static org.mule.runtime.core.internal.exception.TemplateOnErrorHandler.createErrorType;
-
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.Acceptor;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
+import org.mule.runtime.core.api.processor.Router;
 import org.mule.runtime.core.api.util.collection.EventToMessageSequenceSplittingStrategy;
 import org.mule.runtime.core.api.util.collection.SplittingStrategy;
 import org.mule.runtime.core.expression.ExpressionConfig;
@@ -25,7 +25,7 @@ import org.mule.runtime.core.routing.outbound.AbstractMessageSequenceSplitter;
  * <p>
  * <b>EIP Reference:</b> <a href="http://www.eaipatterns.com/Sequencer.html">http ://www.eaipatterns.com/Sequencer.html</a>
  */
-public class Splitter extends AbstractMessageSequenceSplitter implements Initialisable {
+public class Splitter extends AbstractMessageSequenceSplitter implements Initialisable, Router {
 
   private ExpressionConfig config = new ExpressionConfig("#[payload]");
   private SplittingStrategy<Event, MessageSequence<?>> strategy;

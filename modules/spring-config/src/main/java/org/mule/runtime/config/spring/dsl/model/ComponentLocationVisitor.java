@@ -9,7 +9,9 @@ package org.mule.runtime.config.spring.dsl.model;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
+import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.UNKNOWN;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.builder;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.FLOW_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MODULE_OPERATION_CHAIN;
@@ -40,6 +42,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * Visitor that setups the {@link DefaultComponentLocation} for all mule components in the artifact configuration.
@@ -101,7 +105,8 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
         } else {
           // this is the case of the when element inside the choice
           componentLocation = parentComponentLocation.appendRoutePart()
-              .appendLocationPart(findNonProcessorPath(componentModel), empty(), empty(), empty());
+              .appendLocationPart(findNonProcessorPath(componentModel), of(TypedComponentIdentifier.builder().withType(UNKNOWN)
+                  .withIdentifier(buildFromStringRepresentation("mule:route")).build()), empty(), empty());
         }
       } else if (isProcessor(componentModel)) {
         if (isModuleOperation(componentModel.getParent())) {

@@ -17,6 +17,7 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections.CollectionUtils.disjunction;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.UNKNOWN;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.from;
@@ -422,7 +423,7 @@ public class ApplicationModel {
                   DefaultComponentLocation.DefaultLocationPart locationPart =
                       new DefaultComponentLocation.DefaultLocationPart(CONFIGURATION_PROPERTIES_ELEMENT,
                                                                        of(TypedComponentIdentifier.builder()
-                                                                           .withType(ComponentType.GLOBAL)
+                                                                           .withType(UNKNOWN)
                                                                            .withIdentifier(CONFIGURATION_PROPERTIES)
                                                                            .build()),
                                                                        of(configFile.getFilename()),
