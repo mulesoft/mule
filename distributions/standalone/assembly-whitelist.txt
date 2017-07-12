@@ -121,10 +121,10 @@
 /mule-standalone-${productVersion}/lib/mule
 /mule-standalone-${productVersion}/lib/mule/mule-api-1.0.0-BETA.x-SNAPSHOT.jar
 /mule-standalone-${productVersion}/lib/mule/mule-core-${productVersion}.jar
-/mule-standalone-${productVersion}/lib/mule/mule-extensions-api-1.0.0-BETA.x-SNAPSHOT.jar
-/mule-standalone-${productVersion}/lib/mule/mule-extensions-soap-api-1.0.0-BETA.x-SNAPSHOT.jar
-/mule-standalone-${productVersion}/lib/mule/mule-extensions-api-persistence-1.0.0-BETA.x-SNAPSHOT.jar
-/mule-standalone-${productVersion}/lib/mule/mule-extensions-api-dsql-1.0.0-BETA.x-SNAPSHOT.jar
+/mule-standalone-${productVersion}/lib/mule/mule-extensions-api-1.0.0-BETA.3.jar
+/mule-standalone-${productVersion}/lib/mule/mule-extensions-soap-api-1.0.0-BETA.3.jar
+/mule-standalone-${productVersion}/lib/mule/mule-extensions-api-persistence-1.0.0-BETA.3.jar
+/mule-standalone-${productVersion}/lib/mule/mule-extensions-api-dsql-1.0.0-BETA.3.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-artifact-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-metadata-model-api-1.0.0-BETA.x-SNAPSHOT.jar
 /mule-standalone-${productVersion}/lib/mule/mule-metadata-model-java-1.0.0-BETA.x-SNAPSHOT.jar
