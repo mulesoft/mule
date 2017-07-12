@@ -18,12 +18,12 @@ import static org.mule.module.http.api.HttpConstants.HttpStatus.NOT_FOUND;
 import static org.mule.module.http.internal.listener.NoListenerRequestHandler.NO_LISTENER_ENTITY_FORMAT;
 import static org.mule.module.http.matcher.HttpResponseReasonPhraseMatcher.hasReasonPhrase;
 import static org.mule.module.http.matcher.HttpResponseStatusCodeMatcher.hasStatusCode;
-import static org.mule.module.http.utils.RequestUtils.executeRequestWithSocket;
 import org.mule.api.MuleMessage;
 import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.api.HttpConstants.HttpStatus;
 import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
+import org.mule.module.http.utils.SocketRequester;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -117,8 +117,11 @@ public class HttpListenerConfigFunctionalTestCase extends FunctionalTestCase
     public void noListenerConfigWithSpecialCharacters() throws Exception
     {
         String invalidPathWithSpecialCharacters = "/<script></script>";
-        String responseText = executeRequestWithSocket("GET "+ invalidPathWithSpecialCharacters + " HTTP/1.0", noListenerConfigPort.getNumber());
-        assertThat(responseText, containsString(format(NO_LISTENER_ENTITY_FORMAT, escapeHtml(invalidPathWithSpecialCharacters))));
+        SocketRequester socketRequester = new SocketRequester("localhost", noListenerConfigPort.getNumber());
+        socketRequester.initialize();
+        socketRequester.doRequest("GET " + invalidPathWithSpecialCharacters + " HTTP/1.1");
+        assertThat(socketRequester.getResponse(), containsString(format(NO_LISTENER_ENTITY_FORMAT, escapeHtml(invalidPathWithSpecialCharacters))));
+        socketRequester.finalizeGracefully();
     }
 
     @Test
