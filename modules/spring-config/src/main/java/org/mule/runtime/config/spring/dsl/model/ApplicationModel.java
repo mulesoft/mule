@@ -27,7 +27,6 @@ import static org.mule.runtime.extension.api.util.NameUtils.pluralize;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.DOMAIN_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.EE_DOMAIN_PREFIX;
-
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.app.declaration.ElementDeclaration;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -210,6 +209,20 @@ public class ApplicationModel {
       builder().withNamespace(CORE_PREFIX).withName(CONFIGURATION_PROPERTIES_ELEMENT).build();
   public static final ComponentIdentifier MODULE_OPERATION_CHAIN =
       builder().withNamespace(CORE_PREFIX).withName(MODULE_OPERATION_CHAIN_ELEMENT).build();
+
+
+  // TODO MULE-13042 - remove this constants and their usages one this code gets migrated to use extension models.
+  public static final String MUNIT_PREFIX = "munit";
+  public static final ComponentIdentifier MUNIT_TEST_IDENTIFIER =
+      builder().withNamespace(MUNIT_PREFIX).withName("test").build();
+  public static final ComponentIdentifier MUNIT_BEFORE_TEST_IDENTIFIER =
+      builder().withNamespace(MUNIT_PREFIX).withName("before-test").build();
+  public static final ComponentIdentifier MUNIT_BEFORE_SUITE_IDENTIFIER =
+      builder().withNamespace(MUNIT_PREFIX).withName("before-suite").build();
+  public static final ComponentIdentifier MUNIT_AFTER_TEST_IDENTIFIER =
+      builder().withNamespace(MUNIT_PREFIX).withName("after-test").build();
+  public static final ComponentIdentifier MUNIT_AFTER_SUITE_IDENTIFIER =
+      builder().withNamespace(MUNIT_PREFIX).withName("after-suite").build();
 
   public static final String CLASS_ATTRIBUTE = "class";
 
