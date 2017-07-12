@@ -8,6 +8,7 @@
 package org.mule.module.http.utils;
 
 import static org.mule.util.StringUtils.isEmpty;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -31,9 +32,9 @@ public class SocketRequester
         this.port = port;
     }
 
-    public void initialize () throws IOException
+    public void initialize() throws IOException
     {
-        if(!initialized)
+        if (!initialized)
         {
             socket = new Socket(host, port);
             printWriter = new PrintWriter(socket.getOutputStream());
@@ -44,7 +45,7 @@ public class SocketRequester
 
     public void doRequest(String requestText) throws Exception
     {
-        if(!initialized)
+        if (!initialized)
         {
             throw new IllegalStateException("Socket Requester has not been initialized");
         }
@@ -57,7 +58,7 @@ public class SocketRequester
 
     public String getResponse() throws IOException
     {
-        if(!initialized)
+        if (!initialized)
         {
             throw new IllegalStateException("Socket Requester has not been initialized");
         }
@@ -80,17 +81,17 @@ public class SocketRequester
         return stringBuilder.toString();
     }
 
-    public void finalize () throws IOException
+    public void finalize() throws IOException
     {
-        if(socket != null)
+        if (socket != null)
         {
             socket.close();
         }
-        if(printWriter != null)
+        if (printWriter != null)
         {
             printWriter.close();
         }
-        if(bufferedReader != null)
+        if (bufferedReader != null)
         {
             bufferedReader.close();
         }
@@ -102,7 +103,7 @@ public class SocketRequester
         {
             finalize();
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             // Ignoring exception to finalize gracefully.
         }
