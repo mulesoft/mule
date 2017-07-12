@@ -9,6 +9,8 @@ package org.mule.runtime.config.spring.dsl.model;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
+import static org.hamcrest.Matchers.anyOf;
+import static org.hamcrest.Matchers.containsString;
 import static java.util.Optional.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
@@ -107,6 +109,8 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
     assertThat(componentModelList, hasSize(3));
 
     assertThat(componentModelList.get(0).getIdentifier().getName(), equalTo("flow-ref"));
+    assertThat(componentModelList.get(0).getNameAttribute(), equalTo("flowOne"));
+
     assertThat(componentModelList.get(1).getNameAttribute(), equalTo("flowTwo"));
     assertThat(componentModelList.get(2).getNameAttribute(), equalTo("flowOne"));
   }
@@ -138,7 +142,10 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
     assertThat(componentModelList, hasSize(3));
 
     assertThat(componentModelList.get(0).getNameAttribute(), equalTo("flowOne"));
+
     assertThat(componentModelList.get(1).getIdentifier().getName(), equalTo("flow-ref"));
+    assertThat(componentModelList.get(1).getNameAttribute(), equalTo("flowOne"));
+
     assertThat(componentModelList.get(2).getNameAttribute(), equalTo("flowTwo"));
 
     assertThat(minimalModel.findTopLevelNamedComponent("flowTwo").get().getConfigFileName().get(),
@@ -152,10 +159,24 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
     MinimalApplicationModelGenerator generator = createGeneratorForConfig("resolve-dependencies-cyclic-dependency-config.xml");
     ApplicationModel minimalModel = generator.getMinimalModel(Location.builder().globalName("flowA").build());
     assertThat(minimalModel.findTopLevelNamedComponent("flowA").isPresent(), is(true));
+    assertThat(minimalModel.findTopLevelNamedComponent("flowA").get().isEnabled(), is(true));
     assertThat(minimalModel.findTopLevelNamedComponent("flowB").isPresent(), is(true));
+    assertThat(minimalModel.findTopLevelNamedComponent("flowB").get().isEnabled(), is(true));
 
     List<ComponentModel> componentModelList = generator.resolveComponentModelDependencies();
+    // Cyclic dependencies, order don't matter here
     assertThat(componentModelList, hasSize(4));
+    assertThat(componentModelList.get(0).getIdentifier().getName(), equalTo("flow-ref"));
+    assertThat(componentModelList.get(0).getNameAttribute(), anyOf(containsString("flowA"), containsString("flowB")));
+
+    assertThat(componentModelList.get(1).getIdentifier().getName(), equalTo("flow"));
+    assertThat(componentModelList.get(1).getNameAttribute(), anyOf(containsString("flowA"), containsString("flowB")));
+
+    assertThat(componentModelList.get(2).getIdentifier().getName(), equalTo("flow-ref"));
+    assertThat(componentModelList.get(2).getNameAttribute(), anyOf(containsString("flowA"), containsString("flowB")));
+
+    assertThat(componentModelList.get(3).getIdentifier().getName(), equalTo("flow"));
+    assertThat(componentModelList.get(3).getNameAttribute(), anyOf(containsString("flowA"), containsString("flowB")));
   }
 
   @Test
@@ -192,6 +213,38 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
   }
 
   @Test
+  public void flowWithChoice() throws Exception {
+    MinimalApplicationModelGenerator generator = createGeneratorForConfig("choice-element-config.xml");
+    ApplicationModel minimalModel =
+        generator.getMinimalModel(builder().globalName("flowWithChoice").addProcessorsPart().addIndexPart(0).addPart("route")
+            .addIndexPart(0).addProcessorsPart().addIndexPart(0).build());
+    assertThat(minimalModel.findTopLevelNamedComponent("flowWithChoice").isPresent(), is(true));
+    assertThat(minimalModel.findTopLevelNamedComponent("flowWithChoice").get().getInnerComponents().size(), is(1));
+
+    ComponentModel choiceComponentModel =
+        minimalModel.findTopLevelNamedComponent("flowWithChoice").get().getInnerComponents().get(0);
+    assertThat(choiceComponentModel.getIdentifier(), is(buildFromStringRepresentation("mule:choice")));
+    assertThat(choiceComponentModel.isEnabled(), is(true));
+
+    assertThat(choiceComponentModel.getInnerComponents().size(), is(2));
+    ComponentModel whenLogger0 = choiceComponentModel.getInnerComponents().get(0);
+    assertThat(whenLogger0.isEnabled(), is(true));
+
+    assertThat(whenLogger0.getInnerComponents().size(), is(1));
+    ComponentModel logger0 = whenLogger0.getInnerComponents().get(0);
+    assertThat(logger0.getParameters().get("message"), is("LOG0"));
+    assertThat(logger0.isEnabled(), is(true));
+
+    ComponentModel whenLogger1 = choiceComponentModel.getInnerComponents().get(1);
+    assertThat(whenLogger1.isEnabled(), is(false));
+
+    assertThat(whenLogger1.getInnerComponents().size(), is(1));
+    ComponentModel logger1 = whenLogger1.getInnerComponents().get(0);
+    assertThat(logger1.getParameters().get("message"), is("LOG1"));
+    assertThat(logger1.isEnabled(), is(false));
+  }
+
+  @Test
   public void flowWithSourcePathToSource() throws Exception {
     MinimalApplicationModelGenerator generator = createGeneratorForConfig("flow-source-config.xml");
     ApplicationModel minimalModel = generator.getMinimalModel(builder().globalName("flowWithSource").addSourcePart().build());
@@ -212,6 +265,23 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
     assertThat(minimalModel.findTopLevelNamedComponent("flowWithLowLevelNameAttribute").get().getInnerComponents().get(0)
         .getNameAttribute().equals("asyncName"), is(true));
   }
+
+  @Test
+  public void propagateEnableTrueOnRequestedComponentAndInnerComponents() throws Exception {
+    MinimalApplicationModelGenerator generator = createGeneratorForConfig("low-level-name-attribute-config.xml");
+    ApplicationModel minimalModel =
+        generator
+            .getMinimalModel(builder().globalName("flowWithLowLevelNameAttribute").addProcessorsPart().addIndexPart(0).build());
+    assertThat(minimalModel.findTopLevelNamedComponent("flowWithLowLevelNameAttribute").isPresent(), is(true));
+    assertThat(minimalModel.findTopLevelNamedComponent("flowWithLowLevelNameAttribute").get().isEnabled(), is(true));
+    ComponentModel asyncComponent =
+        minimalModel.findTopLevelNamedComponent("flowWithLowLevelNameAttribute").get().getInnerComponents().get(0);
+    assertThat(asyncComponent.getNameAttribute(), is("asyncName"));
+    assertThat(asyncComponent.isEnabled(), is(true));
+    assertThat(asyncComponent.getInnerComponents().size(), is(1));
+    assertThat(asyncComponent.getInnerComponents().get(0).isEnabled(), is(true));
+  }
+
 
   private MinimalApplicationModelGenerator createGeneratorForConfig(String... configFileName) throws Exception {
     List<ConfigFile> configFiles = new ArrayList<>();
