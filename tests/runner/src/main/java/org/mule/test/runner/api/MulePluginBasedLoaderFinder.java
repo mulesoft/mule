@@ -6,7 +6,6 @@
  */
 package org.mule.test.runner.api;
 
-import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
 import static org.mule.test.runner.utils.ExtensionLoaderUtils.getLoaderById;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
@@ -40,7 +39,11 @@ public class MulePluginBasedLoaderFinder {
   public Map<String, Object> getParams() {
     Map<String, Object> params = new HashMap<>();
     MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor = mulePlugin.getExtensionModelLoaderDescriptor().get();
-    params.put(TYPE_PROPERTY_NAME, muleArtifactLoaderDescriptor.getAttributes().get("type"));
+    Map<String, Object> attributes = muleArtifactLoaderDescriptor.getAttributes();
+    attributes.entrySet().stream()
+        .forEach(entry -> {
+          params.put(entry.getKey(), entry.getValue());
+        });
     params.put(VERSION, mulePlugin.getMinMuleVersion());
     return params;
   }

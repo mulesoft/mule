@@ -58,7 +58,6 @@ import static org.mule.runtime.internal.dsl.DslConstants.POOLING_PROFILE_ELEMENT
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
-
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.DataUnit;
@@ -102,7 +101,6 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.object.ObjectFactory;
 import org.mule.runtime.core.api.processor.AbstractProcessor;
 import org.mule.runtime.core.api.processor.LoggerMessageProcessor;
-import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.RetryNotifier;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
@@ -151,6 +149,7 @@ import org.mule.runtime.core.processor.IdempotentRedeliveryPolicy;
 import org.mule.runtime.core.processor.InvokerMessageProcessor;
 import org.mule.runtime.core.processor.ResponseMessageProcessorAdapter;
 import org.mule.runtime.core.processor.SecurityFilterMessageProcessor;
+import org.mule.runtime.core.processor.TryScope;
 import org.mule.runtime.core.processor.simple.AbstractAddVariablePropertyProcessor;
 import org.mule.runtime.core.processor.simple.AddFlowVariableProcessor;
 import org.mule.runtime.core.processor.simple.AddPropertyProcessor;
@@ -210,8 +209,6 @@ import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
 import org.mule.runtime.dsl.api.component.TypeConverter;
 
-import com.google.common.collect.ImmutableMap;
-
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -219,6 +216,8 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.regex.Pattern;
+
+import com.google.common.collect.ImmutableMap;
 
 /**
  * {@link ComponentBuildingDefinition} definitions for the components provided by the core runtime.
@@ -458,7 +457,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
             .withSetterParameterDefinition(NAME, fromSimpleParameter(NAME).build()).build());
     // TODO MULE-12726 Remove TryProcessorFactoryBean
     componentBuildingDefinitions
-        .add(baseDefinition.withIdentifier(TRY).withTypeDefinition(fromType(MessageProcessorChain.class))
+        .add(baseDefinition.withIdentifier(TRY).withTypeDefinition(fromType(TryScope.class))
             .withObjectFactoryType(TryProcessorFactoryBean.class)
             .withSetterParameterDefinition("exceptionListener", fromChildConfiguration(MessagingExceptionHandler.class).build())
             .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())

@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api.routing;
 
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
-import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.Router;
 
 /**
  * Routes the event to <code>MessageProcessor</code>s using an expression to evaluate the event being processed and determine if a
@@ -16,7 +16,7 @@ import org.mule.runtime.core.api.processor.Processor;
  * If the implementation supports the use of a default route then this will be used to route any events that don't match any other
  * routes.
  */
-public interface SelectiveRouter extends Processor {
+public interface SelectiveRouter extends Router {
 
   void addRoute(String expression, MessageProcessorChain processor);
 

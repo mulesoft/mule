@@ -8,6 +8,7 @@ package org.mule.runtime.core.processor;
 
 import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.errorInvokingMessageProcessorWithinTransaction;
 import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createScopeTransactionalExecutionTemplate;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -19,9 +20,7 @@ import static org.mule.runtime.core.api.processor.MessageProcessors.processToApp
 import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContextHandleErrors;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_INDIFFERENT;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
-import static org.mule.runtime.core.api.config.i18n.CoreMessages.errorInvokingMessageProcessorWithinTransaction;
 import static reactor.core.publisher.Flux.from;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -29,27 +28,26 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
-import org.mule.runtime.core.api.execution.TransactionalExecutionTemplate;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.Scope;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
-
-import java.util.List;
-import java.util.Optional;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 /**
  * Wraps the invocation of a list of nested processors {@link org.mule.runtime.core.api.processor.Processor} with a transaction.
  * If the {@link org.mule.runtime.core.api.transaction.TransactionConfig} is null then no transaction is used and the next
  * {@link org.mule.runtime.core.api.processor.Processor} is invoked directly.
  */
-public class TryMessageProcessor extends AbstractMessageProcessorOwner implements Processor {
+public class TryScope extends AbstractMessageProcessorOwner implements Scope {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(TryMessageProcessor.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(TryScope.class);
 
   protected MessageProcessorChain nestedChain;
   protected MuleTransactionConfig transactionConfig;
@@ -87,7 +85,7 @@ public class TryMessageProcessor extends AbstractMessageProcessorOwner implement
     if (nestedChain == null) {
       return publisher;
     } else if (isTransactionActive() || transactionConfig.getAction() != ACTION_INDIFFERENT) {
-      return Processor.super.apply(publisher);
+      return Scope.super.apply(publisher);
     } else {
       return from(publisher)
           .flatMap(event -> processWithChildContextHandleErrors(event, nestedChain, ofNullable(getLocation())));

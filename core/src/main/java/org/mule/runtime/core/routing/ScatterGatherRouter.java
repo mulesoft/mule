@@ -28,7 +28,7 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.Pipeline;
-import org.mule.runtime.core.api.processor.MessageRouter;
+import org.mule.runtime.core.api.processor.Router;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.routing.AggregationContext;
@@ -59,7 +59,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @since 3.5.0
  */
-public class ScatterGatherRouter extends AbstractMessageProcessorOwner implements MessageRouter {
+public class ScatterGatherRouter extends AbstractMessageProcessorOwner implements Router {
 
   private static final Logger logger = LoggerFactory.getLogger(ScatterGatherRouter.class);
 
@@ -176,21 +176,9 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
    * 
    * @throws IllegalStateException if invoked after {@link #initialise()} is completed
    */
-  @Override
   public void addRoute(Processor processor) throws MuleException {
     checkNotInitialised();
     routes.add(processor);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @throws IllegalStateException if invoked after {@link #initialise()} is completed
-   */
-  @Override
-  public void removeRoute(Processor processor) throws MuleException {
-    checkNotInitialised();
-    routes.remove(processor);
   }
 
   private void buildRouteChains() {

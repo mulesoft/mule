@@ -15,7 +15,7 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
 import org.mule.runtime.core.api.transaction.TypedTransactionFactory;
-import org.mule.runtime.core.processor.TryMessageProcessor;
+import org.mule.runtime.core.processor.TryScope;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionType;
 
@@ -51,7 +51,7 @@ public class TryProcessorFactoryBean extends AbstractAnnotatedObject implements 
 
   @Override
   public Object getObject() throws Exception {
-    TryMessageProcessor txProcessor = new TryMessageProcessor();
+    TryScope txProcessor = new TryScope();
     txProcessor.setAnnotations(getAnnotations());
     txProcessor.setExceptionListener(this.exceptionListener);
     txProcessor.setTransactionConfig(createTransactionConfig(this.transactionalAction, this.transactionType));
