@@ -6,6 +6,8 @@
  */
 package org.mule.module.http.internal.listener;
 
+import static java.lang.String.format;
+import static org.apache.commons.lang.StringEscapeUtils.escapeHtml;
 import static org.mule.module.http.api.HttpConstants.HttpStatus.NOT_FOUND;
 
 /**
@@ -16,16 +18,23 @@ public class NoListenerRequestHandler extends ErrorRequestHandler
 
     public static final String RESOURCE_NOT_FOUND = "Resource not found.";
 
+    public static final String NO_LISTENER_ENTITY_FORMAT = "No listener for endpoint: %s";
+
     private static NoListenerRequestHandler instance = new NoListenerRequestHandler();
 
     private NoListenerRequestHandler()
     {
-        super(NOT_FOUND.getStatusCode(), NOT_FOUND.getReasonPhrase(), "No listener for endpoint: %s");
+        super(NOT_FOUND.getStatusCode(), NOT_FOUND.getReasonPhrase(), NO_LISTENER_ENTITY_FORMAT);
     }
 
     public static NoListenerRequestHandler getInstance()
     {
         return instance;
+    }
+
+    protected String getResolvedEntity (String uri)
+    {
+        return  format(entityFormat, escapeHtml(uri));
     }
 
 }
