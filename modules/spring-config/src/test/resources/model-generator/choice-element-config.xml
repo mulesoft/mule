@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+    <flow name="flowWithChoice">
+        <choice>
+            <when expression="payload == 0" >
+                <logger message="LOG0"/>
+            </when>
+
+            <when expression="payload == 1" >
+                <logger message="LOG1"/>
+            </when>
+        </choice>
+    </flow>
+</mule>
