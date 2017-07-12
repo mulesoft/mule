@@ -6,7 +6,7 @@
  */
 package org.mule.module.http.internal.listener;
 
-import static org.apache.commons.lang.StringEscapeUtils.escapeHtml;
+import static java.lang.String.format;
 import org.mule.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.module.http.internal.domain.request.HttpRequestContext;
 import org.mule.module.http.internal.listener.async.HttpResponseReadyCallback;
@@ -24,7 +24,7 @@ public class ErrorRequestHandler implements RequestHandler
 
     private int statusCode;
     private String reasonPhrase;
-    private String entityFormat;
+    protected String entityFormat;
 
     public ErrorRequestHandler(int statusCode, String reasonPhrase, String entityFormat)
     {
@@ -36,7 +36,7 @@ public class ErrorRequestHandler implements RequestHandler
     @Override
     public void handleRequest(HttpRequestContext requestContext, HttpResponseReadyCallback responseCallback)
     {
-        String resolvedEntity = String.format(entityFormat, escapeHtml(requestContext.getRequest().getUri()));
+        String resolvedEntity = getResolvedEntity(requestContext.getRequest().getUri());
         responseCallback.responseReady(new org.mule.module.http.internal.domain.response.HttpResponseBuilder()
                                                .setStatusCode(statusCode)
                                                .setReasonPhrase(reasonPhrase)
@@ -46,7 +46,7 @@ public class ErrorRequestHandler implements RequestHandler
             @Override
             public void responseSendFailure(Throwable exception)
             {
-                logger.warn(String.format("Error while sending %s response %s", statusCode, exception.getMessage()));
+                logger.warn(format("Error while sending %s response %s", statusCode, exception.getMessage()));
                 if (logger.isDebugEnabled())
                 {
                     logger.debug("exception thrown",exception);
@@ -59,4 +59,10 @@ public class ErrorRequestHandler implements RequestHandler
             }
         });
     }
+
+    protected String getResolvedEntity (String uri)
+    {
+        return  format(entityFormat, uri);
+    }
+
 }

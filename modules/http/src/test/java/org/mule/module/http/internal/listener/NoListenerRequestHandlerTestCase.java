@@ -16,6 +16,7 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.module.http.internal.listener.NoListenerRequestHandler.NO_LISTENER_ENTITY_FORMAT;
 
 import org.mule.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.module.http.internal.domain.request.HttpRequestContext;
@@ -31,22 +32,18 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 
-public class ErrorRequestHandlerTestCase extends AbstractMuleTestCase
+public class NoListenerRequestHandlerTestCase extends AbstractMuleTestCase
 {
-    private final static int TEST_STATUS_CODE = 404;
-    private final static String TEST_REASON_PHRASE = "Test reason phrase";
     private final static String TEST_REQUEST_INVALID_URI  = "http://localhost:8081/<script>alert('hello');</script>";
-    private final static String TEST_ENTITY_FORMAT = "Error Handler for: %s";
     private final HttpRequestContext context = mock(HttpRequestContext.class, RETURNS_DEEP_STUBS);
     private final HttpResponseReadyCallback responseReadyCallback = mock(HttpResponseReadyCallback.class);
-    private ErrorRequestHandler errorRequestHandler;
+    private NoListenerRequestHandler noListenerRequestHandler;
 
     @Before
     public void setUp() throws Exception
     {
-        errorRequestHandler = new ErrorRequestHandler(TEST_STATUS_CODE, TEST_REASON_PHRASE, TEST_ENTITY_FORMAT);
+        noListenerRequestHandler = NoListenerRequestHandler.getInstance();
         when(context.getRequest().getUri()).thenReturn(TEST_REQUEST_INVALID_URI);
-
     }
 
     @Test
@@ -65,7 +62,7 @@ public class ErrorRequestHandlerTestCase extends AbstractMuleTestCase
                 return  null ;
             }
         }).when(responseReadyCallback).responseReady(any(HttpResponse.class), any(ResponseStatusCallback.class));
-        errorRequestHandler.handleRequest(context, responseReadyCallback);
-        assertThat(result[0], is(format(TEST_ENTITY_FORMAT, escapeHtml(TEST_REQUEST_INVALID_URI))));
+        noListenerRequestHandler.handleRequest(context, responseReadyCallback);
+        assertThat(result[0], is(format(NO_LISTENER_ENTITY_FORMAT, escapeHtml(TEST_REQUEST_INVALID_URI))));
     }
 }
