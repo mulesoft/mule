@@ -270,7 +270,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
       validateExpressions = Boolean.valueOf(p);
     }
 
-    p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "timeout.disable");
+    p = System.getProperty(MuleProperties.MULE_DISABLE_RESPONSE_TIMEOUT);
     if (p != null) {
       disableTimeouts = Boolean.valueOf(p);
     }
