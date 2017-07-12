@@ -13,6 +13,11 @@ import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentT
 import static org.mule.runtime.api.component.TypedComponentIdentifier.builder;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.FLOW_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MODULE_OPERATION_CHAIN;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MUNIT_AFTER_SUITE_IDENTIFIER;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MUNIT_AFTER_TEST_IDENTIFIER;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MUNIT_BEFORE_SUITE_IDENTIFIER;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MUNIT_BEFORE_TEST_IDENTIFIER;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MUNIT_TEST_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SUBFLOW_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.extension.xml.MacroExpansionModuleModel.ORIGINAL_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.spring.ComponentModelHelper.isErrorHandler;
@@ -21,13 +26,14 @@ import static org.mule.runtime.config.spring.dsl.spring.ComponentModelHelper.isP
 import static org.mule.runtime.config.spring.dsl.spring.ComponentModelHelper.isRouter;
 import static org.mule.runtime.config.spring.dsl.spring.ComponentModelHelper.isTemplateOnErrorHandler;
 import static org.mule.runtime.config.spring.dsl.spring.ComponentModelHelper.resolveComponentType;
-import com.google.common.collect.ImmutableList;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.config.spring.dsl.spring.ComponentModelHelper;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.DefaultLocationPart;
+
+import com.google.common.collect.ImmutableList;
 
 import java.util.Collections;
 import java.util.List;
@@ -72,8 +78,13 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
     } else if (existsWithinFlow(componentModel) || existsWithinSubflow(componentModel)) {
       ComponentModel parentComponentModel = componentModel.getParent();
       DefaultComponentLocation parentComponentLocation = parentComponentModel.getComponentLocation();
-      if (parentComponentModel.getIdentifier().equals(FLOW_IDENTIFIER)) {
+      if (isRootProcessorScope(parentComponentModel)) {
         componentLocation = processFlowDirectChild(componentModel, parentComponentLocation, typedComponentIdentifier);
+      } else if (isMunitFlowIdentifier(parentComponentModel)) {
+        componentLocation = parentComponentLocation
+            .appendRoutePart()
+            .appendLocationPart(findProcessorPath(componentModel), typedComponentIdentifier, componentModel.getConfigFileName(),
+                                componentModel.getLineNumber());
       } else if (isErrorHandler(componentModel)) {
         componentLocation = processErrorHandlerComponent(componentModel, parentComponentLocation, typedComponentIdentifier);
       } else if (isTemplateOnErrorHandler(componentModel)) {
@@ -117,6 +128,17 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
                                                      componentModel.getConfigFileName(), componentModel.getLineNumber());
     }
     componentModel.setComponentLocation(componentLocation);
+  }
+
+  private boolean isMunitFlowIdentifier(ComponentModel componentModel) {
+    return componentModel.getIdentifier().equals(MUNIT_TEST_IDENTIFIER);
+  }
+
+  private boolean isRootProcessorScope(ComponentModel componentModel) {
+    ComponentIdentifier identifier = componentModel.getIdentifier();
+    return identifier.equals(FLOW_IDENTIFIER) || identifier.equals(MUNIT_BEFORE_SUITE_IDENTIFIER) ||
+        identifier.equals(MUNIT_BEFORE_TEST_IDENTIFIER) || identifier.equals(MUNIT_AFTER_SUITE_IDENTIFIER) ||
+        identifier.equals(MUNIT_AFTER_TEST_IDENTIFIER);
   }
 
   private boolean isModuleOperation(ComponentModel componentModel) {
@@ -175,7 +197,7 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
                                                      componentModel.getLineNumber());
     } else if (isProcessor(componentModel)) {
       if (isModuleOperation(componentModel)) {
-        //just point to the correct typed component operation identifier
+        // just point to the correct typed component operation identifier
         typedComponentIdentifier = getModuleOperationTypeComponentIdentifier(componentModel);
       }
       componentLocation = parentComponentLocation
@@ -205,9 +227,11 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
   }
 
   /**
-   * It rewrites the history for those macro expanded operations that are not direct children from a flow, which means the returned
-   * {@link ComponentLocation} are mapped to the new operation rather the original flow.
-   * @param componentModel source to generate the new {@link ComponentLocation}, it also relies in its parent {@link ComponentModel#getParent()}
+   * It rewrites the history for those macro expanded operations that are not direct children from a flow, which means the
+   * returned {@link ComponentLocation} are mapped to the new operation rather the original flow.
+   * 
+   * @param componentModel source to generate the new {@link ComponentLocation}, it also relies in its parent
+   *        {@link ComponentModel#getParent()}
    * @param operationTypedIdentifier identifier of the current operation
    * @return a fictitious {@link ComponentLocation}
    */
@@ -249,7 +273,10 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
   }
 
   private boolean existsWithinFlow(ComponentModel componentModel) {
-    return existsWithin(componentModel, FLOW_IDENTIFIER);
+    return existsWithin(componentModel, FLOW_IDENTIFIER) || existsWithin(componentModel, MUNIT_TEST_IDENTIFIER) ||
+        existsWithin(componentModel, MUNIT_BEFORE_SUITE_IDENTIFIER) || existsWithin(componentModel, MUNIT_BEFORE_TEST_IDENTIFIER)
+        ||
+        existsWithin(componentModel, MUNIT_AFTER_SUITE_IDENTIFIER) || existsWithin(componentModel, MUNIT_AFTER_TEST_IDENTIFIER);
   }
 
   private boolean existsWithinSubflow(ComponentModel componentModel) {
