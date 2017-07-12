@@ -84,16 +84,6 @@
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
-                <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
-                    <xs:annotation>
-                        <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-                <xs:attribute type="mule:expressionString" use="optional" name="outputEncoding">
-                    <xs:annotation>
-                        <xs:documentation>The encoding of the payload that this operation outputs.</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
                 <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/tx" type="org.mule.runtime.extension.api.tx.SourceTransactionalActionEnumType" use="optional" name="transactionalAction">
                     <xs:annotation>
                         <xs:documentation>The type of beginning action that sources can take regarding transactions.</xs:documentation>
@@ -138,16 +128,6 @@
                 <xs:attribute xmlns:extension="http://www.mulesoft.org/schema/mule/extension" type="extension:operationTransactionalActionType" use="optional" name="action">
                     <xs:annotation>
                         <xs:documentation>The type of joining action that operations can take regarding transactions.</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-                <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
-                    <xs:annotation>
-                        <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-                <xs:attribute type="mule:expressionString" use="optional" name="outputEncoding">
-                    <xs:annotation>
-                        <xs:documentation>The encoding of the payload that this operation outputs.</xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
