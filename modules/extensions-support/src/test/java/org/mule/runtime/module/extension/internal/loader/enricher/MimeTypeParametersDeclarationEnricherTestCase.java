@@ -126,6 +126,13 @@ public class MimeTypeParametersDeclarationEnricherTestCase extends AbstractMuleT
   }
 
   @Test
+  public void enumMethod() {
+    setOperationImplementingMethod("enumMethod");
+    enricher.enrich(extensionLoadingContext);
+    assertThat(source.getAllParameters(), hasSize(0));
+  }
+
+  @Test
   public void appleResultReturnTypeOperation() {
     setOperationImplementingMethod("resultApple");
     enricher.enrich(extensionLoadingContext);
@@ -203,8 +210,15 @@ public class MimeTypeParametersDeclarationEnricherTestCase extends AbstractMuleT
     public Apple appleMethod() {
       return null;
     }
+
+    public TestEnum enumMethod() {
+      return TestEnum.ENUM1;
+    }
   }
 
+  public enum TestEnum {
+    ENUM1, ENUM2
+  }
 
   public class TestStringSource extends Source<String, Attributes> {
 

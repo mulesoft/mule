@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
-import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ADVANCED_TAB_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
@@ -20,6 +20,7 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplementingType;
 
 import org.mule.metadata.api.ClassTypeLoader;
+import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.model.BinaryType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
@@ -98,7 +99,7 @@ public final class MimeTypeParametersDeclarationEnricher extends AbstractAnnotat
 
       @Override
       public void visitString(StringType stringType) {
-        holder.set(true);
+        holder.set(!stringType.getAnnotation(EnumAnnotation.class).isPresent());
       }
 
       @Override
@@ -108,7 +109,7 @@ public final class MimeTypeParametersDeclarationEnricher extends AbstractAnnotat
 
       @Override
       public void visitObject(ObjectType objectType) {
-        holder.set(getTypeId(objectType).orElse("").equals(Object.class.getName()));
+        holder.set(getId(objectType).equals(Object.class.getName()));
       }
 
       @Override
