@@ -66,7 +66,7 @@ abstract class AbstractEventContext implements EventContext {
     }).subscribe();
     // When there are no child contexts response triggers completion directly.
     completionSubscriberDisposable = Mono.<Void>whenDelayError(completionCallback,
-                                                               responseProcessor.then())
+                                                               responseProcessor.materialize().then())
         .doOnEach(s -> s.accept(completionProcessor)).subscribe();
   }
 
@@ -82,14 +82,13 @@ abstract class AbstractEventContext implements EventContext {
     // completion condition.
     completionSubscriberDisposable.dispose();
     completionSubscriberDisposable =
-        responseProcessor.onErrorResume(throwable -> empty()).and(completionCallback).and(getChildCompletionPublisher()).then()
+        responseProcessor.onErrorResume(throwable -> empty()).and(completionCallback).and(getChildCompletionPublisher())
+            .materialize().then()
             .doOnEach(s -> s.accept(completionProcessor)).subscribe();
   }
 
   private Mono<Void> getChildCompletionPublisher() {
-    return when(childContexts.stream()
-        .map(eventContext -> from(eventContext.getCompletionPublisher()).onErrorResume(throwable -> empty()))
-        .collect(toList()));
+    return when(childContexts.stream().map(eventContext -> from(eventContext.getCompletionPublisher())).collect(toList()));
   }
 
   /**
