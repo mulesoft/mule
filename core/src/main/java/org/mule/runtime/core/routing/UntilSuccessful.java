@@ -87,9 +87,7 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
     this.untilSuccessfulStrategy.setUntilSuccessfulConfiguration(this);
 
     initialiseIfNeeded(untilSuccessfulStrategy, muleContext);
-    String flowName = flowConstruct.getName();
-    String clusterId = muleContext.getClusterId();
-    eventKeyPrefix = flowName + "-" + clusterId + "-";
+    eventKeyPrefix = getLocation().getParts().get(0).getPartPath() + "-" + muleContext.getClusterId() + "-";
   }
 
   private void setWaitTime() {

@@ -6,19 +6,15 @@
  */
 package org.mule.runtime.core.api.context.notification;
 
-import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.DefaultEventContext.create;
 import static org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo.createInfo;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 
-import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExpressionManager;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.exception.MessagingException;
+import org.mule.runtime.core.api.processor.Processor;
 
 public class MessageProcessorNotification extends EnrichedServerNotification implements SynchronousServerEvent {
 
@@ -32,20 +28,19 @@ public class MessageProcessorNotification extends EnrichedServerNotification imp
     registerAction("message processor post invoke", MESSAGE_PROCESSOR_POST_INVOKE);
   }
 
-  private static ThreadLocal<String> lastRootMessageId = new ThreadLocal<>();
   private EventContext eventContext;
 
-  public MessageProcessorNotification(EnrichedNotificationInfo notificationInfo, FlowConstruct flowConstruct,
-                                      EventContext eventContext, int action) {
-    super(notificationInfo, action, flowConstruct);
+  public MessageProcessorNotification(EnrichedNotificationInfo notificationInfo, ComponentLocation componentLocation,
+                                      EventContext eventContext,
+                                      int action) {
+    super(notificationInfo, action, componentLocation != null ? componentLocation.getParts().get(0).getPartPath() : null);
     this.eventContext = eventContext;
   }
 
-  public static MessageProcessorNotification createFrom(Event event, FlowConstruct flowConstruct, Processor processor,
+  public static MessageProcessorNotification createFrom(Event event, ComponentLocation componentLocation, Processor processor,
                                                         MessagingException exceptionThrown, int action) {
-    EnrichedNotificationInfo notificationInfo =
-        createInfo(produceEvent(event, flowConstruct), exceptionThrown, processor);
-    return new MessageProcessorNotification(notificationInfo, flowConstruct, event.getContext(), action);
+    EnrichedNotificationInfo notificationInfo = createInfo(event, exceptionThrown, processor);
+    return new MessageProcessorNotification(notificationInfo, componentLocation, event.getContext(), action);
   }
 
   public Processor getProcessor() {
@@ -56,24 +51,7 @@ public class MessageProcessorNotification extends EnrichedServerNotification imp
     return eventContext;
   }
 
-  /**
-   * If event is null, produce and event with the proper message root ID, to allow it to be correlated with others in the thread
-   */
-  private static Event produceEvent(Event sourceEvent, FlowConstruct flowConstruct) {
-    String rootId = lastRootMessageId.get();
-    if (sourceEvent != null) {
-      lastRootMessageId.set(sourceEvent.getCorrelationId());
-      return sourceEvent;
-    } else if (rootId != null && flowConstruct != null) {
-      final Message msg = of(null);
-      return Event.builder(create(flowConstruct, fromSingleComponent("MessageProcessorNotification"), lastRootMessageId.get()))
-          .message(msg)
-          .flow(flowConstruct).build();
-    } else {
-      return null;
-    }
-  }
-
+  @Override
   public MessagingException getException() {
     return (MessagingException) super.getException();
   }

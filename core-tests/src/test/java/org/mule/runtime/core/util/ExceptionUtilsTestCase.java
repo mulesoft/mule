@@ -37,11 +37,10 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.exception.ErrorTypeLocator;
 import org.mule.runtime.core.api.exception.MessagingException;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -169,7 +168,6 @@ public class ExceptionUtilsTestCase extends AbstractMuleTestCase {
   public void updateMessaginExceptionWithErrorWithOutError() {
     MessagingException messagingExceptionMock = mock(MessagingException.class);
     Processor processorMock = mock(Processor.class);
-    FlowConstruct flowConstructMock = mock(FlowConstruct.class);
     MuleContext muleContextMock = mock(MuleContext.class);
     ErrorTypeLocator errorTypeLocatorMock = mock(ErrorTypeLocator.class);
 
@@ -189,13 +187,12 @@ public class ExceptionUtilsTestCase extends AbstractMuleTestCase {
 
     when(eventContextMock.getId()).thenReturn("someid");
 
-    when(flowConstructMock.getMuleContext()).thenReturn(muleContextMock);
     when(muleContextMock.getErrorTypeLocator()).thenReturn(errorTypeLocatorMock);
 
     when(errorTypeLocatorMock.lookupErrorType(messagingExceptionMock)).thenReturn(mock(ErrorType.class));
 
 
-    updateMessagingExceptionWithError(messagingExceptionMock, processorMock, flowConstructMock);
+    updateMessagingExceptionWithError(messagingExceptionMock, processorMock, muleContextMock);
 
     verify(messagingExceptionMock, atLeast(1)).setProcessedEvent(any(Event.class));
   }
@@ -204,7 +201,6 @@ public class ExceptionUtilsTestCase extends AbstractMuleTestCase {
   public void updateMessaginExceptionWithError() {
     MessagingException messagingExceptionMock = mock(MessagingException.class);
     Processor processorMock = mock(Processor.class);
-    FlowConstruct flowConstructMock = mock(FlowConstruct.class);
     MuleContext muleContextMock = mock(MuleContext.class);
     ErrorTypeLocator errorTypeLocatorMock = mock(ErrorTypeLocator.class);
 
@@ -225,13 +221,12 @@ public class ExceptionUtilsTestCase extends AbstractMuleTestCase {
 
     when(eventContextMock.getId()).thenReturn("someid");
 
-    when(flowConstructMock.getMuleContext()).thenReturn(muleContextMock);
     when(muleContextMock.getErrorTypeLocator()).thenReturn(errorTypeLocatorMock);
 
     when(errorTypeLocatorMock.lookupErrorType(messagingExceptionMock)).thenReturn(mock(ErrorType.class));
 
 
-    updateMessagingExceptionWithError(messagingExceptionMock, processorMock, flowConstructMock);
+    updateMessagingExceptionWithError(messagingExceptionMock, processorMock, muleContextMock);
 
     verify(messagingExceptionMock, times(0)).setProcessedEvent(any(Event.class));
   }

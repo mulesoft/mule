@@ -12,6 +12,7 @@ import static org.mule.runtime.core.DefaultEventContext.child;
 import static org.mule.runtime.core.api.Event.builder;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Processor;
@@ -62,7 +63,7 @@ public class FirstSuccessfulRoutingStrategy extends AbstractRoutingStrategy {
           failed = true;
         } else {
           failed = getMuleContext().getExpressionManager()
-              .evaluateBoolean(failureExpression, returnEvent, flowConstruct, false, true);
+              .evaluateBoolean(failureExpression, returnEvent, ((AnnotatedObject) flowConstruct).getLocation(), false, true);
         }
       } catch (Exception ex) {
         failed = true;
@@ -75,10 +76,10 @@ public class FirstSuccessfulRoutingStrategy extends AbstractRoutingStrategy {
 
     if (failed) {
       if (failExceptionCause != null) {
-        throw new RoutingFailedException(createStaticMessage("all message processor failed during first successful routing strategy"),
+        throw new RoutingFailedException(createStaticMessage("all processors failed during first-successful routing strategy"),
                                          failExceptionCause);
       } else {
-        throw new RoutingFailedException(createStaticMessage("all message processor failed during first successful routing strategy"));
+        throw new RoutingFailedException(createStaticMessage("all processors failed during first-successful routing strategy"));
       }
     }
 

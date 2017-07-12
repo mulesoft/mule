@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.core.processor.chain;
 
+import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.replace;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.api.context.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE;
 import static org.mule.runtime.core.api.context.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE;
+import static org.mule.runtime.core.api.context.notification.MessageProcessorNotification.createFrom;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setFlowConstructIfNeeded;
@@ -20,7 +22,6 @@ import static org.mule.runtime.core.api.util.ExceptionUtils.NULL_ERROR_HANDLER;
 import static org.mule.runtime.core.api.util.ExceptionUtils.updateMessagingExceptionWithError;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.slf4j.LoggerFactory.getLogger;
-import static reactor.core.publisher.Flux.empty;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
 
@@ -43,6 +44,7 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.util.ExceptionUtils;
 import org.mule.runtime.core.processor.interceptor.ReactiveInterceptorAdapter;
@@ -55,10 +57,10 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.logging.Level;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
+
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -70,11 +72,11 @@ abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObject imp
 
   private static final Logger LOGGER = getLogger(AbstractMessageProcessorChain.class);
 
-  protected final String name;
-  protected final List<Processor> processors;
-  protected MuleContext muleContext;
-  protected FlowConstruct flowConstruct;
-  protected MessagingExceptionHandler messagingExceptionHandler;
+  private final String name;
+  private final List<Processor> processors;
+  private MuleContext muleContext;
+  private ProcessingStrategy processingStrategy;
+  private MessagingExceptionHandler messagingExceptionHandler;
   private StreamingManager streamingManager;
 
   AbstractMessageProcessorChain(String name, List<Processor> processors) {
@@ -127,9 +129,9 @@ abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObject imp
     // threads which may be limited to avoid deadlocks.
     // Use anonymous ReactiveProcessor to apply processing strategy to processor + previous interceptors
     // while using the processing type of the processor itself.
-    if (flowConstruct instanceof Pipeline && ((Pipeline) flowConstruct).getProcessingStrategy() != null) {
+    if (processingStrategy != null) {
       interceptors
-          .add((processor, next) -> ((Pipeline) flowConstruct).getProcessingStrategy().onProcessor(new ReactiveProcessor() {
+          .add((processor, next) -> processingStrategy.onProcessor(new ReactiveProcessor() {
 
             @Override
             public Publisher<Event> apply(Publisher<Event> eventPublisher) {
@@ -175,7 +177,7 @@ abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObject imp
     muleContext.getProcessorInterceptorManager().getInterceptorFactories().stream()
         .forEach(interceptorFactory -> {
           ReactiveInterceptorAdapter reactiveInterceptorAdapter = new ReactiveInterceptorAdapter(interceptorFactory);
-          reactiveInterceptorAdapter.setFlowConstruct(flowConstruct);
+          reactiveInterceptorAdapter.setMuleContext(muleContext);
           interceptors.add(0, reactiveInterceptorAdapter);
         });
 
@@ -187,7 +189,7 @@ abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObject imp
         .onErrorResume(RejectedExecutionException.class,
                        throwable -> Mono.from(event.getContext()
                            .error(updateMessagingExceptionWithError(new MessagingException(event, throwable, processor),
-                                                                    processor, flowConstruct),
+                                                                    processor, muleContext),
                                   getMessagingExceptionHandler()))
                            .then(Mono.empty()))
         .onErrorResume(MessagingException.class,
@@ -199,13 +201,13 @@ abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObject imp
 
   private Function<MessagingException, MessagingException> updateMessagingException(Processor processor) {
     return exception -> ExceptionUtils.updateMessagingException(LOGGER, processor, exception, muleContext.getErrorTypeLocator(),
-                                                                muleContext.getErrorTypeRepository(), flowConstruct, muleContext);
+                                                                muleContext.getErrorTypeRepository(), muleContext);
   }
 
   private Consumer<Event> preNotification(Processor processor) {
     return event -> {
       if (event.isNotificationsEnabled()) {
-        fireNotification(muleContext.getNotificationManager(), flowConstruct, event, processor, null,
+        fireNotification(muleContext.getNotificationManager(), event, processor, null,
                          MESSAGE_PROCESSOR_PRE_INVOKE);
       }
     };
@@ -214,7 +216,7 @@ abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObject imp
   private Consumer<Event> postNotification(Processor processor) {
     return event -> {
       if (event.isNotificationsEnabled()) {
-        fireNotification(muleContext.getNotificationManager(), flowConstruct, event, processor, null,
+        fireNotification(muleContext.getNotificationManager(), event, processor, null,
                          MESSAGE_PROCESSOR_POST_INVOKE);
 
       }
@@ -224,22 +226,21 @@ abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObject imp
   private Consumer<MessagingException> errorNotification(Processor processor) {
     return exception -> {
       if (exception.getEvent().isNotificationsEnabled()) {
-        fireNotification(muleContext.getNotificationManager(), flowConstruct, exception.getEvent(), processor, exception,
+        fireNotification(muleContext.getNotificationManager(), exception.getEvent(), processor, exception,
                          MESSAGE_PROCESSOR_POST_INVOKE);
       }
     };
   }
 
-  private void fireNotification(ServerNotificationManager serverNotificationManager, FlowConstruct flowConstruct,
-                                Event event, Processor processor, MessagingException exceptionThrown,
-                                int action) {
+  private void fireNotification(ServerNotificationManager serverNotificationManager, Event event, Processor processor,
+                                MessagingException exceptionThrown, int action) {
     if (serverNotificationManager != null
         && serverNotificationManager.isNotificationEnabled(MessageProcessorNotification.class)) {
 
       if (processor instanceof AnnotatedObject
           && ((AnnotatedObject) processor).getLocation() != null) {
         serverNotificationManager
-            .fireNotification(MessageProcessorNotification.createFrom(event, flowConstruct, processor, exceptionThrown, action));
+            .fireNotification(createFrom(event, ((AnnotatedObject) processor).getLocation(), processor, exceptionThrown, action));
       }
     }
   }
@@ -253,25 +254,25 @@ abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObject imp
     StringBuilder string = new StringBuilder();
     string.append(getClass().getSimpleName());
     if (!isBlank(name)) {
-      string.append(String.format(" '%s' ", name));
+      string.append(format(" '%s' ", name));
     }
 
     Iterator<Processor> mpIterator = processors.iterator();
 
-    final String nl = String.format("%n");
+    final String nl = format("%n");
 
     // TODO have it print the nested structure with indents increasing for nested MPCs
     if (mpIterator.hasNext()) {
-      string.append(String.format("%n[ "));
+      string.append(format("%n[ "));
       while (mpIterator.hasNext()) {
         Processor mp = mpIterator.next();
-        final String indented = replace(mp.toString(), nl, String.format("%n  "));
-        string.append(String.format("%n  %s", indented));
+        final String indented = replace(mp.toString(), nl, format("%n  "));
+        string.append(format("%n  %s", indented));
         if (mpIterator.hasNext()) {
           string.append(", ");
         }
       }
-      string.append(String.format("%n]"));
+      string.append(format("%n]"));
     }
 
     return string.toString();
@@ -297,8 +298,7 @@ abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObject imp
   }
 
   public MessagingExceptionHandler getMessagingExceptionHandler() {
-    return messagingExceptionHandler != null ? messagingExceptionHandler
-        : flowConstruct != null ? flowConstruct.getExceptionListener() : NULL_ERROR_HANDLER;
+    return messagingExceptionHandler != null ? messagingExceptionHandler : NULL_ERROR_HANDLER;
   }
 
   @Override
@@ -309,7 +309,10 @@ abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObject imp
 
   @Override
   public void setFlowConstruct(FlowConstruct flowConstruct) {
-    this.flowConstruct = flowConstruct;
+    if (flowConstruct instanceof Pipeline
+        && ((Pipeline) flowConstruct).getProcessingStrategy() != null) {
+      processingStrategy = ((Pipeline) flowConstruct).getProcessingStrategy();
+    }
     setFlowConstructIfNeeded(getMessageProcessorsForLifecycle(), flowConstruct);
   }
 

@@ -13,6 +13,7 @@ import static org.mule.runtime.core.api.Event.builder;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
@@ -66,7 +67,10 @@ public abstract class AbstractUntilSuccessfulProcessingStrategy implements Until
     }
 
     if (muleContext.getExpressionManager().evaluateBoolean(untilSuccessfulConfiguration.getFailureExpression(), returnEvent,
-                                                           untilSuccessfulConfiguration.getFlowConstruct(), false, true)) {
+                                                           ((AnnotatedObject) untilSuccessfulConfiguration.getFlowConstruct())
+                                                               .getLocation(),
+                                                           false,
+                                                           true)) {
       throw new MuleRuntimeException(createStaticMessage("Failure expression positive when processing event: " + returnEvent));
     }
 

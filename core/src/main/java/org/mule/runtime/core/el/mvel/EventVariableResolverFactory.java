@@ -13,9 +13,9 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.mvel2.ParserConfiguration;
 import org.mule.mvel2.integration.VariableResolver;
 import org.mule.mvel2.integration.VariableResolverFactory;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.MuleContext;
 
 import org.slf4j.Logger;
 
@@ -25,31 +25,30 @@ public class EventVariableResolverFactory extends MessageVariableResolverFactory
   private static final long serialVersionUID = -6819292692339684915L;
 
   private final String FLOW = "flow";
-  private FlowConstruct flowConstruct;
+  private String flowName;
 
   public EventVariableResolverFactory(ParserConfiguration parserConfiguration, MuleContext muleContext, Event event,
-                                      Event.Builder eventBuilder, FlowConstruct flowConstruct) {
+                                      Event.Builder eventBuilder, ComponentLocation componentLocation) {
     super(parserConfiguration, muleContext, event, eventBuilder);
-    this.flowConstruct = flowConstruct;
+    this.flowName = componentLocation != null ? componentLocation.getParts().get(0).getPartPath() : null;
   }
 
   /**
    * Convenience constructor to allow for more concise creation of VariableResolverFactory chains without and performance overhead
    * incurred by using a builder.
-   * 
-   * @param next
    */
   public EventVariableResolverFactory(ParserConfiguration parserConfiguration, MuleContext muleContext, Event event,
-                                      Event.Builder eventBuilder, FlowConstruct flowConstruct, VariableResolverFactory next) {
-    this(parserConfiguration, muleContext, event, eventBuilder, flowConstruct);
+                                      Event.Builder eventBuilder, ComponentLocation componentLocation,
+                                      VariableResolverFactory next) {
+    this(parserConfiguration, muleContext, event, eventBuilder, componentLocation);
     setNextFactory(next);
   }
 
   @Override
   public VariableResolver getVariableResolver(String name) {
     if (event != null) {
-      if (FLOW.equals(name) && flowConstruct != null) {
-        return new MuleImmutableVariableResolver<>(FLOW, (new FlowContext(flowConstruct.getName())), null);
+      if (FLOW.equals(name) && flowName != null) {
+        return new MuleImmutableVariableResolver<>(FLOW, (new FlowContext(flowName)), null);
       } else if (MULE_EVENT_INTERNAL_VARIABLE.equals(name)) {
         return new MuleImmutableVariableResolver<>(MULE_EVENT_INTERNAL_VARIABLE, event, null);
       }

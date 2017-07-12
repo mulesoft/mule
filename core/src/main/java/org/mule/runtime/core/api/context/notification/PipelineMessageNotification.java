@@ -30,9 +30,10 @@ public class PipelineMessageNotification extends EnrichedServerNotification impl
   }
 
   public PipelineMessageNotification(EnrichedNotificationInfo notificationInfo, Pipeline pipeline, int action) {
-    super(notificationInfo, action, pipeline);
+    super(notificationInfo, action, pipeline.getName());
   }
 
+  @Override
   public MessagingException getException() {
     return (MessagingException) super.getException();
   }

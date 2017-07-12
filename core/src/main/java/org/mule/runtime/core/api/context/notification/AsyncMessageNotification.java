@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.core.api.context.notification;
 
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.core.api.exception.MessagingException;
+import org.mule.runtime.core.api.processor.Processor;
 
 /**
  * <code>AsyncMessageNotification</code> when async work is scheduled and completed for a given flow
@@ -25,14 +25,15 @@ public class AsyncMessageNotification extends EnrichedServerNotification impleme
     registerAction("async process complete", PROCESS_ASYNC_COMPLETE);
   }
 
-  public AsyncMessageNotification(EnrichedNotificationInfo notificationInfo, FlowConstruct flowConstruct, int action) {
-    super(notificationInfo, action, flowConstruct);
+  public AsyncMessageNotification(EnrichedNotificationInfo notificationInfo, ComponentLocation componentLocation, int action) {
+    super(notificationInfo, action, componentLocation);
   }
 
   public Processor getMessageProcessor() {
     return (Processor) super.getComponent();
   }
 
+  @Override
   public MessagingException getException() {
     return (MessagingException) super.getException();
   }

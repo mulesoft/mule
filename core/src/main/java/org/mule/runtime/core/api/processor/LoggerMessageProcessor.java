@@ -7,14 +7,13 @@
 package org.mule.runtime.core.api.processor;
 
 import static org.mule.runtime.core.api.util.StreamingUtils.withCursoredEvent;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.util.StringUtils;
@@ -29,8 +28,7 @@ import org.slf4j.LoggerFactory;
  * 'org.mule.runtime.core.api.processor.LoggerMessageProcessor' category. The level and category can both be configured to suit
  * your needs.
  */
-public class LoggerMessageProcessor extends AbstractAnnotatedObject
-    implements Processor, Initialisable, MuleContextAware, FlowConstructAware {
+public class LoggerMessageProcessor extends AbstractAnnotatedObject implements Processor, Initialisable, MuleContextAware {
 
   protected transient Logger logger;
 
@@ -39,7 +37,6 @@ public class LoggerMessageProcessor extends AbstractAnnotatedObject
   protected String level = "INFO";
 
   protected MuleContext muleContext;
-  protected FlowConstruct flowConstruct;
   protected ExtendedExpressionManager expressionManager;
 
   @Override
@@ -73,7 +70,7 @@ public class LoggerMessageProcessor extends AbstractAnnotatedObject
       } else {
         LogLevel logLevel = LogLevel.valueOf(level);
         if (LogLevel.valueOf(level).isEnabled(logger)) {
-          logLevel.log(logger, expressionManager.parse(message, event, flowConstruct));
+          logLevel.log(logger, expressionManager.parse(message, event, getLocation()));
         }
       }
     }
@@ -89,11 +86,6 @@ public class LoggerMessageProcessor extends AbstractAnnotatedObject
   @Override
   public void setMuleContext(MuleContext muleContext) {
     this.muleContext = muleContext;
-  }
-
-  @Override
-  public void setFlowConstruct(FlowConstruct flowConstruct) {
-    this.flowConstruct = flowConstruct;
   }
 
   public void setMessage(String message) {

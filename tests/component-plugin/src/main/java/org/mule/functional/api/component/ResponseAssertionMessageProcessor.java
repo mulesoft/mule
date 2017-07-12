@@ -16,6 +16,7 @@ import static org.mule.functional.api.component.FlowAssert.addAssertion;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setFlowConstructIfNeeded;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
+
 import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -23,16 +24,17 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.expression.InvalidExpressionException;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.exception.MessagingException;
-
-import com.eaio.uuid.UUID;
 
 import java.util.concurrent.CountDownLatch;
 
 import org.reactivestreams.Publisher;
+
+import com.eaio.uuid.UUID;
+
 import reactor.core.publisher.Flux;
 
 public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
@@ -59,7 +61,7 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
       throw new InvalidExpressionException(expression, result.errorMessage().orElse("Invalid expression"));
     }
     responseLatch = new CountDownLatch(responseCount);
-    addAssertion(flowConstruct.getName(), this);
+    addAssertion(getLocation().getParts().get(0).getPartPath(), this);
   }
 
   @Override
@@ -110,7 +112,7 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
       responseTaskToken = generateTaskToken();
     }
 
-    responseResult = responseResult && expressionManager.evaluateBoolean(responseExpression, event, flowConstruct, false, true);
+    responseResult = responseResult && expressionManager.evaluateBoolean(responseExpression, event, getLocation(), false, true);
     increaseResponseCount();
     responseLatch.countDown();
     return event;
@@ -193,7 +195,6 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
 
   @Override
   public void setFlowConstruct(FlowConstruct flowConstruct) {
-    super.setFlowConstruct(flowConstruct);
     setFlowConstructIfNeeded(next, flowConstruct);
   }
 }

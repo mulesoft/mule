@@ -7,14 +7,17 @@
 package org.mule.tck.junit4;
 
 import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonMap;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.FileUtils.deleteTree;
 import static org.mule.runtime.core.api.util.FileUtils.newFile;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.junit4.TestsLogConfigurationHelper.clearLoggingConfig;
@@ -27,7 +30,6 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.DefaultEventContext;
-import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.DefaultTransformationService;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
@@ -407,6 +409,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
 
   public static Flow getNamedTestFlow(String name) throws MuleException {
     Flow flow = builder(name, muleContext).build();
+    flow.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent(name)));
     muleContext.getRegistry().registerFlowConstruct(flow);
     return flow;
   }

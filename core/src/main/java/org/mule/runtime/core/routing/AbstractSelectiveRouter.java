@@ -291,8 +291,7 @@ public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject im
 
   @Override
   public String toString() {
-    return format("%s [flow-construct=%s, started=%s]", getClass().getSimpleName(),
-                  flowConstruct != null ? flowConstruct.getName() : null, started);
+    return format("%s [flow=%s, started=%s]", getClass().getSimpleName(), getLocation().getParts().get(0).getPartPath(), started);
   }
 
   @Override

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.context.notification;
 
-import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.api.component.location.ComponentLocation;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,10 +42,9 @@ public class ConnectorMessageNotification extends EnrichedServerNotification imp
     registerAction("end request", MESSAGE_REQUEST_END);
   }
 
-  public ConnectorMessageNotification(EnrichedNotificationInfo notificationInfo, FlowConstruct flowConstruct,
+  public ConnectorMessageNotification(EnrichedNotificationInfo notificationInfo, ComponentLocation componentLocation,
                                       int action) {
-    super(notificationInfo, action, flowConstruct);
-    this.flowConstruct = flowConstruct;
+    super(notificationInfo, action, componentLocation);
   }
 
   @Override

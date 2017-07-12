@@ -6,12 +6,16 @@
  */
 package org.mule.runtime.core.internal.context.notification;
 
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.singletonMap;
+import static org.mule.runtime.core.api.config.DefaultMuleConfiguration.isFlowTrace;
+
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
@@ -22,11 +26,9 @@ import org.mule.runtime.core.api.context.notification.PipelineMessageNotificatio
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.runtime.core.api.execution.LocationExecutionContextProvider;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.internal.logging.LogConfigChangeSubject;
 
 import java.beans.PropertyChangeListener;
-import java.util.Collections;
 import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
@@ -136,7 +138,7 @@ public class MessageProcessingFlowTraceManager extends LocationExecutionContextP
    * @param notification the notification that contains the event and the processor that is about to be invoked.
    */
   public void onPipelineNotificationStart(PipelineMessageNotification notification) {
-    onFlowStart(notification.getInfo(), notification.getFlowConstruct().getName());
+    onFlowStart(notification.getInfo(), notification.getResourceIdentifier());
   }
 
   @Override
@@ -154,12 +156,11 @@ public class MessageProcessingFlowTraceManager extends LocationExecutionContextP
   }
 
   @Override
-  public Map<String, Object> getContextInfo(EnrichedNotificationInfo notificationInfo, Processor lastProcessed,
-                                            FlowConstruct flowConstruct) {
-    if (DefaultMuleConfiguration.isFlowTrace()) {
-      return Collections.<String, Object>singletonMap(FLOW_STACK_INFO_KEY, notificationInfo.getFlowCallStack().toString());
+  public Map<String, Object> getContextInfo(EnrichedNotificationInfo notificationInfo, Processor lastProcessed) {
+    if (isFlowTrace()) {
+      return singletonMap(FLOW_STACK_INFO_KEY, notificationInfo.getFlowCallStack().toString());
     } else {
-      return Collections.<String, Object>emptyMap();
+      return emptyMap();
     }
   }
 }

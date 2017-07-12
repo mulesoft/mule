@@ -130,11 +130,6 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
       super(name, processors);
     }
 
-    @Override
-    protected List<Processor> getProcessorsToExecute() {
-      return processors;
-    }
-
   }
 
   protected static class DefaultMessageProcessorChain extends AbstractMessageProcessorChain {

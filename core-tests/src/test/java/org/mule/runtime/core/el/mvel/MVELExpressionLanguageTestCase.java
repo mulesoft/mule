@@ -7,7 +7,9 @@
 package org.mule.runtime.core.el.mvel;
 
 import static java.nio.charset.StandardCharsets.UTF_16;
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
+import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -18,11 +20,18 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
+import static org.mule.mvel2.optimizers.OptimizerFactory.DYNAMIC;
+import static org.mule.mvel2.optimizers.OptimizerFactory.SAFE_REFLECTIVE;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
+import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.MediaType.JSON;
+import static org.mule.runtime.core.el.mvel.MVELExpressionLanguageTestCase.Variant.EXPRESSION_STRAIGHT_UP;
+import static org.mule.runtime.core.el.mvel.MVELExpressionLanguageTestCase.Variant.EXPRESSION_WITH_DELIMITER;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 
 import org.mule.mvel2.CompileException;
@@ -33,21 +42,23 @@ import org.mule.mvel2.optimizers.OptimizerFactory;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.api.metadata.AbstractDataTypeBuilderFactory;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.config.MuleManifest;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExpressionLanguageContext;
 import org.mule.runtime.core.api.el.ExpressionLanguageExtension;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.api.config.MuleManifest;
-import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.el.context.AppContext;
 import org.mule.runtime.core.el.context.MessageContext;
 import org.mule.runtime.core.el.function.RegexExpressionLanguageFuntion;
+import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.message.InternalMessage;
+import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.File;
@@ -57,14 +68,11 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -115,8 +123,11 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
     mvel = new MVELExpressionLanguage(muleContext);
     mvel.initialise();
 
-    flowConstruct = mock(FlowConstruct.class);
+    flowConstruct = mock(FlowConstruct.class, withSettings().extraInterfaces(AnnotatedObject.class));
     when(flowConstruct.getName()).thenReturn("myFlow");
+    final DefaultComponentLocation location = fromSingleComponent("myFlow");
+    when(((AnnotatedObject) flowConstruct).getAnnotation(LOCATION_KEY)).thenReturn(location);
+    when(((AnnotatedObject) flowConstruct).getLocation()).thenReturn(location);
   }
 
   @Test
@@ -135,17 +146,17 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
   @Test
   public void testEvaluateStringMapOfStringObject() {
     // Literals
-    assertEquals("hi", evaluate("'hi'", Collections.<String, Object>emptyMap()));
-    assertEquals(4, evaluate("2*2", Collections.<String, Object>emptyMap()));
+    assertEquals("hi", evaluate("'hi'", emptyMap()));
+    assertEquals(4, evaluate("2*2", emptyMap()));
 
     // Static context
-    assertEquals(Calendar.getInstance().getTimeZone(), evaluate("server.timeZone", Collections.<String, Object>emptyMap()));
-    assertEquals(MuleManifest.getProductVersion(), evaluate("mule.version", Collections.<String, Object>emptyMap()));
-    assertEquals(muleContext.getConfiguration().getId(), evaluate("app.name", Collections.<String, Object>emptyMap()));
+    assertEquals(Calendar.getInstance().getTimeZone(), evaluate("server.timeZone", emptyMap()));
+    assertEquals(MuleManifest.getProductVersion(), evaluate("mule.version", emptyMap()));
+    assertEquals(muleContext.getConfiguration().getId(), evaluate("app.name", emptyMap()));
 
     // Custom variables (via method param)
-    assertEquals(1, evaluate("foo", Collections.<String, Object>singletonMap("foo", 1)));
-    assertEquals("bar", evaluate("foo", Collections.<String, Object>singletonMap("foo", "bar")));
+    assertEquals(1, evaluate("foo", singletonMap("foo", 1)));
+    assertEquals("bar", evaluate("foo", singletonMap("foo", "bar")));
   }
 
   @Test
@@ -172,8 +183,8 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
     Event event = createMockEvent();
 
     // Custom variables (via method param)
-    assertEquals(1, evaluate("foo", Collections.<String, Object>singletonMap("foo", 1)));
-    assertEquals("bar", evaluate("foo", Collections.<String, Object>singletonMap("foo", "bar")));
+    assertEquals(1, evaluate("foo", singletonMap("foo", 1)));
+    assertEquals("bar", evaluate("foo", singletonMap("foo", "bar")));
   }
 
   @Test
@@ -211,7 +222,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
 
   @Test
   public void appTakesPrecedenceOverEverything() throws Exception {
-    mvel.setAliases(Collections.singletonMap("app", "'other1'"));
+    mvel.setAliases(singletonMap("app", "'other1'"));
     Event event = eventBuilder().message(of("")).addVariable("app", "otherb").build();
     muleContext.getRegistry().registerObject("foo",
                                              (ExpressionLanguageExtension) context -> context.addVariable("app", "otherc"));
@@ -221,7 +232,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
 
   @Test
   public void messageTakesPrecedenceOverEverything() throws Exception {
-    mvel.setAliases(Collections.singletonMap("message", "'other1'"));
+    mvel.setAliases(singletonMap("message", "'other1'"));
     Event event = eventBuilder().message(of("")).addVariable("message", "other2").build();
     muleContext.getRegistry().registerObject("foo",
                                              (ExpressionLanguageExtension) context -> context.addVariable("message", "other3"));
@@ -239,7 +250,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
 
   @Test
   public void aliasTakesPrecedenceOverAutoResolved() throws RegistrationException, InitialisationException {
-    mvel.setAliases(Collections.singletonMap("foo", "'bar'"));
+    mvel.setAliases(singletonMap("foo", "'bar'"));
     muleContext.getRegistry().registerObject("key", (ExpressionLanguageExtension) context -> context.addVariable("foo", "other"));
     mvel.initialise();
     assertEquals("bar", evaluate("foo"));
@@ -247,21 +258,21 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
 
   @Test
   public void aliasTakesPrecedenceOverExtension() throws Exception {
-    mvel.setAliases(Collections.singletonMap("foo", "'bar'"));
+    mvel.setAliases(singletonMap("foo", "'bar'"));
     mvel.initialise();
     assertEquals("bar", evaluate("foo"));
   }
 
   @Test
   public void addImport() throws InitialisationException {
-    mvel.setImports(Collections.<String, Class<?>>singletonMap("loc", Locale.class));
+    mvel.setImports(singletonMap("loc", Locale.class));
     mvel.initialise();
     assertEquals(Locale.class, evaluate("loc"));
   }
 
   @Test
   public void addAlias() throws InitialisationException {
-    mvel.setAliases(Collections.<String, String>singletonMap("appName", "app.name"));
+    mvel.setAliases(singletonMap("appName", "app.name"));
     mvel.initialise();
     assertEquals(muleContext.getConfiguration().getId(), evaluate("appName"));
   }
@@ -412,10 +423,12 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
 
   protected TypedValue evaluateTyped(String expression, Event event) throws Exception {
     if (variant.equals(Variant.EXPRESSION_WITH_DELIMITER)) {
-      return mvel.evaluate("#[mel:" + expression + "]", event, Event.builder(event), flowConstruct,
+      return mvel.evaluate("#[mel:" + expression + "]", event, Event.builder(event),
+                           ((AnnotatedObject) flowConstruct).getLocation(),
                            BindingContext.builder().build());
     } else {
-      return mvel.evaluate(expression, event, Event.builder(event), flowConstruct, BindingContext.builder().build());
+      return mvel.evaluate(expression, event, Event.builder(event), ((AnnotatedObject) flowConstruct).getLocation(),
+                           BindingContext.builder().build());
     }
   }
 
@@ -429,9 +442,10 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
 
   protected Object evaluate(String expression, Event event) throws Exception {
     if (variant.equals(Variant.EXPRESSION_WITH_DELIMITER)) {
-      return mvel.evaluateUntyped("#[mel:" + expression + "]", event, Event.builder(event), flowConstruct, null);
+      return mvel.evaluateUntyped("#[mel:" + expression + "]", event, Event.builder(event),
+                                  ((AnnotatedObject) flowConstruct).getLocation(), null);
     } else {
-      return mvel.evaluateUntyped(expression, event, Event.builder(event), flowConstruct, null);
+      return mvel.evaluateUntyped(expression, event, Event.builder(event), ((AnnotatedObject) flowConstruct).getLocation(), null);
     }
   }
 
@@ -481,12 +495,14 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
     EXPRESSION_WITH_DELIMITER, EXPRESSION_STRAIGHT_UP
   }
 
-  @Parameters
+  @Parameters(name = "{0}, {1}")
   public static List<Object[]> parameters() {
-    return Arrays.asList(new Object[][] {{Variant.EXPRESSION_WITH_DELIMITER, OptimizerFactory.SAFE_REFLECTIVE},
-        {Variant.EXPRESSION_WITH_DELIMITER, OptimizerFactory.DYNAMIC},
-        {Variant.EXPRESSION_STRAIGHT_UP, OptimizerFactory.SAFE_REFLECTIVE},
-        {Variant.EXPRESSION_STRAIGHT_UP, OptimizerFactory.DYNAMIC}});
+    return Arrays.asList(new Object[][] {
+        {EXPRESSION_WITH_DELIMITER, SAFE_REFLECTIVE},
+        {EXPRESSION_WITH_DELIMITER, DYNAMIC},
+        {EXPRESSION_STRAIGHT_UP, SAFE_REFLECTIVE},
+        {EXPRESSION_STRAIGHT_UP, DYNAMIC}
+    });
   }
 
   private static class HelloWorldFunction extends Function {
@@ -499,32 +515,6 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
     public Object call(Object ctx, Object thisValue, org.mule.mvel2.integration.VariableResolverFactory factory, Object[] parms) {
       return "Hello World!";
     }
-  }
-
-  /**
-   * Scans all classes accessible from the context class loader which belong to the given package and subpackages.
-   * 
-   * @param packageName The base package
-   * @return The classes
-   * @throws ClassNotFoundException
-   * @throws IOException
-   * @throws URISyntaxException
-   */
-  private static Class[] getClasses(String packageName) throws ClassNotFoundException, IOException, URISyntaxException {
-    ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-    assert classLoader != null;
-    String path = packageName.replace('.', '/');
-    Enumeration<URL> resources = classLoader.getResources(path);
-    List<File> dirs = new ArrayList<>();
-    while (resources.hasMoreElements()) {
-      URL resource = resources.nextElement();
-      dirs.add(new File(resource.toURI()));
-    }
-    ArrayList<Class> classes = new ArrayList<>();
-    for (File directory : dirs) {
-      classes.addAll(findClasses(directory, packageName));
-    }
-    return classes.toArray(new Class[classes.size()]);
   }
 
   /**
@@ -553,9 +543,11 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
   @Test
   public void collectionAccessPayloadChangedMULE7506() throws Exception {
     Event event = eventBuilder().message(of(new String[] {"1", "2"})).build();
-    assertEquals("1", mvel.evaluateUntyped("payload[0]", event, Event.builder(event), flowConstruct, null));
+    assertEquals("1", mvel.evaluateUntyped("payload[0]", event, Event.builder(event),
+                                           ((AnnotatedObject) flowConstruct).getLocation(), null));
     event = Event.builder(event).message(InternalMessage.builder(event.getMessage()).payload(singletonList("1")).build()).build();
-    assertEquals("1", mvel.evaluateUntyped("payload[0]", event, Event.builder(event), flowConstruct, null));
+    assertEquals("1", mvel.evaluateUntyped("payload[0]", event, Event.builder(event),
+                                           ((AnnotatedObject) flowConstruct).getLocation(), null));
   }
 
 }

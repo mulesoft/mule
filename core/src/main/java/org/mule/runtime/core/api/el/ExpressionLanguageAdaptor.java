@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.el;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.api.el.ValidationResult;
@@ -26,8 +27,8 @@ public interface ExpressionLanguageAdaptor {
 
   /**
    * Registers the given {@link BindingContext} entries as globals. Notice globals cannot be removed once registered, only
-   * overwritten by the registration of a binding with the same identifier.
-   * Implementations should be thread safe to avoid race conditions between registration and expression evaluation.
+   * overwritten by the registration of a binding with the same identifier. Implementations should be thread safe to avoid race
+   * conditions between registration and expression evaluation.
    *
    * @param bindingContext the context to register
    */
@@ -36,21 +37,21 @@ public interface ExpressionLanguageAdaptor {
   /**
    * Evaluates an expression according to a given {@link BindingContext}, an {@link Event} and a {@link FlowConstruct}.
    *
-   * @param expression     the expression to be executed
-   * @param event          the current event being processed
-   * @param flowConstruct  the flow where the event is being processed
+   * @param expression the expression to be executed
+   * @param event the current event being processed
+   * @param componentLocation the location of the component where the event is being processed
    * @param bindingContext the bindings to consider
    * @return the result of execution of the expression.
    * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
    */
-  TypedValue evaluate(String expression, Event event, FlowConstruct flowConstruct, BindingContext bindingContext)
+  TypedValue evaluate(String expression, Event event, ComponentLocation componentLocation, BindingContext bindingContext)
       throws ExpressionRuntimeException;
 
   /**
    * Evaluates an expression according to a given {@link BindingContext}.
    *
    * @param expression the expression to be executed
-   * @param event      the current event being processed
+   * @param event the current event being processed
    * @return the result of execution of the expression.
    * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
    */
@@ -59,10 +60,10 @@ public interface ExpressionLanguageAdaptor {
   /**
    * Evaluates an expression according to a given {@link BindingContext} and outputs .
    *
-   * @param expression         the expression to be executed
-   * @param event              the current event being processed
+   * @param expression the expression to be executed
+   * @param event the current event being processed
    * @param expectedOutputType the expected output type so that automatic conversion can be performed for the resulting value
-   *                           type.
+   *        type.
    * @return the result of execution of the expression.
    * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
    */
@@ -72,18 +73,19 @@ public interface ExpressionLanguageAdaptor {
   /**
    * Evaluates an expression according to a given {@link BindingContext}, an {@link Event} and a {@link FlowConstruct}.
    *
-   * @param expression         the expression to be executed
+   * @param expression the expression to be executed
    * @param expectedOutputType the expected output type so that automatic conversion can be performed for the resulting value
-   *                           type.
-   * @param event              the current event being processed
-   * @param flowConstruct      the flow where the event is being processed
-   * @param context            the bindings to consider
-   * @param failOnNull         indicates if should fail if the evaluation result is {@code null}
+   *        type.
+   * @param event the current event being processed
+   * @param componentLocation the location of the component where the event is being processed
+   * @param context the bindings to consider
+   * @param failOnNull indicates if should fail if the evaluation result is {@code null}
    * @return the result of execution of the expression.
    * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
    */
-  TypedValue evaluate(String expression, DataType expectedOutputType, Event event, FlowConstruct flowConstruct,
-                      BindingContext context, boolean failOnNull)
+  TypedValue evaluate(String expression, DataType expectedOutputType, Event event, ComponentLocation componentLocation,
+                      BindingContext context,
+                      boolean failOnNull)
       throws ExpressionRuntimeException;
 
   /**
@@ -95,26 +97,26 @@ public interface ExpressionLanguageAdaptor {
   ValidationResult validate(String expression);
 
   /**
-   * Splits using the specified expression and group it with the batch size. If batch size is less or equals to zero then no batching is done.
-   * The expression should return a collection of elements.
+   * Splits using the specified expression and group it with the batch size. If batch size is less or equals to zero then no
+   * batching is done. The expression should return a collection of elements.
    *
-   * @param expression     the expression to be executed
-   * @param event          the current event being processed
-   * @param flowConstruct  the flow where the event is being processed
+   * @param expression the expression to be executed
+   * @param event the current event being processed
+   * @param componentLocation the location of the component where the event is being processed
    * @param bindingContext the bindings to consider
    * @return the result of execution of the expression.
    * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
    */
-  Iterator<TypedValue<?>> split(String expression, Event event, FlowConstruct flowConstruct,
+  Iterator<TypedValue<?>> split(String expression, Event event, ComponentLocation componentLocation,
                                 BindingContext bindingContext)
       throws ExpressionRuntimeException;
 
   /**
-   * Splits using the specified expression and group it with the batch size. If batch size is less or equals to zero then no batching is done.
-   * The expression should return a collection of elements.
+   * Splits using the specified expression and group it with the batch size. If batch size is less or equals to zero then no
+   * batching is done. The expression should return a collection of elements.
    *
-   * @param expression     the expression to be executed
-   * @param event          the current event being processed
+   * @param expression the expression to be executed
+   * @param event the current event being processed
    * @param bindingContext the bindings to consider
    * @return the result of execution of the expression.
    * @throws ExpressionRuntimeException if a problem occurs evaluating the expression

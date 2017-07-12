@@ -8,13 +8,11 @@ package org.mule.test.tck;
 
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.startsWith;
-import static org.mockito.Mockito.mock;
 import static org.mule.functional.api.exception.FunctionalTestException.EXCEPTION_MESSAGE;
 
 import org.mule.functional.api.component.FunctionalTestProcessor;
 import org.mule.functional.api.exception.FunctionalTestException;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.IOException;
@@ -34,7 +32,6 @@ public class FunctionalTestProcessorTestCase extends AbstractMuleTestCase {
   @Before
   public void initFunctionaTestComponent() {
     ftc = new FunctionalTestProcessor();
-    ftc.setFlowConstruct(mock(FlowConstruct.class));
     ftc.setThrowException(true);
   }
 

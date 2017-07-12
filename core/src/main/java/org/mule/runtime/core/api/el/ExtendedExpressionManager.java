@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.el;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
@@ -33,12 +34,12 @@ public interface ExtendedExpressionManager extends ExpressionManager {
    * @param expression the expression to be executed
    * @param event the current event being processed
    * @param eventBuilder event builder instance used to mutate the current message or event.
-   * @param flowConstruct the flow where the event is being processed
+   * @param componentLocation the location of the component where the event is being processed
    * @return the result of execution of the expression.
    * @deprecated Mutation via expressions is deprecated.
    */
   @Deprecated
-  TypedValue evaluate(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct)
+  TypedValue evaluate(String expression, Event event, Event.Builder eventBuilder, ComponentLocation componentLocation)
       throws ExpressionRuntimeException;
 
   /**
@@ -51,12 +52,12 @@ public interface ExtendedExpressionManager extends ExpressionManager {
    * @param expression a single expression i.e. header://foo that defines how the message should be enriched
    * @param event The event to be enriched
    * @param eventBuilder event builder instance used to mutate the current message or event.
-   * @param flowConstruct the flow where the event is being processed
+   * @param componentLocation the location of the component where the event is being processed
    * @param value The typed value used for enrichment
    * @deprecated Mutation via expressions is deprecated.
    */
   @Deprecated
-  void enrich(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct, TypedValue value);
+  void enrich(String expression, Event event, Event.Builder eventBuilder, ComponentLocation componentLocation, TypedValue value);
 
   /**
    * Evaluates expressions in a given string. This method will iterate through each expression and evaluate it. If a user needs to
@@ -69,13 +70,13 @@ public interface ExtendedExpressionManager extends ExpressionManager {
    * @param expression one or more expressions ebedded in a literal string i.e. "Value is #[mel:xpath://foo] other value is
    *        #[mel:header:foo]."
    * @param event The current event being processed
-   * @param flowConstruct the flow where the event is being processed
+   * @param componentLocation the location of the component where the event is being processed
    * @return the result of the evaluation
    * @throws ExpressionRuntimeException if the expression is invalid, or a null is found for the expression and 'failIfNull is set
    *         to true.
    * @deprecated Parsing of expressions is deprecated. Use standard evaluation instead.
    */
   @Deprecated
-  String parse(String expression, Event event, FlowConstruct flowConstruct) throws ExpressionRuntimeException;
+  String parse(String expression, Event event, ComponentLocation componentLocation) throws ExpressionRuntimeException;
 
 }

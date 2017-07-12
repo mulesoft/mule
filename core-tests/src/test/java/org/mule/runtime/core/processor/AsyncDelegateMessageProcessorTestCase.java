@@ -8,6 +8,7 @@ package org.mule.runtime.core.processor;
 
 import static java.lang.Thread.currentThread;
 import static java.time.Duration.ofMillis;
+import static java.util.Collections.singletonMap;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -17,9 +18,11 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static reactor.core.publisher.Mono.from;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -66,7 +69,7 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
     flow.initialise();
     flow.start();
 
-    messageProcessor = createAsyncDelegatMessageProcessor(target, flow);
+    messageProcessor = createAsyncDelegateMessageProcessor(target, flow);
     messageProcessor.start();
   }
 
@@ -166,9 +169,10 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
     assertThat(exceptionThrown, nullValue());
   }
 
-  protected AsyncDelegateMessageProcessor createAsyncDelegatMessageProcessor(Processor listener, FlowConstruct flowConstruct)
+  protected AsyncDelegateMessageProcessor createAsyncDelegateMessageProcessor(Processor listener, FlowConstruct flowConstruct)
       throws Exception {
     AsyncDelegateMessageProcessor mp = new AsyncDelegateMessageProcessor(newChain(listener), "thread");
+    mp.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent("flow")));
     mp.setFlowConstruct(flowConstruct);
     initialiseIfNeeded(mp, true, muleContext);
     return mp;

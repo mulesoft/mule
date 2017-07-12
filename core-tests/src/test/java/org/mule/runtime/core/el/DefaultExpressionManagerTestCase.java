@@ -28,6 +28,7 @@ import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.DataType.fromFunction;
 import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.EXPRESSION_LANGUAGE;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.ExpressionLanguageStory.SUPPORT_MVEL_DW;
 
@@ -166,7 +167,8 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
     FlowConstruct mockFlowConstruct = mock(FlowConstruct.class);
     when(mockFlowConstruct.getName()).thenReturn("myFlowName");
 
-    String result = (String) expressionManager.evaluate("#[flow.name]", testEvent(), mockFlowConstruct).getValue();
+    String result = (String) expressionManager
+        .evaluate("#[flow.name]", testEvent(), fromSingleComponent(mockFlowConstruct.getName())).getValue();
     assertThat(result, is(mockFlowConstruct.getName()));
   }
 
@@ -208,19 +210,19 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
   @Test
   @Description("Verifies that parsing works with inner expressions in MVEL but only with regular ones in DW.")
   public void parseCompatibility() throws MuleException {
-    assertThat(expressionManager.parse("this is #[mel:payload]", testEvent(), mock(FlowConstruct.class)),
+    assertThat(expressionManager.parse("this is #[mel:payload]", testEvent(), fromSingleComponent("flowName")),
                is(String.format("this is %s", TEST_PAYLOAD)));
-    assertThat(expressionManager.parse("#['this is ' ++ payload]", testEvent(), mock(FlowConstruct.class)),
+    assertThat(expressionManager.parse("#['this is ' ++ payload]", testEvent(), fromSingleComponent("flowName")),
                is(String.format("this is %s", TEST_PAYLOAD)));
     expectedException.expect(RuntimeException.class);
-    expressionManager.parse("this is #[payload]", testEvent(), mock(FlowConstruct.class));
+    expressionManager.parse("this is #[payload]", testEvent(), fromSingleComponent("flowName"));
   }
 
   @Test
   @Description("Verifies that parsing works for plain String scenarios.")
   public void parse() throws MuleException {
     String expression = "this is a test";
-    assertThat(expressionManager.parse(expression, testEvent(), mock(FlowConstruct.class)), is(expression));
+    assertThat(expressionManager.parse(expression, testEvent(), fromSingleComponent("flowName")), is(expression));
   }
 
   @Test

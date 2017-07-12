@@ -7,13 +7,14 @@
 package org.mule.runtime.core.routing.requestreply;
 
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
-import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.api.processor.InternalMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.RequestReplyReplierMessageProcessor;
+import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 
 public abstract class AbstractReplyToPropertyRequestReplyReplier extends AbstractInterceptingMessageProcessor
@@ -45,7 +46,9 @@ public abstract class AbstractReplyToPropertyRequestReplyReplier extends Abstrac
       throws MuleException {
     if (result != null && replyToHandler != null) {
       String requestor = ((InternalMessage) result.getMessage()).getOutboundProperty(MULE_REPLY_TO_REQUESTOR_PROPERTY);
-      if ((requestor != null && !requestor.equals(flowConstruct.getName())) || requestor == null) {
+      if ((requestor != null
+          && !requestor.equals(getLocation().getParts().get(0).getPartPath()))
+          || requestor == null) {
         return replyToHandler.processReplyTo(event, result.getMessage(), replyTo);
       } else {
         return event;

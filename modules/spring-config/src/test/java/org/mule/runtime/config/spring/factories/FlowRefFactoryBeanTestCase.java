@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.spring.factories;
 
+import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertNotSame;
@@ -21,14 +22,17 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
+import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -55,6 +59,7 @@ import org.junit.Test;
 import org.mockito.MockSettings;
 import org.reactivestreams.Publisher;
 import org.springframework.context.ApplicationContext;
+
 import reactor.core.publisher.Mono;
 
 @SmallTest
@@ -65,7 +70,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleContextTestCase {
   private static final String STATIC_REFERENCED_FLOW = "staticReferencedFlow";
   private static final String DYNAMIC_REFERENCED_FLOW = "dynamicReferencedFlow";
   private static final String PARSED_DYNAMIC_REFERENCED_FLOW = "parsedDynamicReferencedFlow";
-  private static final String DYNAMIC_NON_EXISTANT = "#[mel:'nonExistant']";
+  private static final String DYNAMIC_NON_EXISTANT = "#['nonExistant']";
   private static final String NON_EXISTANT = "nonExistant";
 
   private Event result;
@@ -194,7 +199,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleContextTestCase {
   @Test(expected = MuleRuntimeException.class)
   public void dynamicFlowRefDoesNotExist() throws Exception {
     doReturn(true).when(expressionManager).isExpression(anyString());
-    doReturn("other").when(expressionManager).parse(eq(DYNAMIC_NON_EXISTANT), any(Event.class), any(FlowConstruct.class));
+    doReturn("other").when(expressionManager).parse(eq(DYNAMIC_NON_EXISTANT), any(Event.class), any(ComponentLocation.class));
 
     getFlowRefProcessor(createFlowRefFactoryBean(DYNAMIC_NON_EXISTANT)).process(testEvent());
   }
@@ -202,6 +207,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleContextTestCase {
   private FlowRefFactoryBean createFlowRefFactoryBean(String name) throws InitialisationException {
     FlowRefFactoryBean flowRefFactoryBean = new FlowRefFactoryBean();
     flowRefFactoryBean.setName(name);
+    flowRefFactoryBean.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent("flow")));
     flowRefFactoryBean.setApplicationContext(applicationContext);
     flowRefFactoryBean.setMuleContext(mockMuleContext);
     return flowRefFactoryBean;
@@ -220,7 +226,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleContextTestCase {
   private FlowRefFactoryBean createDynamicFlowRefFactoryBean(Processor target) throws InitialisationException {
     doReturn(true).when(expressionManager).isExpression(anyString());
     doReturn(PARSED_DYNAMIC_REFERENCED_FLOW).when(expressionManager).parse(eq(DYNAMIC_REFERENCED_FLOW), any(Event.class),
-                                                                           any(FlowConstruct.class));
+                                                                           any(ComponentLocation.class));
     when(applicationContext.getBean(eq(PARSED_DYNAMIC_REFERENCED_FLOW))).thenReturn(target);
     when(target.apply(any())).thenAnswer(invocation -> {
       Mono<Event> mono = from(invocation.getArgumentAt(0, Publisher.class));

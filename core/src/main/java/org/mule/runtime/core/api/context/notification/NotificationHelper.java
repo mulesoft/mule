@@ -9,17 +9,18 @@ package org.mule.runtime.core.api.context.notification;
 import static org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo.createInfo;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.privileged.context.notification.OptimisedNotificationHandler;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Simple class to fire notifications of a specified type over a {@link ServerNotificationHandler}.
@@ -95,13 +96,25 @@ public class NotificationHelper {
    * @param action the action code for the notification
    */
   public void fireNotification(Object source, Event event, FlowConstruct flowConstruct, int action) {
-    ServerNotificationHandler serverNotificationHandler = getNotificationHandler(flowConstruct.getMuleContext());
+    fireNotification(source, event, ((AnnotatedObject) flowConstruct).getLocation(), flowConstruct.getMuleContext(), action);
+  }
+
+  /**
+   * Fires a {@link ConnectorMessageNotification} for the given arguments using the {@link ServerNotificationHandler} associated
+   * to the given {@code event} and based on a {@link ComponentLocation}.
+   *
+   * @param source
+   * @param event a {@link org.mule.runtime.core.api.Event}
+   * @param location the location of the component that generated the notification
+   * @param context the mule context
+   * @param action the action code for the notification
+   */
+  public void fireNotification(Object source, Event event, ComponentLocation location, MuleContext context, int action) {
+    ServerNotificationHandler serverNotificationHandler = getNotificationHandler(context);
     try {
       if (serverNotificationHandler.isNotificationEnabled(notificationClass)) {
         serverNotificationHandler
-            .fireNotification(new ConnectorMessageNotification(createInfo(event, null, source),
-                                                               flowConstruct,
-                                                               action));
+            .fireNotification(new ConnectorMessageNotification(createInfo(event, null, source), location, action));
       }
     } catch (Exception e) {
       logger.warn("Could not fire notification. Action: " + action, e);

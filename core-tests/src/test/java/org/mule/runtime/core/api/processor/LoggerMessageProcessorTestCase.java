@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.processor;
 
+import static java.util.Collections.singletonMap;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -15,9 +16,12 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
 import static org.mule.runtime.core.api.construct.Flow.builder;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
+import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
@@ -37,6 +41,7 @@ public class LoggerMessageProcessorTestCase extends AbstractMuleTestCase {
   @Before
   public void before() throws RegistrationException {
     flow = builder("flow", mockContextWithServices()).build();
+    flow.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent("flow")));
   }
 
   @Test
@@ -92,7 +97,8 @@ public class LoggerMessageProcessorTestCase extends AbstractMuleTestCase {
     when(loggerMessageProcessor.logger.isErrorEnabled()).thenReturn("ERROR".equals(enabledLevel));
     loggerMessageProcessor.expressionManager = buildExpressionManager();
     loggerMessageProcessor.log(muleEvent);
-    verify(loggerMessageProcessor.expressionManager, timesEvaluateExpression).parse("some expression", muleEvent, flow);
+    verify(loggerMessageProcessor.expressionManager, timesEvaluateExpression).parse("some expression", muleEvent,
+                                                                                    ((AnnotatedObject) flow).getLocation());
   }
 
   // Orchestrates the verifications for a call with a null MuleEvent
@@ -148,10 +154,10 @@ public class LoggerMessageProcessorTestCase extends AbstractMuleTestCase {
 
   private LoggerMessageProcessor buildLoggerMessageProcessorWithLevel(String level) {
     LoggerMessageProcessor loggerMessageProcessor = new LoggerMessageProcessor();
+    loggerMessageProcessor.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent("flow")));
     loggerMessageProcessor.initLogger();
     loggerMessageProcessor.logger = buildMockLogger();
     loggerMessageProcessor.setLevel(level);
-    loggerMessageProcessor.setFlowConstruct(flow);
     return loggerMessageProcessor;
   }
 
@@ -160,7 +166,6 @@ public class LoggerMessageProcessorTestCase extends AbstractMuleTestCase {
     loggerMessageProcessor = buildLoggerMessageProcessorWithLevel(level);
     loggerMessageProcessor.expressionManager = buildExpressionManager();
     loggerMessageProcessor.setMessage("some expression");
-    loggerMessageProcessor.setFlowConstruct(flow);
     return loggerMessageProcessor;
   }
 
@@ -174,7 +179,8 @@ public class LoggerMessageProcessorTestCase extends AbstractMuleTestCase {
 
   private ExtendedExpressionManager buildExpressionManager() {
     ExtendedExpressionManager expressionLanguage = mock(ExtendedExpressionManager.class);
-    when(expressionLanguage.parse(anyString(), any(Event.class), eq(flow))).thenReturn("text to log");
+    when(expressionLanguage.parse(anyString(), any(Event.class), eq(((AnnotatedObject) flow).getLocation())))
+        .thenReturn("text to log");
     return expressionLanguage;
   }
 

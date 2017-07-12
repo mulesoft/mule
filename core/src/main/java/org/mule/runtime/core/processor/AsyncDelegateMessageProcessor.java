@@ -19,6 +19,7 @@ import static org.mule.runtime.core.internal.util.ProcessingStrategyUtils.isSync
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -26,7 +27,6 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.context.notification.AsyncMessageNotification;
 import org.mule.runtime.core.api.exception.MessagingException;
@@ -40,14 +40,14 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.session.DefaultMuleSession;
 
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.List;
 import java.util.function.Consumer;
 
 import javax.inject.Inject;
+
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Processes {@link Event}'s asynchronously using a {@link ProcessingStrategy} to schedule asynchronous processing of
@@ -120,11 +120,12 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
         .doOnNext(request -> just(request)
             .map(event -> asyncEvent(request))
             .transform(innerPublisher -> from(innerPublisher)
-                .doOnNext(fireAsyncScheduledNotification(flowConstruct))
+                .doOnNext(fireAsyncScheduledNotification())
                 .doOnNext(asyncRequest -> just(asyncRequest)
                     .transform(scheduleAsync(delegate))
-                    .doOnNext(event -> fireAsyncCompleteNotification(event, flowConstruct, null))
-                    .doOnError(MessagingException.class, e -> fireAsyncCompleteNotification(e.getEvent(), flowConstruct, e))
+                    .doOnNext(event -> fireAsyncCompleteNotification(event, null))
+                    .doOnError(MessagingException.class,
+                               e -> fireAsyncCompleteNotification(e.getEvent(), e))
                     .onErrorResume(MessagingException.class, messagingExceptionHandler)
                     .doOnError(UNEXPECTED_EXCEPTION_PREDICATE,
                                exception -> logger.error("Unhandled exception in async processing.",
@@ -157,15 +158,14 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
         .session(new DefaultMuleSession(event.getSession())).build();
   }
 
-  private Consumer<Event> fireAsyncScheduledNotification(FlowConstruct flowConstruct) {
+  private Consumer<Event> fireAsyncScheduledNotification() {
     return event -> muleContext.getNotificationManager()
-        .fireNotification(new AsyncMessageNotification(createInfo(event, null, this), flowConstruct,
-                                                       PROCESS_ASYNC_SCHEDULED));
+        .fireNotification(new AsyncMessageNotification(createInfo(event, null, this), getLocation(), PROCESS_ASYNC_SCHEDULED));
   }
 
-  private void fireAsyncCompleteNotification(Event event, FlowConstruct flowConstruct, MessagingException exception) {
+  private void fireAsyncCompleteNotification(Event event, MessagingException exception) {
     muleContext.getNotificationManager()
-        .fireNotification(new AsyncMessageNotification(createInfo(event, exception, this), flowConstruct,
+        .fireNotification(new AsyncMessageNotification(createInfo(event, exception, this), getLocation(),
                                                        PROCESS_ASYNC_COMPLETE));
   }
 

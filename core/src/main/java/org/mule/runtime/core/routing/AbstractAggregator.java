@@ -32,11 +32,11 @@ import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.routing.Aggregator;
 import org.mule.runtime.core.api.store.PartitionableObjectStore;
+import org.mule.runtime.core.internal.util.store.ProvidedObjectStoreWrapper;
+import org.mule.runtime.core.internal.util.store.ProvidedPartitionableObjectStoreWrapper;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 import org.mule.runtime.core.routing.correlation.EventCorrelator;
 import org.mule.runtime.core.routing.correlation.EventCorrelatorCallback;
-import org.mule.runtime.core.internal.util.store.ProvidedObjectStoreWrapper;
-import org.mule.runtime.core.internal.util.store.ProvidedPartitionableObjectStoreWrapper;
 
 import java.util.function.Supplier;
 
@@ -73,8 +73,8 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
   @Override
   public void initialise() throws InitialisationException {
     if (storePrefix == null) {
-      storePrefix =
-          format("%s%s.%s.", muleContext.getConfiguration().getId(), flowConstruct.getName(), this.getClass().getName());
+      storePrefix = format("%s%s.%s.", muleContext.getConfiguration().getId(), getLocation().getParts().get(0).getPartPath(),
+                           this.getClass().getName());
     }
 
     initProcessedGroupsObjectStore();

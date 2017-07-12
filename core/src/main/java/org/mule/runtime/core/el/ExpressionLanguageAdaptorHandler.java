@@ -15,12 +15,12 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_MEL_AS_DEFAUL
 import static org.mule.runtime.core.el.DefaultExpressionManager.DW_PREFIX;
 import static org.mule.runtime.core.el.DefaultExpressionManager.MEL_PREFIX;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExtendedExpressionLanguageAdaptor;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
@@ -81,17 +81,17 @@ public class ExpressionLanguageAdaptorHandler implements ExtendedExpressionLangu
   }
 
   @Override
-  public TypedValue evaluate(String expression, DataType expectedOutputType, Event event, FlowConstruct flowConstruct,
+  public TypedValue evaluate(String expression, DataType expectedOutputType, Event event, ComponentLocation componentLocation,
                              BindingContext context, boolean failOnNull)
       throws ExpressionRuntimeException {
-    return selectExpressionLanguage(expression).evaluate(expression, expectedOutputType, event, flowConstruct, context,
+    return selectExpressionLanguage(expression).evaluate(expression, expectedOutputType, event, componentLocation, context,
                                                          failOnNull);
   }
 
   @Override
-  public TypedValue evaluate(String expression, Event event, FlowConstruct flowConstruct, BindingContext bindingContext)
+  public TypedValue evaluate(String expression, Event event, ComponentLocation componentLocation, BindingContext bindingContext)
       throws ExpressionRuntimeException {
-    return selectExpressionLanguage(expression).evaluate(expression, event, flowConstruct, bindingContext);
+    return selectExpressionLanguage(expression).evaluate(expression, event, componentLocation, bindingContext);
   }
 
   @Override
@@ -100,28 +100,29 @@ public class ExpressionLanguageAdaptorHandler implements ExtendedExpressionLangu
   }
 
   @Override
-  public TypedValue evaluate(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct,
+  public TypedValue evaluate(String expression, Event event, Event.Builder eventBuilder, ComponentLocation componentLocation,
                              BindingContext bindingContext)
       throws ExpressionRuntimeException {
-    return selectExpressionLanguage(expression).evaluate(expression, event, eventBuilder, flowConstruct, bindingContext);
+    return selectExpressionLanguage(expression).evaluate(expression, event, eventBuilder, componentLocation, bindingContext);
   }
 
   @Override
-  public void enrich(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct, Object object) {
-    selectExpressionLanguage(expression).enrich(expression, event, eventBuilder, flowConstruct, object);
+  public void enrich(String expression, Event event, Event.Builder eventBuilder, ComponentLocation componentLocation,
+                     Object object) {
+    selectExpressionLanguage(expression).enrich(expression, event, eventBuilder, componentLocation, object);
   }
 
   @Override
-  public void enrich(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct,
+  public void enrich(String expression, Event event, Event.Builder eventBuilder, ComponentLocation componentLocation,
                      TypedValue value) {
-    selectExpressionLanguage(expression).enrich(expression, event, eventBuilder, flowConstruct, value);
+    selectExpressionLanguage(expression).enrich(expression, event, eventBuilder, componentLocation, value);
   }
 
   @Override
-  public Iterator<TypedValue<?>> split(String expression, Event event, FlowConstruct flowConstruct,
+  public Iterator<TypedValue<?>> split(String expression, Event event, ComponentLocation componentLocation,
                                        BindingContext bindingContext)
       throws ExpressionRuntimeException {
-    return selectExpressionLanguage(expression).split(expression, event, flowConstruct, bindingContext);
+    return selectExpressionLanguage(expression).split(expression, event, componentLocation, bindingContext);
   }
 
   @Override

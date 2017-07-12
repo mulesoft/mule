@@ -9,19 +9,19 @@ package org.mule.runtime.core.routing.requestreply;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY;
 
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.internal.message.InternalMessage;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.FlowConstructAware;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transport.LegacyInboundEndpoint;
+import org.mule.runtime.core.internal.message.InternalMessage;
 
 public class SimpleAsyncRequestReplyRequester extends AbstractAsyncRequestReplyRequester implements Startable, Stoppable {
 
@@ -31,7 +31,8 @@ public class SimpleAsyncRequestReplyRequester extends AbstractAsyncRequestReplyR
   protected void sendAsyncRequest(Event event) throws MuleException {
     event = Event.builder(event)
         .message(InternalMessage.builder(event.getMessage()).addOutboundProperty(MULE_REPLY_TO_PROPERTY, getReplyTo())
-            .addOutboundProperty(MULE_REPLY_TO_REQUESTOR_PROPERTY, flowConstruct.getName()).build())
+            .addOutboundProperty(MULE_REPLY_TO_REQUESTOR_PROPERTY, getLocation().getParts().get(0).getPartPath())
+            .build())
         .build();
     requestMessageProcessor.process(event);
   }

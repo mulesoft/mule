@@ -24,6 +24,7 @@ import static org.mule.runtime.api.exception.MuleException.INFO_LOCATION_KEY;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.core.api.exception.MessagingException.PAYLOAD_INFO_KEY;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
@@ -221,7 +222,7 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
     when(mockProcessor.toString()).thenReturn("Mock@1");
     MessagingException exception = new MessagingException(CoreMessages.createStaticMessage(""), testEvent, mockProcessor);
     exception.getInfo()
-        .putAll(locationProvider.getContextInfo(createInfo(testEvent, exception, mockProcessor), mockProcessor, null));
+        .putAll(locationProvider.getContextInfo(createInfo(testEvent, exception, mockProcessor), mockProcessor));
     assertThat(exception.getInfo().get(INFO_LOCATION_KEY).toString(),
                is("Mock@1 @ MessagingExceptionTestCase"));
   }
@@ -236,7 +237,7 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
     when(componentLocation.getLocation()).thenReturn("flow/processor");
     MessagingException exception = new MessagingException(CoreMessages.createStaticMessage(""), testEvent, mockProcessor);
     exception.getInfo()
-        .putAll(locationProvider.getContextInfo(createInfo(testEvent, exception, mockProcessor), mockProcessor, flowConstruct));
+        .putAll(locationProvider.getContextInfo(createInfo(testEvent, exception, mockProcessor), mockProcessor));
     assertThat(exception.getInfo().get(INFO_LOCATION_KEY).toString(),
                is("flow/processor @ MessagingExceptionTestCase:muleApp.xml:10"));
   }
@@ -244,12 +245,11 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
   @Test
   public void withFailingProcessorNotPathResolver() {
     Processor mockProcessor = mock(Processor.class);
-    FlowConstruct nonPathResolver = mock(FlowConstruct.class);
     when(mockProcessor.toString()).thenReturn("Mock@1");
 
     MessagingException exception = new MessagingException(CoreMessages.createStaticMessage(""), testEvent, mockProcessor);
     exception.getInfo()
-        .putAll(locationProvider.getContextInfo(createInfo(testEvent, exception, mockProcessor), mockProcessor, nonPathResolver));
+        .putAll(locationProvider.getContextInfo(createInfo(testEvent, exception, mockProcessor), mockProcessor));
     assertThat(exception.getInfo().get(INFO_LOCATION_KEY).toString(),
                is("Mock@1 @ MessagingExceptionTestCase"));
   }
@@ -268,7 +268,7 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
 
     MessagingException exception = new MessagingException(CoreMessages.createStaticMessage(""), testEvent, mockProcessor);
     exception.getInfo()
-        .putAll(locationProvider.getContextInfo(createInfo(testEvent, exception, mockProcessor), mockProcessor, null));
+        .putAll(locationProvider.getContextInfo(createInfo(testEvent, exception, mockProcessor), mockProcessor));
     assertThat(exception.getInfo().get(MuleException.INFO_LOCATION_KEY).toString(),
                is("Mock@1 @ MessagingExceptionTestCase:muleApp.xml:10 (Mock Component)"));
   }
@@ -285,7 +285,7 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
 
     MessagingException exception = new MessagingException(CoreMessages.createStaticMessage(""), testEvent, mockProcessor);
     exception.getInfo()
-        .putAll(locationProvider.getContextInfo(createInfo(testEvent, exception, mockProcessor), mockProcessor, flowConstruct));
+        .putAll(locationProvider.getContextInfo(createInfo(testEvent, exception, mockProcessor), mockProcessor));
     assertThat(exception.getInfo().get(INFO_LOCATION_KEY).toString(),
                is("flow/processor @ MessagingExceptionTestCase:muleApp.xml:10 (Mock Component)"));
   }
@@ -296,12 +296,11 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
     when(((AnnotatedObject) mockProcessor).getAnnotation(eq(docNameAttrName))).thenReturn("Mock Component");
     when(((AnnotatedObject) mockProcessor).getAnnotation(eq(sourceFileNameAttrName))).thenReturn("muleApp.xml");
     when(((AnnotatedObject) mockProcessor).getAnnotation(eq(sourceFileLineAttrName))).thenReturn(10);
-    FlowConstruct nonPathResolver = mock(FlowConstruct.class);
     when(mockProcessor.toString()).thenReturn("Mock@1");
 
     MessagingException exception = new MessagingException(CoreMessages.createStaticMessage(""), testEvent, mockProcessor);
     exception.getInfo()
-        .putAll(locationProvider.getContextInfo(createInfo(testEvent, exception, mockProcessor), mockProcessor, nonPathResolver));
+        .putAll(locationProvider.getContextInfo(createInfo(testEvent, exception, mockProcessor), mockProcessor));
     assertThat(exception.getInfo().get(INFO_LOCATION_KEY).toString(),
                is("Mock@1 @ MessagingExceptionTestCase:muleApp.xml:10 (Mock Component)"));
   }

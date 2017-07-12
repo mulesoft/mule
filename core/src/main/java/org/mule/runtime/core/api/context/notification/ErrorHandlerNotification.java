@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.context.notification;
 
-import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.api.component.location.ComponentLocation;
 
 public class ErrorHandlerNotification extends EnrichedServerNotification {
 
@@ -20,7 +20,7 @@ public class ErrorHandlerNotification extends EnrichedServerNotification {
     registerAction("exception strategy process end", PROCESS_END);
   }
 
-  public ErrorHandlerNotification(EnrichedNotificationInfo notificationInfo, FlowConstruct flowConstruct, int action) {
-    super(notificationInfo, action, flowConstruct);
+  public ErrorHandlerNotification(EnrichedNotificationInfo notificationInfo, ComponentLocation componentLocation, int action) {
+    super(notificationInfo, action, componentLocation);
   }
 }
