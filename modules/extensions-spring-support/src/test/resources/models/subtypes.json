@@ -2644,7 +2644,7 @@
           "isAbstract": false,
           "isFinal": false,
           "implementedInterfaces": [
-            "org.mule.runtime.api.message.Attributes"
+            "java.io.Serializable"
           ],
           "parent": "",
           "genericTypes": []

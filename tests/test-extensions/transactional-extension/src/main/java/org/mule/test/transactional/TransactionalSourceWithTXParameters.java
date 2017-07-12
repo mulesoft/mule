@@ -7,7 +7,6 @@
 package org.mule.test.transactional;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.runtime.source.Source;
@@ -17,7 +16,7 @@ import org.mule.test.transactional.connection.TestTransactionalConnection;
 
 import java.util.function.Function;
 
-public class TransactionalSourceWithTXParameters extends Source<SourceTransactionalAction, Attributes> {
+public class TransactionalSourceWithTXParameters extends Source<SourceTransactionalAction, Object> {
 
   @Connection
   private TestTransactionalConnection connection;
@@ -28,7 +27,7 @@ public class TransactionalSourceWithTXParameters extends Source<SourceTransactio
   public static Function<Object, Object> responseCallback;
 
   @Override
-  public void onStart(SourceCallback<SourceTransactionalAction, Attributes> sourceCallback) throws MuleException {
+  public void onStart(SourceCallback<SourceTransactionalAction, Object> sourceCallback) throws MuleException {
     responseCallback.apply(txAction);
   }
 

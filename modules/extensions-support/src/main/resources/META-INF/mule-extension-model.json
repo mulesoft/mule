@@ -91,26 +91,7 @@
       "outputAttributes": {
         "type": {
           "format": "java",
-          "type": "Object",
-          "annotations": {
-            "typeId": "org.mule.runtime.api.message.NullAttributes",
-            "classInformation": {
-              "hasDefaultConstructor": false,
-              "isInterface": false,
-              "isInstantiable": false,
-              "isAbstract": false,
-              "isFinal": true,
-              "implementedInterfaces": [
-                "org.mule.runtime.api.message.Attributes"
-              ],
-              "parent": "",
-              "genericTypes": []
-            },
-            "typeAlias": {
-              "value": "NullAttributes"
-            }
-          },
-          "fields": []
+          "type": "Void"
         },
         "hasDynamicType": false,
         "description": "",
@@ -434,26 +415,7 @@
       "outputAttributes": {
         "type": {
           "format": "java",
-          "type": "Object",
-          "annotations": {
-            "typeId": "org.mule.runtime.api.message.NullAttributes",
-            "classInformation": {
-              "hasDefaultConstructor": false,
-              "isInterface": false,
-              "isInstantiable": false,
-              "isAbstract": false,
-              "isFinal": true,
-              "implementedInterfaces": [
-                "org.mule.runtime.api.message.Attributes"
-              ],
-              "parent": "",
-              "genericTypes": []
-            },
-            "typeAlias": {
-              "value": "NullAttributes"
-            }
-          },
-          "fields": []
+          "type": "Void"
         },
         "hasDynamicType": false,
         "description": "",
@@ -717,26 +679,7 @@
       "outputAttributes": {
         "type": {
           "format": "java",
-          "type": "Object",
-          "annotations": {
-            "typeId": "org.mule.runtime.api.message.NullAttributes",
-            "classInformation": {
-              "hasDefaultConstructor": false,
-              "isInterface": false,
-              "isInstantiable": false,
-              "isAbstract": false,
-              "isFinal": true,
-              "implementedInterfaces": [
-                "org.mule.runtime.api.message.Attributes"
-              ],
-              "parent": "",
-              "genericTypes": []
-            },
-            "typeAlias": {
-              "value": "NullAttributes"
-            }
-          },
-          "fields": []
+          "type": "Void"
         },
         "hasDynamicType": false,
         "description": "",
@@ -1230,21 +1173,19 @@
           "format": "java",
           "type": "Object",
           "annotations": {
-            "typeId": "org.mule.runtime.api.message.Attributes",
+            "typeId": "java.lang.Object",
             "classInformation": {
-              "hasDefaultConstructor": false,
-              "isInterface": true,
-              "isInstantiable": false,
-              "isAbstract": true,
+              "hasDefaultConstructor": true,
+              "isInterface": false,
+              "isInstantiable": true,
+              "isAbstract": false,
               "isFinal": false,
-              "implementedInterfaces": [
-                "java.io.Serializable"
-              ],
+              "implementedInterfaces": [],
               "parent": "",
               "genericTypes": []
             },
             "typeAlias": {
-              "value": "Attributes"
+              "value": "Object"
             }
           },
           "fields": []
@@ -1398,26 +1339,7 @@
       "outputAttributes": {
         "type": {
           "format": "java",
-          "type": "Object",
-          "annotations": {
-            "typeId": "org.mule.runtime.api.message.NullAttributes",
-            "classInformation": {
-              "hasDefaultConstructor": false,
-              "isInterface": false,
-              "isInstantiable": false,
-              "isAbstract": false,
-              "isFinal": true,
-              "implementedInterfaces": [
-                "org.mule.runtime.api.message.Attributes"
-              ],
-              "parent": "",
-              "genericTypes": []
-            },
-            "typeAlias": {
-              "value": "NullAttributes"
-            }
-          },
-          "fields": []
+          "type": "Void"
         },
         "hasDynamicType": false,
         "description": "",
@@ -1751,21 +1673,19 @@
           "format": "java",
           "type": "Object",
           "annotations": {
-            "typeId": "org.mule.runtime.api.message.Attributes",
+            "typeId": "java.lang.Object",
             "classInformation": {
-              "hasDefaultConstructor": false,
-              "isInterface": true,
-              "isInstantiable": false,
-              "isAbstract": true,
+              "hasDefaultConstructor": true,
+              "isInterface": false,
+              "isInstantiable": true,
+              "isAbstract": false,
               "isFinal": false,
-              "implementedInterfaces": [
-                "java.io.Serializable"
-              ],
+              "implementedInterfaces": [],
               "parent": "",
               "genericTypes": []
             },
             "typeAlias": {
-              "value": "Attributes"
+              "value": "Object"
             }
           },
           "fields": []
@@ -1807,26 +1727,7 @@
       "outputAttributes": {
         "type": {
           "format": "java",
-          "type": "Object",
-          "annotations": {
-            "typeId": "org.mule.runtime.api.message.NullAttributes",
-            "classInformation": {
-              "hasDefaultConstructor": false,
-              "isInterface": false,
-              "isInstantiable": false,
-              "isAbstract": false,
-              "isFinal": true,
-              "implementedInterfaces": [
-                "org.mule.runtime.api.message.Attributes"
-              ],
-              "parent": "",
-              "genericTypes": []
-            },
-            "typeAlias": {
-              "value": "NullAttributes"
-            }
-          },
-          "fields": []
+          "type": "Void"
         },
         "hasDynamicType": false,
         "description": "",
@@ -2009,21 +1910,19 @@
           "format": "java",
           "type": "Object",
           "annotations": {
-            "typeId": "org.mule.runtime.api.message.Attributes",
+            "typeId": "java.lang.Object",
             "classInformation": {
-              "hasDefaultConstructor": false,
-              "isInterface": true,
-              "isInstantiable": false,
-              "isAbstract": true,
+              "hasDefaultConstructor": true,
+              "isInterface": false,
+              "isInstantiable": true,
+              "isAbstract": false,
               "isFinal": false,
-              "implementedInterfaces": [
-                "java.io.Serializable"
-              ],
+              "implementedInterfaces": [],
               "parent": "",
               "genericTypes": []
             },
             "typeAlias": {
-              "value": "Attributes"
+              "value": "Object"
             }
           },
           "fields": []
@@ -2144,21 +2043,19 @@
           "format": "java",
           "type": "Object",
           "annotations": {
-            "typeId": "org.mule.runtime.api.message.Attributes",
+            "typeId": "java.lang.Object",
             "classInformation": {
-              "hasDefaultConstructor": false,
-              "isInterface": true,
-              "isInstantiable": false,
-              "isAbstract": true,
+              "hasDefaultConstructor": true,
+              "isInterface": false,
+              "isInstantiable": true,
+              "isAbstract": false,
               "isFinal": false,
-              "implementedInterfaces": [
-                "java.io.Serializable"
-              ],
+              "implementedInterfaces": [],
               "parent": "",
               "genericTypes": []
             },
             "typeAlias": {
-              "value": "Attributes"
+              "value": "Object"
             }
           },
           "fields": []
@@ -2202,21 +2099,19 @@
           "format": "java",
           "type": "Object",
           "annotations": {
-            "typeId": "org.mule.runtime.api.message.Attributes",
+            "typeId": "java.lang.Object",
             "classInformation": {
-              "hasDefaultConstructor": false,
-              "isInterface": true,
-              "isInstantiable": false,
-              "isAbstract": true,
+              "hasDefaultConstructor": true,
+              "isInterface": false,
+              "isInstantiable": true,
+              "isAbstract": false,
               "isFinal": false,
-              "implementedInterfaces": [
-                "java.io.Serializable"
-              ],
+              "implementedInterfaces": [],
               "parent": "",
               "genericTypes": []
             },
             "typeAlias": {
-              "value": "Attributes"
+              "value": "Object"
             }
           },
           "fields": []
@@ -2405,21 +2300,19 @@
           "format": "java",
           "type": "Object",
           "annotations": {
-            "typeId": "org.mule.runtime.api.message.Attributes",
+            "typeId": "java.lang.Object",
             "classInformation": {
-              "hasDefaultConstructor": false,
-              "isInterface": true,
-              "isInstantiable": false,
-              "isAbstract": true,
+              "hasDefaultConstructor": true,
+              "isInterface": false,
+              "isInstantiable": true,
+              "isAbstract": false,
               "isFinal": false,
-              "implementedInterfaces": [
-                "java.io.Serializable"
-              ],
+              "implementedInterfaces": [],
               "parent": "",
               "genericTypes": []
             },
             "typeAlias": {
-              "value": "Attributes"
+              "value": "Object"
             }
           },
           "fields": []
@@ -2626,21 +2519,19 @@
           "format": "java",
           "type": "Object",
           "annotations": {
-            "typeId": "org.mule.runtime.api.message.Attributes",
+            "typeId": "java.lang.Object",
             "classInformation": {
-              "hasDefaultConstructor": false,
-              "isInterface": true,
-              "isInstantiable": false,
-              "isAbstract": true,
+              "hasDefaultConstructor": true,
+              "isInterface": false,
+              "isInstantiable": true,
+              "isAbstract": false,
               "isFinal": false,
-              "implementedInterfaces": [
-                "java.io.Serializable"
-              ],
+              "implementedInterfaces": [],
               "parent": "",
               "genericTypes": []
             },
             "typeAlias": {
-              "value": "Attributes"
+              "value": "Object"
             }
           },
           "fields": []

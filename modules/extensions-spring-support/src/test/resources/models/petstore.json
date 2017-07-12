@@ -5194,21 +5194,19 @@
               "format": "java",
               "type": "Object",
               "annotations": {
-                "typeId": "org.mule.runtime.api.message.Attributes",
+                "typeId": "java.lang.Object",
                 "classInformation": {
-                  "hasDefaultConstructor": false,
-                  "isInterface": true,
-                  "isInstantiable": false,
-                  "isAbstract": true,
+                  "hasDefaultConstructor": true,
+                  "isInterface": false,
+                  "isInstantiable": true,
+                  "isAbstract": false,
                   "isFinal": false,
-                  "implementedInterfaces": [
-                    "java.io.Serializable"
-                  ],
+                  "implementedInterfaces": [],
                   "parent": "",
                   "genericTypes": []
                 },
                 "typeAlias": {
-                  "value": "Attributes"
+                  "value": "Object"
                 }
               },
               "fields": []
@@ -10921,21 +10919,19 @@
           "format": "java",
           "type": "Object",
           "annotations": {
-            "typeId": "org.mule.runtime.api.message.Attributes",
+            "typeId": "java.lang.Object",
             "classInformation": {
-              "hasDefaultConstructor": false,
-              "isInterface": true,
-              "isInstantiable": false,
-              "isAbstract": true,
+              "hasDefaultConstructor": true,
+              "isInterface": false,
+              "isInstantiable": true,
+              "isAbstract": false,
               "isFinal": false,
-              "implementedInterfaces": [
-                "java.io.Serializable"
-              ],
+              "implementedInterfaces": [],
               "parent": "",
               "genericTypes": []
             },
             "typeAlias": {
-              "value": "Attributes"
+              "value": "Object"
             }
           },
           "fields": []

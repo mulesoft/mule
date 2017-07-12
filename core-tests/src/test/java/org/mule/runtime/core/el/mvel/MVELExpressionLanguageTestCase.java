@@ -24,7 +24,6 @@ import static org.mockito.Mockito.withSettings;
 import static org.mule.mvel2.optimizers.OptimizerFactory.DYNAMIC;
 import static org.mule.mvel2.optimizers.OptimizerFactory.SAFE_REFLECTIVE;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
@@ -33,7 +32,6 @@ import static org.mule.runtime.core.el.mvel.MVELExpressionLanguageTestCase.Varia
 import static org.mule.runtime.core.el.mvel.MVELExpressionLanguageTestCase.Variant.EXPRESSION_WITH_DELIMITER;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
-
 import org.mule.mvel2.CompileException;
 import org.mule.mvel2.ParserContext;
 import org.mule.mvel2.PropertyAccessException;
@@ -61,7 +59,6 @@ import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -69,7 +66,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
@@ -469,14 +465,14 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
   }
 
   protected Event createMockEvent(String payload, DataType dataType) {
-    return createMockEvent(payload, dataType, NULL_ATTRIBUTES, OBJECT);
+    return createMockEvent(payload, dataType, null, OBJECT);
   }
 
   protected Event createMockEvent(String payload, DataType dataType, Object attributes, DataType attributesDataType) {
     Event event = mock(Event.class);
     InternalMessage message = mock(InternalMessage.class);
-    when(message.getPayload()).thenReturn(new TypedValue<Object>(payload, dataType));
-    when(message.getAttributes()).thenReturn(new TypedValue<Object>(attributes, attributesDataType));
+    when(message.getPayload()).thenReturn(new TypedValue<>(payload, dataType));
+    when(message.getAttributes()).thenReturn(new TypedValue<>(attributes, attributesDataType));
     when(event.getMessage()).thenReturn(message);
     when(event.getFlowCallStack()).thenReturn(new DefaultFlowCallStack());
     when(event.getError()).thenReturn(empty());
@@ -491,7 +487,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
     return createMockEventWithAttributes(STRING);
   }
 
-  public static enum Variant {
+  public enum Variant {
     EXPRESSION_WITH_DELIMITER, EXPRESSION_STRAIGHT_UP
   }
 
@@ -515,29 +511,6 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
     public Object call(Object ctx, Object thisValue, org.mule.mvel2.integration.VariableResolverFactory factory, Object[] parms) {
       return "Hello World!";
     }
-  }
-
-  /**
-   * Recursive method used to find all classes in a given directory and subdirs.
-   * 
-   * @param directory The base directory
-   * @param packageName The package name for classes found inside the base directory
-   * @return The classes
-   * @throws ClassNotFoundException
-   */
-  private static List<Class> findClasses(File directory, String packageName) throws ClassNotFoundException {
-    List<Class> classes = new ArrayList<>();
-    if (!directory.exists()) {
-      return classes;
-    }
-    File[] files = directory.listFiles();
-    for (File file : files) {
-      if (file.getName().endsWith(".class")) {
-        classes.add(org.apache.commons.lang3.ClassUtils
-            .getClass(packageName + '.' + file.getName().substring(0, file.getName().length() - 6)));
-      }
-    }
-    return classes;
   }
 
   @Test

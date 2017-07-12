@@ -8,17 +8,16 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.metadata.MediaType;
@@ -51,7 +50,7 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleTe
   protected Event event;
 
   @Mock
-  protected Attributes attributes;
+  protected Object attributes;
 
   protected ReturnDelegate delegate;
 
@@ -83,7 +82,7 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleTe
     Message message = getOutputMessage(result);
 
     assertThat(message.getPayload().getValue(), is(sameInstance(payload)));
-    assertThat(message.getAttributes().getValue(), is(NULL_ATTRIBUTES));
+    assertThat(message.getAttributes().getValue(), is(nullValue()));
     assertThat(message.getPayload().getDataType().getMediaType(), equalTo(mediaType));
   }
 
@@ -96,14 +95,14 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleTe
     Message message = getOutputMessage(result);
 
     assertThat(message.getPayload().getValue(), is(sameInstance(payload)));
-    assertThat(message.getAttributes().getValue(), is(NULL_ATTRIBUTES));
+    assertThat(message.getAttributes().getValue(), is(nullValue()));
     assertThat(message.getPayload().getDataType().getType().equals(String.class), is(true));
   }
 
   @Test
   public void operationReturnsOperationResultThatOnlySpecifiesPayloadAndAttributes() throws Exception {
     Object payload = "hello world!";
-    Attributes newAttributes = mock(Attributes.class);
+    Object newAttributes = mock(Object.class);
 
     Event result = delegate.asReturnValue(Result.builder().output(payload).attributes(newAttributes).build(), operationContext);
 

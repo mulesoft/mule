@@ -48,7 +48,6 @@ import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -196,7 +195,7 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
     spyInjector(muleContext);
     reset(muleContext.getSchedulerService());
     when(result.getMediaType()).thenReturn(of(ANY));
-    when(result.getAttributes()).thenReturn(of(mock(Attributes.class)));
+    when(result.getAttributes()).thenReturn(empty());
 
     muleContext.getRegistry().registerObject(OBJECT_STREAMING_MANAGER, streamingManager);
 

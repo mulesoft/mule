@@ -165,8 +165,7 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
     when(muleEvent.getMessage().toString()).thenThrow(new RuntimeException("Message.toString() should not be called"));
 
     expectedException.expect(Exception.class);
-    Event exceptionHandlingResult =
-        exceptionHandlingResult = onErrorContinueHandler.handleException(mockException, muleEvent);
+    onErrorContinueHandler.handleException(mockException, muleEvent);
   }
 
   private Processor createChagingEventMessageProcessor(final Event lastEventCreated) {

@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.execution;
 
-import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 
@@ -18,7 +17,7 @@ import reactor.core.publisher.MonoSink;
  *
  * @since 4.0
  */
-final class ReactorCompletionCallback implements CompletionCallback<Object, Attributes> {
+final class ReactorCompletionCallback implements CompletionCallback<Object, Object> {
 
   private final MonoSink<Object> sink;
 
@@ -27,7 +26,7 @@ final class ReactorCompletionCallback implements CompletionCallback<Object, Attr
   }
 
   @Override
-  public void success(Result<Object, Attributes> result) {
+  public void success(Result<Object, Object> result) {
     sink.success(result);
   }
 

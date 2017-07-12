@@ -9,7 +9,6 @@ package org.mule.functional.junit4;
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 import static org.junit.Assert.fail;
-import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
@@ -67,7 +66,7 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> {
    * @param attributes the message attributes
    * @return this {@link FlowRunner}
    */
-  public R withAttributes(Attributes attributes) {
+  public R withAttributes(Object attributes) {
     eventBuilder.withAttributes(attributes);
     return (R) this;
   }
@@ -79,7 +78,7 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> {
    * @param key the key of the inbound property to add
    * @param value the value of the inbound property to add
    * @return this {@link FlowRunner}
-   * @deprecated Transport infrastructure is deprecated. Use {@link Attributes} instead.
+   * @deprecated Transport infrastructure is deprecated. Use {@link Message#getAttributes()} instead.
    */
   @Deprecated
   public R withInboundProperty(String key, Serializable value) {
@@ -93,7 +92,7 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> {
    *
    * @param properties the inbound properties to add
    * @return this {@link FlowRunner}
-   * @deprecated Transport infrastructure is deprecated. Use {@link Attributes} instead.
+   * @deprecated Transport infrastructure is deprecated. Use {@link Message#getAttributes()} instead.
    */
   @Deprecated
   public R withInboundProperties(Map<String, Serializable> properties) {
@@ -109,7 +108,7 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> {
    * @param key the key of the outbound property to add
    * @param value the value of the outbound property to add
    * @return this {@link FlowRunner}
-   * @deprecated Transport infrastructure is deprecated. Use {@link Attributes} instead.
+   * @deprecated Transport infrastructure is deprecated. Use {@link Message#getAttributes()} instead.
    */
   @Deprecated
   public R withOutboundProperty(String key, Serializable value) {

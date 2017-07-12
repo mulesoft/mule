@@ -28,7 +28,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
 import static org.mule.runtime.api.meta.model.ExecutionType.BLOCKING;
 import static org.mule.runtime.api.meta.model.ExecutionType.CPU_INTENSIVE;
@@ -49,7 +48,6 @@ import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExecutionType;
@@ -128,7 +126,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
   public void operationReturnsOperationResultWhichKeepsNoValues() throws Exception {
     Object payload = new Object();
     MediaType mediaType = ANY.withCharset(getDefaultEncoding(context));
-    Attributes attributes = mock(Attributes.class);
+    Object attributes = mock(Object.class);
 
     when(operationExecutor.execute(any(ExecutionContext.class)))
         .thenReturn(just(builder().output(payload).mediaType(mediaType).attributes(attributes).build()));
@@ -148,7 +146,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
 
     Object payload = new Object();
     MediaType mediaType = ANY.withCharset(getDefaultEncoding(context));
-    Attributes attributes = mock(Attributes.class);
+    Object attributes = mock(Object.class);
 
     when(operationExecutor.execute(any(ExecutionContext.class)))
         .thenReturn(just(builder().output(payload).mediaType(mediaType).attributes(attributes).build()));
@@ -170,13 +168,13 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
         .thenReturn(just(builder().output(payload).mediaType(mediaType).build()));
 
     event =
-        Event.builder(event).message(Message.builder().payload("").attributes(mock(Attributes.class)).build()).build();
+        Event.builder(event).message(Message.builder().payload("").attributes(mock(Object.class)).build()).build();
 
     Message message = messageProcessor.process(event).getMessage();
     assertThat(message, is(notNullValue()));
 
     assertThat(message.getPayload().getValue(), is(sameInstance(payload)));
-    assertThat(message.getAttributes().getValue(), is(NULL_ATTRIBUTES));
+    assertThat(message.getAttributes().getValue(), is(nullValue()));
     assertThat(message.getPayload().getDataType().getMediaType(), equalTo(mediaType));
   }
 
@@ -186,20 +184,20 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
 
     when(operationExecutor.execute(any(ExecutionContext.class))).thenReturn(just(builder().output(payload).build()));
     event =
-        Event.builder(event).message(Message.builder().payload("").attributes(mock(Attributes.class)).build()).build();
+        Event.builder(event).message(Message.builder().payload("").attributes(mock(Object.class)).build()).build();
 
     Message message = messageProcessor.process(event).getMessage();
     assertThat(message, is(notNullValue()));
 
     assertThat(message.getPayload().getValue(), is(sameInstance(payload)));
-    assertThat(message.getAttributes().getValue(), is(NULL_ATTRIBUTES));
+    assertThat(message.getAttributes().getValue(), is(nullValue()));
     assertThat(message.getPayload().getDataType().getType().equals(String.class), is(true));
   }
 
   @Test
   public void operationReturnsOperationResultWithPayloadAndAttributes() throws Exception {
     Object payload = "hello world!";
-    Attributes attributes = mock(Attributes.class);
+    Object attributes = mock(Object.class);
 
     when(operationExecutor.execute(any(ExecutionContext.class)))
         .thenReturn(just(builder().output(payload).attributes(attributes).build()));

@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.util.message;
 
-import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.api.util.StreamingUtils.streamingContent;
 import org.mule.runtime.api.message.Message;
@@ -79,15 +78,18 @@ public final class MessageUtils {
    *
    * @return a {@link Message}
    */
-  public static Message toMessage(Result result,
+  public static Message toMessage(Result<?, ?> result,
                                   MediaType mediaType,
                                   CursorProviderFactory cursorProviderFactory,
                                   Event event) {
-    return Message.builder()
+    Message.Builder builder = Message.builder()
         .payload(streamingContent(result.getOutput(), cursorProviderFactory, event))
-        .mediaType(mediaType)
-        .attributes(result.getAttributes().orElse(NULL_ATTRIBUTES))
-        .build();
+        .mediaType(mediaType);
+
+    result.getAttributes().ifPresent(builder::attributes);
+    result.getAttributesMediaType().ifPresent(builder::attributesMediaType);
+
+    return builder.build();
   }
 
   /**

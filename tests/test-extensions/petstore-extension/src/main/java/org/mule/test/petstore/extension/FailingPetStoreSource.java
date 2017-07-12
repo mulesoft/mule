@@ -11,7 +11,6 @@ import static java.util.concurrent.Executors.newSingleThreadExecutor;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -22,7 +21,7 @@ import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import java.util.concurrent.ExecutorService;
 
 @Alias("source")
-public class FailingPetStoreSource extends Source<String, Attributes> {
+public class FailingPetStoreSource extends Source<String, Object> {
 
   @Config
   PetStoreConnector config;
@@ -40,7 +39,7 @@ public class FailingPetStoreSource extends Source<String, Attributes> {
   public static ExecutorService executor;
 
   @Override
-  public void onStart(SourceCallback<String, Attributes> sourceCallback) throws MuleException {
+  public void onStart(SourceCallback<String, Object> sourceCallback) throws MuleException {
     PetStoreConnector.timesStarted++;
 
     if (failOnStart || failedDueOnException) {

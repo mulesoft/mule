@@ -8,7 +8,6 @@ package org.mule.test.transactional;
 
 import static java.util.concurrent.Executors.newFixedThreadPool;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.extension.api.annotation.execution.OnError;
 import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
 import org.mule.runtime.extension.api.annotation.execution.OnTerminate;
@@ -18,7 +17,7 @@ import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.test.transactional.connection.TestTransactionalConnection;
 
-public class TransactionalSource extends Source<TestTransactionalConnection, Attributes> {
+public class TransactionalSource extends Source<TestTransactionalConnection, Object> {
 
   @Connection
   private static TestTransactionalConnection connection;
@@ -30,9 +29,9 @@ public class TransactionalSource extends Source<TestTransactionalConnection, Att
   public static Boolean isSuccess;
 
   @Override
-  public void onStart(SourceCallback<TestTransactionalConnection, Attributes> sourceCallback) throws MuleException {
+  public void onStart(SourceCallback<TestTransactionalConnection, Object> sourceCallback) throws MuleException {
     newFixedThreadPool(1).execute(() -> sourceCallback
-        .handle(Result.<TestTransactionalConnection, Attributes>builder().output(connection).build()));
+        .handle(Result.<TestTransactionalConnection, Object>builder().output(connection).build()));
   }
 
   @Override

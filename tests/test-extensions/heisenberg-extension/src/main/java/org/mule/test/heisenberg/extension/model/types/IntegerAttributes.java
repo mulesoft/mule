@@ -6,9 +6,9 @@
  */
 package org.mule.test.heisenberg.extension.model.types;
 
-import org.mule.runtime.api.message.Attributes;
+import java.io.Serializable;
 
-public class IntegerAttributes implements Attributes {
+public class IntegerAttributes implements Serializable {
 
   private int value;
 

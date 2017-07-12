@@ -16,7 +16,6 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -272,7 +271,7 @@ public class ParameterLayoutOrderDeclarationEnricherTestCase {
   }
 
 
-  public static class ImplicitSourceOrder extends Source<String, Attributes> {
+  public static class ImplicitSourceOrder extends Source<String, Object> {
 
     @Parameter
     String paramOne;
@@ -284,7 +283,7 @@ public class ParameterLayoutOrderDeclarationEnricherTestCase {
     String paramThree;
 
     @Override
-    public void onStart(SourceCallback<String, Attributes> sourceCallback) throws MuleException {
+    public void onStart(SourceCallback<String, Object> sourceCallback) throws MuleException {
 
     }
 
@@ -294,7 +293,7 @@ public class ParameterLayoutOrderDeclarationEnricherTestCase {
     }
   }
 
-  public static class ExplicitSourceOrder extends Source<String, Attributes> {
+  public static class ExplicitSourceOrder extends Source<String, Object> {
 
     @Parameter
     @Placement(order = 1)
@@ -319,7 +318,7 @@ public class ParameterLayoutOrderDeclarationEnricherTestCase {
     }
   }
 
-  public static class MixedSourceOrder extends Source<String, Attributes> {
+  public static class MixedSourceOrder extends Source<String, Object> {
 
     @Parameter
     @Placement(order = 2)
@@ -342,7 +341,7 @@ public class ParameterLayoutOrderDeclarationEnricherTestCase {
     }
   }
 
-  public static class ExplicitSourceOrderWithCallbacks extends Source<String, Attributes> {
+  public static class ExplicitSourceOrderWithCallbacks extends Source<String, Object> {
 
     @Parameter
     @Placement(order = 2)
@@ -369,7 +368,7 @@ public class ParameterLayoutOrderDeclarationEnricherTestCase {
     }
 
   }
-  public static class MixedSourceOrderWithCallbacks extends Source<Apple, Attributes> {
+  public static class MixedSourceOrderWithCallbacks extends Source<Apple, Object> {
 
     @Parameter
     String paramOne;

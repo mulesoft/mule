@@ -12,20 +12,21 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.api.metadata.DataType.BOOLEAN;
 import static org.mule.runtime.api.metadata.DataType.HTML_STRING;
+import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.DataType.TEXT_STRING;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaType.HTML;
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
 import static org.mule.runtime.api.metadata.MediaType.XML;
-import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.message.BaseAttributes;
 import org.mule.runtime.core.internal.message.DefaultMessageBuilder;
@@ -42,14 +43,11 @@ import javax.activation.DataHandler;
 
 import org.junit.Test;
 
-/**
- *
- */
 public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
 
   private static final String NEW_PAYLOAD = "new payload";
-  private static final Attributes TEST_ATTR = NULL_ATTRIBUTES;
-  private static final Attributes TEST_ATTR_2 = new BaseAttributes() {};
+  private static final Object BASE_ATTRIBUTES = new BaseAttributes() {};
+  private static final DataType BASE_ATTRIBUTES_DATATYPE = DataType.fromObject(BASE_ATTRIBUTES);
   private static final String PROPERTY_KEY = "propertyKey";
   private static final Serializable PROPERTY_VALUE = "propertyValue";
   private static final MediaType HTML_STRING_UTF8 = HTML.withCharset(UTF_8);
@@ -57,37 +55,39 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
   @Test
   public void createNewAPIMessageViaMessageInterface() {
     org.mule.runtime.api.message.Message message;
-    message = org.mule.runtime.api.message.Message.builder().payload(TEST_PAYLOAD).mediaType(HTML_STRING_UTF8)
-        .attributes(TEST_ATTR).build();
+    message = org.mule.runtime.api.message.Message.builder()
+        .payload(TEST_PAYLOAD)
+        .mediaType(HTML_STRING_UTF8)
+        .build();
 
     assertThat(message.getPayload().getValue(), is(TEST_PAYLOAD));
     assertThat(message.getPayload().getDataType().getType(), equalTo(String.class));
     assertThat(message.getPayload().getDataType().getMediaType(), is(HTML_STRING_UTF8));
-    assertThat(message.getAttributes().getValue(), is(TEST_ATTR));
-    // FIXME: what about attributes' data type?
+    assertThat(message.getAttributes().getValue(), is(nullValue()));
+    assertThat(message.getAttributes().getDataType().getMediaType(), is(OBJECT.getMediaType()));
   }
 
   @Test
   public void createAPIMessageViaMessageInterfaceFromCopy() {
     org.mule.runtime.api.message.Message message;
-    message = org.mule.runtime.api.message.Message.builder().payload(TEST_PAYLOAD).attributes(TEST_ATTR).build();
+    message = org.mule.runtime.api.message.Message.builder().payload(TEST_PAYLOAD).build();
 
     org.mule.runtime.api.message.Message messageCopy;
-    messageCopy = org.mule.runtime.api.message.Message.builder(message).payload(true).attributes(TEST_ATTR_2).build();
+    messageCopy = org.mule.runtime.api.message.Message.builder(message).payload(true).attributes(BASE_ATTRIBUTES).build();
 
     assertThat(messageCopy.getPayload().getValue(), is(true));
     assertThat(messageCopy.getPayload().getDataType(), is(BOOLEAN));
-    assertThat(messageCopy.getAttributes().getValue(), is(TEST_ATTR_2));
-    // FIXME: what about attributes' data type?
+    assertThat(messageCopy.getAttributes().getValue(), is(BASE_ATTRIBUTES));
+    assertThat(messageCopy.getAttributes().getDataType(), is(BASE_ATTRIBUTES_DATATYPE));
   }
 
   @Test
   public void createNewMessageViaMessageInterface() {
-    Message message = Message.builder().payload(TEST_PAYLOAD).attributes(TEST_ATTR).build();
+    Message message = Message.builder().payload(TEST_PAYLOAD).build();
 
     assertThat(message.getPayload().getValue(), is(TEST_PAYLOAD));
     assertThat(message.getPayload().getDataType(), is(STRING));
-    assertThat(message.getAttributes().getValue(), is(TEST_ATTR));
+    assertThat(message.getAttributes().getValue(), is(nullValue()));
   }
 
   @Test
@@ -98,7 +98,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
     htmlStringList.add("HTML3");
 
     Message message =
-        InternalMessage.builder().collectionPayload(htmlStringList, String.class).itemMediaType(HTML).attributes(TEST_ATTR)
+        InternalMessage.builder().collectionPayload(htmlStringList, String.class).itemMediaType(HTML)
             .build();
 
     assertThat(message.getPayload().getValue(), is(htmlStringList));
@@ -116,7 +116,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
     htmlStringList.add("HTML3");
 
     Message message =
-        InternalMessage.builder().collectionPayload(htmlStringList, String.class).itemMediaType(HTML).attributes(TEST_ATTR)
+        InternalMessage.builder().collectionPayload(htmlStringList, String.class).itemMediaType(HTML)
             .build();
 
     Message copy = InternalMessage.builder(message).build();
@@ -130,12 +130,12 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void createMessageViaMessageInterfaceFromCopy() {
-    Message messageCopy = InternalMessage.builder(createTestMessage()).payload(true).attributes(TEST_ATTR_2).build();
+    Message messageCopy = InternalMessage.builder(createTestMessage()).payload(true).attributes(BASE_ATTRIBUTES).build();
 
     assertThat(messageCopy.getPayload().getValue(), is(true));
     assertThat(messageCopy.getPayload().getDataType(), is(BOOLEAN));
-    assertThat(messageCopy.getAttributes().getValue(), is(TEST_ATTR_2));
-    // FIXME: what about attributes' data type?
+    assertThat(messageCopy.getAttributes().getValue(), is(BASE_ATTRIBUTES));
+    assertThat(messageCopy.getAttributes().getDataType(), is(BASE_ATTRIBUTES_DATATYPE));
   }
 
   @Test
@@ -281,13 +281,14 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
   }
 
   private Message createTestMessage() {
-    return new DefaultMessageBuilder().payload(TEST_PAYLOAD).mediaType(TEXT).attributes(TEST_ATTR).build();
+    return new DefaultMessageBuilder().payload(TEST_PAYLOAD).mediaType(TEXT).build();
   }
 
   private void assertTestMessage(Message message) {
     assertThat(message.getPayload().getValue(), is(TEST_PAYLOAD));
     assertThat(message.getPayload().getDataType(), is(TEXT_STRING));
-    assertThat(message.getAttributes().getValue(), is(TEST_ATTR));
+    assertThat(message.getAttributes().getValue(), is(nullValue()));
+    assertThat(message.getAttributes().getDataType(), is(OBJECT));
   }
 
 }

@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.message;
 
-import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
@@ -97,7 +96,7 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
      * @param key
      * @param value
      * @return
-     * @deprecated Transport infrastructure is deprecated. Use {@link Attributes} instead.
+     * @deprecated Transport infrastructure is deprecated. Use {@link Message#getAttributes()} instead.
      */
     @Deprecated
     Builder addInboundProperty(String key, Serializable value);
@@ -107,7 +106,7 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
      * @param value
      * @param mediaType
      * @return
-     * @deprecated Transport infrastructure is deprecated. Use {@link Attributes} instead.
+     * @deprecated Transport infrastructure is deprecated. Use {@link Message#getAttributes()} instead.
      */
     @Deprecated
     Builder addInboundProperty(String key, Serializable value, MediaType mediaType);
@@ -117,7 +116,7 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
      * @param value
      * @param dataType
      * @return
-     * @deprecated Transport infrastructure is deprecated. Use {@link Attributes} instead.
+     * @deprecated Transport infrastructure is deprecated. Use {@link Message#getAttributes()} instead.
      */
     @Deprecated
     Builder addInboundProperty(String key, Serializable value, DataType dataType);
@@ -126,7 +125,7 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
      * @param key
      * @param value
      * @return
-     * @deprecated Transport infrastructure is deprecated. Use {@link Attributes} instead.
+     * @deprecated Transport infrastructure is deprecated. Use {@link Message#getAttributes()} instead.
      */
     @Deprecated
     Builder addOutboundProperty(String key, Serializable value);
@@ -136,7 +135,7 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
      * @param value
      * @param mediaType
      * @return
-     * @deprecated Transport infrastructure is deprecated. Use {@link Attributes} instead.
+     * @deprecated Transport infrastructure is deprecated. Use {@link Message#getAttributes()} instead.
      */
     @Deprecated
     Builder addOutboundProperty(String key, Serializable value, MediaType mediaType);
@@ -146,7 +145,7 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
      * @param value
      * @param dataType
      * @return
-     * @deprecated Transport infrastructure is deprecated. Use {@link Attributes} instead.
+     * @deprecated Transport infrastructure is deprecated. Use {@link Message#getAttributes()} instead.
      */
     @Deprecated
     Builder addOutboundProperty(String key, Serializable value, DataType dataType);
@@ -154,7 +153,7 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
     /**
      * @param key
      * @return
-     * @deprecated Transport infrastructure is deprecated. Use {@link Attributes} instead.
+     * @deprecated Transport infrastructure is deprecated. Use {@link Message#getAttributes()} instead.
      */
     @Deprecated
     Builder removeInboundProperty(String key);
@@ -162,7 +161,7 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
     /**
      * @param key
      * @return
-     * @deprecated Transport infrastructure is deprecated. Use {@link Attributes} instead.
+     * @deprecated Transport infrastructure is deprecated. Use {@link Message#getAttributes()} instead.
      */
     @Deprecated
     Builder removeOutboundProperty(String key);
@@ -204,7 +203,7 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
     /**
      * @param inboundProperties
      * @return
-     * @deprecated Transport infrastructure is deprecated. Use {@link Attributes} instead.
+     * @deprecated Transport infrastructure is deprecated. Use {@link Message#getAttributes()} instead.
      */
     @Deprecated
     Builder inboundProperties(Map<String, Serializable> inboundProperties);
@@ -212,7 +211,7 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
     /**
      * @param outboundProperties
      * @return
-     * @deprecated Transport infrastructure is deprecated. Use {@link Attributes} instead.
+     * @deprecated Transport infrastructure is deprecated. Use {@link Message#getAttributes()} instead.
      */
     @Deprecated
     Builder outboundProperties(Map<String, Serializable> outboundProperties);

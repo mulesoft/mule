@@ -8,7 +8,6 @@ package org.mule.functional.junit4;
 
 import static org.mockito.Mockito.spy;
 import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR_LOCATION;
-import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
@@ -39,8 +38,8 @@ import org.reactivestreams.Publisher;
 public class TestEventBuilder {
 
   private Object payload;
+  private Object attributes;
   private MediaType mediaType = MediaType.ANY;
-  private Attributes attributes;
   private Map<String, Serializable> inboundProperties = new HashMap<>();
   private Map<String, Serializable> outboundProperties = new HashMap<>();
   private Map<String, DataHandler> inboundAttachments = new HashMap<>();
@@ -89,7 +88,7 @@ public class TestEventBuilder {
    * @param attributes the attributes object for the produced {@link org.mule.runtime.api.message.Message}
    * @return this {@link TestEventBuilder}
    */
-  public TestEventBuilder withAttributes(Attributes attributes) {
+  public TestEventBuilder withAttributes(Object attributes) {
     this.attributes = attributes;
     return this;
   }
@@ -100,7 +99,7 @@ public class TestEventBuilder {
    * @param key the key of the inbound property to add
    * @param value the value of the inbound property to add
    * @return this {@link TestEventBuilder}
-   * @deprecated Transport infrastructure is deprecated. Use {@link Attributes} instead.
+   * @deprecated Transport infrastructure is deprecated. Use {@link Message#getAttributes()} instead.
    */
   @Deprecated
   public TestEventBuilder withInboundProperty(String key, Serializable value) {
@@ -114,7 +113,7 @@ public class TestEventBuilder {
    *
    * @param properties the inbound properties to add
    * @return this {@link TestEventBuilder}
-   * @deprecated Transport infrastructure is deprecated. Use {@link Attributes} instead.
+   * @deprecated Transport infrastructure is deprecated. Use {@link Message#getAttributes()} instead.
    */
   @Deprecated
   public TestEventBuilder withInboundProperties(Map<String, Serializable> properties) {
@@ -129,7 +128,7 @@ public class TestEventBuilder {
    * @param key the key of the outbound property to add
    * @param value the value of the outbound property to add
    * @return this {@link TestEventBuilder}
-   * @deprecated Transport infrastructure is deprecated. Use {@link Attributes} instead.
+   * @deprecated Transport infrastructure is deprecated. Use {@link Message#getAttributes()} instead.
    */
   @Deprecated
   public TestEventBuilder withOutboundProperty(String key, Serializable value) {

@@ -28,7 +28,6 @@ import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG_
 import static org.mule.test.vegan.extension.VeganExtension.APPLE;
 import static org.mule.test.vegan.extension.VeganExtension.BANANA;
 import org.mule.metadata.api.ClassTypeLoader;
-import org.mule.runtime.api.message.NullAttributes;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
 import org.mule.runtime.api.meta.model.HasExternalLibraries;
@@ -122,7 +121,7 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
     assertThat(operation.isBlocking(), is(false));
     assertThat(operation.getExecutionType(), is(CPU_LITE));
     assertThat(operation.getOutput().getType(), equalTo(typeLoader.load(String.class)));
-    assertThat(operation.getOutputAttributes().getType(), equalTo(typeLoader.load(NullAttributes.class)));
+    assertThat(operation.getOutputAttributes().getType(), equalTo(typeLoader.load(void.class)));
   }
 
   @Test
