@@ -566,6 +566,7 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
 
   private void assertCompletionDone(EventContext parent) {
     assertThat(from(parent.getCompletionPublisher()).toFuture().isDone(), is(true));
+    assertThat(from(parent.getCompletionPublisher()).toFuture().isCompletedExceptionally(), is(false));
   }
 
   private void assertCompletionNotDone(EventContext child1) {

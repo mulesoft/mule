@@ -100,7 +100,7 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
     for (; messageSequence.hasNext();) {
       correlationSequence++;
 
-      final Builder builder = builder(child(originalEvent.getContext(), ofNullable(getLocation()), false), originalEvent);
+      final Builder builder = builder(originalEvent);
 
       propagateFlowVars(lastResult, builder);
       if (counterVariableName != null) {
@@ -113,7 +113,7 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
       try {
         Event resultEvent = processNext(builder.build());
         if (resultEvent != null) {
-          resultEvents.add(builder(originalEvent.getContext(), resultEvent).build());
+          resultEvents.add(resultEvent);
           lastResult = resultEvent;
         }
       } catch (MessagingException e) {
