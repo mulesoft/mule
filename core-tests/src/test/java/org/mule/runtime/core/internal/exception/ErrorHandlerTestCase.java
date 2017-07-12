@@ -34,9 +34,6 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
-import org.mule.runtime.core.internal.exception.ErrorHandler;
-import org.mule.runtime.core.internal.exception.ErrorHandlerFactory;
-import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

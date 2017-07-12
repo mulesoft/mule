@@ -6,12 +6,13 @@
  */
 package org.mule.runtime.config.spring.factories;
 
-import static org.mule.runtime.core.DefaultEventContext.child;
-import static org.mule.runtime.core.api.Event.builder;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
+import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContextHandleErrors;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Flux.from;
@@ -32,7 +33,6 @@ import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.processor.AnnotatedProcessor;
@@ -52,6 +52,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import reactor.core.publisher.Mono;
 
 public class FlowRefFactoryBean extends AbstractAnnotatedObject
     implements FactoryBean<Processor>, ApplicationContextAware, MuleContextAware {
@@ -73,14 +74,6 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
     }
 
     return new FlowRefMessageProcessor();
-  }
-
-  private Event createChildEvent(Event event) {
-    return builder(child(event.getContext()), event).build();
-  }
-
-  private Event createParentEvent(Event parent, Event result) {
-    return builder(parent.getContext(), result).build();
   }
 
   protected Processor getReferencedFlow(String name, FlowConstruct flowConstruct) throws MuleException {
@@ -165,21 +158,7 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
 
     @Override
     public Event process(Event event) throws MuleException {
-      try {
-        final Processor referencedProcessor = resolveReferencedProcessor(event);
-
-        // If referenced processor is a Flow use a child EventContext and wait for completion else simply compose
-        if (referencedProcessor instanceof Flow) {
-          return createParentEvent(event, ((Processor) event1 -> referencedProcessor.process(event1))
-              .process(createChildEvent(event)));
-        } else {
-          return referencedProcessor.process(event);
-        }
-
-      } catch (MessagingException me) {
-        me.setProcessedEvent(createParentEvent(event, me.getEvent()));
-        throw me;
-      }
+      return processToApply(event, this);
     }
 
     @Override
@@ -194,16 +173,10 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
 
         // If referenced processor is a Flow use a child EventContext and wait for completion else simply compose
         if (referencedProcessor instanceof Flow) {
-          Event childEvent = createChildEvent(event);
-          just(childEvent)
-              .transform(referencedProcessor)
-              // Use empty error handler to avoid reactor ErrorCallbackNotImplemented
-              .subscribe(null, throwable -> {
-              });
-          return from(childEvent.getContext().getResponsePublisher())
-              .map(result -> builder(event.getContext(), result).build())
-              .doOnError(MessagingException.class,
-                         me -> me.setProcessedEvent(createParentEvent(event, me.getEvent())));
+          return just(event)
+              .flatMap(request -> Mono
+                  .from(processWithChildContextHandleErrors(request, referencedProcessor,
+                                                            ofNullable(FlowRefFactoryBean.this.getLocation()))));
         } else {
           return just(event).transform(referencedProcessor);
         }

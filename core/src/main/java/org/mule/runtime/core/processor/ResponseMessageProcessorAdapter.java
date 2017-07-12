@@ -6,11 +6,13 @@
  */
 package org.mule.runtime.core.processor;
 
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setFlowConstructIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
+import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContext;
-import static org.mule.runtime.core.api.execution.MessageProcessorExecutionTemplate.createExecutionTemplate;
 import static reactor.core.publisher.Flux.from;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -24,14 +26,11 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.execution.MessageProcessorExecutionTemplate;
 
 import org.reactivestreams.Publisher;
 
 public class ResponseMessageProcessorAdapter extends AbstractInterceptingMessageProcessor
     implements Lifecycle, FlowConstructAware {
-
-  private MessageProcessorExecutionTemplate messageProcessorExecutionTemplate = createExecutionTemplate();
 
   protected Processor responseProcessor;
 
@@ -51,24 +50,7 @@ public class ResponseMessageProcessorAdapter extends AbstractInterceptingMessage
 
   @Override
   public Event process(Event event) throws MuleException {
-    Event response = processNext(event);
-    if (responseProcessor == null || !isEventValid(response)) {
-      return response;
-    } else {
-      return resolveReturnEvent(responseProcessor.process(response), response);
-    }
-  }
-
-  private Event resolveReturnEvent(Event result, Event original) {
-    if (result == null) {
-      // If <response> returns null then it acts as an implicit branch like in flows, the different
-      // here is that what's next, it's not another message processor that follows this one in the
-      // configuration file but rather the response phase of the inbound endpoint, or optionally
-      // other response processing on the way back to the inbound endpoint.
-      return original;
-    } else {
-      return result;
-    }
+    return processToApply(event, this);
   }
 
   @Override
@@ -79,7 +61,8 @@ public class ResponseMessageProcessorAdapter extends AbstractInterceptingMessage
       return from(publisher)
           .transform(applyNext())
           // Use flatMap and child context in order to handle null response and continue with current event
-          .flatMap(event -> from(processWithChildContext(event, responseProcessor)).defaultIfEmpty(event));
+          .flatMap(event -> from(processWithChildContext(event, responseProcessor, ofNullable(getLocation())))
+              .defaultIfEmpty(event));
     }
   }
 
@@ -121,13 +104,11 @@ public class ResponseMessageProcessorAdapter extends AbstractInterceptingMessage
   public void setFlowConstruct(FlowConstruct flowConstruct) {
     super.setFlowConstruct(flowConstruct);
     setFlowConstructIfNeeded(responseProcessor, flowConstruct);
-    messageProcessorExecutionTemplate.setFlowConstruct(flowConstruct);
   }
 
   @Override
   public void setMuleContext(MuleContext muleContext) {
     super.setMuleContext(muleContext);
     setMuleContextIfNeeded(responseProcessor, muleContext);
-    messageProcessorExecutionTemplate.setMuleContext(muleContext);
   }
 }

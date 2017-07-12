@@ -83,31 +83,13 @@ public class FlowProcessingPhaseTestCase extends AbstractMuleTestCase {
 
   @Test
   public void supportedTemplates() {
-    new PhaseSupportTestHelper<FlowProcessingPhaseTemplate>(FlowProcessingPhaseTemplate.class).testSupportTemplates(phase);
+    new PhaseSupportTestHelper<>(FlowProcessingPhaseTemplate.class).testSupportTemplates(phase);
   }
 
   @Test
   public void order() {
     assertThat(phase.compareTo(new ValidationPhase()), is(1));
     assertThat(phase.compareTo(Mockito.mock(MessageProcessPhase.class)), is(0));
-  }
-
-  @Test
-  public void runPhaseWithExceptionThrown() throws Exception {
-    when(mockContext.supportsAsynchronousProcessing()).thenReturn(false);
-    doThrow(mockException).when(mockTemplate).afterSuccessfulProcessingFlow(any(Event.class));
-    phase.runPhase(mockTemplate, mockContext, mockNotifier);
-    verify(mockContext.getFlowConstruct()).getExceptionListener();
-    verifyOnlyFailureWasCalled(mockException);
-  }
-
-  @Test
-  public void runPhaseWithMessagingExceptionThrown() throws Exception {
-    when(mockContext.supportsAsynchronousProcessing()).thenReturn(false);
-    when(mockTemplate.routeEvent(Mockito.any(Event.class))).thenThrow(mockMessagingException);
-    phase.runPhase(mockTemplate, mockContext, mockNotifier);
-    verify(mockContext.getFlowConstruct()).getExceptionListener();
-    verifyOnlySuccessfulWasCalled();
   }
 
   @Test
@@ -125,7 +107,6 @@ public class FlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     InOrder inOrderVerify =
         Mockito.inOrder(mockContext, mockContext.getFlowConstruct(), mockRequestResponseTemplate, mockNotifier);
     inOrderVerify.verify(mockContext, atLeastOnce()).getTransactionConfig();
-    inOrderVerify.verify(mockContext.getFlowConstruct()).getExceptionListener();
     inOrderVerify.verify(mockRequestResponseTemplate).getEvent();
     inOrderVerify.verify(mockRequestResponseTemplate).beforeRouteEvent(any(Event.class));
     inOrderVerify.verify(mockRequestResponseTemplate).routeEvent(any(Event.class));
@@ -133,15 +114,6 @@ public class FlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     inOrderVerify.verify(mockRequestResponseTemplate).afterSuccessfulProcessingFlow(any(Event.class));
     inOrderVerify.verify(mockNotifier).phaseSuccessfully();
     verifyOnlySuccessfulWasCalled();
-  }
-
-  @Test
-  public void sendResponseWhenFlowExecutionFailsAndExceptionIsHandled() throws MuleException {
-    when(mockContext.supportsAsynchronousProcessing()).thenReturn(false);
-    when(mockRequestResponseTemplate.afterRouteEvent(any(Event.class))).thenThrow(mockMessagingException);
-    when(mockMessagingException.handled()).thenReturn(true);
-    phase.runPhase(mockRequestResponseTemplate, mockContext, mockNotifier);
-    verify(mockRequestResponseTemplate).sendResponseToClient(any(Event.class));
   }
 
   @Test
@@ -176,8 +148,8 @@ public class FlowProcessingPhaseTestCase extends AbstractMuleTestCase {
   @Test
   public void responseNotificationFired() throws MuleException {
     when(mockContext.supportsAsynchronousProcessing()).thenReturn(false);
-    when(mockRequestResponseTemplate.afterRouteEvent(any(Event.class))).thenThrow(mockMessagingException);
-    when(mockMessagingException.handled()).thenReturn(true);
+    when(mockRequestResponseTemplate.afterRouteEvent(any(Event.class)))
+        .thenAnswer(invocation -> invocation.getArgumentAt(0, Event.class));
     phase.runPhase(mockRequestResponseTemplate, mockContext, mockNotifier);
     verify(notificationHelper).fireNotification(any(MessageSource.class), any(Event.class),
                                                 any(FlowConstruct.class), eq(MESSAGE_RESPONSE));

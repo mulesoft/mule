@@ -8,20 +8,21 @@ package org.mule.runtime.core.processor.chain;
 
 import static org.apache.commons.lang3.StringUtils.replace;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
+import static org.mule.runtime.core.api.context.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE;
+import static org.mule.runtime.core.api.context.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setFlowConstructIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
+import static org.mule.runtime.core.api.util.ExceptionUtils.NULL_ERROR_HANDLER;
 import static org.mule.runtime.core.api.util.ExceptionUtils.updateMessagingExceptionWithError;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
-import static org.mule.runtime.core.api.context.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE;
-import static org.mule.runtime.core.api.context.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE;
-import static org.mule.runtime.core.api.execution.MessageProcessorExecutionTemplate.createExecutionTemplate;
 import static org.slf4j.LoggerFactory.getLogger;
+import static reactor.core.publisher.Flux.empty;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
-import static reactor.core.publisher.Mono.empty;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -31,22 +32,19 @@ import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
+import org.mule.runtime.core.api.context.notification.MessageProcessorNotification;
+import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.api.transport.LegacyInboundEndpoint;
 import org.mule.runtime.core.api.util.ExceptionUtils;
-import org.mule.runtime.core.api.context.notification.MessageProcessorNotification;
-import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
-import org.mule.runtime.core.api.exception.MessagingException;
-import org.mule.runtime.core.api.execution.MessageProcessorExecutionTemplate;
 import org.mule.runtime.core.processor.interceptor.ReactiveInterceptorAdapter;
 import org.mule.runtime.core.streaming.StreamingManager;
 
@@ -57,10 +55,10 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.logging.Level;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
-
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -68,48 +66,25 @@ import reactor.core.publisher.Mono;
  * Builder needs to return a composite rather than the first MessageProcessor in the chain. This is so that if this chain is
  * nested in another chain the next MessageProcessor in the parent chain is not injected into the first in the nested chain.
  */
-public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObject implements MessageProcessorChain {
+abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObject implements MessageProcessorChain {
 
   private static final Logger LOGGER = getLogger(AbstractMessageProcessorChain.class);
 
-  protected String name;
-  protected List<Processor> processors;
+  protected final String name;
+  protected final List<Processor> processors;
   protected MuleContext muleContext;
   protected FlowConstruct flowConstruct;
-  private MessageProcessorExecutionTemplate messageProcessorExecutionTemplate = createExecutionTemplate();
   protected MessagingExceptionHandler messagingExceptionHandler;
   private StreamingManager streamingManager;
 
-  public AbstractMessageProcessorChain(List<Processor> processors) {
-    this(null, processors);
-  }
-
-  public AbstractMessageProcessorChain(String name, List<Processor> processors) {
+  AbstractMessageProcessorChain(String name, List<Processor> processors) {
     this.name = name;
     this.processors = processors;
   }
 
   @Override
   public Event process(Event event) throws MuleException {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug(String.format("Invoking %s with event %s", this, event));
-    }
-    if (event == null) {
-      return null;
-    }
-
-    return doProcess(event);
-  }
-
-  protected Event doProcess(Event event) throws MuleException {
-    for (Processor processor : getProcessorsToExecute()) {
-      setCurrentEvent(event);
-      event = messageProcessorExecutionTemplate.execute(processor, event);
-      if (event == null) {
-        return null;
-      }
-    }
-    return event;
+    return processToApply(event, this);
   }
 
   @Override
@@ -152,7 +127,7 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
     // threads which may be limited to avoid deadlocks.
     // Use anonymous ReactiveProcessor to apply processing strategy to processor + previous interceptors
     // while using the processing type of the processor itself.
-    if (flowConstruct instanceof Pipeline) {
+    if (flowConstruct instanceof Pipeline && ((Pipeline) flowConstruct).getProcessingStrategy() != null) {
       interceptors
           .add((processor, next) -> ((Pipeline) flowConstruct).getProcessingStrategy().onProcessor(new ReactiveProcessor() {
 
@@ -210,10 +185,14 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
     interceptors.add((processor, next) -> stream -> from(stream).concatMap(event -> just(event)
         .transform(next)
         .onErrorResume(RejectedExecutionException.class,
-                       throwable -> handleError(event.getContext())
-                           .apply(updateMessagingExceptionWithError(new MessagingException(event, throwable, processor),
-                                                                    processor, flowConstruct)))
-        .onErrorResume(MessagingException.class, handleError(event.getContext()))));
+                       throwable -> Mono.from(event.getContext()
+                           .error(updateMessagingExceptionWithError(new MessagingException(event, throwable, processor),
+                                                                    processor, flowConstruct),
+                                  getMessagingExceptionHandler()))
+                           .then(Mono.empty()))
+        .onErrorResume(MessagingException.class,
+                       throwable -> Mono.from(event.getContext().error(throwable, getMessagingExceptionHandler()))
+                           .then(Mono.empty()))));
 
     return interceptors;
   }
@@ -221,27 +200,6 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
   private Function<MessagingException, MessagingException> updateMessagingException(Processor processor) {
     return exception -> ExceptionUtils.updateMessagingException(LOGGER, processor, exception, muleContext.getErrorTypeLocator(),
                                                                 muleContext.getErrorTypeRepository(), flowConstruct, muleContext);
-  }
-
-  private Function<MessagingException, Publisher<Event>> handleError(EventContext eventContext) {
-    if (flowConstruct instanceof Pipeline && ((Pipeline) flowConstruct).getSource() instanceof LegacyInboundEndpoint) {
-      // TODO MULE-11023 Migrate transaction execution template mechanism to use non-blocking API
-      // Don't handle exception in chain as it needs to be handled by HandleExceptionInterceptor.
-      return messagingException -> {
-        eventContext.error(messagingException);
-        return empty();
-      };
-    } else {
-      return messagingException -> Mono.from(getMessagingExceptionHandler().apply(messagingException))
-          .flatMapMany(handled -> {
-            eventContext.success(handled);
-            return Mono.<Event>empty();
-          })
-          .onErrorResume(rethrown -> {
-            eventContext.error(rethrown);
-            return empty();
-          });
-    }
   }
 
   private Consumer<Event> preNotification(Processor processor) {
@@ -339,20 +297,19 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
   }
 
   public MessagingExceptionHandler getMessagingExceptionHandler() {
-    return messagingExceptionHandler != null ? messagingExceptionHandler : flowConstruct.getExceptionListener();
+    return messagingExceptionHandler != null ? messagingExceptionHandler
+        : flowConstruct != null ? flowConstruct.getExceptionListener() : NULL_ERROR_HANDLER;
   }
 
   @Override
   public void setMuleContext(MuleContext muleContext) {
     this.muleContext = muleContext;
-    this.messageProcessorExecutionTemplate.setMuleContext(muleContext);
     setMuleContextIfNeeded(getMessageProcessorsForLifecycle(), muleContext);
   }
 
   @Override
   public void setFlowConstruct(FlowConstruct flowConstruct) {
     this.flowConstruct = flowConstruct;
-    this.messageProcessorExecutionTemplate.setFlowConstruct(flowConstruct);
     setFlowConstructIfNeeded(getMessageProcessorsForLifecycle(), flowConstruct);
   }
 

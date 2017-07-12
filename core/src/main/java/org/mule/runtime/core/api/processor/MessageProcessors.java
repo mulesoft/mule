@@ -6,25 +6,27 @@
  */
 package org.mule.runtime.core.api.processor;
 
+import static java.util.Optional.of;
 import static org.mule.runtime.core.DefaultEventContext.child;
 import static org.mule.runtime.core.api.Event.builder;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
-import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingException;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.processor.chain.ExplicitMessageProcessorChainBuilder;
 import org.mule.runtime.core.processor.chain.ExplicitMessageProcessorChainBuilder.ExplicitMessageProcessorChain;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.reactivestreams.Publisher;
 
@@ -121,25 +123,54 @@ public class MessageProcessors {
   }
 
   /**
-   * Process a {@link ReactiveProcessor} using a child {@link EventContext}. This is useful if it is necessary to performing
-   * processing in a scope and handle an empty result rather than complete the response for the whole Flow.
+   * Process a {@link ReactiveProcessor} using a child {@link EventContext}. This is useful if it is necessary to perform
+   * processing in a scope and handle an empty result or error locally rather than complete the response for the whole Flow.
+   * <p>
+   * No error-handling will be performed when errors occur.
    *
    * @param event the event to process.
    * @param processor the processor to process.
+   * @param componentLocation
    * @return the future result of processing processor.
    */
-  public static Publisher<Event> processWithChildContext(Event event, ReactiveProcessor processor) {
-    EventContext child = child(event.getContext());
-    just(Event.builder(child, event).build())
+  public static Publisher<Event> processWithChildContext(Event event, ReactiveProcessor processor,
+                                                         Optional<ComponentLocation> componentLocation) {
+    return internalProcessWithChildContext(event, processor, child(event.getContext(), componentLocation, false));
+  }
+
+  /**
+   * Process a {@link ReactiveProcessor} using a child {@link EventContext}. This is useful if it is necessary to perform
+   * processing in a scope and handle an empty result or error locally rather than complete the response for the whole Flow.
+   * <p>
+   * The {@link MessagingExceptionHandler} configured on {@link MessageProcessorChain} or {@link FlowConstruct} will be used to
+   * handle any errors that occur.
+   *
+   * @param event the event to process.
+   * @param processor the processor to process.
+   * @param componentLocation
+   * @return the future result of processing processor.
+   */
+  public static Publisher<Event> processWithChildContextHandleErrors(Event event, ReactiveProcessor processor,
+                                                                     Optional<ComponentLocation> componentLocation) {
+    return internalProcessWithChildContext(event, processor, child(event.getContext(), componentLocation, true));
+  }
+
+  private static Publisher<Event> internalProcessWithChildContext(Event event, ReactiveProcessor processor, EventContext child) {
+    return just(builder(child, event).build())
         .transform(processor)
-        .subscribe(response -> {
+        .doOnNext(result -> {
           if (!(from(child.getResponsePublisher()).toFuture().isDone())) {
-            child.success(response);
+            child.success(result);
           }
-        }, child::error);
-    return from(child.getResponsePublisher())
-        .map(result -> Event.builder(event.getContext(), result).build())
-        .doOnError(MessagingException.class, me -> me.setProcessedEvent(builder(event.getContext(), me.getEvent()).build()));
+        })
+        .switchIfEmpty(from(child.getResponsePublisher()))
+        .map(result -> builder(event.getContext(), result).build())
+        .doOnError(MessagingException.class, me -> me.setProcessedEvent(builder(event.getContext(), me.getEvent()).build()))
+        .doOnSuccess(result -> {
+          if (result == null) {
+            event.getContext().success();
+          }
+        });
   }
 
 }

@@ -7,6 +7,8 @@
 package org.mule.runtime.core.processor;
 
 import static java.util.Collections.singletonList;
+import static java.util.Optional.ofNullable;
+import static org.mule.runtime.core.DefaultEventContext.child;
 import static org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.api.rx.Exceptions.UNEXPECTED_EXCEPTION_PREDICATE;
@@ -24,7 +26,6 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
@@ -89,7 +90,8 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
   @Override
   public void start() throws MuleException {
     scheduler = schedulerService.ioScheduler(getLocation() != null
-        ? muleContext.getSchedulerBaseConfig().withName(getLocation().getLocation()) : muleContext.getSchedulerBaseConfig());
+        ? muleContext.getSchedulerBaseConfig().withName(getLocation().getLocation())
+        : muleContext.getSchedulerBaseConfig());
     reactorScheduler = fromExecutorService(scheduler);
     super.start();
   }
@@ -150,7 +152,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
 
   private Event asyncEvent(Event event) {
     // Clone event, make it async and remove ReplyToHandler
-    return Event.builder(DefaultEventContext.child(event.getContext()), event)
+    return Event.builder(child(event.getContext(), ofNullable(getLocation()), true), event)
         .replyToHandler(null)
         .session(new DefaultMuleSession(event.getSession())).build();
   }

@@ -7,18 +7,21 @@
 package org.mule.runtime.core.processor;
 
 import static java.util.Collections.singletonList;
+import static java.util.Optional.ofNullable;
+import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createScopeTransactionalExecutionTemplate;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setFlowConstructIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
-import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContext;
+import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
+import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContextHandleErrors;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_INDIFFERENT;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.errorInvokingMessageProcessorWithinTransaction;
-import static org.mule.runtime.core.api.execution.TransactionalErrorHandlingExecutionTemplate.createScopeExecutionTemplate;
 import static reactor.core.publisher.Flux.from;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -26,12 +29,14 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
+import org.mule.runtime.core.api.execution.TransactionalExecutionTemplate;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
@@ -55,8 +60,17 @@ public class TryMessageProcessor extends AbstractMessageProcessorOwner implement
       return event;
     } else {
       ExecutionTemplate<Event> executionTemplate =
-          createScopeExecutionTemplate(muleContext, flowConstruct, transactionConfig, messagingExceptionHandler);
-      ExecutionCallback<Event> processingCallback = () -> nestedChain.process(event);
+          createScopeTransactionalExecutionTemplate(muleContext, transactionConfig);
+      ExecutionCallback<Event> processingCallback = () -> {
+        try {
+          Event e = processToApply(event, p -> from(p)
+              .flatMap(request -> processWithChildContextHandleErrors(request, nestedChain, ofNullable(getLocation()))));
+          return e;
+
+        } catch (Exception e) {
+          throw e;
+        }
+      };
 
       try {
         return executionTemplate.execute(processingCallback);
@@ -75,7 +89,8 @@ public class TryMessageProcessor extends AbstractMessageProcessorOwner implement
     } else if (isTransactionActive() || transactionConfig.getAction() != ACTION_INDIFFERENT) {
       return Processor.super.apply(publisher);
     } else {
-      return from(publisher).flatMap(event -> processWithChildContext(event, p -> from(p).transform(nestedChain)));
+      return from(publisher)
+          .flatMap(event -> processWithChildContextHandleErrors(event, nestedChain, ofNullable(getLocation())));
     }
   }
 

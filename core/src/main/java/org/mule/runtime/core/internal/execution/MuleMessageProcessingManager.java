@@ -54,7 +54,6 @@ public class MuleMessageProcessingManager implements MessageProcessingManager, M
     }
     messageProcessPhaseList.add(new ValidationPhase());
     messageProcessPhaseList.add(new FlowProcessingPhase());
-    messageProcessPhaseList.add(new AsyncResponseFlowProcessingPhase());
     messageProcessPhaseList.add(new ModuleFlowProcessingPhase(policyManager));
     Collections.sort(messageProcessPhaseList, (messageProcessPhase, messageProcessPhase2) -> {
       int compareValue = 0;

@@ -7,10 +7,12 @@
 package org.mule.runtime.core.internal.enricher;
 
 import static java.util.Collections.singletonList;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.api.Event.builder;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
+import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContext;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
 import static reactor.core.publisher.Flux.from;
@@ -28,6 +30,7 @@ import org.mule.runtime.core.api.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.reactivestreams.Publisher;
 
@@ -62,8 +65,7 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements Pr
 
   @Override
   public Event process(Event event) throws MuleException {
-    return enrich(enrichmentProcessor.process(builder(event).session(new DefaultMuleSession(event.getSession())).build()),
-                  event);
+    return processToApply(event, this);
   }
 
   protected Event enrich(Event currentEvent,
@@ -98,7 +100,7 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements Pr
         // Use flatMap and child context in order to handle null response and do nothing rather than complete response as empty
         // if enrichment processor drops event due to a filter for example.
         .flatMap(event -> from(processWithChildContext(builder(event).session(new DefaultMuleSession(event.getSession()))
-            .build(), enrichmentProcessor))
+            .build(), enrichmentProcessor, ofNullable(getLocation())))
                 .map(checkedFunction(response -> enrich(response, event)))
                 .defaultIfEmpty(event));
   }

@@ -45,26 +45,6 @@ public final class Operators {
   }
 
   /**
-   * Custom function to be used with {@link reactor.core.publisher.Flux#handle(BiConsumer)} when a map function may return
-   * {@code null} and this should be interpreted by echoing the incoming event rather than causing an error.
-   *
-   * @param mapper map function
-   * @return custom operator {@link BiConsumer} to be used with {@link reactor.core.publisher.Flux#handle(BiConsumer)}.
-   */
-  public static BiConsumer<Event, SynchronousSink<Event>> echoOnNullMap(Function<Event, Event> mapper) {
-    return (event, sink) -> {
-      if (event != null) {
-        Event result = mapper.apply(event);
-        if (result != null) {
-          sink.next(result);
-        } else {
-          sink.next(event);
-        }
-      }
-    };
-  }
-
-  /**
    * Return a singleton {@link Subscriber} that does not check for double onSubscribe and purely request Long.MAX. Unlike using
    * {@link Flux#subscribe()} directly this will not throw an exception if an error occurs.
    *

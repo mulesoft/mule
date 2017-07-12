@@ -22,18 +22,21 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
+import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 
 /**
  * A holder for a pair of MessageProcessor and an expression.
  */
 public class MessageProcessorExpressionPair extends AbstractAnnotatedObject
-    implements FlowConstructAware, MuleContextAware, Lifecycle {
+    implements FlowConstructAware, MuleContextAware, Lifecycle, MessagingExceptionHandlerAware {
 
   private final String expression;
-  private final Processor messageProcessor;
+  private final MessageProcessorChain messageProcessor;
 
-  public MessageProcessorExpressionPair(String expression, Processor messageProcessor) {
+  public MessageProcessorExpressionPair(String expression, MessageProcessorChain messageProcessor) {
     requireNonNull(expression, "expression can't be null");
     requireNonNull(messageProcessor, "messageProcessor can't be null");
     this.expression = expression;
@@ -44,7 +47,7 @@ public class MessageProcessorExpressionPair extends AbstractAnnotatedObject
     return expression;
   }
 
-  public Processor getMessageProcessor() {
+  public MessageProcessorChain getMessageProcessor() {
     return messageProcessor;
   }
 
@@ -58,43 +61,36 @@ public class MessageProcessorExpressionPair extends AbstractAnnotatedObject
 
   @Override
   public void setFlowConstruct(FlowConstruct flowConstruct) {
-    if (messageProcessor instanceof FlowConstructAware) {
-      ((FlowConstructAware) messageProcessor).setFlowConstruct(flowConstruct);
-    }
+    messageProcessor.setFlowConstruct(flowConstruct);
   }
 
   @Override
   public void setMuleContext(MuleContext context) {
-    if (messageProcessor instanceof MuleContextAware) {
-      ((MuleContextAware) messageProcessor).setMuleContext(context);
-    }
+    messageProcessor.setMuleContext(context);
   }
 
   @Override
   public void initialise() throws InitialisationException {
-    if (messageProcessor instanceof Initialisable) {
-      ((Initialisable) messageProcessor).initialise();
-    }
+    messageProcessor.initialise();
   }
 
   @Override
   public void start() throws MuleException {
-    if (messageProcessor instanceof Startable) {
-      ((Startable) messageProcessor).start();
-    }
+    messageProcessor.start();
   }
 
   @Override
   public void stop() throws MuleException {
-    if (messageProcessor instanceof Stoppable) {
-      ((Stoppable) messageProcessor).stop();
-    }
+    messageProcessor.stop();
   }
 
   @Override
   public void dispose() {
-    if (messageProcessor instanceof Disposable) {
-      ((Disposable) messageProcessor).dispose();
-    }
+    messageProcessor.dispose();
+  }
+
+  @Override
+  public void setMessagingExceptionHandler(MessagingExceptionHandler messagingExceptionHandler) {
+    messageProcessor.setMessagingExceptionHandler(messagingExceptionHandler);
   }
 }

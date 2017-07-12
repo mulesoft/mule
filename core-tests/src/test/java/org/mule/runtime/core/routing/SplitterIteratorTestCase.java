@@ -28,7 +28,6 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -36,7 +35,7 @@ import org.junit.Test;
 
 public class SplitterIteratorTestCase extends AbstractMuleTestCase {
 
-  private Event muleEvent = mock(Event.class);
+  private Event muleEvent;
   private MuleContext muleContext = mock(MuleContext.class);
   private ExtendedExpressionManager expressionManager = mock(ExtendedExpressionManager.class);
   private final List<TypedValue<?>> integers = createListOfIntegers();
@@ -51,8 +50,7 @@ public class SplitterIteratorTestCase extends AbstractMuleTestCase {
     when(expressionConfig.getFullExpression()).thenReturn("fullExpression");
     when(expressionManager.split(any(String.class), any(Event.class), any(BindingContext.class)))
         .thenReturn(integers.iterator());
-    when(muleEvent.getFlowCallStack()).thenReturn(flowCallStack);
-    when(muleEvent.getError()).thenReturn(Optional.empty());
+    muleEvent = testEvent();
     splitter.initialise();
   }
 

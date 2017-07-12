@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.exception;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -19,8 +20,10 @@ import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
+import reactor.core.publisher.Mono;
 
 //TODO: MULE-9307 re-write junits for rollback exception strategy
 
@@ -59,11 +62,14 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
   }
 
   @Override
-  protected Event beforeRouting(MessagingException exception, Event event) {
-    if (!isRedeliveryExhausted(exception)) {
-      rollback(exception);
-    }
-    return event;
+  protected Function<Event, Event> beforeRouting(MessagingException exception) {
+    return event -> {
+      event = super.beforeRouting(exception).apply(event);
+      if (!isRedeliveryExhausted(exception)) {
+        rollback(exception);
+      }
+      return event;
+    };
   }
 
   @Override
@@ -82,19 +88,18 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
   }
 
   @Override
-  protected Publisher<Event> routeAsync(Event event, MessagingException t) {
-    Publisher<Event> eventPublisher = just(event);
-    if (isRedeliveryExhausted(t)) {
+  protected Function<Event, Publisher<Event>> route(MessagingException exception) {
+    if (isRedeliveryExhausted(exception)) {
       if (redeliveryExceeded != null) {
-        markExceptionAsHandled(t);
-        eventPublisher = redeliveryExceeded.apply(eventPublisher);
+        markExceptionAsHandled(exception);
+        return event -> just(event).transform(redeliveryExceeded);
       } else {
         logger.info("Message redelivery exhausted. No redelivery exhausted actions configured. Message consumed.");
       }
     } else {
-      eventPublisher = super.routeAsync(event, t);
+      return super.route(exception);
     }
-    return eventPublisher;
+    return event -> just(event);
   }
 
   @Override

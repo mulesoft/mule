@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.processor;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
@@ -14,11 +16,13 @@ import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
-import static org.mockito.internal.verification.VerificationModeFactory.times;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
+import static org.mule.runtime.core.api.rx.Exceptions.checkedConsumer;
+import static reactor.core.publisher.Mono.error;
+import static reactor.core.publisher.Mono.from;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -48,6 +52,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Answers;
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Mono;
 
 public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
 
@@ -62,19 +68,25 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
   private Processor mockWaitingMessageProcessor = mock(Processor.class, Answers.RETURNS_DEEP_STUBS.get());
   private Processor mockDlqMessageProcessor = mock(Processor.class, Answers.RETURNS_DEEP_STUBS.get());
   private InternalMessage message = mock(InternalMessage.class, Answers.RETURNS_DEEP_STUBS.get());
-  private Event event = mock(Event.class, Answers.RETURNS_DEEP_STUBS.get());
+  private Event event;
   private Latch waitLatch = new Latch();
   private CountDownLatch waitingMessageProcessorExecutionLatch = new CountDownLatch(2);
   private final IdempotentRedeliveryPolicy irp = new IdempotentRedeliveryPolicy();
+  private AtomicInteger count = new AtomicInteger();
 
   @Before
   @SuppressWarnings("rawtypes")
   public void setUpTest() throws MuleException {
-    when(mockFailingMessageProcessor.process(any(Event.class))).thenThrow(new RuntimeException("failing"));
-    when(mockWaitingMessageProcessor.process(event)).thenAnswer(invocationOnMock -> {
-      waitingMessageProcessorExecutionLatch.countDown();
-      waitLatch.await(2000, TimeUnit.MILLISECONDS);
-      return mockFailingMessageProcessor.process((Event) invocationOnMock.getArguments()[0]);
+    event = spy(testEvent());
+    when(mockFailingMessageProcessor.apply(any(Publisher.class)))
+        .thenAnswer(invocation -> error(new RuntimeException("failing"))
+            .doOnError(e -> count.getAndIncrement()));
+    when(mockWaitingMessageProcessor.apply(any(Publisher.class))).thenAnswer(invocationOnMock -> {
+      Mono<Event> mono = from(invocationOnMock.getArgumentAt(0, Publisher.class));
+      return mono.doOnNext(checkedConsumer(event1 -> {
+        waitingMessageProcessorExecutionLatch.countDown();
+        waitLatch.await(2000, MILLISECONDS);
+      })).transform(mockFailingMessageProcessor);
     });
     MuleLockFactory muleLockFactory = new MuleLockFactory();
     muleLockFactory.setMuleContext(mockMuleContext);
@@ -110,7 +122,7 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
     when(message.getPayload()).thenReturn(new TypedValue<>(STRING_MESSAGE, STRING));
     irp.initialise();
     processUntilFailure();
-    verify(mockFailingMessageProcessor, times(MAX_REDELIVERY_COUNT + 1)).process(event);
+    assertThat(count.get(), equalTo(MAX_REDELIVERY_COUNT + 1));
   }
 
   @Test
@@ -122,7 +134,7 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
         .thenAnswer(invocation -> serializationObjectStore);
     irp.initialise();
     processUntilFailure();
-    verify(mockFailingMessageProcessor, times(MAX_REDELIVERY_COUNT + 1)).process(event);
+    assertThat(count.get(), equalTo(MAX_REDELIVERY_COUNT + 1));
   }
 
   @Test
@@ -134,11 +146,11 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
     firstIrpExecutionThread.start();
     ExecuteIrpThread threadCausingRedeliveryException = new ExecuteIrpThread();
     threadCausingRedeliveryException.start();
-    waitingMessageProcessorExecutionLatch.await(5000, TimeUnit.MILLISECONDS);
+    waitingMessageProcessorExecutionLatch.await(5000, MILLISECONDS);
     waitLatch.release();
     firstIrpExecutionThread.join();
     threadCausingRedeliveryException.join();
-    verify(mockFailingMessageProcessor, times(2)).process(event);
+    assertThat(count.get(), equalTo(2));
   }
 
   private void processUntilFailure() {

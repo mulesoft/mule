@@ -6,11 +6,14 @@
  */
 package org.mule.runtime.core.routing;
 
+import static java.util.Optional.empty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.Event.builder;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -44,13 +47,16 @@ public abstract class AbstractUntilSuccessfulProcessingStrategy implements Until
   protected Event processEvent(final Event event) {
     Event returnEvent;
     try {
-      returnEvent = untilSuccessfulConfiguration.getRoute().process(event);
+      returnEvent = untilSuccessfulConfiguration.getRoute()
+          .process(builder(DefaultEventContext.child(event.getContext(), empty()), event).build());
     } catch (final MuleException me) {
       throw new MuleRuntimeException(me);
     }
 
     if (returnEvent == null) {
       return returnEvent;
+    } else {
+      returnEvent = builder(event.getContext(), returnEvent).build();
     }
 
     final Message msg = returnEvent.getMessage();
@@ -80,7 +86,7 @@ public abstract class AbstractUntilSuccessfulProcessingStrategy implements Until
       return event;
     }
 
-    return Event.builder(event).message(Message.builder(event.getMessage())
+    return builder(event).message(Message.builder(event.getMessage())
         .payload(getUntilSuccessfulConfiguration().getMuleContext().getExpressionManager().evaluate(ackExpression, event)
             .getValue())
         .build()).build();

@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.exception;
 
 import static java.util.Arrays.stream;
 import static java.util.Collections.singletonList;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -16,6 +17,7 @@ import static org.mule.runtime.core.api.context.notification.ErrorHandlerNotific
 import static org.mule.runtime.core.api.context.notification.ErrorHandlerNotification.PROCESS_START;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContext;
+import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
@@ -24,7 +26,6 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.ErrorHandlerNotification;
 import org.mule.runtime.core.api.exception.DisjunctiveErrorTypeMatcher;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
@@ -39,15 +40,14 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
 import org.mule.runtime.core.internal.message.InternalMessage;
-import org.mule.runtime.core.processor.AbstractRequestResponseMessageProcessor;
 import org.mule.runtime.core.routing.requestreply.ReplyToPropertyRequestReplyReplier;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
-
-import reactor.core.publisher.Mono;
 
 public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     implements MessagingExceptionHandlerAcceptor {
@@ -64,24 +64,67 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   @Override
   final public Event handleException(MessagingException exception, Event event) {
     try {
-      return new ExceptionMessageProcessor(exception, muleContext, flowConstruct).process(event);
-    } catch (MuleException e) {
-      throw new RuntimeException(e);
+      return from(applyInternal(exception, event)).block();
+    } catch (Throwable throwable) {
+      throw new RuntimeException(unwrap(throwable));
     }
   }
 
   @Override
   public Publisher<Event> apply(final MessagingException exception) {
-    Publisher<Event> publisher =
-        new ExceptionMessageProcessor(exception, muleContext, flowConstruct).apply(just(exception.getEvent()));
-    return from(publisher).handle((event, sink) -> {
-      if (exception.handled()) {
-        sink.next(event);
-      } else {
-        exception.setProcessedEvent(event);
-        sink.error(exception);
+    return applyInternal(exception, exception.getEvent());
+  }
+
+  private Publisher<Event> applyInternal(final MessagingException exception, Event event) {
+    return just(event)
+        .map(beforeRouting(exception))
+        .flatMapMany(route(exception)).last()
+        .map(afterRouting(exception))
+        .doOnError(MessagingException.class, onRoutingError())
+        .<Event>handle((result, sink) -> {
+          if (exception.handled()) {
+            sink.next(result);
+          } else {
+            exception.setProcessedEvent(result);
+            sink.error(exception);
+          }
+        })
+        .doOnTerminate((result, throwable) -> fireEndNotification(event, result, throwable));
+  }
+
+  private Consumer<MessagingException> onRoutingError() {
+    return me -> {
+      try {
+        me.setInErrorHandler(true);
+        logger.error("Exception during exception strategy execution");
+        doLogException(me);
+        TransactionCoordination.getInstance().rollbackCurrentTransaction();
+      } catch (Exception ex) {
+        // Do nothing
+        logger.warn(ex.getMessage());
       }
-    });
+    };
+  }
+
+  private void fireEndNotification(Event event, Event result, Throwable throwable) {
+    muleContext.getNotificationManager()
+        .fireNotification(new ErrorHandlerNotification(createInfo(result != null ? result
+            : event, throwable instanceof MessagingException ? (MessagingException) throwable : null,
+                                                                  configuredMessageProcessors),
+                                                       flowConstruct, PROCESS_END));
+  }
+
+  protected Function<Event, Publisher<Event>> route(MessagingException exception) {
+    return event -> {
+      if (getMessageProcessors().isEmpty()) {
+        return just(event);
+      } else {
+        event = Event.builder(event)
+            .message(InternalMessage.builder(event.getMessage()).exceptionPayload(new DefaultExceptionPayload(exception)).build())
+            .build();
+      }
+      return from(processWithChildContext(event, configuredMessageProcessors, ofNullable(getLocation())));
+    };
   }
 
   @Override
@@ -95,90 +138,6 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     return configuredMessageProcessors == null ? new ArrayList<>() : singletonList(configuredMessageProcessors);
   }
 
-  private class ExceptionMessageProcessor extends AbstractRequestResponseMessageProcessor {
-
-
-    private MessagingException exception;
-
-    public ExceptionMessageProcessor(MessagingException exception, MuleContext muleContext, FlowConstruct flowConstruct) {
-      this.exception = exception;
-      setMuleContext(muleContext);
-      setFlowConstruct(flowConstruct);
-      next = new Processor() {
-
-        @Override
-        public Event process(Event event) throws MuleException {
-          if (!getMessageProcessors().isEmpty()) {
-            Event newEvent = Event.builder(event)
-                .message(InternalMessage.builder(event.getMessage()).exceptionPayload(new DefaultExceptionPayload(exception))
-                    .build())
-                .build();
-            return configuredMessageProcessors.process(newEvent);
-          } else {
-            return event;
-          }
-        }
-
-        @Override
-        public Publisher<Event> apply(Publisher<Event> publisher) {
-          // TODO MULE-11023 Migrate transaction execution template mechanism to use non-blocking API
-          // Use child context if HandleExceptionInterceptor is being used to avoid response being completed twice.
-          // TODO MULE-12720 This code makes processCatch/processFinally work for this particular
-          // AbstractRequestResponseMessageProcessor, others don't work
-          return Mono.from(publisher).flatMapMany(event -> processWithChildContext(event, p -> from(p)
-              .flatMapMany(childEvent -> Mono.from(routeAsync(childEvent, exception)))));
-        }
-      };
-
-    }
-
-    @Override
-    protected Event processRequest(Event request) throws MuleException {
-      muleContext.getNotificationManager()
-          .fireNotification(new ErrorHandlerNotification(createInfo(request, exception, configuredMessageProcessors),
-                                                         flowConstruct, PROCESS_START));
-      fireNotification(exception, request);
-      logException(exception, request);
-      processStatistics();
-
-      markExceptionAsHandledIfRequired(exception);
-      return beforeRouting(exception, request);
-    }
-
-    @Override
-    protected Event processResponse(Event response) throws MuleException {
-      response = afterRouting(exception, response);
-      if (response != null) {
-        response = processReplyTo(response, exception);
-        closeStream(response.getMessage());
-        return nullifyExceptionPayloadIfRequired(response);
-      }
-      return response;
-    }
-
-    @Override
-    protected Event processCatch(Event event, MessagingException exception) throws MessagingException {
-      try {
-        exception.setInErrorHandler(true);
-        logger.error("Exception during exception strategy execution");
-        doLogException(exception);
-        TransactionCoordination.getInstance().rollbackCurrentTransaction();
-      } catch (Exception ex) {
-        // Do nothing
-        logger.warn(ex.getMessage());
-      }
-
-      throw exception;
-    }
-
-    @Override
-    protected void processFinally(Event event, MessagingException exception) {
-      muleContext.getNotificationManager()
-          .fireNotification(new ErrorHandlerNotification(createInfo(event, exception, configuredMessageProcessors),
-                                                         flowConstruct, PROCESS_END));
-    }
-
-  }
 
   private void markExceptionAsHandledIfRequired(Exception exception) {
     if (handleException) {
@@ -215,16 +174,6 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     if (statistics != null && statistics.isEnabled()) {
       statistics.incExecutionError();
     }
-  }
-
-  protected Publisher<Event> routeAsync(Event event, MessagingException t) {
-    if (!getMessageProcessors().isEmpty()) {
-      event = Event.builder(event)
-          .message(InternalMessage.builder(event.getMessage()).exceptionPayload(new DefaultExceptionPayload(t)).build())
-          .build();
-      return configuredMessageProcessors.apply(just(event));
-    }
-    return just(event);
   }
 
   @Override
@@ -275,12 +224,29 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     return errorTypeMatcher == null && when == null;
   }
 
-  protected Event afterRouting(MessagingException exception, Event event) {
-    return event;
+  protected Function<Event, Event> afterRouting(MessagingException exception) {
+    return event -> {
+      if (event != null) {
+        event = processReplyTo(event, exception);
+        return nullifyExceptionPayloadIfRequired(event);
+      }
+      return event;
+    };
   }
 
-  protected Event beforeRouting(MessagingException exception, Event event) {
-    return event;
+  protected Function<Event, Event> beforeRouting(MessagingException exception) {
+    return event -> {
+      muleContext.getNotificationManager()
+          .fireNotification(new ErrorHandlerNotification(createInfo(event, exception, configuredMessageProcessors),
+                                                         flowConstruct, PROCESS_START));
+      fireNotification(exception, event);
+      logException(exception, event);
+      processStatistics();
+      // Reset this flag to apply situation where a error-handler exception is handled in a parent error-handler.
+      exception.setInErrorHandler(false);
+      markExceptionAsHandledIfRequired(exception);
+      return event;
+    };
   }
 
   @Override

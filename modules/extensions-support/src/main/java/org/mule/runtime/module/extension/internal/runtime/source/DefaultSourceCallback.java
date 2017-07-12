@@ -9,8 +9,9 @@ package org.mule.runtime.module.extension.internal.runtime.source;
 import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.api.execution.TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate;
+import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.returnsListOfMessages;
+
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Message;
@@ -20,6 +21,7 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
+import org.mule.runtime.core.api.execution.TransactionalExecutionTemplate;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.internal.execution.ExceptionCallback;
@@ -188,7 +190,7 @@ class DefaultSourceCallback<T, A> implements SourceCallback<T, A> {
 
   private void executeFlowTransactionally(SourceCallbackContext context, MessageProcessContext messageProcessContext,
                                           Message message, TransactionConfig transactionConfig) {
-    ExecutionTemplate<Event> executionTemplate = createMainExecutionTemplate(muleContext, flowConstruct, transactionConfig);
+    ExecutionTemplate<Event> executionTemplate = createTransactionalExecutionTemplate(muleContext, transactionConfig);
 
     ConnectionHandler connectionHandler = messageSource.getConnectionHandler()
         .orElseThrow(() -> new MuleRuntimeException(createStaticMessage(format(UNABLE_TO_START_TX_ERROR_MSG_TEMPLATE,

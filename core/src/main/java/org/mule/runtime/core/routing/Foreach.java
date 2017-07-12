@@ -8,9 +8,13 @@ package org.mule.runtime.core.routing;
 
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.exception.MuleException.INFO_LOCATION_KEY;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
+import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContextHandleErrors;
+import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static org.mule.runtime.core.routing.ExpressionSplittingStrategy.DEFAULT_SPIT_EXPRESSION;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -28,11 +32,13 @@ import org.mule.runtime.core.routing.outbound.AbstractMessageSequenceSplitter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
+import reactor.core.publisher.Mono;
 
 /**
  * The {@code foreach} {@link Processor} allows iterating over a collection payload, or any collection obtained by an expression,
@@ -105,17 +111,22 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     return responseBuilder.build();
   }
 
-  protected Event doProcess(Event event) throws MuleException, MessagingException {
+  protected Event doProcess(Event event) throws MuleException {
     try {
-      return ownedMessageProcessor.process(event);
-    } catch (MessagingException e) {
-      if (splitter.equals(e.getFailingMessageProcessor())) {
-        // Make sure the context information for the exception is relative to the ForEach.
-        e.getInfo().remove(INFO_LOCATION_KEY);
-        throw new MessagingException(event, e.getCause(), this);
-      } else {
-        throw e;
-      }
+      return Mono.just(event)
+          .then(request -> Mono
+              .from(processWithChildContextHandleErrors(request, ownedMessageProcessor, ofNullable(getLocation()))))
+          .onErrorMap(MessagingException.class, e -> {
+            if (splitter.equals(e.getFailingMessageProcessor())) {
+              // Make sure the context information for the exception is relative to the ForEach.
+              e.getInfo().remove(INFO_LOCATION_KEY);
+              return new MessagingException(event, e.getCause(), this);
+            } else {
+              return e;
+            }
+          }).block();
+    } catch (Throwable throwable) {
+      throw rxExceptionToMuleException(throwable);
     }
   }
 
