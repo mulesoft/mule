@@ -6,11 +6,11 @@
  */
 package org.mule.runtime.core.internal.construct;
 
+import static java.lang.System.currentTimeMillis;
 import static java.util.Collections.unmodifiableList;
 import static org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.api.rx.Exceptions.UNEXPECTED_EXCEPTION_PREDICATE;
-import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.api.context.notification.PipelineMessageNotification.PROCESS_COMPLETE;
 import static org.mule.runtime.core.api.context.notification.PipelineMessageNotification.PROCESS_END;
 import static org.mule.runtime.core.api.context.notification.PipelineMessageNotification.PROCESS_START;
@@ -318,7 +318,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
           .fireNotification(new PipelineMessageNotification(createInfo(event, null, AbstractPipeline.this), AbstractPipeline.this,
                                                             PROCESS_START));
 
-      long startTime = System.currentTimeMillis();
+      long startTime = currentTimeMillis();
       ProcessingTime time = event.getContext().getProcessingTime();
 
       // Fire COMPLETE notification on async response

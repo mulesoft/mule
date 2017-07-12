@@ -7,6 +7,7 @@
 package org.mule.runtime.core.routing.outbound;
 
 import static java.util.Collections.emptySet;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.DefaultEventContext.child;
 import static org.mule.runtime.core.api.Event.builder;
@@ -14,7 +15,6 @@ import static org.mule.runtime.core.api.Event.builder;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Acceptor;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
@@ -100,7 +100,7 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
     for (; messageSequence.hasNext();) {
       correlationSequence++;
 
-      final Builder builder = builder(child(originalEvent.getContext(), getLocation(), false), originalEvent);
+      final Builder builder = builder(child(originalEvent.getContext(), ofNullable(getLocation()), false), originalEvent);
 
       propagateFlowVars(lastResult, builder);
       if (counterVariableName != null) {

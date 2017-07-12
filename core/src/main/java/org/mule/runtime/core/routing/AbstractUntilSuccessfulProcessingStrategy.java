@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.routing;
 
+import static java.util.Optional.empty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.Event.builder;
 
@@ -47,7 +48,7 @@ public abstract class AbstractUntilSuccessfulProcessingStrategy implements Until
     Event returnEvent;
     try {
       returnEvent = untilSuccessfulConfiguration.getRoute()
-          .process(builder(DefaultEventContext.child(event.getContext()), event).build());
+          .process(builder(DefaultEventContext.child(event.getContext(), empty()), event).build());
     } catch (final MuleException me) {
       throw new MuleRuntimeException(me);
     }

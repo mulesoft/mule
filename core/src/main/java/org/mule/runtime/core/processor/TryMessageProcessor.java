@@ -7,6 +7,7 @@
 package org.mule.runtime.core.processor;
 
 import static java.util.Collections.singletonList;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createScopeTransactionalExecutionTemplate;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -35,6 +36,7 @@ import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
@@ -62,7 +64,7 @@ public class TryMessageProcessor extends AbstractMessageProcessorOwner implement
       ExecutionCallback<Event> processingCallback = () -> {
         try {
           Event e = processToApply(event, p -> from(p)
-              .flatMap(request -> processWithChildContextHandleErrors(request, nestedChain, getLocation())));
+              .flatMap(request -> processWithChildContextHandleErrors(request, nestedChain, ofNullable(getLocation()))));
           return e;
 
         } catch (Exception e) {
@@ -88,7 +90,7 @@ public class TryMessageProcessor extends AbstractMessageProcessorOwner implement
       return Processor.super.apply(publisher);
     } else {
       return from(publisher)
-          .flatMap(event -> processWithChildContextHandleErrors(event, nestedChain, getLocation()));
+          .flatMap(event -> processWithChildContextHandleErrors(event, nestedChain, ofNullable(getLocation())));
     }
   }
 

@@ -22,12 +22,19 @@ import org.mule.runtime.core.internal.execution.ValidateTransactionalStateInterc
 
 /**
  * ExecutionTemplate created should be used on a MessageProcessor that are previously wrapper by
- * {@link TransactionalExecutionTemplate} should be used when: An outbound endpoint is called An outbound router is called Any
- * other MessageProcessor able to manage transactions is called Instance of TransactionTemplate created by this method will:
- * Resolve non xa transactions created before it if the TransactionConfig action requires it Suspend-Resume xa transaction created
- * before it if the TransactionConfig action requires it Start a transaction if required by TransactionConfig action Resolve
- * transaction if was started by this TransactionTemplate Route any exception to exception strategy if it was not already routed
- * to it
+ * {@link TransactionalExecutionTemplate} should be used when:
+ * <ul>
+ * <li>An outbound endpoint is called.</li>
+ * <li>An outbound router is called.</li>
+ * <li>Other MessageProcessor able to manage transactions is called.</li>
+ * </ul>
+ * Any Instance of TransactionTemplate created by this method will:
+ * <ul>
+ * <li>Resolve non xa transactions created before it if the TransactionConfig action requires.</li>
+ * <li>Suspend-Resume xa transaction created before it if the TransactionConfig action requires it.</li>
+ * <li>Start a transaction if required by TransactionConfig action.</li>
+ * <li><Resolve transaction if was started by this TransactionTemplate.</li>
+ * </ul>
  *
  */
 public class TransactionalExecutionTemplate<T> implements ExecutionTemplate<T> {

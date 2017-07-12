@@ -16,7 +16,6 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
 import org.mule.runtime.core.api.exception.ErrorTypeRepository;
-import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.internal.message.InternalMessage;
 
@@ -64,16 +63,6 @@ public class OnErrorContinueHandler extends TemplateOnErrorHandler {
   protected Event nullifyExceptionPayloadIfRequired(Event event) {
     return Event.builder(event).error(null).message(InternalMessage.builder(event.getMessage()).exceptionPayload(null).build())
         .build();
-  }
-
-  @Override
-  protected Event afterRouting(MessagingException exception, Event event) {
-    return event;
-  }
-
-  @Override
-  protected Event beforeRouting(MessagingException exception, Event event) {
-    return event;
   }
 
   @Override

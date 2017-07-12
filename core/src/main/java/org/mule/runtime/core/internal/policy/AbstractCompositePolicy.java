@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.policy;
 
+import static java.util.Optional.empty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
@@ -67,7 +68,7 @@ public abstract class AbstractCompositePolicy<ParametersTransformer, ParametersP
    */
   public final Publisher<Event> processPolicies(Event operationEvent) {
     return just(operationEvent)
-        .flatMapMany(event -> processWithChildContext(event, new AbstractCompositePolicy.NextOperationCall(), null));
+        .flatMapMany(event -> processWithChildContext(event, new AbstractCompositePolicy.NextOperationCall(), empty()));
   }
 
   /**

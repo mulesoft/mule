@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.enricher;
 
 import static java.util.Collections.singletonList;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.api.Event.builder;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
@@ -29,6 +30,7 @@ import org.mule.runtime.core.api.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.reactivestreams.Publisher;
 
@@ -98,7 +100,7 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements Pr
         // Use flatMap and child context in order to handle null response and do nothing rather than complete response as empty
         // if enrichment processor drops event due to a filter for example.
         .flatMap(event -> from(processWithChildContext(builder(event).session(new DefaultMuleSession(event.getSession()))
-            .build(), enrichmentProcessor, getLocation()))
+            .build(), enrichmentProcessor, ofNullable(getLocation())))
                 .map(checkedFunction(response -> enrich(response, event)))
                 .defaultIfEmpty(event));
   }

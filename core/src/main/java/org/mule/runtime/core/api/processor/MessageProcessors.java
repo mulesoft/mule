@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.processor;
 
+import static java.util.Optional.of;
 import static org.mule.runtime.core.DefaultEventContext.child;
 import static org.mule.runtime.core.api.Event.builder;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
@@ -25,6 +26,7 @@ import org.mule.runtime.core.processor.chain.ExplicitMessageProcessorChainBuilde
 import org.mule.runtime.core.processor.chain.ExplicitMessageProcessorChainBuilder.ExplicitMessageProcessorChain;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.reactivestreams.Publisher;
 
@@ -132,7 +134,7 @@ public class MessageProcessors {
    * @return the future result of processing processor.
    */
   public static Publisher<Event> processWithChildContext(Event event, ReactiveProcessor processor,
-                                                         ComponentLocation componentLocation) {
+                                                         Optional<ComponentLocation> componentLocation) {
     return internalProcessWithChildContext(event, processor, child(event.getContext(), componentLocation, false));
   }
 
@@ -149,7 +151,7 @@ public class MessageProcessors {
    * @return the future result of processing processor.
    */
   public static Publisher<Event> processWithChildContextHandleErrors(Event event, ReactiveProcessor processor,
-                                                                     ComponentLocation componentLocation) {
+                                                                     Optional<ComponentLocation> componentLocation) {
     return internalProcessWithChildContext(event, processor, child(event.getContext(), componentLocation, true));
   }
 

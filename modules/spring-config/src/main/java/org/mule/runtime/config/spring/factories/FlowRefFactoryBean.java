@@ -6,8 +6,7 @@
  */
 package org.mule.runtime.config.spring.factories;
 
-import static org.mule.runtime.core.DefaultEventContext.child;
-import static org.mule.runtime.core.api.Event.builder;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
@@ -75,14 +74,6 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
     }
 
     return new FlowRefMessageProcessor();
-  }
-
-  private Event createChildEvent(Event event) {
-    return builder(child(event.getContext()), event).build();
-  }
-
-  private Event createParentEvent(Event parent, Event result) {
-    return builder(parent.getContext(), result).build();
   }
 
   protected Processor getReferencedFlow(String name, FlowConstruct flowConstruct) throws MuleException {
@@ -185,7 +176,7 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
           return just(event)
               .flatMap(request -> Mono
                   .from(processWithChildContextHandleErrors(request, referencedProcessor,
-                                                            FlowRefFactoryBean.this.getLocation())));
+                                                            ofNullable(FlowRefFactoryBean.this.getLocation()))));
         } else {
           return just(event).transform(referencedProcessor);
         }

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.processor;
 
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setFlowConstructIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
@@ -60,7 +61,8 @@ public class ResponseMessageProcessorAdapter extends AbstractInterceptingMessage
       return from(publisher)
           .transform(applyNext())
           // Use flatMap and child context in order to handle null response and continue with current event
-          .flatMap(event -> from(processWithChildContext(event, responseProcessor, getLocation())).defaultIfEmpty(event));
+          .flatMap(event -> from(processWithChildContext(event, responseProcessor, ofNullable(getLocation())))
+              .defaultIfEmpty(event));
     }
   }
 

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.policy;
 
+import static java.util.Optional.empty;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.functional.Either.left;
 import static org.mule.runtime.core.api.functional.Either.right;
@@ -82,7 +83,7 @@ public class CompositeSourcePolicy extends
   @Override
   protected Publisher<Event> processNextOperation(Event event) {
     return just(event)
-        .then(request -> from(processWithChildContext(request, flowExecutionProcessor, null)))
+        .then(request -> from(processWithChildContext(request, flowExecutionProcessor, empty())))
         .map(flowExecutionResponse -> {
           originalResponseParameters =
               getParametersProcessor().getSuccessfulExecutionResponseParametersFunction().apply(flowExecutionResponse);

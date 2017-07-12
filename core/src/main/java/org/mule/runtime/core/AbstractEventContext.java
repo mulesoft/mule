@@ -10,16 +10,17 @@ import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.from;
+import static reactor.core.publisher.Mono.just;
 import static reactor.core.publisher.Mono.when;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
-import org.mule.runtime.core.internal.util.rx.Operators;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
@@ -153,10 +154,10 @@ abstract class AbstractEventContext implements EventContext {
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug(this + " handling messaging exception.");
     }
-    return from(handler.apply(messagingException))
-        .doOnSuccess(handled -> success(handled))
+    return just(messagingException).flatMapMany(handler)
+        .doOnNext(handled -> success(handled))
         .doOnError(rethrown -> error(rethrown))
-        .onErrorResume(t -> empty())
+        .materialize()
         .then();
   }
 

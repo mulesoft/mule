@@ -82,10 +82,11 @@ public final class DefaultEventContext extends AbstractEventContext implements S
    * not complete the parent context
    * 
    * @param parent the parent context
+   * @param componentLocation he location of the component that creates the child context and operates on result if available.
    * @return a new child context
    */
-  public static EventContext child(EventContext parent) {
-    return child(parent, null, false);
+  public static EventContext child(EventContext parent, Optional<ComponentLocation> componentLocation) {
+    return child(parent, componentLocation, false);
   }
 
   /**
@@ -95,12 +96,12 @@ public final class DefaultEventContext extends AbstractEventContext implements S
    * not complete the parent context
    *
    * @param parent the parent context
-   * @param componentLocation the location of the component that creates the child context and operates on result.
+   * @param componentLocation the location of the component that creates the child context and operates on result if available.
    * @param handleErrors if the {@link MessagingExceptionHandler} should be used to handle errors.
    * @return a new child context
    */
-  public static EventContext child(EventContext parent, ComponentLocation componentLocation, boolean handleErrors) {
-    EventContext child = new ChildEventContext(parent, componentLocation, handleErrors);
+  public static EventContext child(EventContext parent, Optional<ComponentLocation> componentLocation, boolean handleErrors) {
+    EventContext child = new ChildEventContext(parent, componentLocation.orElse(null), handleErrors);
     if (parent instanceof AbstractEventContext) {
       ((AbstractEventContext) parent).addChildContext(child);
     }

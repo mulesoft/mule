@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.routing;
 
+import static java.util.Optional.empty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.DefaultEventContext.child;
 import static org.mule.runtime.core.api.Event.builder;
@@ -53,7 +54,7 @@ public class FirstSuccessfulRoutingStrategy extends AbstractRoutingStrategy {
 
     for (Processor mp : messageProcessors) {
       try {
-        returnEvent = processor.processRoute(mp, builder(child(event.getContext()), event).build());
+        returnEvent = processor.processRoute(mp, builder(child(event.getContext(), empty()), event).build());
 
         if (returnEvent == null) {
           failed = false;

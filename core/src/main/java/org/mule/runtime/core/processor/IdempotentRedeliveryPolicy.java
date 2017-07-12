@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.processor;
 
+import static java.util.Optional.empty;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -154,7 +155,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
       }
 
       try {
-        Event returnEvent = processNext(Event.builder(DefaultEventContext.child(event.getContext()), event).build());
+        Event returnEvent = processNext(Event.builder(DefaultEventContext.child(event.getContext(), empty()), event).build());
         counter = findCounter(messageId);
         if (counter != null) {
           resetCounter(messageId);

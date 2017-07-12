@@ -190,7 +190,7 @@ public class ModuleFlowProcessingPhase
    */
   private Mono<Void> policySuccessError(SourceErrorException see, SourcePolicySuccessResult successResult, PhaseContext ctx) {
     MessagingException messagingException = see.toMessagingException();
-    return when(from(ctx.messageProcessContext.getFlowConstruct().getExceptionListener().apply(messagingException))
+    return when(just(messagingException).flatMapMany(ctx.messageProcessContext.getFlowConstruct().getExceptionListener()).last()
         .onErrorResume(e -> empty()),
                 sendErrorResponse(messagingException, successResult.createErrorResponseParameters(), ctx)
                     .doOnSuccess(v -> onTerminate(ctx.terminateConsumer, right(see.getEvent())))).then();

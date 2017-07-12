@@ -8,6 +8,7 @@ package org.mule.runtime.core.routing;
 
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.exception.MuleException.INFO_LOCATION_KEY;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContextHandleErrors;
@@ -31,6 +32,7 @@ import org.mule.runtime.core.routing.outbound.AbstractMessageSequenceSplitter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -112,7 +114,8 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
   protected Event doProcess(Event event) throws MuleException {
     try {
       return Mono.just(event)
-          .then(request -> Mono.from(processWithChildContextHandleErrors(request, ownedMessageProcessor, getLocation())))
+          .then(request -> Mono
+              .from(processWithChildContextHandleErrors(request, ownedMessageProcessor, ofNullable(getLocation()))))
           .onErrorMap(MessagingException.class, e -> {
             if (splitter.equals(e.getFailingMessageProcessor())) {
               // Make sure the context information for the exception is relative to the ForEach.
