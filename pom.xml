@@ -224,7 +224,7 @@
         <muleDslApiVersion>1.0.0-BETA.3</muleDslApiVersion>
         <muleExtensionsApiVersion>1.0.0-BETA.3</muleExtensionsApiVersion>
         <muleHttpPolicyApiVersion>1.0.0-BETA.3</muleHttpPolicyApiVersion>
-        <muleMavenClientApi>1.0.0-BETA.x-SNAPSHOT</muleMavenClientApi>
+        <muleMavenClientApi>1.0.0-BETA.3</muleMavenClientApi>
         <muleMavenClientImpl>1.0.0-BETA.x-SNAPSHOT</muleMavenClientImpl>
         <mulePolicyApiVersion>1.0.0-BETA.3</mulePolicyApiVersion>
         <muleApiVersion>1.0.0-BETA.3</muleApiVersion>
