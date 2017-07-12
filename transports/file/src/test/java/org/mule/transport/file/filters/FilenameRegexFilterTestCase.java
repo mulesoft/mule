@@ -6,15 +6,15 @@
  */
 package org.mule.transport.file.filters;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsNull.notNullValue;
+import static org.hamcrest.core.IsNull.nullValue;
+
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 @SmallTest
 public class FilenameRegexFilterTestCase extends AbstractMuleTestCase
@@ -24,15 +24,15 @@ public class FilenameRegexFilterTestCase extends AbstractMuleTestCase
     public void testFilenameRegexFilter()
     {
         FilenameRegexFilter filter = new FilenameRegexFilter();
-        assertNull(filter.getPattern());
-        assertFalse(filter.accept("foo"));
+        assertThat(filter.getPattern(), nullValue());
+        assertThat(filter.accept("foo"), equalTo(false));
 
         filter.setPattern("[0-9]*_test.csv");
-        assertNotNull(filter.getPattern());
+        assertThat(filter.getPattern(), notNullValue());
         filter.setCaseSensitive(true);
-        assertNotNull(filter.getPattern());
+        assertThat(filter.getPattern(), notNullValue());
         filter.setPattern(null);
-        assertNull(filter.getPattern());
+        assertThat(filter.getPattern(), nullValue());
 
         filter.setPattern("[0-9]*_test.csv");
         filter.setCaseSensitive(true);
@@ -40,15 +40,29 @@ public class FilenameRegexFilterTestCase extends AbstractMuleTestCase
         String fileNameNoMatch1 = "20060101_test_test.csv";
         String fileNameNoMatch2 = "20060101_TEST.csv";
 
-        assertNotNull(filter.getPattern());
-        assertTrue(filter.accept(fileNameMatch));
-        assertFalse(filter.accept(fileNameNoMatch1));
-        assertFalse(filter.accept(fileNameNoMatch2));
+        assertThat(filter.getPattern(), notNullValue());
+        assertThat(filter.accept(fileNameMatch), equalTo(true));
+        assertThat(filter.accept(fileNameNoMatch1), equalTo(false));
+        assertThat(filter.accept(fileNameNoMatch2), equalTo(false));
 
         filter.setCaseSensitive(false);
-        assertTrue(filter.accept(fileNameMatch));
-        assertFalse(filter.accept(fileNameNoMatch1));
-        assertTrue(filter.accept(fileNameNoMatch2));
+        assertThat(filter.accept(fileNameMatch), equalTo(true));
+        assertThat(filter.accept(fileNameNoMatch1), equalTo(false));
+        assertThat(filter.accept(fileNameNoMatch2), equalTo(true));
+
+        filter.setPattern("test\\d{2,4}.csv");
+        String fileNameNoMatchRange = "test.csv";
+        String fileNameNoMatchRange1 = "test1.csv";
+        String fileNameMatchRange2 = "test11.csv";
+        String fileNameMatchRange3 = "test111.csv";
+        String fileNameMatchRange4 = "test1111.csv";
+        String fileNameNoMatchRange5 = "test11111.csv";
+        assertThat(filter.accept(fileNameNoMatchRange), equalTo(false));
+        assertThat(filter.accept(fileNameNoMatchRange1), equalTo(false));
+        assertThat(filter.accept(fileNameMatchRange2), equalTo(true));
+        assertThat(filter.accept(fileNameMatchRange3), equalTo(true));
+        assertThat(filter.accept(fileNameMatchRange4), equalTo(true));
+        assertThat(filter.accept(fileNameNoMatchRange5), equalTo(false));
     }
 
 }
