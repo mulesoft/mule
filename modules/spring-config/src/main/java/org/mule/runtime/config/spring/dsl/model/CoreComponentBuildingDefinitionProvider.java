@@ -149,7 +149,7 @@ import org.mule.runtime.core.processor.IdempotentRedeliveryPolicy;
 import org.mule.runtime.core.processor.InvokerMessageProcessor;
 import org.mule.runtime.core.processor.ResponseMessageProcessorAdapter;
 import org.mule.runtime.core.processor.SecurityFilterMessageProcessor;
-import org.mule.runtime.core.processor.TryMessageProcessor;
+import org.mule.runtime.core.processor.TryScope;
 import org.mule.runtime.core.processor.simple.AbstractAddVariablePropertyProcessor;
 import org.mule.runtime.core.processor.simple.AddFlowVariableProcessor;
 import org.mule.runtime.core.processor.simple.AddPropertyProcessor;
@@ -457,7 +457,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
             .withSetterParameterDefinition(NAME, fromSimpleParameter(NAME).build()).build());
     // TODO MULE-12726 Remove TryProcessorFactoryBean
     componentBuildingDefinitions
-        .add(baseDefinition.withIdentifier(TRY).withTypeDefinition(fromType(TryMessageProcessor.class))
+        .add(baseDefinition.withIdentifier(TRY).withTypeDefinition(fromType(TryScope.class))
             .withObjectFactoryType(TryProcessorFactoryBean.class)
             .withSetterParameterDefinition("exceptionListener", fromChildConfiguration(MessagingExceptionHandler.class).build())
             .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())

@@ -35,8 +35,6 @@ import org.mule.runtime.config.spring.dsl.spring.ComponentModelHelper;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.DefaultLocationPart;
 
-import com.google.common.collect.ImmutableList;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -53,6 +51,7 @@ import com.google.common.collect.ImmutableList;
 public class ComponentLocationVisitor implements Consumer<ComponentModel> {
 
   private static final String PROCESSORS_PART_NAME = "processors";
+  private static final ComponentIdentifier ROUTE_COMPONENT_IDENTIFIER = buildFromStringRepresentation("mule:route");
 
   /**
    * For every {@link ComponentModel} in the configuration, sets the {@link DefaultComponentLocation} associated within an
@@ -106,7 +105,7 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
           // this is the case of the when element inside the choice
           componentLocation = parentComponentLocation.appendRoutePart()
               .appendLocationPart(findNonProcessorPath(componentModel), of(TypedComponentIdentifier.builder().withType(UNKNOWN)
-                  .withIdentifier(buildFromStringRepresentation("mule:route")).build()), empty(), empty());
+                  .withIdentifier(ROUTE_COMPONENT_IDENTIFIER).build()), empty(), empty());
         }
       } else if (isProcessor(componentModel)) {
         if (isModuleOperation(componentModel.getParent())) {

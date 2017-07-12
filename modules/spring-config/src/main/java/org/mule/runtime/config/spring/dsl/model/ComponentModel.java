@@ -17,6 +17,9 @@ import org.mule.runtime.core.api.processor.Router;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.BeanReference;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -25,9 +28,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
-
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.config.BeanReference;
 
 /**
  * An {@code ComponentModel} represents the user configuration of a component (flow, config, message processor, etc) defined in an
@@ -171,7 +171,6 @@ public class ComponentModel {
    * @return true if this {@code ComponentModel} represents a {@code org.mule.runtime.core.api.processor.MessageProcessor} scope.
    */
   public boolean isScope() {
-    // TODO MULE-9691 : Define a clear mechanism to realize if the object to be build is an scope. For now this works.
     return Router.class.isAssignableFrom(type);
   }
 
@@ -222,9 +221,9 @@ public class ComponentModel {
   }
 
   /**
-   * Setter used for components that should be created eagerly without going through spring. This is the case of models contributing
-   * to IoC {@link org.mule.runtime.api.ioc.ObjectProvider} interface that require to be created before the application components
-   * so they can be referenced.
+   * Setter used for components that should be created eagerly without going through spring. This is the case of models
+   * contributing to IoC {@link org.mule.runtime.api.ioc.ObjectProvider} interface that require to be created before the
+   * application components so they can be referenced.
    * 
    * @param objectInstance the object instance created from this model.
    */

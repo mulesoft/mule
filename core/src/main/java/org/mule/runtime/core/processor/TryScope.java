@@ -45,9 +45,9 @@ import java.util.List;
  * If the {@link org.mule.runtime.core.api.transaction.TransactionConfig} is null then no transaction is used and the next
  * {@link org.mule.runtime.core.api.processor.Processor} is invoked directly.
  */
-public class TryMessageProcessor extends AbstractMessageProcessorOwner implements Scope {
+public class TryScope extends AbstractMessageProcessorOwner implements Scope {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(TryMessageProcessor.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(TryScope.class);
 
   protected MessageProcessorChain nestedChain;
   protected MuleTransactionConfig transactionConfig;

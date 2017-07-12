@@ -7,9 +7,14 @@
 package org.mule.runtime.core.api.routing;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.processor.Router;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.Router;
 
+/**
+ * A router which route will be conditionally executed.
+ * 
+ * @since 4.0
+ */
 public interface MatchableRouter extends MatchableMessageProcessor, Router {
 
   /**
