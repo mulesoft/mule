@@ -62,7 +62,7 @@ public class ExceptionUtils {
 
 
   /**
-   * Null {@link MessagingExceptionHandler} which can we used to configure a {@link MessageProcessorChain} to not handle errors.
+   * Null {@link MessagingExceptionHandler} which can be used to configure a {@link MessageProcessorChain} to not handle errors.
    */
   public static final MessagingExceptionHandler NULL_ERROR_HANDLER = new MessagingExceptionHandler() {
 
