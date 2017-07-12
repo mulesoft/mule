@@ -25,6 +25,12 @@ public interface AllureConstants {
 
       String SEARCH_CONFIGURATION = "Search configuration";
     }
+
+    interface MUnitComponentLocatorStory {
+
+      String MUNIT_COMPONENT_LOCATION = "MUnit component location";
+
+    }
   }
 
   interface DeploymentTypeFeature {
