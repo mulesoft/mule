@@ -48,6 +48,16 @@
                 <xs:attribute type="mule:substitutableLong" use="required" name="castFrequencyInMillis"></xs:attribute>
                 <xs:attribute type="xs:string" use="required" name="spell"></xs:attribute>
                 <xs:attribute type="mule:substitutableInt" use="optional" default="1" name="spellSize"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
+                    <xs:annotation>
+                        <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" name="outputEncoding">
+                    <xs:annotation>
+                        <xs:documentation>The encoding of the payload that this operation outputs.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
@@ -75,6 +85,16 @@
                     </xs:annotation>
                 </xs:attribute>
                 <xs:attribute type="xs:string" use="optional" default="#[payload]" name="stream"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
+                    <xs:annotation>
+                        <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" name="outputEncoding">
+                    <xs:annotation>
+                        <xs:documentation>The encoding of the payload that this operation outputs.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
                         <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -117,6 +137,16 @@
                 </xs:attribute>
                 <xs:attribute type="xs:string" use="optional" default="#[payload]" name="stream"></xs:attribute>
                 <xs:attribute type="mule:expressionInt" use="required" name="position"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
+                    <xs:annotation>
+                        <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" name="outputEncoding">
+                    <xs:annotation>
+                        <xs:documentation>The encoding of the payload that this operation outputs.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
                         <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -138,6 +168,16 @@
                     </xs:annotation>
                 </xs:attribute>
                 <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="data"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
+                    <xs:annotation>
+                        <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" name="outputEncoding">
+                    <xs:annotation>
+                        <xs:documentation>The encoding of the payload that this operation outputs.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
                         <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -251,6 +291,16 @@
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
                 <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
                 <xs:attribute type="mule:expressionString" use="optional" name="instructionsFile"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
+                    <xs:annotation>
+                        <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" name="outputEncoding">
+                    <xs:annotation>
+                        <xs:documentation>The encoding of the payload that this operation outputs.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
                         <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>

@@ -76,6 +76,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Configura
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectionProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectionTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.InterceptorsModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.NullSafeModelProperty;
@@ -92,6 +93,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -290,6 +292,16 @@ public class MuleExtensionUtils {
   public static java.util.Optional<Method> getImplementingMethod(OperationDeclaration operationDeclaration) {
     return operationDeclaration.getModelProperty(ImplementingMethodModelProperty.class)
         .map(ImplementingMethodModelProperty::getMethod);
+  }
+
+  /**
+   * Returns the {@link Class} that was used to declare the given {@code declaration}.
+   *
+   * @param declaration a {@link BaseDeclaration} implementation.
+   * @return A {@link Class} where the element was defined or {@link Optional#empty()} if the element was defined by other means.
+   */
+  public static java.util.Optional<? extends Class<?>> getImplementingType(BaseDeclaration<?> declaration) {
+    return declaration.getModelProperty(ImplementingTypeModelProperty.class).map(ImplementingTypeModelProperty::getType);
   }
 
   /**

@@ -58,33 +58,33 @@
             </xs:complexContent>
         </xs:complexType>
     </xs:element>
-  <xs:complexType name="org.mule.test.vegan.extension.GroupedFood">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="1" name="food">
-            <xs:complexType>
-              <xs:choice minOccurs="1" maxOccurs="1">
-                <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1" maxOccurs="1" ref="vegan:abstract-farmed-food"></xs:element>
-                <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1" maxOccurs="1" ref="vegan:global-abstract-farmed-food"></xs:element>
-              </xs:choice>
-            </xs:complexType>
-          </xs:element>
-        </xs:sequence>
-        <xs:attribute type="xs:string" use="optional" name="food"></xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" abstract="true" name="abstract-grouped-food"></xs:element>
-  <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" substitutionGroup="vegan:abstract-grouped-food" name="grouped-food">
-    <xs:complexType>
-      <xs:complexContent>
-        <xs:extension base="vegan:org.mule.test.vegan.extension.GroupedFood">
-          <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
-        </xs:extension>
-      </xs:complexContent>
+    <xs:complexType name="org.mule.test.vegan.extension.GroupedFood">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element minOccurs="0" maxOccurs="1" name="food">
+                        <xs:complexType>
+                            <xs:choice minOccurs="1" maxOccurs="1">
+                                <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1" maxOccurs="1" ref="vegan:abstract-farmed-food"></xs:element>
+                                <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1" maxOccurs="1" ref="vegan:global-abstract-farmed-food"></xs:element>
+                            </xs:choice>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute type="xs:string" use="optional" name="food"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
     </xs:complexType>
-  </xs:element>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" abstract="true" name="abstract-grouped-food"></xs:element>
+    <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" substitutionGroup="vegan:abstract-grouped-food" name="grouped-food">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="vegan:org.mule.test.vegan.extension.GroupedFood">
+                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
     <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" name="pear-config">
         <xs:complexType>
             <xs:complexContent>
@@ -214,13 +214,13 @@
                             </xs:sequence>
                         </xs:complexType>
                     </xs:element>
-          <xs:element minOccurs="0" maxOccurs="1" name="pojo-grouped-food">
-            <xs:complexType>
-              <xs:complexContent>
-                <xs:extension xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" base="vegan:org.mule.test.vegan.extension.GroupedFood"></xs:extension>
-              </xs:complexContent>
-            </xs:complexType>
-          </xs:element>
+                    <xs:element minOccurs="0" maxOccurs="1" name="pojo-grouped-food">
+                        <xs:complexType>
+                            <xs:complexContent>
+                                <xs:extension xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" base="vegan:org.mule.test.vegan.extension.GroupedFood"></xs:extension>
+                            </xs:complexContent>
+                        </xs:complexType>
+                    </xs:element>
                     <xs:element minOccurs="0" maxOccurs="1" name="sample">
                         <xs:complexType>
                             <xs:complexContent>
@@ -228,25 +228,25 @@
                             </xs:complexContent>
                         </xs:complexType>
                     </xs:element>
-          <xs:element minOccurs="0" maxOccurs="1" name="as-group-inline">
-            <xs:complexType>
-              <xs:complexContent>
-                <xs:extension base="mule:abstractExtensionType">
-                  <xs:sequence>
-                    <xs:element minOccurs="0" maxOccurs="1" name="food">
-                      <xs:complexType>
-                        <xs:choice minOccurs="1" maxOccurs="1">
-                          <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1" maxOccurs="1" ref="vegan:abstract-farmed-food"></xs:element>
-                          <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1" maxOccurs="1" ref="vegan:global-abstract-farmed-food"></xs:element>
-                        </xs:choice>
-                      </xs:complexType>
+                    <xs:element minOccurs="0" maxOccurs="1" name="as-group-inline">
+                        <xs:complexType>
+                            <xs:complexContent>
+                                <xs:extension base="mule:abstractExtensionType">
+                                    <xs:sequence>
+                                        <xs:element minOccurs="0" maxOccurs="1" name="food">
+                                            <xs:complexType>
+                                                <xs:choice minOccurs="1" maxOccurs="1">
+                                                    <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1" maxOccurs="1" ref="vegan:abstract-farmed-food"></xs:element>
+                                                    <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1" maxOccurs="1" ref="vegan:global-abstract-farmed-food"></xs:element>
+                                                </xs:choice>
+                                            </xs:complexType>
+                                        </xs:element>
+                                    </xs:sequence>
+                                    <xs:attribute type="xs:string" use="optional" name="food"></xs:attribute>
+                                </xs:extension>
+                            </xs:complexContent>
+                        </xs:complexType>
                     </xs:element>
-                  </xs:sequence>
-                  <xs:attribute type="xs:string" use="optional" name="food"></xs:attribute>
-                </xs:extension>
-              </xs:complexContent>
-            </xs:complexType>
-          </xs:element>
                     <xs:element minOccurs="0" maxOccurs="1" name="response">
                         <xs:complexType>
                             <xs:complexContent>
@@ -329,6 +329,16 @@
                     </xs:annotation>
                 </xs:attribute>
                 <xs:attribute type="mule:expressionString" use="optional" name="shouldNotOverride"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
+                    <xs:annotation>
+                        <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" name="outputEncoding">
+                    <xs:annotation>
+                        <xs:documentation>The encoding of the payload that this operation outputs.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
                         <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -398,6 +408,16 @@
                     </xs:annotation>
                 </xs:attribute>
                 <xs:attribute type="mule:expressionString" use="required" name="theWord"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
+                    <xs:annotation>
+                        <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" name="outputEncoding">
+                    <xs:annotation>
+                        <xs:documentation>The encoding of the payload that this operation outputs.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
                         <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -670,6 +690,16 @@
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
+                    <xs:annotation>
+                        <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" name="outputEncoding">
+                    <xs:annotation>
+                        <xs:documentation>The encoding of the payload that this operation outputs.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
@@ -714,37 +744,37 @@
                     </xs:element>
                 </xs:sequence>
                 <xs:attribute type="xs:string" use="optional" name="policy"></xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="target">
-          <xs:annotation>
-            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ConsumingGroupedFoodType" substitutionGroup="mule:abstract-operator" name="consuming-grouped-food"></xs:element>
-  <xs:complexType name="ConsumingGroupedFoodType">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="1" name="pojo-grouped-food">
-            <xs:complexType>
-              <xs:complexContent>
-                <xs:extension xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" base="vegan:org.mule.test.vegan.extension.GroupedFood"></xs:extension>
-              </xs:complexContent>
-            </xs:complexType>
-          </xs:element>
-          <xs:element minOccurs="0" maxOccurs="1" name="food">
-            <xs:complexType>
-              <xs:choice minOccurs="1" maxOccurs="1">
-                <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1" maxOccurs="1" ref="vegan:abstract-farmed-food"></xs:element>
-                <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1" maxOccurs="1" ref="vegan:global-abstract-farmed-food"></xs:element>
-              </xs:choice>
-            </xs:complexType>
-          </xs:element>
-        </xs:sequence>
-        <xs:attribute type="xs:string" use="optional" name="pojoGroupedFood"></xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="food"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="target">
+                    <xs:annotation>
+                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ConsumingGroupedFoodType" substitutionGroup="mule:abstract-operator" name="consuming-grouped-food"></xs:element>
+    <xs:complexType name="ConsumingGroupedFoodType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element minOccurs="0" maxOccurs="1" name="pojo-grouped-food">
+                        <xs:complexType>
+                            <xs:complexContent>
+                                <xs:extension xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" base="vegan:org.mule.test.vegan.extension.GroupedFood"></xs:extension>
+                            </xs:complexContent>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element minOccurs="0" maxOccurs="1" name="food">
+                        <xs:complexType>
+                            <xs:choice minOccurs="1" maxOccurs="1">
+                                <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1" maxOccurs="1" ref="vegan:abstract-farmed-food"></xs:element>
+                                <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1" maxOccurs="1" ref="vegan:global-abstract-farmed-food"></xs:element>
+                            </xs:choice>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute type="xs:string" use="optional" name="pojoGroupedFood"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="food"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
                         <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -891,6 +921,16 @@
                 <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
                 <xs:attribute type="xs:string" use="required" name="food"></xs:attribute>
                 <xs:attribute type="mule:expressionMap" use="optional" name="menu"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
+                    <xs:annotation>
+                        <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" name="outputEncoding">
+                    <xs:annotation>
+                        <xs:documentation>The encoding of the payload that this operation outputs.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
                         <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>

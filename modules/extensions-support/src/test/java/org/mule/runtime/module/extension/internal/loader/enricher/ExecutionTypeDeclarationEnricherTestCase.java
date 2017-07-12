@@ -18,7 +18,6 @@ import org.mule.runtime.api.meta.model.ExecutionType;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
-import org.mule.runtime.extension.api.annotation.DataTypeParameters;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.internal.loader.enricher.ExecutionTypeDeclarationEnricher;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -48,7 +47,6 @@ public class ExecutionTypeDeclarationEnricherTestCase extends AbstractMuleTestCa
   private ExecutionTypeDeclarationEnricher enricher = new ExecutionTypeDeclarationEnricher();
 
   @Before
-  @DataTypeParameters
   public void before() {
     when(extensionLoadingContext.getExtensionDeclarer()).thenReturn(extensionDeclarer);
     when(extensionDeclarer.getDeclaration()).thenReturn(extensionDeclaration);
