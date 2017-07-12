@@ -14,30 +14,54 @@ import java.net.Socket;
 
 public class RequestUtils
 {
+
     private RequestUtils()
     {
     }
 
-    public static String executeRequestWithSocket (String requestText, int port) throws Exception
+    public static String executeRequestWithSocket(String requestText, int port) throws Exception
     {
-        Socket socket = new Socket("localhost", port);
-        PrintWriter printWriter = new PrintWriter(socket.getOutputStream());
-        printWriter.println(requestText);
-        printWriter.println("");
-        printWriter.flush();
+        Socket socket = null;
+        PrintWriter printWriter = null;
+        BufferedReader bufferedReader = null;
+        StringBuilder stringBuilder;
 
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        StringBuilder stringBuilder = new StringBuilder();
-        String outputString;
-
-        while((outputString = bufferedReader.readLine()) != null)
+        try
         {
-            stringBuilder.append(outputString);
-        }
+            socket = new Socket("localhost", port);
+            printWriter = new PrintWriter(socket.getOutputStream());
+            printWriter.println(requestText);
+            printWriter.println("");
+            printWriter.flush();
 
-        bufferedReader.close();
-        printWriter.close();
-        socket.close();
+            bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            stringBuilder = new StringBuilder();
+            String outputString;
+
+            while ((outputString = bufferedReader.readLine()) != null)
+            {
+                stringBuilder.append(outputString);
+            }
+        }
+        catch (Exception e)
+        {
+            throw e;
+        }
+        finally
+        {
+            if (socket != null)
+            {
+                socket.close();
+            }
+            if (bufferedReader != null)
+            {
+                bufferedReader.close();
+            }
+            if (printWriter != null)
+            {
+                printWriter.close();
+            }
+        }
 
         return stringBuilder.toString();
     }
