@@ -207,7 +207,7 @@
         <staxonVersion>1.2</staxonVersion>
         <testFtpServerVersion>1.0.6</testFtpServerVersion>
         <unirestVersion>1.4.9</unirestVersion>
-        <weaveVersion>2.0.0-BETA.3-SNAPSHOT</weaveVersion>
+        <weaveVersion>2.0.0-BETA.2</weaveVersion>
         <woodstoxVersion>4.4.1</woodstoxVersion>
         <wrapperVersion>3.2.3</wrapperVersion>
         <xalanVersion>2.7.2</xalanVersion>

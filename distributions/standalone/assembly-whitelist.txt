@@ -166,7 +166,7 @@
 /mule-standalone-${productVersion}/services/mule-service-http-1.0.0-BETA.x-SNAPSHOT.zip
 /mule-standalone-${productVersion}/services/mule-service-oauth-1.0.0-BETA.x-SNAPSHOT.zip
 /mule-standalone-${productVersion}/services/mule-service-soap-1.0.0-BETA.x-SNAPSHOT.zip
-/mule-standalone-${productVersion}/services/mule-service-weave-2.0.0-BETA.3-+
+/mule-standalone-${productVersion}/services/mule-service-weave-2.0.0-BETA.2.zip
 #
 # /lib/opt
 #
