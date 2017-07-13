@@ -81,9 +81,9 @@ public class MinimalApplicationModelGenerator {
     Iterator<ComponentModel> iterator = applicationModel.getRootComponentModel().getInnerComponents().iterator();
     while (iterator.hasNext()) {
       ComponentModel componentModel = iterator.next();
-      if (componentModel.getNameAttribute() == null || !allRequiredComponentModels.contains(componentModel.getNameAttribute())) {
-        componentModel.setEnabled(false);
-        componentModel.executedOnEveryInnerComponent(component -> component.setEnabled(false));
+      if (componentModel.getNameAttribute() != null && allRequiredComponentModels.contains(componentModel.getNameAttribute())) {
+        componentModel.setEnabled(true);
+        componentModel.executedOnEveryInnerComponent(component -> component.setEnabled(true));
       }
     }
     ComponentModel currentComponentModel = requestedComponentModel;
@@ -102,6 +102,8 @@ public class MinimalApplicationModelGenerator {
     // Finally we set the requested componentModel as enabled as it could have been disabled when traversing dependencies
     requestedComponentModel.setEnabled(true);
     requestedComponentModel.executedOnEveryInnerComponent(componentModel -> componentModel.setEnabled(true));
+    // mule root component model has to be enabled too
+    this.applicationModel.getRootComponentModel().setEnabled(true);
     return applicationModel;
   }
 
@@ -197,9 +199,6 @@ public class MinimalApplicationModelGenerator {
   }
 
   private Set<String> resolveComponentDependencies(ComponentModel requestedComponentModel) {
-    if (!requestedComponentModel.isEnabled()) {
-      return new HashSet<>();
-    }
     Set<String> otherDependencies = new HashSet<>();
     requestedComponentModel.getInnerComponents()
         .stream().forEach(childComponent -> {
