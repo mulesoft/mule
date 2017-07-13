@@ -126,7 +126,7 @@ public class CursorManager {
    * cursors concurrently.
    */
   private void registerEventContext(EventContext eventContext) {
-    from(eventContext.getCompletionPublisher()).subscribe(aVoid -> terminated(eventContext));
+    from(eventContext.getCompletionPublisher()).subscribe(null, null, () -> terminated(eventContext));
   }
 
   private EventContext getRoot(EventContext eventContext) {
