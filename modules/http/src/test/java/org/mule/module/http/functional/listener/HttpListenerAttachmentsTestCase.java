@@ -20,13 +20,13 @@ import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.module.http.api.HttpHeaders.Values.CHUNKED;
 import static org.mule.module.http.api.HttpHeaders.Values.MULTIPART_FORM_DATA;
+import static org.mule.module.http.internal.HttpParser.parseMultipartContent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.message.ds.ByteArrayDataSource;
 import org.mule.module.http.api.HttpHeaders;
-import org.mule.module.http.internal.HttpParser;
 import org.mule.module.http.internal.multipart.HttpPart;
 import org.mule.module.http.internal.multipart.HttpPartDataSource;
 import org.mule.module.http.internal.request.grizzly.ByteArrayPart;
@@ -154,7 +154,7 @@ public class HttpListenerAttachmentsTestCase extends FunctionalTestCase
             assertThat(muleAttachment.getHeader(CONTENT_DISPOSITION), equalTo("file; name=\"partName\"; documentId=1"));
 
             // check that the HTTP response includes the same headers as the HTTP request (when echoing)
-            final Collection<HttpPart> parts = HttpParser.parseMultipartContent(response.getResponseBodyAsStream(), response.getContentType());
+            final Collection<HttpPart> parts = parseMultipartContent(response.getResponseBodyAsStream(), response.getContentType());
             assertThat(parts.size(), Is.is(1));
             HttpPart receivedPart = new ArrayList<>(parts).get(0);
             assertThat(receivedPart.getHeader("Custom-Header"), equalTo("custom"));
@@ -238,7 +238,7 @@ public class HttpListenerAttachmentsTestCase extends FunctionalTestCase
             assertThat(muleAttachment.getHeader(CONTENT_TRANSFER_ENCODING), equalTo("base64"));
 
             // check that the HTTP response includes the same headers as the HTTP request (when echoing)
-            final Collection<HttpPart> parts = HttpParser.parseMultipartContent(response.getResponseBodyAsStream(), response.getContentType());
+            final Collection<HttpPart> parts = parseMultipartContent(response.getResponseBodyAsStream(), response.getContentType());
             assertThat(parts.size(), Is.is(1));
             HttpPart receivedPart = new ArrayList<>(parts).get(0);
             assertThat(receivedPart.getHeader("Custom-Header"), equalTo("custom"));
@@ -279,7 +279,7 @@ public class HttpListenerAttachmentsTestCase extends FunctionalTestCase
                 final String contentType = response.getFirstHeader(HttpHeaders.Names.CONTENT_TYPE).getValue();
                 assertThat(contentType, Matchers.containsString(expectedResponseContentType));
 
-                final Collection<HttpPart> parts = HttpParser.parseMultipartContent(response.getEntity().getContent(), contentType);
+                final Collection<HttpPart> parts = parseMultipartContent(response.getEntity().getContent(), contentType);
                 assertThat(parts.size(), Is.is(2));
                 Map<String, Part> partsAsMap = convertPartsToMap(parts);
                 assertThat(partsAsMap.get(TEXT_BODY_FIELD_NAME), IsNull.notNullValue());

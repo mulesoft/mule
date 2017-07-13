@@ -6,7 +6,7 @@
  */
 package org.mule.module.http.internal.multipart;
 
-import static java.lang.String.valueOf;
+import static java.lang.String.format;
 import org.mule.api.MuleRuntimeException;
 import org.mule.message.ds.ByteArrayDataSource;
 import org.mule.util.IOUtils;
@@ -26,7 +26,7 @@ import javax.activation.FileDataSource;
 
 public class HttpPartDataSource implements DataSource
 {
-    public static final String ANONYMOUS_ATTACHMENT_PREFIX = "mule_attachment_";
+    public static final String ANONYMOUS_ATTACHMENT_FORMAT = "mule_attachment_%s";
 
     private final HttpPart part;
     private byte[] content;
@@ -94,17 +94,8 @@ public class HttpPartDataSource implements DataSource
         int anonymousPartCount = 0;
         for (HttpPart part : parts)
         {
-            String name;
-            if (part.getName() == null)
-            {
-                name = ANONYMOUS_ATTACHMENT_PREFIX + valueOf(anonymousPartCount);
-                anonymousPartCount++;
-            }
-            else
-            {
-                name = part.getName();
-            }
-            httpParts.put(name, new DataHandler(new HttpPartDataSource(part)));
+            httpParts.put(part.getName() == null ? format(ANONYMOUS_ATTACHMENT_FORMAT, anonymousPartCount++) : part.getName(),
+                          new DataHandler(new HttpPartDataSource(part)));
         }
         return httpParts;
     }
