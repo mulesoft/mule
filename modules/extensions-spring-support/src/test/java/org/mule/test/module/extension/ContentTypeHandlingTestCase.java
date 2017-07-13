@@ -60,7 +60,7 @@ public class ContentTypeHandlingTestCase extends AbstractExtensionFunctionalTest
   public void onlySetEncodingOnXml() throws Exception {
     Event response = runFlow("onlySetEncodingOnXml");
     DataType dataType = response.getMessage().getPayload().getDataType();
-    assertCustomMimeType(dataType);
+    assertCustomEncoding(dataType);
   }
 
   @Test

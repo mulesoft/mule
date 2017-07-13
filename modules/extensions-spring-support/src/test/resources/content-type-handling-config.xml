@@ -36,7 +36,7 @@
     </flow>
 
     <flow name="onlySetEncodingOnXml">
-        <heisenberg:name-as-stream config-ref="heisenberg" index="0" outputEncoding="${customEncoding}" />
+        <heisenberg:name-as-stream config-ref="heisenberg" outputEncoding="${customEncoding}" />
     </flow>
 
     <flow name="onlySetMimeTypeOnXml">
