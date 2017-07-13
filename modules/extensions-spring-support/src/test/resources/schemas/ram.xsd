@@ -1,153 +1,153 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xs:schema xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.mulesoft.org/schema/mule/ram" attributeFormDefault="unqualified" elementFormDefault="qualified">
-    <xs:import namespace="http://www.w3.org/XML/1998/namespace"></xs:import>
-    <xs:import namespace="http://www.springframework.org/schema/beans" schemaLocation="http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"></xs:import>
-    <xs:import namespace="http://www.mulesoft.org/schema/mule/core" schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule.xsd"></xs:import>
-    <xs:import namespace="http://www.mulesoft.org/schema/mule/extension" schemaLocation="http://www.mulesoft.org/schema/mule/extension/current/mule-extension.xsd"></xs:import>
-    <xs:complexType name="org.mule.runtime.extension.api.soap.MessageDispatcherProvider">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType"></xs:extension>
-        </xs:complexContent>
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace"></xs:import>
+  <xs:import namespace="http://www.springframework.org/schema/beans" schemaLocation="http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"></xs:import>
+  <xs:import namespace="http://www.mulesoft.org/schema/mule/core" schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule.xsd"></xs:import>
+  <xs:import namespace="http://www.mulesoft.org/schema/mule/extension" schemaLocation="http://www.mulesoft.org/schema/mule/extension/current/mule-extension.xsd"></xs:import>
+  <xs:complexType name="org.mule.runtime.extension.api.soap.MessageDispatcherProvider">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType"></xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:ram="http://www.mulesoft.org/schema/mule/ram" type="ram:org.mule.runtime.extension.api.soap.MessageDispatcherProvider" substitutionGroup="mule:abstract-extension" abstract="true" name="global-abstract-message-dispatcher-provider"></xs:element>
+  <xs:element xmlns:ram="http://www.mulesoft.org/schema/mule/ram" type="ram:org.mule.runtime.extension.api.soap.MessageDispatcherProvider" abstract="true" name="abstract-message-dispatcher-provider"></xs:element>
+  <xs:complexType name="org.mule.test.ram.MiniverseDispatcherProvider">
+    <xs:complexContent>
+      <xs:extension xmlns:ram="http://www.mulesoft.org/schema/mule/ram" base="ram:org.mule.runtime.extension.api.soap.MessageDispatcherProvider"></xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns:ram="http://www.mulesoft.org/schema/mule/ram" type="ram:org.mule.test.ram.MiniverseDispatcherProvider" substitutionGroup="ram:abstract-message-dispatcher-provider" abstract="true" name="abstract-miniverse-dispatcher-provider"></xs:element>
+  <xs:element xmlns:ram="http://www.mulesoft.org/schema/mule/ram" substitutionGroup="ram:abstract-miniverse-dispatcher-provider" name="miniverse-dispatcher-provider">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="ram:org.mule.test.ram.MiniverseDispatcherProvider"></xs:extension>
+      </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:ram="http://www.mulesoft.org/schema/mule/ram" type="ram:org.mule.runtime.extension.api.soap.MessageDispatcherProvider" substitutionGroup="mule:abstract-extension" abstract="true" name="global-abstract-message-dispatcher-provider"></xs:element>
-    <xs:element xmlns:ram="http://www.mulesoft.org/schema/mule/ram" type="ram:org.mule.runtime.extension.api.soap.MessageDispatcherProvider" abstract="true" name="abstract-message-dispatcher-provider"></xs:element>
-    <xs:complexType name="org.mule.test.ram.MiniverseDispatcherProvider">
-        <xs:complexContent>
-            <xs:extension xmlns:ram="http://www.mulesoft.org/schema/mule/ram" base="ram:org.mule.runtime.extension.api.soap.MessageDispatcherProvider"></xs:extension>
-        </xs:complexContent>
+  </xs:element>
+  <xs:complexType name="org.mule.test.ram.DefaultPortalGunDispatcherProvider">
+    <xs:complexContent>
+      <xs:extension xmlns:ram="http://www.mulesoft.org/schema/mule/ram" base="ram:org.mule.runtime.extension.api.soap.MessageDispatcherProvider">
+        <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString" use="required" name="responseMessage"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns:ram="http://www.mulesoft.org/schema/mule/ram" type="ram:org.mule.test.ram.DefaultPortalGunDispatcherProvider" substitutionGroup="ram:abstract-message-dispatcher-provider" abstract="true" name="abstract-default-portal-gun-dispatcher-provider"></xs:element>
+  <xs:element xmlns:ram="http://www.mulesoft.org/schema/mule/ram" substitutionGroup="ram:abstract-default-portal-gun-dispatcher-provider" name="default-portal-gun-dispatcher-provider">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="ram:org.mule.test.ram.DefaultPortalGunDispatcherProvider"></xs:extension>
+      </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns:ram="http://www.mulesoft.org/schema/mule/ram" type="ram:org.mule.test.ram.MiniverseDispatcherProvider" substitutionGroup="ram:abstract-message-dispatcher-provider" abstract="true" name="abstract-miniverse-dispatcher-provider"></xs:element>
-    <xs:element xmlns:ram="http://www.mulesoft.org/schema/mule/ram" substitutionGroup="ram:abstract-miniverse-dispatcher-provider" name="miniverse-dispatcher-provider">
-        <xs:complexType>
-            <xs:complexContent>
-                <xs:extension base="ram:org.mule.test.ram.MiniverseDispatcherProvider"></xs:extension>
-            </xs:complexContent>
-        </xs:complexType>
-    </xs:element>
-    <xs:complexType name="org.mule.test.ram.DefaultPortalGunDispatcherProvider">
-        <xs:complexContent>
-            <xs:extension xmlns:ram="http://www.mulesoft.org/schema/mule/ram" base="ram:org.mule.runtime.extension.api.soap.MessageDispatcherProvider">
-                <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString" use="required" name="responseMessage"></xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
+  </xs:element>
+  <xs:complexType name="org.mule.runtime.module.extension.soap.internal.runtime.connection.transport.DefaultHttpMessageDispatcherProvider">
+    <xs:complexContent>
+      <xs:extension xmlns:ram="http://www.mulesoft.org/schema/mule/ram" base="ram:org.mule.runtime.extension.api.soap.MessageDispatcherProvider">
+        <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString" use="optional" name="requesterConfig"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns:ram="http://www.mulesoft.org/schema/mule/ram" type="ram:org.mule.runtime.module.extension.soap.internal.runtime.connection.transport.DefaultHttpMessageDispatcherProvider" substitutionGroup="ram:abstract-message-dispatcher-provider" abstract="true" name="abstract-default-http-message-dispatcher-provider"></xs:element>
+  <xs:element xmlns:ram="http://www.mulesoft.org/schema/mule/ram" substitutionGroup="ram:abstract-default-http-message-dispatcher-provider" name="default-http-message-dispatcher-provider">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="ram:org.mule.runtime.module.extension.soap.internal.runtime.connection.transport.DefaultHttpMessageDispatcherProvider"></xs:extension>
+      </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns:ram="http://www.mulesoft.org/schema/mule/ram" type="ram:org.mule.test.ram.DefaultPortalGunDispatcherProvider" substitutionGroup="ram:abstract-message-dispatcher-provider" abstract="true" name="abstract-default-portal-gun-dispatcher-provider"></xs:element>
-    <xs:element xmlns:ram="http://www.mulesoft.org/schema/mule/ram" substitutionGroup="ram:abstract-default-portal-gun-dispatcher-provider" name="default-portal-gun-dispatcher-provider">
-        <xs:complexType>
-            <xs:complexContent>
-                <xs:extension base="ram:org.mule.test.ram.DefaultPortalGunDispatcherProvider"></xs:extension>
-            </xs:complexContent>
-        </xs:complexType>
-    </xs:element>
-    <xs:complexType name="org.mule.runtime.module.extension.soap.internal.runtime.connection.transport.DefaultHttpMessageDispatcherProvider">
-        <xs:complexContent>
-            <xs:extension xmlns:ram="http://www.mulesoft.org/schema/mule/ram" base="ram:org.mule.runtime.extension.api.soap.MessageDispatcherProvider">
-                <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString" use="optional" name="requesterConfig"></xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
+  </xs:element>
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" name="config">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="mule:abstractExtensionType">
+          <xs:annotation>
+            <xs:documentation>Default configuration</xs:documentation>
+          </xs:annotation>
+          <xs:sequence minOccurs="1" maxOccurs="1">
+            <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="1" maxOccurs="1" ref="extension:abstractConnectionProvider"></xs:element>
+          </xs:sequence>
+          <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns:ram="http://www.mulesoft.org/schema/mule/ram" type="ram:org.mule.runtime.module.extension.soap.internal.runtime.connection.transport.DefaultHttpMessageDispatcherProvider" substitutionGroup="ram:abstract-message-dispatcher-provider" abstract="true" name="abstract-default-http-message-dispatcher-provider"></xs:element>
-    <xs:element xmlns:ram="http://www.mulesoft.org/schema/mule/ram" substitutionGroup="ram:abstract-default-http-message-dispatcher-provider" name="default-http-message-dispatcher-provider">
-        <xs:complexType>
-            <xs:complexContent>
-                <xs:extension base="ram:org.mule.runtime.module.extension.soap.internal.runtime.connection.transport.DefaultHttpMessageDispatcherProvider"></xs:extension>
-            </xs:complexContent>
-        </xs:complexType>
-    </xs:element>
-    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" name="config">
-        <xs:complexType>
-            <xs:complexContent>
+  </xs:element>
+  <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" substitutionGroup="extension:abstractConnectionProvider" name="rick-and-morty-connection">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="extension:abstractConnectionProviderType">
+          <xs:sequence minOccurs="0" maxOccurs="1">
+            <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+            <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:pooling-profile"></xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="transport">
+              <xs:complexType>
+                <xs:choice minOccurs="1" maxOccurs="1">
+                  <xs:element xmlns:ram="http://www.mulesoft.org/schema/mule/ram" minOccurs="1" maxOccurs="1" ref="ram:abstract-message-dispatcher-provider"></xs:element>
+                  <xs:element xmlns:ram="http://www.mulesoft.org/schema/mule/ram" minOccurs="1" maxOccurs="1" ref="ram:global-abstract-message-dispatcher-provider"></xs:element>
+                </xs:choice>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString" use="required" name="wsdlUrl"></xs:attribute>
+          <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString" use="required" name="service"></xs:attribute>
+          <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString" use="required" name="port"></xs:attribute>
+          <xs:attribute type="xs:string" use="optional" name="transport"></xs:attribute>
+          <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:substitutableBoolean" use="optional" name="disableValidation">
+            <xs:annotation>
+              <xs:documentation>Disables connection validation</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/ram" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="InvokeType" substitutionGroup="mule:abstract-operator" name="invoke">
+    <xs:annotation>
+      <xs:documentation>invokes Web Service operations</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="InvokeType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" name="message">
+            <xs:complexType>
+              <xs:complexContent>
                 <xs:extension base="mule:abstractExtensionType">
-                    <xs:annotation>
-                        <xs:documentation>Default configuration</xs:documentation>
-                    </xs:annotation>
-                    <xs:sequence minOccurs="1" maxOccurs="1">
-                        <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="1" maxOccurs="1" ref="extension:abstractConnectionProvider"></xs:element>
-                    </xs:sequence>
-                    <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
+                  <xs:sequence>
+                    <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="body"></xs:element>
+                    <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="headers"></xs:element>
+                    <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="attachments"></xs:element>
+                  </xs:sequence>
                 </xs:extension>
-            </xs:complexContent>
-        </xs:complexType>
-    </xs:element>
-    <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" substitutionGroup="extension:abstractConnectionProvider" name="rick-and-morty-connection">
-        <xs:complexType>
-            <xs:complexContent>
-                <xs:extension base="extension:abstractConnectionProviderType">
-                    <xs:sequence minOccurs="0" maxOccurs="1">
-                        <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
-                        <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:pooling-profile"></xs:element>
-                        <xs:element minOccurs="0" maxOccurs="1" name="transport">
-                            <xs:complexType>
-                                <xs:choice minOccurs="1" maxOccurs="1">
-                                    <xs:element xmlns:ram="http://www.mulesoft.org/schema/mule/ram" minOccurs="1" maxOccurs="1" ref="ram:abstract-message-dispatcher-provider"></xs:element>
-                                    <xs:element xmlns:ram="http://www.mulesoft.org/schema/mule/ram" minOccurs="1" maxOccurs="1" ref="ram:global-abstract-message-dispatcher-provider"></xs:element>
-                                </xs:choice>
-                            </xs:complexType>
-                        </xs:element>
-                    </xs:sequence>
-                    <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString" use="required" name="wsdlUrl"></xs:attribute>
-                    <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString" use="required" name="service"></xs:attribute>
-                    <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString" use="required" name="port"></xs:attribute>
-                    <xs:attribute type="xs:string" use="optional" name="transport"></xs:attribute>
-                    <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:substitutableBoolean" use="optional" name="disableValidation">
-                        <xs:annotation>
-                            <xs:documentation>Disables connection validation</xs:documentation>
-                        </xs:annotation>
-                    </xs:attribute>
-                </xs:extension>
-            </xs:complexContent>
-        </xs:complexType>
-    </xs:element>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/ram" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="InvokeType" substitutionGroup="mule:abstract-operator" name="invoke">
-        <xs:annotation>
-            <xs:documentation>invokes Web Service operations</xs:documentation>
-        </xs:annotation>
-    </xs:element>
-    <xs:complexType name="InvokeType">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence minOccurs="0" maxOccurs="1">
-                    <xs:element minOccurs="0" maxOccurs="1" name="message">
-                      <xs:complexType>
-                        <xs:complexContent>
-                          <xs:extension base="mule:abstractExtensionType">
-                            <xs:sequence>
-                              <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="body"></xs:element>
-                              <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="headers"></xs:element>
-                              <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="attachments"></xs:element>
-                            </xs:sequence>
-                          </xs:extension>
-                        </xs:complexContent>
-                      </xs:complexType>
-                    </xs:element>
-                    <xs:element minOccurs="0" maxOccurs="1" name="transport-headers">
-                        <xs:complexType>
-                            <xs:sequence>
-                                <xs:element minOccurs="0" maxOccurs="unbounded" name="transport-header">
-                                    <xs:complexType>
-                                        <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
-                                        <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
-                                    </xs:complexType>
-                                </xs:element>
-                            </xs:sequence>
-                        </xs:complexType>
-                    </xs:element>
-                </xs:sequence>
-                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
-                    <xs:annotation>
-                        <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-                <xs:attribute type="mule:expressionString" use="required" name="service"></xs:attribute>
-                <xs:attribute type="mule:expressionString" use="required" name="operation"></xs:attribute>
-                <xs:attribute type="mule:expressionMap" use="optional" name="transportHeaders"></xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="target">
-                    <xs:annotation>
-                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" name="transport-headers">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="transport-header">
+                  <xs:complexType>
+                    <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
+                    <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="required" name="service"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="required" name="operation"></xs:attribute>
+        <xs:attribute type="mule:expressionMap" use="optional" name="transportHeaders"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
 </xs:schema>

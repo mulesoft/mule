@@ -44,6 +44,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.o
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static org.mule.test.vegan.extension.VeganExtension.APPLE;
 import static org.mule.test.vegan.extension.VeganExtension.BANANA;
+
 import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
@@ -106,9 +107,11 @@ import org.mule.test.heisenberg.extension.model.types.WeaponType;
 import org.mule.test.petstore.extension.PetStoreConnector;
 import org.mule.test.vegan.extension.PaulMcCartneySource;
 import org.mule.test.vegan.extension.VeganExtension;
-
 import com.google.common.reflect.TypeToken;
-
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.runners.MockitoJUnitRunner;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Calendar;
@@ -118,11 +121,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -138,6 +136,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   private static final String SOURCE_CALLBACK_PARAMETER = "payment";
   private static final String SOURCE_REPEATED_CALLBACK_PARAMETER = "sameNameParameter";
   private static final String SAY_MY_NAME_OPERATION = "sayMyName";
+  private static final String NAME_AS_STREAM = "nameAsStream";
   private static final String GET_ENEMY_OPERATION = "getEnemy";
   private static final String GET_ALL_ENEMIES_OPERATION = "getAllEnemies";
   private static final String KILL_OPERATION = "kill";
@@ -466,8 +465,9 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertThat(extensionDeclaration.getOperations(), hasSize(35));
 
     WithOperationsDeclaration withOperationsDeclaration = extensionDeclaration.getConfigurations().get(0);
-    assertThat(withOperationsDeclaration.getOperations().size(), is(8));
+    assertThat(withOperationsDeclaration.getOperations().size(), is(9));
     assertOperation(withOperationsDeclaration, SAY_MY_NAME_OPERATION, "");
+    assertOperation(withOperationsDeclaration, NAME_AS_STREAM, "");
     assertOperation(withOperationsDeclaration, GET_ENEMY_OPERATION, "");
     assertOperation(withOperationsDeclaration, GET_ALL_ENEMIES_OPERATION, "");
     assertOperation(extensionDeclaration, KILL_OPERATION, "");
