@@ -198,11 +198,13 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> implements Dispo
   }
 
   private ExecutionCallback<Event> getFlowRunCallback(final Flow flow) {
+    // TODO MULE-13053 Update and improve FlowRunner to support non-blocking flow execution and assertions.
     return () -> flow.process(getOrBuildEvent());
   }
 
   private ExecutionCallback<Event> getFlowDispatchCallback(final Flow flow) {
     return () -> {
+      // TODO MULE-13053 Update and improve FlowRunner to support non-blocking flow execution and assertions.
       flow.process(getOrBuildEvent());
       return null;
     };

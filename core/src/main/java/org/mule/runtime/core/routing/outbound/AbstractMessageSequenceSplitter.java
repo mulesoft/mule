@@ -7,10 +7,9 @@
 package org.mule.runtime.core.routing.outbound;
 
 import static java.util.Collections.emptySet;
-import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.core.DefaultEventContext.child;
 import static org.mule.runtime.core.api.Event.builder;
+import static org.mule.runtime.core.api.processor.MessageProcessors.processToApplyWithChildContext;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
@@ -100,7 +99,7 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
     for (; messageSequence.hasNext();) {
       correlationSequence++;
 
-      final Builder builder = builder(child(originalEvent.getContext(), ofNullable(getLocation()), false), originalEvent);
+      final Builder builder = builder(originalEvent);
 
       propagateFlowVars(lastResult, builder);
       if (counterVariableName != null) {
@@ -111,7 +110,8 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
       initEventBuilder(messageSequence.next(), originalEvent, builder, resolvePropagatedFlowVars(lastResult));
 
       try {
-        Event resultEvent = processNext(builder.build());
+        // TODO MULE-13052 Migrate Splitter and Foreach implementation to non-blocking
+        Event resultEvent = processToApplyWithChildContext(builder.build(), applyNext());
         if (resultEvent != null) {
           resultEvents.add(builder(originalEvent.getContext(), resultEvent).build());
           lastResult = resultEvent;
