@@ -32,11 +32,11 @@
     </flow>
 
     <flow name="setsContentTypeOnXml">
-        <heisenberg:say-my-name config-ref="heisenberg" outputEncoding="${customEncoding}" outputMimeType="text/plain"/>
+        <heisenberg:say-my-name config-ref="heisenberg"  outputMimeType="text/plain"/>
     </flow>
 
     <flow name="onlySetEncodingOnXml">
-        <heisenberg:get-enemy config-ref="heisenberg" index="0" outputEncoding="${customEncoding}" />
+        <heisenberg:name-as-stream config-ref="heisenberg" index="0" outputEncoding="${customEncoding}" />
     </flow>
 
     <flow name="onlySetMimeTypeOnXml">
@@ -48,7 +48,7 @@
     </flow>
 
     <flow name="setEncodingInMimeTypeAndParam">
-        <heisenberg:say-my-name config-ref="heisenberg" outputMimeType="application/json; charset=UTF-8" outputEncoding="UTF-16"/>
+        <heisenberg:name-as-stream config-ref="heisenberg" outputMimeType="application/json; charset=UTF-8" outputEncoding="UTF-16"/>
     </flow>
 
 </mule>

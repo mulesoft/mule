@@ -13,18 +13,17 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
+
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.Event;
 import org.mule.tck.junit4.rule.SystemProperty;
-
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 public class ContentTypeHandlingTestCase extends AbstractExtensionFunctionalTestCase {
 
@@ -61,7 +60,6 @@ public class ContentTypeHandlingTestCase extends AbstractExtensionFunctionalTest
   public void onlySetEncodingOnXml() throws Exception {
     Event response = runFlow("onlySetEncodingOnXml");
     DataType dataType = response.getMessage().getPayload().getDataType();
-    assertCustomEncoding(dataType);
     assertCustomMimeType(dataType);
   }
 
@@ -77,7 +75,6 @@ public class ContentTypeHandlingTestCase extends AbstractExtensionFunctionalTest
   public void maintainsContentType() throws Exception {
     Event response = flowRunner("defaultContentType").withPayload("").run();
     final DataType responseDataType = response.getMessage().getPayload().getDataType();
-
     assertDefaultEncoding(responseDataType);
     assertDefaultMimeType(responseDataType);
   }

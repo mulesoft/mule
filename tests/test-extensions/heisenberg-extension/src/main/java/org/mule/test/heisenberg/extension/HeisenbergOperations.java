@@ -51,6 +51,8 @@ import org.mule.test.heisenberg.extension.model.Weapon;
 import org.mule.test.heisenberg.extension.model.types.IntegerAttributes;
 import org.mule.test.heisenberg.extension.model.types.WeaponType;
 import javax.inject.Inject;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
@@ -270,6 +272,10 @@ public class HeisenbergOperations implements Disposable {
 
   public void throwError() {
     throw new LinkageError();
+  }
+
+  public InputStream nameAsStream(@Config HeisenbergExtension config) {
+    return new ByteArrayInputStream(sayMyName(config).getBytes());
   }
 
   @Override
