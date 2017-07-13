@@ -7,6 +7,10 @@
 
 package org.mule.runtime.core.internal.streaming.object.iterator;
 
+import org.mule.runtime.core.api.streaming.iterator.AbstractConsumer;
+import org.mule.runtime.core.api.streaming.iterator.Consumer;
+import org.mule.runtime.core.api.streaming.iterator.Producer;
+
 import java.util.NoSuchElementException;
 
 /**

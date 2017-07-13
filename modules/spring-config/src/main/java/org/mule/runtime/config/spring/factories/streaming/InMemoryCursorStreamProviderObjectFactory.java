@@ -8,8 +8,8 @@ package org.mule.runtime.config.spring.factories.streaming;
 
 import org.mule.runtime.api.util.DataSize;
 import org.mule.runtime.api.util.DataUnit;
-import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
-import org.mule.runtime.core.streaming.bytes.InMemoryCursorStreamConfig;
+import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
+import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamConfig;
 
 public class InMemoryCursorStreamProviderObjectFactory
     extends AbstractCursorProviderObjectFactory<CursorStreamProviderFactory> {

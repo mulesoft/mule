@@ -6,12 +6,13 @@
  */
 package org.mule.runtime.core.internal.streaming.bytes;
 
-import org.mule.runtime.core.internal.streaming.bytes.factory.InMemoryCursorStreamProviderFactory;
+import org.mule.runtime.core.api.streaming.bytes.ByteBufferManager;
+import org.mule.runtime.core.api.streaming.bytes.factory.InMemoryCursorStreamProviderFactory;
 import org.mule.runtime.core.internal.streaming.bytes.factory.NullCursorStreamProviderFactory;
-import org.mule.runtime.core.streaming.StreamingManager;
-import org.mule.runtime.core.streaming.bytes.ByteStreamingManager;
-import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
-import org.mule.runtime.core.streaming.bytes.InMemoryCursorStreamConfig;
+import org.mule.runtime.core.api.streaming.StreamingManager;
+import org.mule.runtime.core.api.streaming.bytes.ByteStreamingManager;
+import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
+import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamConfig;
 
 /**
  * Default implementation of {@link ByteStreamingManager}

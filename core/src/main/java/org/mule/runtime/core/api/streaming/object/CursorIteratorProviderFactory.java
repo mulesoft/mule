@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.streaming.object;
+package org.mule.runtime.core.api.streaming.object;
 
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
-import org.mule.runtime.core.streaming.CursorProviderFactory;
+import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 
 import java.util.Iterator;
 

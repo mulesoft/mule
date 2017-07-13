@@ -4,12 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.streaming.bytes;
+package org.mule.runtime.core.internal.streaming.bytes;
 
 import static org.mule.runtime.extension.api.ExtensionConstants.DEFAULT_BYTES_STREAMING_MAX_BUFFER_SIZE;
 import static org.mule.runtime.extension.api.ExtensionConstants.DEFAULT_BYTE_STREAMING_BUFFER_DATA_UNIT;
 import org.mule.runtime.api.util.DataSize;
-import org.mule.runtime.core.internal.streaming.bytes.InputStreamBuffer;
 
 /**
  * Configuration for a {@link InputStreamBuffer} which uses a local file for buffering

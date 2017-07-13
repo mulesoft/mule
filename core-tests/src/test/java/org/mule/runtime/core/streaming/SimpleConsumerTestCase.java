@@ -13,8 +13,8 @@ import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertNull;
 import static junit.framework.Assert.assertTrue;
 import org.mule.runtime.core.internal.streaming.object.iterator.ClosedConsumerException;
-import org.mule.runtime.core.internal.streaming.object.iterator.Consumer;
-import org.mule.runtime.core.internal.streaming.object.iterator.Producer;
+import org.mule.runtime.core.api.streaming.iterator.Consumer;
+import org.mule.runtime.core.api.streaming.iterator.Producer;
 import org.mule.runtime.core.internal.streaming.object.iterator.SimpleConsumer;
 import org.mule.tck.size.SmallTest;
 

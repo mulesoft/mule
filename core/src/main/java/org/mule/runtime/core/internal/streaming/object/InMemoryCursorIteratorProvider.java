@@ -7,8 +7,8 @@
 package org.mule.runtime.core.internal.streaming.object;
 
 import org.mule.runtime.api.streaming.object.CursorIterator;
-import org.mule.runtime.core.internal.streaming.object.iterator.StreamingIterator;
-import org.mule.runtime.core.streaming.object.InMemoryCursorIteratorConfig;
+import org.mule.runtime.core.api.streaming.iterator.StreamingIterator;
+import org.mule.runtime.core.api.streaming.object.InMemoryCursorIteratorConfig;
 
 /**
  * An implementation of {@link AbstractCursorIteratorProvider} which yields

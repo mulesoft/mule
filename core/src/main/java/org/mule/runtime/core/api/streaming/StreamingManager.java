@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.streaming;
+package org.mule.runtime.core.api.streaming;
 
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.internal.streaming.CursorContext;
-import org.mule.runtime.core.streaming.bytes.ByteStreamingManager;
-import org.mule.runtime.core.streaming.object.ObjectStreamingManager;
+import org.mule.runtime.core.api.streaming.bytes.ByteStreamingManager;
+import org.mule.runtime.core.api.streaming.object.ObjectStreamingManager;
 
 /**
  * Manages resources dedicated to perform streaming of bytes or objects, so that the runtime can keep track of them,

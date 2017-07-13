@@ -7,7 +7,7 @@
 package org.mule.runtime.core.internal.streaming.object.factory;
 
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.streaming.StreamingManager;
+import org.mule.runtime.core.api.streaming.StreamingManager;
 
 import java.util.Iterator;
 

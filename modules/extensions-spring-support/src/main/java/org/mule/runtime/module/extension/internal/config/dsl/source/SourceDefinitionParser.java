@@ -19,7 +19,7 @@ import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
-import org.mule.runtime.core.streaming.CursorProviderFactory;
+import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;

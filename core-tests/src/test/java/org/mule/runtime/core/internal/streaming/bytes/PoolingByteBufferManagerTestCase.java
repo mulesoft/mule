@@ -23,7 +23,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_STREAMING_MAX
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.util.concurrent.Latch;
-import org.mule.runtime.core.streaming.MemoryManager;
+import org.mule.runtime.core.internal.streaming.MemoryManager;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

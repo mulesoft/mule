@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.core.internal.streaming.object.iterator;
+package org.mule.runtime.core.api.streaming.iterator;
 
 
 import org.mule.runtime.api.streaming.HasSize;

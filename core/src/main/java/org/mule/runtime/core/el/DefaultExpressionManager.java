@@ -36,7 +36,7 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.util.TemplateParser;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.internal.util.OneTimeWarning;
-import org.mule.runtime.core.streaming.StreamingManager;
+import org.mule.runtime.core.api.streaming.StreamingManager;
 
 import java.util.Collection;
 import java.util.Iterator;

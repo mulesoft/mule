@@ -10,7 +10,7 @@ package org.mule.runtime.core.streaming;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 
 import org.mule.runtime.core.internal.streaming.object.iterator.CompositeProducer;
-import org.mule.runtime.core.internal.streaming.object.iterator.Producer;
+import org.mule.runtime.core.api.streaming.iterator.Producer;
 import org.mule.tck.size.SmallTest;
 
 import java.util.ArrayList;

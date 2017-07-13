@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.streaming.bytes;
+package org.mule.runtime.core.api.streaming.bytes;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.extension.api.ExtensionConstants.DEFAULT_BYTES_STREAMING_MAX_BUFFER_SIZE;

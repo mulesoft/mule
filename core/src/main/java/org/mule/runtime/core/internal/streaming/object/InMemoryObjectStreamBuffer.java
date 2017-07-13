@@ -10,8 +10,8 @@ import static java.lang.Math.floor;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import org.mule.runtime.api.streaming.exception.StreamingBufferSizeExceededException;
-import org.mule.runtime.core.internal.streaming.object.iterator.StreamingIterator;
-import org.mule.runtime.core.streaming.object.InMemoryCursorIteratorConfig;
+import org.mule.runtime.core.api.streaming.iterator.StreamingIterator;
+import org.mule.runtime.core.api.streaming.object.InMemoryCursorIteratorConfig;
 
 import java.util.ArrayList;
 import java.util.List;

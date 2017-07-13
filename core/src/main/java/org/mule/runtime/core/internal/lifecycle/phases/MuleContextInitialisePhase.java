@@ -23,7 +23,7 @@ import org.mule.runtime.core.api.transport.LegacyConnector;
 import org.mule.runtime.core.internal.lifecycle.NotificationLifecycleObject;
 import org.mule.runtime.core.privileged.util.annotation.AnnotationMetaData;
 import org.mule.runtime.core.privileged.util.annotation.AnnotationUtils;
-import org.mule.runtime.core.streaming.StreamingManager;
+import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 
 import java.lang.reflect.Method;

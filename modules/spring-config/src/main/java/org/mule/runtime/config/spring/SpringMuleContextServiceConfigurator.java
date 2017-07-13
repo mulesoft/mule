@@ -111,7 +111,7 @@ import org.mule.runtime.core.internal.management.stats.DefaultProcessingTimeWatc
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.core.internal.policy.DefaultPolicyManager;
 import org.mule.runtime.core.internal.policy.DefaultPolicyStateHandler;
-import org.mule.runtime.core.internal.streaming.DefaultStreamingManager;
+import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
 import org.mule.runtime.core.internal.transformer.DynamicDataTypeConversionResolver;
 import org.mule.runtime.core.internal.util.DefaultStreamCloserService;
 import org.mule.runtime.core.internal.util.queue.TransactionalQueueManager;

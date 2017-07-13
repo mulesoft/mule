@@ -10,9 +10,9 @@ import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.internal.streaming.object.InMemoryCursorIteratorProvider;
-import org.mule.runtime.core.internal.streaming.object.iterator.StreamingIterator;
-import org.mule.runtime.core.streaming.StreamingManager;
-import org.mule.runtime.core.streaming.object.InMemoryCursorIteratorConfig;
+import org.mule.runtime.core.api.streaming.iterator.StreamingIterator;
+import org.mule.runtime.core.api.streaming.StreamingManager;
+import org.mule.runtime.core.api.streaming.object.InMemoryCursorIteratorConfig;
 
 import java.util.Iterator;
 

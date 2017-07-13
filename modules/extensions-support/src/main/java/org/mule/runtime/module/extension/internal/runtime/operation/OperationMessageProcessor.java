@@ -58,7 +58,7 @@ import org.mule.runtime.core.api.rx.Exceptions;
 import org.mule.runtime.core.internal.policy.OperationExecutionFunction;
 import org.mule.runtime.core.internal.policy.OperationPolicy;
 import org.mule.runtime.core.internal.policy.PolicyManager;
-import org.mule.runtime.core.streaming.CursorProviderFactory;
+import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;

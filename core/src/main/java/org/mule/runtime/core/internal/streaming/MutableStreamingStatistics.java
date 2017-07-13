@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.streaming;
 
-import org.mule.runtime.core.streaming.StreamingStatistics;
+import org.mule.runtime.core.api.streaming.StreamingStatistics;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

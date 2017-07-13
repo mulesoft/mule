@@ -39,7 +39,7 @@ import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.api.util.StreamCloserService;
 import org.mule.runtime.core.internal.message.InternalMessage;
-import org.mule.runtime.core.streaming.StreamingManager;
+import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.mule.TestTransaction;
 

@@ -18,9 +18,10 @@ import static org.mule.runtime.core.internal.util.ConcurrencyUtils.withLock;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.streaming.bytes.ByteBufferManager;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.core.internal.streaming.DefaultMemoryManager;
-import org.mule.runtime.core.streaming.MemoryManager;
+import org.mule.runtime.core.internal.streaming.MemoryManager;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;

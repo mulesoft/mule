@@ -46,7 +46,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
-import org.mule.runtime.core.streaming.StreamingManager;
+import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.List;

@@ -46,7 +46,7 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.util.ExceptionUtils;
 import org.mule.runtime.core.processor.interceptor.ReactiveInterceptorAdapter;
-import org.mule.runtime.core.streaming.StreamingManager;
+import org.mule.runtime.core.api.streaming.StreamingManager;
 
 import java.util.ArrayList;
 import java.util.Iterator;

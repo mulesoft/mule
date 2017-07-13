@@ -28,7 +28,7 @@ import org.mule.runtime.core.internal.execution.ExceptionCallback;
 import org.mule.runtime.core.api.execution.MessageProcessContext;
 import org.mule.runtime.core.api.execution.MessageProcessingManager;
 import org.mule.runtime.core.internal.execution.SourceResultAdapter;
-import org.mule.runtime.core.streaming.CursorProviderFactory;
+import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;

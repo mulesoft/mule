@@ -12,7 +12,8 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.streaming.exception.StreamingBufferSizeExceededException;
 import org.mule.runtime.api.util.LazyValue;
-import org.mule.runtime.core.streaming.bytes.InMemoryCursorStreamConfig;
+import org.mule.runtime.core.api.streaming.bytes.ByteBufferManager;
+import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamConfig;
 
 import java.io.IOException;
 import java.io.InputStream;

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.streaming;
+package org.mule.runtime.core.api.streaming;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -15,14 +15,15 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.internal.streaming.bytes.ByteBufferManager;
+import org.mule.runtime.core.api.streaming.bytes.ByteBufferManager;
+import org.mule.runtime.core.internal.streaming.CursorManager;
+import org.mule.runtime.core.internal.streaming.ManagedCursorProvider;
+import org.mule.runtime.core.internal.streaming.MutableStreamingStatistics;
 import org.mule.runtime.core.internal.streaming.bytes.DefaultByteStreamingManager;
 import org.mule.runtime.core.internal.streaming.bytes.PoolingByteBufferManager;
 import org.mule.runtime.core.internal.streaming.object.DefaultObjectStreamingManager;
-import org.mule.runtime.core.streaming.StreamingManager;
-import org.mule.runtime.core.streaming.StreamingStatistics;
-import org.mule.runtime.core.streaming.bytes.ByteStreamingManager;
-import org.mule.runtime.core.streaming.object.ObjectStreamingManager;
+import org.mule.runtime.core.api.streaming.bytes.ByteStreamingManager;
+import org.mule.runtime.core.api.streaming.object.ObjectStreamingManager;
 
 import javax.inject.Inject;
 
