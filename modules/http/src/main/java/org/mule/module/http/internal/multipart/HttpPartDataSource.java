@@ -6,10 +6,9 @@
  */
 package org.mule.module.http.internal.multipart;
 
+import static java.lang.String.valueOf;
 import org.mule.api.MuleRuntimeException;
 import org.mule.message.ds.ByteArrayDataSource;
-import org.mule.message.ds.StringDataSource;
-import org.mule.module.http.internal.HttpParam;
 import org.mule.util.IOUtils;
 
 import java.io.ByteArrayInputStream;
@@ -24,10 +23,10 @@ import java.util.Map;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
-import javax.servlet.http.Part;
 
 public class HttpPartDataSource implements DataSource
 {
+    public static final String ANONYMOUS_ATTACHMENT_PREFIX = "mule_attachment_";
 
     private final HttpPart part;
     private byte[] content;
@@ -92,9 +91,20 @@ public class HttpPartDataSource implements DataSource
     public static Map<String, DataHandler> createDataHandlerFrom(Collection<HttpPart> parts)
     {
         final Map<String, DataHandler> httpParts = new HashMap<>(parts.size());
+        int anonymousPartCount = 0;
         for (HttpPart part : parts)
         {
-            httpParts.put(part.getName(), new DataHandler(new HttpPartDataSource(part)));
+            String name;
+            if (part.getName() == null)
+            {
+                name = ANONYMOUS_ATTACHMENT_PREFIX + valueOf(anonymousPartCount);
+                anonymousPartCount++;
+            }
+            else
+            {
+                name = part.getName();
+            }
+            httpParts.put(name, new DataHandler(new HttpPartDataSource(part)));
         }
         return httpParts;
     }

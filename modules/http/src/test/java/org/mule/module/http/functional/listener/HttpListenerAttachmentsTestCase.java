@@ -210,6 +210,43 @@ public class HttpListenerAttachmentsTestCase extends FunctionalTestCase
         }
     }
 
+    @Test
+    public void receiveMultipartMixed() throws Exception {
+        RequestBuilder requestBuilder = new RequestBuilder();
+        AsyncHttpClientConfig asyncHttpClientConfig = new AsyncHttpClientConfig.Builder().build();
+        GrizzlyAsyncHttpProvider grizzlyAsyncHttpProvider = new GrizzlyAsyncHttpProvider(asyncHttpClientConfig);
+
+        requestBuilder.setMethod("POST");
+        requestBuilder.setUrl(getUrl(mixedPath.getValue()));
+        requestBuilder.setHeader(CONTENT_TYPE, "multipart/mixed");
+        ByteArrayPart byteArrayPart = new ByteArrayPart(null, "blahblah".getBytes(), "application/pdf", null, null, null, "base64");
+        byteArrayPart.addCustomHeader("Custom-Header: ", "custom");
+        requestBuilder.addBodyPart(byteArrayPart);
+
+        try (AsyncHttpClient asyncHttpClient = new AsyncHttpClient(grizzlyAsyncHttpProvider, asyncHttpClientConfig))
+        {
+
+            ListenableFuture<Response> responseFuture = asyncHttpClient.executeRequest(requestBuilder.build());
+            com.ning.http.client.Response response = responseFuture.get();
+
+            // check that the Mule message is created correctly from the HTTP request
+            final MuleMessage receivedMessage = muleContext.getClient().request(VM_MESSAGE_ENDPOINT, 1000);
+            assertThat(receivedMessage.getInboundAttachmentNames().size(), is(1));
+            HttpPartDataSource muleAttachment = (HttpPartDataSource) receivedMessage.getInboundAttachment("mule_attachment_0").getDataSource();
+            assertThat(muleAttachment.getHeader("Custom-Header"), equalTo("custom"));
+            assertThat(muleAttachment.getContentType(), equalTo("application/pdf"));
+            assertThat(muleAttachment.getHeader(CONTENT_TRANSFER_ENCODING), equalTo("base64"));
+
+            // check that the HTTP response includes the same headers as the HTTP request (when echoing)
+            final Collection<HttpPart> parts = HttpParser.parseMultipartContent(response.getResponseBodyAsStream(), response.getContentType());
+            assertThat(parts.size(), Is.is(1));
+            HttpPart receivedPart = new ArrayList<>(parts).get(0);
+            assertThat(receivedPart.getHeader("Custom-Header"), equalTo("custom"));
+            assertThat(receivedPart.getContentType(), equalTo("application/pdf"));
+            assertThat(receivedPart.getHeader(CONTENT_TRANSFER_ENCODING), equalTo("base64"));
+        }
+    }
+
     private MuleMessage getResponseWithExpectedAttachmentFrom(String path) throws MuleException, IOException
     {
         MuleMessage response = muleContext.getClient().send(getUrl(path), getTestMuleMessage());
