@@ -11,9 +11,10 @@ import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.exception.MuleException.INFO_LOCATION_KEY;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
-import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContextHandleErrors;
+import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContext;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static org.mule.runtime.core.routing.ExpressionSplittingStrategy.DEFAULT_SPIT_EXPRESSION;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -113,9 +114,10 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
 
   protected Event doProcess(Event event) throws MuleException {
     try {
+      // TODO MULE-13052 Migrate Splitter and Foreach implementation to non-blocking
       return Mono.just(event)
           .then(request -> Mono
-              .from(processWithChildContextHandleErrors(request, ownedMessageProcessor, ofNullable(getLocation()))))
+              .from(processWithChildContext(request, ownedMessageProcessor, ofNullable(getLocation()))))
           .onErrorMap(MessagingException.class, e -> {
             if (splitter.equals(e.getFailingMessageProcessor())) {
               // Make sure the context information for the exception is relative to the ForEach.

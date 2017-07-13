@@ -46,6 +46,7 @@ abstract class AbstractEventContext implements EventContext {
   private transient Mono<Void> completionCallback = empty();
 
   public AbstractEventContext() {
+    // Required for serialization
     this(empty());
   }
 
@@ -66,7 +67,7 @@ abstract class AbstractEventContext implements EventContext {
     }).subscribe();
     // When there are no child contexts response triggers completion directly.
     completionSubscriberDisposable = Mono.<Void>whenDelayError(completionCallback,
-                                                               responseProcessor.then())
+                                                               responseProcessor.materialize().then())
         .doOnEach(s -> s.accept(completionProcessor)).subscribe();
   }
 
@@ -82,14 +83,13 @@ abstract class AbstractEventContext implements EventContext {
     // completion condition.
     completionSubscriberDisposable.dispose();
     completionSubscriberDisposable =
-        responseProcessor.onErrorResume(throwable -> empty()).and(completionCallback).and(getChildCompletionPublisher()).then()
+        responseProcessor.onErrorResume(throwable -> empty()).and(completionCallback).and(getChildCompletionPublisher())
+            .materialize().then()
             .doOnEach(s -> s.accept(completionProcessor)).subscribe();
   }
 
   private Mono<Void> getChildCompletionPublisher() {
-    return when(childContexts.stream()
-        .map(eventContext -> from(eventContext.getCompletionPublisher()).onErrorResume(throwable -> empty()))
-        .collect(toList()));
+    return when(childContexts.stream().map(eventContext -> from(eventContext.getCompletionPublisher())).collect(toList()));
   }
 
   /**
@@ -99,7 +99,7 @@ abstract class AbstractEventContext implements EventContext {
   public final void success() {
     synchronized (this) {
       if (responseProcessor.isTerminated()) {
-        LOGGER.warn(this + " empty response was already completed, ignoring.");
+        LOGGER.info(this + " empty response was already completed, ignoring.");
         return;
       }
 
@@ -117,7 +117,7 @@ abstract class AbstractEventContext implements EventContext {
   public final void success(Event event) {
     synchronized (this) {
       if (responseProcessor.isTerminated()) {
-        LOGGER.warn(this + " response was already completed, ignoring.");
+        LOGGER.info(this + " response was already completed, ignoring.");
         return;
       }
 
@@ -135,7 +135,7 @@ abstract class AbstractEventContext implements EventContext {
   public final void error(Throwable throwable) {
     synchronized (this) {
       if (responseProcessor.isTerminated()) {
-        LOGGER.warn(this + " error response was already completed, ignoring.");
+        LOGGER.info(this + " error response was already completed, ignoring.");
         return;
       }
 
