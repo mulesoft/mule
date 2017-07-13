@@ -153,6 +153,7 @@
         <commonsDbUtilsVersion>1.2</commonsDbUtilsVersion>
         <commonsHttpClientVersion>3.1</commonsHttpClientVersion>
         <commonsIoVersion>2.4</commonsIoVersion>
+        <commonsTextVersion>1.1</commonsTextVersion>
         <commonsLangVersion>3.6</commonsLangVersion>
         <commonsNetVersion>3.5</commonsNetVersion>
         <commonsPoolVersion>1.6</commonsPoolVersion>
@@ -884,6 +885,11 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
                 <version>${commonsLangVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-text</artifactId>
+                <version>${commonsTextVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
