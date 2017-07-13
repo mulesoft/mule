@@ -13,9 +13,9 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import org.mule.runtime.core.internal.streaming.object.iterator.ClosedConsumerException;
-import org.mule.runtime.core.internal.streaming.object.iterator.Consumer;
-import org.mule.runtime.core.internal.streaming.object.iterator.ListConsumer;
-import org.mule.runtime.core.internal.streaming.object.iterator.Producer;
+import org.mule.runtime.core.api.streaming.iterator.Consumer;
+import org.mule.runtime.core.api.streaming.iterator.ListConsumer;
+import org.mule.runtime.core.api.streaming.iterator.Producer;
 import org.mule.tck.size.SmallTest;
 
 import java.io.IOException;

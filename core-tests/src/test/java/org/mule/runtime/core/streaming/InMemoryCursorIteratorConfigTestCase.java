@@ -8,7 +8,7 @@ package org.mule.runtime.core.streaming;
 
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingStory.BYTES_STREAMING;
-import org.mule.runtime.core.streaming.object.InMemoryCursorIteratorConfig;
+import org.mule.runtime.core.api.streaming.object.InMemoryCursorIteratorConfig;
 import org.mule.tck.size.SmallTest;
 
 import ru.yandex.qatools.allure.annotations.Features;

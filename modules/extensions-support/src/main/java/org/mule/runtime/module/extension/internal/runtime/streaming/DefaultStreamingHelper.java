@@ -10,9 +10,9 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.internal.streaming.object.iterator.StreamingIterator;
-import org.mule.runtime.core.streaming.CursorProviderFactory;
-import org.mule.runtime.core.streaming.StreamingManager;
+import org.mule.runtime.core.api.streaming.iterator.StreamingIterator;
+import org.mule.runtime.core.api.streaming.CursorProviderFactory;
+import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 

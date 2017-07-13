@@ -4,10 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.streaming.bytes;
+package org.mule.runtime.core.api.streaming.bytes;
 
 import org.mule.runtime.api.streaming.bytes.CursorStream;
-import org.mule.runtime.core.streaming.bytes.InMemoryCursorStreamConfig;
+import org.mule.runtime.core.internal.streaming.bytes.BufferedCursorStream;
+import org.mule.runtime.core.internal.streaming.bytes.InMemoryStreamBuffer;
 
 import java.io.InputStream;
 

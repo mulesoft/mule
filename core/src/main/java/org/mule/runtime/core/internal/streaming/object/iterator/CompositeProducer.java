@@ -7,6 +7,8 @@
 
 package org.mule.runtime.core.internal.streaming.object.iterator;
 
+import org.mule.runtime.core.api.streaming.iterator.Producer;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Iterator;

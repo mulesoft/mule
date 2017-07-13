@@ -11,9 +11,9 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import org.mule.runtime.api.streaming.object.CursorIterator;
-import org.mule.runtime.core.internal.streaming.object.iterator.Consumer;
-import org.mule.runtime.core.internal.streaming.object.iterator.ConsumerStreamingIterator;
-import org.mule.runtime.core.internal.streaming.object.iterator.StreamingIterator;
+import org.mule.runtime.core.api.streaming.iterator.Consumer;
+import org.mule.runtime.core.api.streaming.iterator.ConsumerStreamingIterator;
+import org.mule.runtime.core.api.streaming.iterator.StreamingIterator;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.IOException;

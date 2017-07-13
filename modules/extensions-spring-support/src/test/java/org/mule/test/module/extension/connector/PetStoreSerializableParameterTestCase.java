@@ -11,9 +11,9 @@ import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
-import org.mule.runtime.core.internal.streaming.bytes.InMemoryCursorStreamProvider;
-import org.mule.runtime.core.internal.streaming.bytes.SimpleByteBufferManager;
-import org.mule.runtime.core.streaming.bytes.InMemoryCursorStreamConfig;
+import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamProvider;
+import org.mule.tck.core.streaming.SimpleByteBufferManager;
+import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamConfig;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
 import java.io.ByteArrayInputStream;

@@ -10,7 +10,7 @@ import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.internal.util.message.MessageUtils.toMessage;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.streaming.CursorProviderFactory;
+import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.util.Collection;

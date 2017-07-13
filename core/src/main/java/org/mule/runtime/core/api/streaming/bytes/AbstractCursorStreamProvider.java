@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.streaming.bytes;
+package org.mule.runtime.core.api.streaming.bytes;
 
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import org.mule.runtime.api.streaming.bytes.CursorStream;

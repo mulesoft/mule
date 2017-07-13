@@ -4,7 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.streaming.bytes;
+package org.mule.runtime.core.api.streaming.bytes;
+
+import org.mule.runtime.core.internal.streaming.bytes.MaxStreamingMemoryExceededException;
 
 import java.nio.ByteBuffer;
 

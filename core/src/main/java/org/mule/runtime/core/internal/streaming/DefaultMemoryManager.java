@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.internal.streaming;
 
-import org.mule.runtime.core.streaming.MemoryManager;
-
 /**
  * Default implementation of {@link MemoryManager}
  *

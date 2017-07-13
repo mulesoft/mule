@@ -9,7 +9,7 @@ package org.mule.runtime.core.streaming;
 import static org.mule.runtime.api.util.DataUnit.BYTE;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 import org.mule.runtime.api.util.DataSize;
-import org.mule.runtime.core.streaming.bytes.InMemoryCursorStreamConfig;
+import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamConfig;
 import org.mule.tck.size.SmallTest;
 
 import ru.yandex.qatools.allure.annotations.Features;

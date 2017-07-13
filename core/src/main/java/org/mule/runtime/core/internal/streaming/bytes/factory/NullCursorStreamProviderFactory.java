@@ -8,8 +8,9 @@ package org.mule.runtime.core.internal.streaming.bytes.factory;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.functional.Either;
-import org.mule.runtime.core.internal.streaming.bytes.ByteBufferManager;
-import org.mule.runtime.core.streaming.StreamingManager;
+import org.mule.runtime.core.api.streaming.bytes.ByteBufferManager;
+import org.mule.runtime.core.api.streaming.StreamingManager;
+import org.mule.runtime.core.api.streaming.bytes.factory.AbstractCursorStreamProviderFactory;
 
 import java.io.InputStream;
 

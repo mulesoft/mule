@@ -11,7 +11,7 @@ import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.extension.api.ExtensionConstants.DEFAULT_OBJECT_STREAMING_BUFFER_SIZE;
 import org.mule.runtime.core.internal.streaming.AbstractStreamingBuffer;
-import org.mule.runtime.core.internal.streaming.object.iterator.StreamingIterator;
+import org.mule.runtime.core.api.streaming.iterator.StreamingIterator;
 
 import java.util.NoSuchElementException;
 import java.util.Optional;

@@ -8,10 +8,10 @@ package org.mule.runtime.core.internal.streaming.object;
 
 import org.mule.runtime.core.internal.streaming.object.factory.InMemoryCursorIteratorProviderFactory;
 import org.mule.runtime.core.internal.streaming.object.factory.NullCursorIteratorProviderFactory;
-import org.mule.runtime.core.streaming.StreamingManager;
-import org.mule.runtime.core.streaming.object.CursorIteratorProviderFactory;
-import org.mule.runtime.core.streaming.object.InMemoryCursorIteratorConfig;
-import org.mule.runtime.core.streaming.object.ObjectStreamingManager;
+import org.mule.runtime.core.api.streaming.StreamingManager;
+import org.mule.runtime.core.api.streaming.object.CursorIteratorProviderFactory;
+import org.mule.runtime.core.api.streaming.object.InMemoryCursorIteratorConfig;
+import org.mule.runtime.core.api.streaming.object.ObjectStreamingManager;
 
 /**
  * Default implementation of {@link ObjectStreamingManager}
