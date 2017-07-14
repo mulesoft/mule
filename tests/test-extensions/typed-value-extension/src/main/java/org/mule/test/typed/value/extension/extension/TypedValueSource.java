@@ -8,7 +8,6 @@
 package org.mule.test.typed.value.extension.extension;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
@@ -18,13 +17,13 @@ import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 
 @Alias("source")
-public class TypedValueSource extends Source<String, Attributes> {
+public class TypedValueSource extends Source<String, Object> {
 
   public static TypedValue<String> onSuccessValue;
 
   @Override
-  public void onStart(SourceCallback<String, Attributes> sourceCallback) throws MuleException {
-    sourceCallback.handle(Result.<String, Attributes>builder().output("This is a string").build());
+  public void onStart(SourceCallback<String, Object> sourceCallback) throws MuleException {
+    sourceCallback.handle(Result.<String, Object>builder().output("This is a string").build());
   }
 
   @Override

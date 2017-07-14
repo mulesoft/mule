@@ -23,9 +23,7 @@ import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIM
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static org.reflections.ReflectionUtils.getMethods;
 import static org.reflections.ReflectionUtils.withName;
-
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
@@ -42,15 +40,17 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Implement
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Apple;
+
+import java.io.ByteArrayInputStream;
+import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Optional;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import java.io.ByteArrayInputStream;
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Optional;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -191,11 +191,11 @@ public class MimeTypeParametersDeclarationEnricherTestCase extends AbstractMuleT
 
     public void voidMethod() {}
 
-    public Result<String, Attributes> resultString() {
+    public Result<String, Object> resultString() {
       return null;
     }
 
-    public Result<Apple, Attributes> resultApple() {
+    public Result<Apple, Object> resultApple() {
       return null;
     }
 
@@ -220,19 +220,19 @@ public class MimeTypeParametersDeclarationEnricherTestCase extends AbstractMuleT
     ENUM1, ENUM2
   }
 
-  public class TestStringSource extends Source<String, Attributes> {
+  public class TestStringSource extends Source<String, Object> {
 
     @Override
-    public void onStart(SourceCallback<String, Attributes> sourceCallback) throws MuleException {}
+    public void onStart(SourceCallback<String, Object> sourceCallback) throws MuleException {}
 
     @Override
     public void onStop() {}
   }
 
-  public class TestAppleSource extends Source<Apple, Attributes> {
+  public class TestAppleSource extends Source<Apple, Object> {
 
     @Override
-    public void onStart(SourceCallback<Apple, Attributes> sourceCallback) throws MuleException {}
+    public void onStart(SourceCallback<Apple, Object> sourceCallback) throws MuleException {}
 
     @Override
     public void onStop() {}

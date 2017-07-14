@@ -10,7 +10,6 @@ import static java.util.Arrays.asList;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.when;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_LOADER;
-import org.mule.runtime.api.message.NullAttributes;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -50,7 +49,7 @@ public class OperationParameterModelValidatorTestCase extends AbstractMuleTestCa
     when(extensionModel.getName()).thenReturn(EXTENSION_NAME);
     when(operationModel.getName()).thenReturn(OPERATION_NAME);
     when(operationModel.getOutput().getType()).thenReturn(TYPE_LOADER.load(String.class));
-    when(operationModel.getOutputAttributes().getType()).thenReturn(TYPE_LOADER.load(NullAttributes.class));
+    when(operationModel.getOutputAttributes().getType()).thenReturn(TYPE_LOADER.load(void.class));
     when(goodParameter.getName()).thenReturn("valid");
     when(extensionModel.getOperationModels()).thenReturn(asList(operationModel));
     when(operationModel.getAllParameterModels()).thenReturn(asList(goodParameter));

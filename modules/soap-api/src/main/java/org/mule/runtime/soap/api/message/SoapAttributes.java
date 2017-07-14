@@ -8,10 +8,10 @@ package org.mule.runtime.soap.api.message;
 
 import static com.google.common.collect.ImmutableMap.copyOf;
 import static com.google.common.collect.ImmutableMap.of;
-import org.mule.runtime.api.message.Attributes;
 
 import com.google.common.collect.ImmutableMap;
 
+import java.io.Serializable;
 import java.util.Map;
 
 /**
@@ -20,7 +20,7 @@ import java.util.Map;
  *
  * @since 4.0
  */
-public final class SoapAttributes implements Attributes {
+public final class SoapAttributes implements Serializable {
 
   private final Map<String, String> protocolHeaders;
   private final Map<String, String> soapHeaders;

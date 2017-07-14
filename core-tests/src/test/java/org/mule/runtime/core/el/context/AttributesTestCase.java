@@ -6,13 +6,11 @@
  */
 package org.mule.runtime.core.el.context;
 
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.ATTRIBUTES;
-import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
@@ -38,9 +36,9 @@ public class AttributesTestCase extends AbstractELTestCase {
 
   @Test
   public void attributes() throws Exception {
-    Attributes attributes = NULL_ATTRIBUTES;
+    Object attributes = mock(Object.class);
     when(message.getAttributes()).thenReturn(new TypedValue<>(attributes, DataType.OBJECT));
-    assertThat(evaluate(ATTRIBUTES, event), equalTo(attributes));
+    assertThat(evaluate(ATTRIBUTES, event), sameInstance(attributes));
   }
 
 }

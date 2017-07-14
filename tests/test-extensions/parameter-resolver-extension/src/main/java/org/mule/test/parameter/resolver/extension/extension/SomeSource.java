@@ -8,16 +8,14 @@
 package org.mule.test.parameter.resolver.extension.extension;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.extension.api.annotation.param.Config;
-import org.mule.runtime.extension.api.annotation.param.ConfigOverride;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 
-public class SomeSource extends Source<String, Attributes> {
+public class SomeSource extends Source<String, Object> {
 
   @Parameter
   public static ParameterResolver<String> someString;
@@ -29,7 +27,7 @@ public class SomeSource extends Source<String, Attributes> {
   public static ParameterResolverExtension extension;
 
   @Override
-  public void onStart(SourceCallback<String, Attributes> sourceCallback) throws MuleException {}
+  public void onStart(SourceCallback<String, Object> sourceCallback) throws MuleException {}
 
   @Override
   public void onStop() {

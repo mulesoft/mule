@@ -7,20 +7,19 @@
 package org.mule.test.petstore.extension;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 
 @Alias("pet-source")
-public class PetStoreSource extends Source<String, Attributes> {
+public class PetStoreSource extends Source<String, Object> {
 
   @ParameterGroup(name = "Breeder")
   private ExclusivePetBreeder breeder;
 
   @Override
-  public void onStart(SourceCallback<String, Attributes> sourceCallback) throws MuleException {}
+  public void onStart(SourceCallback<String, Object> sourceCallback) throws MuleException {}
 
   @Override
   public void onStop() {}

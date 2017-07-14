@@ -20,7 +20,6 @@ import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthCo
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedFields;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.runtime.api.message.NullAttributes;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectedDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclaration;
@@ -62,8 +61,7 @@ public class JavaOAuthDeclarationEnricher extends AbstractAnnotatedDeclarationEn
 
   private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
   private final MetadataType stringType = typeLoader.load(String.class);
-  private final MetadataType voidType = typeLoader.load(Void.class);
-  private final MetadataType nullAttributesType = typeLoader.load(NullAttributes.class);
+  private final MetadataType voidType = typeLoader.load(void.class);
 
   @Override
   public void enrich(ExtensionLoadingContext extensionLoadingContext) {
@@ -148,7 +146,7 @@ public class JavaOAuthDeclarationEnricher extends AbstractAnnotatedDeclarationEn
     operation.setBlocking(true);
     operation.setExecutionType(BLOCKING);
     operation.setOutput(toDeclaration(voidType));
-    operation.setOutputAttributes(toDeclaration(nullAttributesType));
+    operation.setOutputAttributes(toDeclaration(voidType));
     operation.setRequiresConnection(false);
     operation.setSupportsStreaming(false);
     operation.setTransactional(false);

@@ -36,7 +36,6 @@ import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.model.VoidType;
 import org.mule.metadata.java.api.utils.JavaTypeUtils;
-import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.CollectionDataType;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MapDataType;
@@ -276,7 +275,7 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
     return new HashMap<>();
   }
 
-  public Result<String, Attributes> operationResult() {
+  public Result<String, Object> operationResult() {
     return null;
   }
 
@@ -284,7 +283,7 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
     return null;
   }
 
-  public PagingProvider<Object, Result<String, Attributes>> pagingProviderOperationResult() {
+  public PagingProvider<Object, Result<String, Object>> pagingProviderOperationResult() {
     return null;
   }
 
@@ -304,7 +303,7 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
   private void assertAttributesType(String method) throws Exception {
     MetadataType attributesType = IntrospectionUtils.getMethodReturnAttributesType(getMethod(method), TYPE_LOADER);
     assertThat(attributesType, is(instanceOf(ObjectType.class)));
-    assertType(attributesType, Attributes.class);
+    assertType(attributesType, Object.class);
   }
 
   private void assertVoidAttributesType(String method) throws Exception {

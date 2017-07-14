@@ -18,8 +18,6 @@ import static org.mule.test.heisenberg.extension.model.types.WeaponType.FIRE_WEA
 import static org.mule.test.vegan.extension.VeganExtension.VEGAN;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.message.Attributes;
-import org.mule.runtime.api.message.NullAttributes;
 import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.client.OperationParameters;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -85,7 +83,7 @@ public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigT
         .addParameter("victim", "Juani")
         .addParameter("goodbyeMessage", "ADIOS")
         .build();
-    Result<String, ? extends Attributes> result = doExecute(HEISENBERG_EXT_NAME, "kill", params);
+    Result<String, Object> result = doExecute(HEISENBERG_EXT_NAME, "kill", params);
     assertThat(result.getOutput(), is("ADIOS, Juani"));
   }
 
@@ -96,7 +94,7 @@ public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigT
         .addParameter("victim", "#[mel:'Juani']")
         .addParameter("goodbyeMessage", "ADIOS")
         .build();
-    Result<String, ? extends Attributes> result = doExecute(HEISENBERG_EXT_NAME, "kill", params);
+    Result<String, Object> result = doExecute(HEISENBERG_EXT_NAME, "kill", params);
     assertThat(result.getOutput(), is("ADIOS, Juani"));
   }
 
@@ -116,7 +114,7 @@ public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigT
         .addParameter("type", FIRE_WEAPON)
         .addParameter("attributesOfWeapon", attributes)
         .build();
-    Result<String, Attributes> result = doExecute(HEISENBERG_EXT_NAME, "killWithWeapon", params);
+    Result<String, Object> result = doExecute(HEISENBERG_EXT_NAME, "killWithWeapon", params);
     assertThat(result.getOutput(), is("Killed with: You have been killed with Ricin , Type FIRE_WEAPON and attribute brand"));
   }
 
@@ -130,7 +128,7 @@ public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigT
         .addParameter("name", "Juani")
         .addParameter("knownAddresses", emptyList())
         .build();
-    Result<String, Attributes> result = doExecute(HEISENBERG_EXT_NAME, "alias", params);
+    Result<String, Object> result = doExecute(HEISENBERG_EXT_NAME, "alias", params);
     assertThat(result.getOutput(), is(ALIAS_OUTPUT));
   }
 
@@ -138,7 +136,7 @@ public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigT
   @Description("Executes an operation that has a parameter with default value using the client and checks the output")
   public void executeOperationWithDefaultValueParameter() throws Throwable {
     OperationParameters params = builder().configName("apple").build();
-    Result<Collection<?>, Attributes> result = doExecute(VEGAN, "tryToEatThisListOfMaps", params);
+    Result<Collection<?>, Object> result = doExecute(VEGAN, "tryToEatThisListOfMaps", params);
     assertThat(result.getOutput(), instanceOf(List.class));
     assertThat(result.getOutput(), hasSize(0));
   }
@@ -147,7 +145,7 @@ public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigT
   @Description("Executes an operation that has a @NullSafe annotated parameter using the client and checks the output")
   public void executeOperationWithNullSafeParameter() throws Throwable {
     OperationParameters params = builder().configName("banana").build();
-    Result<VeganPolicy, Attributes> result = doExecute(VEGAN, "applyPolicy", params);
+    Result<VeganPolicy, Object> result = doExecute(VEGAN, "applyPolicy", params);
     assertThat(result.getOutput().getMeetAllowed(), is(false));
     assertThat(result.getOutput().getIngredients().getSaltMiligrams(), is(0));
   }
@@ -166,10 +164,9 @@ public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigT
   @Description("Executes a void operation using the client")
   public void executeVoidOperation() throws Throwable {
     OperationParameters params = builder().configName(HEISENBERG_CONFIG).build();
-    Result<Object, Attributes> result = doExecute(HEISENBERG_EXT_NAME, "die", params);
+    Result<Object, Object> result = doExecute(HEISENBERG_EXT_NAME, "die", params);
     assertThat(result.getOutput(), is(nullValue()));
-    assertThat(result.getAttributes().isPresent(), is(true));
-    assertThat(result.getAttributes().get(), instanceOf(NullAttributes.class));
+    assertThat(result.getAttributes().isPresent(), is(false));
   }
 
   @Test

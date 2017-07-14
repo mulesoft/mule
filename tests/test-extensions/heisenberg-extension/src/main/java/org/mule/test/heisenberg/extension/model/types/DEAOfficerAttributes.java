@@ -6,9 +6,13 @@
  */
 package org.mule.test.heisenberg.extension.model.types;
 
-import org.mule.runtime.core.api.message.BaseAttributes;
+import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
 
-public class DEAOfficerAttributes extends BaseAttributes {
+import java.io.Serializable;
+
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+
+public class DEAOfficerAttributes implements Serializable {
 
   private final boolean isHank;
 
@@ -18,5 +22,10 @@ public class DEAOfficerAttributes extends BaseAttributes {
 
   public boolean isHank() {
     return isHank;
+  }
+
+  @Override
+  public String toString() {
+    return ReflectionToStringBuilder.toString(this, SHORT_PREFIX_STYLE);
   }
 }

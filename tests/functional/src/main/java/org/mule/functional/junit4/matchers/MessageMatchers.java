@@ -6,7 +6,6 @@
  */
 package org.mule.functional.junit4.matchers;
 
-import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
 
@@ -16,7 +15,7 @@ import org.hamcrest.Matcher;
 public class MessageMatchers {
 
   /**
-   * Verifies the {@link Message}'s attributes using any {@link Attributes} matcher.
+   * Verifies the {@link Message}'s attributes using any {@link Message#getAttributes()} matcher.
    */
   @Factory
   public static <T> Matcher<Message> hasAttributes(Matcher<T> attributesMatcher) {

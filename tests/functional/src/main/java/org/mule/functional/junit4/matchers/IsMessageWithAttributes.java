@@ -6,7 +6,6 @@
  */
 package org.mule.functional.junit4.matchers;
 
-import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Message;
 
 import org.hamcrest.Description;
@@ -14,7 +13,7 @@ import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
 /**
- * Verifies a {@link Message}'s attributes, using a specific {@link Attributes} matcher.
+ * Verifies a {@link Message}'s attributes, using a specific {@link Message#getAttributes()} matcher.
  *
  * @since 4.0
  */

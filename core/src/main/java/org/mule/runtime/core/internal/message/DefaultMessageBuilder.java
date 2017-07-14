@@ -12,7 +12,6 @@ import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
-import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.core.PropertyScope.INBOUND;
 import static org.mule.runtime.core.PropertyScope.OUTBOUND;
 import static org.mule.runtime.core.api.Event.getCurrentEvent;
@@ -33,11 +32,11 @@ import org.mule.runtime.api.util.CaseInsensitiveMapWrapper;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.message.ExceptionPayload;
+import org.mule.runtime.core.api.store.DeserializationPostInitialisable;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder;
 import org.mule.runtime.core.internal.metadata.DefaultCollectionDataType;
-import org.mule.runtime.core.api.store.DeserializationPostInitialisable;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -64,7 +63,7 @@ public class DefaultMessageBuilder
 
   private Object payload;
   private DataType dataType;
-  private Object attributes = NULL_ATTRIBUTES;
+  private Object attributes;
   private DataType attributesDataType;
 
   private ExceptionPayload exceptionPayload;
@@ -161,7 +160,7 @@ public class DefaultMessageBuilder
 
   @Override
   public InternalMessage.Builder nullAttributes() {
-    this.attributes = NULL_ATTRIBUTES;
+    this.attributes = null;
     return this;
   }
 
@@ -390,7 +389,9 @@ public class DefaultMessageBuilder
       buf.append(lineSeparator());
       buf.append("  mediaType=").append(getPayload().getDataType().getMediaType());
       buf.append(lineSeparator());
-      buf.append("  attributes=").append(getAttributes().getValue().toString());
+      buf.append("  attributes=").append(String.valueOf(getAttributes().getValue()));
+      buf.append(lineSeparator());
+      buf.append("  attributesMediaType=").append(getAttributes().getDataType().getMediaType());
       buf.append(lineSeparator());
       buf.append("  exceptionPayload=").append(defaultIfNull(exceptionPayload, NOT_SET));
       buf.append(lineSeparator());

@@ -6,11 +6,10 @@
  */
 package org.mule.test.vegan.extension;
 
-import org.mule.runtime.api.message.Attributes;
-
+import java.io.Serializable;
 import java.util.List;
 
-public class HarvestApplesAttributes implements Attributes {
+public class HarvestApplesAttributes implements Serializable {
 
   private List<Object> parameters;
 

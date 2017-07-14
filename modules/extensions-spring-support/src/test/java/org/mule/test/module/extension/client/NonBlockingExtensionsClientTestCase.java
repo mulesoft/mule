@@ -9,7 +9,6 @@ package org.mule.test.module.extension.client;
 import static org.mule.test.allure.AllureConstants.ExtensionsClientFeature.EXTENSIONS_CLIENT;
 import static org.mule.test.allure.AllureConstants.ExtensionsClientFeature.ExtensionsClientStory.NON_BLOCKING_CLIENT;
 
-import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.extension.api.client.OperationParameters;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 

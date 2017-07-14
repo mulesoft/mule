@@ -8,7 +8,7 @@ package org.mule.runtime.core.api.message;
 
 import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
 
-import org.mule.runtime.api.message.Attributes;
+import java.io.Serializable;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
@@ -17,7 +17,7 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
  * 
  * @since 4.0
  */
-public abstract class BaseAttributes implements Attributes {
+public abstract class BaseAttributes implements Serializable {
 
   @Override
   public String toString() {

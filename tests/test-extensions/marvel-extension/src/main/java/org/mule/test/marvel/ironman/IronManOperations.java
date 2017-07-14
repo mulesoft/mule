@@ -8,13 +8,10 @@ package org.mule.test.marvel.ironman;
 
 import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.api.meta.model.ExecutionType.CPU_INTENSIVE;
-
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.message.NullAttributes;
 import org.mule.runtime.extension.api.annotation.execution.Execution;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
@@ -24,6 +21,7 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.test.marvel.model.Missile;
 import org.mule.test.marvel.model.Villain;
+
 import java.util.concurrent.ScheduledExecutorService;
 
 public class IronManOperations implements Initialisable, Disposable {
@@ -48,13 +46,12 @@ public class IronManOperations implements Initialisable, Disposable {
   public void fireMissile(@Config IronMan ironMan,
                           @Connection Missile missile,
                           Villain at,
-                          CompletionCallback<String, NullAttributes> callback) {
+                          CompletionCallback<String, Void> callback) {
     final Runnable launch = () -> {
       try {
         ironMan.track(missile);
-        callback.success(Result.<String, NullAttributes>builder()
-            .output(missile.fireAt(at))
-            .attributes(NULL_ATTRIBUTES).build());
+        callback.success(Result.<String, Void>builder()
+            .output(missile.fireAt(at)).build());
       } catch (Exception e) {
         callback.error(e);
       }
@@ -69,9 +66,9 @@ public class IronManOperations implements Initialisable, Disposable {
   }
 
   @Execution(CPU_INTENSIVE)
-  public void computeFlightPlan(@Config IronMan ironMan, CompletionCallback<Void, NullAttributes> callback) {
+  public void computeFlightPlan(@Config IronMan ironMan, CompletionCallback<Void, Void> callback) {
     final Runnable launch = () -> {
-      callback.success(Result.<Void, NullAttributes>builder().build());
+      callback.success(Result.<Void, Void>builder().build());
       ironMan.setFlightPlan(FLIGHT_PLAN);
     };
 

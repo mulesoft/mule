@@ -6,6 +6,13 @@
  */
 package org.mule.runtime.module.extension.internal;
 
+import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.collection.IsEmptyCollection.empty;
+import static org.hamcrest.core.IsCollectionContaining.hasItem;
+import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
@@ -14,35 +21,23 @@ import static org.mule.runtime.api.meta.model.ExecutionType.BLOCKING;
 import static org.mule.runtime.api.meta.model.ExecutionType.CPU_INTENSIVE;
 import static org.mule.runtime.api.meta.model.ExecutionType.CPU_LITE;
 import static org.mule.runtime.api.meta.model.error.ErrorModelBuilder.newError;
-import static org.mule.runtime.core.api.config.MuleManifest.getProductDescription;
-import static org.mule.runtime.core.api.config.MuleManifest.getProductName;
 import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.core.api.config.MuleManifest.getVendorName;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.module.extension.internal.resources.MuleExtensionModelProvider.MULE_VERSION;
 import static org.mule.runtime.module.extension.internal.resources.MuleExtensionModelProvider.getExtensionModel;
-import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.hamcrest.collection.IsEmptyCollection.empty;
-import static org.hamcrest.core.IsCollectionContaining.hasItem;
-import static org.junit.Assert.assertThat;
-
 import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.UnionType;
+import org.mule.metadata.api.model.VoidType;
 import org.mule.metadata.api.model.impl.DefaultAnyType;
 import org.mule.metadata.api.model.impl.DefaultArrayType;
 import org.mule.metadata.api.model.impl.DefaultBooleanType;
 import org.mule.metadata.api.model.impl.DefaultNumberType;
 import org.mule.metadata.api.model.impl.DefaultObjectType;
 import org.mule.metadata.api.model.impl.DefaultStringType;
-import org.mule.metadata.api.model.impl.DefaultVoidType;
-import org.mule.runtime.api.message.Attributes;
-import org.mule.runtime.api.message.NullAttributes;
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -69,14 +64,15 @@ import org.junit.Test;
 
 public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
 
+  private static final String PRODUCT_NAME = "Mule Core";
   private static final ErrorModel errorMuleAny = newError("ANY", "MULE").build();
 
   private static ExtensionModel coreExtensionModel = getExtensionModel();
 
   @Test
   public void consistentWithManifest() {
-    assertThat(coreExtensionModel.getName(), is(getProductName()));
-    assertThat(coreExtensionModel.getDescription(), is(getProductDescription() + ": Core components"));
+    assertThat(coreExtensionModel.getName(), is(PRODUCT_NAME));
+    assertThat(coreExtensionModel.getDescription(), is("Mule Runtime and Integration Platform: Core components"));
     assertThat(coreExtensionModel.getVersion(), is(getProductVersion()));
     assertThat(coreExtensionModel.getVendor(), is(getVendorName()));
     assertThat(coreExtensionModel.getCategory(), is(COMMUNITY));
@@ -233,9 +229,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
 
     assertThat(collectionAggregatorModel.getOutput().getType(), instanceOf(DefaultArrayType.class));
     assertThat(collectionAggregatorModel.getOutput().hasDynamicType(), is(false));
-    assertThat(collectionAggregatorModel.getOutputAttributes().getType(), instanceOf(DefaultObjectType.class));
-    assertThat(collectionAggregatorModel.getOutputAttributes().getType().getAnnotation(TypeIdAnnotation.class).get().getValue(),
-               is(NullAttributes.class.getName()));
+    assertThat(collectionAggregatorModel.getOutputAttributes().getType(), instanceOf(VoidType.class));
     assertThat(collectionAggregatorModel.getOutputAttributes().hasDynamicType(), is(false));
 
     final List<ParameterModel> paramModels = collectionAggregatorModel.getAllParameterModels();
@@ -539,9 +533,9 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
    * @param model the model to assert on
    */
   private void assertOutputSameAsInput(final OperationModel model) {
-    assertThat(model.getOutput().getType(), instanceOf(DefaultVoidType.class));
+    assertThat(model.getOutput().getType(), instanceOf(VoidType.class));
     assertThat(model.getOutput().hasDynamicType(), is(false));
-    assertThat(model.getOutputAttributes().getType(), instanceOf(DefaultVoidType.class));
+    assertThat(model.getOutputAttributes().getType(), instanceOf(VoidType.class));
     assertThat(model.getOutputAttributes().hasDynamicType(), is(false));
   }
 
@@ -553,9 +547,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
   private void assertComponentDeterminesOutput(final OperationModel model) {
     assertThat(model.getOutput().getType(), instanceOf(DefaultAnyType.class));
     assertThat(model.getOutput().hasDynamicType(), is(false));
-    assertThat(model.getOutputAttributes().getType(), instanceOf(DefaultObjectType.class));
-    assertThat(model.getOutputAttributes().getType().getAnnotation(TypeIdAnnotation.class).get().getValue(),
-               is(NullAttributes.class.getName()));
+    assertThat(model.getOutputAttributes().getType(), instanceOf(VoidType.class));
     assertThat(model.getOutputAttributes().hasDynamicType(), is(false));
   }
 
@@ -569,7 +561,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(model.getOutput().hasDynamicType(), is(false));
     assertThat(model.getOutputAttributes().getType(), instanceOf(DefaultObjectType.class));
     assertThat(model.getOutputAttributes().getType().getAnnotation(TypeIdAnnotation.class).get().getValue(),
-               is(Attributes.class.getName()));
+               is(Object.class.getName()));
     assertThat(model.getOutputAttributes().hasDynamicType(), is(false));
   }
 

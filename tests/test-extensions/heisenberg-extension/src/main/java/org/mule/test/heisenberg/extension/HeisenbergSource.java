@@ -18,13 +18,10 @@ import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatu
 import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatus.ERROR_INVOKE;
 import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatus.NONE;
 import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatus.SUCCESS;
-
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
-import org.mule.runtime.extension.api.runtime.source.SourceResult;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Streaming;
 import org.mule.runtime.extension.api.annotation.execution.OnError;
@@ -39,6 +36,7 @@ import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
+import org.mule.runtime.extension.api.runtime.source.SourceResult;
 import org.mule.test.heisenberg.extension.model.Methylamine;
 import org.mule.test.heisenberg.extension.model.PersonalInfo;
 
@@ -49,7 +47,7 @@ import javax.inject.Inject;
 @Alias("ListenPayments")
 @EmitsResponse
 @Streaming
-public class HeisenbergSource extends Source<String, Attributes> {
+public class HeisenbergSource extends Source<String, Object> {
 
   public static final String CORE_POOL_SIZE_ERROR_MESSAGE = "corePoolSize cannot be a negative value";
   public static final String INITIAL_BATCH_NUMBER_ERROR_MESSAGE = "initialBatchNumber cannot be a negative value";
@@ -98,7 +96,7 @@ public class HeisenbergSource extends Source<String, Attributes> {
   }
 
   @Override
-  public void onStart(SourceCallback<String, Attributes> sourceCallback) throws MuleException {
+  public void onStart(SourceCallback<String, Object> sourceCallback) throws MuleException {
     checkArgument(heisenberg != null, "config not injected");
     connection.verifyLifecycle(1, 1, 0, 0);
     HeisenbergExtension.sourceTimesStarted++;
@@ -170,12 +168,12 @@ public class HeisenbergSource extends Source<String, Attributes> {
     gatheredMoney = 0;
   }
 
-  private Result<String, Attributes> makeResult(SourceCallback sourceCallback) {
+  private Result<String, Object> makeResult(SourceCallback sourceCallback) {
     if (initialBatchNumber < 0) {
       sourceCallback.onSourceException(new RuntimeException(INITIAL_BATCH_NUMBER_ERROR_MESSAGE));
     }
 
-    return Result.<String, Attributes>builder()
+    return Result.<String, Object>builder()
         .output(format("Meth Batch %d. If found by DEA contact %s", ++initialBatchNumber, connection.getSaulPhoneNumber()))
         .build();
   }

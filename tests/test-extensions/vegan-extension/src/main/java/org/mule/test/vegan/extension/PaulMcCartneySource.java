@@ -7,19 +7,18 @@
 package org.mule.test.vegan.extension;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.tck.testmodels.fruit.Fruit;
 
-public class PaulMcCartneySource extends Source<Fruit, Attributes> {
+public class PaulMcCartneySource extends Source<Fruit, Object> {
 
   @Config
   private Object config;
 
   @Override
-  public void onStart(SourceCallback<Fruit, Attributes> sourceCallback) throws MuleException {
+  public void onStart(SourceCallback<Fruit, Object> sourceCallback) throws MuleException {
 
   }
 

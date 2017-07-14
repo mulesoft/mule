@@ -6,11 +6,12 @@
  */
 package org.mule.test.metadata.extension.model.attribute;
 
-import org.mule.runtime.core.api.message.BaseAttributes;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 
+import java.io.Serializable;
+
 @XmlHints(allowTopLevelDefinition = true)
-public class AnimalsOutputAttributes extends BaseAttributes implements AbstractOutputAttributes {
+public class AnimalsOutputAttributes implements Serializable, AbstractOutputAttributes {
 
   private String outputId = "AnimalsOutputAttributes";
   private String kind;

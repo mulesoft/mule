@@ -6,8 +6,8 @@
  */
 package org.mule.test.vegan.extension;
 
-import org.mule.runtime.core.api.message.BaseAttributes;
+import java.io.Serializable;
 
-public class VeganAttributes extends BaseAttributes {
+public class VeganAttributes implements Serializable {
 
 }

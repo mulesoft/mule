@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
-import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.internal.util.message.MessageUtils.toMessageCollection;
@@ -81,7 +80,7 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
       return Message.builder()
           .payload(streamingContent(value, cursorProviderFactory, event))
           .mediaType(mediaType)
-          .attributes(NULL_ATTRIBUTES).build();
+          .build();
     }
   }
 

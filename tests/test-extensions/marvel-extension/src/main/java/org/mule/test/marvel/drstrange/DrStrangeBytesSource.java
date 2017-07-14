@@ -7,10 +7,7 @@
 package org.mule.test.marvel.drstrange;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
-
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.message.NullAttributes;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.extension.api.annotation.Alias;
@@ -27,7 +24,7 @@ import java.io.InputStream;
 import javax.inject.Inject;
 
 @Alias("bytes-caster")
-public class DrStrangeBytesSource extends Source<InputStream, NullAttributes> {
+public class DrStrangeBytesSource extends Source<InputStream, Void> {
 
   @Inject
   private SchedulerService schedulerService;
@@ -47,11 +44,10 @@ public class DrStrangeBytesSource extends Source<InputStream, NullAttributes> {
   private DrStrange config;
 
   @Override
-  public void onStart(SourceCallback<InputStream, NullAttributes> sourceCallback) throws MuleException {
+  public void onStart(SourceCallback<InputStream, Void> sourceCallback) throws MuleException {
     scheduler = schedulerService.cpuLightScheduler();
-    scheduler.scheduleAtFixedRate(() -> sourceCallback.handle(Result.<InputStream, NullAttributes>builder()
+    scheduler.scheduleAtFixedRate(() -> sourceCallback.handle(Result.<InputStream, Void>builder()
         .output(new ByteArrayInputStream(getSpellBytes(spell)))
-        .attributes(NULL_ATTRIBUTES)
         .build()), 0, castFrequencyInMillis, MILLISECONDS);
   }
 

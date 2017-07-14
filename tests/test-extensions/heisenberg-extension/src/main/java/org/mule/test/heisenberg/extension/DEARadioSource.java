@@ -7,10 +7,7 @@
 package org.mule.test.heisenberg.extension;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
-
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.scheduler.SchedulerConfig;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
@@ -27,7 +24,7 @@ import java.util.Random;
 import javax.inject.Inject;
 
 @Alias("dea-radio")
-public class DEARadioSource extends Source<List<Result<String, DEAOfficerAttributes>>, Attributes> {
+public class DEARadioSource extends Source<List<Result<String, DEAOfficerAttributes>>, Object> {
 
   public static final int MESSAGES_PER_POLL = 5;
   public static final String MESSAGE_TEXT = "I heard Heisenberg is in the neighborhood";
@@ -43,7 +40,7 @@ public class DEARadioSource extends Source<List<Result<String, DEAOfficerAttribu
   private Random random = new Random();
 
   @Override
-  public void onStart(SourceCallback<List<Result<String, DEAOfficerAttributes>>, Attributes> sourceCallback)
+  public void onStart(SourceCallback<List<Result<String, DEAOfficerAttributes>>, Object> sourceCallback)
       throws MuleException {
 
     executor = schedulerService.cpuLightScheduler(baseConfig.withShutdownTimeout(500, MILLISECONDS));
@@ -57,7 +54,7 @@ public class DEARadioSource extends Source<List<Result<String, DEAOfficerAttribu
     }
   }
 
-  private Result<List<Result<String, DEAOfficerAttributes>>, Attributes> makeResult() {
+  private Result<List<Result<String, DEAOfficerAttributes>>, Object> makeResult() {
     List<Result<String, DEAOfficerAttributes>> messages = new ArrayList<>(MESSAGES_PER_POLL);
     for (int i = 0; i < MESSAGES_PER_POLL; i++) {
       boolean isHank = random.nextInt() % 2 == 0;
@@ -67,9 +64,8 @@ public class DEARadioSource extends Source<List<Result<String, DEAOfficerAttribu
           .build());
     }
 
-    return Result.<List<Result<String, DEAOfficerAttributes>>, Attributes>builder()
+    return Result.<List<Result<String, DEAOfficerAttributes>>, Object>builder()
         .output(messages)
-        .attributes(NULL_ATTRIBUTES)
         .build();
   }
 }

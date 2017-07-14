@@ -10,6 +10,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
@@ -19,10 +20,8 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
-import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -145,8 +144,8 @@ public class MessageContextTestCase extends AbstractELTestCase {
 
   @Test
   public void attributes() throws Exception {
-    Attributes attributes = NULL_ATTRIBUTES;
+    Object attributes = mock(Object.class);
     when(message.getAttributes()).thenReturn(new TypedValue<>(attributes, DataType.OBJECT));
-    assertThat(evaluate("message.attributes", event), is(attributes));
+    assertThat(evaluate("message.attributes", event), is(sameInstance(attributes)));
   }
 }

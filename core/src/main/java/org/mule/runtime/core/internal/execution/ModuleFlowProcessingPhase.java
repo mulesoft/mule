@@ -7,53 +7,51 @@
 package org.mule.runtime.core.internal.execution;
 
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.DefaultEventContext.create;
 import static org.mule.runtime.core.api.Event.builder;
+import static org.mule.runtime.core.api.context.notification.ConnectorMessageNotification.MESSAGE_ERROR_RESPONSE;
+import static org.mule.runtime.core.api.context.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
 import static org.mule.runtime.core.api.context.notification.ConnectorMessageNotification.MESSAGE_RESPONSE;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.SOURCE_ERROR_RESPONSE_GENERATE;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.SOURCE_ERROR_RESPONSE_SEND;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.SOURCE_RESPONSE_GENERATE;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.SOURCE_RESPONSE_SEND;
 import static org.mule.runtime.core.api.functional.Either.left;
 import static org.mule.runtime.core.api.functional.Either.right;
 import static org.mule.runtime.core.api.message.ErrorBuilder.builder;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.api.util.ExceptionUtils.createErrorEvent;
-import static org.mule.runtime.core.api.context.notification.ConnectorMessageNotification.MESSAGE_ERROR_RESPONSE;
-import static org.mule.runtime.core.api.context.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.SOURCE_ERROR_RESPONSE_GENERATE;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.SOURCE_ERROR_RESPONSE_SEND;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.SOURCE_RESPONSE_GENERATE;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.SOURCE_RESPONSE_SEND;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
-import static reactor.core.publisher.Mono.empty;
-import static reactor.core.publisher.Mono.error;
 import static org.mule.runtime.core.internal.util.message.MessageUtils.toMessage;
 import static org.mule.runtime.core.internal.util.message.MessageUtils.toMessageCollection;
+import static reactor.core.publisher.Mono.empty;
+import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.fromCallable;
 import static reactor.core.publisher.Mono.just;
 import static reactor.core.publisher.Mono.when;
-
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.execution.MessageProcessTemplate;
-import org.mule.runtime.core.api.functional.Either;
-import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
 import org.mule.runtime.core.api.exception.ErrorTypeRepository;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.api.execution.MessageProcessContext;
-import org.mule.runtime.core.internal.policy.SourcePolicyFailureResult;
+import org.mule.runtime.core.api.execution.MessageProcessTemplate;
+import org.mule.runtime.core.api.functional.Either;
+import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.internal.policy.SourcePolicy;
+import org.mule.runtime.core.internal.policy.SourcePolicyFailureResult;
 import org.mule.runtime.core.internal.policy.SourcePolicySuccessResult;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
@@ -259,10 +257,9 @@ public class ModuleFlowProcessingPhase
       final Object resultValue = result.getOutput();
 
       if (resultValue instanceof Collection && adapter.isCollection()) {
-        message = toMessage(Result.<Collection<Message>, Attributes>builder()
+        message = toMessage(Result.<Collection<Message>, TypedValue>builder()
             .output(toMessageCollection((Collection<Result>) resultValue, adapter.getCursorProviderFactory(),
                                         templateEvent))
-            .attributes(NULL_ATTRIBUTES)
             .mediaType(result.getMediaType().orElse(ANY))
             .build());
       } else {
