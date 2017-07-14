@@ -6,10 +6,9 @@
  */
 package org.mule.module.http.internal.multipart;
 
+import static java.lang.String.format;
 import org.mule.api.MuleRuntimeException;
 import org.mule.message.ds.ByteArrayDataSource;
-import org.mule.message.ds.StringDataSource;
-import org.mule.module.http.internal.HttpParam;
 import org.mule.util.IOUtils;
 
 import java.io.ByteArrayInputStream;
@@ -18,16 +17,16 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
-import javax.servlet.http.Part;
 
 public class HttpPartDataSource implements DataSource
 {
+    public static final String ANONYMOUS_ATTACHMENT_FORMAT = "mule_attachment_%d";
 
     private final HttpPart part;
     private byte[] content;
@@ -91,10 +90,12 @@ public class HttpPartDataSource implements DataSource
 
     public static Map<String, DataHandler> createDataHandlerFrom(Collection<HttpPart> parts)
     {
-        final Map<String, DataHandler> httpParts = new HashMap<>(parts.size());
+        final Map<String, DataHandler> httpParts = new LinkedHashMap<>(parts.size());
+        int anonymousPartCount = 0;
         for (HttpPart part : parts)
         {
-            httpParts.put(part.getName(), new DataHandler(new HttpPartDataSource(part)));
+            httpParts.put(part.getName() == null ? format(ANONYMOUS_ATTACHMENT_FORMAT, anonymousPartCount++) : part.getName(),
+                          new DataHandler(new HttpPartDataSource(part)));
         }
         return httpParts;
     }
