@@ -1,465 +1,440 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xs:schema xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.mulesoft.org/schema/mule/typed-value" attributeFormDefault="unqualified" elementFormDefault="qualified">
-    <xs:import namespace="http://www.w3.org/XML/1998/namespace"></xs:import>
-    <xs:import namespace="http://www.springframework.org/schema/beans" schemaLocation="http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"></xs:import>
-    <xs:import namespace="http://www.mulesoft.org/schema/mule/core" schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule.xsd"></xs:import>
-    <xs:import namespace="http://www.mulesoft.org/schema/mule/extension" schemaLocation="http://www.mulesoft.org/schema/mule/extension/current/mule-extension.xsd"></xs:import>
-    <xs:complexType name="org.mule.test.heisenberg.extension.model.DifferedKnockableDoor">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-                <xs:attribute type="mule:expressionString" use="optional" name="victim"></xs:attribute>
-                <xs:attribute type="mule:expressionString" use="optional" name="address"></xs:attribute>
-                <xs:attribute type="mule:expressionString" use="optional" name="encodedPasssword"></xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace"></xs:import>
+  <xs:import namespace="http://www.springframework.org/schema/beans" schemaLocation="http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"></xs:import>
+  <xs:import namespace="http://www.mulesoft.org/schema/mule/core" schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule.xsd"></xs:import>
+  <xs:import namespace="http://www.mulesoft.org/schema/mule/extension" schemaLocation="http://www.mulesoft.org/schema/mule/extension/current/mule-extension.xsd"></xs:import>
+  <xs:complexType name="org.mule.test.heisenberg.extension.model.DifferedKnockableDoor">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+        <xs:attribute type="mule:expressionString" use="optional" name="victim"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" name="address"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" name="encodedPasssword"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" abstract="true" name="abstract-differed-knockable-door"></xs:element>
+  <xs:element xmlns:typed-value="http://www.mulesoft.org/schema/mule/typed-value" substitutionGroup="typed-value:abstract-differed-knockable-door" name="differed-knockable-door">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="typed-value:org.mule.test.heisenberg.extension.model.DifferedKnockableDoor">
+          <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" abstract="true" name="abstract-differed-knockable-door"></xs:element>
-    <xs:element xmlns:typed-value="http://www.mulesoft.org/schema/mule/typed-value" substitutionGroup="typed-value:abstract-differed-knockable-door" name="differed-knockable-door">
-        <xs:complexType>
-            <xs:complexContent>
-                <xs:extension base="typed-value:org.mule.test.heisenberg.extension.model.DifferedKnockableDoor">
-                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
-                </xs:extension>
-            </xs:complexContent>
-        </xs:complexType>
-    </xs:element>
-    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" abstract="true" name="abstract-door"></xs:element>
-    <xs:element xmlns:typed-value="http://www.mulesoft.org/schema/mule/typed-value" substitutionGroup="typed-value:abstract-door" name="door">
-        <xs:complexType>
-            <xs:complexContent>
-                <xs:extension base="typed-value:org.mule.test.heisenberg.extension.model.KnockeableDoor">
-                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
-                </xs:extension>
-            </xs:complexContent>
-        </xs:complexType>
-    </xs:element>
-    <xs:complexType name="org.mule.test.heisenberg.extension.model.KnockeableDoor">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-                <xs:sequence minOccurs="0" maxOccurs="1">
-                    <xs:element minOccurs="0" maxOccurs="1" name="previous">
-                        <xs:complexType>
-                            <xs:complexContent>
-                                <xs:extension xmlns:typed-value="http://www.mulesoft.org/schema/mule/typed-value" base="typed-value:org.mule.test.heisenberg.extension.model.KnockeableDoor"></xs:extension>
-                            </xs:complexContent>
-                        </xs:complexType>
-                    </xs:element>
-                </xs:sequence>
-                <xs:attribute type="mule:expressionString" use="required" name="victim"></xs:attribute>
-                <xs:attribute type="mule:expressionString" use="required" name="address"></xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="previous"></xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
+  </xs:element>
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" abstract="true" name="abstract-door"></xs:element>
+  <xs:element xmlns:typed-value="http://www.mulesoft.org/schema/mule/typed-value" substitutionGroup="typed-value:abstract-door" name="door">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="typed-value:org.mule.test.heisenberg.extension.model.KnockeableDoor">
+          <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" name="config">
-        <xs:complexType>
-            <xs:complexContent>
+  </xs:element>
+  <xs:complexType name="org.mule.test.heisenberg.extension.model.KnockeableDoor">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" name="previous">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension xmlns:typed-value="http://www.mulesoft.org/schema/mule/typed-value" base="typed-value:org.mule.test.heisenberg.extension.model.KnockeableDoor"></xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="victim"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="required" name="address"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="previous"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" name="config">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="mule:abstractExtensionType">
+          <xs:annotation>
+            <xs:documentation>Default configuration</xs:documentation>
+          </xs:annotation>
+          <xs:sequence minOccurs="0" maxOccurs="1">
+            <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="0" maxOccurs="1" ref="extension:dynamic-config-policy"></xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="differed-door">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension xmlns:typed-value="http://www.mulesoft.org/schema/mule/typed-value" base="typed-value:org.mule.test.heisenberg.extension.model.DifferedKnockableDoor"></xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="stringTypedValue"></xs:attribute>
+          <xs:attribute type="xs:string" use="optional" name="differedDoor"></xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/typed-value" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="TypedValueOnConfigType" substitutionGroup="mule:abstract-operator" name="typed-value-on-config"></xs:element>
+  <xs:complexType name="TypedValueOnConfigType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/typed-value" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="TypedValueOperationStringParameterType" substitutionGroup="mule:abstract-operator" name="typed-value-operation-string-parameter"></xs:element>
+  <xs:complexType name="TypedValueOperationStringParameterType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" default="This is a default string" name="stringValue"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
+          <xs:annotation>
+            <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/typed-value" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="SourceType" substitutionGroup="mule:abstract-message-source" name="source"></xs:element>
+  <xs:complexType name="SourceType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
+          <xs:annotation>
+            <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="required" name="stringValue"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/typed-value" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="MixedTypedValuesType" substitutionGroup="mule:abstract-operator" name="mixed-typed-values"></xs:element>
+  <xs:complexType name="MixedTypedValuesType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="complex-typed-value"></xs:element>
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="complex-not-wrapped"></xs:element>
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="map-of-complex-values"></xs:element>
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="map-of-complex-typed-values"></xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" name="simple-pojo">
+            <xs:complexType>
+              <xs:complexContent>
                 <xs:extension base="mule:abstractExtensionType">
-                    <xs:annotation>
-                        <xs:documentation>Default configuration</xs:documentation>
-                    </xs:annotation>
-                    <xs:sequence minOccurs="0" maxOccurs="1">
-                        <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="0" maxOccurs="1" ref="extension:dynamic-config-policy"></xs:element>
-                        <xs:element minOccurs="0" maxOccurs="1" name="differed-door">
-                            <xs:complexType>
-                                <xs:complexContent>
-                                    <xs:extension xmlns:typed-value="http://www.mulesoft.org/schema/mule/typed-value" base="typed-value:org.mule.test.heisenberg.extension.model.DifferedKnockableDoor"></xs:extension>
-                                </xs:complexContent>
-                            </xs:complexType>
-                        </xs:element>
-                    </xs:sequence>
-                    <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
-                    <xs:attribute type="mule:expressionString" use="optional" name="stringTypedValue"></xs:attribute>
-                    <xs:attribute type="xs:string" use="optional" name="differedDoor"></xs:attribute>
+                  <xs:sequence></xs:sequence>
+                  <xs:attribute type="mule:expressionString" use="optional" name="user"></xs:attribute>
+                  <xs:attribute type="mule:expressionString" use="optional" name="pass"></xs:attribute>
                 </xs:extension>
-            </xs:complexContent>
-        </xs:complexType>
-    </xs:element>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/typed-value" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="TypedValueOnConfigType" substitutionGroup="mule:abstract-operator" name="typed-value-on-config"></xs:element>
-    <xs:complexType name="TypedValueOnConfigType">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
-                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
-                    <xs:annotation>
-                        <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="target">
-                    <xs:annotation>
-                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/typed-value" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="TypedValueOperationStringParameterType" substitutionGroup="mule:abstract-operator" name="typed-value-operation-string-parameter"></xs:element>
-    <xs:complexType name="TypedValueOperationStringParameterType">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
-                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
-                    <xs:annotation>
-                        <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-                <xs:attribute type="mule:expressionString" use="optional" default="This is a default string" name="stringValue"></xs:attribute>
-                <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
-                    <xs:annotation>
-                        <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-                <xs:attribute type="mule:expressionString" use="optional" name="outputEncoding">
-                    <xs:annotation>
-                        <xs:documentation>The encoding of the payload that this operation outputs.</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="target">
-                    <xs:annotation>
-                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/typed-value" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="SourceType" substitutionGroup="mule:abstract-message-source" name="source"></xs:element>
-    <xs:complexType name="SourceType">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
-                <xs:sequence minOccurs="0" maxOccurs="1">
-                    <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
-                    <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
-                </xs:sequence>
-                <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
-                    <xs:annotation>
-                        <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-                <xs:attribute type="mule:expressionString" use="optional" name="outputEncoding">
-                    <xs:annotation>
-                        <xs:documentation>The encoding of the payload that this operation outputs.</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-                <xs:attribute type="mule:expressionString" use="required" name="stringValue"></xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/typed-value" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="MixedTypedValuesType" substitutionGroup="mule:abstract-operator" name="mixed-typed-values"></xs:element>
-    <xs:complexType name="MixedTypedValuesType">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence minOccurs="0" maxOccurs="1">
-                    <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="complex-typed-value"></xs:element>
-                    <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="complex-not-wrapped"></xs:element>
-                    <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="map-of-complex-values"></xs:element>
-                    <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="map-of-complex-typed-values"></xs:element>
-                    <xs:element minOccurs="0" maxOccurs="1" name="simple-pojo">
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:expressionString" use="optional" name="stringNotWrapped"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" name="wrappedString"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/typed-value" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="TypedValueForInputStreamType" substitutionGroup="mule:abstract-operator" name="typed-value-for-input-stream"></xs:element>
+  <xs:complexType name="TypedValueForInputStreamType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-byte-streaming-strategy"></xs:element>
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="input-stream"></xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
+          <xs:annotation>
+            <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" name="outputEncoding">
+          <xs:annotation>
+            <xs:documentation>The encoding of the payload that this operation outputs.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/typed-value" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="TypedValueForObjectType" substitutionGroup="mule:abstract-operator" name="typed-value-for-object"></xs:element>
+  <xs:complexType name="TypedValueForObjectType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="object-typed-value"></xs:element>
+        </xs:sequence>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/typed-value" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="TypedValueForStringInsidePojoType" substitutionGroup="mule:abstract-operator" name="typed-value-for-string-inside-pojo"></xs:element>
+  <xs:complexType name="TypedValueForStringInsidePojoType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" name="differed-door">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension xmlns:typed-value="http://www.mulesoft.org/schema/mule/typed-value" base="typed-value:org.mule.test.heisenberg.extension.model.DifferedKnockableDoor"></xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="xs:string" use="optional" name="differedDoor"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/typed-value" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="TypedValueOperationDoorListParameterType" substitutionGroup="mule:abstract-operator" name="typed-value-operation-door-list-parameter"></xs:element>
+  <xs:complexType name="TypedValueOperationDoorListParameterType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" name="door-values">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element xmlns:typed-value="http://www.mulesoft.org/schema/mule/typed-value" minOccurs="0" maxOccurs="unbounded" ref="typed-value:abstract-door"></xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:expressionList" use="optional" name="doorValues"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/typed-value" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="TypedValueOperationDoorMapParameterType" substitutionGroup="mule:abstract-operator" name="typed-value-operation-door-map-parameter"></xs:element>
+  <xs:complexType name="TypedValueOperationDoorMapParameterType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" name="door-map-values">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="door-map-value">
+                  <xs:complexType>
+                    <xs:sequence maxOccurs="1">
+                      <xs:element xmlns:typed-value="http://www.mulesoft.org/schema/mule/typed-value" minOccurs="0" maxOccurs="1" ref="typed-value:abstract-door"></xs:element>
+                    </xs:sequence>
+                    <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" name="value"></xs:attribute>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:expressionMap" use="optional" name="doorMapValues"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/typed-value" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="TypedValueOperationDoorParameterType" substitutionGroup="mule:abstract-operator" name="typed-value-operation-door-parameter"></xs:element>
+  <xs:complexType name="TypedValueOperationDoorParameterType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" name="door-value">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension xmlns:typed-value="http://www.mulesoft.org/schema/mule/typed-value" base="typed-value:org.mule.test.heisenberg.extension.model.KnockeableDoor"></xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="xs:string" use="optional" name="doorValue"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/typed-value" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="TypedValueOperationPojoWithNullsafeAndContentType" substitutionGroup="mule:abstract-operator" name="typed-value-operation-pojo-with-nullsafe-and-content"></xs:element>
+  <xs:complexType name="TypedValueOperationPojoWithNullsafeAndContentType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" name="param">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension base="mule:abstractExtensionType">
+                  <xs:sequence>
+                    <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="description"></xs:element>
+                    <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="brand-name"></xs:element>
+                  </xs:sequence>
+                  <xs:attribute type="mule:expressionInt" use="optional" name="weight"></xs:attribute>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/typed-value" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="TypedValueOperationStringListParameterType" substitutionGroup="mule:abstract-operator" name="typed-value-operation-string-list-parameter"></xs:element>
+  <xs:complexType name="TypedValueOperationStringListParameterType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" name="string-values">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="string-value">
+                  <xs:complexType>
+                    <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:expressionList" use="optional" name="stringValues"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/typed-value" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="TypedValueOperationStringMapListParameterType" substitutionGroup="mule:abstract-operator" name="typed-value-operation-string-map-list-parameter"></xs:element>
+  <xs:complexType name="TypedValueOperationStringMapListParameterType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" name="door-map-list-values">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="door-map-list-value">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element minOccurs="0" maxOccurs="unbounded" name="door-map-list-value-item">
                         <xs:complexType>
-                            <xs:complexContent>
-                                <xs:extension base="mule:abstractExtensionType">
-                                    <xs:sequence></xs:sequence>
-                                    <xs:attribute type="mule:expressionString" use="optional" name="user"></xs:attribute>
-                                    <xs:attribute type="mule:expressionString" use="optional" name="pass"></xs:attribute>
-                                </xs:extension>
-                            </xs:complexContent>
+                          <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
                         </xs:complexType>
-                    </xs:element>
-                </xs:sequence>
-                <xs:attribute type="mule:expressionString" use="optional" name="stringNotWrapped"></xs:attribute>
-                <xs:attribute type="mule:expressionString" use="optional" name="wrappedString"></xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="target">
-                    <xs:annotation>
-                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/typed-value" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="TypedValueForInputStreamType" substitutionGroup="mule:abstract-operator" name="typed-value-for-input-stream"></xs:element>
-    <xs:complexType name="TypedValueForInputStreamType">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence minOccurs="0" maxOccurs="1">
-                    <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-byte-streaming-strategy"></xs:element>
-                    <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="input-stream"></xs:element>
-                </xs:sequence>
-                <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
-                    <xs:annotation>
-                        <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-                <xs:attribute type="mule:expressionString" use="optional" name="outputEncoding">
-                    <xs:annotation>
-                        <xs:documentation>The encoding of the payload that this operation outputs.</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="target">
-                    <xs:annotation>
-                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/typed-value" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="TypedValueForObjectType" substitutionGroup="mule:abstract-operator" name="typed-value-for-object"></xs:element>
-    <xs:complexType name="TypedValueForObjectType">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence minOccurs="0" maxOccurs="1">
-                    <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="object-typed-value"></xs:element>
-                </xs:sequence>
-                <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
-                    <xs:annotation>
-                        <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-                <xs:attribute type="mule:expressionString" use="optional" name="outputEncoding">
-                    <xs:annotation>
-                        <xs:documentation>The encoding of the payload that this operation outputs.</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="target">
-                    <xs:annotation>
-                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/typed-value" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="TypedValueForStringInsidePojoType" substitutionGroup="mule:abstract-operator" name="typed-value-for-string-inside-pojo"></xs:element>
-    <xs:complexType name="TypedValueForStringInsidePojoType">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence minOccurs="0" maxOccurs="1">
-                    <xs:element minOccurs="0" maxOccurs="1" name="differed-door">
-                        <xs:complexType>
-                            <xs:complexContent>
-                                <xs:extension xmlns:typed-value="http://www.mulesoft.org/schema/mule/typed-value" base="typed-value:org.mule.test.heisenberg.extension.model.DifferedKnockableDoor"></xs:extension>
-                            </xs:complexContent>
-                        </xs:complexType>
-                    </xs:element>
-                </xs:sequence>
-                <xs:attribute type="xs:string" use="optional" name="differedDoor"></xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="target">
-                    <xs:annotation>
-                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/typed-value" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="TypedValueOperationDoorListParameterType" substitutionGroup="mule:abstract-operator" name="typed-value-operation-door-list-parameter"></xs:element>
-    <xs:complexType name="TypedValueOperationDoorListParameterType">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence minOccurs="0" maxOccurs="1">
-                    <xs:element minOccurs="0" maxOccurs="1" name="door-values">
-                        <xs:complexType>
-                            <xs:sequence>
-                                <xs:element xmlns:typed-value="http://www.mulesoft.org/schema/mule/typed-value" minOccurs="0" maxOccurs="unbounded" ref="typed-value:abstract-door"></xs:element>
-                            </xs:sequence>
-                        </xs:complexType>
-                    </xs:element>
-                </xs:sequence>
-                <xs:attribute type="mule:expressionList" use="optional" name="doorValues"></xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="target">
-                    <xs:annotation>
-                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/typed-value" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="TypedValueOperationDoorMapParameterType" substitutionGroup="mule:abstract-operator" name="typed-value-operation-door-map-parameter"></xs:element>
-    <xs:complexType name="TypedValueOperationDoorMapParameterType">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence minOccurs="0" maxOccurs="1">
-                    <xs:element minOccurs="0" maxOccurs="1" name="door-map-values">
-                        <xs:complexType>
-                            <xs:sequence>
-                                <xs:element minOccurs="0" maxOccurs="unbounded" name="door-map-value">
-                                    <xs:complexType>
-                                        <xs:sequence maxOccurs="1">
-                                            <xs:element xmlns:typed-value="http://www.mulesoft.org/schema/mule/typed-value" minOccurs="0" maxOccurs="1" ref="typed-value:abstract-door"></xs:element>
-                                        </xs:sequence>
-                                        <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
-                                        <xs:attribute type="xs:string" use="optional" name="value"></xs:attribute>
-                                    </xs:complexType>
-                                </xs:element>
-                            </xs:sequence>
-                        </xs:complexType>
-                    </xs:element>
-                </xs:sequence>
-                <xs:attribute type="mule:expressionMap" use="optional" name="doorMapValues"></xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="target">
-                    <xs:annotation>
-                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/typed-value" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="TypedValueOperationDoorParameterType" substitutionGroup="mule:abstract-operator" name="typed-value-operation-door-parameter"></xs:element>
-    <xs:complexType name="TypedValueOperationDoorParameterType">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence minOccurs="0" maxOccurs="1">
-                    <xs:element minOccurs="0" maxOccurs="1" name="door-value">
-                        <xs:complexType>
-                            <xs:complexContent>
-                                <xs:extension xmlns:typed-value="http://www.mulesoft.org/schema/mule/typed-value" base="typed-value:org.mule.test.heisenberg.extension.model.KnockeableDoor"></xs:extension>
-                            </xs:complexContent>
-                        </xs:complexType>
-                    </xs:element>
-                </xs:sequence>
-                <xs:attribute type="xs:string" use="optional" name="doorValue"></xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="target">
-                    <xs:annotation>
-                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/typed-value" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="TypedValueOperationPojoWithNullsafeAndContentType" substitutionGroup="mule:abstract-operator" name="typed-value-operation-pojo-with-nullsafe-and-content"></xs:element>
-    <xs:complexType name="TypedValueOperationPojoWithNullsafeAndContentType">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence minOccurs="0" maxOccurs="1">
-                    <xs:element minOccurs="0" maxOccurs="1" name="param">
-                        <xs:complexType>
-                            <xs:complexContent>
-                                <xs:extension base="mule:abstractExtensionType">
-                                    <xs:sequence>
-                                        <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="description"></xs:element>
-                                        <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="brand-name"></xs:element>
-                                    </xs:sequence>
-                                    <xs:attribute type="mule:expressionInt" use="optional" name="weight"></xs:attribute>
-                                </xs:extension>
-                            </xs:complexContent>
-                        </xs:complexType>
-                    </xs:element>
-                </xs:sequence>
-                <xs:attribute type="xs:string" use="optional" name="target">
-                    <xs:annotation>
-                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/typed-value" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="TypedValueOperationStringListParameterType" substitutionGroup="mule:abstract-operator" name="typed-value-operation-string-list-parameter"></xs:element>
-    <xs:complexType name="TypedValueOperationStringListParameterType">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence minOccurs="0" maxOccurs="1">
-                    <xs:element minOccurs="0" maxOccurs="1" name="string-values">
-                        <xs:complexType>
-                            <xs:sequence>
-                                <xs:element minOccurs="0" maxOccurs="unbounded" name="string-value">
-                                    <xs:complexType>
-                                        <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
-                                    </xs:complexType>
-                                </xs:element>
-                            </xs:sequence>
-                        </xs:complexType>
-                    </xs:element>
-                </xs:sequence>
-                <xs:attribute type="mule:expressionList" use="optional" name="stringValues"></xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="target">
-                    <xs:annotation>
-                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/typed-value" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="TypedValueOperationStringMapListParameterType" substitutionGroup="mule:abstract-operator" name="typed-value-operation-string-map-list-parameter"></xs:element>
-    <xs:complexType name="TypedValueOperationStringMapListParameterType">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence minOccurs="0" maxOccurs="1">
-                    <xs:element minOccurs="0" maxOccurs="1" name="door-map-list-values">
-                        <xs:complexType>
-                            <xs:sequence>
-                                <xs:element minOccurs="0" maxOccurs="unbounded" name="door-map-list-value">
-                                    <xs:complexType>
-                                        <xs:sequence>
-                                            <xs:element minOccurs="0" maxOccurs="unbounded" name="door-map-list-value-item">
-                                                <xs:complexType>
-                                                    <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
-                                                </xs:complexType>
-                                            </xs:element>
-                                        </xs:sequence>
-                                        <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
-                                        <xs:attribute type="mule:expressionList" use="optional" name="value"></xs:attribute>
-                                    </xs:complexType>
-                                </xs:element>
-                            </xs:sequence>
-                        </xs:complexType>
-                    </xs:element>
-                </xs:sequence>
-                <xs:attribute type="mule:expressionMap" use="optional" name="doorMapListValues"></xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="target">
-                    <xs:annotation>
-                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/typed-value" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="TypedValueOperationStringMapParameterType" substitutionGroup="mule:abstract-operator" name="typed-value-operation-string-map-parameter"></xs:element>
-    <xs:complexType name="TypedValueOperationStringMapParameterType">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence minOccurs="0" maxOccurs="1">
-                    <xs:element minOccurs="0" maxOccurs="1" name="string-map-values">
-                        <xs:complexType>
-                            <xs:sequence>
-                                <xs:element minOccurs="0" maxOccurs="unbounded" name="string-map-value">
-                                    <xs:complexType>
-                                        <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
-                                        <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
-                                    </xs:complexType>
-                                </xs:element>
-                            </xs:sequence>
-                        </xs:complexType>
-                    </xs:element>
-                </xs:sequence>
-                <xs:attribute type="mule:expressionMap" use="optional" name="stringMapValues"></xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="target">
-                    <xs:annotation>
-                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/typed-value" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="TypedValueOperationWithStringContentType" substitutionGroup="mule:abstract-operator" name="typed-value-operation-with-string-content"></xs:element>
-    <xs:complexType name="TypedValueOperationWithStringContentType">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence minOccurs="0" maxOccurs="1">
-                    <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="string-description"></xs:element>
-                </xs:sequence>
-                <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
-                    <xs:annotation>
-                        <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-                <xs:attribute type="mule:expressionString" use="optional" name="outputEncoding">
-                    <xs:annotation>
-                        <xs:documentation>The encoding of the payload that this operation outputs.</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="target">
-                    <xs:annotation>
-                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
+                      </xs:element>
+                    </xs:sequence>
+                    <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
+                    <xs:attribute type="mule:expressionList" use="optional" name="value"></xs:attribute>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:expressionMap" use="optional" name="doorMapListValues"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/typed-value" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="TypedValueOperationStringMapParameterType" substitutionGroup="mule:abstract-operator" name="typed-value-operation-string-map-parameter"></xs:element>
+  <xs:complexType name="TypedValueOperationStringMapParameterType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" name="string-map-values">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="string-map-value">
+                  <xs:complexType>
+                    <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
+                    <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:expressionMap" use="optional" name="stringMapValues"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/typed-value" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="TypedValueOperationWithStringContentType" substitutionGroup="mule:abstract-operator" name="typed-value-operation-with-string-content"></xs:element>
+  <xs:complexType name="TypedValueOperationWithStringContentType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="string-description"></xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
+          <xs:annotation>
+            <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
 </xs:schema>

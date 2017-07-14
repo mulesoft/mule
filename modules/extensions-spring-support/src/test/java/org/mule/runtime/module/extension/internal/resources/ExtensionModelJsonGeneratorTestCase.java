@@ -19,6 +19,7 @@ import static org.mule.runtime.core.api.util.IOUtils.getResourceAsString;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
 import static org.mule.runtime.module.extension.internal.resources.MuleExtensionModelProvider.MULE_VERSION;
+
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
@@ -49,7 +50,11 @@ import org.mule.test.transactional.TransactionalExtension;
 import org.mule.test.typed.value.extension.extension.TypedValueExtension;
 import org.mule.test.values.extension.ValuesExtension;
 import org.mule.test.vegan.extension.VeganExtension;
-
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.skyscreamer.jsonassert.JSONAssert;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -57,12 +62,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.skyscreamer.jsonassert.JSONAssert;
 
 @SmallTest
 @RunWith(Parameterized.class)
