@@ -15,6 +15,7 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.extension.api.annotation.privileged.DeclarationEnrichers;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
@@ -24,7 +25,6 @@ import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.module.extension.internal.loader.enricher.BooleanParameterDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ConfigNameDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ConnectionDeclarationEnricher;
-import org.mule.runtime.extension.internal.loader.enricher.MimeTypeParametersDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.DisplayDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.DynamicMetadataDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ElementReferenceDeclarionEnricher;
@@ -53,7 +53,6 @@ import org.mule.runtime.module.extension.internal.loader.validation.ParameterGro
 import org.mule.runtime.module.extension.internal.loader.validation.ParameterTypeModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.PrivilegedApiValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.ValueProviderModelValidator;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.function.BiFunction;
@@ -84,7 +83,6 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
                                                                                                new ConnectionDeclarationEnricher(),
                                                                                                new ErrorsDeclarationEnricher(),
                                                                                                new ExtensionsErrorsDeclarationEnricher(),
-                                                                                               new MimeTypeParametersDeclarationEnricher(),
                                                                                                new DisplayDeclarationEnricher(),
                                                                                                new DynamicMetadataDeclarationEnricher(),
                                                                                                new ImportedTypesDeclarationEnricher(),
