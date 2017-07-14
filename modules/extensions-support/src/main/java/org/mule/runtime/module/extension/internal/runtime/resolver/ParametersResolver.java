@@ -20,6 +20,7 @@ import static org.mule.runtime.core.api.util.collection.Collectors.toImmutableLi
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isFlattenedParameterGroup;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
 import static org.mule.runtime.extension.api.util.NameUtils.getModelName;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.getDefaultValueResolver;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.getExpressionBasedValueResolver;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.getFieldDefaultValueValueResolver;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getContainerName;
@@ -64,7 +65,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -192,15 +192,16 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
       if (parameters.containsKey(parameterName)) {
         resolver = toValueResolver(parameters.get(parameterName), p.getModelProperties());
       } else {
-        resolver = getDefaultValueResolver(p.getModelProperty(DefaultEncodingModelProperty.class).isPresent(), () -> {
-          Object defaultValue = p.getDefaultValue();
-          if (defaultValue instanceof String) {
-            return getExpressionBasedValueResolver((String) defaultValue, p, muleContext);
-          } else if (defaultValue != null) {
-            return new StaticValueResolver<>(defaultValue);
-          }
-          return null;
-        });
+        resolver =
+            getDefaultValueResolver(p.getModelProperty(DefaultEncodingModelProperty.class).isPresent(), muleContext, () -> {
+              Object defaultValue = p.getDefaultValue();
+              if (defaultValue instanceof String) {
+                return getExpressionBasedValueResolver((String) defaultValue, p, muleContext);
+              } else if (defaultValue != null) {
+                return new StaticValueResolver<>(defaultValue);
+              }
+              return null;
+            });
       }
 
       if (isNullSafe(p)) {
@@ -276,6 +277,7 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
         valueResolver = toValueResolver(parameters.get(key));
       } else if (!isParameterGroup) {
         valueResolver = getDefaultValueResolver(field.getAnnotation(DefaultEncodingAnnotation.class).isPresent(),
+                                                muleContext,
                                                 () -> getDefaultValue(field).isPresent()
                                                     ? getFieldDefaultValueValueResolver(field, muleContext)
                                                     : null);
@@ -394,16 +396,5 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
   private ValueResolver<?> getCollectionResolver(Collection<?> collection) {
     return CollectionValueResolver.of(collection.getClass(),
                                       collection.stream().map(p -> toValueResolver(p)).collect(toImmutableList()));
-  }
-
-  /**
-   * Gets a {@link ValueResolver} for the parameter if it has an associated a default value or encoding.
-   *
-   * @param hasDefaultEncoding whether the parameter has to use runtime's default encoding or not
-   * @return {@link Supplier} for obtaining the the proper {@link ValueResolver} for the default value, {@code null} if there is
-   *         no default.
-   */
-  private ValueResolver<?> getDefaultValueResolver(boolean hasDefaultEncoding, Supplier<ValueResolver<?>> supplier) {
-    return hasDefaultEncoding ? new StaticValueResolver<>(muleContext.getConfiguration().getDefaultEncoding()) : supplier.get();
   }
 }

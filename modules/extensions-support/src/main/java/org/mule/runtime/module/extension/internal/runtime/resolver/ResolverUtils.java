@@ -6,11 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
-import static org.mule.metadata.api.utils.MetadataTypeUtils.getDefaultValue;
-import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isParameterResolver;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isTypedValue;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -22,6 +17,13 @@ import org.mule.runtime.core.api.MuleContext;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
+
+import static org.mule.metadata.api.utils.MetadataTypeUtils.getDefaultValue;
+import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isParameterResolver;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isTypedValue;
 
 /**
  * Utility class to share common behaviour between resolvers
@@ -63,6 +65,18 @@ public class ResolverUtils {
                                            () -> isParameterResolver(metadataType) || isParameterResolver(modelProperties),
                                            metadataType,
                                            muleContext);
+  }
+
+  /**
+   * Gets a {@link ValueResolver} for the parameter if it has an associated a default value or encoding.
+   *
+   * @param hasDefaultEncoding whether the parameter has to use runtime's default encoding or not
+   * @return {@link Supplier} for obtaining the the proper {@link ValueResolver} for the default value, {@code null} if there is
+   *         no default.
+   */
+  static ValueResolver<?> getDefaultValueResolver(boolean hasDefaultEncoding, MuleContext muleContext,
+                                                  Supplier<ValueResolver<?>> supplier) {
+    return hasDefaultEncoding ? new StaticValueResolver<>(muleContext.getConfiguration().getDefaultEncoding()) : supplier.get();
   }
 
   private static ValueResolver<?> getExpressionBasedValueResolver(String expression, BooleanSupplier isTypedValue,
