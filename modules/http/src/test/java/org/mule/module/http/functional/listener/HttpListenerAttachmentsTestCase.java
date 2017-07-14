@@ -155,7 +155,7 @@ public class HttpListenerAttachmentsTestCase extends FunctionalTestCase
 
             // check that the HTTP response includes the same headers as the HTTP request (when echoing)
             final Collection<HttpPart> parts = parseMultipartContent(response.getResponseBodyAsStream(), response.getContentType());
-            assertThat(parts.size(), Is.is(1));
+            assertThat(parts.size(), is(1));
             HttpPart receivedPart = new ArrayList<>(parts).get(0);
             assertThat(receivedPart.getHeader("Custom-Header"), equalTo("custom"));
             assertThat(receivedPart.getContentType(), equalTo("application/pdf"));
@@ -239,7 +239,7 @@ public class HttpListenerAttachmentsTestCase extends FunctionalTestCase
 
             // check that the HTTP response includes the same headers as the HTTP request (when echoing)
             final Collection<HttpPart> parts = parseMultipartContent(response.getResponseBodyAsStream(), response.getContentType());
-            assertThat(parts.size(), Is.is(1));
+            assertThat(parts.size(), is(1));
             HttpPart receivedPart = new ArrayList<>(parts).get(0);
             assertThat(receivedPart.getHeader("Custom-Header"), equalTo("custom"));
             assertThat(receivedPart.getContentType(), equalTo("application/pdf"));
@@ -280,7 +280,7 @@ public class HttpListenerAttachmentsTestCase extends FunctionalTestCase
                 assertThat(contentType, Matchers.containsString(expectedResponseContentType));
 
                 final Collection<HttpPart> parts = parseMultipartContent(response.getEntity().getContent(), contentType);
-                assertThat(parts.size(), Is.is(2));
+                assertThat(parts.size(), is(2));
                 Map<String, Part> partsAsMap = convertPartsToMap(parts);
                 assertThat(partsAsMap.get(TEXT_BODY_FIELD_NAME), IsNull.notNullValue());
                 assertThat(partsAsMap.get(FILE_BODY_FIELD_NAME), IsNull.notNullValue());

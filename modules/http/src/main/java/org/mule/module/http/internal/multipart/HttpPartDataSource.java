@@ -17,7 +17,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.activation.DataHandler;
@@ -26,7 +26,7 @@ import javax.activation.FileDataSource;
 
 public class HttpPartDataSource implements DataSource
 {
-    public static final String ANONYMOUS_ATTACHMENT_FORMAT = "mule_attachment_%s";
+    public static final String ANONYMOUS_ATTACHMENT_FORMAT = "mule_attachment_%d";
 
     private final HttpPart part;
     private byte[] content;
@@ -90,7 +90,7 @@ public class HttpPartDataSource implements DataSource
 
     public static Map<String, DataHandler> createDataHandlerFrom(Collection<HttpPart> parts)
     {
-        final Map<String, DataHandler> httpParts = new HashMap<>(parts.size());
+        final Map<String, DataHandler> httpParts = new LinkedHashMap<>(parts.size());
         int anonymousPartCount = 0;
         for (HttpPart part : parts)
         {
