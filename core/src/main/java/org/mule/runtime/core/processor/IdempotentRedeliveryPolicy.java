@@ -6,8 +6,12 @@
  */
 package org.mule.runtime.core.processor;
 
+import static java.lang.String.format;
 import static java.util.Optional.empty;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.initialisationFailure;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.dsl.api.component.config.ComponentLocationUtils.getFlowNameFrom;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lock.LockFactory;
@@ -17,13 +21,13 @@ import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.exception.MessageRedeliveredException;
+import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
-import org.mule.runtime.core.transformer.simple.ByteArrayToHexString;
 import org.mule.runtime.core.internal.util.store.ObjectStorePartition;
 import org.mule.runtime.core.internal.util.store.ProvidedObjectStoreWrapper;
+import org.mule.runtime.core.transformer.simple.ByteArrayToHexString;
 
 import java.io.InputStream;
 import java.security.MessageDigest;
@@ -78,15 +82,14 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
       try {
         MessageDigest.getInstance(messageDigestAlgorithm);
       } catch (NoSuchAlgorithmException e) {
-        throw new InitialisationException(CoreMessages.initialisationFailure(String
-            .format("Exception '%s' initializing message digest algorithm %s", e.getMessage(), messageDigestAlgorithm)), this);
+        throw new InitialisationException(initialisationFailure(format("Exception '%s' initializing message digest algorithm %s",
+                                                                       e.getMessage(), messageDigestAlgorithm)),
+                                          this);
 
       }
     }
 
-    String appName = muleContext.getConfiguration().getId();
-    String flowName = flowConstruct.getName();
-    idrId = String.format("%s-%s-%s", appName, flowName, "idr");
+    idrId = format("%s-%s-%s", muleContext.getConfiguration().getId(), getFlowNameFrom(getLocation()), "idr");
     lockFactory = muleContext.getLockFactory();
     if (store == null) {
       store = new ProvidedObjectStoreWrapper<>(null, internalObjectStoreSupplier());
@@ -211,7 +214,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
       byte[] digestedBytes = md.digest(bytes);
       return (String) byteArrayToHexString.transform(digestedBytes);
     } else {
-      return muleContext.getExpressionManager().parse(idExpression, event, flowConstruct);
+      return muleContext.getExpressionManager().parse(idExpression, event, getLocation());
     }
   }
 

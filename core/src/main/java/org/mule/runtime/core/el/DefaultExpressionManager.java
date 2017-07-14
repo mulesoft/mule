@@ -15,6 +15,8 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_
 import static org.mule.runtime.core.api.util.ClassUtils.isInstance;
 import static org.mule.runtime.core.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.slf4j.LoggerFactory.getLogger;
+
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.DefaultValidationResult;
 import org.mule.runtime.api.el.ValidationResult;
@@ -27,7 +29,6 @@ import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExtendedExpressionLanguageAdaptor;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.el.GlobalBindingContextProvider;
@@ -114,23 +115,23 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   }
 
   @Override
-  public TypedValue evaluate(String expression, Event event, FlowConstruct flowConstruct) {
-    return evaluate(expression, event, Event.builder(event), flowConstruct, NULL_BINDING_CONTEXT);
+  public TypedValue evaluate(String expression, Event event, ComponentLocation componentLocation) {
+    return evaluate(expression, event, Event.builder(event), componentLocation, NULL_BINDING_CONTEXT);
   }
 
   @Override
-  public TypedValue evaluate(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct) {
-    return evaluate(expression, event, eventBuilder, flowConstruct, NULL_BINDING_CONTEXT);
+  public TypedValue evaluate(String expression, Event event, Event.Builder eventBuilder, ComponentLocation componentLocation) {
+    return evaluate(expression, event, eventBuilder, componentLocation, NULL_BINDING_CONTEXT);
   }
 
   @Override
-  public TypedValue evaluate(String expression, Event event, FlowConstruct flowConstruct, BindingContext context) {
-    return evaluate(expression, event, Event.builder(event), flowConstruct, context);
+  public TypedValue evaluate(String expression, Event event, ComponentLocation componentLocation, BindingContext context) {
+    return evaluate(expression, event, Event.builder(event), componentLocation, context);
   }
 
-  private TypedValue evaluate(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct,
+  private TypedValue evaluate(String expression, Event event, Event.Builder eventBuilder, ComponentLocation componentLocation,
                               BindingContext context) {
-    return handleStreaming(expressionLanguage.evaluate(expression, event, eventBuilder, flowConstruct, context), event);
+    return handleStreaming(expressionLanguage.evaluate(expression, event, eventBuilder, componentLocation, context), event);
   }
 
   @Override
@@ -150,9 +151,10 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
 
   @Override
   public TypedValue evaluate(String expression, DataType outputType, BindingContext context, Event event,
-                             FlowConstruct flowConstruct, boolean failOnNull)
+                             ComponentLocation componentLocation, boolean failOnNull)
       throws ExpressionRuntimeException {
-    return handleStreaming(expressionLanguage.evaluate(expression, outputType, event, flowConstruct, context, failOnNull), event);
+    return handleStreaming(expressionLanguage.evaluate(expression, outputType, event, componentLocation, context, failOnNull),
+                           event);
   }
 
   private TypedValue handleStreaming(TypedValue value, Event event) {
@@ -179,21 +181,22 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   }
 
   @Override
-  public void enrich(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct, TypedValue value) {
-    expressionLanguage.enrich(expression, event, eventBuilder, flowConstruct, value);
+  public void enrich(String expression, Event event, Event.Builder eventBuilder, ComponentLocation componentLocation,
+                     TypedValue value) {
+    expressionLanguage.enrich(expression, event, eventBuilder, componentLocation, value);
   }
 
   @Override
-  public boolean evaluateBoolean(String expression, Event event, FlowConstruct flowConstruct)
+  public boolean evaluateBoolean(String expression, Event event, ComponentLocation componentLocation)
       throws ExpressionRuntimeException {
-    return evaluateBoolean(expression, event, flowConstruct, false, false);
+    return evaluateBoolean(expression, event, componentLocation, false, false);
   }
 
   @Override
-  public boolean evaluateBoolean(String expression, Event event, FlowConstruct flowConstruct, boolean nullReturnsTrue,
+  public boolean evaluateBoolean(String expression, Event event, ComponentLocation componentLocation, boolean nullReturnsTrue,
                                  boolean nonBooleanReturnsTrue)
       throws ExpressionRuntimeException {
-    return resolveBoolean(evaluate(expression, DataType.BOOLEAN, NULL_BINDING_CONTEXT, event, flowConstruct, false)
+    return resolveBoolean(evaluate(expression, DataType.BOOLEAN, NULL_BINDING_CONTEXT, event, componentLocation, false)
         .getValue(), nullReturnsTrue,
                           nonBooleanReturnsTrue, expression);
   }
@@ -221,12 +224,12 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   }
 
   @Override
-  public String parse(String expression, Event event, FlowConstruct flowConstruct) throws ExpressionRuntimeException {
+  public String parse(String expression, Event event, ComponentLocation componentLocation) throws ExpressionRuntimeException {
     Builder eventBuilder = Event.builder(event);
     parseWarning.warn();
     if (hasMelExpression(expression) || melDefault) {
       return parser.parse(token -> {
-        Object result = evaluate(token, event, eventBuilder, flowConstruct).getValue();
+        Object result = evaluate(token, event, eventBuilder, componentLocation).getValue();
         if (result instanceof Message) {
           return ((Message) result).getPayload().getValue();
         } else {
@@ -234,7 +237,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
         }
       }, expression);
     } else if (isExpression(expression)) {
-      TypedValue evaluation = evaluate(expression, event, eventBuilder, flowConstruct);
+      TypedValue evaluation = evaluate(expression, event, eventBuilder, componentLocation);
       try {
         return (String) transform(evaluation, evaluation.getDataType(), STRING).getValue();
       } catch (TransformerException e) {
@@ -250,12 +253,12 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
     }
   }
 
-  private String parse(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct)
+  private String parse(String expression, Event event, Event.Builder eventBuilder, ComponentLocation componentLocation)
       throws ExpressionRuntimeException {
     parseWarning.warn();
     if (hasMelExpression(expression) || melDefault) {
       return parser.parse(token -> {
-        Object result = evaluate(token, event, eventBuilder, flowConstruct).getValue();
+        Object result = evaluate(token, event, eventBuilder, componentLocation).getValue();
         if (result instanceof Message) {
           return ((Message) result).getPayload().getValue();
         } else {
@@ -263,7 +266,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
         }
       }, expression);
     } else if (isExpression(expression)) {
-      TypedValue evaluation = evaluate(expression, event, eventBuilder, flowConstruct);
+      TypedValue evaluation = evaluate(expression, event, eventBuilder, componentLocation);
       try {
         return (String) transform(evaluation, evaluation.getDataType(), STRING).getValue();
       } catch (TransformerException e) {
@@ -280,10 +283,10 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   }
 
   @Override
-  public Iterator<TypedValue<?>> split(String expression, Event event, FlowConstruct flowConstruct,
+  public Iterator<TypedValue<?>> split(String expression, Event event, ComponentLocation componentLocation,
                                        BindingContext bindingContext)
       throws ExpressionRuntimeException {
-    return expressionLanguage.split(expression, event, flowConstruct, bindingContext);
+    return expressionLanguage.split(expression, event, componentLocation, bindingContext);
   }
 
   @Override

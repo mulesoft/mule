@@ -12,11 +12,14 @@ import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SOURCE;
+
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.LocationPart;
+import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
@@ -90,14 +93,13 @@ public class NotificationHelperTestCase extends AbstractMuleTestCase {
 
   @Test
   public void fireNotificationForEvent() {
-    final ComponentLocation location = mock(ComponentLocation.class);
-    when(messageSource.getLocation()).thenReturn(location);
-    final FlowConstruct flowConstruct = mock(FlowConstruct.class);
+    when(messageSource.getLocation()).thenReturn(TEST_CONNECTOR_LOCATION);
+    final FlowConstruct flowConstruct = mock(FlowConstruct.class, withSettings().extraInterfaces(AnnotatedObject.class));
     when(flowConstruct.getMuleContext()).thenReturn(muleContext);
     final int action = 100;
 
-    helper.fireNotification(messageSource, event, flowConstruct, action);
-    assertConnectorMessageNotification(eventNotificationHandler, messageSource, location, flowConstruct, action);
+    helper.fireNotification(messageSource, event, TEST_CONNECTOR_LOCATION, muleContext, action);
+    assertConnectorMessageNotification(eventNotificationHandler, messageSource, TEST_CONNECTOR_LOCATION, action);
   }
 
   @Test
@@ -125,23 +127,22 @@ public class NotificationHelperTestCase extends AbstractMuleTestCase {
         .withIdentifier(buildFromStringRepresentation("http:listener"))
         .build());
     when(messageSource.getLocation()).thenReturn(location);
-    final FlowConstruct flowConstruct = mock(FlowConstruct.class);
+    final FlowConstruct flowConstruct = mock(FlowConstruct.class, withSettings().extraInterfaces(AnnotatedObject.class));
     when(flowConstruct.getMuleContext()).thenReturn(muleContext);
     final int action = 100;
 
-    helper.fireNotification(messageSource, event, flowConstruct, action);
-    assertConnectorMessageNotification(eventNotificationHandler, messageSource, location, flowConstruct, action);
+    helper.fireNotification(messageSource, event, location, muleContext, action);
+    assertConnectorMessageNotification(eventNotificationHandler, messageSource, location, action);
   }
 
   private void assertConnectorMessageNotification(ServerNotificationHandler notificationHandler, MessageSource messageSource,
-                                                  ComponentLocation location, FlowConstruct flowConstruct, int action) {
+                                                  ComponentLocation location, int action) {
     ArgumentCaptor<ConnectorMessageNotification> notificationCaptor = ArgumentCaptor.forClass(ConnectorMessageNotification.class);
     verify(notificationHandler).fireNotification(notificationCaptor.capture());
 
     ConnectorMessageNotification notification = notificationCaptor.getValue();
     assertThat(notification.getComponent(), is(messageSource));
     assertThat(notification.getAction(), is(action));
-    assertThat(notification.getFlowConstruct(), is(flowConstruct));
     assertThat(notification.getComponent().getLocation(), is(location));
   }
 

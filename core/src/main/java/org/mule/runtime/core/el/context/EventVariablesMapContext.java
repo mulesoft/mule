@@ -19,13 +19,13 @@ import java.util.Set;
 /**
  * Flow variables wrapper {@link Map} for exposing Flow variables via an {@link ExtendedExpressionLanguageAdaptor}
  */
-public class FlowVariableMapContext extends AbstractMapContext<Object> {
+public class EventVariablesMapContext extends AbstractMapContext<Object> {
 
   private Event event;
   private Event.Builder eventBuider;
 
   // TODO MULE-10471 Immutable event used in MEL/Scripting should be shared for consistency
-  public FlowVariableMapContext(Event event, Event.Builder eventBuider) {
+  public EventVariablesMapContext(Event event, Event.Builder eventBuider) {
     this.event = event;
     this.eventBuider = eventBuider;
   }

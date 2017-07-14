@@ -30,7 +30,6 @@ import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo;
 import org.mule.runtime.core.api.exception.ErrorTypeLocator;
 import org.mule.runtime.core.api.exception.ErrorTypeRepository;
@@ -250,12 +249,12 @@ public class ExceptionUtils {
   }
 
   public static MessagingException putContext(MessagingException messagingException, Processor failingMessageProcessor,
-                                              Event event, FlowConstruct flowConstruct, MuleContext muleContext) {
+                                              Event event, MuleContext muleContext) {
     EnrichedNotificationInfo notificationInfo =
         createInfo(event, messagingException, null);
     for (ExceptionContextProvider exceptionContextProvider : muleContext.getExceptionContextProviders()) {
       for (Map.Entry<String, Object> contextInfoEntry : exceptionContextProvider
-          .getContextInfo(notificationInfo, failingMessageProcessor, flowConstruct).entrySet()) {
+          .getContextInfo(notificationInfo, failingMessageProcessor).entrySet()) {
         if (!messagingException.getInfo().containsKey(contextInfoEntry.getKey())) {
           messagingException.getInfo().put(contextInfoEntry.getKey(), contextInfoEntry.getValue());
         }
@@ -306,14 +305,12 @@ public class ExceptionUtils {
    * @param exception the exception to update based on it's content
    * @param errorTypeLocator the error type locator
    * @param errorTypeRepository the error type repository
-   * @param flowConstruct the flow associated with the exception
    * @param muleContext the context of the artifact
    * @return a {@link MessagingException} with the proper {@link Error} associated to it's {@link Event}
    */
   public static MessagingException updateMessagingException(Logger logger, Processor processor, MessagingException exception,
                                                             ErrorTypeLocator errorTypeLocator,
-                                                            ErrorTypeRepository errorTypeRepository, FlowConstruct flowConstruct,
-                                                            MuleContext muleContext) {
+                                                            ErrorTypeRepository errorTypeRepository, MuleContext muleContext) {
     Optional<Exception> rootExceptionOptional =
         findRootExceptionForErrorHandling(exception, processor, errorTypeLocator, errorTypeRepository);
 
@@ -351,7 +348,7 @@ public class ExceptionUtils {
                                          processor);
     }
     exception.setProcessedEvent(createErrorEvent(exception.getEvent(), processor, exception, errorTypeLocator));
-    return putContext(exception, failing, exception.getEvent(), flowConstruct, muleContext);
+    return putContext(exception, failing, exception.getEvent(), muleContext);
   }
 
   /**
@@ -441,13 +438,13 @@ public class ExceptionUtils {
   }
 
   public static MessagingException updateMessagingExceptionWithError(MessagingException exception, Processor failing,
-                                                                     FlowConstruct flowConstruct) {
+                                                                     MuleContext muleContext) {
     // If Event already has Error, for example because of an interceptor then conserve existing Error instance
     if (!exception.getEvent().getError().isPresent()) {
       exception
           .setProcessedEvent(createErrorEvent(exception.getEvent(), failing, exception,
-                                              flowConstruct.getMuleContext().getErrorTypeLocator()));
+                                              muleContext.getErrorTypeLocator()));
     }
-    return putContext(exception, failing, exception.getEvent(), flowConstruct, flowConstruct.getMuleContext());
+    return putContext(exception, failing, exception.getEvent(), muleContext);
   }
 }

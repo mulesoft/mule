@@ -9,8 +9,8 @@ package org.mule.functional.api.notification;
 import org.mule.functional.api.component.FunctionalTestProcessor;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.context.notification.CustomNotification;
+import org.mule.runtime.core.api.transformer.TransformerException;
 
 /**
  * A <code>FunctionlTestNotification</code> is fired by the {@link FunctionalTestProcessor} when it receives an event. Test cases
@@ -44,10 +44,10 @@ public class FunctionalTestNotification extends CustomNotification {
   private final Object replyMessage;
   private final Event event;
 
-  public FunctionalTestNotification(Event event, FlowConstruct flowConstruct, Object replyMessage, int action)
+  public FunctionalTestNotification(Event event, String flowName, Object replyMessage, int action)
       throws TransformerException {
     super(event.getMessage().getPayload().getValue(), action);
-    resourceIdentifier = flowConstruct.getName();
+    resourceIdentifier = flowName;
     this.replyMessage = replyMessage;
     this.event = event;
   }

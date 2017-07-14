@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.processor;
 
+import static java.util.Collections.singletonMap;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -18,6 +19,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedConsumer;
@@ -26,19 +28,19 @@ import static reactor.core.publisher.Mono.from;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.internal.message.InternalMessage;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.ObjectStoreManager;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.util.concurrent.Latch;
 import org.mule.runtime.core.internal.lock.MuleLockFactory;
 import org.mule.runtime.core.internal.lock.SingleServerLockProvider;
-import org.mule.runtime.core.api.util.concurrent.Latch;
+import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.SerializationTestUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -46,13 +48,13 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Answers;
 import org.reactivestreams.Publisher;
+
 import reactor.core.publisher.Mono;
 
 public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
@@ -66,7 +68,6 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
   private ObjectStoreManager mockObjectStoreManager = mock(ObjectStoreManager.class, Answers.RETURNS_DEEP_STUBS.get());
   private Processor mockFailingMessageProcessor = mock(Processor.class, Answers.RETURNS_DEEP_STUBS.get());
   private Processor mockWaitingMessageProcessor = mock(Processor.class, Answers.RETURNS_DEEP_STUBS.get());
-  private Processor mockDlqMessageProcessor = mock(Processor.class, Answers.RETURNS_DEEP_STUBS.get());
   private InternalMessage message = mock(InternalMessage.class, Answers.RETURNS_DEEP_STUBS.get());
   private Event event;
   private Latch waitLatch = new Latch();
@@ -106,6 +107,7 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
     irp.setUseSecureHash(true);
     irp.setFlowConstruct(mock(FlowConstruct.class));
     irp.setMuleContext(mockMuleContext);
+    irp.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
     irp.setListener(mockFailingMessageProcessor);
   }
 

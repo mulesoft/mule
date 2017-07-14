@@ -9,12 +9,14 @@ package org.mule.runtime.core.processor;
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.api.processor.util.InvokerMessageProcessorUtil.splitArgumentsExpression;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToInvoke;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.initialisationFailure;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.methodWithNumParamsNotFoundOnObject;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.methodWithParamsNotFoundOnObject;
+import static org.mule.runtime.core.api.processor.util.InvokerMessageProcessorUtil.splitArgumentsExpression;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -24,18 +26,16 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
-import org.mule.runtime.core.api.exception.MessagingException;
-import org.mule.runtime.core.transformer.TransformerTemplate;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.api.util.TemplateParser;
 import org.mule.runtime.core.api.util.TemplateParser.PatternInfo;
+import org.mule.runtime.core.transformer.TransformerTemplate;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -48,7 +48,6 @@ import java.util.Map.Entry;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * <code>InvokerMessageProcessor</code> invokes a specified method of an object. An array of argument expressions can be provided
@@ -56,10 +55,9 @@ import org.slf4j.LoggerFactory;
  * expressions provided. The results of the expression evaluations will automatically be transformed where possible to the method
  * argument type. Multiple methods with the same name and same number of arguments are not supported currently.
  */
-public class InvokerMessageProcessor extends AbstractAnnotatedObject
-    implements Processor, Initialisable, FlowConstructAware {
+public class InvokerMessageProcessor extends AbstractAnnotatedObject implements Processor, Initialisable {
 
-  protected final transient Logger logger = LoggerFactory.getLogger(getClass());
+  private static final Logger LOGGER = getLogger(InvokerMessageProcessor.class);
 
   protected Object object;
   protected Class<?> objectType;
@@ -74,7 +72,6 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject
 
   @Inject
   protected MuleContext muleContext;
-  protected FlowConstruct flowConstruct;
 
   @Override
   public void initialise() throws InitialisationException {
@@ -108,14 +105,14 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject
       }
     }
 
-    if (logger.isDebugEnabled()) {
-      logger.debug(String.format("Initialised %s to use method: '%s'", this, method));
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug(String.format("Initialised %s to use method: '%s'", this, method));
     }
   }
 
   protected void lookupObjectInstance() throws InitialisationException {
-    if (logger.isDebugEnabled()) {
-      logger.debug(String.format("No object instance speciedied.  Looking up single instance of type %s in mule registry",
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug(String.format("No object instance speciedied.  Looking up single instance of type %s in mule registry",
                                  objectType));
     }
 
@@ -138,8 +135,8 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject
     Event resultEvent = event;
     Object[] args = evaluateArguments(event, arguments);
 
-    if (logger.isDebugEnabled()) {
-      logger.debug(format("Invoking  '%s' of '%s' with arguments: '%s'", method.getName(), object, args));
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug(format("Invoking  '%s' of '%s' with arguments: '%s'", method.getName(), object, args));
     }
 
     try {
@@ -196,14 +193,15 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject
     if (expressionCandidate instanceof String) {
       Object arg;
       String expression = (String) expressionCandidate;
+
       // If string contains is a single expression then evaluate otherwise
       // parse. We can't use parse() always because that will convert
       // everything to a string
       if (expression.startsWith(patternInfo.getPrefix()) && expression.endsWith(patternInfo.getSuffix())
           && expression.lastIndexOf(patternInfo.getPrefix()) == 0) {
-        arg = expressionManager.evaluate(expression, event, flowConstruct).getValue();
+        arg = expressionManager.evaluate(expression, event, getLocation()).getValue();
       } else {
-        arg = expressionManager.parse(expression, event, flowConstruct);
+        arg = expressionManager.parse(expression, event, getLocation());
       }
 
       // If expression evaluates to a Message then use it's payload
@@ -277,11 +275,6 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject
 
   public void setMuleContext(MuleContext context) {
     this.muleContext = context;
-  }
-
-  @Override
-  public void setFlowConstruct(FlowConstruct flowConstruct) {
-    this.flowConstruct = flowConstruct;
   }
 
   public void setObjectType(Class<?> objectType) {

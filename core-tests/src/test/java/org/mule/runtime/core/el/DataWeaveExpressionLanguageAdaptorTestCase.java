@@ -15,7 +15,6 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
@@ -40,8 +39,10 @@ import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.PARAME
 import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.PAYLOAD;
 import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.PROPERTIES;
 import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.VARIABLES;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.EXPRESSION_LANGUAGE;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.ExpressionLanguageStory.SUPPORT_DW;
+
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.el.ExpressionLanguage;
@@ -56,7 +57,6 @@ import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleManifest;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.message.BaseAttributes;
 import org.mule.runtime.core.api.security.DefaultMuleAuthentication;
@@ -76,6 +76,7 @@ import java.util.Optional;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
@@ -231,9 +232,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
     when(event.getVariableNames()).thenReturn(variables);
     TypedValue<String> varValue = new TypedValue<>("", STRING);
     variables.forEach(var -> doReturn(varValue).when(event).getVariable(var));
-    FlowConstruct mockFlowConstruct = mock(FlowConstruct.class);
     String flowName = "myFlowName";
-    when(mockFlowConstruct.getName()).thenReturn(flowName);
 
     assertThat(expressionLanguage.evaluate(PAYLOAD, event, BindingContext.builder().build()).getValue(), is(TEST_PAYLOAD));
     assertThat(expressionLanguage.evaluate(ATTRIBUTES, event, BindingContext.builder().build()).getValue(), is(instanceOf(
@@ -241,7 +240,8 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
     assertThat(expressionLanguage.evaluate(ERROR, event, BindingContext.builder().build()).getValue(), is(nullValue()));
     assertThat(expressionLanguage.evaluate(VARIABLES, event, BindingContext.builder().build()).getValue(),
                is(instanceOf(Map.class)));
-    assertThat(expressionLanguage.evaluate("flow.name", event, mockFlowConstruct, BindingContext.builder().build()).getValue(),
+    assertThat(expressionLanguage.evaluate("flow.name", event, fromSingleComponent(flowName), BindingContext.builder().build())
+        .getValue(),
                is(flowName));
   }
 
@@ -324,11 +324,10 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
   @Test
   public void flowNameBinding() {
     Event event = getEventWithError(empty());
-    FlowConstruct mockFlowConstruct = mock(FlowConstruct.class);
     String flowName = "myFlowName";
-    when(mockFlowConstruct.getName()).thenReturn(flowName);
 
-    TypedValue result = expressionLanguage.evaluate("flow.name", event, mockFlowConstruct, BindingContext.builder().build());
+    TypedValue result =
+        expressionLanguage.evaluate("flow.name", event, fromSingleComponent(flowName), BindingContext.builder().build());
     assertThat(result.getDataType(), is(STRING));
     assertThat(result.getValue(), is(flowName));
   }

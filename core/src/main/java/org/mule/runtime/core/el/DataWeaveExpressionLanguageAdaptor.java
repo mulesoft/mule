@@ -13,7 +13,9 @@ import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_
 import static org.mule.runtime.core.el.BindingContextUtils.addEventBindings;
 import static org.mule.runtime.core.el.DefaultExpressionManager.DW_PREFIX;
 import static org.mule.runtime.core.el.DefaultExpressionManager.PREFIX_EXPR_SEPARATOR;
+import static org.mule.runtime.dsl.api.component.config.ComponentLocationUtils.getFlowNameFrom;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.el.ExpressionExecutionException;
@@ -25,7 +27,6 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExtendedExpressionLanguageAdaptor;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.registry.RegistrationException;
@@ -116,21 +117,21 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
   }
 
   @Override
-  public TypedValue evaluate(String expression, DataType expectedOutputType, Event event, FlowConstruct flowConstruct,
+  public TypedValue evaluate(String expression, DataType expectedOutputType, Event event, ComponentLocation componentLocation,
                              BindingContext context, boolean failOnNull)
       throws ExpressionRuntimeException {
     BindingContext.Builder contextBuilder = bindingContextBuilderFor(event, context);
-    addFlowBindings(flowConstruct, contextBuilder);
+    addFlowBindings(componentLocation, contextBuilder);
     return sanitizeAndEvaluate(expression, exp -> expressionExecutor.evaluate(exp, expectedOutputType, contextBuilder.build()));
   }
 
   @Override
-  public TypedValue evaluate(String expression, Event event, FlowConstruct flowConstruct, BindingContext bindingContext) {
-    return evaluate(expression, event, null, flowConstruct, bindingContext);
+  public TypedValue evaluate(String expression, Event event, ComponentLocation componentLocation, BindingContext bindingContext) {
+    return evaluate(expression, event, null, componentLocation, bindingContext);
   }
 
   @Override
-  public TypedValue evaluate(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct,
+  public TypedValue evaluate(String expression, Event event, Event.Builder eventBuilder, ComponentLocation componentLocation,
                              BindingContext context) {
     String sanitized = sanitize(expression);
     if (isPayloadExpression(sanitized)) {
@@ -138,7 +139,7 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
           : context != null ? context.lookup(PAYLOAD).orElse(null) : null;
     } else {
       BindingContext.Builder contextBuilder = bindingContextBuilderFor(event, context);
-      addFlowBindings(flowConstruct, contextBuilder);
+      addFlowBindings(componentLocation, contextBuilder);
       return evaluate(sanitized, exp -> expressionExecutor.evaluate(exp, contextBuilder.build()));
     }
   }
@@ -149,11 +150,11 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
   }
 
   @Override
-  public Iterator<TypedValue<?>> split(String expression, Event event, FlowConstruct flowConstruct,
+  public Iterator<TypedValue<?>> split(String expression, Event event, ComponentLocation componentLocation,
                                        BindingContext bindingContext)
       throws ExpressionRuntimeException {
     BindingContext.Builder contextBuilder = bindingContextBuilderFor(event, bindingContext);
-    addFlowBindings(flowConstruct, contextBuilder);
+    addFlowBindings(componentLocation, contextBuilder);
     return sanitizeAndEvaluate(expression, exp -> expressionExecutor.split(exp, contextBuilder.build()));
   }
 
@@ -165,12 +166,13 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
   }
 
   @Override
-  public void enrich(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct, Object object) {
+  public void enrich(String expression, Event event, Event.Builder eventBuilder, ComponentLocation componentLocation,
+                     Object object) {
     throw new UnsupportedOperationException("Enrichment is not allowed, yet.");
   }
 
   @Override
-  public void enrich(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct,
+  public void enrich(String expression, Event event, Event.Builder eventBuilder, ComponentLocation componentLocation,
                      TypedValue value) {
     throw new UnsupportedOperationException("Enrichment is not allowed, yet.");
   }
@@ -181,7 +183,7 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
    *
    * @param expression the expression to sanitize before running
    * @param evaluation the function to evaluate the expression with
-   * @param <T>        the type that the function returns
+   * @param <T> the type that the function returns
    * @return the result of the evaluation
    */
   private <T> T sanitizeAndEvaluate(String expression, Function<String, T> evaluation) {
@@ -196,9 +198,9 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
     }
   }
 
-  private BindingContext.Builder addFlowBindings(FlowConstruct flow, BindingContext.Builder contextBuilder) {
-    if (flow != null) {
-      contextBuilder.addBinding(FLOW, new TypedValue<>(new FlowVariablesAccessor(flow.getName()),
+  private BindingContext.Builder addFlowBindings(ComponentLocation componentLocation, BindingContext.Builder contextBuilder) {
+    if (componentLocation != null) {
+      contextBuilder.addBinding(FLOW, new TypedValue<>(new FlowVariablesAccessor(getFlowNameFrom(componentLocation)),
                                                        fromType(FlowVariablesAccessor.class)));
     }
     return contextBuilder;

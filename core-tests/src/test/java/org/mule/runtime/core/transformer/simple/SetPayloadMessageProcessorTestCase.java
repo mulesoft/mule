@@ -18,6 +18,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
@@ -25,7 +26,6 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.processor.simple.SetPayloadMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -54,7 +54,7 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleContextTestC
 
     when(muleContext.getExpressionManager()).thenReturn(expressionManager);
     when(muleContext.getConfiguration()).thenReturn(mock(MuleConfiguration.class));
-    when(expressionManager.parse(anyString(), any(Event.class), any(FlowConstruct.class)))
+    when(expressionManager.parse(anyString(), any(Event.class), any(ComponentLocation.class)))
         .thenAnswer(invocation -> (String) invocation.getArguments()[0]);
   }
 

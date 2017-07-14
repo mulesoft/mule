@@ -16,13 +16,14 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
+
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -57,7 +58,7 @@ public class CopyPropertiesProcessorTestCase extends AbstractMuleTestCase {
   @Before
   public void setUp() throws Exception {
     when(mockMuleContext.getExpressionManager()).thenReturn(mockExpressionManager);
-    when(mockExpressionManager.parse(anyString(), any(Event.class), any(FlowConstruct.class)))
+    when(mockExpressionManager.parse(anyString(), any(Event.class), any(ComponentLocation.class)))
         .thenAnswer(invocation -> invocation.getArguments()[0]);
 
     muleMessage = Message.builder().payload("").mediaType(PROPERTY_DATA_TYPE.getMediaType()).build();

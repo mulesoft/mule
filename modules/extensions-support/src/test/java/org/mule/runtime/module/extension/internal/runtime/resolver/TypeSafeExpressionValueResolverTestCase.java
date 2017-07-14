@@ -18,10 +18,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.Message.of;
+
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.JavaTypeLoader;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -96,7 +97,7 @@ public class TypeSafeExpressionValueResolverTestCase extends AbstractMuleContext
   }
 
   private void verifyExpressionManager(VerificationMode mode) {
-    verify(expressionManager, mode).parse(anyString(), any(Event.class), any(FlowConstruct.class));
+    verify(expressionManager, mode).parse(anyString(), any(Event.class), any(ComponentLocation.class));
   }
 
   private <T> ValueResolver<T> getResolver(String expression, MetadataType expectedType) throws Exception {

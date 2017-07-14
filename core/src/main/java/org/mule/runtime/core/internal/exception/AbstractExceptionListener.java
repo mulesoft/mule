@@ -109,25 +109,13 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
       if (ex.getCause() != null && getCause(ex) instanceof SecurityException) {
         fireNotification(new SecurityNotification((SecurityException) getCause(ex), SECURITY_AUTHENTICATION_FAILED));
       } else {
-        fireNotification(new ExceptionNotification(createInfo(event, ex, null), flowConstruct));
+        fireNotification(new ExceptionNotification(createInfo(event, ex, null), getLocation()));
       }
     }
   }
 
   private Throwable getCause(Exception ex) {
     return ex.getCause() instanceof TypedException ? ex.getCause().getCause() : ex.getCause();
-  }
-
-  /**
-   * Used to log the error passed into this Exception Listener
-   *
-   * @param t the exception thrown
-   */
-  protected void logException(Throwable t, Event event) {
-    if (TRUE.toString().equals(logException)
-        || this.muleContext.getExpressionManager().evaluateBoolean(logException, event, flowConstruct, true, true)) {
-      doLogException(t);
-    }
   }
 
   protected void doLogException(Throwable t) {

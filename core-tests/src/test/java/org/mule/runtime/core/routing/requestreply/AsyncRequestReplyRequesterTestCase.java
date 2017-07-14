@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.routing.requestreply;
 
+import static java.util.Collections.singletonMap;
 import static junit.framework.Assert.assertNull;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.junit.Assert.assertEquals;
@@ -15,6 +16,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
@@ -33,9 +35,9 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.ResponseTimeoutException;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.util.concurrent.Latch;
+import org.mule.runtime.core.internal.util.store.MuleObjectStoreManager;
 import org.mule.runtime.core.processor.AsyncDelegateMessageProcessor;
 import org.mule.runtime.core.routing.correlation.EventCorrelatorTestCase;
-import org.mule.runtime.core.internal.util.store.MuleObjectStoreManager;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.probe.JUnitLambdaProbe;
@@ -230,6 +232,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
   protected AsyncDelegateMessageProcessor createAsyncMessageProcessor(SensingNullMessageProcessor target)
       throws InitialisationException {
     asyncMP = new AsyncDelegateMessageProcessor(newChain(target));
+    asyncMP.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
     initialiseIfNeeded(asyncMP, true, muleContext);
     return asyncMP;
   }
@@ -243,6 +246,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
   class TestAsyncRequestReplyRequester extends AbstractAsyncRequestReplyRequester {
 
     TestAsyncRequestReplyRequester(MuleContext muleContext) throws MuleException {
+      setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
       setMuleContext(muleContext);
       initialise();
       start();

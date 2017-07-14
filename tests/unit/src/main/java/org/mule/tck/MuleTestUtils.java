@@ -6,10 +6,13 @@
  */
 package org.mule.tck;
 
+import static java.util.Collections.singletonMap;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
 import static org.mule.runtime.core.api.construct.Flow.builder;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
@@ -52,6 +55,7 @@ public final class MuleTestUtils {
   public static Flow getTestFlow(MuleContext context) throws MuleException {
     // Use direct processing strategy given flow used in test event is not used for processing.
     final Flow flow = builder(APPLE_FLOW, context).processingStrategyFactory(new DirectProcessingStrategyFactory()).build();
+    flow.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent(APPLE_FLOW)));
     if (context.getRegistry() != null) {
       context.getRegistry().registerFlowConstruct(flow);
     }

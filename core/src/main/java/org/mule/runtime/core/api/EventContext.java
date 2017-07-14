@@ -7,8 +7,8 @@
 package org.mule.runtime.core.api;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
+import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.management.stats.ProcessingTime;
@@ -60,24 +60,6 @@ public interface EventContext {
   ComponentLocation getOriginatingLocation();
 
   /**
-   * 
-   * @return the name of the flow that processes events of this context.
-   */
-  String getOriginatingFlowName();
-
-  /**
-   * 
-   * @return the name of the component that generated the message for the first event of this context.
-   */
-  String getOriginatingConnectorName();
-
-  /**
-   *
-   * @return the name of the source that generated the message for the first event of this context.
-   */
-  String getOriginatingSourceName();
-
-  /**
    * Complete this {@link EventContext} successfully with no result {@link Event}.
    */
   void success();
@@ -100,6 +82,8 @@ public interface EventContext {
    * Allows handling of {@link MessagingException} using supplied {@link MessagingExceptionHandler} before completing this
    * {@link EventContext} with {@link #success(Event)} or {@link #error(Throwable)} based on the result of handling.
    * Implementation may decide not to perform error handling based on specific needs.
+   * <p>
+   * This is only available if the flow where this contexts's events are running calculates their processing time.
    *
    * @param messagingException the messaging exception.
    * @param exceptionHandler the exception handler to handle messaging exception.
@@ -110,7 +94,7 @@ public interface EventContext {
   /**
    * @returns information about the times spent processing the events for this context (so far).
    */
-  ProcessingTime getProcessingTime();
+  Optional<ProcessingTime> getProcessingTime();
 
   /**
    * Events have a list of message processor paths it went trough so that the execution path of an event can be reconstructed
@@ -139,9 +123,8 @@ public interface EventContext {
    */
   Optional<EventContext> getParentContext();
 
-
   /**
-   * A {@link Publisher<Event>} that completes when a response is ready or an error was produced for this {@link EventContext} but
+   * A {@link Publisher} that completes when a response is ready or an error was produced for this {@link EventContext} but
    * importantly before the Response {@link Publisher} obtained via {@link #getResponsePublisher()} completes. This allows for
    * response subscribers that are executed before the source, client or parent flow receives to be registered. In order to
    * subscribe after response processing you can use the response {@link Publisher}.
@@ -157,10 +140,9 @@ public interface EventContext {
   Publisher<Event> getBeforeResponsePublisher();
 
   /**
-   * A {@link Publisher<Event>} that completes when a response is ready or an error was produced for this {@link EventContext}.
-   * Any subscribers registered before the response completes will be executed after the response has been processed by the
-   * source, client or parent flow. In order to subscribe before response processing you can use the before response
-   * {@link Publisher}.
+   * A {@link Publisher} that completes when a response is ready or an error was produced for this {@link EventContext}. Any
+   * subscribers registered before the response completes will be executed after the response has been processed by the source,
+   * client or parent flow. In order to subscribe before response processing you can use the before response {@link Publisher}.
    * <p/>
    * Any asynchronous processing initiated as part of processing the request {@link Event} maybe still be in process when this
    * {@link Publisher} completes. The completion {@link Publisher} can be used to perform an action after all processing is
@@ -173,9 +155,9 @@ public interface EventContext {
   Publisher<Event> getResponsePublisher();
 
   /**
-   * A {@link Publisher<Void>} that completes when a this {@link EventContext} and all child {@link EventContext}'s have
-   * completed. In practice this means that this {@link Publisher<Void>} completes once all branches of execution have completed
-   * regardless of is they are synchronous or asynchronous. This {@link Publisher} will never complete with an error.
+   * A {@link Publisher} that completes when a this {@link EventContext} and all child {@link EventContext}'s have completed. In
+   * practice this means that this {@link Publisher} completes once all branches of execution have completed regardless of is they
+   * are synchronous or asynchronous. This {@link Publisher} will never complete with an error.
    *
    * @return publisher that completes when this {@link EventContext} and all child context have completed.
    */

@@ -165,7 +165,8 @@ public class IdempotentMessageValidator extends AbstractAnnotatedObject
       return !store.contains(id);
     } catch (MuleException e) {
       LOGGER.error("Exception attempting to determine idempotency of incoming message for " + flowConstruct.getName()
-          + " from the connector " + event.getContext().getOriginatingConnectorName(), e);
+          + " from the connector "
+          + event.getContext().getOriginatingLocation().getComponentIdentifier().getIdentifier().getNamespace(), e);
       return false;
     }
   }

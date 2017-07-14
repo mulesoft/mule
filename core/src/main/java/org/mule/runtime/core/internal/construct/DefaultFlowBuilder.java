@@ -217,7 +217,7 @@ public class DefaultFlowBuilder implements Builder {
               getSink().accept(request);
             } catch (RejectedExecutionException ree) {
               request.getContext()
-                  .error(updateMessagingExceptionWithError(new MessagingException(event, ree, this), this, this));
+                  .error(updateMessagingExceptionWithError(new MessagingException(event, ree, this), this, getMuleContext()));
             }
             return Mono.from(request.getContext().getResponsePublisher())
                 .map(r -> {

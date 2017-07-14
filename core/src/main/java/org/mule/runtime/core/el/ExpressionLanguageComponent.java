@@ -15,7 +15,6 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.processor.Processor;
 
@@ -23,8 +22,7 @@ import java.io.IOException;
 
 import javax.inject.Inject;
 
-public class ExpressionLanguageComponent extends AbstractAnnotatedObject
-    implements Processor, FlowConstructAware, Initialisable {
+public class ExpressionLanguageComponent extends AbstractAnnotatedObject implements Processor, Initialisable {
 
   @Inject
   private ExtendedExpressionManager expressionMgr;
@@ -48,7 +46,7 @@ public class ExpressionLanguageComponent extends AbstractAnnotatedObject
   @Override
   public Event process(Event event) throws MuleException {
     Event.Builder eventBuilder = Event.builder(event);
-    expressionMgr.evaluate(expression, event, eventBuilder, flowConstruct);
+    expressionMgr.evaluate(expression, event, eventBuilder, getLocation());
     return eventBuilder.build();
   }
 
@@ -58,10 +56,5 @@ public class ExpressionLanguageComponent extends AbstractAnnotatedObject
 
   public void setExpressionFile(String expressionFile) {
     this.expressionFile = expressionFile;
-  }
-
-  @Override
-  public void setFlowConstruct(FlowConstruct flowConstruct) {
-    this.flowConstruct = flowConstruct;
   }
 }

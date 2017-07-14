@@ -12,6 +12,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
 import static org.mule.runtime.core.api.util.StringMessageUtils.getBoilerPlate;
 import static org.mule.runtime.core.api.util.StringMessageUtils.truncate;
+import static org.mule.runtime.dsl.api.component.config.ComponentLocationUtils.getFlowNameFrom;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.functional.api.exception.FunctionalTestException;
@@ -29,12 +30,11 @@ import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.api.exception.MessagingException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,8 +53,7 @@ import org.slf4j.Logger;
  * @see FunctionalTestNotification
  * @see FunctionalTestNotificationListener
  */
-public class FunctionalTestProcessor extends AbstractAnnotatedObject
-    implements Processor, Lifecycle, MuleContextAware, FlowConstructAware {
+public class FunctionalTestProcessor extends AbstractAnnotatedObject implements Processor, Lifecycle, MuleContextAware {
 
   private static final Logger logger = getLogger(FunctionalTestProcessor.class);
 
@@ -70,7 +69,6 @@ public class FunctionalTestProcessor extends AbstractAnnotatedObject
   private boolean logMessageDetails = false;
   private String id = "<none>";
   private MuleContext muleContext;
-  private FlowConstruct flowConstruct;
   private static List<LifecycleCallback> lifecycleCallbacks = new ArrayList<>();
 
 
@@ -101,11 +99,6 @@ public class FunctionalTestProcessor extends AbstractAnnotatedObject
   @Override
   public void setMuleContext(MuleContext context) {
     this.muleContext = context;
-  }
-
-  @Override
-  public void setFlowConstruct(FlowConstruct flowConstruct) {
-    this.flowConstruct = flowConstruct;
   }
 
   @Override
@@ -166,7 +159,7 @@ public class FunctionalTestProcessor extends AbstractAnnotatedObject
    * @return a concatenated string of the current payload and the appendString
    */
   protected String append(String contents, Event event) {
-    return contents + muleContext.getExpressionManager().parse(appendString, event, flowConstruct);
+    return contents + muleContext.getExpressionManager().parse(appendString, event, getLocation());
   }
 
   /**
@@ -184,7 +177,7 @@ public class FunctionalTestProcessor extends AbstractAnnotatedObject
     final Message message = event.getMessage();
     if (logger.isInfoEnabled()) {
       String msg = getBoilerPlate("Message Received in flow: "
-          + flowConstruct.getName() + ". Content is: "
+          + getFlowNameFrom(getLocation()) + ". Content is: "
           + truncate(message.getPayload().getValue().toString(), 100, true), '*', 80);
 
       logger.info(msg);
@@ -207,7 +200,7 @@ public class FunctionalTestProcessor extends AbstractAnnotatedObject
     if (returnData != null) {
       if (returnData instanceof String && muleContext.getExpressionManager().isExpression(returnData.toString())) {
         replyBuilder =
-            replyBuilder.payload(muleContext.getExpressionManager().parse(returnData.toString(), event, flowConstruct));
+            replyBuilder.payload(muleContext.getExpressionManager().parse(returnData.toString(), event, getLocation()));
       } else {
         replyBuilder = replyBuilder.payload(returnData);
       }
@@ -219,7 +212,8 @@ public class FunctionalTestProcessor extends AbstractAnnotatedObject
     Event replyMessage = Event.builder(event).message(replyBuilder.build()).build();
 
     if (isEnableNotifications()) {
-      muleContext.fireNotification(new FunctionalTestNotification(event, flowConstruct, replyMessage, EVENT_RECEIVED));
+      muleContext
+          .fireNotification(new FunctionalTestNotification(event, getFlowNameFrom(getLocation()), replyMessage, EVENT_RECEIVED));
     }
 
     // Time to wait before returning
@@ -234,9 +228,9 @@ public class FunctionalTestProcessor extends AbstractAnnotatedObject
   }
 
   /**
-   * An event callback is called when a message is received by the service. An Event callback isn't strictly required but it
-   * is useful for performing assertions on the current message being received. Note that the FunctionalTestProcessor should be
-   * made a singleton when using Event callbacks
+   * An event callback is called when a message is received by the service. An Event callback isn't strictly required but it is
+   * useful for performing assertions on the current message being received. Note that the FunctionalTestProcessor should be made
+   * a singleton when using Event callbacks
    * <p/>
    * Another option is to register a {@link FunctionalTestNotificationListener} with Mule and this will deleiver a
    * {@link FunctionalTestNotification} for every message received by this service
@@ -250,9 +244,9 @@ public class FunctionalTestProcessor extends AbstractAnnotatedObject
   }
 
   /**
-   * An event callback is called when a message is received by the service. An Event callback isn't strictly required but it
-   * is useful for performing assertions on the current message being received. Note that the FunctionalTestProcessor should be
-   * made a singleton when using Event callbacks
+   * An event callback is called when a message is received by the service. An Event callback isn't strictly required but it is
+   * useful for performing assertions on the current message being received. Note that the FunctionalTestProcessor should be made
+   * a singleton when using Event callbacks
    * <p/>
    * Another option is to register a {@link FunctionalTestNotificationListener} with Mule and this will deleiver a
    * {@link FunctionalTestNotification} for every message received by this service

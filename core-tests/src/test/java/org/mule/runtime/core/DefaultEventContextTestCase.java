@@ -7,6 +7,7 @@
 package org.mule.runtime.core;
 
 import static java.time.Duration.ofMillis;
+import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -31,11 +32,21 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.util.concurrent.Latch;
+import org.mule.runtime.core.api.util.func.CheckedFunction;
+import org.mule.runtime.core.api.util.func.CheckedSupplier;
+import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.DefaultLocationPart;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import java.util.List;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
 import reactor.core.publisher.MonoProcessor;
 import ru.yandex.qatools.allure.annotations.Description;
@@ -44,16 +55,54 @@ import ru.yandex.qatools.allure.annotations.Stories;
 
 @Features(EVENT_CONTEXT)
 @Stories(RESPONSE_AND_COMPLETION_PUBLISHERS)
+@RunWith(Parameterized.class)
 public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
 
+  private Supplier<EventContext> context;
+  private Function<MonoProcessor<Void>, EventContext> contextWithCompletion;
+  private Function<ComponentLocation, EventContext> contextWithComponentLocation;
+
+  public DefaultEventContextTestCase(Supplier<EventContext> context,
+                                     Function<MonoProcessor<Void>, EventContext> contextWithCompletion,
+                                     Function<ComponentLocation, EventContext> contextWithComponentLocation) {
+    this.context = context;
+    this.contextWithCompletion = contextWithCompletion;
+    this.contextWithComponentLocation = contextWithComponentLocation;
+  }
+
+  @Parameters
+  public static List<Object[]> data() {
+    return asList(new Object[][] {
+        {
+            (CheckedSupplier<EventContext>) () -> create(getTestFlow(muleContext), TEST_CONNECTOR_LOCATION),
+            (CheckedFunction<MonoProcessor<Void>, EventContext>) externalCompletion -> create(getTestFlow(muleContext),
+                                                                                              TEST_CONNECTOR_LOCATION, null,
+                                                                                              externalCompletion),
+            (CheckedFunction<ComponentLocation, EventContext>) location -> create(getTestFlow(muleContext), location)
+        },
+        {
+            (CheckedSupplier<EventContext>) () -> create("id", DefaultEventContextTestCase.class.getName(),
+                                                         TEST_CONNECTOR_LOCATION),
+            (CheckedFunction<MonoProcessor<Void>, EventContext>) externalCompletion -> create("id",
+                                                                                              DefaultEventContextTestCase.class
+                                                                                                  .getName(),
+                                                                                              TEST_CONNECTOR_LOCATION, null,
+                                                                                              externalCompletion),
+            (CheckedFunction<ComponentLocation, EventContext>) location -> create("id",
+                                                                                  DefaultEventContextTestCase.class.getName(),
+                                                                                  location)
+        }
+    });
+  }
+
   @Test
   @Description("EventContext response publisher completes with value of result. Also given response publisher completed and " +
       "there there are no child contexts the completion publisher also completes.")
   public void successWithResult() throws Exception {
-    EventContext parent = create(getTestFlow(muleContext), TEST_CONNECTOR_LOCATION);
+    EventContext parent = context.get();
 
     Event event = testEvent();
     assertCompletionNotDone(parent);
@@ -67,7 +116,7 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
   @Description("EventContext response publisher completes with null result. Also given response publisher completed and " +
       "there there are no child contexts the completion publisher also completes.")
   public void successNoResult() throws Exception {
-    EventContext parent = create(getTestFlow(muleContext), TEST_CONNECTOR_LOCATION);
+    EventContext parent = context.get();
 
     parent.success();
 
@@ -80,7 +129,7 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
   @Description("EventContext response publisher completes with error. Also given response publisher completed and " +
       "there there are no child contexts the completion publisher also completes.")
   public void error() throws Exception {
-    EventContext parent = create(getTestFlow(muleContext), TEST_CONNECTOR_LOCATION);
+    EventContext parent = context.get();
 
     RuntimeException exception = new RuntimeException();
     assertCompletionNotDone(parent);
@@ -99,7 +148,7 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
   @Description("EventContext beforeResponsePublisher subscribers are notified before responsePublisher subscribers (assuming " +
       "both are subscribed before response is completed)")
   public void beforeResponse() throws Exception {
-    EventContext parent = create(getTestFlow(muleContext), TEST_CONNECTOR_LOCATION);
+    EventContext parent = context.get();
 
     Event event = testEvent();
 
@@ -142,7 +191,7 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
   @Description("Parent EventContext only completes once response publisher completes with a value and all child contexts are " +
       "complete.")
   public void childSuccessWithResult() throws Exception {
-    EventContext parent = create(getTestFlow(muleContext), TEST_CONNECTOR_LOCATION);
+    EventContext parent = context.get();
     EventContext child = DefaultEventContext.child(parent, empty());
 
     Event event = testEvent();
@@ -164,7 +213,7 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
   @Description("Parent EventContext only completes once response publisher completes with a value and all child contexts are " +
       "complete, even when child context completes after parent context response.")
   public void childDelayedSuccessWithResult() throws Exception {
-    EventContext parent = create(getTestFlow(muleContext), TEST_CONNECTOR_LOCATION);
+    EventContext parent = context.get();
     EventContext child = DefaultEventContext.child(parent, empty());
 
     Event event = testEvent();
@@ -188,7 +237,7 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
   @Description("Parent EventContext only completes once response publisher completes with no value and all child contexts are " +
       "complete.")
   public void childSuccessWithNoResult() throws Exception {
-    EventContext parent = create(getTestFlow(muleContext), TEST_CONNECTOR_LOCATION);
+    EventContext parent = context.get();
     EventContext child = DefaultEventContext.child(parent, empty());
 
     child.success();
@@ -205,7 +254,7 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
   @Description("Parent EventContext only completes once response publisher completes with no value and all child contexts are " +
       "complete, even when child context completes after parent context response.")
   public void childDelayedSuccessWithNoResult() throws Exception {
-    EventContext parent = create(getTestFlow(muleContext), TEST_CONNECTOR_LOCATION);
+    EventContext parent = context.get();
     EventContext child = DefaultEventContext.child(parent, empty());
 
     parent.success();
@@ -226,7 +275,7 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
   @Description("Parent EventContext only completes once response publisher completes with error and all child contexts are " +
       "complete.")
   public void childError() throws Exception {
-    EventContext parent = create(getTestFlow(muleContext), TEST_CONNECTOR_LOCATION);
+    EventContext parent = context.get();
     EventContext child = DefaultEventContext.child(parent, empty());
 
     RuntimeException exception = new RuntimeException();
@@ -245,7 +294,7 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
   @Description("Parent EventContext only completes once response publisher completes with error and all child contexts are " +
       "complete, even when child context completes after parent context response.")
   public void childDelayedError() throws Exception {
-    EventContext parent = create(getTestFlow(muleContext), TEST_CONNECTOR_LOCATION);
+    EventContext parent = context.get();
     EventContext child = DefaultEventContext.child(parent, empty());
 
     RuntimeException exception = new RuntimeException();
@@ -268,7 +317,7 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
   @Description("Parent EventContext only completes once response publisher completes with a value and all child contexts are " +
       "complete, even when child is run async with a delay.")
   public void asyncChild() throws Exception {
-    EventContext parent = create(getTestFlow(muleContext), TEST_CONNECTOR_LOCATION);
+    EventContext parent = context.get();
     EventContext child1 = DefaultEventContext.child(parent, empty());
 
     Event event = testEvent();
@@ -298,7 +347,7 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
   @Description("Parent EventContext only completes once response publisher completes with a value and all child and grandchild " +
       "contexts are complete.")
   public void multipleLevelsGrandchildFirst() throws Exception {
-    EventContext parent = create(getTestFlow(muleContext), TEST_CONNECTOR_LOCATION);
+    EventContext parent = context.get();
     EventContext child = DefaultEventContext.child(parent, empty());
     EventContext grandchild = DefaultEventContext.child(child, empty());
 
@@ -342,7 +391,7 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
   @Description("Parent EventContext only completes once response publisher completes with a value and all child and grandchild " +
       "contexts are complete, even if parent response is available earlier.")
   public void multipleLevelsParentFirst() throws Exception {
-    EventContext parent = create(getTestFlow(muleContext), TEST_CONNECTOR_LOCATION);
+    EventContext parent = context.get();
     EventContext child = DefaultEventContext.child(parent, empty());
     EventContext grandchild = DefaultEventContext.child(child, empty());
 
@@ -385,7 +434,7 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
   @Description("Parent EventContext only completes once response publisher completes with a value and all child contexts are " +
       "complete, even if one branch of the tree completes.")
   public void multipleBranches() throws Exception {
-    EventContext parent = create(getTestFlow(muleContext), TEST_CONNECTOR_LOCATION);
+    EventContext parent = context.get();
     EventContext child1 = DefaultEventContext.child(parent, empty());
     EventContext child2 = DefaultEventContext.child(parent, empty());
 
@@ -425,7 +474,7 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
       + " once the external publisher completes.")
   public void externalCompletionSuccess() throws Exception {
     MonoProcessor<Void> externalCompletion = MonoProcessor.create();
-    EventContext parent = create(getTestFlow(muleContext), TEST_CONNECTOR_LOCATION, null, externalCompletion);
+    EventContext parent = contextWithCompletion.apply(externalCompletion);
 
     Event event = testEvent();
     assertCompletionNotDone(parent);
@@ -443,7 +492,7 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
       + " once the external publisher completes.")
   public void externalCompletionError() throws Exception {
     MonoProcessor<Void> externalCompletion = MonoProcessor.create();
-    EventContext parent = create(getTestFlow(muleContext), TEST_CONNECTOR_LOCATION, null, externalCompletion);
+    EventContext parent = contextWithCompletion.apply(externalCompletion);
 
     RuntimeException exception = new RuntimeException();
     assertCompletionNotDone(parent);
@@ -460,7 +509,7 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
       "complete and external completion completes.")
   public void externalCompletionWithChild() throws Exception {
     MonoProcessor<Void> externalCompletion = MonoProcessor.create();
-    EventContext parent = create(getTestFlow(muleContext), TEST_CONNECTOR_LOCATION, null, externalCompletion);
+    EventContext parent = contextWithCompletion.apply(externalCompletion);
     EventContext child = DefaultEventContext.child(parent, empty());
 
     Event event = testEvent();
@@ -485,7 +534,7 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
   @Description("When a child event context is de-serialized it is decoupled from parent context but response and completion " +
       "publisher still complete when a response event is available.")
   public void deserializedChild() throws Exception {
-    EventContext parent = create(getTestFlow(muleContext), TEST_CONNECTOR_LOCATION, null);
+    EventContext parent = context.get();
     EventContext child = DefaultEventContext.child(parent, empty());
 
     byte[] bytes = muleContext.getObjectSerializer().getExternalProtocol().serialize(child);
@@ -502,7 +551,7 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
   @Test
   @Description("When a parent event context is de-serialized the parent context no longer waits for completion of child context.")
   public void deserializedParent() throws Exception {
-    EventContext parent = create(getTestFlow(muleContext), TEST_CONNECTOR_LOCATION, null);
+    EventContext parent = context.get();
     EventContext child = DefaultEventContext.child(parent, empty());
 
     byte[] bytes = muleContext.getObjectSerializer().getExternalProtocol().serialize(parent);
@@ -525,19 +574,20 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
         .build();
     ComponentLocation location = mock(ComponentLocation.class);
     when(location.getComponentIdentifier()).thenReturn(typedComponentIdentifier);
-    EventContext context = create(getTestFlow(muleContext), location);
+    when(location.getParts()).thenReturn(asList(new DefaultLocationPart("flow", empty(), empty(), empty())));
+    EventContext context = contextWithComponentLocation.apply(location);
 
-    assertThat(context.getOriginatingConnectorName(), is("http"));
-    assertThat(context.getOriginatingSourceName(), is("listener"));
+    assertThat(context.getOriginatingLocation().getComponentIdentifier().getIdentifier().getNamespace(), is("http"));
+    assertThat(context.getOriginatingLocation().getComponentIdentifier().getIdentifier().getName(), is("listener"));
   }
 
   @Test
   @Description("Verify that a single component location produces connector and source data.")
   public void componentDataFromSingleComponent() throws Exception {
-    EventContext context = create(getTestFlow(muleContext), TEST_CONNECTOR_LOCATION);
+    EventContext context = this.context.get();
 
-    assertThat(context.getOriginatingConnectorName(), is(CORE_PREFIX));
-    assertThat(context.getOriginatingSourceName(), is("test"));
+    assertThat(context.getOriginatingLocation().getComponentIdentifier().getIdentifier().getNamespace(), is(CORE_PREFIX));
+    assertThat(context.getOriginatingLocation().getComponentIdentifier().getIdentifier().getName(), is("test"));
   }
 
   private void assertBeforeResponseDone(EventContext parent) {

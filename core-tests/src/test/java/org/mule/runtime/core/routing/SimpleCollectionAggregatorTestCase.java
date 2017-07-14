@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.routing;
 
+import static java.util.Collections.singletonMap;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
@@ -14,6 +15,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.DefaultEventContext;
@@ -48,6 +50,7 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
     router.setListener(sensingMessageProcessor);
     router.setMuleContext(muleContext);
     router.setFlowConstruct(flow);
+    router.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
     router.initialise();
 
     EventContext executionContext = DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION, "foo");
@@ -93,6 +96,7 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
     router.setListener(sensingMessageProcessor);
     router.setMuleContext(muleContext);
     router.setFlowConstruct(flow);
+    router.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
     router.initialise();
 
     EventContext executionContext = DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION, "foo");
@@ -122,6 +126,7 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
     SimpleCollectionAggregator router = new SimpleCollectionAggregator();
     router.setMuleContext(muleContext);
     router.setFlowConstruct(flow);
+    router.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
     router.initialise();
 
     EventContext executionContext = DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION, "foo");

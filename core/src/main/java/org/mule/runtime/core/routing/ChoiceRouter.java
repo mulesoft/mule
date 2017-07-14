@@ -23,13 +23,12 @@ import java.util.Optional;
  */
 public class ChoiceRouter extends AbstractSelectiveRouter {
 
-  private FlowConstruct flowConstruct;
   private MuleContext muleContext;
 
   @Override
   protected Optional<Processor> selectProcessor(Event event) {
     return getConditionalMessageProcessors().stream()
-        .filter(cmp -> muleContext.getExpressionManager().evaluateBoolean(cmp.getExpression(), event, flowConstruct, false, true))
+        .filter(cmp -> muleContext.getExpressionManager().evaluateBoolean(cmp.getExpression(), event, getLocation(), false, true))
         .findFirst()
         .map(cmp -> cmp.getMessageProcessor());
   }
@@ -46,7 +45,6 @@ public class ChoiceRouter extends AbstractSelectiveRouter {
   @Override
   public void setFlowConstruct(FlowConstruct flowConstruct) {
     super.setFlowConstruct(flowConstruct);
-    this.flowConstruct = flowConstruct;
   }
 
   @Override

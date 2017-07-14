@@ -9,12 +9,16 @@ package org.mule.runtime.core.el.context;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCause;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.mule.mvel2.optimizers.OptimizerFactory.DYNAMIC;
+import static org.mule.mvel2.optimizers.OptimizerFactory.SAFE_REFLECTIVE;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
+
 import org.mule.mvel2.ImmutableElementException;
 import org.mule.mvel2.PropertyAccessException;
 import org.mule.mvel2.optimizers.OptimizerFactory;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
@@ -73,7 +77,8 @@ public abstract class AbstractELTestCase extends AbstractMuleContextTestCase {
 
   @SuppressWarnings("deprecation")
   protected Object evaluate(String expression, Event event, Event.Builder eventBuilder) {
-    return expressionLanguage.evaluate(expression, event, eventBuilder, flowConstruct, BindingContext.builder().build())
+    return expressionLanguage.evaluate(expression, event, eventBuilder, ((AnnotatedObject) flowConstruct).getLocation(),
+                                       BindingContext.builder().build())
         .getValue();
   }
 
@@ -82,8 +87,8 @@ public abstract class AbstractELTestCase extends AbstractMuleContextTestCase {
   }
 
   @Parameters
-  public static List<Object[]> parameters() {
-    return Arrays.asList(new Object[][] {{OptimizerFactory.DYNAMIC}, {OptimizerFactory.SAFE_REFLECTIVE}});
+  public static List<Object> parameters() {
+    return Arrays.asList(DYNAMIC, SAFE_REFLECTIVE);
   }
 
   protected ExtendedExpressionLanguageAdaptor getExpressionLanguage() {

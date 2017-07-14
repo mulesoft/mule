@@ -17,14 +17,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
-import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -54,7 +54,7 @@ public class SetPayloadTransformerTestCase extends AbstractMuleTestCase {
 
     when(mockMuleEvent.getMessage()).thenReturn(mockMuleMessage);
     when(mockMuleContext.getExpressionManager()).thenReturn(mockExpressionManager);
-    when(mockExpressionManager.parse(anyString(), any(Event.class), any(FlowConstruct.class)))
+    when(mockExpressionManager.parse(anyString(), any(Event.class), any(ComponentLocation.class)))
         .thenAnswer(invocation -> (String) invocation.getArguments()[0]);
   }
 

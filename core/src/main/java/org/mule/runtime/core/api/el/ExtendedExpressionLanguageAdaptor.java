@@ -6,16 +6,16 @@
  */
 package org.mule.runtime.core.api.el;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.internal.message.InternalMessage;
 
 /**
- * Extends the {@link ExpressionLanguageAdaptor} supporting mutating operations and the propagation of more variables.
- * Only meant to distinguish the Mule 3 inherited behaviour from the current approach.
+ * Extends the {@link ExpressionLanguageAdaptor} supporting mutating operations and the propagation of more variables. Only meant
+ * to distinguish the Mule 3 inherited behaviour from the current approach.
  *
  * @since 4.0
  */
@@ -28,59 +28,56 @@ public interface ExtendedExpressionLanguageAdaptor extends ExpressionLanguageAda
    * expression when executed. Variable provided in the map will only be available if there are no conflict with context variables
    * provided by the expression language implementation.
    *
-   * This version of {@code evaluate} allows {@link Event} or {@link InternalMessage} mutation performed
-   * within the expression to be maintained post-evaluation via the use of a result
-   * {@link org.mule.runtime.core.api.Event.Builder} which should be created from the original event before being passed and then
-   * used to construct the post-evaluation event.
+   * This version of {@code evaluate} allows {@link Event} or {@link InternalMessage} mutation performed within the expression to
+   * be maintained post-evaluation via the use of a result {@link org.mule.runtime.core.api.Event.Builder} which should be created
+   * from the original event before being passed and then used to construct the post-evaluation event.
    *
    * @param expression the expression to be executed
    * @param event the current event being processed
    * @param eventBuilder event builder instance used to mutate the current message or event.
-   * @param flowConstruct the flow where the event is being processed
+   * @param componentLocation the location of the component where the event is being processed
    * @param bindingContext the bindings to consider
    * @return the result of execution of the expression.
    * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
    * @deprecated Mutation via expressions is deprecated.
    */
   @Deprecated
-  TypedValue evaluate(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct,
+  TypedValue evaluate(String expression, Event event, Event.Builder eventBuilder, ComponentLocation componentLocation,
                       BindingContext bindingContext)
       throws ExpressionRuntimeException;
 
   /**
    * Enriches an event.
    *
-   * This version of {@code enrich} allows {@link Event} or {@link InternalMessage} mutation performed
-   * within the expression to be maintained post-evaluation via the use of a result
-   * {@link org.mule.runtime.core.api.Event.Builder} which should be created from the original event before being passed and then
-   * used to construct the post-evaluation event.
+   * This version of {@code enrich} allows {@link Event} or {@link InternalMessage} mutation performed within the expression to be
+   * maintained post-evaluation via the use of a result {@link org.mule.runtime.core.api.Event.Builder} which should be created
+   * from the original event before being passed and then used to construct the post-evaluation event.
    *
    * @param expression a single expression i.e. header://foo that defines how the message should be enriched
    * @param event The event to be enriched
    * @param eventBuilder event builder instance used to mutate the current message or event.
-   * @param flowConstruct the flow where the event is being processed
+   * @param componentLocation the location of the component where the event is being processed
    * @param object The object used for enrichment
    * @deprecated Mutation via expressions is deprecated.
    */
   @Deprecated
-  void enrich(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct, Object object);
+  void enrich(String expression, Event event, Event.Builder eventBuilder, ComponentLocation componentLocation, Object object);
 
   /**
    * Enriches an event using a typed value.
    *
-   * This version of {@code enrich} allows {@link Event} or {@link InternalMessage} mutation performed
-   * within the expression to be maintained post-evaluation via the use of a result
-   * {@link org.mule.runtime.core.api.Event.Builder} which should be created from the original event before being passed and then
-   * used to construct the post-evaluation event.
+   * This version of {@code enrich} allows {@link Event} or {@link InternalMessage} mutation performed within the expression to be
+   * maintained post-evaluation via the use of a result {@link org.mule.runtime.core.api.Event.Builder} which should be created
+   * from the original event before being passed and then used to construct the post-evaluation event.
    *
    * @param expression a single expression i.e. header://foo that defines how the message should be enriched
    * @param event The event to be enriched
    * @param eventBuilder event builder instance used to mutate the current message or event.
-   * @param flowConstruct the flow where the event is being processed
+   * @param componentLocation the location of the component where the event is being processed
    * @param value The typed value used for enrichment
    * @deprecated Mutation via expressions is deprecated.
    */
   @Deprecated
-  void enrich(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct, TypedValue value);
+  void enrich(String expression, Event event, Event.Builder eventBuilder, ComponentLocation componentLocation, TypedValue value);
 
 }

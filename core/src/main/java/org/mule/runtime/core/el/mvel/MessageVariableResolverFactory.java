@@ -12,11 +12,11 @@ import org.mule.mvel2.integration.VariableResolverFactory;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.internal.message.InternalMessage;
-import org.mule.runtime.core.el.context.FlowVariableMapContext;
+import org.mule.runtime.core.api.exception.MessagingException;
+import org.mule.runtime.core.el.context.EventVariablesMapContext;
 import org.mule.runtime.core.el.context.MessageContext;
 import org.mule.runtime.core.el.context.SessionVariableMapContext;
-import org.mule.runtime.core.api.exception.MessagingException;
+import org.mule.runtime.core.internal.message.InternalMessage;
 
 import java.util.Map;
 
@@ -77,7 +77,8 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
       } else if (ATTRIBUTES.equals(name)) {
         return new MuleImmutableVariableResolver<>(ATTRIBUTES, event.getMessage().getAttributes().getValue(), null);
       } else if (FLOW_VARS.equals(name)) {
-        return new MuleImmutableVariableResolver<Map<String, Object>>(FLOW_VARS, new FlowVariableMapContext(event, eventBuilder),
+        return new MuleImmutableVariableResolver<Map<String, Object>>(FLOW_VARS,
+                                                                      new EventVariablesMapContext(event, eventBuilder),
                                                                       null);
       } else if (EXCEPTION.equals(name)) {
         if (event.getError().isPresent()) {

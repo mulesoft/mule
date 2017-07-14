@@ -6,11 +6,14 @@
  */
 package org.mule.runtime.core.routing;
 
+import static java.util.Collections.singletonMap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -47,6 +50,7 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase {
     TestEventResequencer router = new TestEventResequencer(3);
     router.setMuleContext(muleContext);
     router.setFlowConstruct(flow);
+    router.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
     router.initialise();
 
     EventContext context = DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION, "foo");
@@ -81,6 +85,7 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase {
     TestEventResequencer router = new TestEventResequencer(3);
     router.setMuleContext(muleContext);
     router.setFlowConstruct(flow);
+    router.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
     router.initialise();
 
     EventContext context = DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION, "foo");
@@ -100,6 +105,7 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase {
     router.setMuleContext(muleContext);
     router.setEventComparator(new EventPayloadComparator());
     router.setFlowConstruct(flow);
+    router.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent("flow")));
     router.initialise();
 
     assertNull(router.process(event2));

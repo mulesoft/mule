@@ -16,9 +16,9 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setFlowConstructIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.management.stats.RouterStatistics.TYPE_OUTBOUND;
-import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
+import static org.mule.runtime.dsl.api.component.config.ComponentLocationUtils.getFlowNameFrom;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
 
@@ -291,8 +291,7 @@ public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject im
 
   @Override
   public String toString() {
-    return format("%s [flow-construct=%s, started=%s]", getClass().getSimpleName(),
-                  flowConstruct != null ? flowConstruct.getName() : null, started);
+    return format("%s [flow=%s, started=%s]", getClass().getSimpleName(), getFlowNameFrom(getLocation()), started);
   }
 
   @Override

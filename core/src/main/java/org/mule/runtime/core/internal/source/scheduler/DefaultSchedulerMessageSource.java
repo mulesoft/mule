@@ -16,6 +16,7 @@ import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.CreateException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -27,12 +28,11 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.api.lifecycle.CreateException;
+import org.mule.runtime.core.api.context.notification.ConnectorMessageNotification;
+import org.mule.runtime.core.api.context.notification.NotificationHelper;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.source.polling.PeriodicScheduler;
-import org.mule.runtime.core.api.context.notification.ConnectorMessageNotification;
-import org.mule.runtime.core.api.context.notification.NotificationHelper;
 
 import java.util.concurrent.ScheduledFuture;
 
@@ -115,7 +115,7 @@ public class DefaultSchedulerMessageSource extends AbstractAnnotatedObject
     // Make sure we start with a clean state.
     setCurrentEvent(null);
 
-    if (!pollOnPrimaryInstanceOnly() || flowConstruct.getMuleContext().isPrimaryPollingInstance()) {
+    if (!pollOnPrimaryInstanceOnly() || muleContext.isPrimaryPollingInstance()) {
       poll();
     }
   }
@@ -137,7 +137,7 @@ public class DefaultSchedulerMessageSource extends AbstractAnnotatedObject
       just(request)
           .map(message -> builder(create(flowConstruct, getLocation())).message(request).flow(flowConstruct).build())
           .doOnNext(event -> setCurrentEvent(event))
-          .doOnNext(event -> notificationHelper.fireNotification(this, event, flowConstruct, MESSAGE_RECEIVED))
+          .doOnNext(event -> notificationHelper.fireNotification(this, event, getLocation(), muleContext, MESSAGE_RECEIVED))
           .transform(listener)
           .subscribe(requestUnbounded());
     } catch (Exception e) {

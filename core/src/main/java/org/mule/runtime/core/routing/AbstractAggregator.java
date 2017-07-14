@@ -13,6 +13,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAG
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
 import static org.mule.runtime.core.internal.util.rx.Operators.nullSafeMap;
+import static org.mule.runtime.dsl.api.component.config.ComponentLocationUtils.getFlowNameFrom;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 
@@ -32,11 +33,11 @@ import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.routing.Aggregator;
 import org.mule.runtime.core.api.store.PartitionableObjectStore;
+import org.mule.runtime.core.internal.util.store.ProvidedObjectStoreWrapper;
+import org.mule.runtime.core.internal.util.store.ProvidedPartitionableObjectStoreWrapper;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 import org.mule.runtime.core.routing.correlation.EventCorrelator;
 import org.mule.runtime.core.routing.correlation.EventCorrelatorCallback;
-import org.mule.runtime.core.internal.util.store.ProvidedObjectStoreWrapper;
-import org.mule.runtime.core.internal.util.store.ProvidedPartitionableObjectStoreWrapper;
 
 import java.util.function.Supplier;
 
@@ -74,7 +75,7 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
   public void initialise() throws InitialisationException {
     if (storePrefix == null) {
       storePrefix =
-          format("%s%s.%s.", muleContext.getConfiguration().getId(), flowConstruct.getName(), this.getClass().getName());
+          format("%s%s.%s.", muleContext.getConfiguration().getId(), getFlowNameFrom(getLocation()), this.getClass().getName());
     }
 
     initProcessedGroupsObjectStore();

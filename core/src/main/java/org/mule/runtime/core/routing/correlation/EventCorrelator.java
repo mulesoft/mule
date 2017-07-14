@@ -28,19 +28,18 @@ import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.execution.ExecutionTemplate;
-import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.routing.RoutingException;
-import org.mule.runtime.core.api.store.PartitionableObjectStore;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.RoutingNotification;
 import org.mule.runtime.core.api.exception.MessagingException;
-import org.mule.runtime.core.routing.EventGroup;
+import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.routing.RoutingException;
+import org.mule.runtime.core.api.store.DeserializationPostInitialisable;
+import org.mule.runtime.core.api.store.PartitionableObjectStore;
 import org.mule.runtime.core.api.util.StringMessageUtils;
 import org.mule.runtime.core.api.util.monitor.Expirable;
 import org.mule.runtime.core.api.util.monitor.ExpiryMonitor;
-import org.mule.runtime.core.api.store.DeserializationPostInitialisable;
+import org.mule.runtime.core.routing.EventGroup;
 
 import java.io.Serializable;
 import java.text.MessageFormat;
@@ -146,7 +145,8 @@ public class EventCorrelator implements Startable, Stoppable {
           }
           // Fire a notification to say we received this message
           muleContext
-              .fireNotification(new RoutingNotification(event.getMessage(), event.getContext().getOriginatingConnectorName(),
+              .fireNotification(new RoutingNotification(event.getMessage(), event.getContext().getOriginatingLocation()
+                  .getComponentIdentifier().getIdentifier().getNamespace(),
                                                         MISSED_AGGREGATION_GROUP_EVENT));
           return null;
         }

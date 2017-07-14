@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.core.routing;
 
+import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
 import static org.mule.runtime.core.api.management.stats.RouterStatistics.TYPE_OUTBOUND;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
@@ -40,6 +42,7 @@ public class ChoiceRouterTestCase extends AbstractReactiveProcessorTestCase {
   protected void doSetUp() throws Exception {
     super.doSetUp();
     choiceRouter = new ChoiceRouter();
+    choiceRouter.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
   }
 
   @Test

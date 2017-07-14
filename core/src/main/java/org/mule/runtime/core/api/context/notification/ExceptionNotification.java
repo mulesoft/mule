@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.context.notification;
 
-import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.api.component.location.ComponentLocation;
 
 /**
  * This class is from Mule 2.2.5. It is modified so the ExceptionNotification has a resourceId of the exception type. This is only
@@ -24,8 +24,8 @@ public class ExceptionNotification extends EnrichedServerNotification {
     registerAction("exception", EXCEPTION_ACTION);
   }
 
-  public ExceptionNotification(EnrichedNotificationInfo notificationInfo, FlowConstruct flowConstruct) {
-    super(notificationInfo, EXCEPTION_ACTION, flowConstruct);
+  public ExceptionNotification(EnrichedNotificationInfo notificationInfo, ComponentLocation componentLocation) {
+    super(notificationInfo, EXCEPTION_ACTION, componentLocation);
   }
 
   @Override

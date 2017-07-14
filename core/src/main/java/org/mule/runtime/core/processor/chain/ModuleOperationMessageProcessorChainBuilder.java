@@ -9,6 +9,7 @@ package org.mule.runtime.core.processor.chain;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.core.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.core.internal.message.InternalMessage.builder;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
@@ -18,7 +19,9 @@ import static reactor.core.publisher.Flux.just;
 import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.utils.MetadataTypeUtils;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
+import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -34,7 +37,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.reactivestreams.Publisher;
 
@@ -187,16 +189,22 @@ public class ModuleOperationMessageProcessorChainBuilder extends ExplicitMessage
 
     private Map<String, Object> evaluateParameters(Event event, Map<String, Pair<String, MetadataType>> unevaluatedMap) {
       return unevaluatedMap.entrySet().stream()
-          .collect(Collectors.toMap(Map.Entry::getKey,
-                                    entry -> expressionManager.isExpression(entry.getValue().getFirst())
-                                        ? getEvaluatedValue(event, entry.getValue().getFirst(), entry.getValue().getSecond())
-                                        : entry.getValue().getFirst()));
+          .collect(toMap(Map.Entry::getKey,
+                         entry -> expressionManager.isExpression(entry.getValue().getFirst())
+                             ? getEvaluatedValue(event, entry.getValue().getFirst(), entry.getValue().getSecond())
+                             : entry.getValue().getFirst()));
     }
 
     private Object getEvaluatedValue(Event event, String value, MetadataType metadataType) {
+      ComponentLocation headLocation = null;
+      final Processor head = getProcessorsToExecute().get(0);
+      if (head instanceof AnnotatedObject) {
+        headLocation = ((AnnotatedObject) head).getLocation();
+      }
+
       Object evaluatedResult;
       if (metadataType.getMetadataFormat().getValidMimeTypes().contains(MetadataFormat.JAVA)) {
-        evaluatedResult = expressionManager.evaluate(value, event, flowConstruct).getValue();
+        evaluatedResult = expressionManager.evaluate(value, event, headLocation).getValue();
       } else {
         final String mediaType = metadataType.getMetadataFormat().getValidMimeTypes().iterator().next();
         final DataType expectedOutputType =
@@ -206,7 +214,7 @@ public class ModuleOperationMessageProcessorChainBuilder extends ExplicitMessage
                 .charset(UTF_8)
                 .build();
         evaluatedResult = expressionManager
-            .evaluate(value, expectedOutputType, NULL_BINDING_CONTEXT, event, flowConstruct, false).getValue();
+            .evaluate(value, expectedOutputType, NULL_BINDING_CONTEXT, event, headLocation, false).getValue();
       }
       return evaluatedResult;
     }

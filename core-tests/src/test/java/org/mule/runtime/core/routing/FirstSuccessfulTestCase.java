@@ -6,18 +6,21 @@
  */
 package org.mule.runtime.core.routing;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.tck.MuleTestUtils.createErrorMock;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleSession;
@@ -29,9 +32,6 @@ import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-
-import java.util.Arrays;
-import java.util.List;
 
 import org.junit.Test;
 
@@ -99,13 +99,13 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
 
   private FirstSuccessful createFirstSuccessfulRouter(Processor... processors) throws Exception {
     FirstSuccessful fs = new FirstSuccessful();
-    final FlowConstruct flow = mock(FlowConstruct.class);
+    final FlowConstruct flow = mock(FlowConstruct.class, withSettings().extraInterfaces(AnnotatedObject.class));
     when(flow.getMuleContext()).thenReturn(muleContext);
+    when(((AnnotatedObject) flow).getLocation()).thenReturn(TEST_CONNECTOR_LOCATION);
     fs.setFlowConstruct(flow);
     fs.setMuleContext(muleContext);
 
-    List<Processor> routes = Arrays.asList(processors);
-    fs.setRoutes(routes);
+    fs.setRoutes(asList(processors));
 
     return fs;
   }

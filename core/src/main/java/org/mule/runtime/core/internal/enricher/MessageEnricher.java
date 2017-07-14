@@ -16,6 +16,7 @@ import static org.mule.runtime.core.api.processor.MessageProcessors.processToApp
 import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContext;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
 import static reactor.core.publisher.Flux.from;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
@@ -23,16 +24,15 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.Scope;
 import org.mule.runtime.core.api.session.DefaultMuleSession;
 import org.mule.runtime.core.api.util.StringUtils;
-import org.mule.runtime.core.api.processor.Scope;
 import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
-
-import org.reactivestreams.Publisher;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+
+import org.reactivestreams.Publisher;
 
 /**
  * The <code>Message Enricher</code> allows the current message to be augmented using data from a seperate resource.
@@ -77,7 +77,7 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements Sc
       sourceExpressionArg = "#[mel:payload:]";
     }
 
-    TypedValue typedValue = expressionManager.evaluate(sourceExpressionArg, enrichmentEvent, flowConstruct);
+    TypedValue typedValue = expressionManager.evaluate(sourceExpressionArg, enrichmentEvent, getLocation());
 
     if (typedValue.getValue() instanceof Message) {
       Message muleMessage = (Message) typedValue.getValue();
@@ -86,7 +86,7 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements Sc
 
     if (!StringUtils.isEmpty(targetExpressionArg)) {
       Event.Builder eventBuilder = builder(currentEvent);
-      expressionManager.enrich(targetExpressionArg, currentEvent, eventBuilder, flowConstruct, typedValue);
+      expressionManager.enrich(targetExpressionArg, currentEvent, eventBuilder, getLocation(), typedValue);
       return eventBuilder.build();
     } else {
       return builder(currentEvent).message(Message.builder(currentEvent.getMessage())

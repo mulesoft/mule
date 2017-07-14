@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.api.execution;
 
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo;
 import org.mule.runtime.core.api.processor.Processor;
 
@@ -25,10 +24,8 @@ public interface ExceptionContextProvider {
   /**
    * 
    * @param notificationInfo
-   * @param flowConstruct
    * @return info entries to be added to the logged exception message
    */
-  Map<String, Object> getContextInfo(EnrichedNotificationInfo notificationInfo, Processor lastProcessed,
-                                     FlowConstruct flowConstruct);
+  Map<String, Object> getContextInfo(EnrichedNotificationInfo notificationInfo, Processor lastProcessed);
 
 }

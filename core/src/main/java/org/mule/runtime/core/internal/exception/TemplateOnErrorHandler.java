@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.exception;
 
+import static java.lang.Boolean.TRUE;
 import static java.util.Arrays.stream;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
@@ -111,7 +112,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
         .fireNotification(new ErrorHandlerNotification(createInfo(result != null ? result
             : event, throwable instanceof MessagingException ? (MessagingException) throwable : null,
                                                                   configuredMessageProcessors),
-                                                       flowConstruct, PROCESS_END));
+                                                       getLocation(), PROCESS_END));
   }
 
   protected Function<Event, Publisher<Event>> route(MessagingException exception) {
@@ -210,8 +211,8 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
 
   @Override
   public boolean accept(Event event) {
-    return acceptsAll() || acceptsErrorType(event)
-        || (when != null && muleContext.getExpressionManager().evaluateBoolean(when, event, flowConstruct));
+    return acceptsAll() || acceptsErrorType(event) || (when != null
+        && muleContext.getExpressionManager().evaluateBoolean(when, event, getLocation()));
   }
 
 
@@ -238,7 +239,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     return event -> {
       muleContext.getNotificationManager()
           .fireNotification(new ErrorHandlerNotification(createInfo(event, exception, configuredMessageProcessors),
-                                                         flowConstruct, PROCESS_START));
+                                                         getLocation(), PROCESS_START));
       fireNotification(exception, event);
       logException(exception, event);
       processStatistics();
@@ -247,6 +248,18 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
       markExceptionAsHandledIfRequired(exception);
       return event;
     };
+  }
+
+  /**
+   * Used to log the error passed into this Exception Listener
+   *
+   * @param t the exception thrown
+   */
+  protected void logException(Throwable t, Event event) {
+    if (TRUE.toString().equals(logException)
+        || this.muleContext.getExpressionManager().evaluateBoolean(logException, event, getLocation(), true, true)) {
+      doLogException(t);
+    }
   }
 
   @Override

@@ -6,6 +6,7 @@
  */
 package org.mule.test.tck;
 
+import static java.util.Collections.singletonMap;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
@@ -15,8 +16,11 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.el.ValidationResult.success;
+import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 
 import org.mule.functional.api.component.AssertionMessageProcessor;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -54,10 +58,10 @@ public class AssertionMessageProcessorTestCase extends AbstractMuleTestCase {
     expressionManager = mock(ExtendedExpressionManager.class);
     when(expressionManager.isValid(anyString())).thenReturn(true);
     when(expressionManager.validate(anyString())).thenReturn(success());
-    when(expressionManager.evaluateBoolean(eq(TRUE_EXPRESSION), any(Event.class), any(FlowConstruct.class), anyBoolean(),
+    when(expressionManager.evaluateBoolean(eq(TRUE_EXPRESSION), any(Event.class), any(ComponentLocation.class), anyBoolean(),
                                            anyBoolean()))
                                                .thenReturn(true);
-    when(expressionManager.evaluateBoolean(eq(FALSE_EXPRESSION), any(Event.class), any(FlowConstruct.class), anyBoolean(),
+    when(expressionManager.evaluateBoolean(eq(FALSE_EXPRESSION), any(Event.class), any(ComponentLocation.class), anyBoolean(),
                                            anyBoolean()))
                                                .thenReturn(false);
 
@@ -70,23 +74,20 @@ public class AssertionMessageProcessorTestCase extends AbstractMuleTestCase {
 
   @Test
   public void startAssertionMessageProcessor() throws Exception {
-    AssertionMessageProcessor asp = createAssertionMessageProcessor();
-    asp.setFlowConstruct(flowConstruct);
+    AssertionMessageProcessor asp = baseAssertionMP();
     asp.start();
   }
 
   @Test
   public void processDummyEvent() throws Exception {
-    AssertionMessageProcessor asp = createAssertionMessageProcessor();
-    asp.setFlowConstruct(flowConstruct);
+    AssertionMessageProcessor asp = baseAssertionMP();
     asp.start();
     asp.process(mockEvent);
   }
 
   @Test
   public void processValidEvent() throws Exception {
-    AssertionMessageProcessor asp = createAssertionMessageProcessor();
-    asp.setFlowConstruct(flowConstruct);
+    AssertionMessageProcessor asp = baseAssertionMP();
     asp.setExpression(TRUE_EXPRESSION);
     asp.start();
     asp.process(mockEvent);
@@ -96,8 +97,7 @@ public class AssertionMessageProcessorTestCase extends AbstractMuleTestCase {
 
   @Test
   public void processInvalidEvent() throws Exception {
-    AssertionMessageProcessor asp = createAssertionMessageProcessor();
-    asp.setFlowConstruct(flowConstruct);
+    AssertionMessageProcessor asp = baseAssertionMP();
     asp.setExpression(FALSE_EXPRESSION);
     asp.start();
     asp.process(mockEvent);
@@ -107,8 +107,7 @@ public class AssertionMessageProcessorTestCase extends AbstractMuleTestCase {
 
   @Test
   public void processZeroEvents() throws Exception {
-    AssertionMessageProcessor asp = createAssertionMessageProcessor();
-    asp.setFlowConstruct(flowConstruct);
+    AssertionMessageProcessor asp = baseAssertionMP();
     asp.setExpression(TRUE_EXPRESSION);
     asp.start();
     assertThat(asp.expressionFailed(), is(false));
@@ -117,8 +116,7 @@ public class AssertionMessageProcessorTestCase extends AbstractMuleTestCase {
 
   @Test
   public void processSomeValidEvents() throws Exception {
-    AssertionMessageProcessor asp = createAssertionMessageProcessor();
-    asp.setFlowConstruct(flowConstruct);
+    AssertionMessageProcessor asp = baseAssertionMP();
     asp.setExpression(TRUE_EXPRESSION);
     asp.start();
     asp.process(mockEvent);
@@ -130,8 +128,7 @@ public class AssertionMessageProcessorTestCase extends AbstractMuleTestCase {
 
   @Test
   public void processSomeInvalidEvent() throws Exception {
-    AssertionMessageProcessor asp = createAssertionMessageProcessor();
-    asp.setFlowConstruct(flowConstruct);
+    AssertionMessageProcessor asp = baseAssertionMP();
     asp.setExpression(TRUE_EXPRESSION);
     asp.start();
     asp.process(mockEvent);
@@ -146,8 +143,7 @@ public class AssertionMessageProcessorTestCase extends AbstractMuleTestCase {
 
   @Test
   public void processMoreThanCountEvents() throws Exception {
-    AssertionMessageProcessor asp = createAssertionMessageProcessor();
-    asp.setFlowConstruct(flowConstruct);
+    AssertionMessageProcessor asp = baseAssertionMP();
     asp.setExpression(TRUE_EXPRESSION);
     asp.setCount(5);
     asp.start();
@@ -160,8 +156,7 @@ public class AssertionMessageProcessorTestCase extends AbstractMuleTestCase {
 
   @Test
   public void processLessThanCountEvents() throws Exception {
-    AssertionMessageProcessor asp = createAssertionMessageProcessor();
-    asp.setFlowConstruct(flowConstruct);
+    AssertionMessageProcessor asp = baseAssertionMP();
     asp.setExpression(TRUE_EXPRESSION);
     asp.setCount(5);
     asp.start();
@@ -174,8 +169,7 @@ public class AssertionMessageProcessorTestCase extends AbstractMuleTestCase {
 
   @Test
   public void processExactCountEvents() throws Exception {
-    AssertionMessageProcessor asp = createAssertionMessageProcessor();
-    asp.setFlowConstruct(flowConstruct);
+    AssertionMessageProcessor asp = baseAssertionMP();
     asp.setExpression(TRUE_EXPRESSION);
     asp.setCount(5);
     asp.start();
@@ -184,6 +178,13 @@ public class AssertionMessageProcessorTestCase extends AbstractMuleTestCase {
     }
     assertThat(asp.expressionFailed(), is(false));
     assertThat(asp.countFailOrNullEvent(), is(false));
+  }
+
+  public AssertionMessageProcessor baseAssertionMP() {
+    AssertionMessageProcessor asp = createAssertionMessageProcessor();
+    asp.setExpressionManager(expressionManager);
+    asp.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent("flow")));
+    return asp;
   }
 
   protected AssertionMessageProcessor createAssertionMessageProcessor() {

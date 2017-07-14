@@ -24,6 +24,7 @@ import org.mule.mvel2.compiler.ExpressionCompiler;
 import org.mule.mvel2.integration.VariableResolverFactory;
 import org.mule.mvel2.integration.impl.CachedMapVariableResolverFactory;
 import org.mule.mvel2.util.CompilerTools;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -33,13 +34,12 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.el.ExtendedExpressionLanguageAdaptor;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.el.mvel.datatype.MvelDataTypeResolver;
 import org.mule.runtime.core.el.mvel.datatype.MvelEnricherDataTypePropagator;
-import org.mule.runtime.core.api.util.IOUtils;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -127,7 +127,7 @@ public class MVELExpressionLanguage implements ExtendedExpressionLanguageAdaptor
     return (T) evaluateInternal(expression, context);
   }
 
-  public <T> T evaluateUntyped(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct,
+  public <T> T evaluateUntyped(String expression, Event event, Event.Builder eventBuilder, ComponentLocation componentLocation,
                                Map<String, Object> vars) {
     if (event == null) {
       return evaluateUntyped(expression, vars);
@@ -137,7 +137,8 @@ public class MVELExpressionLanguage implements ExtendedExpressionLanguageAdaptor
         new DelegateVariableResolverFactory(globalContext, createVariableVariableResolverFactory(event, eventBuilder));
     final DelegateVariableResolverFactory delegate =
         new DelegateVariableResolverFactory(staticContext, new EventVariableResolverFactory(parserConfiguration, muleContext,
-                                                                                            event, eventBuilder, flowConstruct,
+                                                                                            event, eventBuilder,
+                                                                                            componentLocation,
                                                                                             innerDelegate));
     if (vars != null) {
       context.setNextFactory(new CachedMapVariableResolverFactory(vars, delegate));
@@ -148,19 +149,20 @@ public class MVELExpressionLanguage implements ExtendedExpressionLanguageAdaptor
   }
 
   @Override
-  public void enrich(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct,
+  public void enrich(String expression, Event event, Event.Builder eventBuilder, ComponentLocation componentLocation,
                      Object object) {
     expression = removeExpressionMarker(expression);
     expression = createEnrichmentExpression(expression);
-    evaluateUntyped(expression, event, eventBuilder, flowConstruct, singletonMap(OBJECT_FOR_ENRICHMENT, object));
+    evaluateUntyped(expression, event, eventBuilder, componentLocation, singletonMap(OBJECT_FOR_ENRICHMENT, object));
   }
 
   @Override
-  public void enrich(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct,
+  public void enrich(String expression, Event event, Event.Builder eventBuilder, ComponentLocation componentLocation,
                      TypedValue typedValue) {
     expression = removeExpressionMarker(expression);
     expression = createEnrichmentExpression(expression);
-    evaluateUntyped(expression, event, eventBuilder, flowConstruct, singletonMap(OBJECT_FOR_ENRICHMENT, typedValue.getValue()));
+    evaluateUntyped(expression, event, eventBuilder, componentLocation,
+                    singletonMap(OBJECT_FOR_ENRICHMENT, typedValue.getValue()));
 
     final Serializable compiledExpression = expressionExecutor.getCompiledExpression(expression);
 
@@ -169,10 +171,10 @@ public class MVELExpressionLanguage implements ExtendedExpressionLanguageAdaptor
   }
 
   @Override
-  public Iterator<TypedValue<?>> split(String expression, Event event, FlowConstruct flowConstruct,
+  public Iterator<TypedValue<?>> split(String expression, Event event, ComponentLocation componentLocation,
                                        BindingContext bindingContext)
       throws ExpressionRuntimeException {
-    TypedValue evaluate = evaluate(expression, event, flowConstruct, bindingContext);
+    TypedValue evaluate = evaluate(expression, event, componentLocation, bindingContext);
     return MVELSplitDataIterator.createFrom(evaluate.getValue());
 
   }
@@ -202,26 +204,26 @@ public class MVELExpressionLanguage implements ExtendedExpressionLanguageAdaptor
   }
 
   @Override
-  public TypedValue evaluate(String expression, DataType expectedOutputType, Event event, FlowConstruct flowConstruct,
+  public TypedValue evaluate(String expression, DataType expectedOutputType, Event event, ComponentLocation componentLocation,
                              BindingContext context, boolean failOnNull)
       throws ExpressionRuntimeException {
-    return evaluate(expression, event, flowConstruct, context);
+    return evaluate(expression, event, componentLocation, context);
   }
 
   @Override
-  public TypedValue evaluate(String expression, Event event, FlowConstruct flowConstruct, BindingContext bindingContext) {
-    return evaluate(expression, event, Event.builder(event), flowConstruct, bindingContext);
+  public TypedValue evaluate(String expression, Event event, ComponentLocation componentLocation, BindingContext bindingContext) {
+    return evaluate(expression, event, Event.builder(event), componentLocation, bindingContext);
   }
 
   @Override
-  public TypedValue evaluate(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct,
+  public TypedValue evaluate(String expression, Event event, Event.Builder eventBuilder, ComponentLocation componentLocation,
                              BindingContext bindingContext) {
     expression = removeExpressionMarker(expression);
     Map<String, Object> bindingMap = bindingContext.identifiers().stream().collect(toMap(id -> id,
                                                                                          id -> bindingContext.lookup(id).get()
                                                                                              .getValue()));
 
-    final Object value = evaluateUntyped(expression, event, eventBuilder, flowConstruct, bindingMap);
+    final Object value = evaluateUntyped(expression, event, eventBuilder, componentLocation, bindingMap);
     if (value instanceof TypedValue) {
       return (TypedValue) value;
     } else {

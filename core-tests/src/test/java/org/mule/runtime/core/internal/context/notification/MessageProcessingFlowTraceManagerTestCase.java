@@ -19,11 +19,13 @@ import static org.mule.runtime.core.api.context.notification.EnrichedNotificatio
 import static org.mule.runtime.core.api.context.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE;
 import static org.mule.runtime.core.api.context.notification.PipelineMessageNotification.PROCESS_START;
 import static org.mule.runtime.core.internal.context.notification.MessageProcessingFlowTraceManager.FLOW_STACK_INFO_KEY;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
@@ -32,7 +34,6 @@ import org.mule.runtime.core.api.context.notification.MessageProcessorNotificati
 import org.mule.runtime.core.api.context.notification.PipelineMessageNotification;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -153,7 +154,7 @@ public class MessageProcessingFlowTraceManagerTestCase extends AbstractMuleTestC
   }
 
   protected String getContextInfo(Event event, FlowConstruct flow) {
-    return (String) manager.getContextInfo(createInfo(event, null, null), null, flow).get(FLOW_STACK_INFO_KEY);
+    return (String) manager.getContextInfo(createInfo(event, null, null), null).get(FLOW_STACK_INFO_KEY);
   }
 
   @Test
@@ -349,7 +350,7 @@ public class MessageProcessingFlowTraceManagerTestCase extends AbstractMuleTestC
   }
 
   protected PipelineMessageNotification buildPipelineNotification(Event event, String name) {
-    Pipeline flowConstruct = mock(Pipeline.class);
+    Pipeline flowConstruct = mock(Pipeline.class, withSettings().extraInterfaces(AnnotatedObject.class));
     when(flowConstruct.getName()).thenReturn(name);
 
     return new PipelineMessageNotification(createInfo(event, null, null), flowConstruct, PROCESS_START);

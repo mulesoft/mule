@@ -33,6 +33,7 @@ import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.processor.AnnotatedProcessor;
@@ -52,6 +53,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+
 import reactor.core.publisher.Mono;
 
 public class FlowRefFactoryBean extends AbstractAnnotatedObject
@@ -107,6 +109,9 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
   }
 
   private void prepareProcessor(Processor p, FlowConstruct flowConstruct) {
+    if (p instanceof MessagingExceptionHandlerAware && flowConstruct != null) {
+      ((MessagingExceptionHandlerAware) p).setMessagingExceptionHandler(flowConstruct.getExceptionListener());
+    }
     if (p instanceof FlowConstructAware) {
       ((FlowConstructAware) p).setFlowConstruct(flowConstruct);
     }
@@ -186,7 +191,7 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
     protected Processor resolveReferencedProcessor(Event event) throws MuleException {
       String flowName;
       if (isExpression) {
-        flowName = muleContext.getExpressionManager().parse(refName, event, flowConstruct);
+        flowName = muleContext.getExpressionManager().parse(refName, event, getLocation());
       } else {
         flowName = refName;
       }

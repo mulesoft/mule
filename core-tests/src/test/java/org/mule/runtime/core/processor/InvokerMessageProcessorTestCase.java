@@ -7,15 +7,17 @@
 package org.mule.runtime.core.processor;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonMap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
 
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.exception.MessagingException;
+import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
@@ -34,6 +36,7 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleContextTestCase
     super.doSetUp();
     invoker = new InvokerMessageProcessor();
     invoker.setObject(new TestInvokeObject());
+    invoker.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
     invoker.setMuleContext(muleContext);
   }
 
@@ -205,6 +208,7 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleContextTestCase
 
     invoker = new InvokerMessageProcessor();
     invoker.setMuleContext(muleContext);
+    invoker.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
     invoker.setObjectType(TestInvokeObject.class);
     invoker.setMethodName("testMethod3");
     invoker.setArgumentExpressionsString("#[mel:'1']");

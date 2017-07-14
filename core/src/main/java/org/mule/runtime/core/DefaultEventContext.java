@@ -10,7 +10,9 @@ import static java.lang.System.identityHashCode;
 import static java.time.OffsetTime.now;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
+import static org.mule.runtime.dsl.api.component.config.ComponentLocationUtils.getFlowNameFrom;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.core.api.Event;
@@ -19,15 +21,16 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.management.stats.ProcessingTime;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.context.notification.DefaultProcessorsTrace;
-import org.mule.runtime.core.api.management.stats.ProcessingTime;
 
 import java.io.Serializable;
 import java.time.OffsetTime;
 import java.util.Optional;
 
 import org.reactivestreams.Publisher;
+
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -64,6 +67,29 @@ public final class DefaultEventContext extends AbstractEventContext implements S
   /**
    * Builds a new execution context with the given parameters.
    *
+   * @param id the unique id for this event context.
+   * @param serverId the id of the running mule server
+   * @param location the location of the component that received the first message for this context.
+   */
+  public static EventContext create(String id, String serverId, ComponentLocation location) {
+    return create(id, serverId, location, null);
+  }
+
+  /**
+   * Builds a new execution context with the given parameters and an empty publisher.
+   *
+   * @param id the unique id for this event context.
+   * @param serverId the id of the running mule server
+   * @param location the location of the component that received the first message for this context.
+   * @param correlationId See {@link EventContext#getCorrelationId()}.
+   */
+  public static EventContext create(String id, String serverId, ComponentLocation location, String correlationId) {
+    return create(id, serverId, location, correlationId, Mono.empty());
+  }
+
+  /**
+   * Builds a new execution context with the given parameters.
+   *
    * @param flow the flow that processes events of this context.
    * @param location the location of the component that received the first message for this context.
    * @param correlationId See {@link EventContext#getCorrelationId()}.
@@ -73,6 +99,20 @@ public final class DefaultEventContext extends AbstractEventContext implements S
   public static EventContext create(FlowConstruct flow, ComponentLocation location, String correlationId,
                                     Publisher<Void> externalCompletionPublisher) {
     return new DefaultEventContext(flow, location, correlationId, externalCompletionPublisher);
+  }
+
+  /**
+   * Builds a new execution context with the given parameters.
+   *
+   * @param id the unique id for this event context.
+   * @param location the location of the component that received the first message for this context.
+   * @param correlationId See {@link EventContext#getCorrelationId()}.
+   * @param externalCompletionPublisher void publisher that completes when source completes enabling completion of
+   *        {@link EventContext} to depend on completion of source.
+   */
+  public static EventContext create(String id, String serverId, ComponentLocation location, String correlationId,
+                                    Publisher<Void> externalCompletionPublisher) {
+    return new DefaultEventContext(id, serverId, location, correlationId, externalCompletionPublisher);
   }
 
   /**
@@ -115,9 +155,6 @@ public final class DefaultEventContext extends AbstractEventContext implements S
 
   private final String serverId;
   private final ComponentLocation location;
-  private final String flowName;
-  private final String connectorName;
-  private final String sourceName;
 
   private final ProcessingTime processingTime;
   private final ProcessorsTrace processorsTrace = new DefaultProcessorsTrace();
@@ -143,23 +180,8 @@ public final class DefaultEventContext extends AbstractEventContext implements S
   }
 
   @Override
-  public String getOriginatingFlowName() {
-    return flowName;
-  }
-
-  @Override
-  public String getOriginatingConnectorName() {
-    return connectorName;
-  }
-
-  @Override
-  public String getOriginatingSourceName() {
-    return sourceName;
-  }
-
-  @Override
-  public ProcessingTime getProcessingTime() {
-    return processingTime;
+  public Optional<ProcessingTime> getProcessingTime() {
+    return ofNullable(processingTime);
   }
 
   @Override
@@ -192,18 +214,36 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     super(externalCompletionPublisher);
     this.id = flow.getUniqueIdString();
     this.serverId = flow.getServerId();
-    this.flowName = flow.getName();
     this.location = location;
-    this.connectorName = location.getComponentIdentifier().getIdentifier().getNamespace();
-    this.sourceName = location.getComponentIdentifier().getIdentifier().getName();
     this.processingTime = ProcessingTime.newInstance(flow);
+    this.correlationId = correlationId;
+  }
+
+  /**
+   * Builds a new execution context with the given parameters.
+   *
+   * @param id the unique id for this event context.
+   * @param serverId the id of the running mule server
+   * @param location the location of the component that received the first message for this context.
+   * @param correlationId the correlation id that was set by the {@link MessageSource} for the first {@link Event} of this
+   *        context, if available.
+   * @param externalCompletionPublisher void publisher that completes when source completes enabling completion of
+   *        {@link EventContext} to depend on completion of source.
+   */
+  private DefaultEventContext(String id, String serverId, ComponentLocation location, String correlationId,
+                              Publisher<Void> externalCompletionPublisher) {
+    super(externalCompletionPublisher);
+    this.id = id;
+    this.serverId = serverId;
+    this.location = location;
+    this.processingTime = null;
     this.correlationId = correlationId;
   }
 
   @Override
   public String toString() {
-    return getClass().getSimpleName() + " { id: " + id + "; correlationId: " + correlationId + "; flowName: " + flowName
-        + "; serverId: " + serverId + " }";
+    return getClass().getSimpleName() + " { id: " + id + "; correlationId: " + correlationId + "; flowName: "
+        + getFlowNameFrom(getOriginatingLocation()) + "; serverId: " + serverId + " }";
   }
 
   private static class ChildEventContext extends AbstractEventContext implements Serializable {
@@ -242,22 +282,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     }
 
     @Override
-    public String getOriginatingFlowName() {
-      return parent.getOriginatingFlowName();
-    }
-
-    @Override
-    public String getOriginatingConnectorName() {
-      return parent.getOriginatingConnectorName();
-    }
-
-    @Override
-    public String getOriginatingSourceName() {
-      return parent.getOriginatingSourceName();
-    }
-
-    @Override
-    public ProcessingTime getProcessingTime() {
+    public Optional<ProcessingTime> getProcessingTime() {
       return parent.getProcessingTime();
     }
 
@@ -274,7 +299,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     @Override
     public String toString() {
       return getClass().getSimpleName() + " { id: " + getId() + "; correlationId: " + parent.getCorrelationId()
-          + "; flowName: " + parent.getOriginatingFlowName() + "; commponentLocation: "
+          + "; flowName: " + getFlowNameFrom(parent.getOriginatingLocation()) + "; commponentLocation: "
           + (componentLocation != null ? componentLocation.getLocation() : EMPTY) + "; handleErrors: " + handleErrors + " }";
     }
 

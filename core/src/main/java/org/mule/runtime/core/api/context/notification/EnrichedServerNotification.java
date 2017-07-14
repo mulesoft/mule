@@ -6,12 +6,13 @@
  */
 package org.mule.runtime.core.api.context.notification;
 
+import static org.mule.runtime.dsl.api.component.config.ComponentLocationUtils.getFlowNameFrom;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.GroupCorrelation;
 
 import java.util.Map;
@@ -23,23 +24,18 @@ import java.util.Optional;
 public abstract class EnrichedServerNotification extends ServerNotification {
 
   protected EnrichedNotificationInfo notificationInfo;
-  protected FlowConstruct flowConstruct;
 
-  public EnrichedServerNotification(EnrichedNotificationInfo notificationInfo, int action,
-                                    FlowConstruct flowConstruct) {
-    this(notificationInfo, action, flowConstruct != null ? flowConstruct.getName() : null);
-    this.flowConstruct = flowConstruct;
-  }
-
-  public EnrichedServerNotification(EnrichedNotificationInfo notificationInfo, int action,
-                                    String resourceIdentifier) {
+  public EnrichedServerNotification(EnrichedNotificationInfo notificationInfo, int action, String resourceIdentifier) {
     super(notificationInfo, action, resourceIdentifier);
     this.notificationInfo = notificationInfo;
   }
 
+  public EnrichedServerNotification(EnrichedNotificationInfo notificationInfo, int action, ComponentLocation componentLocation) {
+    this(notificationInfo, action, componentLocation != null ? getFlowNameFrom(componentLocation) : null);
+  }
+
   /**
-   * This function should not be used anymore, try getMessage, getError or getException depending
-   * on the situation.
+   * This function should not be used anymore, try getMessage, getError or getException depending on the situation.
    *
    * @return the notification information instead of the event used before
    */
@@ -47,18 +43,6 @@ public abstract class EnrichedServerNotification extends ServerNotification {
   @Override
   public Object getSource() {
     return notificationInfo;
-  }
-
-  /**
-   * This function should not be used anymore, try getFlowConstruct().getName() or getComponent().getLocation() depending
-   * on the situation.
-   *
-   * @return the resource identifier used before
-   */
-  @Deprecated
-  @Override
-  public String getResourceIdentifier() {
-    return super.getResourceIdentifier();
   }
 
   public String getUniqueId() {
@@ -101,13 +85,8 @@ public abstract class EnrichedServerNotification extends ServerNotification {
     return notificationInfo.getOriginatingFlowName();
   }
 
-  public FlowConstruct getFlowConstruct() {
-    return flowConstruct;
-  }
-
   @Override
   public String toString() {
-    //return format("%s {action=%s, resourceId=%s, serverId=%s, timestamp=%s, uniqueId=%s, correlationId=%s, groupCorrelation=%s")
     return EVENT_NAME + "{" + "action=" + getActionName(action) + ", resourceId=" + resourceIdentifier + ", serverId=" + serverId
         + ", timestamp=" + timestamp + "}";
   }
@@ -118,7 +97,7 @@ public abstract class EnrichedServerNotification extends ServerNotification {
     }
 
     ComponentLocation location = getComponent().getLocation();
-    return location.getParts().get(0).getPartPath() + "/" + location.getComponentIdentifier().getIdentifier().toString();
+    return getFlowNameFrom(location) + "/" + location.getComponentIdentifier().getIdentifier().toString();
   }
 
   public EnrichedNotificationInfo getInfo() {

@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.core.routing;
 
+import static java.util.Collections.singletonMap;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.DefaultEventContext;
@@ -38,6 +40,7 @@ public class MessageChunkAggregatorTestCase extends AbstractMuleContextTestCase 
     MessageChunkAggregator router = new MessageChunkAggregator();
     router.setMuleContext(muleContext);
     router.setFlowConstruct(flow);
+    router.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
     router.initialise();
 
     Message message1 = of("test event A");
