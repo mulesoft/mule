@@ -285,6 +285,7 @@
         <mule.jmh.elasticsearch.maven.plugin.version>1.0.0-SNAPSHOT</mule.jmh.elasticsearch.maven.plugin.version>
 
         <maven.replacer.plugin>1.5.3</maven.replacer.plugin>
+        <maven.source.plugin.version>3.0.1</maven.source.plugin.version>
 
         <!-- v1.1.0 has an issue with Optional dependencies, whenjbpmVersion resolving the graph it overrides the optionality of a transitive
              dependency with the one define in the dependency management (which is mostly in all the cases "false")
@@ -2247,7 +2248,17 @@
                         <!-- Attempting to generate it automatically by configuring the execution here will cause issues when adding new modules -->
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
-                        <inherited>false</inherited>
+                        <version>${maven.source.plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                    <goal>test-jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
                     </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
