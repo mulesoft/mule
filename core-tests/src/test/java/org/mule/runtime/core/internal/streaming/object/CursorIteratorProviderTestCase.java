@@ -36,14 +36,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import ru.yandex.qatools.allure.annotations.Description;
-import ru.yandex.qatools.allure.annotations.Features;
-import ru.yandex.qatools.allure.annotations.Stories;
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
 @RunWith(Parameterized.class)
 @SmallTest
-@Features(STREAMING)
-@Stories(OBJECT_STREAMING)
+@Feature(STREAMING)
+@Story(OBJECT_STREAMING)
 public class CursorIteratorProviderTestCase extends AbstractObjectStreamingTestCase {
 
   protected static final int DATA_SIZE = 500;

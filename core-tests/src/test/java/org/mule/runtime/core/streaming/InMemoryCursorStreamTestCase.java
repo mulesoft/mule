@@ -12,12 +12,12 @@ import org.mule.runtime.api.util.DataSize;
 import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamConfig;
 import org.mule.tck.size.SmallTest;
 
-import ru.yandex.qatools.allure.annotations.Features;
-import ru.yandex.qatools.allure.annotations.Stories;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
 @SmallTest
-@Features(STREAMING)
-@Stories(STREAMING)
+@Feature(STREAMING)
+@Story(STREAMING)
 public class InMemoryCursorStreamTestCase extends InMemoryStreamingConfigContractTestCase {
 
   @Override

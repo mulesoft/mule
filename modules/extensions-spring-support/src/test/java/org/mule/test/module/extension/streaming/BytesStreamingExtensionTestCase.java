@@ -37,12 +37,12 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import org.junit.Test;
-import ru.yandex.qatools.allure.annotations.Description;
-import ru.yandex.qatools.allure.annotations.Features;
-import ru.yandex.qatools.allure.annotations.Stories;
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
-@Features(STREAMING)
-@Stories(BYTES_STREAMING)
+@Feature(STREAMING)
+@Story(BYTES_STREAMING)
 public class BytesStreamingExtensionTestCase extends AbstractStreamingExtensionTestCase {
 
   private static final String BARGAIN_SPELL = "dormammu i've come to bargain";

@@ -33,10 +33,10 @@ import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import ru.yandex.qatools.allure.annotations.Features;
+import io.qameta.allure.Feature;
 
 @SmallTest
-@Features(STREAMING)
+@Feature(STREAMING)
 public class PoolingByteBufferManagerTestCase extends AbstractMuleTestCase {
 
   private PoolingByteBufferManager bufferManager = new PoolingByteBufferManager();

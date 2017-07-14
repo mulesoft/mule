@@ -26,11 +26,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import ru.yandex.qatools.allure.annotations.Features;
-import ru.yandex.qatools.allure.annotations.Stories;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
-@Features(HTTP_SERVICE)
-@Stories(REQUEST_BUILDER)
+@Feature(HTTP_SERVICE)
+@Story(REQUEST_BUILDER)
 public class HttpRequestBuilderTestCase {
 
   public static final String URI_VALUE = "someUri";

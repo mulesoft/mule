@@ -74,12 +74,11 @@ import java.util.Optional;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
-import ru.yandex.qatools.allure.annotations.Features;
-import ru.yandex.qatools.allure.annotations.Stories;
-
-@Features(EXPRESSION_LANGUAGE)
-@Stories(SUPPORT_DW)
+@Feature(EXPRESSION_LANGUAGE)
+@Story(SUPPORT_DW)
 public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExpressionLanguageTestCase {
 
   @Rule

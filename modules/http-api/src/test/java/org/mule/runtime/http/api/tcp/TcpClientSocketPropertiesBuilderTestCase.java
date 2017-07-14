@@ -17,11 +17,11 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
-import ru.yandex.qatools.allure.annotations.Features;
-import ru.yandex.qatools.allure.annotations.Stories;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
-@Features(HTTP_SERVICE)
-@Stories(TCP_BUILDER)
+@Feature(HTTP_SERVICE)
+@Story(TCP_BUILDER)
 public class TcpClientSocketPropertiesBuilderTestCase {
 
   TcpClientSocketPropertiesBuilder builder = TcpClientSocketProperties.builder();

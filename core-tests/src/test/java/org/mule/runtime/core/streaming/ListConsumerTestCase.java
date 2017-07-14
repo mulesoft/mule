@@ -24,10 +24,10 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import ru.yandex.qatools.allure.annotations.Features;
+import io.qameta.allure.Feature;
 
 @SmallTest
-@Features(STREAMING)
+@Feature(STREAMING)
 public class ListConsumerTestCase {
 
   private static final int totalCount = 50;

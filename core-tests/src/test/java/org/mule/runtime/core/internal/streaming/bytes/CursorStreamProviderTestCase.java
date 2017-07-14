@@ -39,11 +39,11 @@ import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import ru.yandex.qatools.allure.annotations.Features;
+import io.qameta.allure.Feature;
 
 @RunWith(Parameterized.class)
 @SmallTest
-@Features(STREAMING)
+@Feature(STREAMING)
 public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase {
 
   @Parameterized.Parameters(name = "{0}")

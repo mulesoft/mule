@@ -13,11 +13,11 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.client.OperationParameters;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
-import ru.yandex.qatools.allure.annotations.Features;
-import ru.yandex.qatools.allure.annotations.Stories;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
-@Features(EXTENSIONS_CLIENT)
-@Stories(BLOCKING_CLIENT)
+@Feature(EXTENSIONS_CLIENT)
+@Story(BLOCKING_CLIENT)
 public class BlockingExtensionsClientTestCase extends ExtensionsClientTestCase {
 
   @Override

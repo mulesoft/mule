@@ -13,11 +13,11 @@ import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.PROXY_C
 
 import org.junit.Test;
 
-import ru.yandex.qatools.allure.annotations.Features;
-import ru.yandex.qatools.allure.annotations.Stories;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
-@Features(HTTP_SERVICE)
-@Stories(PROXY_CONFIG_BUILDER)
+@Feature(HTTP_SERVICE)
+@Story(PROXY_CONFIG_BUILDER)
 public class NtlmProxyConfigBuilderTest extends AbstractProxyConfigTestCase<NtlmProxyConfigBuilder> {
 
   private static final String NTLM_DOMAIN = "DOMAIN";

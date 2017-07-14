@@ -33,12 +33,12 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
-import ru.yandex.qatools.allure.annotations.Description;
-import ru.yandex.qatools.allure.annotations.Features;
-import ru.yandex.qatools.allure.annotations.Stories;
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
-@Features(RUNTIME_GLOBAL_CONFIGURATION)
-@Stories(MAVEN_GLOBAL_CONFIGURATION_STORY)
+@Feature(RUNTIME_GLOBAL_CONFIGURATION)
+@Story(MAVEN_GLOBAL_CONFIGURATION_STORY)
 public class MavenConfigTestCase extends AbstractMuleTestCase {
 
   private static final String MAVEN_CENTRAL_REPO_ID = "mavenCentral";

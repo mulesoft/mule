@@ -137,7 +137,7 @@
         <assertJVersion>3.5.2</assertJVersion>
         <asmVersion>3.3.1</asmVersion>
         <asmCommonsVersion>3.1</asmCommonsVersion>
-        <aspectjVersion>1.8.5</aspectjVersion>
+        <aspectjVersion>1.8.10</aspectjVersion>
         <asyncHttpClientVersion>1.12</asyncHttpClientVersion>
         <apacheHttpClientVersion>4.5.2</apacheHttpClientVersion>
         <awaitilityVersion>1.7.0</awaitilityVersion>
@@ -224,7 +224,8 @@
         <xmlPullVersion>1.1.3.4.O</xmlPullVersion>
         <xstreamVersion>1.4.9</xstreamVersion>
         <xaPoolVersion>1.5.0</xaPoolVersion>
-        <allureJunitVersion>1.4.23.HOTFIX1</allureJunitVersion>
+        <allureJunitVersion>2.0-BETA15</allureJunitVersion>
+        <allureReportVersion>2.2.1</allureReportVersion>
 
         <!--Maven plugins versions-->
         <dependency.plugin.version>2.10</dependency.plugin.version>
@@ -266,7 +267,7 @@
         <aetherVersion>1.0.2.v20150114</aetherVersion>
         <aetherProviderVersion>3.3.9</aetherProviderVersion>
         <powermockVersion>1.6.5</powermockVersion>
-        <allure.maven.plugin.version>2.5</allure.maven.plugin.version>
+        <allure.maven.plugin.version>2.8</allure.maven.plugin.version>
         <javaxJmsApiVersion>2.0.1</javaxJmsApiVersion>
         <jetty.maven.plugin.version>9.2.10.v20150310</jetty.maven.plugin.version>
 
@@ -281,8 +282,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>ru.yandex.qatools.allure</groupId>
-            <artifactId>allure-junit-adaptor</artifactId>
+            <groupId>io.qameta.allure</groupId>
+            <artifactId>allure-junit4</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -701,13 +702,8 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <groupId>ru.yandex.qatools.allure</groupId>
-                <artifactId>allure-junit-adaptor</artifactId>
-                <version>${allureJunitVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>ru.yandex.qatools.allure</groupId>
-                <artifactId>allure-java-annotations</artifactId>
+                <groupId>io.qameta.allure</groupId>
+                <artifactId>allure-junit4</artifactId>
                 <version>${allureJunitVersion}</version>
             </dependency>
             <dependency>
@@ -1547,7 +1543,7 @@
                                     <ignoredUsedUndeclaredDependency>junit:junit</ignoredUsedUndeclaredDependency>
                                     <ignoredUsedUndeclaredDependency>commons-logging:commons-logging</ignoredUsedUndeclaredDependency>
                                     <ignoredUsedUndeclaredDependency>org.apache.ftpserver:ftpserver-core</ignoredUsedUndeclaredDependency>
-                                    <ignoredUsedUndeclaredDependency>ru.yandex.qatools.allure</ignoredUsedUndeclaredDependency>
+                                    <ignoredUsedUndeclaredDependency>io.qameta.allure</ignoredUsedUndeclaredDependency>
 
                                     <!-- Logging related artifacts are exposed by the BOOTSTRAP ClassLoader -->
                                     <ignoredUsedUndeclaredDependency>org.slf4j:slf4j-api</ignoredUsedUndeclaredDependency>
@@ -1626,7 +1622,9 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>${maven.surefire.plugin.version}</version>
                     <configuration>
-                        <argLine>-Xmx1024m -Xms256m</argLine>
+                        <workingDirectory>${project.build.directory}</workingDirectory>
+                        <argLine>-javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectjVersion}/aspectjweaver-${aspectjVersion}.jar" -Xmx1024m -Xms256m</argLine>
+                        <testFailureIgnore>true</testFailureIgnore>
                         <trimStackTrace>false</trimStackTrace>
                         <excludes>
                             <!-- Surefire should be able to detect that classes are abstract but it seems it isn't -->
@@ -1636,11 +1634,24 @@
                             <!-- exclude inner classes -->
                             <exclude>**/*$*</exclude>
                         </excludes>
+                        <properties>
+                            <property>
+                                <name>listener</name>
+                                <value>io.qameta.allure.junit4.AllureJunit4</value>
+                            </property>
+                        </properties>
                         <systemPropertyVariables>
                             <!-- Just propagate this variable due to surefire will not do this when forked vm for tests -->
                             <maven.multiModuleProjectDirectory>${maven.multiModuleProjectDirectory}</maven.multiModuleProjectDirectory>
                             <maven.projectVersion>${project.version}</maven.projectVersion>
+                            <allure.profile.is.activated>true</allure.profile.is.activated>
                         </systemPropertyVariables>
+                        <systemProperties>
+                            <property>
+                                <name>allure.results.directory</name>
+                                <value>${project.build.directory}/allure-results</value>
+                            </property>
+                        </systemProperties>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -1770,6 +1781,14 @@
                     <version>${mule.extensions.maven.plugin.version}</version>
                     <extensions>true</extensions>
                 </plugin>
+                <plugin>
+                    <groupId>io.qameta.allure</groupId>
+                    <artifactId>allure-maven</artifactId>
+                    <version>${allure.maven.plugin.version}</version>
+                    <configuration>
+                        <reportVersion>${allureReportVersion}</reportVersion>
+                    </configuration>
+                </plugin>
             </plugins>
         </pluginManagement>
 
@@ -1846,7 +1865,6 @@
                 </executions>
             </plugin>
 
-            <!-- Global test exclusions -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -1932,105 +1950,74 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.mule.tools</groupId>
-                <artifactId>maven-mule-plugin</artifactId>
-                <version>1.7</version>
-                <extensions>true</extensions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-site-plugin</artifactId>
-                <!--
-                    Do not inherit the site config to child modules. This is the only approach that works
-                    to generate aggregated javadocs (which is the main purpose of the site) and that does
-                    not fork the complete lifecycle for each child module.
-                -->
-                <inherited>false</inherited>
-                <configuration>
-                    <reportPlugins>
-                        <!--
-                            Disabled for now, the main purpose of the site is to generate javadocs. We
-                            never actually used the JXR output anyway.
-
-                        <reportPlugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-jxr-plugin</artifactId>
-                            <version>2.2</version>
-                            <configuration>
-                                <aggregate>true</aggregate>
-                            </configuration>
-                        </reportPlugin>
-                        -->
-                        <reportPlugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-project-info-reports-plugin</artifactId>
-                            <reportSets>
-                                <reportSet>
-                                    <reports>
-                                        <report>dependencies</report>
-                                        <report>index</report>
-                                    </reports>
-                                </reportSet>
-                            </reportSets>
-                        </reportPlugin>
-                        <reportPlugin>
-                            <groupId>org.mule.tools</groupId>
-                            <artifactId>mule-test-exclusions-report-plugin</artifactId>
-                            <version>1.2</version>
-                        </reportPlugin>
-                        <reportPlugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-javadoc-plugin</artifactId>
-                            <version>${javadocPluginVersion}</version>
-                            <configuration>
-                                <minmemory>128m</minmemory>
-                                <maxmemory>512m</maxmemory>
-                                <charset>ISO-8859-1</charset>
-                                <encoding>ISO-8859-1</encoding>
-                                <source>${javaVersion}</source>
-                                <configuration>
-                                    <additionalparam>${xDocLint}</additionalparam>
-                                </configuration>
-                                <!-- Link to the external online JavaDoc -->
-                                <links>
-                                    <link>http://docs.oracle.com/javase/7/docs/api/</link>
-                                    <link>http://java.sun.com/j2ee/sdk_1.3/techdocs/api/</link>
-                                    <link>http://jakarta.apache.org/commons/beanutils/commons-beanutils-1.9.3/docs/api/</link>
-                                    <link>http://jakarta.apache.org/commons/collections/api-3.2/</link>
-                                    <link>http://jakarta.apache.org/httpcomponents/httpclient-3.x/apidocs/</link>
-                                    <link>http://jakarta.apache.org/commons/io/api-1.2/</link>
-                                    <link>http://jakarta.apache.org/commons/lang/api-2.1/</link>
-                                    <link>http://jakarta.apache.org/commons/pool/apidocs/</link>
-                                    <link>http://logging.apache.org/log4j/2.x/log4j-api/apidocs/</link>
-                                    <link>http://www.slf4j.org/api/</link>
-                                    <link>http://junit.sourceforge.net/javadoc/</link>
-                                </links>
-                                <groups>
-                                    <group>
-                                        <title>Mule Core</title>
-                                        <packages>org.mule.runtime.core.*</packages>
-                                    </group>
-                                    <group>
-                                        <title>Modules (not part of the Mule core)</title>
-                                        <packages>org.mule.runtime.module.*:org.mule.runtime.core.components.*</packages>
-                                    </group>
-                                    <group>
-                                        <title>Testing Framework</title>
-                                        <packages>org.mule.tck.*:org.mule.functional.*</packages>
-                                    </group>
-                                    <group>
-                                        <title>Tools</title>
-                                        <packages>org.mule.tools.*</packages>
-                                    </group>
-                                </groups>
-                            </configuration>
-                        </reportPlugin>
-                    </reportPlugins>
-                </configuration>
+                <groupId>io.qameta.allure</groupId>
+                <artifactId>allure-maven</artifactId>
             </plugin>
         </plugins>
     </build>
-
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>dependencies</report>
+                            <report>index</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${javadocPluginVersion}</version>
+                <configuration>
+                    <minmemory>128m</minmemory>
+                    <maxmemory>512m</maxmemory>
+                    <charset>ISO-8859-1</charset>
+                    <encoding>ISO-8859-1</encoding>
+                    <source>${javaVersion}</source>
+                    <configuration>
+                        <additionalparam>${xDocLint}</additionalparam>
+                    </configuration>
+                    <!-- Link to the external online JavaDoc -->
+                    <links>
+                        <link>http://docs.oracle.com/javase/7/docs/api/</link>
+                        <link>http://java.sun.com/j2ee/sdk_1.3/techdocs/api/</link>
+                        <link>http://jakarta.apache.org/commons/beanutils/commons-beanutils-1.9.3/docs/api/</link>
+                        <link>http://jakarta.apache.org/commons/collections/api-3.2/</link>
+                        <link>http://jakarta.apache.org/httpcomponents/httpclient-3.x/apidocs/</link>
+                        <link>http://jakarta.apache.org/commons/io/api-1.2/</link>
+                        <link>http://jakarta.apache.org/commons/lang/api-2.1/</link>
+                        <link>http://jakarta.apache.org/commons/pool/apidocs/</link>
+                        <link>http://logging.apache.org/log4j/2.x/log4j-api/apidocs/</link>
+                        <link>http://www.slf4j.org/api/</link>
+                        <link>http://junit.sourceforge.net/javadoc/</link>
+                    </links>
+                    <groups>
+                        <group>
+                            <title>Mule Core</title>
+                            <packages>org.mule.runtime.core.*</packages>
+                        </group>
+                        <group>
+                            <title>Modules (not part of the Mule core)</title>
+                            <packages>org.mule.runtime.module.*:org.mule.runtime.core.components.*</packages>
+                        </group>
+                        <group>
+                            <title>Testing Framework</title>
+                            <packages>org.mule.tck.*:org.mule.functional.*</packages>
+                        </group>
+                        <group>
+                            <title>Tools</title>
+                            <packages>org.mule.tools.*</packages>
+                        </group>
+                    </groups>
+                </configuration>
+            </plugin>
+        </plugins>
+    </reporting>
     <profiles>
 
         <profile>
@@ -2202,65 +2189,6 @@
                     </plugin>
                 </plugins>
             </build>
-        </profile>
-        <profile>
-            <id>allure</id>
-
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-surefire-plugin</artifactId>
-                            <configuration>
-                                <testFailureIgnore>true</testFailureIgnore>
-                                <argLine>
-                                    -javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/${aspectjVersion}/aspectjweaver-${aspectjVersion}.jar
-                                </argLine>
-                                <properties>
-                                    <property>
-                                        <name>listener</name>
-                                        <value>ru.yandex.qatools.allure.junit.AllureRunListener</value>
-                                    </property>
-                                </properties>
-                                <systemPropertyVariables>
-                                    <allure.profile.is.activated>true</allure.profile.is.activated>
-                                </systemPropertyVariables>
-                            </configuration>
-                            <dependencies>
-                                <dependency>
-                                    <groupId>org.aspectj</groupId>
-                                    <artifactId>aspectjweaver</artifactId>
-                                    <version>${aspectjVersion}</version>
-                                </dependency>
-                            </dependencies>
-                        </plugin>
-
-                        <!--Needed only to show reports locally. Run jetty:run and open localhost:8080 to show the report-->
-                        <plugin>
-                            <groupId>org.eclipse.jetty</groupId>
-                            <artifactId>jetty-maven-plugin</artifactId>
-                            <version>${jetty.maven.plugin.version}</version>
-                            <configuration>
-                                <webAppSourceDirectory>${project.build.directory}/site/allure-maven-plugin</webAppSourceDirectory>
-                                <stopKey>stop</stopKey>
-                                <stopPort>1234</stopPort>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-            </build>
-
-            <reporting>
-                <excludeDefaults>true</excludeDefaults>
-                <plugins>
-                    <plugin>
-                        <groupId>ru.yandex.qatools.allure</groupId>
-                        <artifactId>allure-maven-plugin</artifactId>
-                        <version>${allure.maven.plugin.version}</version>
-                    </plugin>
-                </plugins>
-            </reporting>
         </profile>
     </profiles>
 </project>

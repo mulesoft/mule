@@ -14,12 +14,12 @@ import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.P
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 
-import ru.yandex.qatools.allure.annotations.Description;
-import ru.yandex.qatools.allure.annotations.Features;
-import ru.yandex.qatools.allure.annotations.Stories;
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
-@Features(PROCESSING_STRATEGIES)
-@Stories(BLOCKING)
+@Feature(PROCESSING_STRATEGIES)
+@Story(BLOCKING)
 public class BlockingProcessingStrategyTestCase extends DirectProcessingStrategyTestCase {
 
   public BlockingProcessingStrategyTestCase(Mode mode) {

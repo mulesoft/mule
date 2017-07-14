@@ -17,11 +17,11 @@ import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHan
 import org.mule.runtime.api.message.ErrorType;
 
 import org.junit.Test;
-import ru.yandex.qatools.allure.annotations.Features;
-import ru.yandex.qatools.allure.annotations.Stories;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
-@Features(ERROR_HANDLING)
-@Stories(ERROR_TYPES)
+@Feature(ERROR_HANDLING)
+@Story(ERROR_TYPES)
 public class DisjunctiveErrorTypeMatcherTestCase extends AbstractErrorTypeMatcherTestCase {
 
 

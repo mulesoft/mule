@@ -49,12 +49,12 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import reactor.core.publisher.MonoProcessor;
-import ru.yandex.qatools.allure.annotations.Description;
-import ru.yandex.qatools.allure.annotations.Features;
-import ru.yandex.qatools.allure.annotations.Stories;
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
-@Features(EVENT_CONTEXT)
-@Stories(RESPONSE_AND_COMPLETION_PUBLISHERS)
+@Feature(EVENT_CONTEXT)
+@Story(RESPONSE_AND_COMPLETION_PUBLISHERS)
 @RunWith(Parameterized.class)
 public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
 

@@ -13,11 +13,11 @@ import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.P
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 
-import ru.yandex.qatools.allure.annotations.Features;
-import ru.yandex.qatools.allure.annotations.Stories;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
-@Features(PROCESSING_STRATEGIES)
-@Stories(DIRECT)
+@Feature(PROCESSING_STRATEGIES)
+@Story(DIRECT)
 public class DirectPerThreadProcessingStrategyTestCase extends DirectProcessingStrategyTestCase {
 
   public DirectPerThreadProcessingStrategyTestCase(Mode mode) {

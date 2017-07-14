@@ -15,11 +15,11 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
-import ru.yandex.qatools.allure.annotations.Features;
-import ru.yandex.qatools.allure.annotations.Stories;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
-@Features(EXTENSIONS_CLIENT)
-@Stories(NON_BLOCKING_CLIENT)
+@Feature(EXTENSIONS_CLIENT)
+@Story(NON_BLOCKING_CLIENT)
 public class NonBlockingExtensionsClientTestCase extends ExtensionsClientTestCase {
 
   @Override

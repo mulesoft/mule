@@ -20,11 +20,11 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import ru.yandex.qatools.allure.annotations.Features;
-import ru.yandex.qatools.allure.annotations.Stories;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
-@Features(CONFIGURATION_PROPERTIES)
-@Stories(CONFIGURATION_PROPERTIES_RESOLVER_STORY)
+@Feature(CONFIGURATION_PROPERTIES)
+@Story(CONFIGURATION_PROPERTIES_RESOLVER_STORY)
 public class FileConfigurationPropertiesProviderTestCase extends AbstractMuleTestCase {
 
   private DefaultConfigurationPropertiesResolver resolver;

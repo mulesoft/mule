@@ -31,14 +31,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.runners.MockitoJUnitRunner;
-import ru.yandex.qatools.allure.annotations.Description;
-import ru.yandex.qatools.allure.annotations.Features;
-import ru.yandex.qatools.allure.annotations.Stories;
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-@Features(STREAMING)
-@Stories(OBJECT_STREAMING)
+@Feature(STREAMING)
+@Story(OBJECT_STREAMING)
 public class StreamingIteratorTestCase {
 
   private static final int PAGE_SIZE = 100;

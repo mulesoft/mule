@@ -20,11 +20,11 @@ import org.mule.runtime.core.api.exception.ExceptionMapper;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;
-import ru.yandex.qatools.allure.annotations.Features;
-import ru.yandex.qatools.allure.annotations.Stories;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
-@Features(ERROR_HANDLING)
-@Stories(EXCEPTION_MAPPINGS)
+@Feature(ERROR_HANDLING)
+@Story(EXCEPTION_MAPPINGS)
 public class ErrorTypeLocatorTestCase extends AbstractMuleTestCase {
 
   private final ErrorTypeRepository repository = new ErrorTypeRepository();

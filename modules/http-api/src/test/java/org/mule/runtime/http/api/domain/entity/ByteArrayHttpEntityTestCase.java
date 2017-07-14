@@ -15,12 +15,12 @@ import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_SERVICE;
 import java.io.IOException;
 
 import org.junit.Test;
-import ru.yandex.qatools.allure.annotations.Features;
-import ru.yandex.qatools.allure.annotations.Stories;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import sun.misc.IOUtils;
 
-@Features(HTTP_SERVICE)
-@Stories("Entities")
+@Feature(HTTP_SERVICE)
+@Story("Entities")
 public class ByteArrayHttpEntityTestCase {
 
   private byte[] content = "TEST".getBytes();

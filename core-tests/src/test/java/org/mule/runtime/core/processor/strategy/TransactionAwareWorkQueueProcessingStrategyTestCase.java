@@ -23,13 +23,14 @@ import org.mule.tck.testmodels.mule.TestTransaction;
 
 import org.junit.Test;
 
-import ru.yandex.qatools.allure.annotations.Description;
-import ru.yandex.qatools.allure.annotations.Features;
-import ru.yandex.qatools.allure.annotations.Stories;
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+import io.qameta.allure.junit4.DisplayName;
 
-@Features(PROCESSING_STRATEGIES)
-@Stories(DEFAULT)
-@Description("Default (used when no processing strategy is configured)")
+@Feature(PROCESSING_STRATEGIES)
+@Story(DEFAULT)
+@DisplayName("Default processing strategy (used when no processing strategy is configured)")
 public class TransactionAwareWorkQueueProcessingStrategyTestCase extends WorkQueueProcessingStrategyTestCase {
 
   public TransactionAwareWorkQueueProcessingStrategyTestCase(Mode mode) {

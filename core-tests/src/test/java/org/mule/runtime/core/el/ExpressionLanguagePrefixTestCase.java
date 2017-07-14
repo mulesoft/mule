@@ -31,11 +31,11 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.mockito.verification.VerificationMode;
 
-import ru.yandex.qatools.allure.annotations.Features;
-import ru.yandex.qatools.allure.annotations.Stories;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
-@Features(EXPRESSION_LANGUAGE)
-@Stories("Support Mixing DW and MEL in a same application")
+@Feature(EXPRESSION_LANGUAGE)
+@Story("Support Mixing DW and MEL in a same application")
 @RunWith(Parameterized.class)
 @SmallTest
 public class ExpressionLanguagePrefixTestCase extends AbstractMuleTestCase {
