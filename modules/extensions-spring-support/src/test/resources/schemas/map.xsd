@@ -1,111 +1,111 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xs:schema xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.mulesoft.org/schema/mule/map" attributeFormDefault="unqualified" elementFormDefault="qualified">
-    <xs:import namespace="http://www.w3.org/XML/1998/namespace"></xs:import>
-    <xs:import namespace="http://www.springframework.org/schema/beans" schemaLocation="http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"></xs:import>
-    <xs:import namespace="http://www.mulesoft.org/schema/mule/core" schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule.xsd"></xs:import>
-    <xs:import namespace="http://www.mulesoft.org/schema/mule/extension" schemaLocation="http://www.mulesoft.org/schema/mule/extension/current/mule-extension.xsd"></xs:import>
-    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" name="config">
-        <xs:complexType>
-            <xs:complexContent>
-                <xs:extension base="mule:abstractExtensionType">
-                    <xs:annotation>
-                        <xs:documentation>Default configuration</xs:documentation>
-                    </xs:annotation>
-                    <xs:sequence minOccurs="0" maxOccurs="1">
-                        <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="0" maxOccurs="1" ref="extension:dynamic-config-policy"></xs:element>
-                        <xs:element minOccurs="0" maxOccurs="1" name="required-map-defaults">
-                            <xs:complexType>
-                                <xs:sequence>
-                                    <xs:element minOccurs="0" maxOccurs="unbounded" name="required-map-default">
-                                        <xs:complexType>
-                                            <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
-                                            <xs:attribute type="xs:string" use="required" name="value"></xs:attribute>
-                                        </xs:complexType>
-                                    </xs:element>
-                                </xs:sequence>
-                            </xs:complexType>
-                        </xs:element>
-                        <xs:element minOccurs="0" maxOccurs="1" name="required-map-no-expressions">
-                            <xs:complexType>
-                                <xs:sequence>
-                                    <xs:element minOccurs="0" maxOccurs="unbounded" name="required-map-no-expression">
-                                        <xs:complexType>
-                                            <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
-                                            <xs:attribute type="xs:string" use="required" name="value"></xs:attribute>
-                                        </xs:complexType>
-                                    </xs:element>
-                                </xs:sequence>
-                            </xs:complexType>
-                        </xs:element>
-                        <xs:element minOccurs="0" maxOccurs="1" name="required-map-expression-supporteds">
-                            <xs:complexType>
-                                <xs:sequence>
-                                    <xs:element minOccurs="0" maxOccurs="unbounded" name="required-map-expression-supported">
-                                        <xs:complexType>
-                                            <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
-                                            <xs:attribute type="xs:string" use="required" name="value"></xs:attribute>
-                                        </xs:complexType>
-                                    </xs:element>
-                                </xs:sequence>
-                            </xs:complexType>
-                        </xs:element>
-                        <xs:element minOccurs="0" maxOccurs="1" name="optional-map-defaults">
-                            <xs:complexType>
-                                <xs:sequence>
-                                    <xs:element minOccurs="0" maxOccurs="unbounded" name="optional-map-default">
-                                        <xs:complexType>
-                                            <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
-                                            <xs:attribute type="xs:string" use="required" name="value"></xs:attribute>
-                                        </xs:complexType>
-                                    </xs:element>
-                                </xs:sequence>
-                            </xs:complexType>
-                        </xs:element>
-                        <xs:element minOccurs="0" maxOccurs="1" name="optional-map-no-expressions">
-                            <xs:complexType>
-                                <xs:sequence>
-                                    <xs:element minOccurs="0" maxOccurs="unbounded" name="optional-map-no-expression">
-                                        <xs:complexType>
-                                            <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
-                                            <xs:attribute type="xs:string" use="required" name="value"></xs:attribute>
-                                        </xs:complexType>
-                                    </xs:element>
-                                </xs:sequence>
-                            </xs:complexType>
-                        </xs:element>
-                        <xs:element minOccurs="0" maxOccurs="1" name="optional-map-expression-supporteds">
-                            <xs:complexType>
-                                <xs:sequence>
-                                    <xs:element minOccurs="0" maxOccurs="unbounded" name="optional-map-expression-supported">
-                                        <xs:complexType>
-                                            <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
-                                            <xs:attribute type="xs:string" use="required" name="value"></xs:attribute>
-                                        </xs:complexType>
-                                    </xs:element>
-                                </xs:sequence>
-                            </xs:complexType>
-                        </xs:element>
-                    </xs:sequence>
-                    <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
-                    <xs:attribute type="mule:expressionMap" use="optional" name="requiredMapDefaults"></xs:attribute>
-                    <xs:attribute type="mule:mapType" use="optional" name="requiredMapNoExpressions"></xs:attribute>
-                    <xs:attribute type="mule:expressionMap" use="required" name="requiredMapExpressionRequireds"></xs:attribute>
-                    <xs:attribute type="mule:expressionMap" use="optional" name="requiredMapExpressionSupporteds"></xs:attribute>
-                    <xs:attribute type="mule:expressionMap" use="optional" name="optionalMapDefaults"></xs:attribute>
-                    <xs:attribute type="mule:mapType" use="optional" name="optionalMapNoExpressions"></xs:attribute>
-                    <xs:attribute type="mule:expressionMap" use="optional" name="optionalMapExpressionRequireds"></xs:attribute>
-                    <xs:attribute type="mule:expressionMap" use="optional" name="optionalMapExpressionSupporteds"></xs:attribute>
-                </xs:extension>
-            </xs:complexContent>
-        </xs:complexType>
-    </xs:element>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/map" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="FooType" substitutionGroup="mule:abstract-operator" name="foo"></xs:element>
-    <xs:complexType name="FooType">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
-            </xs:extension>
-        </xs:complexContent>
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace"></xs:import>
+  <xs:import namespace="http://www.springframework.org/schema/beans" schemaLocation="http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"></xs:import>
+  <xs:import namespace="http://www.mulesoft.org/schema/mule/core" schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule.xsd"></xs:import>
+  <xs:import namespace="http://www.mulesoft.org/schema/mule/extension" schemaLocation="http://www.mulesoft.org/schema/mule/extension/current/mule-extension.xsd"></xs:import>
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" name="config">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="mule:abstractExtensionType">
+          <xs:annotation>
+            <xs:documentation>Default configuration</xs:documentation>
+          </xs:annotation>
+          <xs:sequence minOccurs="0" maxOccurs="1">
+            <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="0" maxOccurs="1" ref="extension:dynamic-config-policy"></xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="required-map-defaults">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="required-map-default">
+                    <xs:complexType>
+                      <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
+                      <xs:attribute type="xs:string" use="required" name="value"></xs:attribute>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="required-map-no-expressions">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="required-map-no-expression">
+                    <xs:complexType>
+                      <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
+                      <xs:attribute type="xs:string" use="required" name="value"></xs:attribute>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="required-map-expression-supporteds">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="required-map-expression-supported">
+                    <xs:complexType>
+                      <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
+                      <xs:attribute type="xs:string" use="required" name="value"></xs:attribute>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="optional-map-defaults">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="optional-map-default">
+                    <xs:complexType>
+                      <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
+                      <xs:attribute type="xs:string" use="required" name="value"></xs:attribute>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="optional-map-no-expressions">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="optional-map-no-expression">
+                    <xs:complexType>
+                      <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
+                      <xs:attribute type="xs:string" use="required" name="value"></xs:attribute>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="optional-map-expression-supporteds">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="optional-map-expression-supported">
+                    <xs:complexType>
+                      <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
+                      <xs:attribute type="xs:string" use="required" name="value"></xs:attribute>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
+          <xs:attribute type="mule:expressionMap" use="optional" name="requiredMapDefaults"></xs:attribute>
+          <xs:attribute type="mule:mapType" use="optional" name="requiredMapNoExpressions"></xs:attribute>
+          <xs:attribute type="mule:expressionMap" use="required" name="requiredMapExpressionRequireds"></xs:attribute>
+          <xs:attribute type="mule:expressionMap" use="optional" name="requiredMapExpressionSupporteds"></xs:attribute>
+          <xs:attribute type="mule:expressionMap" use="optional" name="optionalMapDefaults"></xs:attribute>
+          <xs:attribute type="mule:mapType" use="optional" name="optionalMapNoExpressions"></xs:attribute>
+          <xs:attribute type="mule:expressionMap" use="optional" name="optionalMapExpressionRequireds"></xs:attribute>
+          <xs:attribute type="mule:expressionMap" use="optional" name="optionalMapExpressionSupporteds"></xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
     </xs:complexType>
+  </xs:element>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/map" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="FooType" substitutionGroup="mule:abstract-operator" name="foo"></xs:element>
+  <xs:complexType name="FooType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
 </xs:schema>

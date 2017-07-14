@@ -2583,36 +2583,6 @@
                 {
                   "type": {
                     "format": "java",
-                    "type": "String",
-                    "annotations": {
-                      "typeId": "java.lang.String"
-                    }
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "expressionSupport": "SUPPORTED",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": true,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "order": 3,
-                    "tabName": "Advanced"
-                  },
-                  "elementReferences": [],
-                  "name": "outputEncoding",
-                  "description": "The encoding of the payload that this operation outputs.",
-                  "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
                     "type": "Object",
                     "annotations": {
                       "typeId": "java.lang.Object",
@@ -2994,36 +2964,6 @@
                   "elementReferences": [],
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
-                  "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "String",
-                    "annotations": {
-                      "typeId": "java.lang.String"
-                    }
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "expressionSupport": "SUPPORTED",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": true,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "order": 3,
-                    "tabName": "Advanced"
-                  },
-                  "elementReferences": [],
-                  "name": "outputEncoding",
-                  "description": "The encoding of the payload that this operation outputs.",
                   "modelProperties": {}
                 },
                 {
@@ -4751,36 +4691,6 @@
             {
               "type": {
                 "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 3,
-                "tabName": "Advanced"
-              },
-              "elementReferences": [],
-              "name": "outputEncoding",
-              "description": "The encoding of the payload that this operation outputs.",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
                 "type": "Object",
                 "annotations": {
                   "typeId": "java.lang.Object",
@@ -5128,36 +5038,6 @@
               "elementReferences": [],
               "name": "outputMimeType",
               "description": "The mime type of the payload that this operation outputs.",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 6,
-                "tabName": "Advanced"
-              },
-              "elementReferences": [],
-              "name": "outputEncoding",
-              "description": "The encoding of the payload that this operation outputs.",
               "modelProperties": {}
             },
             {
@@ -5703,36 +5583,6 @@
             {
               "type": {
                 "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 3,
-                "tabName": "Advanced"
-              },
-              "elementReferences": [],
-              "name": "outputEncoding",
-              "description": "The encoding of the payload that this operation outputs.",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
                 "type": "Object",
                 "annotations": {
                   "typeId": "java.lang.Object",
@@ -5894,7 +5744,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 4
+                "order": 3
               },
               "elementReferences": [],
               "name": "channels",
@@ -5923,7 +5773,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 5
+                "order": 4
               },
               "elementReferences": [],
               "name": "anyParameter",
@@ -6157,36 +6007,6 @@
               "elementReferences": [],
               "name": "outputMimeType",
               "description": "The mime type of the payload that this operation outputs.",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 4,
-                "tabName": "Advanced"
-              },
-              "elementReferences": [],
-              "name": "outputEncoding",
-              "description": "The encoding of the payload that this operation outputs.",
               "modelProperties": {}
             },
             {
@@ -6618,36 +6438,6 @@
               "elementReferences": [],
               "name": "outputMimeType",
               "description": "The mime type of the payload that this operation outputs.",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 4,
-                "tabName": "Advanced"
-              },
-              "elementReferences": [],
-              "name": "outputEncoding",
-              "description": "The encoding of the payload that this operation outputs.",
               "modelProperties": {}
             },
             {
@@ -7240,36 +7030,6 @@
               "elementReferences": [],
               "name": "outputMimeType",
               "description": "The mime type of the payload that this operation outputs.",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 7,
-                "tabName": "Advanced"
-              },
-              "elementReferences": [],
-              "name": "outputEncoding",
-              "description": "The encoding of the payload that this operation outputs.",
               "modelProperties": {}
             },
             {

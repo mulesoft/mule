@@ -1,762 +1,732 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xs:schema xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.mulesoft.org/schema/mule/petstore" attributeFormDefault="unqualified" elementFormDefault="qualified">
-    <xs:import namespace="http://www.w3.org/XML/1998/namespace"></xs:import>
-    <xs:import namespace="http://www.springframework.org/schema/beans" schemaLocation="http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"></xs:import>
-    <xs:import namespace="http://www.mulesoft.org/schema/mule/core" schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule.xsd"></xs:import>
-    <xs:import namespace="http://www.mulesoft.org/schema/mule/extension" schemaLocation="http://www.mulesoft.org/schema/mule/extension/current/mule-extension.xsd"></xs:import>
-    <xs:import namespace="http://www.mulesoft.org/schema/mule/tls" schemaLocation="http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd"></xs:import>
-    <xs:complexType name="org.mule.test.petstore.extension.PhoneNumber">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-                <xs:sequence minOccurs="0" maxOccurs="1">
-                    <xs:element minOccurs="0" maxOccurs="1" name="area-codes">
-                        <xs:complexType>
-                            <xs:sequence>
-                                <xs:element minOccurs="0" maxOccurs="unbounded" name="area-code">
-                                    <xs:complexType>
-                                        <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
-                                    </xs:complexType>
-                                </xs:element>
-                            </xs:sequence>
-                        </xs:complexType>
-                    </xs:element>
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace"></xs:import>
+  <xs:import namespace="http://www.springframework.org/schema/beans" schemaLocation="http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"></xs:import>
+  <xs:import namespace="http://www.mulesoft.org/schema/mule/core" schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule.xsd"></xs:import>
+  <xs:import namespace="http://www.mulesoft.org/schema/mule/extension" schemaLocation="http://www.mulesoft.org/schema/mule/extension/current/mule-extension.xsd"></xs:import>
+  <xs:import namespace="http://www.mulesoft.org/schema/mule/tls" schemaLocation="http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd"></xs:import>
+  <xs:complexType name="org.mule.test.petstore.extension.PhoneNumber">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" name="area-codes">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="area-code">
+                  <xs:complexType>
+                    <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="mobile"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="required" name="home"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" name="countryEncoding"></xs:attribute>
+        <xs:attribute type="mule:expressionList" use="optional" name="areaCodes"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" abstract="true" name="abstract-phone-number"></xs:element>
+  <xs:element xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore" substitutionGroup="petstore:abstract-phone-number" name="phone-number">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="petstore:org.mule.test.petstore.extension.PhoneNumber">
+          <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" name="config">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="mule:abstractExtensionType">
+          <xs:annotation>
+            <xs:documentation>Default configuration</xs:documentation>
+          </xs:annotation>
+          <xs:sequence minOccurs="1" maxOccurs="1">
+            <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="1" maxOccurs="1" ref="extension:abstractConnectionProvider"></xs:element>
+            <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="0" maxOccurs="1" ref="extension:dynamic-config-policy"></xs:element>
+            <xs:element xmlns:tls="http://www.mulesoft.org/schema/mule/tls" minOccurs="0" maxOccurs="1" ref="tls:context"></xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="pets">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="pet">
+                    <xs:complexType>
+                      <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
+                    </xs:complexType>
+                  </xs:element>
                 </xs:sequence>
-                <xs:attribute type="mule:expressionString" use="required" name="mobile"></xs:attribute>
-                <xs:attribute type="mule:expressionString" use="required" name="home"></xs:attribute>
-                <xs:attribute type="mule:expressionString" use="optional" name="countryEncoding"></xs:attribute>
-                <xs:attribute type="mule:expressionList" use="optional" name="areaCodes"></xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" abstract="true" name="abstract-phone-number"></xs:element>
-    <xs:element xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore" substitutionGroup="petstore:abstract-phone-number" name="phone-number">
-        <xs:complexType>
-            <xs:complexContent>
-                <xs:extension base="petstore:org.mule.test.petstore.extension.PhoneNumber">
-                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
-                </xs:extension>
-            </xs:complexContent>
-        </xs:complexType>
-    </xs:element>
-    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" name="config">
-        <xs:complexType>
-            <xs:complexContent>
-                <xs:extension base="mule:abstractExtensionType">
-                    <xs:annotation>
-                        <xs:documentation>Default configuration</xs:documentation>
-                    </xs:annotation>
-                    <xs:sequence minOccurs="1" maxOccurs="1">
-                        <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="1" maxOccurs="1" ref="extension:abstractConnectionProvider"></xs:element>
-                        <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="0" maxOccurs="1" ref="extension:dynamic-config-policy"></xs:element>
-                        <xs:element xmlns:tls="http://www.mulesoft.org/schema/mule/tls" minOccurs="0" maxOccurs="1" ref="tls:context"></xs:element>
-                        <xs:element minOccurs="0" maxOccurs="1" name="pets">
-                            <xs:complexType>
-                                <xs:sequence>
-                                    <xs:element minOccurs="0" maxOccurs="unbounded" name="pet">
-                                        <xs:complexType>
-                                            <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
-                                        </xs:complexType>
-                                    </xs:element>
-                                </xs:sequence>
-                            </xs:complexType>
-                        </xs:element>
-                        <xs:element minOccurs="0" maxOccurs="1" name="cage">
-                            <xs:complexType>
-                                <xs:complexContent>
-                                    <xs:extension xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore" base="petstore:org.mule.test.petstore.extension.PetCage"></xs:extension>
-                                </xs:complexContent>
-                            </xs:complexType>
-                        </xs:element>
-                        <xs:element minOccurs="0" maxOccurs="1" name="cages">
-                            <xs:complexType>
-                                <xs:sequence>
-                                    <xs:element xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore" minOccurs="0" maxOccurs="unbounded" ref="petstore:abstract-pet-cage"></xs:element>
-                                </xs:sequence>
-                            </xs:complexType>
-                        </xs:element>
-                    </xs:sequence>
-                    <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
-                    <xs:attribute type="xs:string" use="optional" name="tlsContext"></xs:attribute>
-                    <xs:attribute type="mule:expressionList" use="optional" name="pets"></xs:attribute>
-                    <xs:attribute type="xs:string" use="optional" name="cage"></xs:attribute>
-                    <xs:attribute type="mule:expressionList" use="optional" name="cages"></xs:attribute>
-                    <xs:attribute type="mule:expressionString" use="required" name="cashierName"></xs:attribute>
-                    <xs:attribute type="mule:expressionString" use="optional" name="rothIRA"></xs:attribute>
-                    <xs:attribute type="mule:expressionString" use="optional" name="pensionPlan"></xs:attribute>
-                    <xs:attribute type="mule:expressionInt" use="optional" name="cash"></xs:attribute>
-                    <xs:attribute type="mule:expressionInt" use="optional" name="debt"></xs:attribute>
-                </xs:extension>
-            </xs:complexContent>
-        </xs:complexType>
-    </xs:element>
-    <xs:complexType name="org.mule.test.petstore.extension.PetCage">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-                <xs:sequence minOccurs="0" maxOccurs="1">
-                    <xs:element minOccurs="0" maxOccurs="1" name="birds">
-                        <xs:complexType>
-                            <xs:sequence>
-                                <xs:element minOccurs="0" maxOccurs="unbounded" name="bird">
-                                    <xs:complexType>
-                                        <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
-                                        <xs:attribute type="mule:expressionInt" use="required" name="value"></xs:attribute>
-                                    </xs:complexType>
-                                </xs:element>
-                            </xs:sequence>
-                        </xs:complexType>
-                    </xs:element>
-                    <xs:element minOccurs="0" maxOccurs="1" name="ammenities">
-                        <xs:complexType>
-                            <xs:sequence>
-                                <xs:element minOccurs="0" maxOccurs="unbounded" name="ammenity">
-                                    <xs:complexType>
-                                        <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
-                                    </xs:complexType>
-                                </xs:element>
-                            </xs:sequence>
-                        </xs:complexType>
-                    </xs:element>
-                    <xs:element xmlns:tls="http://www.mulesoft.org/schema/mule/tls" minOccurs="0" maxOccurs="1" ref="tls:context"></xs:element>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="cage">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore" base="petstore:org.mule.test.petstore.extension.PetCage"></xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="cages">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore" minOccurs="0" maxOccurs="unbounded" ref="petstore:abstract-pet-cage"></xs:element>
                 </xs:sequence>
-                <xs:attribute type="mule:expressionMap" use="optional" name="birds"></xs:attribute>
-                <xs:attribute type="mule:expressionList" use="optional" name="ammenities"></xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="tlsContext"></xs:attribute>
-                <xs:attribute type="mule:expressionString" use="optional" name="encoding"></xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
+          <xs:attribute type="xs:string" use="optional" name="tlsContext"></xs:attribute>
+          <xs:attribute type="mule:expressionList" use="optional" name="pets"></xs:attribute>
+          <xs:attribute type="xs:string" use="optional" name="cage"></xs:attribute>
+          <xs:attribute type="mule:expressionList" use="optional" name="cages"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="required" name="cashierName"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="rothIRA"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="pensionPlan"></xs:attribute>
+          <xs:attribute type="mule:expressionInt" use="optional" name="cash"></xs:attribute>
+          <xs:attribute type="mule:expressionInt" use="optional" name="debt"></xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore" type="petstore:org.mule.test.petstore.extension.PetCage" abstract="true" name="abstract-pet-cage"></xs:element>
-    <xs:element xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore" substitutionGroup="petstore:abstract-pet-cage" name="pet-cage">
-        <xs:complexType>
-            <xs:complexContent>
-                <xs:extension base="petstore:org.mule.test.petstore.extension.PetCage"></xs:extension>
-            </xs:complexContent>
-        </xs:complexType>
-    </xs:element>
-    <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" substitutionGroup="extension:abstractConnectionProvider" name="connection">
-        <xs:complexType>
-            <xs:complexContent>
-                <xs:extension base="extension:abstractConnectionProviderType">
-                    <xs:sequence minOccurs="0" maxOccurs="1">
-                        <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
-                        <xs:element xmlns:tls="http://www.mulesoft.org/schema/mule/tls" minOccurs="0" maxOccurs="1" ref="tls:context"></xs:element>
-                        <xs:element minOccurs="0" maxOccurs="1" name="closed-for-holidays">
-                            <xs:complexType>
-                                <xs:sequence>
-                                    <xs:element minOccurs="0" maxOccurs="unbounded" name="closed-for-holiday">
-                                        <xs:complexType>
-                                            <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionDateTime" use="required" name="value"></xs:attribute>
-                                        </xs:complexType>
-                                    </xs:element>
-                                </xs:sequence>
-                            </xs:complexType>
-                        </xs:element>
-                        <xs:element minOccurs="0" maxOccurs="1" name="discount-dates">
-                            <xs:complexType>
-                                <xs:sequence>
-                                    <xs:element minOccurs="0" maxOccurs="unbounded" name="discount-date">
-                                        <xs:complexType>
-                                            <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionDateTime" use="required" name="value"></xs:attribute>
-                                        </xs:complexType>
-                                    </xs:element>
-                                </xs:sequence>
-                            </xs:complexType>
-                        </xs:element>
-                    </xs:sequence>
-                    <xs:attribute type="xs:string" use="optional" name="tlsContext"></xs:attribute>
-                    <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString" use="required" name="username"></xs:attribute>
-                    <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString" use="required" name="password"></xs:attribute>
-                    <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionDateTime" use="optional" name="openingDate"></xs:attribute>
-                    <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionList" use="optional" name="closedForHolidays"></xs:attribute>
-                    <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionList" use="optional" name="discountDates"></xs:attribute>
-                    <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:substitutableBoolean" use="optional" name="disableValidation">
-                        <xs:annotation>
-                            <xs:documentation>Disables connection validation</xs:documentation>
-                        </xs:annotation>
-                    </xs:attribute>
-                </xs:extension>
-            </xs:complexContent>
-        </xs:complexType>
-    </xs:element>
-    <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" substitutionGroup="extension:abstractConnectionProvider" name="invalid-connection">
-        <xs:complexType>
-            <xs:complexContent>
-                <xs:extension base="extension:abstractConnectionProviderType">
-                    <xs:sequence minOccurs="0" maxOccurs="1">
-                        <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
-                        <xs:element xmlns:tls="http://www.mulesoft.org/schema/mule/tls" minOccurs="0" maxOccurs="1" ref="tls:context"></xs:element>
-                        <xs:element minOccurs="0" maxOccurs="1" name="closed-for-holidays">
-                            <xs:complexType>
-                                <xs:sequence>
-                                    <xs:element minOccurs="0" maxOccurs="unbounded" name="closed-for-holiday">
-                                        <xs:complexType>
-                                            <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionDateTime" use="required" name="value"></xs:attribute>
-                                        </xs:complexType>
-                                    </xs:element>
-                                </xs:sequence>
-                            </xs:complexType>
-                        </xs:element>
-                        <xs:element minOccurs="0" maxOccurs="1" name="discount-dates">
-                            <xs:complexType>
-                                <xs:sequence>
-                                    <xs:element minOccurs="0" maxOccurs="unbounded" name="discount-date">
-                                        <xs:complexType>
-                                            <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionDateTime" use="required" name="value"></xs:attribute>
-                                        </xs:complexType>
-                                    </xs:element>
-                                </xs:sequence>
-                            </xs:complexType>
-                        </xs:element>
-                    </xs:sequence>
-                    <xs:attribute type="xs:string" use="optional" name="tlsContext"></xs:attribute>
-                    <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString" use="required" name="username"></xs:attribute>
-                    <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString" use="required" name="password"></xs:attribute>
-                    <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionDateTime" use="optional" name="openingDate"></xs:attribute>
-                    <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionList" use="optional" name="closedForHolidays"></xs:attribute>
-                    <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionList" use="optional" name="discountDates"></xs:attribute>
-                </xs:extension>
-            </xs:complexContent>
-        </xs:complexType>
-    </xs:element>
-    <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" substitutionGroup="extension:abstractConnectionProvider" name="pooled-connection">
-        <xs:complexType>
-            <xs:complexContent>
-                <xs:extension base="extension:abstractConnectionProviderType">
-                    <xs:sequence minOccurs="0" maxOccurs="1">
-                        <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
-                        <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:pooling-profile"></xs:element>
-                        <xs:element xmlns:tls="http://www.mulesoft.org/schema/mule/tls" minOccurs="0" maxOccurs="1" ref="tls:context"></xs:element>
-                        <xs:element minOccurs="0" maxOccurs="1" name="closed-for-holidays">
-                            <xs:complexType>
-                                <xs:sequence>
-                                    <xs:element minOccurs="0" maxOccurs="unbounded" name="closed-for-holiday">
-                                        <xs:complexType>
-                                            <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionDateTime" use="required" name="value"></xs:attribute>
-                                        </xs:complexType>
-                                    </xs:element>
-                                </xs:sequence>
-                            </xs:complexType>
-                        </xs:element>
-                        <xs:element minOccurs="0" maxOccurs="1" name="discount-dates">
-                            <xs:complexType>
-                                <xs:sequence>
-                                    <xs:element minOccurs="0" maxOccurs="unbounded" name="discount-date">
-                                        <xs:complexType>
-                                            <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionDateTime" use="required" name="value"></xs:attribute>
-                                        </xs:complexType>
-                                    </xs:element>
-                                </xs:sequence>
-                            </xs:complexType>
-                        </xs:element>
-                    </xs:sequence>
-                    <xs:attribute type="xs:string" use="optional" name="tlsContext"></xs:attribute>
-                    <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString" use="required" name="username"></xs:attribute>
-                    <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString" use="required" name="password"></xs:attribute>
-                    <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionDateTime" use="optional" name="openingDate"></xs:attribute>
-                    <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionList" use="optional" name="closedForHolidays"></xs:attribute>
-                    <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionList" use="optional" name="discountDates"></xs:attribute>
-                    <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:substitutableBoolean" use="optional" name="disableValidation">
-                        <xs:annotation>
-                            <xs:documentation>Disables connection validation</xs:documentation>
-                        </xs:annotation>
-                    </xs:attribute>
-                </xs:extension>
-            </xs:complexContent>
-        </xs:complexType>
-    </xs:element>
-    <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" substitutionGroup="extension:abstractConnectionProvider" name="transactional-connection">
-        <xs:complexType>
-            <xs:complexContent>
-                <xs:extension base="extension:abstractConnectionProviderType">
-                    <xs:sequence minOccurs="0" maxOccurs="1">
-                        <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
-                        <xs:element xmlns:tls="http://www.mulesoft.org/schema/mule/tls" minOccurs="0" maxOccurs="1" ref="tls:context"></xs:element>
-                        <xs:element minOccurs="0" maxOccurs="1" name="closed-for-holidays">
-                            <xs:complexType>
-                                <xs:sequence>
-                                    <xs:element minOccurs="0" maxOccurs="unbounded" name="closed-for-holiday">
-                                        <xs:complexType>
-                                            <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionDateTime" use="required" name="value"></xs:attribute>
-                                        </xs:complexType>
-                                    </xs:element>
-                                </xs:sequence>
-                            </xs:complexType>
-                        </xs:element>
-                        <xs:element minOccurs="0" maxOccurs="1" name="discount-dates">
-                            <xs:complexType>
-                                <xs:sequence>
-                                    <xs:element minOccurs="0" maxOccurs="unbounded" name="discount-date">
-                                        <xs:complexType>
-                                            <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionDateTime" use="required" name="value"></xs:attribute>
-                                        </xs:complexType>
-                                    </xs:element>
-                                </xs:sequence>
-                            </xs:complexType>
-                        </xs:element>
-                    </xs:sequence>
-                    <xs:attribute type="xs:string" use="optional" name="tlsContext"></xs:attribute>
-                    <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString" use="required" name="username"></xs:attribute>
-                    <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString" use="required" name="password"></xs:attribute>
-                    <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionDateTime" use="optional" name="openingDate"></xs:attribute>
-                    <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionList" use="optional" name="closedForHolidays"></xs:attribute>
-                    <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionList" use="optional" name="discountDates"></xs:attribute>
-                </xs:extension>
-            </xs:complexContent>
-        </xs:complexType>
-    </xs:element>
-    <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" substitutionGroup="extension:abstractConnectionProvider" name="valid-connection">
-        <xs:complexType>
-            <xs:complexContent>
-                <xs:extension base="extension:abstractConnectionProviderType">
-                    <xs:sequence minOccurs="0" maxOccurs="1">
-                        <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
-                        <xs:element xmlns:tls="http://www.mulesoft.org/schema/mule/tls" minOccurs="0" maxOccurs="1" ref="tls:context"></xs:element>
-                        <xs:element minOccurs="0" maxOccurs="1" name="closed-for-holidays">
-                            <xs:complexType>
-                                <xs:sequence>
-                                    <xs:element minOccurs="0" maxOccurs="unbounded" name="closed-for-holiday">
-                                        <xs:complexType>
-                                            <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionDateTime" use="required" name="value"></xs:attribute>
-                                        </xs:complexType>
-                                    </xs:element>
-                                </xs:sequence>
-                            </xs:complexType>
-                        </xs:element>
-                        <xs:element minOccurs="0" maxOccurs="1" name="discount-dates">
-                            <xs:complexType>
-                                <xs:sequence>
-                                    <xs:element minOccurs="0" maxOccurs="unbounded" name="discount-date">
-                                        <xs:complexType>
-                                            <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionDateTime" use="required" name="value"></xs:attribute>
-                                        </xs:complexType>
-                                    </xs:element>
-                                </xs:sequence>
-                            </xs:complexType>
-                        </xs:element>
-                    </xs:sequence>
-                    <xs:attribute type="xs:string" use="optional" name="tlsContext"></xs:attribute>
-                    <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString" use="required" name="username"></xs:attribute>
-                    <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString" use="required" name="password"></xs:attribute>
-                    <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionDateTime" use="optional" name="openingDate"></xs:attribute>
-                    <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionList" use="optional" name="closedForHolidays"></xs:attribute>
-                    <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionList" use="optional" name="discountDates"></xs:attribute>
-                </xs:extension>
-            </xs:complexContent>
-        </xs:complexType>
-    </xs:element>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="SourceType" substitutionGroup="mule:abstract-message-source" name="source"></xs:element>
-    <xs:complexType name="SourceType">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
-                <xs:sequence minOccurs="0" maxOccurs="1">
-                    <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
-                    <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+  </xs:element>
+  <xs:complexType name="org.mule.test.petstore.extension.PetCage">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" name="birds">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="bird">
+                  <xs:complexType>
+                    <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
+                    <xs:attribute type="mule:expressionInt" use="required" name="value"></xs:attribute>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" name="ammenities">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="ammenity">
+                  <xs:complexType>
+                    <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element xmlns:tls="http://www.mulesoft.org/schema/mule/tls" minOccurs="0" maxOccurs="1" ref="tls:context"></xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:expressionMap" use="optional" name="birds"></xs:attribute>
+        <xs:attribute type="mule:expressionList" use="optional" name="ammenities"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="tlsContext"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" name="encoding"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore" type="petstore:org.mule.test.petstore.extension.PetCage" abstract="true" name="abstract-pet-cage"></xs:element>
+  <xs:element xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore" substitutionGroup="petstore:abstract-pet-cage" name="pet-cage">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="petstore:org.mule.test.petstore.extension.PetCage"></xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" substitutionGroup="extension:abstractConnectionProvider" name="connection">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="extension:abstractConnectionProviderType">
+          <xs:sequence minOccurs="0" maxOccurs="1">
+            <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+            <xs:element xmlns:tls="http://www.mulesoft.org/schema/mule/tls" minOccurs="0" maxOccurs="1" ref="tls:context"></xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="closed-for-holidays">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="closed-for-holiday">
+                    <xs:complexType>
+                      <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionDateTime" use="required" name="value"></xs:attribute>
+                    </xs:complexType>
+                  </xs:element>
                 </xs:sequence>
-                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
-                    <xs:annotation>
-                        <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-                <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="failOnStart"></xs:attribute>
-                <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="failOnException"></xs:attribute>
-                <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
-                    <xs:annotation>
-                        <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-                <xs:attribute type="mule:expressionString" use="optional" name="outputEncoding">
-                    <xs:annotation>
-                        <xs:documentation>The encoding of the payload that this operation outputs.</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="FailConnectionType" substitutionGroup="mule:abstract-operator" name="fail-connection"></xs:element>
-    <xs:complexType name="FailConnectionType">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
-                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
-                    <xs:annotation>
-                        <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="target">
-                    <xs:annotation>
-                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="FailOperationWithExceptionType" substitutionGroup="mule:abstract-operator" name="fail-operation-with-exception"></xs:element>
-    <xs:complexType name="FailOperationWithExceptionType">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
-                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
-                    <xs:annotation>
-                        <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="target">
-                    <xs:annotation>
-                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="FailOperationWithThrowableType" substitutionGroup="mule:abstract-operator" name="fail-operation-with-throwable"></xs:element>
-    <xs:complexType name="FailOperationWithThrowableType">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
-                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
-                    <xs:annotation>
-                        <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="target">
-                    <xs:annotation>
-                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetCageType" substitutionGroup="mule:abstract-operator" name="get-cage"></xs:element>
-    <xs:complexType name="GetCageType">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
-                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
-                    <xs:annotation>
-                        <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="target">
-                    <xs:annotation>
-                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetClientType" substitutionGroup="mule:abstract-operator" name="get-client"></xs:element>
-    <xs:complexType name="GetClientType">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
-                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
-                    <xs:annotation>
-                        <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="target">
-                    <xs:annotation>
-                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetClientOnLatchType" substitutionGroup="mule:abstract-operator" name="get-client-on-latch"></xs:element>
-    <xs:complexType name="GetClientOnLatchType">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
-                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
-                    <xs:annotation>
-                        <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-                <xs:attribute type="xs:string" use="required" name="countDownLatch"></xs:attribute>
-                <xs:attribute type="xs:string" use="required" name="latch"></xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="target">
-                    <xs:annotation>
-                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetPetsType" substitutionGroup="mule:abstract-operator" name="get-pets"></xs:element>
-    <xs:complexType name="GetPetsType">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
-                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
-                    <xs:annotation>
-                        <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-                <xs:attribute type="mule:expressionString" use="required" name="ownerName"></xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="target">
-                    <xs:annotation>
-                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="Pet-sourceType" substitutionGroup="mule:abstract-message-source" name="pet-source"></xs:element>
-    <xs:complexType name="Pet-sourceType">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
-                <xs:sequence minOccurs="0" maxOccurs="1">
-                    <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
-                    <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="discount-dates">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="discount-date">
+                    <xs:complexType>
+                      <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionDateTime" use="required" name="value"></xs:attribute>
+                    </xs:complexType>
+                  </xs:element>
                 </xs:sequence>
-                <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
-                    <xs:annotation>
-                        <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-                <xs:attribute type="mule:expressionString" use="optional" name="outputEncoding">
-                    <xs:annotation>
-                        <xs:documentation>The encoding of the payload that this operation outputs.</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-                <xs:attribute type="mule:expressionString" use="optional" name="mammals"></xs:attribute>
-                <xs:attribute type="mule:expressionString" use="optional" name="birds"></xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute type="xs:string" use="optional" name="tlsContext"></xs:attribute>
+          <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString" use="required" name="username"></xs:attribute>
+          <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString" use="required" name="password"></xs:attribute>
+          <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionDateTime" use="optional" name="openingDate"></xs:attribute>
+          <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionList" use="optional" name="closedForHolidays"></xs:attribute>
+          <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionList" use="optional" name="discountDates"></xs:attribute>
+          <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:substitutableBoolean" use="optional" name="disableValidation">
+            <xs:annotation>
+              <xs:documentation>Disables connection validation</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="DescribeSerializedAnimalType" substitutionGroup="mule:abstract-operator" name="describe-serialized-animal"></xs:element>
-    <xs:complexType name="DescribeSerializedAnimalType">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
-                <xs:attribute type="xs:string" use="required" name="animal"></xs:attribute>
-                <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
-                    <xs:annotation>
-                        <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-                <xs:attribute type="mule:expressionString" use="optional" name="outputEncoding">
-                    <xs:annotation>
-                        <xs:documentation>The encoding of the payload that this operation outputs.</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="target">
-                    <xs:annotation>
-                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="FailType" substitutionGroup="mule:abstract-operator" name="fail"></xs:element>
-    <xs:complexType name="FailType">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence minOccurs="0" maxOccurs="1">
-                    <xs:element minOccurs="0" maxOccurs="1" name="pet-names">
-                        <xs:complexType>
-                            <xs:sequence>
-                                <xs:element minOccurs="0" maxOccurs="unbounded" name="pet-name">
-                                    <xs:complexType>
-                                        <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
-                                        <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
-                                    </xs:complexType>
-                                </xs:element>
-                            </xs:sequence>
-                        </xs:complexType>
-                    </xs:element>
+  </xs:element>
+  <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" substitutionGroup="extension:abstractConnectionProvider" name="invalid-connection">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="extension:abstractConnectionProviderType">
+          <xs:sequence minOccurs="0" maxOccurs="1">
+            <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+            <xs:element xmlns:tls="http://www.mulesoft.org/schema/mule/tls" minOccurs="0" maxOccurs="1" ref="tls:context"></xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="closed-for-holidays">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="closed-for-holiday">
+                    <xs:complexType>
+                      <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionDateTime" use="required" name="value"></xs:attribute>
+                    </xs:complexType>
+                  </xs:element>
                 </xs:sequence>
-                <xs:attribute type="mule:expressionMap" use="optional" name="petNames"></xs:attribute>
-                <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
-                    <xs:annotation>
-                        <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-                <xs:attribute type="mule:expressionString" use="optional" name="outputEncoding">
-                    <xs:annotation>
-                        <xs:documentation>The encoding of the payload that this operation outputs.</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="target">
-                    <xs:annotation>
-                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetBreederType" substitutionGroup="mule:abstract-operator" name="get-breeder"></xs:element>
-    <xs:complexType name="GetBreederType">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
-                <xs:attribute type="mule:expressionString" use="optional" name="mammals"></xs:attribute>
-                <xs:attribute type="mule:expressionString" use="optional" name="birds"></xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="target">
-                    <xs:annotation>
-                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetCashierType" substitutionGroup="mule:abstract-operator" name="get-cashier"></xs:element>
-    <xs:complexType name="GetCashierType">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
-                <xs:attribute type="mule:expressionString" use="required" name="cashierName"></xs:attribute>
-                <xs:attribute type="mule:expressionString" use="optional" name="rothIRA"></xs:attribute>
-                <xs:attribute type="mule:expressionString" use="optional" name="pensionPlan"></xs:attribute>
-                <xs:attribute type="mule:expressionInt" use="optional" name="cash"></xs:attribute>
-                <xs:attribute type="mule:expressionInt" use="optional" name="debt"></xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="target">
-                    <xs:annotation>
-                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetDefaultEncodingType" substitutionGroup="mule:abstract-operator" name="get-default-encoding"></xs:element>
-    <xs:complexType name="GetDefaultEncodingType">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence minOccurs="0" maxOccurs="1">
-                    <xs:element minOccurs="0" maxOccurs="1" name="phone-number">
-                        <xs:complexType>
-                            <xs:complexContent>
-                                <xs:extension xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore" base="petstore:org.mule.test.petstore.extension.PhoneNumber"></xs:extension>
-                            </xs:complexContent>
-                        </xs:complexType>
-                    </xs:element>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="discount-dates">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="discount-date">
+                    <xs:complexType>
+                      <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionDateTime" use="required" name="value"></xs:attribute>
+                    </xs:complexType>
+                  </xs:element>
                 </xs:sequence>
-                <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="usePhoneNumber"></xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="phoneNumber"></xs:attribute>
-                <xs:attribute type="mule:expressionString" use="optional" name="encoding"></xs:attribute>
-                <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
-                    <xs:annotation>
-                        <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-                <xs:attribute type="mule:expressionString" use="optional" name="outputEncoding">
-                    <xs:annotation>
-                        <xs:documentation>The encoding of the payload that this operation outputs.</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="target">
-                    <xs:annotation>
-                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute type="xs:string" use="optional" name="tlsContext"></xs:attribute>
+          <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString" use="required" name="username"></xs:attribute>
+          <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString" use="required" name="password"></xs:attribute>
+          <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionDateTime" use="optional" name="openingDate"></xs:attribute>
+          <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionList" use="optional" name="closedForHolidays"></xs:attribute>
+          <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionList" use="optional" name="discountDates"></xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetFishFromRiverStreamType" substitutionGroup="mule:abstract-operator" name="get-fish-from-river-stream"></xs:element>
-    <xs:complexType name="GetFishFromRiverStreamType">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence minOccurs="0" maxOccurs="1">
-                    <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="river"></xs:element>
+  </xs:element>
+  <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" substitutionGroup="extension:abstractConnectionProvider" name="pooled-connection">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="extension:abstractConnectionProviderType">
+          <xs:sequence minOccurs="0" maxOccurs="1">
+            <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+            <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:pooling-profile"></xs:element>
+            <xs:element xmlns:tls="http://www.mulesoft.org/schema/mule/tls" minOccurs="0" maxOccurs="1" ref="tls:context"></xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="closed-for-holidays">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="closed-for-holiday">
+                    <xs:complexType>
+                      <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionDateTime" use="required" name="value"></xs:attribute>
+                    </xs:complexType>
+                  </xs:element>
                 </xs:sequence>
-                <xs:attribute type="xs:string" use="optional" name="pollutedStream"></xs:attribute>
-                <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
-                    <xs:annotation>
-                        <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-                <xs:attribute type="mule:expressionString" use="optional" name="outputEncoding">
-                    <xs:annotation>
-                        <xs:documentation>The encoding of the payload that this operation outputs.</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="target">
-                    <xs:annotation>
-                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetForbiddenPetsType" substitutionGroup="mule:abstract-operator" name="get-forbidden-pets"></xs:element>
-    <xs:complexType name="GetForbiddenPetsType">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence minOccurs="0" maxOccurs="1">
-                    <xs:element minOccurs="0" maxOccurs="1" name="forbidden-pets">
-                        <xs:complexType>
-                            <xs:sequence>
-                                <xs:element minOccurs="0" maxOccurs="unbounded" name="forbidden-pet">
-                                    <xs:complexType>
-                                        <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/petstore" type="org.mule.test.petstore.extension.PetEnumType" use="required" name="value"></xs:attribute>
-                                    </xs:complexType>
-                                </xs:element>
-                            </xs:sequence>
-                        </xs:complexType>
-                    </xs:element>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="discount-dates">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="discount-date">
+                    <xs:complexType>
+                      <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionDateTime" use="required" name="value"></xs:attribute>
+                    </xs:complexType>
+                  </xs:element>
                 </xs:sequence>
-                <xs:attribute type="mule:expressionList" use="optional" name="forbiddenPets"></xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="target">
-                    <xs:annotation>
-                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute type="xs:string" use="optional" name="tlsContext"></xs:attribute>
+          <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString" use="required" name="username"></xs:attribute>
+          <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString" use="required" name="password"></xs:attribute>
+          <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionDateTime" use="optional" name="openingDate"></xs:attribute>
+          <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionList" use="optional" name="closedForHolidays"></xs:attribute>
+          <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionList" use="optional" name="discountDates"></xs:attribute>
+          <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:substitutableBoolean" use="optional" name="disableValidation">
+            <xs:annotation>
+              <xs:documentation>Disables connection validation</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="MakePhoneCallType" substitutionGroup="mule:abstract-operator" name="make-phone-call"></xs:element>
-    <xs:complexType name="MakePhoneCallType">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence minOccurs="0" maxOccurs="1">
-                    <xs:element minOccurs="0" maxOccurs="1" name="phone-number">
-                        <xs:complexType>
-                            <xs:complexContent>
-                                <xs:extension xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore" base="petstore:org.mule.test.petstore.extension.PhoneNumber"></xs:extension>
-                            </xs:complexContent>
-                        </xs:complexType>
-                    </xs:element>
+  </xs:element>
+  <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" substitutionGroup="extension:abstractConnectionProvider" name="transactional-connection">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="extension:abstractConnectionProviderType">
+          <xs:sequence minOccurs="0" maxOccurs="1">
+            <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+            <xs:element xmlns:tls="http://www.mulesoft.org/schema/mule/tls" minOccurs="0" maxOccurs="1" ref="tls:context"></xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="closed-for-holidays">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="closed-for-holiday">
+                    <xs:complexType>
+                      <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionDateTime" use="required" name="value"></xs:attribute>
+                    </xs:complexType>
+                  </xs:element>
                 </xs:sequence>
-                <xs:attribute type="xs:string" use="optional" name="phoneNumber"></xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="SetSecureCageType" substitutionGroup="mule:abstract-operator" name="set-secure-cage"></xs:element>
-    <xs:complexType name="SetSecureCageType">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence minOccurs="0" maxOccurs="1">
-                    <xs:element minOccurs="0" maxOccurs="1" name="providers">
-                        <xs:complexType>
-                            <xs:sequence>
-                                <xs:element minOccurs="0" maxOccurs="unbounded" name="provider">
-                                    <xs:complexType>
-                                        <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
-                                    </xs:complexType>
-                                </xs:element>
-                            </xs:sequence>
-                        </xs:complexType>
-                    </xs:element>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="discount-dates">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="discount-date">
+                    <xs:complexType>
+                      <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionDateTime" use="required" name="value"></xs:attribute>
+                    </xs:complexType>
+                  </xs:element>
                 </xs:sequence>
-                <xs:attribute type="mule:expressionList" use="optional" name="providers"></xs:attribute>
-                <xs:attribute type="mule:expressionString" use="required" name="user"></xs:attribute>
-                <xs:attribute type="mule:expressionString" use="required" name="pass"></xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute type="xs:string" use="optional" name="tlsContext"></xs:attribute>
+          <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString" use="required" name="username"></xs:attribute>
+          <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString" use="required" name="password"></xs:attribute>
+          <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionDateTime" use="optional" name="openingDate"></xs:attribute>
+          <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionList" use="optional" name="closedForHolidays"></xs:attribute>
+          <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionList" use="optional" name="discountDates"></xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
     </xs:complexType>
-    <xs:simpleType name="org.mule.test.petstore.extension.PetEnumType">
-        <xs:union>
-            <xs:simpleType>
-                <xs:restriction base="xs:string">
-                    <xs:enumeration value="DOG"></xs:enumeration>
-                    <xs:enumeration value="CAT"></xs:enumeration>
-                    <xs:enumeration value="FISH"></xs:enumeration>
-                </xs:restriction>
-            </xs:simpleType>
-            <xs:simpleType>
-                <xs:restriction xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:propertyPlaceholderType"></xs:restriction>
-            </xs:simpleType>
-        </xs:union>
-    </xs:simpleType>
+  </xs:element>
+  <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" substitutionGroup="extension:abstractConnectionProvider" name="valid-connection">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="extension:abstractConnectionProviderType">
+          <xs:sequence minOccurs="0" maxOccurs="1">
+            <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+            <xs:element xmlns:tls="http://www.mulesoft.org/schema/mule/tls" minOccurs="0" maxOccurs="1" ref="tls:context"></xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="closed-for-holidays">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="closed-for-holiday">
+                    <xs:complexType>
+                      <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionDateTime" use="required" name="value"></xs:attribute>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="discount-dates">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="discount-date">
+                    <xs:complexType>
+                      <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionDateTime" use="required" name="value"></xs:attribute>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute type="xs:string" use="optional" name="tlsContext"></xs:attribute>
+          <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString" use="required" name="username"></xs:attribute>
+          <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString" use="required" name="password"></xs:attribute>
+          <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionDateTime" use="optional" name="openingDate"></xs:attribute>
+          <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionList" use="optional" name="closedForHolidays"></xs:attribute>
+          <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionList" use="optional" name="discountDates"></xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="SourceType" substitutionGroup="mule:abstract-message-source" name="source"></xs:element>
+  <xs:complexType name="SourceType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="failOnStart"></xs:attribute>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="failOnException"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
+          <xs:annotation>
+            <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="FailConnectionType" substitutionGroup="mule:abstract-operator" name="fail-connection"></xs:element>
+  <xs:complexType name="FailConnectionType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="FailOperationWithExceptionType" substitutionGroup="mule:abstract-operator" name="fail-operation-with-exception"></xs:element>
+  <xs:complexType name="FailOperationWithExceptionType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="FailOperationWithThrowableType" substitutionGroup="mule:abstract-operator" name="fail-operation-with-throwable"></xs:element>
+  <xs:complexType name="FailOperationWithThrowableType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetCageType" substitutionGroup="mule:abstract-operator" name="get-cage"></xs:element>
+  <xs:complexType name="GetCageType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetClientType" substitutionGroup="mule:abstract-operator" name="get-client"></xs:element>
+  <xs:complexType name="GetClientType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetClientOnLatchType" substitutionGroup="mule:abstract-operator" name="get-client-on-latch"></xs:element>
+  <xs:complexType name="GetClientOnLatchType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="countDownLatch"></xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="latch"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetPetsType" substitutionGroup="mule:abstract-operator" name="get-pets"></xs:element>
+  <xs:complexType name="GetPetsType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="required" name="ownerName"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="Pet-sourceType" substitutionGroup="mule:abstract-message-source" name="pet-source"></xs:element>
+  <xs:complexType name="Pet-sourceType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
+          <xs:annotation>
+            <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" name="mammals"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" name="birds"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="DescribeSerializedAnimalType" substitutionGroup="mule:abstract-operator" name="describe-serialized-animal"></xs:element>
+  <xs:complexType name="DescribeSerializedAnimalType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:attribute type="xs:string" use="required" name="animal"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
+          <xs:annotation>
+            <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="FailType" substitutionGroup="mule:abstract-operator" name="fail"></xs:element>
+  <xs:complexType name="FailType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" name="pet-names">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="pet-name">
+                  <xs:complexType>
+                    <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
+                    <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:expressionMap" use="optional" name="petNames"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
+          <xs:annotation>
+            <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetBreederType" substitutionGroup="mule:abstract-operator" name="get-breeder"></xs:element>
+  <xs:complexType name="GetBreederType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:attribute type="mule:expressionString" use="optional" name="mammals"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" name="birds"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetCashierType" substitutionGroup="mule:abstract-operator" name="get-cashier"></xs:element>
+  <xs:complexType name="GetCashierType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="cashierName"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" name="rothIRA"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" name="pensionPlan"></xs:attribute>
+        <xs:attribute type="mule:expressionInt" use="optional" name="cash"></xs:attribute>
+        <xs:attribute type="mule:expressionInt" use="optional" name="debt"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetDefaultEncodingType" substitutionGroup="mule:abstract-operator" name="get-default-encoding"></xs:element>
+  <xs:complexType name="GetDefaultEncodingType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" name="phone-number">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore" base="petstore:org.mule.test.petstore.extension.PhoneNumber"></xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="usePhoneNumber"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="phoneNumber"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" name="encoding"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
+          <xs:annotation>
+            <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetFishFromRiverStreamType" substitutionGroup="mule:abstract-operator" name="get-fish-from-river-stream"></xs:element>
+  <xs:complexType name="GetFishFromRiverStreamType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="river"></xs:element>
+        </xs:sequence>
+        <xs:attribute type="xs:string" use="optional" name="pollutedStream"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
+          <xs:annotation>
+            <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetForbiddenPetsType" substitutionGroup="mule:abstract-operator" name="get-forbidden-pets"></xs:element>
+  <xs:complexType name="GetForbiddenPetsType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" name="forbidden-pets">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="forbidden-pet">
+                  <xs:complexType>
+                    <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/petstore" type="org.mule.test.petstore.extension.PetEnumType" use="required" name="value"></xs:attribute>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:expressionList" use="optional" name="forbiddenPets"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="MakePhoneCallType" substitutionGroup="mule:abstract-operator" name="make-phone-call"></xs:element>
+  <xs:complexType name="MakePhoneCallType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" name="phone-number">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore" base="petstore:org.mule.test.petstore.extension.PhoneNumber"></xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="xs:string" use="optional" name="phoneNumber"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="SetSecureCageType" substitutionGroup="mule:abstract-operator" name="set-secure-cage"></xs:element>
+  <xs:complexType name="SetSecureCageType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" name="providers">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="provider">
+                  <xs:complexType>
+                    <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:expressionList" use="optional" name="providers"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="required" name="user"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="required" name="pass"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:simpleType name="org.mule.test.petstore.extension.PetEnumType">
+    <xs:union>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="DOG"></xs:enumeration>
+          <xs:enumeration value="CAT"></xs:enumeration>
+          <xs:enumeration value="FISH"></xs:enumeration>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType>
+        <xs:restriction xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:propertyPlaceholderType"></xs:restriction>
+      </xs:simpleType>
+    </xs:union>
+  </xs:simpleType>
 </xs:schema>
