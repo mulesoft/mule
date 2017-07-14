@@ -8,9 +8,12 @@ package org.mule.module.oauth2.internal.authorizationcode.functional;
 
 import static org.junit.Assert.assertThat;
 
+import org.mule.api.registry.RegistrationException;
 import org.mule.module.oauth2.internal.OAuthConstants;
 import org.mule.module.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
 import org.mule.module.oauth2.internal.tokenmanager.TokenManagerConfig;
+
+import java.io.IOException;
 
 import org.apache.http.client.fluent.Request;
 import org.hamcrest.core.Is;
@@ -27,10 +30,39 @@ public class AuthorizationCodeNoTokenManagerConfigTestCase extends AbstractAutho
     }
 
     @Test
-    public void hitRedirectUrlAndGetToken() throws Exception
+    public void obtainTokenWithoutSpaces() throws Exception
     {
-        configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantType();
+        configureWireMockWithSeparator("");
 
+        hitRedirectUrlAndGetToken();
+    }
+
+    @Test
+    public void obtainTokenWithSpaces() throws Exception
+    {
+        configureWireMockWithSeparator(" ");
+
+        hitRedirectUrlAndGetToken();
+    }
+
+    @Test
+    public void obtainTokenWithTabs() throws Exception
+    {
+        configureWireMockWithSeparator("\t");
+
+        hitRedirectUrlAndGetToken();
+    }
+
+    @Test
+    public void obtainTokenWithNewlines() throws Exception
+    {
+        configureWireMockWithSeparator("\n");
+
+        hitRedirectUrlAndGetToken();
+    }
+
+    private void hitRedirectUrlAndGetToken() throws IOException, RegistrationException
+    {
         Request.Get(redirectUrl.getValue() + "?" + OAuthConstants.CODE_PARAMETER + "=" + AUTHENTICATION_CODE)
                 .connectTimeout(REQUEST_TIMEOUT)
                 .socketTimeout(REQUEST_TIMEOUT)
@@ -46,4 +78,9 @@ public class AuthorizationCodeNoTokenManagerConfigTestCase extends AbstractAutho
         assertThat(oauthContext.getRefreshToken(), Is.is(REFRESH_TOKEN));
     }
 
+    private void configureWireMockWithSeparator(String separator)
+    {
+        String body = createBodyWithSeparator(ACCESS_TOKEN, REFRESH_TOKEN, EXPIRES_IN, separator);
+        configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantTypeWithBody(body);
+    }
 }
