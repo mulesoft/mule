@@ -189,15 +189,7 @@ public class HttpResponseToMuleEvent
 
     private Map<String, DataHandler> getInboundAttachments(InputStream responseInputStream, String responseContentType) throws IOException
     {
-        Collection<HttpPartDataSource> httpParts = HttpPartDataSource.createFrom(HttpParser.parseMultipartContent(responseInputStream, responseContentType));
-        Map<String, DataHandler> attachments = new HashMap<>();
-
-        for (HttpPartDataSource httpPart : httpParts)
-        {
-            attachments.put(httpPart.getName(), new DataHandler(httpPart));
-        }
-
-        return attachments;
+        return HttpPartDataSource.createDataHandlerFrom(HttpParser.parseMultipartContent(responseInputStream, responseContentType));
     }
 
     /**

@@ -6,6 +6,7 @@
  */
 package org.mule.module.http.functional.requester;
 
+import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -31,6 +32,11 @@ import org.junit.Test;
 public class HttpRequestInboundAttachmentsTestCase extends AbstractHttpRequestTestCase
 {
 
+    private static final String FORM_DATA = "form-data";
+    private static final String MIXED = "mixed";
+
+    private String subType;
+
     @Override
     protected String getConfigFile()
     {
@@ -38,8 +44,10 @@ public class HttpRequestInboundAttachmentsTestCase extends AbstractHttpRequestTe
     }
 
     @Test
-    public void processInboundAttachments() throws Exception
+    public void processInboundFormDataAttachments() throws Exception
     {
+        subType = FORM_DATA;
+
         Flow flow = (Flow) getFlowConstruct("requestFlow");
 
         MuleEvent event = flow.process(getTestEvent(TEST_MESSAGE));
@@ -51,6 +59,25 @@ public class HttpRequestInboundAttachmentsTestCase extends AbstractHttpRequestTe
         assertAttachment(event.getMessage(), "partName2", "Test part 2", "text/html");
 
         HttpPartDataSource part2Source = (HttpPartDataSource) event.getMessage().getInboundAttachment("partName2").getDataSource();
+        assertThat(part2Source.getHeader("Custom-Header"), equalTo("custom"));
+    }
+
+    @Test
+    public void processInboundMixedAttachments() throws Exception
+    {
+        subType = MIXED;
+
+        Flow flow = (Flow) getFlowConstruct("requestFlow");
+
+        MuleEvent event = flow.process(getTestEvent(TEST_MESSAGE));
+
+        assertThat(event.getMessage().getPayload(), is(instanceOf(NullPayload.class)));
+
+        assertThat(event.getMessage().getInboundAttachmentNames().size(), is(2));
+        assertAttachment(event.getMessage(), "mule_attachment_0", "Test part 1", "text/plain");
+        assertAttachment(event.getMessage(), "mule_attachment_1", "Test part 2", "text/html");
+
+        HttpPartDataSource part2Source = (HttpPartDataSource) event.getMessage().getInboundAttachment("mule_attachment_1").getDataSource();
         assertThat(part2Source.getHeader("Custom-Header"), equalTo("custom"));
     }
 
@@ -68,17 +95,31 @@ public class HttpRequestInboundAttachmentsTestCase extends AbstractHttpRequestTe
     {
         MultiPartWriter multiPartWriter = new MultiPartWriter(response.getWriter());
 
-        response.setContentType("multipart/form-data; boundary=" + multiPartWriter.getBoundary());
+        response.setContentType(format("multipart/%s; boundary=%s", subType, multiPartWriter.getBoundary()));
         response.setStatus(HttpServletResponse.SC_OK);
 
-        multiPartWriter.startPart("text/plain", new String[] { "Content-Disposition: form-data; name=\"partName1\"" });
+        String[] firstPartHeaders;
+        String[] secondPartHeaders;
+
+        if (FORM_DATA.equals(subType))
+        {
+            firstPartHeaders = new String[] { "Content-Disposition: form-data; name=\"partName1\"" };
+            secondPartHeaders = new String[] {
+              "Content-Disposition: form-data; name=\"partName2\"",
+              "Custom-Header: custom"
+            };
+        }
+        else
+        {
+            firstPartHeaders = new String[] {};
+            secondPartHeaders = new String[] { "Custom-Header: custom" };
+        }
+
+        multiPartWriter.startPart("text/plain", firstPartHeaders);
         multiPartWriter.write("Test part 1");
         multiPartWriter.endPart();
 
-        multiPartWriter.startPart("text/html", new String[] {
-            "Content-Disposition: form-data; name=\"partName2\"",
-            "Custom-Header: custom"
-        });
+        multiPartWriter.startPart("text/html", secondPartHeaders);
         multiPartWriter.write("Test part 2");
         multiPartWriter.endPart();
 
