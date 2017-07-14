@@ -552,8 +552,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withTypeDefinition(fromType(MuleConfiguration.class)).withObjectFactoryType(MuleConfigurationConfigurator.class)
         .withSetterParameterDefinition("defaultErrorHandlerName",
                                        fromSimpleParameter("defaultErrorHandler-ref").build())
-        .withSetterParameterDefinition("defaultProcessingStrategy",
-                                       fromSimpleReferenceParameter("defaultProcessingStrategy").build())
         .withSetterParameterDefinition("defaultResponseTimeout", fromSimpleParameter("defaultResponseTimeout").build())
         .withSetterParameterDefinition("maxQueueTransactionFilesSize",
                                        fromSimpleParameter("maxQueueTransactionFilesSize").build())
