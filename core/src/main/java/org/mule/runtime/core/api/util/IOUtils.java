@@ -191,6 +191,18 @@ public class IOUtils {
   }
 
   /**
+   * This method wraps {@link org.apache.commons.io.IOUtils}' <code>toString(InputStream, String)</code> method but catches any
+   * {@link IOException} and wraps it into a {@link RuntimeException}.
+   */
+  public static String toString(InputStream input, String encoding) {
+    try {
+      return org.apache.commons.io.IOUtils.toString(input, encoding);
+    } catch (IOException iox) {
+      throw new RuntimeException(iox);
+    }
+  }
+
+  /**
    * Similar to {@link #toByteArray(InputStream)} but obtaining the stream from the given
    * {@code cursorStreamProvider}
    */
@@ -231,7 +243,15 @@ public class IOUtils {
    * polymorphism for static methods, but rather just direct use of these two methods.
    */
   public static long copyLarge(InputStream input, OutputStream output) throws IOException {
-    byte[] buffer = new byte[bufferSize];
+    return copyLarge(input, output, bufferSize);
+  }
+
+  /**
+   * Re-implement copy method to allow buffer size to be configured. This won't impact all methods because there is no
+   * polymorphism for static methods, but rather just direct use of these two methods.
+   */
+  public static long copyLarge(Reader input, Writer output) throws IOException {
+    char[] buffer = new char[bufferSize];
     long count = 0;
     int n = 0;
     while (-1 != (n = input.read(buffer))) {
@@ -242,11 +262,11 @@ public class IOUtils {
   }
 
   /**
-   * Re-implement copy method to allow buffer size to be configured. This won't impact all methods because there is no
-   * polymorphism for static methods, but rather just direct use of these two methods.
+   * Copies the data read from the {@link InputStream} into the {@link OutputStream}
+   * using a buffer of size {@code bufferSize}
    */
-  public static long copyLarge(Reader input, Writer output) throws IOException {
-    char[] buffer = new char[bufferSize];
+  public static long copyLarge(InputStream input, OutputStream output, int bufferSize) throws IOException {
+    byte[] buffer = new byte[bufferSize];
     long count = 0;
     int n = 0;
     while (-1 != (n = input.read(buffer))) {
