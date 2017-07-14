@@ -9233,9 +9233,10 @@
           "isAbstract": false,
           "isFinal": false,
           "implementedInterfaces": [
+            "java.io.Serializable",
             "org.mule.test.metadata.extension.model.attribute.AbstractOutputAttributes"
           ],
-          "parent": "org.mule.runtime.core.api.message.BaseAttributes",
+          "parent": "",
           "genericTypes": []
         },
         "xmlHints": {
@@ -9287,9 +9288,10 @@
           "isAbstract": false,
           "isFinal": false,
           "implementedInterfaces": [
+            "java.io.Serializable",
             "org.mule.test.metadata.extension.model.attribute.AbstractOutputAttributes"
           ],
-          "parent": "org.mule.runtime.core.api.message.BaseAttributes",
+          "parent": "",
           "genericTypes": []
         },
         "xmlHints": {
