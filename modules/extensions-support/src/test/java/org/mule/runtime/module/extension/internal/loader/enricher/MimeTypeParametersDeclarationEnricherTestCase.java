@@ -220,12 +220,10 @@ public class MimeTypeParametersDeclarationEnricherTestCase extends AbstractMuleT
   public class TestNoGenericsSource extends Source {
 
     @Override
-    public void onStart(SourceCallback sourceCallback) throws MuleException {
-    }
+    public void onStart(SourceCallback sourceCallback) throws MuleException {}
 
     @Override
-    public void onStop() {
-    }
+    public void onStop() {}
   }
 
   private List<ParameterDeclaration> getGroupParameters(ComponentDeclaration declaration) {

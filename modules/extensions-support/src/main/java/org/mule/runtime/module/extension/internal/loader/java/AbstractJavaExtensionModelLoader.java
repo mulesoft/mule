@@ -84,6 +84,7 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
                                                                                                new ConnectionDeclarationEnricher(),
                                                                                                new ErrorsDeclarationEnricher(),
                                                                                                new ExtensionsErrorsDeclarationEnricher(),
+                                                                                               //TODO: MOVE TO EXT_API when https://www.mulesoft.org/jira/browse/MULE-13070
                                                                                                new MimeTypeParametersDeclarationEnricher(),
                                                                                                new DisplayDeclarationEnricher(),
                                                                                                new DynamicMetadataDeclarationEnricher(),
