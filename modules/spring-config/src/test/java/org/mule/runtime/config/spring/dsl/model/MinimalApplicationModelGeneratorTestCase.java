@@ -302,10 +302,12 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
     configFiles.stream().forEach(configFile -> builder.addConfigFile(configFile));
     final ArtifactConfig artifactConfig = builder.build();
     ResourceProvider externalResourceProvider = new ClassLoaderResourceProvider(Thread.currentThread().getContextClassLoader());
-    return new MinimalApplicationModelGenerator(new ApplicationModel(artifactConfig, new ArtifactDeclaration(), emptySet(),
-                                                                     emptyMap(), empty(),
-                                                                     Optional.of(componentBuildingDefinitionRegistry), true,
-                                                                     externalResourceProvider),
+    final ApplicationModel applicationModel = new ApplicationModel(artifactConfig, new ArtifactDeclaration(), emptySet(),
+                                                                   emptyMap(), empty(),
+                                                                   Optional.of(componentBuildingDefinitionRegistry), true,
+                                                                   externalResourceProvider);
+    applicationModel.executeOnEveryComponentTree(componentModel -> componentModel.setEnabled(false));
+    return new MinimalApplicationModelGenerator(applicationModel,
                                                 componentBuildingDefinitionRegistry);
   }
 

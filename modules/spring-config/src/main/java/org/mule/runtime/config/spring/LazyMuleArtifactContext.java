@@ -28,14 +28,15 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigResource;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 
 /**
  * Implementation of {@link MuleArtifactContext} that allows to create configuration components lazily.
@@ -71,6 +72,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
       throws BeansException {
     super(muleContext, artifactConfigResources, artifactDeclaration, optionalObjectsController, artifactProperties,
           artifactType, pluginsClassLoaders, parentConfigurationProperties);
+    this.applicationModel.executeOnEveryMuleComponentTree(componentModel -> componentModel.setEnabled(false));
   }
 
   @Override
@@ -137,7 +139,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
         }
       });
     }
-    applicationModel.executeOnEveryMuleComponentTree(componentModel -> componentModel.setEnabled(true));
+    applicationModel.executeOnEveryMuleComponentTree(componentModel -> componentModel.setEnabled(false));
   }
 
   @Override
