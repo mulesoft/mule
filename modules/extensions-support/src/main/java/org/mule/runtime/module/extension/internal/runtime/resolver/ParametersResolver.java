@@ -192,6 +192,7 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
       if (parameters.containsKey(parameterName)) {
         resolver = toValueResolver(parameters.get(parameterName), p.getModelProperties());
       } else {
+        // TODO MULE-13066
         resolver =
             getDefaultValueResolver(p.getModelProperty(DefaultEncodingModelProperty.class).isPresent(), muleContext, () -> {
               Object defaultValue = p.getDefaultValue();

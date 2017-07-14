@@ -6,6 +6,21 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
+import static java.lang.String.format;
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.joining;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.mule.metadata.api.model.MetadataFormat.JAVA;
+import static org.mule.metadata.api.utils.MetadataTypeUtils.getDefaultValue;
+import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isFlattenedParameterGroup;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.getDefaultValueResolver;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.getFieldDefaultValueValueResolver;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAlias;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFields;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.ArrayType;
@@ -29,22 +44,6 @@ import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBu
 
 import java.lang.reflect.Field;
 import java.util.Optional;
-
-import static java.lang.String.format;
-import static java.util.Collections.emptyList;
-import static java.util.stream.Collectors.joining;
-import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.mule.metadata.api.model.MetadataFormat.JAVA;
-import static org.mule.metadata.api.utils.MetadataTypeUtils.getDefaultValue;
-import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isFlattenedParameterGroup;
-import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.getDefaultValueResolver;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.getFieldDefaultValueValueResolver;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAlias;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFields;
 
 /**
  * A {@link ValueResolver} wrapper which generates and returns default instances if the {@link #delegate} returns {@code null}.
@@ -112,6 +111,7 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
           }
 
           Optional<String> defaultValue = getDefaultValue(objectField);
+          // TODO MULE-13066
           if (defaultValue.isPresent() || field.getAnnotation(DefaultEncoding.class) != null) {
             resolver = getDefaultValueResolver(field.getAnnotation(DefaultEncoding.class) != null, muleContext,
                                                () -> getFieldDefaultValueValueResolver(objectField, muleContext));

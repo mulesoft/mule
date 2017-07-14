@@ -6,6 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
+import static org.mule.metadata.api.utils.MetadataTypeUtils.getDefaultValue;
+import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isParameterResolver;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isTypedValue;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -18,12 +23,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
-
-import static org.mule.metadata.api.utils.MetadataTypeUtils.getDefaultValue;
-import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isParameterResolver;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isTypedValue;
 
 /**
  * Utility class to share common behaviour between resolvers
@@ -76,6 +75,7 @@ public class ResolverUtils {
    */
   static ValueResolver<?> getDefaultValueResolver(boolean hasDefaultEncoding, MuleContext muleContext,
                                                   Supplier<ValueResolver<?>> supplier) {
+    // TODO MULE-13066
     return hasDefaultEncoding ? new StaticValueResolver<>(muleContext.getConfiguration().getDefaultEncoding()) : supplier.get();
   }
 
