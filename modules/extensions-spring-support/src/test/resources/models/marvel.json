@@ -197,7 +197,6 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 2,
                     "tabName": "Advanced"
                   },
                   "elementReferences": [],
@@ -734,7 +733,6 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 3,
                     "tabName": "Advanced"
                   },
                   "elementReferences": [],
@@ -880,7 +878,6 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 2,
                     "tabName": "Advanced"
                   },
                   "elementReferences": [],
@@ -910,7 +907,6 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 3,
                     "tabName": "Advanced"
                   },
                   "elementReferences": [],
@@ -1624,7 +1620,6 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 4,
                     "tabName": "Advanced"
                   },
                   "elementReferences": [],
@@ -1654,7 +1649,6 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 5,
                     "tabName": "Advanced"
                   },
                   "elementReferences": [],
@@ -2385,7 +2379,6 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 2,
                     "tabName": "Advanced"
                   },
                   "elementReferences": [],
@@ -2952,7 +2945,6 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 2,
                 "tabName": "Advanced"
               },
               "elementReferences": [],

@@ -246,7 +246,6 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 2,
                     "tabName": "Advanced"
                   },
                   "elementReferences": [],
@@ -816,7 +815,6 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 2,
                 "tabName": "Advanced"
               },
               "elementReferences": [],
@@ -846,7 +844,6 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 3,
                 "tabName": "Advanced"
               },
               "elementReferences": [],
@@ -2453,7 +2450,6 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 2,
                 "tabName": "Advanced"
               },
               "elementReferences": [],
@@ -2547,7 +2543,7 @@
                   "password": false,
                   "text": false,
                   "query": false,
-                  "order": 2
+                  "order": 1
                 },
                 "elementReferences": [],
                 "name": "stringValue",
@@ -2675,7 +2671,6 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 1,
                 "tabName": "Advanced"
               },
               "elementReferences": [],
