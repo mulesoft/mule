@@ -13208,8 +13208,10 @@
                       "isInstantiable": false,
                       "isAbstract": false,
                       "isFinal": false,
-                      "implementedInterfaces": [],
-                      "parent": "org.mule.runtime.core.api.message.BaseAttributes",
+                      "implementedInterfaces": [
+                        "java.io.Serializable"
+                      ],
+                      "parent": "",
                       "genericTypes": []
                     },
                     "typeAlias": {
