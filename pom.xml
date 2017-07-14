@@ -96,7 +96,6 @@
     </scm>
 
     <modules>
-        <module>buildtools</module>
         <module>core</module>
         <module>core-tests</module>
         <module>modules</module>
