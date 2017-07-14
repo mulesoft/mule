@@ -27,9 +27,9 @@ public interface OAuthConstants
     String GRANT_TYPE_REFRESH_TOKEN = "refresh_token";
 
     //Expressions to extract parameters from standard token url response.
-    String ACCESS_TOKEN_EXPRESSION = "#[regex('" + ".*\"access_token\"[ ]*:[ ]*\"([^\\\"]*)\".*" + "')]";
-    String REFRESH_TOKEN_EXPRESSION = "#[regex('" + ".*\"refresh_token\"[ ]*:[ ]*\"([^\\\"]*)\".*" + "')]";
-    String EXPIRATION_TIME_EXPRESSION = "#[regex('" + ".*\"expires_in\"[ ]*:[ ]*([\\\\d]*).*" + "')]";
+    String ACCESS_TOKEN_EXPRESSION = "#[regex('.*\"access_token\"[ ]*:[ ]*\"([^\\\"]*)\".*', message.payloadAs(java.lang.String).replaceAll('\\\\s+', ' '))]";
+    String REFRESH_TOKEN_EXPRESSION = "#[regex('.*\"refresh_token\"[ ]*:[ ]*\"([^\\\"]*)\".*', message.payloadAs(java.lang.String).replaceAll('\\\\s+', ' '))]";
+    String EXPIRATION_TIME_EXPRESSION = "#[regex('.*\"expires_in\"[ ]*:[ ]*([\\\\d]*).*', message.payloadAs(java.lang.String).replaceAll('\\\\s+', ' '))]";
 
     String DEFAULT_REFRESH_TOKEN_WHEN_EXPRESSION = "#[message.inboundProperties['http.status'] == 401 || message.inboundProperties['http.status'] == 403]";
 
