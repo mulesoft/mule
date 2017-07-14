@@ -82,17 +82,17 @@ public abstract class AbstractOAuthAuthorizationTestCase extends FunctionalTestC
 
     protected void configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantType(String accessToken, String refreshToken)
     {
-        configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantTypeWithBody("{" +
-                                                                                       "\"" + OAuthConstants.ACCESS_TOKEN_PARAMETER + "\":\"" + accessToken + "\"," +
-                                                                                       "\"" + OAuthConstants.EXPIRES_IN_PARAMETER + "\":" + EXPIRES_IN + "," +
-                                                                                       "\"" + OAuthConstants.REFRESH_TOKEN_PARAMETER + "\":\"" + refreshToken + "\"}");
+        configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantTypeWithBody("{\n" +
+                                                                                       "\"" + OAuthConstants.ACCESS_TOKEN_PARAMETER + "\":\"" + accessToken + "\",\n" +
+                                                                                       "\"" + OAuthConstants.EXPIRES_IN_PARAMETER + "\":" + EXPIRES_IN + ",\n" +
+                                                                                       "\"" + OAuthConstants.REFRESH_TOKEN_PARAMETER + "\":\"" + refreshToken + "\"\n}");
     }
 
     protected void configureWireMockToExpectOfflineTokenPathRequestForAuthorizationCodeGrantType(String accessToken)
     {
-        configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantTypeWithBody("{" +
-                                                                                       "\"" + OAuthConstants.ACCESS_TOKEN_PARAMETER + "\":\"" + accessToken + "\"," +
-                                                                                       "\"" + OAuthConstants.EXPIRES_IN_PARAMETER + "\":" + EXPIRES_IN + "," +
+        configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantTypeWithBody("{ \t" +
+                                                                                       "\"" + OAuthConstants.ACCESS_TOKEN_PARAMETER + "\":\"" + accessToken + "\", \t" +
+                                                                                       "\"" + OAuthConstants.EXPIRES_IN_PARAMETER + "\":" + EXPIRES_IN + " \t" +
                                                                                        "\"}");
     }
 
