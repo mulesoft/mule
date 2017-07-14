@@ -19,6 +19,7 @@ import org.mule.module.oauth2.internal.OAuthConstants;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
+import org.mule.util.StringUtils;
 
 import com.github.tomakehurst.wiremock.client.RequestPatternBuilder;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
@@ -70,6 +71,29 @@ public abstract class AbstractOAuthAuthorizationTestCase extends FunctionalTestC
         return "http";
     }
 
+    protected String createBodyWithSeparator(String accessToken, String refreshToken, String expiresIn, String separator)
+    {
+        String[] bodyArr = new String[] {
+                "{",
+                "\"" + OAuthConstants.ACCESS_TOKEN_PARAMETER + "\"", ":", "\"" + accessToken + "\"", ",",
+                "\"" + OAuthConstants.EXPIRES_IN_PARAMETER + "\"", ":", expiresIn, ",",
+                "\"" + OAuthConstants.REFRESH_TOKEN_PARAMETER + "\"", ":", "\"" + refreshToken + "\"",
+                "}"
+        };
+        return StringUtils.join(bodyArr, separator);
+    }
+
+    protected String createBodyWithSeparatorNoRefresh(String accessToken, String expiresIn, String separator)
+    {
+        String[] bodyArr = new String[] {
+                "{",
+                "\"" + OAuthConstants.ACCESS_TOKEN_PARAMETER + "\"", ":", "\"" + accessToken + "\"", ",",
+                "\"" + OAuthConstants.EXPIRES_IN_PARAMETER + "\"", ":", expiresIn,
+                "}"
+        };
+        return StringUtils.join(bodyArr, separator);
+    }
+
     protected void configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantType()
     {
         configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantType(ACCESS_TOKEN);
@@ -82,18 +106,14 @@ public abstract class AbstractOAuthAuthorizationTestCase extends FunctionalTestC
 
     protected void configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantType(String accessToken, String refreshToken)
     {
-        configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantTypeWithBody("{\n" +
-                                                                                       "\"" + OAuthConstants.ACCESS_TOKEN_PARAMETER + "\":\"" + accessToken + "\",\n" +
-                                                                                       "\"" + OAuthConstants.EXPIRES_IN_PARAMETER + "\":" + EXPIRES_IN + ",\n" +
-                                                                                       "\"" + OAuthConstants.REFRESH_TOKEN_PARAMETER + "\":\"" + refreshToken + "\"\n}");
+        String body = createBodyWithSeparator(accessToken, refreshToken, EXPIRES_IN, "");
+        configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantTypeWithBody(body);
     }
 
     protected void configureWireMockToExpectOfflineTokenPathRequestForAuthorizationCodeGrantType(String accessToken)
     {
-        configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantTypeWithBody("{ \t" +
-                                                                                       "\"" + OAuthConstants.ACCESS_TOKEN_PARAMETER + "\":\"" + accessToken + "\", \t" +
-                                                                                       "\"" + OAuthConstants.EXPIRES_IN_PARAMETER + "\":" + EXPIRES_IN + " \t" +
-                                                                                       "\"}");
+        String body = createBodyWithSeparatorNoRefresh(accessToken, EXPIRES_IN, "");
+        configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantTypeWithBody(body);
     }
 
     protected void configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantTypeWithBody(String body)
