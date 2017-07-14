@@ -10,9 +10,12 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.value.ResolvingFailure.Builder.newFailure;
 import static org.mule.runtime.api.value.ValueResult.resultFrom;
+import static org.mule.runtime.core.internal.value.MuleValueProviderServiceUtility.deleteLastPartFromLocation;
+import static org.mule.runtime.core.internal.value.MuleValueProviderServiceUtility.isConnection;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.value.ValueProviderService;
 import org.mule.runtime.api.value.ValueResult;
+import org.mule.runtime.core.internal.value.MuleValueProviderService;
 
 import java.util.Optional;
 
@@ -31,7 +34,7 @@ public class LazyValueProviderService implements ValueProviderService {
   private LazyMuleArtifactContext lazyMuleArtifactContext;
   private ValueProviderService providerService;
 
-  LazyValueProviderService(LazyMuleArtifactContext artifactContext, ValueProviderService providerServiceDelegate) {
+  LazyValueProviderService(LazyMuleArtifactContext artifactContext, MuleValueProviderService providerServiceDelegate) {
     this.lazyMuleArtifactContext = artifactContext;
     this.providerService = providerServiceDelegate;
   }
@@ -40,27 +43,9 @@ public class LazyValueProviderService implements ValueProviderService {
    * {@inheritDoc}
    */
   @Override
-  public ValueResult getComponentValues(Location location, String providerName) {
-    return initializeComponent(location)
-        .orElseGet(() -> providerService.getComponentValues(location, providerName));
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public ValueResult getConfigurationValues(Location location, String providerName) {
-    return initializeComponent(location)
-        .orElseGet(() -> providerService.getConfigurationValues(location, providerName));
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public ValueResult getConnectionProviderValues(Location location, String providerName) {
-    return initializeComponent(location)
-        .orElseGet(() -> providerService.getConfigurationValues(location, providerName));
+  public ValueResult getValues(Location location, String providerName) {
+    return initializeComponent(locationWithOutConnection(location))
+        .orElseGet(() -> providerService.getValues(location, providerName));
   }
 
   private Optional<ValueResult> initializeComponent(Location location) {
@@ -70,5 +55,9 @@ public class LazyValueProviderService implements ValueProviderService {
       return of(resultFrom(newFailure(e).build()));
     }
     return empty();
+  }
+
+  private Location locationWithOutConnection(Location location) {
+    return isConnection(location) ? deleteLastPartFromLocation(location) : location;
   }
 }

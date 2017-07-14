@@ -9,6 +9,7 @@ package org.mule.tck.junit4.matcher;
 import static java.lang.String.format;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.joining;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.core.IsCollectionContaining.hasItems;
 import org.mule.runtime.api.value.Value;
 import org.hamcrest.Description;
@@ -22,16 +23,25 @@ import org.hamcrest.TypeSafeMatcher;
  */
 public final class ValueMatcher extends TypeSafeMatcher<Value> {
 
-
-  private final String id;
-  private String displayName;
-  private String partName;
+  private final Matcher<String> id;
+  private Matcher<String> displayName;
+  private Matcher<String> partName;
   private StringBuilder descriptionBuilder = new StringBuilder();
-  private ValueMatcher[] valueMatchers;
+  private ValueMatcher[] childValues = new ValueMatcher[] {};
 
-  private ValueMatcher(String id) {
+  private ValueMatcher(Matcher<String> id) {
     this.id = id;
-    descriptionBuilder.append(String.format("a Value with id: '%s'", id));
+    descriptionBuilder.append(String.format("a Value whose ID %s", id));
+  }
+
+  /**
+   * Creates a new instance of the {@link ValueMatcher}
+   *
+   * @param id of the {@link Value}
+   * @return the new instance of {@link ValueMatcher}
+   */
+  public static ValueMatcher valueWithId(Matcher<String> id) {
+    return new ValueMatcher(id);
   }
 
   /**
@@ -41,18 +51,16 @@ public final class ValueMatcher extends TypeSafeMatcher<Value> {
    * @return the new instance of {@link ValueMatcher}
    */
   public static ValueMatcher valueWithId(String id) {
-    return new ValueMatcher(id);
+    return valueWithId(is(id));
   }
 
   @Override
   protected boolean matchesSafely(Value value) {
     try {
-      validateEquals(id, value.getId());
-      validateEquals(displayName, value.getDisplayName());
-      validateEquals(partName, value.getPartName());
-      if (valueMatchers != null) {
-        return hasItems(valueMatchers).matches(value.getChilds());
-      }
+      assertThat(value.getId(), id);
+      assertThat(value.getDisplayName(), displayName);
+      assertThat(value.getPartName(), partName);
+      assertThat(value.getChilds(), hasItems(childValues));
       return true;
     } catch (RuntimeException e) {
       return false;
@@ -70,10 +78,19 @@ public final class ValueMatcher extends TypeSafeMatcher<Value> {
    * @param displayName of the {@link Value}
    * @return the contributed {@link ValueMatcher}
    */
-
   public ValueMatcher withDisplayName(String displayName) {
+    return this.withDisplayName(is(displayName));
+  }
+
+  /**
+   * Adds a displayName to compare. If is not added the matcher won't compare displayNames
+   *
+   * @param displayName of the {@link Value}
+   * @return the contributed {@link ValueMatcher}
+   */
+  public ValueMatcher withDisplayName(Matcher<String> displayName) {
     this.displayName = displayName;
-    descriptionBuilder.append(format(", displayName: '%s'", displayName));
+    descriptionBuilder.append(format(", whose displayName %s", displayName));
     return this;
   }
 
@@ -84,8 +101,18 @@ public final class ValueMatcher extends TypeSafeMatcher<Value> {
    * @return the contributed {@link ValueMatcher}
    */
   public ValueMatcher withPartName(String partName) {
+    return this.withPartName(is(partName));
+  }
+
+  /**
+   * Adds a partName to compare. If is not added the matcher won't compare partNames
+   *
+   * @param partName of the {@link Value}
+   * @return the contributed {@link ValueMatcher}
+   */
+  public ValueMatcher withPartName(Matcher<String> partName) {
     this.partName = partName;
-    descriptionBuilder.append(format(", partName: '%s'", partName));
+    descriptionBuilder.append(format(", whose partName %s", partName));
     return this;
   }
 
@@ -96,16 +123,18 @@ public final class ValueMatcher extends TypeSafeMatcher<Value> {
    * @return the contribute {@link ValueMatcher}
    */
   public ValueMatcher withChilds(ValueMatcher... valueMatcher) {
-    this.valueMatchers = valueMatcher;
-    descriptionBuilder.append(format(", with child values: [%s]", stream(valueMatchers)
+    this.childValues = valueMatcher;
+    descriptionBuilder.append(format(", with child values that %s", stream(childValues)
         .map(Matcher::toString)
         .collect(joining(", "))));
     return this;
   }
 
-  private void validateEquals(String actual, String expected) {
-    if (actual != null && !expected.equals(actual)) {
-      throw new RuntimeException(String.format("Assertion Error - Actual: '%s' Expected: '%s'", actual, expected));
+  private <T> void assertThat(T expected, Matcher<T> actual) {
+    if (actual != null) {
+      if (!actual.matches(expected)) {
+        throw new RuntimeException();
+      }
     }
   }
 }
