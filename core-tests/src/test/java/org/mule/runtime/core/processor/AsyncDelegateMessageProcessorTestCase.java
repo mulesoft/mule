@@ -22,7 +22,6 @@ import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static reactor.core.publisher.Mono.from;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -172,7 +171,7 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
   protected AsyncDelegateMessageProcessor createAsyncDelegateMessageProcessor(Processor listener, FlowConstruct flowConstruct)
       throws Exception {
     AsyncDelegateMessageProcessor mp = new AsyncDelegateMessageProcessor(newChain(listener), "thread");
-    mp.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent("flow")));
+    mp.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
     mp.setFlowConstruct(flowConstruct);
     initialiseIfNeeded(mp, true, muleContext);
     return mp;

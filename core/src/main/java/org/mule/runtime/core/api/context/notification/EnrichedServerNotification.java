@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.api.context.notification;
 
+import static org.mule.runtime.dsl.api.component.config.ComponentLocationUtils.getFlowNameFrom;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
@@ -29,7 +31,7 @@ public abstract class EnrichedServerNotification extends ServerNotification {
   }
 
   public EnrichedServerNotification(EnrichedNotificationInfo notificationInfo, int action, ComponentLocation componentLocation) {
-    this(notificationInfo, action, componentLocation != null ? componentLocation.getParts().get(0).getPartPath() : null);
+    this(notificationInfo, action, componentLocation != null ? getFlowNameFrom(componentLocation) : null);
   }
 
   /**
@@ -95,7 +97,7 @@ public abstract class EnrichedServerNotification extends ServerNotification {
     }
 
     ComponentLocation location = getComponent().getLocation();
-    return location.getParts().get(0).getPartPath() + "/" + location.getComponentIdentifier().getIdentifier().toString();
+    return getFlowNameFrom(location) + "/" + location.getComponentIdentifier().getIdentifier().toString();
   }
 
   public EnrichedNotificationInfo getInfo() {

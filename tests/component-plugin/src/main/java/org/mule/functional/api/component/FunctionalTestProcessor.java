@@ -12,6 +12,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
 import static org.mule.runtime.core.api.util.StringMessageUtils.getBoilerPlate;
 import static org.mule.runtime.core.api.util.StringMessageUtils.truncate;
+import static org.mule.runtime.dsl.api.component.config.ComponentLocationUtils.getFlowNameFrom;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.functional.api.exception.FunctionalTestException;
@@ -176,7 +177,7 @@ public class FunctionalTestProcessor extends AbstractAnnotatedObject implements 
     final Message message = event.getMessage();
     if (logger.isInfoEnabled()) {
       String msg = getBoilerPlate("Message Received in flow: "
-          + getLocation().getParts().get(0).getPartPath() + ". Content is: "
+          + getFlowNameFrom(getLocation()) + ". Content is: "
           + truncate(message.getPayload().getValue().toString(), 100, true), '*', 80);
 
       logger.info(msg);
@@ -211,8 +212,8 @@ public class FunctionalTestProcessor extends AbstractAnnotatedObject implements 
     Event replyMessage = Event.builder(event).message(replyBuilder.build()).build();
 
     if (isEnableNotifications()) {
-      muleContext.fireNotification(new FunctionalTestNotification(event, getLocation().getParts().get(0).getPartPath(),
-                                                                  replyMessage, EVENT_RECEIVED));
+      muleContext
+          .fireNotification(new FunctionalTestNotification(event, getFlowNameFrom(getLocation()), replyMessage, EVENT_RECEIVED));
     }
 
     // Time to wait before returning

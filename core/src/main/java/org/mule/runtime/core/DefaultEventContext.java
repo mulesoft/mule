@@ -12,6 +12,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
+import static org.mule.runtime.dsl.api.component.config.ComponentLocationUtils.getFlowNameFrom;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.core.api.Event;
@@ -67,21 +68,23 @@ public final class DefaultEventContext extends AbstractEventContext implements S
    * Builds a new execution context with the given parameters.
    *
    * @param id the unique id for this event context.
+   * @param serverId the id of the running mule server
    * @param location the location of the component that received the first message for this context.
    */
-  public static EventContext create(String id, ComponentLocation location) {
-    return create(id, location, null);
+  public static EventContext create(String id, String serverId, ComponentLocation location) {
+    return create(id, serverId, location, null);
   }
 
   /**
    * Builds a new execution context with the given parameters and an empty publisher.
    *
    * @param id the unique id for this event context.
+   * @param serverId the id of the running mule server
    * @param location the location of the component that received the first message for this context.
    * @param correlationId See {@link EventContext#getCorrelationId()}.
    */
-  public static EventContext create(String id, ComponentLocation location, String correlationId) {
-    return create(id, location, correlationId, Mono.empty());
+  public static EventContext create(String id, String serverId, ComponentLocation location, String correlationId) {
+    return create(id, serverId, location, correlationId, Mono.empty());
   }
 
   /**
@@ -107,9 +110,9 @@ public final class DefaultEventContext extends AbstractEventContext implements S
    * @param externalCompletionPublisher void publisher that completes when source completes enabling completion of
    *        {@link EventContext} to depend on completion of source.
    */
-  public static EventContext create(String id, ComponentLocation location, String correlationId,
+  public static EventContext create(String id, String serverId, ComponentLocation location, String correlationId,
                                     Publisher<Void> externalCompletionPublisher) {
-    return new DefaultEventContext(id, location, correlationId, externalCompletionPublisher);
+    return new DefaultEventContext(id, serverId, location, correlationId, externalCompletionPublisher);
   }
 
   /**
@@ -152,9 +155,6 @@ public final class DefaultEventContext extends AbstractEventContext implements S
 
   private final String serverId;
   private final ComponentLocation location;
-  private final String flowName;
-  private final String connectorName;
-  private final String sourceName;
 
   private final ProcessingTime processingTime;
   private final ProcessorsTrace processorsTrace = new DefaultProcessorsTrace();
@@ -177,21 +177,6 @@ public final class DefaultEventContext extends AbstractEventContext implements S
   @Override
   public ComponentLocation getOriginatingLocation() {
     return location;
-  }
-
-  @Override
-  public String getOriginatingFlowName() {
-    return flowName;
-  }
-
-  @Override
-  public String getOriginatingConnectorName() {
-    return connectorName;
-  }
-
-  @Override
-  public String getOriginatingSourceName() {
-    return sourceName;
   }
 
   @Override
@@ -229,10 +214,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     super(externalCompletionPublisher);
     this.id = flow.getUniqueIdString();
     this.serverId = flow.getServerId();
-    this.flowName = flow.getName();
     this.location = location;
-    this.connectorName = location.getComponentIdentifier().getIdentifier().getNamespace();
-    this.sourceName = location.getComponentIdentifier().getIdentifier().getName();
     this.processingTime = ProcessingTime.newInstance(flow);
     this.correlationId = correlationId;
   }
@@ -241,29 +223,27 @@ public final class DefaultEventContext extends AbstractEventContext implements S
    * Builds a new execution context with the given parameters.
    *
    * @param id the unique id for this event context.
+   * @param serverId the id of the running mule server
    * @param location the location of the component that received the first message for this context.
    * @param correlationId the correlation id that was set by the {@link MessageSource} for the first {@link Event} of this
    *        context, if available.
    * @param externalCompletionPublisher void publisher that completes when source completes enabling completion of
    *        {@link EventContext} to depend on completion of source.
    */
-  private DefaultEventContext(String id, ComponentLocation location, String correlationId,
+  private DefaultEventContext(String id, String serverId, ComponentLocation location, String correlationId,
                               Publisher<Void> externalCompletionPublisher) {
     super(externalCompletionPublisher);
     this.id = id;
-    this.serverId = "-";
-    this.flowName = location.getParts().get(0).getPartPath();
+    this.serverId = serverId;
     this.location = location;
-    this.connectorName = location.getComponentIdentifier().getIdentifier().getNamespace();
-    this.sourceName = location.getComponentIdentifier().getIdentifier().getName();
     this.processingTime = null;
     this.correlationId = correlationId;
   }
 
   @Override
   public String toString() {
-    return getClass().getSimpleName() + " { id: " + id + "; correlationId: " + correlationId + "; flowName: " + flowName
-        + "; serverId: " + serverId + " }";
+    return getClass().getSimpleName() + " { id: " + id + "; correlationId: " + correlationId + "; flowName: "
+        + getFlowNameFrom(getOriginatingLocation()) + "; serverId: " + serverId + " }";
   }
 
   private static class ChildEventContext extends AbstractEventContext implements Serializable {
@@ -302,21 +282,6 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     }
 
     @Override
-    public String getOriginatingFlowName() {
-      return parent.getOriginatingFlowName();
-    }
-
-    @Override
-    public String getOriginatingConnectorName() {
-      return parent.getOriginatingConnectorName();
-    }
-
-    @Override
-    public String getOriginatingSourceName() {
-      return parent.getOriginatingSourceName();
-    }
-
-    @Override
     public Optional<ProcessingTime> getProcessingTime() {
       return parent.getProcessingTime();
     }
@@ -334,7 +299,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     @Override
     public String toString() {
       return getClass().getSimpleName() + " { id: " + getId() + "; correlationId: " + parent.getCorrelationId()
-          + "; flowName: " + parent.getOriginatingFlowName() + "; commponentLocation: "
+          + "; flowName: " + getFlowNameFrom(parent.getOriginatingLocation()) + "; commponentLocation: "
           + (componentLocation != null ? componentLocation.getLocation() : EMPTY) + "; handleErrors: " + handleErrors + " }";
     }
 

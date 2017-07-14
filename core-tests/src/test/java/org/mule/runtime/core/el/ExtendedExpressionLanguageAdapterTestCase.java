@@ -162,7 +162,7 @@ public class ExtendedExpressionLanguageAdapterTestCase extends AbstractWeaveExpr
     TypedValue result = expressionLanguageAdapter.evaluate(melify("flowVars.put(\'key\',\'value\')"),
                                                            event,
                                                            builder1,
-                                                           fromSingleComponent("flowName"),
+                                                           TEST_CONNECTOR_LOCATION,
                                                            emptyBindingContext);
     assertThat(result.getValue(), is(nullValue()));
     assertThat(builder1.build().getVariableNames(), contains("key"));
@@ -171,7 +171,7 @@ public class ExtendedExpressionLanguageAdapterTestCase extends AbstractWeaveExpr
     TypedValue result2 = expressionLanguageAdapter.evaluate("variables.put(\'key\',\'value\')",
                                                             event,
                                                             builder2,
-                                                            fromSingleComponent("flowName"),
+                                                            TEST_CONNECTOR_LOCATION,
                                                             emptyBindingContext);
     assertThat(result2.getValue(), is(nullValue()));
     assertThat(builder2.build().getVariableNames(), not(contains("key")));
@@ -186,7 +186,7 @@ public class ExtendedExpressionLanguageAdapterTestCase extends AbstractWeaveExpr
     TypedValue result = expressionLanguageAdapter.evaluate(melify(expression),
                                                            event,
                                                            builder1,
-                                                           fromSingleComponent("flowName"),
+                                                           TEST_CONNECTOR_LOCATION,
                                                            emptyBindingContext);
     assertThat(result.getValue(), is(1));
     assertThat(builder1.build().getMessage().getPayload().getValue(), is(3));
@@ -196,7 +196,7 @@ public class ExtendedExpressionLanguageAdapterTestCase extends AbstractWeaveExpr
     expressionLanguageAdapter.evaluate(expression,
                                        event,
                                        builder2,
-                                       fromSingleComponent("flowName"),
+                                       TEST_CONNECTOR_LOCATION,
                                        emptyBindingContext);
   }
 
@@ -207,11 +207,11 @@ public class ExtendedExpressionLanguageAdapterTestCase extends AbstractWeaveExpr
     Event.Builder builder = builder(event);
     String myPayload = "myPayload";
     String expression = "payload";
-    expressionLanguageAdapter.enrich(melify(expression), event, builder, fromSingleComponent("flowName"), myPayload);
+    expressionLanguageAdapter.enrich(melify(expression), event, builder, TEST_CONNECTOR_LOCATION, myPayload);
     assertThat(builder.build().getMessage().getPayload().getValue(), is(myPayload));
 
     expectedException.expect(UnsupportedOperationException.class);
-    expressionLanguageAdapter.enrich(expression, event, builder, fromSingleComponent("flowName"), myPayload);
+    expressionLanguageAdapter.enrich(expression, event, builder, TEST_CONNECTOR_LOCATION, myPayload);
   }
 
   @Test
@@ -221,13 +221,13 @@ public class ExtendedExpressionLanguageAdapterTestCase extends AbstractWeaveExpr
     Event.Builder builder = builder(event);
     TypedValue myPayload = new TypedValue("myPayload", STRING);
     String expression = "payload";
-    expressionLanguageAdapter.enrich(melify(expression), event, builder, fromSingleComponent("flowName"), myPayload);
+    expressionLanguageAdapter.enrich(melify(expression), event, builder, TEST_CONNECTOR_LOCATION, myPayload);
     Event enrichedEvent = builder.build();
     assertThat(enrichedEvent.getMessage().getPayload().getValue(), is(myPayload.getValue()));
     assertThat(enrichedEvent.getMessage().getPayload().getDataType(), is(myPayload.getDataType()));
 
     expectedException.expect(UnsupportedOperationException.class);
-    expressionLanguageAdapter.enrich(expression, event, builder, fromSingleComponent("flowName"), myPayload);
+    expressionLanguageAdapter.enrich(expression, event, builder, TEST_CONNECTOR_LOCATION, myPayload);
   }
 
   private String melify(String expression) {

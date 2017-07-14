@@ -12,7 +12,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.DefaultEventContext;
@@ -41,7 +40,7 @@ public class MessageChunkAggregatorTestCase extends AbstractMuleContextTestCase 
     MessageChunkAggregator router = new MessageChunkAggregator();
     router.setMuleContext(muleContext);
     router.setFlowConstruct(flow);
-    router.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent("flow")));
+    router.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
     router.initialise();
 
     Message message1 = of("test event A");

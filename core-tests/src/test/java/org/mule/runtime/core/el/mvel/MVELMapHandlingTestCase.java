@@ -10,7 +10,6 @@ import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.el.ExpressionManager;
@@ -83,7 +82,7 @@ public class MVELMapHandlingTestCase extends AbstractMuleContextTestCase {
   }
 
   private void runExpressionAndExpect(String expression, Object expectedValue, Event event) throws Exception {
-    Object result = el.evaluate(expression, event, fromSingleComponent("flowName")).getValue();
+    Object result = el.evaluate(expression, event, TEST_CONNECTOR_LOCATION).getValue();
     assertThat(format("Expression %s returned unexpected value", expression), result, equalTo(expectedValue));
   }
 }

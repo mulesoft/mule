@@ -84,11 +84,16 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
             (CheckedFunction<ComponentLocation, EventContext>) location -> create(getTestFlow(muleContext), location)
         },
         {
-            (CheckedSupplier<EventContext>) () -> create("id", TEST_CONNECTOR_LOCATION),
+            (CheckedSupplier<EventContext>) () -> create("id", DefaultEventContextTestCase.class.getName(),
+                                                         TEST_CONNECTOR_LOCATION),
             (CheckedFunction<MonoProcessor<Void>, EventContext>) externalCompletion -> create("id",
+                                                                                              DefaultEventContextTestCase.class
+                                                                                                  .getName(),
                                                                                               TEST_CONNECTOR_LOCATION, null,
                                                                                               externalCompletion),
-            (CheckedFunction<ComponentLocation, EventContext>) location -> create("id", location)
+            (CheckedFunction<ComponentLocation, EventContext>) location -> create("id",
+                                                                                  DefaultEventContextTestCase.class.getName(),
+                                                                                  location)
         }
     });
   }
@@ -572,8 +577,8 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
     when(location.getParts()).thenReturn(asList(new DefaultLocationPart("flow", empty(), empty(), empty())));
     EventContext context = contextWithComponentLocation.apply(location);
 
-    assertThat(context.getOriginatingConnectorName(), is("http"));
-    assertThat(context.getOriginatingSourceName(), is("listener"));
+    assertThat(context.getOriginatingLocation().getComponentIdentifier().getIdentifier().getNamespace(), is("http"));
+    assertThat(context.getOriginatingLocation().getComponentIdentifier().getIdentifier().getName(), is("listener"));
   }
 
   @Test
@@ -581,8 +586,8 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
   public void componentDataFromSingleComponent() throws Exception {
     EventContext context = this.context.get();
 
-    assertThat(context.getOriginatingConnectorName(), is(CORE_PREFIX));
-    assertThat(context.getOriginatingSourceName(), is("test"));
+    assertThat(context.getOriginatingLocation().getComponentIdentifier().getIdentifier().getNamespace(), is(CORE_PREFIX));
+    assertThat(context.getOriginatingLocation().getComponentIdentifier().getIdentifier().getName(), is("test"));
   }
 
   private void assertBeforeResponseDone(EventContext parent) {

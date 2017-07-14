@@ -7,6 +7,7 @@
 package org.mule.runtime.core.api.context.notification;
 
 import static org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo.createInfo;
+import static org.mule.runtime.dsl.api.component.config.ComponentLocationUtils.getFlowNameFrom;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -33,7 +34,7 @@ public class MessageProcessorNotification extends EnrichedServerNotification imp
   public MessageProcessorNotification(EnrichedNotificationInfo notificationInfo, ComponentLocation componentLocation,
                                       EventContext eventContext,
                                       int action) {
-    super(notificationInfo, action, componentLocation != null ? componentLocation.getParts().get(0).getPartPath() : null);
+    super(notificationInfo, action, componentLocation != null ? getFlowNameFrom(componentLocation) : null);
     this.eventContext = eventContext;
   }
 

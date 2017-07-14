@@ -15,7 +15,6 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SOURCE;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -94,14 +93,13 @@ public class NotificationHelperTestCase extends AbstractMuleTestCase {
 
   @Test
   public void fireNotificationForEvent() {
-    final ComponentLocation location = fromSingleComponent("flow");
-    when(messageSource.getLocation()).thenReturn(location);
+    when(messageSource.getLocation()).thenReturn(TEST_CONNECTOR_LOCATION);
     final FlowConstruct flowConstruct = mock(FlowConstruct.class, withSettings().extraInterfaces(AnnotatedObject.class));
     when(flowConstruct.getMuleContext()).thenReturn(muleContext);
     final int action = 100;
 
-    helper.fireNotification(messageSource, event, location, muleContext, action);
-    assertConnectorMessageNotification(eventNotificationHandler, messageSource, location, action);
+    helper.fireNotification(messageSource, event, TEST_CONNECTOR_LOCATION, muleContext, action);
+    assertConnectorMessageNotification(eventNotificationHandler, messageSource, TEST_CONNECTOR_LOCATION, action);
   }
 
   @Test

@@ -8,6 +8,7 @@ package org.mule.runtime.core.routing.requestreply;
 
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY;
+import static org.mule.runtime.dsl.api.component.config.ComponentLocationUtils.getFlowNameFrom;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -31,7 +32,7 @@ public class SimpleAsyncRequestReplyRequester extends AbstractAsyncRequestReplyR
   protected void sendAsyncRequest(Event event) throws MuleException {
     event = Event.builder(event)
         .message(InternalMessage.builder(event.getMessage()).addOutboundProperty(MULE_REPLY_TO_PROPERTY, getReplyTo())
-            .addOutboundProperty(MULE_REPLY_TO_REQUESTOR_PROPERTY, getLocation().getParts().get(0).getPartPath())
+            .addOutboundProperty(MULE_REPLY_TO_REQUESTOR_PROPERTY, getFlowNameFrom(getLocation()))
             .build())
         .build();
     requestMessageProcessor.process(event);

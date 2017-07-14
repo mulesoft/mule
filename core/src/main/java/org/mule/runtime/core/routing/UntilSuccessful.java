@@ -11,6 +11,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newExplicitChain;
+import static org.mule.runtime.dsl.api.component.config.ComponentLocationUtils.getFlowNameFrom;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -87,7 +88,7 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
     this.untilSuccessfulStrategy.setUntilSuccessfulConfiguration(this);
 
     initialiseIfNeeded(untilSuccessfulStrategy, muleContext);
-    eventKeyPrefix = getLocation().getParts().get(0).getPartPath() + "-" + muleContext.getClusterId() + "-";
+    eventKeyPrefix = getFlowNameFrom(getLocation()) + "-" + muleContext.getClusterId() + "-";
   }
 
   private void setWaitTime() {

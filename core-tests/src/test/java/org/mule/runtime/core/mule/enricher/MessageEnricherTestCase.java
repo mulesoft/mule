@@ -19,7 +19,6 @@ import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
 import static org.mule.runtime.api.metadata.MediaType.JSON;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 
@@ -236,7 +235,7 @@ public class MessageEnricherTestCase extends AbstractReactiveProcessorTestCase {
 
   public MessageEnricher baseEnricher() {
     MessageEnricher enricher = new MessageEnricher();
-    enricher.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent("enricher")));
+    enricher.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
     enricher.setMuleContext(muleContext);
     return enricher;
   }

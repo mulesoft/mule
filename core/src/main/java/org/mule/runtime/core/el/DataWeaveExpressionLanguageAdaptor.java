@@ -13,6 +13,7 @@ import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_
 import static org.mule.runtime.core.el.BindingContextUtils.addEventBindings;
 import static org.mule.runtime.core.el.DefaultExpressionManager.DW_PREFIX;
 import static org.mule.runtime.core.el.DefaultExpressionManager.PREFIX_EXPR_SEPARATOR;
+import static org.mule.runtime.dsl.api.component.config.ComponentLocationUtils.getFlowNameFrom;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
@@ -199,9 +200,8 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
 
   private BindingContext.Builder addFlowBindings(ComponentLocation componentLocation, BindingContext.Builder contextBuilder) {
     if (componentLocation != null) {
-      contextBuilder.addBinding(FLOW,
-                                new TypedValue<>(new FlowVariablesAccessor(componentLocation.getParts().get(0).getPartPath()),
-                                                 fromType(FlowVariablesAccessor.class)));
+      contextBuilder.addBinding(FLOW, new TypedValue<>(new FlowVariablesAccessor(getFlowNameFrom(componentLocation)),
+                                                       fromType(FlowVariablesAccessor.class)));
     }
     return contextBuilder;
   }

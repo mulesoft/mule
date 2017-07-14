@@ -14,6 +14,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mule.functional.api.component.FlowAssert.addAssertion;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setFlowConstructIfNeeded;
+import static org.mule.runtime.dsl.api.component.config.ComponentLocationUtils.getFlowNameFrom;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
 
@@ -61,7 +62,7 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
       throw new InvalidExpressionException(expression, result.errorMessage().orElse("Invalid expression"));
     }
     responseLatch = new CountDownLatch(responseCount);
-    addAssertion(getLocation().getParts().get(0).getPartPath(), this);
+    addAssertion(getFlowNameFrom(getLocation()), this);
   }
 
   @Override

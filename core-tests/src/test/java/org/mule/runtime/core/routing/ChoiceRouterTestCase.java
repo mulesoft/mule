@@ -15,7 +15,6 @@ import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
 import static org.mule.runtime.core.api.management.stats.RouterStatistics.TYPE_OUTBOUND;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
@@ -43,7 +42,7 @@ public class ChoiceRouterTestCase extends AbstractReactiveProcessorTestCase {
   protected void doSetUp() throws Exception {
     super.doSetUp();
     choiceRouter = new ChoiceRouter();
-    choiceRouter.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent("choiceRouter")));
+    choiceRouter.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
   }
 
   @Test

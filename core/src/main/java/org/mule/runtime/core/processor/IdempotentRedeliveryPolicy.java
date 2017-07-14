@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.initialisationFailure;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.dsl.api.component.config.ComponentLocationUtils.getFlowNameFrom;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -88,8 +89,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
       }
     }
 
-    idrId = format("%s-%s-%s", muleContext.getConfiguration().getId(),
-                   getLocation().getParts().get(0).getPartPath(), "idr");
+    idrId = format("%s-%s-%s", muleContext.getConfiguration().getId(), getFlowNameFrom(getLocation()), "idr");
     lockFactory = muleContext.getLockFactory();
     if (store == null) {
       store = new ProvidedObjectStoreWrapper<>(null, internalObjectStoreSupplier());

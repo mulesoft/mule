@@ -23,7 +23,6 @@ import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedConsumer;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
 
@@ -108,7 +107,7 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
     irp.setUseSecureHash(true);
     irp.setFlowConstruct(mock(FlowConstruct.class));
     irp.setMuleContext(mockMuleContext);
-    irp.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent("flow")));
+    irp.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
     irp.setListener(mockFailingMessageProcessor);
   }
 

@@ -60,24 +60,6 @@ public interface EventContext {
   ComponentLocation getOriginatingLocation();
 
   /**
-   * 
-   * @return the name of the flow that processes events of this context.
-   */
-  String getOriginatingFlowName();
-
-  /**
-   * 
-   * @return the name of the component that generated the message for the first event of this context.
-   */
-  String getOriginatingConnectorName();
-
-  /**
-   *
-   * @return the name of the source that generated the message for the first event of this context.
-   */
-  String getOriginatingSourceName();
-
-  /**
    * Complete this {@link EventContext} successfully with no result {@link Event}.
    */
   void success();

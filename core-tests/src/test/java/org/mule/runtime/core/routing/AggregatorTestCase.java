@@ -12,7 +12,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
@@ -46,7 +45,7 @@ public class AggregatorTestCase extends AbstractMuleContextTestCase {
     TestEventAggregator router = new TestEventAggregator(3);
     router.setMuleContext(muleContext);
     router.setFlowConstruct(flow);
-    router.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent("flow")));
+    router.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
     router.initialise();
 
     EventContext context = DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION, "foo");

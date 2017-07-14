@@ -23,7 +23,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -233,7 +232,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
   protected AsyncDelegateMessageProcessor createAsyncMessageProcessor(SensingNullMessageProcessor target)
       throws InitialisationException {
     asyncMP = new AsyncDelegateMessageProcessor(newChain(target));
-    asyncMP.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent("flow")));
+    asyncMP.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
     initialiseIfNeeded(asyncMP, true, muleContext);
     return asyncMP;
   }
@@ -247,7 +246,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
   class TestAsyncRequestReplyRequester extends AbstractAsyncRequestReplyRequester {
 
     TestAsyncRequestReplyRequester(MuleContext muleContext) throws MuleException {
-      setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent("flow")));
+      setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
       setMuleContext(muleContext);
       initialise();
       start();

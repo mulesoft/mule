@@ -18,7 +18,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
 import static org.mule.runtime.core.api.construct.Flow.builder;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
 import org.mule.runtime.api.meta.AnnotatedObject;
@@ -41,7 +40,7 @@ public class LoggerMessageProcessorTestCase extends AbstractMuleTestCase {
   @Before
   public void before() throws RegistrationException {
     flow = builder("flow", mockContextWithServices()).build();
-    flow.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent("flow")));
+    flow.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
   }
 
   @Test
@@ -154,7 +153,7 @@ public class LoggerMessageProcessorTestCase extends AbstractMuleTestCase {
 
   private LoggerMessageProcessor buildLoggerMessageProcessorWithLevel(String level) {
     LoggerMessageProcessor loggerMessageProcessor = new LoggerMessageProcessor();
-    loggerMessageProcessor.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent("flow")));
+    loggerMessageProcessor.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
     loggerMessageProcessor.initLogger();
     loggerMessageProcessor.logger = buildMockLogger();
     loggerMessageProcessor.setLevel(level);

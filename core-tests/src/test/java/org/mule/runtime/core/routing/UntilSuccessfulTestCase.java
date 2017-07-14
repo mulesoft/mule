@@ -14,7 +14,6 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -83,7 +82,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     untilSuccessful.setMuleContext(muleContext);
     untilSuccessful.setMessagingExceptionHandler(muleContext.getDefaultErrorHandler());
     untilSuccessful.setFlowConstruct(getTestFlow(muleContext));
-    untilSuccessful.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent("flow")));
+    untilSuccessful.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
     untilSuccessful.setMaxRetries(2);
 
     if (millisBetweenRetries != null) {

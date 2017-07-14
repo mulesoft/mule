@@ -12,7 +12,6 @@ import static org.junit.Assert.assertEquals;
 import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
 import static org.mule.runtime.core.api.context.notification.ExceptionNotification.EXCEPTION_ACTION;
 import static org.mule.runtime.core.api.context.notification.ServerNotification.TYPE_ERROR;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.ExceptionNotification;
@@ -32,7 +31,7 @@ public class DefaultExceptionStrategyTestCase extends AbstractMuleContextTestCas
   public void testExceptions() throws Exception {
     InstrumentedExceptionStrategy strategy = new InstrumentedExceptionStrategy(muleContext);
     strategy.setMuleContext(muleContext);
-    strategy.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent("flow")));
+    strategy.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
     strategy.handleException(new IllegalArgumentException("boom"));
     assertEquals(1, strategy.getCount());
   }
@@ -54,7 +53,7 @@ public class DefaultExceptionStrategyTestCase extends AbstractMuleContextTestCas
 
     // throwing exception
     InstrumentedExceptionStrategy strategy = new InstrumentedExceptionStrategy(muleContext);
-    strategy.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent("flow")));
+    strategy.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
     strategy.setMuleContext(muleContext);
     strategy.handleException(new IllegalArgumentException("boom"));
 

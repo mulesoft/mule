@@ -13,6 +13,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAG
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
 import static org.mule.runtime.core.internal.util.rx.Operators.nullSafeMap;
+import static org.mule.runtime.dsl.api.component.config.ComponentLocationUtils.getFlowNameFrom;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 
@@ -73,8 +74,8 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
   @Override
   public void initialise() throws InitialisationException {
     if (storePrefix == null) {
-      storePrefix = format("%s%s.%s.", muleContext.getConfiguration().getId(), getLocation().getParts().get(0).getPartPath(),
-                           this.getClass().getName());
+      storePrefix =
+          format("%s%s.%s.", muleContext.getConfiguration().getId(), getFlowNameFrom(getLocation()), this.getClass().getName());
     }
 
     initProcessedGroupsObjectStore();

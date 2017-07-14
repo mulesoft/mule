@@ -35,7 +35,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.BLOCKING;
 import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.NON_BLOCKING;
 import static reactor.core.publisher.Flux.from;
@@ -710,7 +709,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
   @Test
   public void testChoice() throws Exception {
     ChoiceRouter choiceRouter = new ChoiceRouter();
-    choiceRouter.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent("choiceRouter")));
+    choiceRouter.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
     choiceRouter.addRoute("true", newChain(getAppendingMP("1")));
     choiceRouter.addRoute("true", newChain(getAppendingMP("2")));
     choiceRouter.addRoute("true", newChain(getAppendingMP("3")));

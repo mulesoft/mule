@@ -46,8 +46,8 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.registry.MuleRegistry;
-import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.api.streaming.StreamingManager;
+import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.List;
@@ -210,19 +210,19 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
   @Test
   @Description("Verifies that parsing works with inner expressions in MVEL but only with regular ones in DW.")
   public void parseCompatibility() throws MuleException {
-    assertThat(expressionManager.parse("this is #[mel:payload]", testEvent(), fromSingleComponent("flowName")),
+    assertThat(expressionManager.parse("this is #[mel:payload]", testEvent(), TEST_CONNECTOR_LOCATION),
                is(String.format("this is %s", TEST_PAYLOAD)));
-    assertThat(expressionManager.parse("#['this is ' ++ payload]", testEvent(), fromSingleComponent("flowName")),
+    assertThat(expressionManager.parse("#['this is ' ++ payload]", testEvent(), TEST_CONNECTOR_LOCATION),
                is(String.format("this is %s", TEST_PAYLOAD)));
     expectedException.expect(RuntimeException.class);
-    expressionManager.parse("this is #[payload]", testEvent(), fromSingleComponent("flowName"));
+    expressionManager.parse("this is #[payload]", testEvent(), TEST_CONNECTOR_LOCATION);
   }
 
   @Test
   @Description("Verifies that parsing works for plain String scenarios.")
   public void parse() throws MuleException {
     String expression = "this is a test";
-    assertThat(expressionManager.parse(expression, testEvent(), fromSingleComponent("flowName")), is(expression));
+    assertThat(expressionManager.parse(expression, testEvent(), TEST_CONNECTOR_LOCATION), is(expression));
   }
 
   @Test

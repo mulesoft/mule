@@ -15,7 +15,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.MuleTestUtils.createErrorMock;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -102,7 +101,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
     FirstSuccessful fs = new FirstSuccessful();
     final FlowConstruct flow = mock(FlowConstruct.class, withSettings().extraInterfaces(AnnotatedObject.class));
     when(flow.getMuleContext()).thenReturn(muleContext);
-    when(((AnnotatedObject) flow).getLocation()).thenReturn(fromSingleComponent("flow"));
+    when(((AnnotatedObject) flow).getLocation()).thenReturn(TEST_CONNECTOR_LOCATION);
     fs.setFlowConstruct(flow);
     fs.setMuleContext(muleContext);
 

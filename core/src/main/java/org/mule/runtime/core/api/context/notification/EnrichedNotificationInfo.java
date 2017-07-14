@@ -6,15 +6,17 @@
  */
 package org.mule.runtime.core.api.context.notification;
 
+import static org.mule.runtime.dsl.api.component.config.ComponentLocationUtils.getFlowNameFrom;
+
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.el.ExpressionManager;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.message.GroupCorrelation;
+import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -58,7 +60,7 @@ public class EnrichedNotificationInfo {
       notificationInfo =
           new EnrichedNotificationInfo(event.getContext().getId(), event.getCorrelationId(), event.getGroupCorrelation(),
                                        event.getMessage(), event.getError(), component, e, createVariablesMap(event),
-                                       event.getContext().getOriginatingFlowName(), event.getFlowCallStack());
+                                       getFlowNameFrom(event.getContext().getOriginatingLocation()), event.getFlowCallStack());
       notificationInfo.event = event;
       return notificationInfo;
     } else if (e != null) {
