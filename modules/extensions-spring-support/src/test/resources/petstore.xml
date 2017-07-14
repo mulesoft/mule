@@ -22,7 +22,7 @@
         <petstore:get-client config-ref="${configName}"/>
     </flow>
 
-    <flow name="getClientOnLatch" processingStrategy="synchronous">
+    <flow name="getClientOnLatch"><!--processingStrategy="synchronous"-->
         <petstore:get-client-on-latch config-ref="${configName}" latch="#[connectionLatch]" countDownLatch="#[testLatch]"/>
     </flow>
 

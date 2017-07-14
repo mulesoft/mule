@@ -571,7 +571,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("extensions", fromChildCollectionConfiguration(ConfigurationExtension.class).build())
         .withSetterParameterDefinition("expressionLanguage", fromChildConfiguration(MVELExpressionLanguage.class).build())
         .build());
-    
+
     componentBuildingDefinitions.add(baseDefinition.withIdentifier("notifications")
         .withTypeDefinition(fromType(ServerNotificationManagerConfigurator.class))
         .withSetterParameterDefinition("notificationDynamic", fromSimpleParameter("dynamic").build())
