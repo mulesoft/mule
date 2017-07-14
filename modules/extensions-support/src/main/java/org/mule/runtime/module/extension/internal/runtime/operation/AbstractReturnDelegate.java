@@ -8,13 +8,14 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
+import static org.mule.runtime.core.api.util.StreamingUtils.streamingContent;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.internal.util.message.MessageUtils.toMessageCollection;
 import static org.mule.runtime.core.internal.util.message.MessageUtils.toMessageIterator;
-import static org.mule.runtime.core.api.util.StreamingUtils.streamingContent;
-import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
-import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
+import static org.mule.runtime.extension.internal.loader.enricher.MimeTypeParametersDeclarationEnricher.ENCODING_PARAMETER_NAME;
+import static org.mule.runtime.extension.internal.loader.enricher.MimeTypeParametersDeclarationEnricher.MIME_TYPE_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.returnsListOfMessages;
+
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.metadata.DataType;
@@ -22,11 +23,10 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.streaming.CursorProviderFactory;
 import org.mule.runtime.core.internal.util.message.MessageUtils;
+import org.mule.runtime.core.streaming.CursorProviderFactory;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
-
 import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.Iterator;

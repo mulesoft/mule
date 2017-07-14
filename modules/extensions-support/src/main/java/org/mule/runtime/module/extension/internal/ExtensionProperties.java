@@ -42,16 +42,6 @@ public class ExtensionProperties {
   public static final String COMPLETION_CALLBACK_CONTEXT_PARAM = PROPERTY_PREFIX + "COMPLETION_CALLBACK_CONTEXT_PARAM";
 
   /**
-   * The name of a parameter that allows configuring the mimeType that should be applied
-   */
-  public static final String MIME_TYPE_PARAMETER_NAME = "outputMimeType";
-
-  /**
-   * The name of a parameter that allows configuring the encoding that should be applied
-   */
-  public static final String ENCODING_PARAMETER_NAME = "outputEncoding";
-
-  /**
    * The name mask of a file which contains the {@link ExtensionModel} elements descriptions.
    * <p>
    * The final name of the file is formed like this: {extension-namespace}-extension-descriptions.xml.
@@ -67,11 +57,6 @@ public class ExtensionProperties {
    * The name of a file which contains a json representation of the extension's model
    */
   public static final String EXTENSION_MODEL_JSON_FILE_NAME = "extension-model.json";
-
-  /**
-   * The name of the tab in which advanced parameters should appear
-   */
-  public static final String ADVANCED_TAB_NAME = "Advanced";
 
 
   public static final String DEFAULT_CONNECTION_PROVIDER_NAME = "connection";
