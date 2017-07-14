@@ -31,7 +31,10 @@ import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_STR
 import static org.mule.runtime.extension.api.ExtensionConstants.REDELIVERY_POLICY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.STREAMING_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
+import static org.mule.runtime.extension.internal.loader.enricher.MimeTypeParametersDeclarationEnricher.ENCODING_PARAMETER_NAME;
+import static org.mule.runtime.extension.internal.loader.enricher.MimeTypeParametersDeclarationEnricher.MIME_TYPE_PARAMETER_NAME;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.assertType;
+
 import org.mule.metadata.api.model.BinaryType;
 import org.mule.metadata.api.model.NumberType;
 import org.mule.metadata.api.model.ObjectType;
@@ -50,17 +53,15 @@ import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionDeclarationTestCase;
 import org.mule.tck.size.SmallTest;
-
+import org.junit.Before;
+import org.junit.Test;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
-
 @SmallTest
-public class ComplexExtensionDeclarationTestCase extends AbstractJavaExtensionDeclarationTestCase {
+public class ComplexJavaExtensionDeclarationTestCase extends AbstractJavaExtensionDeclarationTestCase {
 
   private ExtensionModel extensionModel;
 
@@ -110,21 +111,23 @@ public class ComplexExtensionDeclarationTestCase extends AbstractJavaExtensionDe
     assertType(source.getOutputAttributes().getType(), Serializable.class, ObjectType.class);
 
     List<ParameterModel> parameters = source.getAllParameterModels();
-    assertThat(parameters, hasSize(4));
+    assertThat(parameters, hasSize(6));
 
-    ParameterModel parameter = parameters.get(0);
+    assertMimeTypeParams(parameters);
+
+    ParameterModel parameter = parameters.get(2);
     assertThat(parameter.getName(), is(REDELIVERY_POLICY_PARAMETER_NAME));
     assertThat(parameter.getType(), equalTo(new RedeliveryPolicyTypeBuilder().buildRedeliveryPolicyType()));
 
-    parameter = parameters.get(1);
+    parameter = parameters.get(3);
     assertStreamingStrategyParameter(parameter);
 
-    parameter = parameters.get(2);
+    parameter = parameters.get(4);
     assertThat(parameter.getName(), is(PORT));
     assertThat(parameter.isRequired(), is(false));
     assertType(parameter.getType(), Integer.class, NumberType.class);
 
-    parameter = parameters.get(3);
+    parameter = parameters.get(5);
     assertThat(parameter.getName(), is(RECONNECTION_STRATEGY_PARAMETER_NAME));
     assertThat(parameter.getType(), equalTo(new ReconnectionStrategyTypeBuilder().buildReconnectionStrategyType()));
   }
@@ -145,16 +148,18 @@ public class ComplexExtensionDeclarationTestCase extends AbstractJavaExtensionDe
     assertThat(operation.getName(), is(REQUEST_OPERATION_NAME));
     assertType(operation.getOutput().getType(), InputStream.class, BinaryType.class);
     List<ParameterModel> parameterModels = operation.getAllParameterModels();
-    assertThat(parameterModels, hasSize(3));
+    assertThat(parameterModels, hasSize(5));
 
-    ParameterModel parameter = parameterModels.get(0);
+    assertMimeTypeParams(parameterModels);
+
+    ParameterModel parameter = parameterModels.get(2);
     assertStreamingStrategyParameter(parameter);
 
-    parameter = parameterModels.get(1);
+    parameter = parameterModels.get(3);
     assertThat(parameter.getName(), is(PATH));
     assertType(parameter.getType(), String.class, StringType.class);
 
-    parameter = parameterModels.get(2);
+    parameter = parameterModels.get(4);
     assertTargetParameter(parameter);
   }
 
@@ -168,21 +173,26 @@ public class ComplexExtensionDeclarationTestCase extends AbstractJavaExtensionDe
     assertType(parameter.getType(), Object.class, UnionType.class);
   }
 
+  private void assertMimeTypeParams(List<ParameterModel> parameters) {
+    assertThat(parameters.get(0).getName(), is(MIME_TYPE_PARAMETER_NAME));
+    assertThat(parameters.get(1).getName(), is(ENCODING_PARAMETER_NAME));
+  }
+
   @Test
   public void staticResourceOperation() {
     OperationModel operation = extensionModel.getOperationModel(STATIC_RESOURCE_OPERATION_NAME).get();
     assertThat(operation.getName(), is(STATIC_RESOURCE_OPERATION_NAME));
     assertType(operation.getOutput().getType(), InputStream.class, BinaryType.class);
     final List<ParameterModel> parameters = operation.getAllParameterModels();
-    assertThat(parameters, hasSize(3));
+    assertThat(parameters, hasSize(5));
 
-    assertStreamingStrategyParameter(parameters.get(0));
-
-    ParameterModel parameter = parameters.get(1);
+    assertMimeTypeParams(parameters);
+    assertStreamingStrategyParameter(parameters.get(2));
+    ParameterModel parameter = parameters.get(3);
     assertThat(parameter.getName(), is(PATH));
     assertType(parameter.getType(), String.class, StringType.class);
 
-    assertTargetParameter(parameters.get(2));
+    assertTargetParameter(parameters.get(4));
   }
 
   @Test
