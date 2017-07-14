@@ -120,8 +120,7 @@ public class ApplicationModel {
   public static final String PROCESSOR_REFERENCE_ELEMENT = "processor";
   public static final String TRANSFORMER_REFERENCE_ELEMENT = "transformer";
   public static final String ANNOTATION_ELEMENT = "annotations";
-  public static final String PROCESSING_STRATEGY_ATTRIBUTE = "processingStrategy";
-  public static final String PROCESSING_STRATEGY_FACTORY_ATTRIBUTE = "processingStrategyFactory";
+  public static final String FILTER_ELEMENT_SUFFIX = "-filter";
   public static final String CONFIGURATION_ELEMENT = "configuration";
   public static final String DATA_WEAVE = "weave";
   public static final String CUSTOM_TRANSFORMER = "custom-transformer";

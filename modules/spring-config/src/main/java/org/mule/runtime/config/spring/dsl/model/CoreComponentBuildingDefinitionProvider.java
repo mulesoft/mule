@@ -21,8 +21,6 @@ import static org.mule.runtime.api.config.PoolingProfile.POOL_EXHAUSTED_ACTIONS;
 import static org.mule.runtime.api.config.PoolingProfile.POOL_INITIALISATION_POLICIES;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkState;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROCESSING_STRATEGY_ATTRIBUTE;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROCESSING_STRATEGY_FACTORY_ATTRIBUTE;
 import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STARTED;
 import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
 import static org.mule.runtime.core.api.transaction.MuleTransactionConfig.ACTION_INDIFFERENT_STRING;
@@ -391,8 +389,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
             .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
             .withSetterParameterDefinition(EXCEPTION_LISTENER_ATTRIBUTE,
                                            fromChildConfiguration(MessagingExceptionHandler.class).build())
-            .withSetterParameterDefinition(PROCESSING_STRATEGY_FACTORY_ATTRIBUTE,
-                                           fromSimpleReferenceParameter(PROCESSING_STRATEGY_ATTRIBUTE).build())
             .withSetterParameterDefinition("maxConcurrency", fromSimpleParameter("maxConcurrency").build())
             .build());
     componentBuildingDefinitions.add(baseDefinition.withIdentifier(FLOW_REF)

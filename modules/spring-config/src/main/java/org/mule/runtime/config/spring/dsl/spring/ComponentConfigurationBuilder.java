@@ -8,11 +8,8 @@ package org.mule.runtime.config.spring.dsl.spring;
 
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROCESSING_STRATEGY_ATTRIBUTE;
 import static org.mule.runtime.config.spring.dsl.spring.CommonBeanDefinitionCreator.areMatchingTypes;
-import static org.mule.runtime.core.internal.util.ProcessingStrategyUtils.parseProcessingStrategy;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
-import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.dsl.api.component.AttributeDefinition;
 import org.mule.runtime.dsl.api.component.AttributeDefinitionVisitor;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
@@ -264,13 +261,6 @@ class ComponentConfigurationBuilder<T> {
         this.value = new RuntimeBeanReference(reference);
       }
       simpleParameters.remove(configAttributeName);
-      if (configAttributeName.equals(PROCESSING_STRATEGY_ATTRIBUTE) || configAttributeName.equals("defaultProcessingStrategy")) {
-        ProcessingStrategyFactory processingStrategyFactory = parseProcessingStrategy(reference);
-        if (processingStrategyFactory != null) {
-          this.value = processingStrategyFactory;
-          return;
-        }
-      }
     }
 
     @Override
