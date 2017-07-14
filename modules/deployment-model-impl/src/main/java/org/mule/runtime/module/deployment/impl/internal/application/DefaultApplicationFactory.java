@@ -106,7 +106,7 @@ public class DefaultApplicationFactory implements ArtifactFactory<Application> {
 
     final ApplicationDescriptor descriptor = applicationDescriptorFactory.create(appDir);
 
-    return createAppFrom(descriptor);
+    return createArtifact(descriptor);
   }
 
   @Override
@@ -114,7 +114,7 @@ public class DefaultApplicationFactory implements ArtifactFactory<Application> {
     return MuleContainerBootstrapUtils.getMuleAppsDir();
   }
 
-  public Application createAppFrom(ApplicationDescriptor descriptor) throws IOException {
+  public Application createArtifact(ApplicationDescriptor descriptor) throws IOException {
     Domain domain = domainRepository.getDomain(descriptor.getDomain());
 
     if (domain == null) {

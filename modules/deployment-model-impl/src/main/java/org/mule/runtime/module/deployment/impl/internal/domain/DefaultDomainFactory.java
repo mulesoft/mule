@@ -87,10 +87,10 @@ public class DefaultDomainFactory implements ArtifactFactory<Domain> {
       throw new IllegalArgumentException("Mule domain name may not contain spaces: " + domainName);
     }
 
-    return createDomainFrom(findDomain(domainName));
+    return createArtitact(findDomain(domainName));
   }
 
-  private Domain createDomainFrom(DomainDescriptor descriptor) throws IOException {
+  public Domain createArtitact(DomainDescriptor descriptor) throws IOException {
     List<ArtifactPluginDescriptor> artifactPluginDescriptors = descriptor.getPlugins().stream().collect(Collectors.toList());
     List<ArtifactPluginDescriptor> resolvedArtifactPluginDescriptors =
         pluginDependenciesResolver.resolve(artifactPluginDescriptors);
