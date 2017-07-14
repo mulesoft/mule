@@ -175,6 +175,7 @@ public class ExceptionUtilsTestCase extends AbstractMuleTestCase {
     FlowCallStack flowCallStackMock = mock(FlowCallStack.class);
     Message messageMock = mock(Message.class);
     EventContext eventContextMock = mock(EventContext.class);
+    when(eventContextMock.getOriginatingLocation()).thenReturn(TEST_CONNECTOR_LOCATION);
 
     Optional<Error> errorOptional = Optional.ofNullable(null);
 
@@ -208,6 +209,7 @@ public class ExceptionUtilsTestCase extends AbstractMuleTestCase {
     FlowCallStack flowCallStackMock = mock(FlowCallStack.class);
     Message messageMock = mock(Message.class);
     EventContext eventContextMock = mock(EventContext.class);
+    when(eventContextMock.getOriginatingLocation()).thenReturn(TEST_CONNECTOR_LOCATION);
 
     Error errorMock = mock(Error.class);
     Optional<Error> errorOptional = Optional.ofNullable(errorMock);
