@@ -66,6 +66,10 @@ public class DefaultDomainFactory implements DomainFactory {
       throw new IllegalArgumentException("Mule domain name may not contain spaces: " + domainName);
     }
     DomainDescriptor descriptor = findDomain(domainName);
+    return createArtifact(descriptor);
+  }
+
+  public Domain createArtifact(DomainDescriptor descriptor) throws IOException {
     // TODO MULE-9653 - use the plugins class loader maps when plugins are allowed in domains
     DefaultMuleDomain defaultMuleDomain =
         new DefaultMuleDomain(descriptor, domainClassLoaderFactory.create(getDomainId(DEFAULT_DOMAIN_NAME), containerClassLoader,

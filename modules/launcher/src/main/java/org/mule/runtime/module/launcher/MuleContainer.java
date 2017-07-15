@@ -108,7 +108,7 @@ public class MuleContainer {
                                                        () -> findSchedulerService(serviceManager));
     this.repositoryService = new RepositoryServiceFactory().createRepositoryService();
 
-    this.toolingService = new DefaultToolingService(artifactResourcesRegistry.getApplicationFactory());
+    this.toolingService = new DefaultToolingService(artifactResourcesRegistry.getToolingApplicationFactory());
     this.coreExtensionManager = new DefaultMuleCoreExtensionManagerServer(
                                                                           new ClasspathMuleCoreExtensionDiscoverer(artifactResourcesRegistry
                                                                               .getContainerClassLoader()),

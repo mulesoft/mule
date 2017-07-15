@@ -7,7 +7,7 @@
 package org.mule.runtime.module.tooling.internal;
 
 import org.mule.runtime.deployment.model.api.application.Application;
-import org.mule.runtime.module.deployment.impl.internal.application.DefaultApplicationFactory;
+import org.mule.runtime.module.deployment.impl.internal.application.ToolingApplicationFactory;
 import org.mule.runtime.module.tooling.api.ToolingService;
 import org.mule.runtime.module.tooling.api.connectivity.ConnectivityTestingServiceBuilder;
 
@@ -21,12 +21,12 @@ import java.io.IOException;
  */
 public class DefaultToolingService implements ToolingService {
 
-  private final DefaultApplicationFactory applicationFactory;
+  private final ToolingApplicationFactory applicationFactory;
 
   /**
    * @param applicationFactory factory for creating the {@link Application}
    */
-  public DefaultToolingService(DefaultApplicationFactory applicationFactory) {
+  public DefaultToolingService(ToolingApplicationFactory applicationFactory) {
     this.applicationFactory = applicationFactory;
   }
 
