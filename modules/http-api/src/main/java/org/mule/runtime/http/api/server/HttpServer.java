@@ -20,15 +20,18 @@ public interface HttpServer {
 
   /**
    * Binds the ServerSocket to the network interface and starts listening for requests.
-   * 
+   *
+   * @return the server
    * @throws IOException if there was a problem binding to the host and port specified.
    */
-  void start() throws IOException;
+  HttpServer start() throws IOException;
 
   /**
    * Unbinds the ServerSocket to the network interface and stops listening for requests.
+   *
+   * @return the server
    */
-  void stop();
+  HttpServer stop();
 
   /**
    * Removes all secondary data to get rid of the server. Cannot be undone.

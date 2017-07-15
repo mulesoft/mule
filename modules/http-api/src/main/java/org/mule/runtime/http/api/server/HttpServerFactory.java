@@ -22,7 +22,7 @@ public interface HttpServerFactory {
    * @return a newly built {@link HttpServer} based on the {@code configuration}.
    * @throws ConnectionException if the server cannot be created based on the configuration.
    */
-  HttpServer create(HttpServerConfiguration configuration) throws ConnectionException;
+  HttpServer create(HttpServerConfiguration configuration) throws ServerCreationException;
 
   /**
    * Allows to retrieve a previously created {@link HttpServer}, if used from the same context. Keep in mind lifecycle changes to

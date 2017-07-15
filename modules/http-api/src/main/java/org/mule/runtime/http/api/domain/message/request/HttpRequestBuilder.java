@@ -63,23 +63,33 @@ public final class HttpRequestBuilder extends HttpMessageBuilder<HttpRequestBuil
   }
 
   /**
-   * @param headersMap a {@link MultiMap} representing the HTTP headers of the {@link HttpRequest} desired. Non null.
-   * @return this builder
-   */
-  public HttpRequestBuilder setHeaders(MultiMap<String, String> headersMap) {
-    headersMap.keySet().forEach(
-                                key -> headersMap.getAll(key).forEach(
-                                                                      value -> this.headers.put(key, value)));
-    return this;
-  }
-
-  /**
    * @param queryParams a {@link MultiMap} representing the HTTP query params of the {@link HttpRequest} desired. Non null.
    * @return this builder
    */
   public HttpRequestBuilder setQueryParams(MultiMap<String, String> queryParams) {
     this.queryParams = queryParams;
     return this;
+  }
+
+  /**
+   * @return the current URI configured in the builder.
+   */
+  public String getUri() {
+    return uri;
+  }
+
+  /**
+   * @return the current HTTP method configured in the builder.
+   */
+  public String getMethod() {
+    return method;
+  }
+
+  /**
+   * @return an immutable version of the current query parameters in the builder.
+   */
+  public MultiMap<String, String> getQueryParams() {
+    return queryParams.toImmutableMultiMap();
   }
 
   /**

@@ -39,6 +39,20 @@ public final class HttpResponseBuilder extends HttpMessageBuilder<HttpResponseBu
   }
 
   /**
+   * @return the current status code configured in the builder.
+   */
+  public int getStatusCode() {
+    return responseStatus.getStatusCode();
+  }
+
+  /**
+   * @return the current reason phrase configured in the builder.
+   */
+  public String getReasonPhrase() {
+    return responseStatus.getReasonPhrase();
+  }
+
+  /**
    * @return an {@link HttpResponse} as described
    */
   @Override
