@@ -11,7 +11,7 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import ru.yandex.qatools.allure.annotations.Description;
+import io.qameta.allure.Description;
 
 public abstract class InMemoryStreamingConfigContractTestCase extends AbstractMuleTestCase {
 

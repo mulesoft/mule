@@ -26,10 +26,10 @@ import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
-import ru.yandex.qatools.allure.annotations.Features;
+import io.qameta.allure.Feature;
 
 @SmallTest
-@Features(STREAMING)
+@Feature(STREAMING)
 public class SimpleConsumerTestCase {
 
   private Producer<String> producer;

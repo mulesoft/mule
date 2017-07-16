@@ -33,11 +33,11 @@ import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
-import ru.yandex.qatools.allure.annotations.Features;
+import io.qameta.allure.Feature;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-@Features(STREAMING)
+@Feature(STREAMING)
 public class ListableObjectStoreProducerTestCase {
 
   @Mock

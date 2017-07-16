@@ -25,11 +25,11 @@ import java.util.Optional;
 
 import org.junit.Test;
 
-import ru.yandex.qatools.allure.annotations.Features;
-import ru.yandex.qatools.allure.annotations.Stories;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
-@Features(HTTP_SERVICE)
-@Stories(RESPONSE_BUILDER)
+@Feature(HTTP_SERVICE)
+@Story(RESPONSE_BUILDER)
 public class HttpResponseBuilderTestCase {
 
   private HttpResponseBuilder builder = HttpResponse.builder();

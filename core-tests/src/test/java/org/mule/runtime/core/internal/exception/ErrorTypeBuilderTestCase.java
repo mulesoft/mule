@@ -19,11 +19,11 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import ru.yandex.qatools.allure.annotations.Features;
-import ru.yandex.qatools.allure.annotations.Stories;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
-@Features(ERROR_HANDLING)
-@Stories(ERROR_TYPES)
+@Feature(ERROR_HANDLING)
+@Story(ERROR_TYPES)
 public class ErrorTypeBuilderTestCase extends AbstractMuleTestCase {
 
   private static final String NAMESPACE = "CUSTOM";

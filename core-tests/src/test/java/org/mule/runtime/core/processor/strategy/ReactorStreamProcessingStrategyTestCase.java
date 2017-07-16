@@ -26,12 +26,12 @@ import org.mule.runtime.core.processor.strategy.ReactorStreamProcessingStrategyF
 
 import org.junit.Test;
 
-import ru.yandex.qatools.allure.annotations.Description;
-import ru.yandex.qatools.allure.annotations.Features;
-import ru.yandex.qatools.allure.annotations.Stories;
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
-@Features(PROCESSING_STRATEGIES)
-@Stories(REACTOR)
+@Feature(PROCESSING_STRATEGIES)
+@Story(REACTOR)
 public class ReactorStreamProcessingStrategyTestCase extends ReactorProcessingStrategyTestCase {
 
   public ReactorStreamProcessingStrategyTestCase(Mode mode) {

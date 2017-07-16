@@ -17,12 +17,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
-import ru.yandex.qatools.allure.annotations.Description;
-import ru.yandex.qatools.allure.annotations.Features;
-import ru.yandex.qatools.allure.annotations.Stories;
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
-@Features(STREAMING)
-@Stories(OBJECT_STREAMING)
+@Feature(STREAMING)
+@Story(OBJECT_STREAMING)
 public class ObjectStreamingExtensionTestCase extends AbstractStreamingExtensionTestCase {
 
   private static final int DATA_SIZE = 100;

@@ -43,13 +43,14 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import ru.yandex.qatools.allure.annotations.Description;
-import ru.yandex.qatools.allure.annotations.Features;
-import ru.yandex.qatools.allure.annotations.Stories;
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+import io.qameta.allure.junit4.DisplayName;
 
-@Features(EXPRESSION_LANGUAGE)
-@Stories(SUPPORT_MVEL_DW)
-@Description("Test cases verifying the differences between MVEL and DW ELs.")
+@Feature(EXPRESSION_LANGUAGE)
+@Story(SUPPORT_MVEL_DW)
+@DisplayName("MVEL vs. DW Expression Language")
 public class ExtendedExpressionLanguageAdapterTestCase extends AbstractWeaveExpressionLanguageTestCase {
 
   @Rule

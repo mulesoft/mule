@@ -18,12 +18,12 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import ru.yandex.qatools.allure.annotations.Description;
-import ru.yandex.qatools.allure.annotations.Features;
-import ru.yandex.qatools.allure.annotations.Stories;
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
-@Features(CONFIGURATION_PROPERTIES)
-@Stories(COMPONENT_CONFIGURATION_YAML_STORY)
+@Feature(CONFIGURATION_PROPERTIES)
+@Story(COMPONENT_CONFIGURATION_YAML_STORY)
 public class YamlConfigurationPropertiesComponentTestCase {
 
   @Rule

@@ -37,11 +37,11 @@ import java.util.List;
 import java.util.Optional;
 
 import org.junit.Test;
-import ru.yandex.qatools.allure.annotations.Features;
-import ru.yandex.qatools.allure.annotations.Stories;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
-@Features(EXPRESSION_LANGUAGE)
-@Stories(SUPPORT_FUNCTIONS)
+@Feature(EXPRESSION_LANGUAGE)
+@Story(SUPPORT_FUNCTIONS)
 public class GlobalBindingContextProviderTestCase extends AbstractMuleContextTestCase {
 
   public static final String KEY = "testProvider";

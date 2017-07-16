@@ -40,12 +40,12 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.Test;
 
-import ru.yandex.qatools.allure.annotations.Description;
-import ru.yandex.qatools.allure.annotations.Features;
-import ru.yandex.qatools.allure.annotations.Stories;
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
-@Features(PROCESSING_STRATEGIES)
-@Stories(PROACTOR)
+@Feature(PROCESSING_STRATEGIES)
+@Story(PROACTOR)
 public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessingStrategyTestCase {
 
   public ProactorStreamProcessingStrategyTestCase(Mode mode) {

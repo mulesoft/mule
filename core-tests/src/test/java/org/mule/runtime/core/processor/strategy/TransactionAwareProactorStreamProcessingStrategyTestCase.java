@@ -26,12 +26,12 @@ import org.mule.runtime.core.processor.strategy.TransactionAwareProactorStreamPr
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
-import ru.yandex.qatools.allure.annotations.Description;
-import ru.yandex.qatools.allure.annotations.Features;
-import ru.yandex.qatools.allure.annotations.Stories;
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
-@Features(PROCESSING_STRATEGIES)
-@Stories(DEFAULT)
+@Feature(PROCESSING_STRATEGIES)
+@Story(DEFAULT)
 public class TransactionAwareProactorStreamProcessingStrategyTestCase extends ProactorStreamProcessingStrategyTestCase {
 
   public TransactionAwareProactorStreamProcessingStrategyTestCase(AbstractReactiveProcessorTestCase.Mode mode) {

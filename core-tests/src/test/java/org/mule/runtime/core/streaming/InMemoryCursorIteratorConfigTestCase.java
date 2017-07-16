@@ -11,12 +11,12 @@ import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingSto
 import org.mule.runtime.core.api.streaming.object.InMemoryCursorIteratorConfig;
 import org.mule.tck.size.SmallTest;
 
-import ru.yandex.qatools.allure.annotations.Features;
-import ru.yandex.qatools.allure.annotations.Stories;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
 @SmallTest
-@Features(STREAMING)
-@Stories(BYTES_STREAMING)
+@Feature(STREAMING)
+@Story(BYTES_STREAMING)
 public class InMemoryCursorIteratorConfigTestCase extends InMemoryStreamingConfigContractTestCase {
 
   @Override

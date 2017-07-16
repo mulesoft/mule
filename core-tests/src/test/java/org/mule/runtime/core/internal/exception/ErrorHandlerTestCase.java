@@ -46,12 +46,12 @@ import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import ru.yandex.qatools.allure.annotations.Features;
-import ru.yandex.qatools.allure.annotations.Stories;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
 @SmallTest
-@Features(ERROR_HANDLING)
-@Stories(ERROR_HANDLER)
+@Feature(ERROR_HANDLING)
+@Story(ERROR_HANDLER)
 @RunWith(MockitoJUnitRunner.class)
 public class ErrorHandlerTestCase extends AbstractMuleTestCase {
 
