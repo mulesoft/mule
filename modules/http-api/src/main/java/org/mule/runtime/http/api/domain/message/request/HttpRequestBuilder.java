@@ -15,7 +15,7 @@ import org.mule.runtime.http.api.domain.message.HttpMessageBuilder;
 
 /**
  * Builder of {@link HttpRequest}s. Instances can only be obtained using {@link HttpRequest#builder()}. At the very least, the
- * request URI needs to be provided via {@link #setUri(String)}. By default, GET is used as method with empty headers, query
+ * request URI needs to be provided via {@link #uri(String)}. By default, GET is used as method with empty headers, query
  * params and entity.
  *
  * @since 4.0
@@ -35,7 +35,7 @@ public final class HttpRequestBuilder extends HttpMessageBuilder<HttpRequestBuil
    * @param uri the URI of the {@link HttpRequest} desired. Non null.
    * @return this builder
    */
-  public HttpRequestBuilder setUri(String uri) {
+  public HttpRequestBuilder uri(String uri) {
     int queryPos = uri.indexOf("?");
     this.path = queryPos > -1 ? uri.substring(0, queryPos) : uri;
     this.uri = uri;
@@ -43,12 +43,12 @@ public final class HttpRequestBuilder extends HttpMessageBuilder<HttpRequestBuil
   }
 
   /**
-   * Allows for using extension methods, as defined in the rfc. In general, {@link #setMethod(Method)} should be used.
+   * Allows for using extension methods, as defined in the rfc. In general, {@link #method(Method)} should be used.
    * 
    * @param method the HTTP method of the {@link HttpRequest} desired. Non null.
    * @return this builder
    */
-  public HttpRequestBuilder setMethod(String method) {
+  public HttpRequestBuilder method(String method) {
     this.method = method;
     return this;
   }
@@ -57,7 +57,7 @@ public final class HttpRequestBuilder extends HttpMessageBuilder<HttpRequestBuil
    * @param method the HTTP method of the {@link HttpRequest} desired. Non null.
    * @return this builder
    */
-  public HttpRequestBuilder setMethod(Method method) {
+  public HttpRequestBuilder method(Method method) {
     this.method = method.name();
     return this;
   }
@@ -66,7 +66,7 @@ public final class HttpRequestBuilder extends HttpMessageBuilder<HttpRequestBuil
    * @param queryParams a {@link MultiMap} representing the HTTP query params of the {@link HttpRequest} desired. Non null.
    * @return this builder
    */
-  public HttpRequestBuilder setQueryParams(MultiMap<String, String> queryParams) {
+  public HttpRequestBuilder queryParams(MultiMap<String, String> queryParams) {
     this.queryParams = queryParams;
     return this;
   }

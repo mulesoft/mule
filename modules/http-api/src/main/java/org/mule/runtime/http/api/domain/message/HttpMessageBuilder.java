@@ -33,7 +33,7 @@ public abstract class HttpMessageBuilder<B extends HttpMessageBuilder, M extends
    * @param entity the {@link HttpEntity} that should be used as body for the {@link HttpMessage}. Non null.
    * @return this builder
    */
-  public B setEntity(HttpEntity entity) {
+  public B entity(HttpEntity entity) {
     checkNotNull(entity, "entity cannot be null, use an EmptyHttpEntity instead");
     this.entity = entity;
     return (B) this;
@@ -43,7 +43,7 @@ public abstract class HttpMessageBuilder<B extends HttpMessageBuilder, M extends
    * @param headersMap a {@link MultiMap} representing the HTTP headers of the {@link HttpRequest} desired. Non null.
    * @return this builder
    */
-  public B setHeaders(MultiMap<String, String> headersMap) {
+  public B headers(MultiMap<String, String> headersMap) {
     headersMap.keySet().forEach(
                                 key -> headersMap.getAll(key).forEach(
                                                                       value -> this.headers.put(key, value)));

@@ -44,7 +44,7 @@ public class HttpRequestBuilderTestCase {
 
   @Test
   public void defaultRequest() {
-    HttpRequest request = builder.setUri("someUri").build();
+    HttpRequest request = builder.uri("someUri").build();
     assertThat(request.getMethod(), is("GET"));
     assertThat(request.getUri(), is("someUri"));
     assertThat(request.getEntity(), is(instanceOf(EmptyHttpEntity.class)));
@@ -64,11 +64,11 @@ public class HttpRequestBuilderTestCase {
     MultiMap<String, String> paramMap = new MultiMap<>();
 
     paramMap.put(name, value);
-    HttpRequest request = builder.setEntity(new ByteArrayHttpEntity("test".getBytes()))
-        .setUri(URI_VALUE)
-        .setMethod(POST)
-        .setQueryParams(paramMap)
-        .setHeaders(paramMap)
+    HttpRequest request = builder.entity(new ByteArrayHttpEntity("test".getBytes()))
+        .uri(URI_VALUE)
+        .method(POST)
+        .queryParams(paramMap)
+        .headers(paramMap)
         .addHeader(name.toUpperCase(), value.toUpperCase())
         .build();
 
@@ -84,7 +84,7 @@ public class HttpRequestBuilderTestCase {
 
   @Test
   public void headerManipulation() {
-    builder.setUri(URI_VALUE);
+    builder.uri(URI_VALUE);
     assertThat(builder.build().getHeaderNames(), empty());
 
     String otherValue = "otherValue";
@@ -93,7 +93,7 @@ public class HttpRequestBuilderTestCase {
     multiMap.put(name, otherValue);
 
     // add multiple valued header through parameter map and individually
-    builder.setHeaders(multiMap);
+    builder.headers(multiMap);
     builder.addHeader(name, value);
     assertThat(builder.getHeaderValues(name), hasItems(value, otherValue, value));
     assertThat(builder.build().getHeaderValues(name), hasItems(value, otherValue, value));

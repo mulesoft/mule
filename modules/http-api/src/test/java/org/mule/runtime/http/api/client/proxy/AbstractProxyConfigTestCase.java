@@ -24,13 +24,13 @@ public abstract class AbstractProxyConfigTestCase<B extends BaseProxyConfigBuild
   @Test
   public void onlyHost() {
     expectedException.expect(IllegalArgumentException.class);
-    getProxyConfigBuilder().setHost(HOST).build();
+    getProxyConfigBuilder().host(HOST).build();
   }
 
   @Test
   public void onlyPort() {
     expectedException.expect(IllegalArgumentException.class);
-    getProxyConfigBuilder().setPort(PORT).build();
+    getProxyConfigBuilder().port(PORT).build();
   }
 
   protected abstract B getProxyConfigBuilder();

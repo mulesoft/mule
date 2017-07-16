@@ -48,9 +48,9 @@ public class HttpResponseBuilderTestCase {
   @Test
   public void complexResponse() {
     HttpResponse response = builder
-        .setEntity(new ByteArrayHttpEntity("test".getBytes()))
-        .setStatusCode(418)
-        .setReasonPhrase("I'm a teapot")
+        .entity(new ByteArrayHttpEntity("test".getBytes()))
+        .statusCode(418)
+        .reasonPhrase("I'm a teapot")
         .addHeader(header, value)
         .build();
 

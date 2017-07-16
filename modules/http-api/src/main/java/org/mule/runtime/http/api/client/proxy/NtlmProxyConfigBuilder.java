@@ -20,7 +20,7 @@ public final class NtlmProxyConfigBuilder extends BaseProxyConfigBuilder<NtlmPro
 
   protected NtlmProxyConfigBuilder() {}
 
-  public NtlmProxyConfigBuilder setNtlmDomain(String ntlmDomain) {
+  public NtlmProxyConfigBuilder ntlmDomain(String ntlmDomain) {
     this.ntlmDomain = ntlmDomain;
     return this;
   }

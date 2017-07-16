@@ -22,22 +22,22 @@ public abstract class BaseProxyConfigBuilder<P extends ProxyConfig, B extends Ba
   protected String username = null;
   protected String password = null;
 
-  public B setHost(String host) {
+  public B host(String host) {
     this.host = host;
     return (B) this;
   }
 
-  public B setPort(int port) {
+  public B port(int port) {
     this.port = port;
     return (B) this;
   }
 
-  public B setUsername(String username) {
+  public B username(String username) {
     this.username = username;
     return (B) this;
   }
 
-  public B setPassword(String password) {
+  public B password(String password) {
     this.password = password;
     return (B) this;
   }

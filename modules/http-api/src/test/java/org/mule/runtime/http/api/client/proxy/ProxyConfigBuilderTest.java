@@ -30,7 +30,7 @@ public class ProxyConfigBuilderTest extends AbstractProxyConfigTestCase<ProxyCon
 
   @Test
   public void minimalConfig() {
-    ProxyConfig config = proxyConfigBuilder.setHost(HOST).setPort(PORT).build();
+    ProxyConfig config = proxyConfigBuilder.host(HOST).port(PORT).build();
     assertThat(config.getHost(), is(HOST));
     assertThat(config.getPort(), is(PORT));
     assertThat(config.getPassword(), nullValue());
@@ -39,7 +39,7 @@ public class ProxyConfigBuilderTest extends AbstractProxyConfigTestCase<ProxyCon
 
   @Test
   public void fullConfig() {
-    ProxyConfig config = proxyConfigBuilder.setHost(HOST).setPort(PORT).setUsername(USERNAME).setPassword(PASSWORD).build();
+    ProxyConfig config = proxyConfigBuilder.host(HOST).port(PORT).username(USERNAME).password(PASSWORD).build();
     assertThat(config.getHost(), is(HOST));
     assertThat(config.getPort(), is(PORT));
     assertThat(config.getPassword(), is(PASSWORD));

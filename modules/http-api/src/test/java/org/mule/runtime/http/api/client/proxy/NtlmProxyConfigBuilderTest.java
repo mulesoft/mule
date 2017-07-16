@@ -32,13 +32,13 @@ public class NtlmProxyConfigBuilderTest extends AbstractProxyConfigTestCase<Ntlm
   @Test
   public void onlyDomain() {
     expectedException.expect(IllegalArgumentException.class);
-    ntlmProxyConfigBuilder.setNtlmDomain(NTLM_DOMAIN).build();
+    ntlmProxyConfigBuilder.ntlmDomain(NTLM_DOMAIN).build();
   }
 
   @Test
   public void fullConfig() {
-    NtlmProxyConfig config = ntlmProxyConfigBuilder.setHost(HOST).setPort(PORT).setNtlmDomain(NTLM_DOMAIN)
-        .setUsername(USERNAME).setPassword(PASSWORD).build();
+    NtlmProxyConfig config = ntlmProxyConfigBuilder.host(HOST).port(PORT).ntlmDomain(NTLM_DOMAIN)
+        .username(USERNAME).password(PASSWORD).build();
     assertThat(config.getHost(), is(HOST));
     assertThat(config.getPort(), is(PORT));
     assertThat(config.getNtlmDomain(), is(NTLM_DOMAIN));

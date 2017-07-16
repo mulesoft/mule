@@ -21,7 +21,7 @@ public interface HttpServer {
   /**
    * Binds the ServerSocket to the network interface and starts listening for requests.
    *
-   * @return the server
+   * @return this server
    * @throws IOException if there was a problem binding to the host and port specified.
    */
   HttpServer start() throws IOException;
@@ -29,7 +29,7 @@ public interface HttpServer {
   /**
    * Unbinds the ServerSocket to the network interface and stops listening for requests.
    *
-   * @return the server
+   * @return this server
    */
   HttpServer stop();
 
