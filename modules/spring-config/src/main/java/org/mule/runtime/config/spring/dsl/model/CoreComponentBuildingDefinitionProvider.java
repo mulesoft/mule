@@ -27,6 +27,8 @@ import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROCESSI
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROCESSING_STRATEGY_FACTORY_ATTRIBUTE;
 import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STARTED;
 import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
+import static org.mule.runtime.core.api.transaction.MuleTransactionConfig.ACTION_INDIFFERENT_STRING;
+import static org.mule.runtime.core.api.transaction.TransactionType.LOCAL;
 import static org.mule.runtime.core.routing.outbound.AbstractOutboundRouter.DEFAULT_FAILURE_EXPRESSION;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildCollectionConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
@@ -209,6 +211,8 @@ import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
 import org.mule.runtime.dsl.api.component.TypeConverter;
 
+import com.google.common.collect.ImmutableMap;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -216,8 +220,6 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.regex.Pattern;
-
-import com.google.common.collect.ImmutableMap;
 
 /**
  * {@link ComponentBuildingDefinition} definitions for the components provided by the core runtime.
@@ -461,8 +463,11 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
             .withObjectFactoryType(TryProcessorFactoryBean.class)
             .withSetterParameterDefinition("exceptionListener", fromChildConfiguration(MessagingExceptionHandler.class).build())
             .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
-            .withSetterParameterDefinition(TX_ACTION, fromSimpleParameter(TX_ACTION).build())
-            .withSetterParameterDefinition(TX_TYPE, fromSimpleParameter(TX_TYPE, getTransactionTypeConverter()).build()).build());
+            .withSetterParameterDefinition(TX_ACTION, fromSimpleParameter(TX_ACTION).withDefaultValue(ACTION_INDIFFERENT_STRING)
+                .build())
+            .withSetterParameterDefinition(TX_TYPE, fromSimpleParameter(TX_TYPE, getTransactionTypeConverter())
+                .withDefaultValue(LOCAL.name()).build())
+            .build());
 
     componentBuildingDefinitions
         .add(baseDefinition.withIdentifier(UNTIL_SUCCESSFUL).withTypeDefinition(fromType(UntilSuccessful.class))
