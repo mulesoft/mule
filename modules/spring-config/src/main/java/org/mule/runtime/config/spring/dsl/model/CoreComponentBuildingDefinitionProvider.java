@@ -28,6 +28,8 @@ import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROCESSI
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROTOTYPE_OBJECT_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SINGLETON_OBJECT_ELEMENT;
 import static org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
+import static org.mule.runtime.core.transaction.MuleTransactionConfig.ACTION_INDIFFERENT_STRING;
+import static org.mule.runtime.core.transaction.TransactionType.LOCAL;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildCollectionConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildMapConfiguration;
@@ -486,8 +488,12 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
             .withObjectFactoryType(TryProcessorFactoryBean.class)
             .withSetterParameterDefinition("exceptionListener", fromChildConfiguration(MessagingExceptionHandler.class).build())
             .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
-            .withSetterParameterDefinition(TX_ACTION, fromSimpleParameter(TX_ACTION).build())
-            .withSetterParameterDefinition(TX_TYPE, fromSimpleParameter(TX_TYPE, getTransactionTypeConverter()).build()).build());
+            .withSetterParameterDefinition(TX_ACTION, fromSimpleParameter(TX_ACTION).withDefaultValue(ACTION_INDIFFERENT_STRING)
+                .build())
+            .withSetterParameterDefinition(TX_TYPE, fromSimpleParameter(TX_TYPE, getTransactionTypeConverter())
+                .withDefaultValue(LOCAL.name()).build())
+
+            .build());
 
     componentBuildingDefinitions
         .add(baseDefinition.copy().withIdentifier(UNTIL_SUCCESSFUL).withTypeDefinition(fromType(UntilSuccessful.class))
