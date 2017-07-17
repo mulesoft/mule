@@ -83,7 +83,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
   }
 
   /**
-   * The initialise method is call every time the Exception stategy is assigned to a service or connector. This implementation
+   * The initialise method is call every time the Exception strategy is assigned to a service or connector. This implementation
    * ensures that initialise is called only once. The actual initialisation code is contained in the <code>doInitialise()</code>
    * method.
    *
@@ -92,8 +92,8 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
   @Override
   public final synchronized void initialise() throws InitialisationException {
     if (!initialised.get()) {
-      super.initialise();
       doInitialise(muleContext);
+      super.initialise();
       initialised.set(true);
     }
   }
