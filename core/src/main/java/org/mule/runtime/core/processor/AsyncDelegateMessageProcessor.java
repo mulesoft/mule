@@ -67,7 +67,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
 
   private Scheduler scheduler;
   private reactor.core.scheduler.Scheduler reactorScheduler;
-  protected String name;
+  private String name;
   private MessagingExceptionHandler messagingExceptionHandler;
 
   public AsyncDelegateMessageProcessor(MessageProcessorChain delegate) {
@@ -89,9 +89,8 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
 
   @Override
   public void start() throws MuleException {
-    scheduler = schedulerService.ioScheduler(getLocation() != null
-        ? muleContext.getSchedulerBaseConfig().withName(getLocation().getLocation())
-        : muleContext.getSchedulerBaseConfig());
+    scheduler = schedulerService
+        .ioScheduler(muleContext.getSchedulerBaseConfig().withName(name != null ? name : getLocation().getLocation()));
     reactorScheduler = fromExecutorService(scheduler);
     super.start();
   }

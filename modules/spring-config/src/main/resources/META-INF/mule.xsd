@@ -624,7 +624,7 @@
     <xsd:element name="async" type="asyncType" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
-                Processes the nested list of message processors asynchronously using a thread pool
+                Processes the nested list of message processors asynchronously using a scheduler
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -637,7 +637,7 @@
                 <xsd:attribute name="name" type="xsd:string" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Optional name that will be used to name the threads used by this flow.
+                            Optional name that will be used to name the async scheduler.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -1023,7 +1023,7 @@
                 <xsd:attribute name="shutdownTimeout" type="substitutableInt" default="5000">
                     <xsd:annotation>
                         <xsd:documentation>
-                            (As of Mule 2.2.2) The time in milliseconds to wait for any in-progress messages to finish processing before Mule shuts down. After this threshold has been reached, Mule starts interrupting threads, and messages can be lost. If you have a very large number of services in the same Mule instance, if you have components that take more than a couple seconds to process, or if you are using large payloads and/or slower transports, you should increase this value to allow more time for graceful shutdown. The value you specify is applied to services and separately to dispatchers, so the default value of 5000 milliseconds specifies that Mule has ten seconds to process and dispatch messages gracefully after shutdown is initiated.
+                            (As of Mule 2.2.2) The time in milliseconds to wait for any in-progress work to finish running before Mule shuts down. After this threshold has been reached, Mule starts stopping schedulers and interrupting threads, and messages can be lost. If you have a very large number of services in the same Mule instance, if you have components that take more than a couple seconds to process, or if you are using large payloads and/or slower transports, you should increase this value to allow more time for graceful shutdown. The value you specify is applied to services and separately to dispatchers, so the default value of 5000 milliseconds specifies that Mule has ten seconds to process and dispatch messages gracefully after shutdown is initiated.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -1402,7 +1402,7 @@
         </xsd:sequence>
         <xsd:attribute name="blocking" type="substitutableBoolean" default="true">
             <xsd:annotation>
-                <xsd:documentation>If false, the reconnection strategy will run in a separate, non-blocking thread</xsd:documentation>
+                <xsd:documentation>If false, the reconnection strategy will run in a separate scheduler</xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
     </xsd:complexType>
@@ -3949,7 +3949,7 @@
                 </xsd:attribute>
                 <xsd:attribute name="exhaustedAction" default="WHEN_EXHAUSTED_GROW">
                     <xsd:annotation>
-                        <xsd:documentation>Specifies the behavior of the Mule component pool when the pool is exhausted. Possible values are: "WHEN_EXHAUSTED_FAIL", which will throw a NoSuchElementException, "WHEN_EXHAUSTED_WAIT", which will block by invoking Object.wait(long) until a new or idle object is available, or WHEN_EXHAUSTED_GROW, which will create a new Mule instance and return it, essentially making maxActive meaningless. If a positive maxWait value is supplied, it will block for at most that many milliseconds, after which a NoSuchElementException will be thrown. If maxThreadWait is a negative value, it will block indefinitely.</xsd:documentation>
+                        <xsd:documentation>Specifies the behavior of the Mule component pool when the pool is exhausted. Possible values are: "WHEN_EXHAUSTED_FAIL", which will throw a NoSuchElementException, "WHEN_EXHAUSTED_WAIT", which will block by invoking Object.wait(long) until a new or idle object is available, or WHEN_EXHAUSTED_GROW, which will create a new Mule instance and return it, essentially making maxActive meaningless. If a positive maxWait value is supplied, it will block for at most that many milliseconds, after which a NoSuchElementException will be thrown. If 'maxWait' is a negative value, it will block indefinitely.</xsd:documentation>
                     </xsd:annotation>
                     <xsd:simpleType>
                         <xsd:restriction base="xsd:NMTOKEN">
