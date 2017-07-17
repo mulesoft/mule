@@ -12,6 +12,7 @@ import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.value.ValueProviderService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
+import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.DeploymentStartException;
 import org.mule.runtime.deployment.model.api.InstallException;
@@ -106,6 +107,11 @@ public class DeployableArtifactWrapper<T extends DeployableArtifact<D>, D extend
   @Override
   public File[] getResourceFiles() {
     return delegate.getResourceFiles();
+  }
+
+  @Override
+  public void setMuleContextListener(MuleContextListener muleContextListener) {
+    delegate.setMuleContextListener(muleContextListener);
   }
 
   public void start() throws DeploymentStartException {

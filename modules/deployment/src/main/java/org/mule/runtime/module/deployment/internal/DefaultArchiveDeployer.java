@@ -19,6 +19,7 @@ import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.module.artifact.Artifact;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
+import org.mule.runtime.module.deployment.impl.internal.artifact.MuleContextListenerFactory;
 import org.mule.runtime.module.deployment.internal.util.ObservableList;
 
 import java.io.File;
@@ -51,17 +52,20 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
   private final ArtifactDeploymentTemplate deploymentTemplate;
   private ArtifactFactory<T> artifactFactory;
   private DeploymentListener deploymentListener = new NullDeploymentListener();
+  private MuleContextListenerFactory muleContextListenerFactory;
 
 
   public DefaultArchiveDeployer(final ArtifactDeployer deployer, final ArtifactFactory artifactFactory,
                                 final ObservableList<T> artifacts,
-                                ArtifactDeploymentTemplate deploymentTemplate) {
+                                ArtifactDeploymentTemplate deploymentTemplate,
+                                MuleContextListenerFactory muleContextListenerFactory) {
     this.deployer = deployer;
     this.artifactFactory = artifactFactory;
     this.artifacts = artifacts;
     this.deploymentTemplate = deploymentTemplate;
     this.artifactDir = artifactFactory.getArtifactDir();
     this.artifactArchiveInstaller = new ArtifactArchiveInstaller(artifactDir);
+    this.muleContextListenerFactory = muleContextListenerFactory;
   }
 
   @Override
@@ -235,7 +239,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
 
     T artifact;
     try {
-      artifact = artifactFactory.createArtifact(new File(getMuleAppsDir(), addedApp));
+      artifact = createArtifact(new File(getMuleAppsDir(), addedApp));
 
       // add to the list of known artifacts first to avoid deployment loop on failure
       trackArtifact(artifact);
@@ -367,7 +371,14 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
 
   private T installFrom(URI uri) throws IOException {
     File artifactLocation = artifactArchiveInstaller.installArtifact(uri);
-    return artifactFactory.createArtifact(artifactLocation);
+    T artifact = createArtifact(artifactLocation);
+    return artifact;
+  }
+
+  private T createArtifact(File artifactLocation) throws IOException {
+    T artifact = artifactFactory.createArtifact(artifactLocation);
+    artifact.setMuleContextListener(muleContextListenerFactory.create(artifact.getArtifactName()));
+    return artifact;
   }
 
   @Override
@@ -387,7 +398,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
 
     deploymentListener.onDeploymentStart(artifact.getArtifactName());
     try {
-      artifact = artifactFactory.createArtifact(artifact.getLocation());
+      artifact = createArtifact(artifact.getLocation());
       trackArtifact(artifact);
 
       deployer.deploy(artifact);
