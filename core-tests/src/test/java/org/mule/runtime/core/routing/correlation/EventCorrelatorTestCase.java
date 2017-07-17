@@ -15,6 +15,7 @@ import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import io.qameta.allure.Issue;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -123,6 +124,7 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase {
 
   @Test
   @Ignore("MULE-7311")
+  @Issue("MULE-7311")
   public void processesExpiredGroupInPrimaryNode() throws Exception {
     doExpiredGroupMonitoringTest(true);
   }
