@@ -11,19 +11,24 @@ import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.range;
 import static reactor.core.publisher.Mono.delay;
 import static reactor.core.publisher.Mono.error;
+import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
-import org.mule.runtime.core.api.retry.policy.RetryPolicy;
 import org.mule.runtime.core.api.retry.policy.PolicyStatus;
+import org.mule.runtime.core.api.retry.policy.RetryPolicy;
 import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
 
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Scheduler;
 import reactor.util.function.Tuples;
 
 /**
@@ -37,26 +42,29 @@ public class SimpleRetryPolicy implements RetryPolicy {
 
   private volatile int count = SimpleRetryPolicyTemplate.DEFAULT_RETRY_COUNT;
   private volatile long frequency = SimpleRetryPolicyTemplate.DEFAULT_FREQUENCY;
+  private Scheduler timer;
 
-  public SimpleRetryPolicy(long frequency, int retryCount) {
+  public SimpleRetryPolicy(long frequency, int retryCount, ScheduledExecutorService timer) {
     this.frequency = frequency;
     this.count = retryCount;
-    retryCounter = new RetryCounter();
+    this.retryCounter = new RetryCounter();
+    this.timer = fromExecutorService(timer);
   }
 
   @Override
   public <T> Publisher<T> applyPolicy(Publisher<T> publisher,
                                       Predicate<Throwable> shouldRetry,
-                                      Consumer<Throwable> onExhausted) {
+                                      Consumer<Throwable> onExhausted,
+                                      Function<Throwable, Throwable> errorFunction) {
     final int actualCount = count + 1;
     return from(publisher).retryWhen(errors -> errors.zipWith(range(1, actualCount), Tuples::of)
         .flatMap(tuple -> {
           final Throwable exception = tuple.getT1();
           if (tuple.getT2() == actualCount || !shouldRetry.test(exception)) {
             onExhausted.accept(exception);
-            return (Mono<T>) error(exception);
+            return (Mono<T>) error(errorFunction.apply(exception));
           } else {
-            return delay(ofMillis(frequency));
+            return delay(ofMillis(frequency), timer);
           }
         }));
   }

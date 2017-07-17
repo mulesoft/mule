@@ -275,6 +275,13 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="count" type="mule:substitutableInt" use="optional" default="-1">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The number of times error should be thrown.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

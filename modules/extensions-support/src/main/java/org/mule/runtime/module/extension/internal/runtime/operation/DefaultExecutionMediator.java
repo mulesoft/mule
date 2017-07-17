@@ -153,7 +153,8 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
                                                                                e -> extractConnectionException(e)
                                                                                    .isPresent(),
                                                                                e -> stats.ifPresent(s -> s
-                                                                                   .discountInflightOperation())));
+                                                                                   .discountInflightOperation()),
+                                                                               throwable -> throwable));
   }
 
   InterceptorsExecutionResult before(ExecutionContext executionContext, List<Interceptor> interceptors) {

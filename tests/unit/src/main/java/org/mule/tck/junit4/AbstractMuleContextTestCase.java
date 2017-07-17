@@ -129,11 +129,6 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
   public static final int BLOCK_TIMEOUT = 500;
 
   /**
-   * Use this as a semaphore to the unit test to indicate when a callback has successfully been called.
-   */
-  protected Latch callbackCalled;
-
-  /**
    * Indicates if the context should be instantiated per context. Default is false, which means that a context will be
    * instantiated per test method.
    */

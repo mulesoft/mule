@@ -32,25 +32,30 @@ public class ThrowProcessor implements Processor {
 
   private Class<? extends Throwable> exception;
   private String error;
+  private volatile int count;
 
   @Inject
   private MuleContext muleContext;
 
   @Override
   public Event process(Event event) throws MuleException {
-    try {
-      Throwable instantiatedException = exception.newInstance();
-      if (error != null) {
-        ErrorTypeRepository errorTypeRepository = muleContext.getErrorTypeRepository();
-        ErrorType errorType = errorTypeRepository.lookupErrorType(buildFromStringRepresentation(error))
-            .orElseThrow(() -> new DefaultMuleException(format("Could not find error: %s", error)));
-        throw new TypedException(instantiatedException, errorType);
-      } else {
-        checkArgument(instantiatedException instanceof TypedException, EXCEPTION_ERROR);
-        throw (TypedException) instantiatedException;
+    if (count == -1 || count-- > 0) {
+      try {
+        Throwable instantiatedException = exception.newInstance();
+        if (error != null) {
+          ErrorTypeRepository errorTypeRepository = muleContext.getErrorTypeRepository();
+          ErrorType errorType = errorTypeRepository.lookupErrorType(buildFromStringRepresentation(error))
+              .orElseThrow(() -> new DefaultMuleException(format("Could not find error: %s", error)));
+          throw new TypedException(instantiatedException, errorType);
+        } else {
+          checkArgument(instantiatedException instanceof TypedException, EXCEPTION_ERROR);
+          throw (TypedException) instantiatedException;
+        }
+      } catch (InstantiationException | IllegalAccessException e) {
+        throw new DefaultMuleException(format("Failed to instantiate exception class %s", exception.getSimpleName()));
       }
-    } catch (InstantiationException | IllegalAccessException e) {
-      throw new DefaultMuleException(format("Failed to instantiate exception class %s", exception.getSimpleName()));
+    } else {
+      return event;
     }
   }
 
@@ -62,4 +67,7 @@ public class ThrowProcessor implements Processor {
     this.error = error;
   }
 
+  public void setCount(int count) {
+    this.count = count;
+  }
 }

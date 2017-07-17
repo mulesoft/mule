@@ -3606,15 +3606,7 @@
         <xsd:complexType>
             <xsd:complexContent>
                 <xsd:extension base="abstractRoutingMessageProcessorType">
-                    <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" minOccurs="1" maxOccurs="1"/>
-                    <!-- TODO MULE-12379 Allow inline definition of object stores in elements -->
-                    <xsd:attribute name="objectStore-ref" type="xsd:string" use="optional">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                Reference to the org.mule.runtime.core.api.store.ListableObjectStore that will be used to store events pending (re)processing.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:attribute>
+                    <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" minOccurs="1" maxOccurs="unbounded"/>
                     <xsd:attribute name="maxRetries" type="substitutableInt" use="optional" default="5">
                         <xsd:annotation>
                             <xsd:documentation>
@@ -3631,34 +3623,11 @@
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:attribute>
-                    <xsd:attribute name="secondsBetweenRetries" type="substitutableInt" use="optional">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                Specifies the minimum time interval between two process retries in seconds.
-                                The actual time interval depends on the previous execution but should not exceed twice this number.
-                                THIS ATTRIBUTE IS DEPRECATED. Please use millisBetweenRetries instead
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:attribute>
                     <xsd:attribute name="failureExpression" type="xsd:string" use="optional">
                         <xsd:annotation>
                             <xsd:documentation>
                                 Specifies an expression that when evaluated determines if the processing of one a route was a failure or not.
                                 If no expression is specified, only exceptions will be considered as processing failures.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:attribute>
-                    <xsd:attribute name="ackExpression" type="xsd:string" use="optional">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                Specifies an expression that when evaluated determines the synchronous response of until-successful.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:attribute>
-                    <xsd:attribute name="synchronous" type="substitutableBoolean" use="optional" default="false">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                Defines if the route inside until-successful should be executed asynchronously or synchronously within the caller thread.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:attribute>

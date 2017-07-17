@@ -127,9 +127,6 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
                     .doOnError(MessagingException.class,
                                e -> fireAsyncCompleteNotification(e.getEvent(), e))
                     .onErrorResume(MessagingException.class, messagingExceptionHandler)
-                    .doOnError(UNEXPECTED_EXCEPTION_PREDICATE,
-                               exception -> logger.error("Unhandled exception in async processing.",
-                                                         exception))
                     // Even though no response is ever used with this processor, complete the EventContext anyway, so
                     // parent context completes when async processing is complete.
                     .doOnNext(event -> asyncRequest.getContext().success(event))

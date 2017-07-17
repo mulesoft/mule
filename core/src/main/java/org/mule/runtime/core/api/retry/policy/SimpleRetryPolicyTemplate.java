@@ -6,7 +6,15 @@
  */
 package org.mule.runtime.core.api.retry.policy;
 
+import static java.util.concurrent.Executors.newSingleThreadExecutor;
+import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
+
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.internal.retry.policies.SimpleRetryPolicy;
+
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.function.Supplier;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,14 +35,21 @@ public class SimpleRetryPolicyTemplate extends AbstractPolicyTemplate {
 
   protected volatile int count = DEFAULT_RETRY_COUNT;
   protected volatile long frequency = DEFAULT_FREQUENCY;
+  private ScheduledExecutorService retryScheduler;
 
   public SimpleRetryPolicyTemplate() {
     super();
   }
 
   public SimpleRetryPolicyTemplate(long frequency, int retryCount) {
+    // MULE-13092 ExecutionMediator should use scheduler for retry policy
+    this(frequency, retryCount, newSingleThreadScheduledExecutor());
+  }
+
+  public SimpleRetryPolicyTemplate(long frequency, int retryCount, ScheduledExecutorService retryScheduler) {
     this.frequency = frequency;
     this.count = retryCount;
+    this.retryScheduler = retryScheduler;
   }
 
   public long getFrequency() {
@@ -54,7 +69,7 @@ public class SimpleRetryPolicyTemplate extends AbstractPolicyTemplate {
   }
 
   public RetryPolicy createRetryInstance() {
-    return new SimpleRetryPolicy(frequency, count);
+    return new SimpleRetryPolicy(frequency, count, retryScheduler);
   }
 
   @Override

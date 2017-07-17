@@ -6,32 +6,46 @@
  */
 package org.mule.runtime.core.routing;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
-import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
+import static org.mule.runtime.core.api.transaction.TransactionCoordination.getInstance;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
+import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.BLOCKING;
+import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.NON_BLOCKING;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.store.ListableObjectStore;
-import org.mule.runtime.core.api.store.SimpleMemoryObjectStore;
-import org.mule.runtime.core.internal.construct.DefaultFlowBuilder;
+import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
+import org.mule.runtime.core.api.transaction.Transaction;
+import org.mule.runtime.core.api.transaction.TransactionCoordination;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.tck.probe.JUnitProbe;
-import org.mule.tck.probe.PollingProber;
-import org.mule.tck.probe.Prober;
+import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 
 import java.io.ByteArrayInputStream;
+import java.util.Collection;
 
+import org.junit.After;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
+@RunWith(Parameterized.class)
 public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
 
   public static class ConfigurableMessageProcessor implements Processor {
@@ -63,21 +77,33 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     }
   }
 
+  @Rule
+  public ExpectedException expected = ExpectedException.none();
   private UntilSuccessful untilSuccessful;
-
-  private ListableObjectStore<Event> objectStore;
   private ConfigurableMessageProcessor targetMessageProcessor;
-  private Prober pollingProber = new PollingProber(10000, 500l);
-  private Flow mockFlow;
+  private boolean tx;
+
+  public UntilSuccessfulTestCase(boolean tx) {
+    this.tx = tx;
+  }
 
   @Override
   protected void doSetUp() throws Exception {
     super.doSetUp();
-    untilSuccessful = buildUntiSuccessful(1000L);
-    mockFlow = mock(DefaultFlowBuilder.DefaultFlow.class);
+    untilSuccessful = buildUntilSuccessful(1000L);
+    if (tx) {
+      getInstance().bindTransaction(mock(Transaction.class));
+    }
+
   }
 
-  private UntilSuccessful buildUntiSuccessful(Long millisBetweenRetries) throws Exception {
+  @After
+  public void doTeardown() throws Exception {
+    untilSuccessful.dispose();
+    super.doTearDown();
+  }
+
+  private UntilSuccessful buildUntilSuccessful(Long millisBetweenRetries) throws Exception {
     UntilSuccessful untilSuccessful = new UntilSuccessful();
     untilSuccessful.setMuleContext(muleContext);
     untilSuccessful.setMessagingExceptionHandler(muleContext.getDefaultErrorHandler());
@@ -89,11 +115,8 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
       untilSuccessful.setMillisBetweenRetries(millisBetweenRetries);
     }
 
-    objectStore = new SimpleMemoryObjectStore<>();
-    untilSuccessful.setObjectStore(objectStore);
-
     targetMessageProcessor = new ConfigurableMessageProcessor();
-    untilSuccessful.addRoute(targetMessageProcessor);
+    untilSuccessful.setMessageProcessors(singletonList(targetMessageProcessor));
 
     return untilSuccessful;
   }
@@ -108,8 +131,8 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     untilSuccessful.initialise();
     untilSuccessful.start();
 
-    assertSame(testEvent(), untilSuccessful.process(testEvent()));
-    ponderUntilEventProcessed(testEvent());
+    assertLogicallyEqualEvents(testEvent(), untilSuccessful.process(testEvent()));
+    assertTargetEventReceived(testEvent());
   }
 
   @Test
@@ -119,20 +142,8 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     untilSuccessful.start();
 
     final Event testEvent = eventBuilder().message(of(new ByteArrayInputStream("test_data".getBytes()))).build();
-    assertSame(testEvent, untilSuccessful.process(testEvent));
-    ponderUntilEventProcessed(testEvent);
-  }
-
-  @Test
-  public void testSuccessfulDeliveryAckExpression() throws Exception {
-    untilSuccessful.setAckExpression("#[mel:'ACK']");
-    untilSuccessful.setMuleContext(muleContext);
-    untilSuccessful.setFlowConstruct(mockFlow);
-    untilSuccessful.initialise();
-    untilSuccessful.start();
-
-    assertThat(untilSuccessful.process(testEvent()).getMessageAsString(muleContext), equalTo("ACK"));
-    waitDelivery();
+    assertSame(testEvent.getMessage(), untilSuccessful.process(testEvent).getMessage());
+    assertTargetEventReceived(testEvent);
   }
 
   @Test
@@ -142,8 +153,8 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     untilSuccessful.initialise();
     untilSuccessful.start();
 
-    assertSame(testEvent(), untilSuccessful.process(testEvent()));
-    ponderUntilEventProcessed(testEvent());
+    assertSame(testEvent().getMessage(), untilSuccessful.process(testEvent()).getMessage());
+    assertTargetEventReceived(testEvent());
   }
 
   @Test
@@ -154,8 +165,13 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     untilSuccessful.start();
 
     final Event testEvent = eventBuilder().message(of("ERROR")).build();
-    assertSame(testEvent, untilSuccessful.process(testEvent));
-    ponderUntilEventAborted(testEvent);
+    expected.expect(MessagingException.class);
+    expected.expectCause(instanceOf(RetryPolicyExhaustedException.class));
+    try {
+      untilSuccessful.process(testEvent);
+    } finally {
+      assertEquals(targetMessageProcessor.getEventCount(), 1 + untilSuccessful.getMaxRetries());
+    }
   }
 
   @Test
@@ -166,8 +182,13 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     untilSuccessful.start();
 
     final Event testEvent = eventBuilder().message(of("ERROR")).build();
-    assertSame(testEvent, untilSuccessful.process(testEvent));
-    ponderUntilEventAborted(testEvent);
+    expected.expect(MessagingException.class);
+    expected.expectCause(instanceOf(RetryPolicyExhaustedException.class));
+    try {
+      untilSuccessful.process(testEvent);
+    } finally {
+      assertEquals(targetMessageProcessor.getEventCount(), 1 + untilSuccessful.getMaxRetries());
+    }
   }
 
   @Test
@@ -178,104 +199,36 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     untilSuccessful.start();
 
     final Event testEvent = eventBuilder().message(of("ERROR")).build();
-    assertSame(testEvent, untilSuccessful.process(testEvent));
-    ponderUntilEventProcessed(testEvent);
+    assertSame(testEvent.getMessage(), untilSuccessful.process(testEvent).getMessage());
+    assertTargetEventReceived(testEvent);
     assertEquals(targetMessageProcessor.getEventCount(), untilSuccessful.getMaxRetries() + 1);
   }
 
   @Test
-  public void testPreExistingEvents() throws Exception {
-    objectStore.store(new AsynchronousUntilSuccessfulProcessingStrategy().buildQueueKey(testEvent(), getTestFlow(muleContext),
-                                                                                        muleContext),
-                      testEvent());
-    untilSuccessful.setMuleContext(muleContext);
-    untilSuccessful.initialise();
-    untilSuccessful.start();
-    muleContext.start();
-    ponderUntilEventProcessed(testEvent());
-  }
-
-  @Test
   public void testDefaultMillisWait() throws Exception {
-    untilSuccessful = buildUntiSuccessful(null);
+    untilSuccessful = buildUntilSuccessful(null);
     untilSuccessful.setMuleContext(muleContext);
     untilSuccessful.initialise();
     untilSuccessful.start();
     assertEquals(60 * 1000, untilSuccessful.getMillisBetweenRetries());
   }
 
-  @Test
-  public void testMillisWait() throws Exception {
-    final long millis = 10;
-    untilSuccessful.setMillisBetweenRetries(millis);
-    untilSuccessful.setMuleContext(muleContext);
-    untilSuccessful.initialise();
-    untilSuccessful.start();
-
-    assertEquals(millis, untilSuccessful.getMillisBetweenRetries());
-  }
-
-  @Test
-  public void testSecondsWait() throws Exception {
-    final long seconds = 10;
-    untilSuccessful = buildUntiSuccessful(null);
-    untilSuccessful.setSecondsBetweenRetries(seconds);
-    untilSuccessful.setMuleContext(muleContext);
-    untilSuccessful.initialise();
-    untilSuccessful.start();
-
-    assertEquals(seconds * 1000, untilSuccessful.getMillisBetweenRetries());
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void testMillisAndSecondsWait() throws Exception {
-    untilSuccessful.setMillisBetweenRetries(1000L);
-    untilSuccessful.setSecondsBetweenRetries(1000);
-    untilSuccessful.initialise();
-  }
-
-
-  private void ponderUntilEventProcessed(final Event testEvent) throws InterruptedException, MuleException {
-    waitDelivery();
-    assertLogicallyEqualEvents(testEvent, targetMessageProcessor.getEventReceived());
-  }
-
-  private void waitDelivery() {
-    pollingProber.check(new JUnitProbe() {
-
-      @Override
-      protected boolean test() throws Exception {
-        return targetMessageProcessor.getEventReceived() != null && objectStore.allKeys().isEmpty();
-      }
-
-      @Override
-      public String describeFailure() {
-        return "Event not received by target";
-      }
-    });
-  }
-
-  private void ponderUntilEventAborted(final Event testEvent) throws InterruptedException, MuleException {
-    pollingProber.check(new JUnitProbe() {
-
-      @Override
-      protected boolean test() throws Exception {
-        return targetMessageProcessor.getEventCount() > untilSuccessful.getMaxRetries() && objectStore.allKeys().isEmpty();
-      }
-
-      @Override
-      public String describeFailure() {
-        return String.format("Processing not retried %s times.", untilSuccessful.getMaxRetries());
-      }
-    });
-    assertEquals(0, objectStore.allKeys().size());
-    assertEquals(targetMessageProcessor.getEventCount(), 1 + untilSuccessful.getMaxRetries());
+  private void assertTargetEventReceived(Event request) throws MuleException {
+    assertThat(targetMessageProcessor.getEventReceived(), not(nullValue()));
+    assertLogicallyEqualEvents(request, targetMessageProcessor.getEventReceived());
   }
 
   private void assertLogicallyEqualEvents(final Event testEvent, Event eventReceived) throws MuleException {
     // events have been rewritten so are different but the correlation ID has been carried around
     assertEquals(testEvent.getCorrelationId(), eventReceived.getCorrelationId());
     // and their payload
-    assertEquals(testEvent.getMessageAsString(muleContext), eventReceived.getMessageAsString(muleContext));
+    assertEquals(testEvent.getMessage(), eventReceived.getMessage());
   }
+
+  @Parameterized.Parameters
+  public static Collection<Boolean> modeParameters() {
+    return asList(new Boolean[] {Boolean.TRUE, Boolean.FALSE});
+  }
+
+
 }
