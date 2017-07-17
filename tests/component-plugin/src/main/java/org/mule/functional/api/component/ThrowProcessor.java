@@ -52,7 +52,7 @@ public class ThrowProcessor implements Processor {
           throw (TypedException) instantiatedException;
         }
       } catch (InstantiationException | IllegalAccessException e) {
-        throw new DefaultMuleException(format("Failed to instantiate exception class %s", exception.getSimpleName()));
+        throw new DefaultMuleException(format("Failed to instantiate exception class '%s'", exception.getSimpleName()));
       }
     } else {
       return event;

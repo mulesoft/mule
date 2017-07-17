@@ -447,4 +447,19 @@ public class ExceptionUtils {
     }
     return putContext(exception, failing, exception.getEvent(), muleContext);
   }
+
+  /**
+   * Given a {@link MessagingException} return the first cause that isn't a messaging exception. If the candidate exception is not
+   * a {@link MessagingException} then it is returned as is.
+   * 
+   * @param exception candidate exception
+   * @return cause exception.
+   */
+  public static Throwable getMessagingExceptionCause(Throwable exception) {
+    Throwable cause = exception;
+    while (cause instanceof MessagingException) {
+      cause = cause.getCause();
+    }
+    return cause;
+  }
 }

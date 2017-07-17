@@ -15,6 +15,7 @@ import static org.mule.runtime.core.api.processor.MessageProcessors.processToApp
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApplyWithChildContext;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContext;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
+import static org.mule.runtime.core.api.util.ExceptionUtils.getMessagingExceptionCause;
 import static org.mule.runtime.core.routing.outbound.AbstractOutboundRouter.DEFAULT_FAILURE_EXPRESSION;
 import static reactor.core.publisher.Flux.empty;
 import static reactor.core.publisher.Flux.error;
@@ -36,6 +37,7 @@ import org.mule.runtime.core.api.processor.Scope;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
 import org.mule.runtime.core.api.store.ListableObjectStore;
+import org.mule.runtime.core.api.util.ExceptionUtils;
 import org.mule.runtime.core.processor.AbstractMuleObjectOwner;
 
 import java.util.List;
@@ -63,7 +65,8 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(UntilSuccessful.class);
 
-  private static final String UNTIL_SUCCESSFUL_MSG_PREFIX = "until-successful retries exhausted. Last exception message was: %s";
+  private static final String UNTIL_SUCCESSFUL_MSG_PREFIX =
+      "'until-successful' retries exhausted. Last exception message was: %s";
   private static final String EXPRESSION_FAILED_MSG = "Failure expression positive when processing event: ";
   private static final long DEFAULT_MILLIS_BETWEEN_RETRIES = 60 * 1000;
   private static final int DEFAULT_RETRIES = 5;
@@ -79,7 +82,7 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
   @Override
   public void initialise() throws InitialisationException {
     if (nestedChain == null) {
-      throw new InitialisationException(createStaticMessage("One message processor must be configured within UntilSuccessful."),
+      throw new InitialisationException(createStaticMessage("One message processor must be configured within 'until-successful'."),
                                         this);
     }
     super.initialise();
@@ -114,13 +117,13 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
                 return empty();
               }
               if (shouldRetry.test(result)) {
-                throw new ExpressionFailureException(createStaticMessage(EXPRESSION_FAILED_MSG + event));
+                throw new FailureExpressionAssertionException(createStaticMessage(EXPRESSION_FAILED_MSG + event));
               } else {
                 return just(result);
               }
             } catch (Exception e) {
               if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Exception thrown inside until-successful ", e);
+                LOGGER.debug("Exception thrown inside `until-successful` ", e);
               }
               if (getRetryPredicate().test(e)) {
                 lastExecutionException = e;
@@ -144,7 +147,7 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
                   .transform(nestedChain)
                   .doOnNext(result -> {
                     if (shouldRetry.test(result)) {
-                      throw new ExpressionFailureException(createStaticMessage(EXPRESSION_FAILED_MSG + event));
+                      throw new FailureExpressionAssertionException(createStaticMessage(EXPRESSION_FAILED_MSG + event));
                     }
                   })), ofNullable(getLocation())))
               .transform(p -> policyTemplate.applyPolicy(p, getRetryPredicate(), e -> {
@@ -153,13 +156,13 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
   }
 
   private Predicate<Throwable> getRetryPredicate() {
-    return e -> e instanceof ExpressionFailureException
+    return e -> e instanceof FailureExpressionAssertionException
         || (e instanceof MessagingException && shouldRetry.test(((MessagingException) e).getEvent()));
   }
 
   private Function<Throwable, Throwable> getThrowableFunction(Event event) {
     return throwable -> {
-      Throwable cause = throwable instanceof MessagingException ? throwable.getCause() : throwable;
+      Throwable cause = getMessagingExceptionCause(throwable);
       return new MessagingException(event,
                                     new RetryPolicyExhaustedException(createStaticMessage(UNTIL_SUCCESSFUL_MSG_PREFIX,
                                                                                           cause.getMessage()),
@@ -170,7 +173,6 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
 
   private ReactiveProcessor scheduleRoute(ReactiveProcessor route) {
     if (flowConstruct instanceof Pipeline) {
-      // If an async processing strategy is in use then use it to schedule scatter-gather route
       return publisher -> from(publisher).transform(((Pipeline) flowConstruct).getProcessingStrategy().onPipeline(route));
     } else {
       return publisher -> publisher;
@@ -235,9 +237,9 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
     return singletonList(nestedChain);
   }
 
-  private static class ExpressionFailureException extends MuleRuntimeException {
+  private static class FailureExpressionAssertionException extends MuleRuntimeException {
 
-    public ExpressionFailureException(I18nMessage message) {
+    public FailureExpressionAssertionException(I18nMessage message) {
       super(message);
     }
   }

@@ -93,7 +93,7 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
         .withTypeDefinition(fromType(ThrowProcessor.class))
         .withSetterParameterDefinition("exception", fromSimpleParameter("exception").build())
         .withSetterParameterDefinition("error", fromSimpleParameter("error").build())
-        .withSetterParameterDefinition("count", fromSimpleParameter("count").build()).build());
+        .withSetterParameterDefinition("count", fromSimpleParameter("count").withDefaultValue(-1).build()).build());
 
     componentBuildingDefinitions.add(baseDefinition
         .withIdentifier("return-data")

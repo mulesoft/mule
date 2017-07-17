@@ -472,7 +472,8 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     componentBuildingDefinitions
         .add(baseDefinition.withIdentifier(UNTIL_SUCCESSFUL).withTypeDefinition(fromType(UntilSuccessful.class))
             .withSetterParameterDefinition("maxRetries", fromSimpleParameter("maxRetries").withDefaultValue(5).build())
-            .withSetterParameterDefinition("millisBetweenRetries", fromSimpleParameter("millisBetweenRetries").build())
+            .withSetterParameterDefinition("millisBetweenRetries",
+                                           fromSimpleParameter("millisBetweenRetries").withDefaultValue(60000).build())
             .withSetterParameterDefinition("failureExpression",
                                            fromSimpleParameter("failureExpression").withDefaultValue(DEFAULT_FAILURE_EXPRESSION)
                                                .build())
