@@ -145,16 +145,7 @@ goto :eof
 goto :eof
 
 :status
-if not defined JAVA_HOME (
-    echo Please, set the JAVA_HOME environment variable to run this command.
-    goto :eof
-)
-for /F "usebackq" %%i IN (`CALL "%JAVA_HOME%\bin\jps" ^| find "MuleContainerBootstrap"`) do (set PID=%%i)
-if defined PID (
-    echo %MULE_APP_LONG% is running (%PID%^).
-) else (
-    echo %MULE_APP_LONG% is not running.
-)
+"%_WRAPPER_EXE%" -q %_WRAPPER_CONF% %MULE_OPTS%
 goto :eof
 
 rem ###############################################################
