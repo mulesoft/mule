@@ -1624,7 +1624,6 @@
                     <configuration>
                         <workingDirectory>${project.build.directory}</workingDirectory>
                         <argLine>-javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectjVersion}/aspectjweaver-${aspectjVersion}.jar" -Xmx1024m -Xms256m</argLine>
-                        <testFailureIgnore>true</testFailureIgnore>
                         <trimStackTrace>false</trimStackTrace>
                         <excludes>
                             <!-- Surefire should be able to detect that classes are abstract but it seems it isn't -->
