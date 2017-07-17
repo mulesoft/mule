@@ -6,6 +6,7 @@
  */
 package org.mule.transport.file.filters;
 
+import static java.util.regex.Pattern.COMMENTS; 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,6 +18,14 @@ import java.util.regex.Pattern;
 public class FilenameRegexFilter extends FilenameWildcardFilter
 {
     protected volatile Pattern[] compiledPatterns = null;
+
+    Pattern regex = Pattern.compile(
+            ",         # A comma  \n" +
+            "(?!       # not followed...\n" +
+            " [^{]*    # by a sequence of characters without an open brance \n" +
+            " \\}      # immediately followed by a closing brace\n" +
+            ")         # end of lookahead", 
+            COMMENTS);
 
     /**
      * Filter condition decider method.
@@ -68,7 +77,17 @@ public class FilenameRegexFilter extends FilenameWildcardFilter
     @Override
     public void setPattern(String pattern)
     {
-        super.setPattern(pattern);
+        this.pattern = pattern;
+        
+        if (pattern == null || pattern.trim().isEmpty())
+        {
+            this.patterns = new String[0];
+        }
+        else
+        {
+            this.patterns = regex.split(pattern);
+        }
+        
 
         if (patterns != null)
         {
