@@ -32,7 +32,7 @@ public class ThrowProcessor implements Processor {
 
   private Class<? extends Throwable> exception;
   private String error;
-  private volatile int count;
+  private volatile int count = -1;
 
   @Inject
   private MuleContext muleContext;
