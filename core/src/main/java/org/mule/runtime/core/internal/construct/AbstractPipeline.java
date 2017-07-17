@@ -126,14 +126,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   }
 
   private ProcessingStrategyFactory defaultProcessingStrategy() {
-    final ProcessingStrategyFactory defaultProcessingStrategyFactory =
-        getMuleContext().getConfiguration().getDefaultProcessingStrategyFactory();
-
-    if (defaultProcessingStrategyFactory == null) {
-      return createDefaultProcessingStrategyFactory();
-    } else {
-      return defaultProcessingStrategyFactory;
-    }
+    return createDefaultProcessingStrategyFactory();
   }
 
   protected void configurePreProcessors(MessageProcessorChainBuilder builder) throws MuleException {
