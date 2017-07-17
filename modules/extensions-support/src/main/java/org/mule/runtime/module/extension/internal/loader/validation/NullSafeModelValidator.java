@@ -44,10 +44,9 @@ import org.mule.runtime.extension.api.loader.ProblemsReporter;
  */
 public final class NullSafeModelValidator implements ExtensionModelValidator {
 
-  private TypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
-
   @Override
   public void validate(ExtensionModel extensionModel, ProblemsReporter problemsReporter) {
+    TypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
     new ExtensionWalker() {
 
       @Override

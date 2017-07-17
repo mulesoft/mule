@@ -33,8 +33,6 @@ import java.util.Optional;
  */
 public final class SubTypesDeclarationEnricher extends AbstractAnnotatedDeclarationEnricher {
 
-  private ClassTypeLoader typeLoader;
-
   @Override
   public void enrich(ExtensionLoadingContext extensionLoadingContext) {
     ExtensionDeclarer declarer = extensionLoadingContext.getExtensionDeclarer();
@@ -45,15 +43,16 @@ public final class SubTypesDeclarationEnricher extends AbstractAnnotatedDeclarat
       return;
     }
     Class<?> type = implementingType.get().getType();
-    typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(type.getClassLoader());
+    ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(type.getClassLoader());
 
     List<SubTypeMapping> typeMappings = parseRepeatableAnnotation(type, SubTypeMapping.class, c -> ((SubTypesMapping) c).value());
     if (!typeMappings.isEmpty()) {
-      declareSubTypesMapping(declarer, typeMappings, extensionDeclaration.getName());
+      declareSubTypesMapping(declarer, typeMappings, extensionDeclaration.getName(), typeLoader);
     }
   }
 
-  private void declareSubTypesMapping(ExtensionDeclarer declarer, List<SubTypeMapping> typeMappings, String name) {
+  private void declareSubTypesMapping(ExtensionDeclarer declarer, List<SubTypeMapping> typeMappings, String name,
+                                      ClassTypeLoader typeLoader) {
     if (typeMappings.stream().map(SubTypeMapping::baseType).distinct().collect(toList()).size() != typeMappings.size()) {
       throw new IllegalModelDefinitionException(String
           .format("There should be only one SubtypeMapping for any given base type in extension [%s]."
