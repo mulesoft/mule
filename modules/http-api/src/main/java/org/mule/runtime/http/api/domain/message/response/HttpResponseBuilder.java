@@ -24,7 +24,7 @@ public final class HttpResponseBuilder extends HttpMessageBuilder<HttpResponseBu
    * @param statusCode the HTTP status line code desired for the {@link HttpResponse}
    * @return this builder
    */
-  public HttpResponseBuilder setStatusCode(Integer statusCode) {
+  public HttpResponseBuilder statusCode(Integer statusCode) {
     this.responseStatus.setStatusCode(statusCode);
     return this;
   }
@@ -33,9 +33,23 @@ public final class HttpResponseBuilder extends HttpMessageBuilder<HttpResponseBu
    * @param reasonPhrase the HTTP status line reason phrase desired for the {@link HttpResponse}
    * @return
    */
-  public HttpResponseBuilder setReasonPhrase(String reasonPhrase) {
+  public HttpResponseBuilder reasonPhrase(String reasonPhrase) {
     this.responseStatus.setReasonPhrase(reasonPhrase);
     return this;
+  }
+
+  /**
+   * @return the current status code configured in the builder.
+   */
+  public int getStatusCode() {
+    return responseStatus.getStatusCode();
+  }
+
+  /**
+   * @return the current reason phrase configured in the builder.
+   */
+  public String getReasonPhrase() {
+    return responseStatus.getReasonPhrase();
   }
 
   /**

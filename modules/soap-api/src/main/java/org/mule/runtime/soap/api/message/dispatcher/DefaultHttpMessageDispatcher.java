@@ -51,10 +51,10 @@ public final class DefaultHttpMessageDispatcher implements MessageDispatcher {
     MultiMap<String, String> parameters = new MultiMap<>();
     context.getHeaders().forEach(parameters::put);
     HttpRequest request = HttpRequest.builder()
-        .setUri(context.getAddress())
-        .setMethod(POST)
-        .setEntity(new InputStreamHttpEntity(context.getContent()))
-        .setHeaders(parameters)
+        .uri(context.getAddress())
+        .method(POST)
+        .entity(new InputStreamHttpEntity(context.getContent()))
+        .headers(parameters)
         .build();
     try {
       HttpResponse response = client.send(request, 5000, false, null);

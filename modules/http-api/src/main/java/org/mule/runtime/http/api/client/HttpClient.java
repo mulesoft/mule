@@ -6,12 +6,14 @@
  */
 package org.mule.runtime.http.api.client;
 
-import org.mule.runtime.http.api.client.async.ResponseHandler;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 
 import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.concurrent.TimeoutException;
+import java.util.function.BiConsumer;
 
 /**
  * Object that sends an HTTP request, and returns the response. Notice must be started to be used and stopped to be disposed
@@ -46,20 +48,21 @@ public interface HttpClient {
       throws IOException, TimeoutException;
 
   /**
-   * Sends a HttpRequest without blocking the current thread. When a response is available or the request times out the provided
-   * {@link ResponseHandler} will be invoked. Be aware that the response body processing will be deferred so that the response can
+   * Sends a HttpRequest without blocking the current thread. When a response is available or the request times out the returned
+   * {@link CompletableFuture} will be completed. Be aware that the response body processing will be deferred so that the response can
    * be processed even when a large body is still being received. If the full response is needed right away then the provided
-   * {@link ResponseHandler} must execute in a different thread so that it does not block the {@link HttpClient} threads handling
-   * the response.
+   * {@link HttpResponse} must be read in a different thread so that it does not block the {@link HttpClient} threads handling the
+   * response. It's therefore recommended to use {@link CompletableFuture#get()} or any of the async methods available, such as
+   * {@link CompletableFuture#whenCompleteAsync(BiConsumer, Executor)}, to handle the response is those scenarios since they guarantee
+   * executing on a different thread.
    *
    * @param request the {@link HttpRequest} to send
    * @param responseTimeout the time (in milliseconds) to wait for a response
    * @param followRedirects whether or not to follow redirect responses
    * @param authentication the optional {@link HttpRequestAuthentication} to use
-   * @param handler the {@link ResponseHandler} to be invoked when the {@link HttpResponse} is ready.
+   * @return a {@link CompletableFuture} that will complete once the {@link HttpResponse} is available
    */
-  void send(HttpRequest request, int responseTimeout, boolean followRedirects, HttpRequestAuthentication authentication,
-            ResponseHandler handler);
-
+  CompletableFuture<HttpResponse> sendAsync(HttpRequest request, int responseTimeout, boolean followRedirects,
+                                            HttpRequestAuthentication authentication);
 
 }

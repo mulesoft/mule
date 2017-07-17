@@ -8,11 +8,11 @@ package org.mule.runtime.http.api.domain.message;
 
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
-
-import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 import org.mule.runtime.http.api.domain.entity.EmptyHttpEntity;
 import org.mule.runtime.http.api.domain.entity.HttpEntity;
+import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -33,9 +33,20 @@ public abstract class HttpMessageBuilder<B extends HttpMessageBuilder, M extends
    * @param entity the {@link HttpEntity} that should be used as body for the {@link HttpMessage}. Non null.
    * @return this builder
    */
-  public B setEntity(HttpEntity entity) {
+  public B entity(HttpEntity entity) {
     checkNotNull(entity, "entity cannot be null, use an EmptyHttpEntity instead");
     this.entity = entity;
+    return (B) this;
+  }
+
+  /**
+   * @param headersMap a {@link MultiMap} representing the HTTP headers of the {@link HttpRequest} desired. Non null.
+   * @return this builder
+   */
+  public B headers(MultiMap<String, String> headersMap) {
+    headersMap.keySet().forEach(
+                                key -> headersMap.getAll(key).forEach(
+                                                                      value -> this.headers.put(key, value)));
     return (B) this;
   }
 
@@ -82,6 +93,13 @@ public abstract class HttpMessageBuilder<B extends HttpMessageBuilder, M extends
    */
   public Collection<String> getHeaderValues(String name) {
     return headers.getAll(name);
+  }
+
+  /**
+   * @return an immutable version of the current headers in the builder.
+   */
+  public MultiMap<String, String> getHeaders() {
+    return headers.toImmutableMultiMap();
   }
 
   public abstract M build();
