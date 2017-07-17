@@ -7,7 +7,9 @@
 package org.mule.runtime.core.internal.retry.policies;
 
 import static java.time.Duration.ofMillis;
+import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static reactor.core.publisher.Flux.from;
+import static reactor.core.publisher.Flux.just;
 import static reactor.core.publisher.Flux.range;
 import static reactor.core.publisher.Mono.delay;
 import static reactor.core.publisher.Mono.error;
@@ -22,7 +24,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
@@ -64,7 +65,11 @@ public class SimpleRetryPolicy implements RetryPolicy {
             onExhausted.accept(exception);
             return (Mono<T>) error(errorFunction.apply(exception));
           } else {
-            return delay(ofMillis(frequency), timer);
+            if (isTransactionActive()) {
+              return just(delay(ofMillis(frequency), timer).block());
+            } else {
+              return delay(ofMillis(frequency), timer);
+            }
           }
         }));
   }

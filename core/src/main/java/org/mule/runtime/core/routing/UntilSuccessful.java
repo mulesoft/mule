@@ -106,53 +106,17 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
 
   @Override
   public Publisher<Event> apply(Publisher<Event> publisher) {
-    if (isTransactionActive()) {
-      return from(publisher).flatMap(event -> {
-        try {
-          Exception lastExecutionException = null;
-          for (int i = 0; i <= maxRetries; i++) {
-            try {
-              Event result = processToApplyWithChildContext(event, nestedChain);
-              if (result == null) {
-                return empty();
-              }
-              if (shouldRetry.test(result)) {
-                throw new FailureExpressionAssertionException(createStaticMessage(EXPRESSION_FAILED_MSG + event));
-              } else {
-                return just(result);
-              }
-            } catch (Exception e) {
-              if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Exception thrown inside `until-successful` ", e);
-              }
-              if (getRetryPredicate().test(e)) {
-                lastExecutionException = e;
-                if (i < maxRetries) {
-                  sleep(millisBetweenRetries);
-                }
-              } else {
-                return error(e);
-              }
-            }
-          }
-          return error(getThrowableFunction(event).apply(lastExecutionException));
-        } catch (Exception e) {
-          return error(e);
-        }
-      });
-    } else {
-      return from(publisher)
-          .flatMap(event -> Mono
-              .from(processWithChildContext(event, scheduleRoute(p -> Mono.from(p)
-                  .transform(nestedChain)
-                  .doOnNext(result -> {
-                    if (shouldRetry.test(result)) {
-                      throw new FailureExpressionAssertionException(createStaticMessage(EXPRESSION_FAILED_MSG + event));
-                    }
-                  })), ofNullable(getLocation())))
-              .transform(p -> policyTemplate.applyPolicy(p, getRetryPredicate(), e -> {
-              }, getThrowableFunction(event))));
-    }
+    return from(publisher)
+        .flatMap(event -> Mono
+            .from(processWithChildContext(event, scheduleRoute(p -> Mono.from(p)
+                .transform(nestedChain)
+                .doOnNext(result -> {
+                  if (shouldRetry.test(result)) {
+                    throw new FailureExpressionAssertionException(createStaticMessage(EXPRESSION_FAILED_MSG + event));
+                  }
+                })), ofNullable(getLocation())))
+            .transform(p -> policyTemplate.applyPolicy(p, getRetryPredicate(), e -> {
+            }, getThrowableFunction(event))));
   }
 
   private Predicate<Throwable> getRetryPredicate() {
