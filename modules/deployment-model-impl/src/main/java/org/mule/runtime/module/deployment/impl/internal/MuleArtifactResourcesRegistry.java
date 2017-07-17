@@ -7,6 +7,7 @@
 package org.mule.runtime.module.deployment.impl.internal;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
 import org.mule.runtime.container.internal.ContainerModuleDiscoverer;
@@ -35,6 +36,7 @@ import org.mule.runtime.module.deployment.impl.internal.application.ApplicationD
 import org.mule.runtime.module.deployment.impl.internal.application.DefaultApplicationFactory;
 import org.mule.runtime.module.deployment.impl.internal.application.TemporaryApplicationDescriptorFactory;
 import org.mule.runtime.module.deployment.impl.internal.application.TemporaryApplicationFactory;
+import org.mule.runtime.module.deployment.impl.internal.application.ToolingApplicationFactory;
 import org.mule.runtime.module.deployment.impl.internal.artifact.DefaultClassLoaderManager;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ServiceRegistryDescriptorLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainFactory;
@@ -65,6 +67,7 @@ public class MuleArtifactResourcesRegistry {
   private final DefaultDomainManager domainManager;
   private final DefaultDomainFactory domainFactory;
   private final DefaultApplicationFactory applicationFactory;
+  private final ToolingApplicationFactory toolingApplicationFactory;
   private final TemporaryApplicationFactory temporaryApplicationFactory;
   private final DefaultArtifactPluginRepository artifactPluginRepository;
   private final DeployableArtifactClassLoaderFactory<DomainDescriptor> domainClassLoaderFactory;
@@ -162,6 +165,11 @@ public class MuleArtifactResourcesRegistry {
                                                        extensionModelLoaderManager,
                                                        artifactClassLoaderManager, policyTemplateClassLoaderBuilderFactory,
                                                        pluginDependenciesResolver, artifactPluginDescriptorLoader);
+    toolingApplicationFactory = new ToolingApplicationFactory(applicationClassLoaderBuilderFactory, applicationDescriptorFactory,
+                                                              artifactPluginRepository, domainManager, serviceManager,
+                                                              extensionModelLoaderManager,
+                                                              artifactClassLoaderManager, policyTemplateClassLoaderBuilderFactory,
+                                                              pluginDependenciesResolver, artifactPluginDescriptorLoader);
     temporaryApplicationFactory = new TemporaryApplicationFactory(applicationClassLoaderBuilderFactory,
                                                                   new TemporaryApplicationDescriptorFactory(artifactPluginDescriptorLoader,
                                                                                                             artifactPluginRepository,
@@ -203,6 +211,13 @@ public class MuleArtifactResourcesRegistry {
    */
   public DefaultApplicationFactory getApplicationFactory() {
     return applicationFactory;
+  }
+
+  /**
+   * @return factory for creating {@link Application} artifacts for Tooling
+   */
+  public ToolingApplicationFactory getToolingApplicationFactory() {
+    return toolingApplicationFactory;
   }
 
   /**
