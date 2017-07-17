@@ -6,21 +6,15 @@
  */
 package org.mule.runtime.core.routing;
 
-import static java.lang.Thread.sleep;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
-import static org.mule.runtime.core.api.processor.MessageProcessors.processToApplyWithChildContext;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContext;
-import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.api.util.ExceptionUtils.getMessagingExceptionCause;
 import static org.mule.runtime.core.routing.outbound.AbstractOutboundRouter.DEFAULT_FAILURE_EXPRESSION;
-import static reactor.core.publisher.Flux.empty;
-import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Flux.from;
-import static reactor.core.publisher.Flux.just;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -37,7 +31,6 @@ import org.mule.runtime.core.api.processor.Scope;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
 import org.mule.runtime.core.api.store.ListableObjectStore;
-import org.mule.runtime.core.api.util.ExceptionUtils;
 import org.mule.runtime.core.processor.AbstractMuleObjectOwner;
 
 import java.util.List;
