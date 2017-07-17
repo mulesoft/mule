@@ -6,50 +6,57 @@
  */
 package org.mule.runtime.extension.internal.loader.catalog;
 
-import org.junit.Assert;
+import static org.junit.Assert.assertTrue;
+import static org.mule.runtime.core.api.util.ClassUtils.getResource;
+
 import org.junit.Test;
 import org.mule.runtime.extension.internal.loader.catalog.loader.xml.TypesCatalogXmlLoader;
 import org.mule.runtime.extension.internal.loader.catalog.model.TypesCatalog;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;
+import java.net.URISyntaxException;
+import java.nio.file.Paths;
 
 /**
  * TODO(fernandezlautaro: MULE-11501 this class must be moved to a separate module
  */
 public class TypesCatalogLoaderTestCase extends AbstractMuleTestCase {
 
-  //TODO(fernandezlautaro: MULE-11501 resources under the following folder must be moved too
-  private static final File TESTS_FOLDER = new File("src/test/resources/catalog");
+  //TODO(fernandezlautaro: MULE-11501 resources under src/test/resources/catalog must be moved too
 
   @Test
   public void typesJsonCatalogCanBeLoadedFromXmlFile() throws Exception {
-    final File appTypesFile = new File(TESTS_FOLDER, "json-catalog.xml");
+    final File appTypesFile = getResourceFile("json-catalog.xml");
     TypesCatalogXmlLoader typesCatalogXmlLoader = new TypesCatalogXmlLoader();
     final TypesCatalog typesCatalog = typesCatalogXmlLoader.load(appTypesFile.toURI().toURL());
-    Assert.assertTrue(typesCatalog.resolveType("JsonType1").isPresent());
-    Assert.assertTrue(typesCatalog.resolveType("JsonType2").isPresent());
+    assertTrue(typesCatalog.resolveType("JsonType1").isPresent());
+    assertTrue(typesCatalog.resolveType("JsonType2").isPresent());
   }
 
   @Test
   public void typesXsdCatalogCanBeLoadedFromXmlFile() throws Exception {
-    final File appTypesFile = new File(TESTS_FOLDER, "xsd-catalog.xml");
+    final File appTypesFile = getResourceFile("xsd-catalog.xml");
     TypesCatalogXmlLoader typesCatalogXmlLoader = new TypesCatalogXmlLoader();
     final TypesCatalog typesCatalog = typesCatalogXmlLoader.load(appTypesFile.toURI().toURL());
-    Assert.assertTrue(typesCatalog.resolveType("XsdType1").isPresent());
-    Assert.assertTrue(typesCatalog.resolveType("XsdType2").isPresent());
-    Assert.assertTrue(typesCatalog.resolveType("XsdType3").isPresent());
+    assertTrue(typesCatalog.resolveType("XsdType1").isPresent());
+    assertTrue(typesCatalog.resolveType("XsdType2").isPresent());
+    assertTrue(typesCatalog.resolveType("XsdType3").isPresent());
   }
 
   @Test
   public void typesJsonAndXsdCatalogCanBeLoadedFromXmlFile() throws Exception {
-    final File appTypesFile = new File(TESTS_FOLDER, "json-and-xsd-catalog.xml");
+    final File appTypesFile = getResourceFile("json-and-xsd-catalog.xml");
     TypesCatalogXmlLoader typesCatalogXmlLoader = new TypesCatalogXmlLoader();
     final TypesCatalog typesCatalog = typesCatalogXmlLoader.load(appTypesFile.toURI().toURL());
-    Assert.assertTrue(typesCatalog.resolveType("XsdType1").isPresent());
-    Assert.assertTrue(typesCatalog.resolveType("XsdType2").isPresent());
-    Assert.assertTrue(typesCatalog.resolveType("JsonType1").isPresent());
-    Assert.assertTrue(typesCatalog.resolveType("JsonType2").isPresent());
+    assertTrue(typesCatalog.resolveType("XsdType1").isPresent());
+    assertTrue(typesCatalog.resolveType("XsdType2").isPresent());
+    assertTrue(typesCatalog.resolveType("JsonType1").isPresent());
+    assertTrue(typesCatalog.resolveType("JsonType2").isPresent());
+  }
+
+  private File getResourceFile(String filename) throws URISyntaxException {
+    return new File(getResource(Paths.get("catalog", filename).toString(), getClass()).toURI());
   }
 
 }

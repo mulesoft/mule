@@ -63,6 +63,7 @@ import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPO
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.PRIVILEGED_ARTIFACTS_PROPERTY;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.PRIVILEGED_EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
+import static org.mule.runtime.core.api.util.ClassUtils.getResource;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.config.bootstrap.ClassLoaderRegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.PROPERTY_DOMAIN;
@@ -2085,8 +2086,9 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
             .definedBy("app-providing-resource-for-plugin.xml")
             .dependingOn(pluginUsingAppResource)
             .configuredWith(EXPORTED_RESOURCES, "META-INF/app-resource.txt")
-            .usingResource("src/test/resources/test-resource.txt", "META-INF/app-resource.txt");
+            .usingResource(getResource("test-resource.txt", getClass()).getFile(), "META-INF/app-resource.txt");
     addPackedAppFromBuilder(artifactFileBuilder);
+
 
     startDeployment();
 
