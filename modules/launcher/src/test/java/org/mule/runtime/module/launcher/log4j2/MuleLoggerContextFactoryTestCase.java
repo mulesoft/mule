@@ -12,12 +12,16 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.api.util.ClassUtils.getResource;
+
 import org.mule.runtime.module.artifact.classloader.RegionClassLoader;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 
 import org.apache.logging.log4j.core.LoggerContext;
 import org.junit.Before;
@@ -29,7 +33,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class MuleLoggerContextFactoryTestCase {
+public class MuleLoggerContextFactoryTestCase extends AbstractMuleTestCase {
 
   private static final File CONFIG_LOCATION = new File("my/local/log4j2.xml");
 
@@ -46,8 +50,8 @@ public class MuleLoggerContextFactoryTestCase {
   }
 
   @Test
-  public void externalConf() throws IOException {
-    File customLogConfig = new File("src/test/resources/log4j2-test-custom.xml");
+  public void externalConf() throws IOException, URISyntaxException {
+    File customLogConfig = new File(getResource("log4j2-test-custom.xml", getClass()).toURI());
     assertThat(customLogConfig.exists(), is(true));
     when(artifactDescriptor.getLogConfigFile()).thenReturn(customLogConfig);
     final MuleLoggerContextFactory loggerCtxFactory = mockLoggerContextFactory();
