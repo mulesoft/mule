@@ -7,12 +7,15 @@
 
 package org.mule;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.transformer.types.MimeTypes.APPLICATION_XML;
+
 import org.mule.api.MuleContext;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
@@ -39,6 +42,8 @@ import org.junit.Test;
 public class DefaultMuleEventTestCase extends AbstractMuleTestCase
 {
 
+    private static final String URI = "test://user:password@test";
+    private static final String MASKED_URI = "test://<<credentials>>@test";
     public static final String CUSTOM_ENCODING = "UTF-8";
     public static final String PROPERTY_NAME = "test";
     public static final String PROPERTY_VALUE = "foo";
@@ -193,13 +198,23 @@ public class DefaultMuleEventTestCase extends AbstractMuleTestCase
         assertThat(event.isTransacted(), equalTo(true));
     }
 
+    @Test
+    public void toStringMasksMessageResourceURI() throws EndpointException
+    {
+        Flow flow = mock(Flow.class);
+        when(flow.isSynchronous()).thenReturn(false);
+        DefaultMuleEvent event = new DefaultMuleEvent(muleMessage, createMockTransactionalInboundEndpoint(), flow);
+        assertThat(event.toString(), not(containsString(URI)));
+        assertThat(event.toString(), containsString(MASKED_URI));
+    }
+
     private InboundEndpoint createMockTransactionalInboundEndpoint() throws EndpointException
     {
         InboundEndpoint inboundEndpoint = mock(InboundEndpoint.class);
         TransactionConfig transactionConfig = mock(TransactionConfig.class);
         when(transactionConfig.isTransacted()).thenReturn(true);
         when(inboundEndpoint.getTransactionConfig()).thenReturn(transactionConfig);
-        when(inboundEndpoint.getEndpointURI()).thenReturn(new MuleEndpointURI("test://test", muleContext));
+        when(inboundEndpoint.getEndpointURI()).thenReturn(new MuleEndpointURI(URI, muleContext));
         return inboundEndpoint;
     }
 }
