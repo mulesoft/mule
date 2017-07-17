@@ -38,6 +38,7 @@ import org.mule.runtime.extension.api.connectivity.oauth.OAuthModelProperty;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthParameterModelProperty;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.exception.IllegalConnectionProviderModelDefinitionException;
+import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.OperationExecutorModelProperty;
@@ -57,119 +58,129 @@ import java.util.Set;
  *
  * @since 4.0
  */
-public class JavaOAuthDeclarationEnricher extends AbstractAnnotatedDeclarationEnricher {
-
-  private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
-  private final MetadataType stringType = typeLoader.load(String.class);
-  private final MetadataType voidType = typeLoader.load(void.class);
+public class JavaOAuthDeclarationEnricher implements DeclarationEnricher {
 
   @Override
   public void enrich(ExtensionLoadingContext extensionLoadingContext) {
-    final ExtensionDeclaration extensionDeclaration = extensionLoadingContext.getExtensionDeclarer().getDeclaration();
+    new EnricherDelegate().enrich(extensionLoadingContext);
+  }
 
-    Set<Reference<ConnectionProviderDeclaration>> visitedProviders = new HashSet<>();
-    Set<Reference<ConfigurationDeclaration>> oauthConfigs = new HashSet<>();
-    Reference<Boolean> oauthGloballySupported = new Reference<>(false);
+  private class EnricherDelegate extends AbstractAnnotatedDeclarationEnricher {
 
-    new DeclarationWalker() {
+    private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
+    private final MetadataType stringType = typeLoader.load(String.class);
+    private final MetadataType voidType = typeLoader.load(void.class);
 
-      @Override
-      protected void onConnectionProvider(ConnectedDeclaration owner, ConnectionProviderDeclaration declaration) {
-        if (!visitedProviders.add(new Reference<>(declaration))) {
-          return;
-        }
+    @Override
+    public void enrich(ExtensionLoadingContext extensionLoadingContext) {
+      final ExtensionDeclaration extensionDeclaration = extensionLoadingContext.getExtensionDeclarer().getDeclaration();
 
-        if (declaration.getModelProperty(OAuthModelProperty.class).isPresent()) {
-          if (owner instanceof ExtensionDeclaration) {
-            oauthGloballySupported.set(true);
-            stop();
-          } else if (owner instanceof ConfigurationDeclaration) {
-            oauthConfigs.add(new Reference<>((ConfigurationDeclaration) owner));
+      Set<Reference<ConnectionProviderDeclaration>> visitedProviders = new HashSet<>();
+      Set<Reference<ConfigurationDeclaration>> oauthConfigs = new HashSet<>();
+      Reference<Boolean> oauthGloballySupported = new Reference<>(false);
+
+      new DeclarationWalker() {
+
+        @Override
+        protected void onConnectionProvider(ConnectedDeclaration owner, ConnectionProviderDeclaration declaration) {
+          if (!visitedProviders.add(new Reference<>(declaration))) {
+            return;
           }
 
-          enrichOAuthParameters(declaration);
-          extractImplementingType(declaration).ifPresent(type -> enrichCallbackValues(declaration, type));
+          if (declaration.getModelProperty(OAuthModelProperty.class).isPresent()) {
+            if (owner instanceof ExtensionDeclaration) {
+              oauthGloballySupported.set(true);
+              stop();
+            } else if (owner instanceof ConfigurationDeclaration) {
+              oauthConfigs.add(new Reference<>((ConfigurationDeclaration) owner));
+            }
+
+            enrichOAuthParameters(declaration);
+            extractImplementingType(declaration).ifPresent(type -> enrichCallbackValues(declaration, type));
+          }
         }
+      }.walk(extensionDeclaration);
+
+      List<ConfigurationDeclaration> configs;
+      if (oauthGloballySupported.get()) {
+        configs = extensionDeclaration.getConfigurations();
+      } else {
+        configs = oauthConfigs.stream().map(Reference::get).collect(toList());
       }
-    }.walk(extensionDeclaration);
 
-    List<ConfigurationDeclaration> configs;
-    if (oauthGloballySupported.get()) {
-      configs = extensionDeclaration.getConfigurations();
-    } else {
-      configs = oauthConfigs.stream().map(Reference::get).collect(toList());
+      OperationDeclaration unauthorize = buildUnauthorizeOperation();
+      configs.forEach(c -> c.addOperation(unauthorize));
     }
 
-    OperationDeclaration unauthorize = buildUnauthorizeOperation();
-    configs.forEach(c -> c.addOperation(unauthorize));
-  }
-
-  private void enrichOAuthParameters(ConnectionProviderDeclaration declaration) {
-    declaration.getAllParameters().forEach(p -> p.getModelProperty(DeclaringMemberModelProperty.class)
-        .map(DeclaringMemberModelProperty::getDeclaringField)
-        .ifPresent(field -> {
-          OAuthParameter annotation = field.getAnnotation(OAuthParameter.class);
-          if (annotation != null) {
-            validateExpressionSupport(declaration, p, field);
-            p.setExpressionSupport(NOT_SUPPORTED);
-            p.addModelProperty(new OAuthParameterModelProperty(annotation.requestAlias()));
-          }
-        }));
-  }
-
-
-  private void validateExpressionSupport(ConnectionProviderDeclaration provider,
-                                         ParameterDeclaration parameter,
-                                         Field field) {
-    Expression expression = field.getAnnotation(Expression.class);
-    if (expression != null && expression.value() != NOT_SUPPORTED) {
-      throw new IllegalConnectionProviderModelDefinitionException(
-                                                                  format("Parameter '%s' in Connection Provider '%s' is marked as supporting expressions. Expressions are not supported "
-                                                                      + "in OAuth parameters", parameter.getName(),
-                                                                         provider.getName()));
+    private void enrichOAuthParameters(ConnectionProviderDeclaration declaration) {
+      declaration.getAllParameters().forEach(p -> p.getModelProperty(DeclaringMemberModelProperty.class)
+          .map(DeclaringMemberModelProperty::getDeclaringField)
+          .ifPresent(field -> {
+            OAuthParameter annotation = field.getAnnotation(OAuthParameter.class);
+            if (annotation != null) {
+              validateExpressionSupport(declaration, p, field);
+              p.setExpressionSupport(NOT_SUPPORTED);
+              p.addModelProperty(new OAuthParameterModelProperty(annotation.requestAlias()));
+            }
+          }));
     }
-  }
 
-  private void enrichCallbackValues(ConnectionProviderDeclaration declaration, Class type) {
-    Map<Field, String> values = getAnnotatedFields(type, OAuthCallbackValue.class).stream()
-        .collect(toMap(identity(), field -> field.getAnnotation(OAuthCallbackValue.class).expression()));
 
-    if (!values.isEmpty()) {
-      declaration.addModelProperty(new OAuthCallbackValuesModelProperty(values));
+    private void validateExpressionSupport(ConnectionProviderDeclaration provider,
+                                           ParameterDeclaration parameter,
+                                           Field field) {
+      Expression expression = field.getAnnotation(Expression.class);
+      if (expression != null && expression.value() != NOT_SUPPORTED) {
+        throw new IllegalConnectionProviderModelDefinitionException(
+                                                                    format(
+                                                                           "Parameter '%s' in Connection Provider '%s' is marked as supporting expressions. Expressions are not supported "
+                                                                               + "in OAuth parameters",
+                                                                           parameter.getName(),
+                                                                           provider.getName()));
+      }
     }
-  }
 
-  private OperationDeclaration buildUnauthorizeOperation() {
-    OperationDeclaration operation = new OperationDeclaration(UNAUTHORIZE_OPERATION_NAME);
-    operation.setDescription("Deletes all the access token information of a given resource owner id so that it's impossible to "
-        + "execute any operation for that user without doing the authorization dance again");
-    operation.setBlocking(true);
-    operation.setExecutionType(BLOCKING);
-    operation.setOutput(toDeclaration(voidType));
-    operation.setOutputAttributes(toDeclaration(voidType));
-    operation.setRequiresConnection(false);
-    operation.setSupportsStreaming(false);
-    operation.setTransactional(false);
-    operation.addModelProperty(new OperationExecutorModelProperty(model -> new UnauthorizeOperationExecutor()));
+    private void enrichCallbackValues(ConnectionProviderDeclaration declaration, Class type) {
+      Map<Field, String> values = getAnnotatedFields(type, OAuthCallbackValue.class).stream()
+          .collect(toMap(identity(), field -> field.getAnnotation(OAuthCallbackValue.class).expression()));
 
-    ParameterGroupDeclaration group = operation.getParameterGroup(DEFAULT_GROUP_NAME);
-    group.showInDsl(false);
-    ParameterDeclaration parameter = new ParameterDeclaration(RESOURCE_OWNER_ID_PARAMETER_NAME);
-    parameter.setDescription("The id of the resource owner which access should be invalidated");
-    parameter.setExpressionSupport(SUPPORTED);
-    parameter.setLayoutModel(LayoutModel.builder().build());
-    parameter.setRequired(false);
-    parameter.setParameterRole(BEHAVIOUR);
-    parameter.setType(stringType, false);
-    group.addParameter(parameter);
+      if (!values.isEmpty()) {
+        declaration.addModelProperty(new OAuthCallbackValuesModelProperty(values));
+      }
+    }
 
-    return operation;
-  }
+    private OperationDeclaration buildUnauthorizeOperation() {
+      OperationDeclaration operation = new OperationDeclaration(UNAUTHORIZE_OPERATION_NAME);
+      operation.setDescription("Deletes all the access token information of a given resource owner id so that it's impossible to "
+          + "execute any operation for that user without doing the authorization dance again");
+      operation.setBlocking(true);
+      operation.setExecutionType(BLOCKING);
+      operation.setOutput(toDeclaration(voidType));
+      operation.setOutputAttributes(toDeclaration(voidType));
+      operation.setRequiresConnection(false);
+      operation.setSupportsStreaming(false);
+      operation.setTransactional(false);
+      operation.addModelProperty(new OperationExecutorModelProperty(model -> new UnauthorizeOperationExecutor()));
 
-  private OutputDeclaration toDeclaration(MetadataType type) {
-    OutputDeclaration declaration = new OutputDeclaration();
-    declaration.setType(type, false);
+      ParameterGroupDeclaration group = operation.getParameterGroup(DEFAULT_GROUP_NAME);
+      group.showInDsl(false);
+      ParameterDeclaration parameter = new ParameterDeclaration(RESOURCE_OWNER_ID_PARAMETER_NAME);
+      parameter.setDescription("The id of the resource owner which access should be invalidated");
+      parameter.setExpressionSupport(SUPPORTED);
+      parameter.setLayoutModel(LayoutModel.builder().build());
+      parameter.setRequired(false);
+      parameter.setParameterRole(BEHAVIOUR);
+      parameter.setType(stringType, false);
+      group.addParameter(parameter);
 
-    return declaration;
+      return operation;
+    }
+
+    private OutputDeclaration toDeclaration(MetadataType type) {
+      OutputDeclaration declaration = new OutputDeclaration();
+      declaration.setType(type, false);
+
+      return declaration;
+    }
   }
 }

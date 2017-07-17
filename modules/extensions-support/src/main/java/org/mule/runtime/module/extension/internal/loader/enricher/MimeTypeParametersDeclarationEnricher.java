@@ -27,6 +27,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.WithSourcesDeclaration
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarationWalker;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.ExtensionProperties;
 import java.io.InputStream;
@@ -40,61 +41,69 @@ import java.io.InputStream;
  *
  * @since 4.0
  */
-public final class MimeTypeParametersDeclarationEnricher extends AbstractAnnotatedDeclarationEnricher {
-
-  private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
+public final class MimeTypeParametersDeclarationEnricher implements DeclarationEnricher {
 
   @Override
   public void enrich(ExtensionLoadingContext extensionLoadingContext) {
-    final ExtensionDeclaration declaration = extensionLoadingContext.getExtensionDeclarer().getDeclaration();
-    new IdempotentDeclarationWalker() {
-
-      @Override
-      protected void onOperation(OperationDeclaration declaration) {
-        declareMimeTypeParameters(declaration);
-      }
-
-      @Override
-      protected void onSource(WithSourcesDeclaration owner, SourceDeclaration declaration) {
-        declareMimeTypeParameters(declaration);
-      }
-    }.walk(declaration);
+    new EnricherDelegate().enrich(extensionLoadingContext);
   }
 
-  private void declareOutputEncodingParameter(ParameterGroupDeclaration group) {
-    group.addParameter(newParameter(ENCODING_PARAMETER_NAME, "The encoding of the payload that this operation outputs."));
-  }
+  private class EnricherDelegate extends AbstractAnnotatedDeclarationEnricher {
 
-  private void declareOutputMimeTypeParameter(ParameterGroupDeclaration group) {
-    group.addParameter(newParameter(MIME_TYPE_PARAMETER_NAME, "The mime type of the payload that this operation outputs."));
-  }
+    private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
 
-  private void declareMimeTypeParameters(ComponentDeclaration declaration) {
-    declaration.getOutput().getType().accept(new MetadataTypeVisitor() {
+    @Override
+    public void enrich(ExtensionLoadingContext extensionLoadingContext) {
+      final ExtensionDeclaration declaration = extensionLoadingContext.getExtensionDeclarer().getDeclaration();
+      new IdempotentDeclarationWalker() {
 
-      @Override
-      public void visitString(StringType stringType) {
-        if (!stringType.getAnnotation(EnumAnnotation.class).isPresent()) {
-          declareOutputMimeTypeParameter(declaration.getParameterGroup(DEFAULT_GROUP_NAME));
+        @Override
+        protected void onOperation(OperationDeclaration declaration) {
+          declareMimeTypeParameters(declaration);
         }
-      }
 
-      @Override
-      public void visitBinaryType(BinaryType binaryType) {
-        ParameterGroupDeclaration group = declaration.getParameterGroup(DEFAULT_GROUP_NAME);
-        declareOutputMimeTypeParameter(group);
-        declareOutputEncodingParameter(group);
-      }
-    });
-  }
+        @Override
+        protected void onSource(WithSourcesDeclaration owner, SourceDeclaration declaration) {
+          declareMimeTypeParameters(declaration);
+        }
+      }.walk(declaration);
+    }
 
-  private ParameterDeclaration newParameter(String name, String description) {
-    ParameterDeclaration parameter = new ParameterDeclaration(name);
-    parameter.setRequired(false);
-    parameter.setExpressionSupport(SUPPORTED);
-    parameter.setType(typeLoader.load(String.class), false);
-    parameter.setDescription(description);
-    parameter.setLayoutModel(LayoutModel.builder().tabName(ADVANCED_TAB_NAME).build());
-    return parameter;
+    private void declareOutputEncodingParameter(ParameterGroupDeclaration group) {
+      group.addParameter(newParameter(ENCODING_PARAMETER_NAME, "The encoding of the payload that this operation outputs."));
+    }
+
+    private void declareOutputMimeTypeParameter(ParameterGroupDeclaration group) {
+      group.addParameter(newParameter(MIME_TYPE_PARAMETER_NAME, "The mime type of the payload that this operation outputs."));
+    }
+
+    private void declareMimeTypeParameters(ComponentDeclaration declaration) {
+      declaration.getOutput().getType().accept(new MetadataTypeVisitor() {
+
+        @Override
+        public void visitString(StringType stringType) {
+          if (!stringType.getAnnotation(EnumAnnotation.class).isPresent()) {
+            declareOutputMimeTypeParameter(declaration.getParameterGroup(DEFAULT_GROUP_NAME));
+          }
+        }
+
+        @Override
+        public void visitBinaryType(BinaryType binaryType) {
+          ParameterGroupDeclaration group = declaration.getParameterGroup(DEFAULT_GROUP_NAME);
+          declareOutputMimeTypeParameter(group);
+          declareOutputEncodingParameter(group);
+        }
+      });
+    }
+
+    private ParameterDeclaration newParameter(String name, String description) {
+      ParameterDeclaration parameter = new ParameterDeclaration(name);
+      parameter.setRequired(false);
+      parameter.setExpressionSupport(SUPPORTED);
+      parameter.setType(typeLoader.load(String.class), false);
+      parameter.setDescription(description);
+      parameter.setLayoutModel(LayoutModel.builder().tabName(ADVANCED_TAB_NAME).build());
+      return parameter;
+    }
   }
 }

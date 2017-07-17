@@ -27,14 +27,9 @@ import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
  */
 public final class JavaExportedTypesDeclarationEnricher extends AbstractAnnotatedDeclarationEnricher {
 
-  private final ClassTypeLoader typeLoader;
-
-  public JavaExportedTypesDeclarationEnricher() {
-    this.typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
-  }
-
   @Override
   public void enrich(ExtensionLoadingContext extensionLoadingContext) {
+    ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
     Export exportAnnotation = extractAnnotation(extensionLoadingContext.getExtensionDeclarer().getDeclaration(), Export.class);
     if (exportAnnotation != null) {
       ExtensionDeclarer declarer = extensionLoadingContext.getExtensionDeclarer();
