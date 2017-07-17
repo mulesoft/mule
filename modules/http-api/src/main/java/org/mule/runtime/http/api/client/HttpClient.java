@@ -11,7 +11,9 @@ import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.concurrent.TimeoutException;
+import java.util.function.BiConsumer;
 
 /**
  * Object that sends an HTTP request, and returns the response. Notice must be started to be used and stopped to be disposed
@@ -50,7 +52,9 @@ public interface HttpClient {
    * {@link CompletableFuture} will be completed. Be aware that the response body processing will be deferred so that the response can
    * be processed even when a large body is still being received. If the full response is needed right away then the provided
    * {@link HttpResponse} must be read in a different thread so that it does not block the {@link HttpClient} threads handling the
-   * response.
+   * response. It's therefore recommended to use {@link CompletableFuture#get()} or any of the async methods available, such as
+   * {@link CompletableFuture#whenCompleteAsync(BiConsumer, Executor)}, to handle the response is those scenarios since they guarantee
+   * executing on a different thread.
    *
    * @param request the {@link HttpRequest} to send
    * @param responseTimeout the time (in milliseconds) to wait for a response
