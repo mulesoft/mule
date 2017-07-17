@@ -82,19 +82,18 @@ public class MuleDeploymentService implements DeploymentService {
                                Supplier<SchedulerService> schedulerServiceSupplier) {
     // TODO MULE-9653 : Migrate domain class loader creation to use ArtifactClassLoaderBuilder which already has support for
     // artifact plugins.
-    domainFactory.setMuleContextListenerFactory(new DeploymentMuleContextListenerFactory(domainDeploymentListener));
-    applicationFactory.setMuleContextListenerFactory(new DeploymentMuleContextListenerFactory(applicationDeploymentListener));
-
     ArtifactDeployer<Application> applicationMuleDeployer = new DefaultArtifactDeployer<>();
     ArtifactDeployer<Domain> domainMuleDeployer = new DefaultArtifactDeployer<>();
 
     this.applicationDeployer = new DefaultArchiveDeployer<>(applicationMuleDeployer, applicationFactory, applications,
-                                                            NOP_ARTIFACT_DEPLOYMENT_TEMPLATE);
+                                                            NOP_ARTIFACT_DEPLOYMENT_TEMPLATE,
+                                                            new DeploymentMuleContextListenerFactory(applicationDeploymentListener));
     this.applicationDeployer.setDeploymentListener(applicationDeploymentListener);
     this.domainDeployer = new DomainArchiveDeployer(
                                                     new DefaultArchiveDeployer<>(domainMuleDeployer, domainFactory, domains,
                                                                                  new DomainDeploymentTemplate(applicationDeployer,
-                                                                                                              this)),
+                                                                                                              this),
+                                                                                 new DeploymentMuleContextListenerFactory(domainDeploymentListener)),
                                                     applicationDeployer, this);
     this.domainDeployer.setDeploymentListener(domainDeploymentListener);
 

@@ -19,8 +19,8 @@ import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.globalconfig.api.GlobalConfigLoader;
+import org.mule.runtime.module.deployment.impl.internal.application.DefaultApplicationFactory;
 import org.mule.runtime.module.deployment.impl.internal.application.DeployableMavenClassLoaderModelLoader;
-import org.mule.runtime.module.deployment.impl.internal.application.ToolingApplicationFactory;
 import org.mule.runtime.module.tooling.api.connectivity.ConnectivityTestingServiceBuilder;
 
 import java.io.File;
@@ -36,11 +36,11 @@ import org.apache.maven.model.Model;
  */
 class DefaultConnectivityTestingServiceBuilder implements ConnectivityTestingServiceBuilder {
 
-  private final ToolingApplicationFactory defaultApplicationFactory;
+  private final DefaultApplicationFactory defaultApplicationFactory;
   private ArtifactDeclaration artifactDeclaration;
   private Model model;
 
-  DefaultConnectivityTestingServiceBuilder(ToolingApplicationFactory defaultApplicationFactory) {
+  DefaultConnectivityTestingServiceBuilder(DefaultApplicationFactory defaultApplicationFactory) {
     this.defaultApplicationFactory = defaultApplicationFactory;
     createTempMavenModel();
   }

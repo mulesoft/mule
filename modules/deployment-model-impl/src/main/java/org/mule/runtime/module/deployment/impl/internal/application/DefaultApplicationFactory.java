@@ -28,7 +28,6 @@ import org.mule.runtime.module.artifact.classloader.MuleDeployableArtifactClassL
 import org.mule.runtime.module.artifact.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.descriptor.BundleDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
-import org.mule.runtime.module.deployment.impl.internal.artifact.MuleContextListenerFactory;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainRepository;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
 import org.mule.runtime.module.deployment.impl.internal.plugin.DefaultArtifactPlugin;
@@ -61,7 +60,6 @@ public class DefaultApplicationFactory implements ArtifactFactory<Application> {
   private final PolicyTemplateClassLoaderBuilderFactory policyTemplateClassLoaderBuilderFactory;
   private final PluginDependenciesResolver pluginDependenciesResolver;
   private final ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader;
-  private MuleContextListenerFactory muleContextListenerFactory;
 
   public DefaultApplicationFactory(ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory,
                                    ApplicationDescriptorFactory applicationDescriptorFactory,
@@ -91,10 +89,6 @@ public class DefaultApplicationFactory implements ArtifactFactory<Application> {
     this.policyTemplateClassLoaderBuilderFactory = policyTemplateClassLoaderBuilderFactory;
     this.pluginDependenciesResolver = pluginDependenciesResolver;
     this.artifactPluginDescriptorLoader = artifactPluginDescriptorLoader;
-  }
-
-  public void setMuleContextListenerFactory(MuleContextListenerFactory muleContextListenerFactory) {
-    this.muleContextListenerFactory = muleContextListenerFactory;
   }
 
   @Override
@@ -154,11 +148,6 @@ public class DefaultApplicationFactory implements ArtifactFactory<Application> {
                                    applicationPolicyProvider);
 
     applicationPolicyProvider.setApplication(delegate);
-
-    if (muleContextListenerFactory != null) {
-      delegate.setMuleContextListener(muleContextListenerFactory.create(descriptor.getName()));
-    }
-
     return new ApplicationWrapper(delegate);
   }
 

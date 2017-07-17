@@ -23,7 +23,6 @@ import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResol
 import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
-import org.mule.runtime.module.deployment.impl.internal.artifact.MuleContextListenerFactory;
 import org.mule.runtime.module.deployment.impl.internal.plugin.DefaultArtifactPlugin;
 import org.mule.runtime.module.service.ServiceRepository;
 
@@ -40,8 +39,6 @@ public class DefaultDomainFactory implements ArtifactFactory<Domain> {
   private final ServiceRepository serviceRepository;
   private final PluginDependenciesResolver pluginDependenciesResolver;
   private final DomainClassLoaderBuilderFactory domainClassLoaderBuilderFactory;
-
-  private MuleContextListenerFactory muleContextListenerFactory;
 
   /**
    * Creates a new domain factory
@@ -70,10 +67,6 @@ public class DefaultDomainFactory implements ArtifactFactory<Domain> {
     this.serviceRepository = serviceRepository;
     this.pluginDependenciesResolver = pluginDependenciesResolver;
     this.domainClassLoaderBuilderFactory = domainClassLoaderBuilderFactory;
-  }
-
-  public void setMuleContextListenerFactory(MuleContextListenerFactory muleContextListenerFactory) {
-    this.muleContextListenerFactory = muleContextListenerFactory;
   }
 
   @Override
@@ -107,10 +100,6 @@ public class DefaultDomainFactory implements ArtifactFactory<Domain> {
 
     DefaultMuleDomain defaultMuleDomain =
         new DefaultMuleDomain(descriptor, domainClassLoader, classLoaderRepository, serviceRepository, artifactPlugins);
-
-    if (muleContextListenerFactory != null) {
-      defaultMuleDomain.setMuleContextListener(muleContextListenerFactory.create(descriptor.getName()));
-    }
     DomainWrapper domainWrapper = new DomainWrapper(defaultMuleDomain, this);
     domainManager.addDomain(domainWrapper);
     return domainWrapper;
