@@ -28,7 +28,6 @@ import org.mule.runtime.module.artifact.classloader.MuleDeployableArtifactClassL
 import org.mule.runtime.module.artifact.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.descriptor.BundleDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
-import org.mule.runtime.module.deployment.impl.internal.artifact.MuleContextListenerFactory;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainRepository;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
 import org.mule.runtime.module.deployment.impl.internal.plugin.DefaultArtifactPlugin;
@@ -61,7 +60,6 @@ public class DefaultApplicationFactory implements ArtifactFactory<Application> {
   private final PolicyTemplateClassLoaderBuilderFactory policyTemplateClassLoaderBuilderFactory;
   private final PluginDependenciesResolver pluginDependenciesResolver;
   private final ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader;
-  private MuleContextListenerFactory muleContextListenerFactory;
 
   public DefaultApplicationFactory(ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory,
                                    ApplicationDescriptorFactory applicationDescriptorFactory,
@@ -93,10 +91,6 @@ public class DefaultApplicationFactory implements ArtifactFactory<Application> {
     this.artifactPluginDescriptorLoader = artifactPluginDescriptorLoader;
   }
 
-  public void setMuleContextListenerFactory(MuleContextListenerFactory muleContextListenerFactory) {
-    this.muleContextListenerFactory = muleContextListenerFactory;
-  }
-
   @Override
   public Application createArtifact(File appDir) throws IOException {
     String appName = appDir.getName();
@@ -106,7 +100,7 @@ public class DefaultApplicationFactory implements ArtifactFactory<Application> {
 
     final ApplicationDescriptor descriptor = applicationDescriptorFactory.create(appDir);
 
-    return createAppFrom(descriptor);
+    return createArtifact(descriptor);
   }
 
   @Override
@@ -114,7 +108,7 @@ public class DefaultApplicationFactory implements ArtifactFactory<Application> {
     return MuleContainerBootstrapUtils.getMuleAppsDir();
   }
 
-  public Application createAppFrom(ApplicationDescriptor descriptor) throws IOException {
+  public Application createArtifact(ApplicationDescriptor descriptor) throws IOException {
     Domain domain = domainRepository.getDomain(descriptor.getDomain());
 
     if (domain == null) {
@@ -154,11 +148,6 @@ public class DefaultApplicationFactory implements ArtifactFactory<Application> {
                                    applicationPolicyProvider);
 
     applicationPolicyProvider.setApplication(delegate);
-
-    if (muleContextListenerFactory != null) {
-      delegate.setMuleContextListener(muleContextListenerFactory.create(descriptor.getName()));
-    }
-
     return new ApplicationWrapper(delegate);
   }
 

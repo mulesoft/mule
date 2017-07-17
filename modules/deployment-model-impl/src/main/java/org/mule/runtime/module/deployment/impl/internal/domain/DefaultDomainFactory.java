@@ -23,7 +23,6 @@ import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResol
 import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
-import org.mule.runtime.module.deployment.impl.internal.artifact.MuleContextListenerFactory;
 import org.mule.runtime.module.deployment.impl.internal.plugin.DefaultArtifactPlugin;
 import org.mule.runtime.module.service.ServiceRepository;
 
@@ -40,8 +39,6 @@ public class DefaultDomainFactory implements ArtifactFactory<Domain> {
   private final ServiceRepository serviceRepository;
   private final PluginDependenciesResolver pluginDependenciesResolver;
   private final DomainClassLoaderBuilderFactory domainClassLoaderBuilderFactory;
-
-  private MuleContextListenerFactory muleContextListenerFactory;
 
   /**
    * Creates a new domain factory
@@ -72,10 +69,6 @@ public class DefaultDomainFactory implements ArtifactFactory<Domain> {
     this.domainClassLoaderBuilderFactory = domainClassLoaderBuilderFactory;
   }
 
-  public void setMuleContextListenerFactory(MuleContextListenerFactory muleContextListenerFactory) {
-    this.muleContextListenerFactory = muleContextListenerFactory;
-  }
-
   @Override
   public Domain createArtifact(File domainLocation) throws IOException {
     String domainName = domainLocation.getName();
@@ -87,10 +80,10 @@ public class DefaultDomainFactory implements ArtifactFactory<Domain> {
       throw new IllegalArgumentException("Mule domain name may not contain spaces: " + domainName);
     }
 
-    return createDomainFrom(findDomain(domainName));
+    return createArtitact(findDomain(domainName));
   }
 
-  private Domain createDomainFrom(DomainDescriptor descriptor) throws IOException {
+  public Domain createArtitact(DomainDescriptor descriptor) throws IOException {
     List<ArtifactPluginDescriptor> artifactPluginDescriptors = descriptor.getPlugins().stream().collect(Collectors.toList());
     List<ArtifactPluginDescriptor> resolvedArtifactPluginDescriptors =
         pluginDependenciesResolver.resolve(artifactPluginDescriptors);
@@ -107,10 +100,6 @@ public class DefaultDomainFactory implements ArtifactFactory<Domain> {
 
     DefaultMuleDomain defaultMuleDomain =
         new DefaultMuleDomain(descriptor, domainClassLoader, classLoaderRepository, serviceRepository, artifactPlugins);
-
-    if (muleContextListenerFactory != null) {
-      defaultMuleDomain.setMuleContextListener(muleContextListenerFactory.create(descriptor.getName()));
-    }
     DomainWrapper domainWrapper = new DomainWrapper(defaultMuleDomain, this);
     domainManager.addDomain(domainWrapper);
     return domainWrapper;
