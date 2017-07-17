@@ -45,7 +45,7 @@ public class ThrowProcessor implements Processor {
         if (error != null) {
           ErrorTypeRepository errorTypeRepository = muleContext.getErrorTypeRepository();
           ErrorType errorType = errorTypeRepository.lookupErrorType(buildFromStringRepresentation(error))
-              .orElseThrow(() -> new DefaultMuleException(format("Could not find error: %s", error)));
+              .orElseThrow(() -> new DefaultMuleException(format("Could not find error: '%s'", error)));
           throw new TypedException(instantiatedException, errorType);
         } else {
           checkArgument(instantiatedException instanceof TypedException, EXCEPTION_ERROR);
