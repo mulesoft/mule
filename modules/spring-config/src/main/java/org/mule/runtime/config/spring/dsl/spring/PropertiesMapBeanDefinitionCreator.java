@@ -14,16 +14,17 @@ import static org.springframework.beans.factory.xml.BeanDefinitionParserDelegate
 import static org.springframework.beans.factory.xml.BeanDefinitionParserDelegate.KEY_REF_ATTRIBUTE;
 import static org.springframework.beans.factory.xml.BeanDefinitionParserDelegate.MAP_ELEMENT;
 import static org.springframework.beans.factory.xml.BeanDefinitionParserDelegate.VALUE_REF_ATTRIBUTE;
+
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
+
+import java.util.HashMap;
 
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.ManagedMap;
 
-import java.util.HashMap;
-
-public class PropertiesMapBeanDefinitionCreator extends BeanDefinitionCreator {
+class PropertiesMapBeanDefinitionCreator extends BeanDefinitionCreator {
 
   @Override
   boolean handleRequest(CreateBeanDefinitionRequest createBeanDefinitionRequest) {

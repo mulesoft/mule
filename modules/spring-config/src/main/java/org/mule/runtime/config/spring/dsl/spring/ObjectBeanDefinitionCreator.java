@@ -25,7 +25,7 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
  *
  * @since 4.0
  */
-public class ObjectBeanDefinitionCreator extends BeanDefinitionCreator {
+class ObjectBeanDefinitionCreator extends BeanDefinitionCreator {
 
   private static final String REF_PARAMETER = "ref";
   private static final String CLASS_PARAMETER = "class";

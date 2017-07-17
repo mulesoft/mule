@@ -28,7 +28,7 @@ import org.springframework.beans.factory.support.ManagedList;
  *
  * @since 4.0
  */
-public class CollectionBeanDefinitionCreator extends BeanDefinitionCreator {
+class CollectionBeanDefinitionCreator extends BeanDefinitionCreator {
 
   @Override
   boolean handleRequest(CreateBeanDefinitionRequest createBeanDefinitionRequest) {

@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static org.apache.commons.beanutils.BeanUtils.setProperty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.rootBeanDefinition;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.ioc.ObjectProvider;
@@ -30,7 +31,7 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public class EagerObjectCreator extends BeanDefinitionCreator {
+class EagerObjectCreator extends BeanDefinitionCreator {
 
   /**
    * These are the set of component model types that will not support complete dependency injection and lifecycle capabilities

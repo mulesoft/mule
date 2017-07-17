@@ -28,8 +28,6 @@ import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_PRO
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.NAME_ATTRIBUTE;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.OBJECT_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SECURITY_MANAGER_IDENTIFIER;
-import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.from;
-import static org.mule.runtime.config.spring.dsl.spring.CommonBeanDefinitionCreator.adaptFilterBeanDefinitions;
 import static org.mule.runtime.config.spring.dsl.spring.CommonBeanDefinitionCreator.areMatchingTypes;
 import static org.mule.runtime.config.spring.dsl.spring.ComponentModelHelper.addAnnotation;
 import static org.mule.runtime.config.spring.dsl.spring.WrapperElementType.COLLECTION;
@@ -59,11 +57,7 @@ import org.mule.runtime.dsl.api.component.AttributeDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
 
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.config.BeanReference;
-import org.springframework.beans.factory.support.AbstractBeanDefinition;
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-import org.w3c.dom.Element;
+import com.google.common.collect.ImmutableSet;
 
 import java.util.HashMap;
 import java.util.List;
@@ -74,7 +68,10 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
-import com.google.common.collect.ImmutableSet;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.BeanReference;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.w3c.dom.Element;
 
 /**
  * The {@code BeanDefinitionFactory} is the one that knows how to convert a {@code ComponentModel} to an actual
@@ -160,21 +157,8 @@ public class BeanDefinitionFactory {
     if (!innerComponents.isEmpty()) {
       for (ComponentModel innerComponent : innerComponents) {
         if (innerComponent.isEnabled()) {
-          if (hasDefinition(innerComponent.getIdentifier(), of(innerComponent.getParent().getIdentifier()))) {
-            resolveComponentRecursively(componentModel, innerComponent, registry, componentModelPostProcessor,
-                                        oldParsingMechanism);
-          } else {
-            Either<BeanDefinition, BeanReference> oldParseResult =
-                oldParsingMechanism.apply((Element) from(innerComponent).getNode(), null);
-
-            if (oldParseResult.isLeft()) {
-              AbstractBeanDefinition oldBeanDefinition = (AbstractBeanDefinition) oldParseResult.getLeft();
-              oldBeanDefinition = adaptFilterBeanDefinitions(componentModel, oldBeanDefinition);
-              innerComponent.setBeanDefinition(oldBeanDefinition);
-            } else if (oldParseResult.isRight()) {
-              innerComponent.setBeanReference(oldParseResult.getRight());
-            }
-          }
+          resolveComponentRecursively(componentModel, innerComponent, registry, componentModelPostProcessor,
+                                      oldParsingMechanism);
         }
       }
     }
@@ -325,7 +309,6 @@ public class BeanDefinitionFactory {
     ExceptionStrategyRefBeanDefinitionCreator exceptionStrategyRefBeanDefinitionCreator =
         new ExceptionStrategyRefBeanDefinitionCreator();
     PropertiesMapBeanDefinitionCreator propertiesMapBeanDefinitionCreator = new PropertiesMapBeanDefinitionCreator();
-    FilterReferenceBeanDefinitionCreator filterReferenceBeanDefinitionCreator = new FilterReferenceBeanDefinitionCreator();
     ReferenceBeanDefinitionCreator referenceBeanDefinitionCreator = new ReferenceBeanDefinitionCreator();
     SimpleTypeBeanDefinitionCreator simpleTypeBeanDefinitionCreator = new SimpleTypeBeanDefinitionCreator();
     CollectionBeanDefinitionCreator collectionBeanDefinitionCreator = new CollectionBeanDefinitionCreator();
@@ -336,8 +319,7 @@ public class BeanDefinitionFactory {
     eagerObjectCreator.setNext(objectBeanDefinitionCreator);
     objectBeanDefinitionCreator.setNext(propertiesMapBeanDefinitionCreator);
     propertiesMapBeanDefinitionCreator.setNext(exceptionStrategyRefBeanDefinitionCreator);
-    exceptionStrategyRefBeanDefinitionCreator.setNext(filterReferenceBeanDefinitionCreator);
-    filterReferenceBeanDefinitionCreator.setNext(referenceBeanDefinitionCreator);
+    exceptionStrategyRefBeanDefinitionCreator.setNext(referenceBeanDefinitionCreator);
     referenceBeanDefinitionCreator.setNext(simpleTypeBeanDefinitionCreator);
     simpleTypeBeanDefinitionCreator.setNext(collectionBeanDefinitionCreator);
     collectionBeanDefinitionCreator.setNext(mapEntryBeanDefinitionCreator);

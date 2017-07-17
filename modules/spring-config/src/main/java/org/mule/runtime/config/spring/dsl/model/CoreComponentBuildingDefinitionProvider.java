@@ -8,12 +8,10 @@
 package org.mule.runtime.config.spring.dsl.model;
 
 import static java.lang.Boolean.parseBoolean;
-import static java.lang.String.format;
 import static java.lang.String.valueOf;
 import static java.util.Arrays.asList;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.ArrayUtils.addAll;
-import static org.apache.commons.lang3.StringUtils.split;
 import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_MAX_POOL_ACTIVE;
 import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_MAX_POOL_IDLE;
 import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_MAX_POOL_WAIT;
@@ -60,6 +58,7 @@ import static org.mule.runtime.internal.dsl.DslConstants.POOLING_PROFILE_ELEMENT
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
+
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.DataUnit;
@@ -106,7 +105,6 @@ import org.mule.runtime.core.api.processor.LoggerMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.RetryNotifier;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
-import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.security.EncryptionStrategy;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.security.SecurityProvider;
@@ -114,6 +112,8 @@ import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.source.polling.CronScheduler;
 import org.mule.runtime.core.api.source.polling.FixedFrequencyScheduler;
 import org.mule.runtime.core.api.source.polling.PeriodicScheduler;
+import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
+import org.mule.runtime.core.api.streaming.object.CursorIteratorProviderFactory;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionType;
 import org.mule.runtime.core.api.transaction.xa.XaTransactionFactory;
@@ -173,23 +173,10 @@ import org.mule.runtime.core.routing.ScatterGatherRouter;
 import org.mule.runtime.core.routing.SimpleCollectionAggregator;
 import org.mule.runtime.core.routing.Splitter;
 import org.mule.runtime.core.routing.UntilSuccessful;
-import org.mule.runtime.core.routing.filters.EqualsFilter;
-import org.mule.runtime.core.routing.filters.ExceptionTypeFilter;
-import org.mule.runtime.core.routing.filters.ExpressionFilter;
-import org.mule.runtime.core.routing.filters.MessagePropertyFilter;
-import org.mule.runtime.core.routing.filters.NotWildcardFilter;
-import org.mule.runtime.core.routing.filters.PayloadTypeFilter;
-import org.mule.runtime.core.routing.filters.RegExFilter;
-import org.mule.runtime.core.routing.filters.WildcardFilter;
-import org.mule.runtime.core.routing.filters.logic.AndFilter;
-import org.mule.runtime.core.routing.filters.logic.NotFilter;
-import org.mule.runtime.core.routing.filters.logic.OrFilter;
 import org.mule.runtime.core.routing.requestreply.SimpleAsyncRequestReplyRequester;
 import org.mule.runtime.core.security.MuleSecurityManagerConfigurator;
 import org.mule.runtime.core.security.PasswordBasedEncryptionStrategy;
 import org.mule.runtime.core.security.SecretKeyEncryptionStrategy;
-import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
-import org.mule.runtime.core.api.streaming.object.CursorIteratorProviderFactory;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.runtime.core.transformer.codec.Base64Decoder;
 import org.mule.runtime.core.transformer.codec.Base64Encoder;
@@ -210,15 +197,12 @@ import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
 import org.mule.runtime.dsl.api.component.TypeConverter;
 
-import com.google.common.collect.ImmutableMap;
-
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.Function;
-import java.util.regex.Pattern;
 
 /**
  * {@link ComponentBuildingDefinition} definitions for the components provided by the core runtime.
@@ -239,7 +223,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   private static final String PROCESSOR_CHAIN = "processor-chain";
   private static final String PROCESSOR = "processor";
   private static final String TRANSFORMER = "transformer";
-  private static final String FILTER = "filter";
   private static final String CUSTOM_PROCESSOR = "custom-processor";
   private static final String CLASS_ATTRIBUTE = "class";
   private static final String SUB_FLOW = "sub-flow";
@@ -265,14 +248,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   private static final String TX_TYPE = "transactionType";
 
   private static final Class<?> MESSAGE_PROCESSOR_CLASS = Processor.class;
-
-  private Map<String, Integer> regExFlagsMapping = ImmutableMap.<String, Integer>builder()
-      .put("CANON_EQ", Integer.valueOf(Pattern.CANON_EQ))
-      .put("CASE_INSENSITIVE", Integer.valueOf(Pattern.CASE_INSENSITIVE))
-      .put("DOTALL", Integer.valueOf(Pattern.DOTALL))
-      .put("MULTILINE", Integer.valueOf(Pattern.MULTILINE))
-      .put("UNICODE_CASE", Integer.valueOf(Pattern.UNICODE_CASE))
-      .build();
 
   private static ComponentBuildingDefinition.Builder baseDefinition =
       new ComponentBuildingDefinition.Builder().withNamespace(CORE_PREFIX);
@@ -314,12 +289,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withTypeDefinition(fromType(RedeliveryExceeded.class))
         .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
         .asScope().build());
-    componentBuildingDefinitions
-        .add(baseDefinition.withIdentifier("commit-transaction").withTypeDefinition(fromType(WildcardFilter.class))
-            .withSetterParameterDefinition("pattern", fromSimpleParameter("exception-pattern").build()).build());
-    componentBuildingDefinitions
-        .add(baseDefinition.withIdentifier("rollback-transaction").withTypeDefinition(fromType(NotWildcardFilter.class))
-            .withSetterParameterDefinition("pattern", fromSimpleParameter("exception-pattern").build()).build());
     componentBuildingDefinitions.add(baseDefinition.withIdentifier(ERROR_HANDLER)
         .withTypeDefinition(fromType(ErrorHandler.class))
         .withSetterParameterDefinition("globalName", fromSimpleParameter(NAME).build())
@@ -393,8 +362,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .add(baseDefinition.withIdentifier(PROCESSOR).withTypeDefinition(fromType(AbstractProcessor.class)).build());
     componentBuildingDefinitions
         .add(baseDefinition.withIdentifier(TRANSFORMER).withTypeDefinition(fromType(Transformer.class)).build());
-    componentBuildingDefinitions
-        .add(baseDefinition.withIdentifier(FILTER).withTypeDefinition(fromType(Object.class)).build());
     componentBuildingDefinitions.add(baseDefinition.withIdentifier(CUSTOM_PROCESSOR)
         .withTypeDefinition(fromConfigurationAttribute(CLASS_ATTRIBUTE)
             .checkingThatIsClassOrInheritsFrom(MESSAGE_PROCESSOR_CLASS))
@@ -781,7 +748,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .build());
 
     componentBuildingDefinitions.addAll(getStreamingDefinitions());
-    componentBuildingDefinitions.addAll(getFiltersDefinitions());
+    componentBuildingDefinitions.addAll(getIdempotentValidatorsDefinitions());
     componentBuildingDefinitions.addAll(getReconnectionDefinitions());
     componentBuildingDefinitions.addAll(getTransactionDefinitions());
     return componentBuildingDefinitions;
@@ -791,95 +758,8 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     return TransactionType::valueOf;
   }
 
-  private List<ComponentBuildingDefinition> getFiltersDefinitions() {
+  private List<ComponentBuildingDefinition> getIdempotentValidatorsDefinitions() {
     List<ComponentBuildingDefinition> definitions = new LinkedList<>();
-
-    definitions.add(baseDefinition
-        .withIdentifier("and-filter")
-        .withTypeDefinition(fromType(AndFilter.class))
-        .withConstructorParameterDefinition(fromChildCollectionConfiguration(Filter.class).build())
-        .build());
-
-    definitions.add(baseDefinition
-        .withIdentifier("or-filter")
-        .withTypeDefinition(fromType(OrFilter.class))
-        .withConstructorParameterDefinition(fromChildCollectionConfiguration(Filter.class).build())
-        .build());
-
-    definitions.add(baseDefinition
-        .withIdentifier("not-filter")
-        .withTypeDefinition(fromType(NotFilter.class))
-        .withConstructorParameterDefinition(fromChildConfiguration(Filter.class).build())
-        .build());
-
-    definitions.add(baseDefinition
-        .withIdentifier("regex-filter")
-        .withTypeDefinition(fromType(RegExFilter.class))
-        .withSetterParameterDefinition("flags", fromSimpleParameter("flags", value -> {
-          String flags = (String) value;
-          int combinedFlags = 0;
-          String[] flagStrings = split(flags, ',');
-          for (String flagString : flagStrings) {
-            Integer flag = regExFlagsMapping.get(flagString);
-            if (flag == null) {
-              String message =
-                  format("Invalid flag '%1s'. Must be one of %2s", flagString, regExFlagsMapping.keySet().toString());
-              throw new IllegalArgumentException(message);
-            }
-            combinedFlags = combinedFlags | flag.intValue();
-          }
-          return Integer.valueOf(combinedFlags);
-        }).build())
-        .withSetterParameterDefinition("pattern", fromSimpleParameter("pattern").build())
-        .withSetterParameterDefinition("value", fromSimpleParameter("value").build())
-        .build());
-
-    definitions.add(baseDefinition
-        .withIdentifier("exception-type-filter")
-        .withTypeDefinition(fromType(ExceptionTypeFilter.class))
-        .withConstructorParameterDefinition(fromSimpleParameter("expectedType", stringToClassConverter()).build())
-        .build());
-
-    definitions.add(baseDefinition
-        .withIdentifier("message-property-filter")
-        .withTypeDefinition(fromType(MessagePropertyFilter.class))
-        .withConstructorParameterDefinition(fromSimpleParameter("pattern").build())
-        .withSetterParameterDefinition("value", fromSimpleParameter("value").build())
-        .withSetterParameterDefinition("scope", fromSimpleParameter("scope").build())
-        .withSetterParameterDefinition("caseSensitive", fromSimpleParameter("caseSensitive").build())
-        .build());
-
-    definitions.add(baseDefinition
-        .withIdentifier("payload-type-filter")
-        .withTypeDefinition(fromType(PayloadTypeFilter.class))
-        .withConstructorParameterDefinition(fromSimpleParameter("expectedType", stringToClassConverter()).build())
-        .build());
-
-    definitions.add(baseDefinition
-        .withIdentifier("wildcard-filter")
-        .withTypeDefinition(fromType(WildcardFilter.class))
-        .withSetterParameterDefinition("caseSensitive", fromSimpleParameter("caseSensitive").build())
-        .withSetterParameterDefinition("pattern", fromSimpleParameter("pattern").build())
-        .build());
-
-    definitions.add(baseDefinition
-        .withIdentifier("equals-filter")
-        .withTypeDefinition(fromType(EqualsFilter.class))
-        .withSetterParameterDefinition("pattern", fromSimpleParameter("pattern").build())
-        .build());
-
-    definitions.add(baseDefinition
-        .withIdentifier("expression-filter")
-        .withTypeDefinition(fromType(ExpressionFilter.class))
-        .withConstructorParameterDefinition(fromSimpleParameter("expression").build())
-        .withSetterParameterDefinition("nullReturnsTrue", fromSimpleParameter("nullReturnsTrue").build())
-        .build());
-
-    definitions.add(baseDefinition
-        .withIdentifier("custom-filter")
-        .withTypeDefinition(fromConfigurationAttribute(CLASS_ATTRIBUTE))
-        .asPrototype()
-        .build());
 
     ComponentBuildingDefinition.Builder baseIdempotentMessageFilterDefinition = baseDefinition
         .withSetterParameterDefinition("idExpression", fromSimpleParameter("idExpression").build())
