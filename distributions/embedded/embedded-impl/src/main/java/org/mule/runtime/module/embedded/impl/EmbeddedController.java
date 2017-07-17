@@ -121,7 +121,7 @@ public class EmbeddedController {
             artifactResourcesRegistry.getApplicationDescriptorFactory().create(deploymentApplicationLocation);
         artifactResourcesRegistry.getDomainFactory().createArtifact(createDefaultDomainDir());
 
-        this.application = artifactResourcesRegistry.getApplicationFactory().createAppFrom(applicationDescriptor);
+        this.application = artifactResourcesRegistry.getApplicationFactory().createArtifact(applicationDescriptor);
       } catch (IOException e) {
         throw new RuntimeException(e);
       }
