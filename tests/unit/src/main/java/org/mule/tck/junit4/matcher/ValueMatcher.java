@@ -130,9 +130,9 @@ public final class ValueMatcher extends TypeSafeMatcher<Value> {
     return this;
   }
 
-  private <T> void assertThat(T expected, Matcher<T> actual) {
-    if (actual != null) {
-      if (!actual.matches(expected)) {
+  private <T> void assertThat(T actual, Matcher<T> expected) {
+    if (expected != null) {
+      if (!expected.matches(actual)) {
         throw new RuntimeException();
       }
     }
