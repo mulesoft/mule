@@ -8,6 +8,7 @@ package org.mule.runtime.core.transformer.simple;
 
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 
+import io.qameta.allure.Issue;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.Transformer;
@@ -97,6 +98,7 @@ public class SerializedMuleMessageTransformersTestCase extends AbstractTransform
 
   @Override
   @Ignore("See MULE-6046")
+  @Issue("MULE-6046")
   public void testRoundTrip() throws Exception {}
 
   @Override

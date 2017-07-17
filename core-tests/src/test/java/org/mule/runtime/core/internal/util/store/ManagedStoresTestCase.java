@@ -16,6 +16,8 @@ import static org.junit.Assert.fail;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
+
+import io.qameta.allure.Issue;
 import org.mule.runtime.api.store.ObjectAlreadyExistsException;
 import org.mule.runtime.api.store.ObjectDoesNotExistException;
 import org.mule.runtime.api.store.ObjectStore;
@@ -92,6 +94,7 @@ public class ManagedStoresTestCase extends AbstractMuleContextTestCase {
   }
 
   @Ignore("MULE-6926")
+  @Issue("MULE-6926")
   @Test
   public void testPartitionablePersistenceStore() throws ObjectStoreException, RegistrationException, InterruptedException {
     PartitionedPersistentObjectStore<String> partitionedStore = new PartitionedPersistentObjectStore<>(muleContext);

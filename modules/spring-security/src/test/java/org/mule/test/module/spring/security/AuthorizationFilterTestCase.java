@@ -20,6 +20,7 @@ import static org.mule.runtime.http.api.HttpHeaders.Names.WWW_AUTHENTICATE;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
+import io.qameta.allure.Issue;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
@@ -45,6 +46,7 @@ public class AuthorizationFilterTestCase extends MuleArtifactFunctionalTestCase 
 
   @Test
   @Ignore("MULE-11897: When filter throws exception, the handler loses the reference to the filter")
+  @Issue("MULE-11897")
   public void testAuthenticatedButNotAuthorized() throws Exception {
     doRequest(null, "localhost", "anon", "anon", getUrl(), false, FORBIDDEN.getStatusCode());
   }
