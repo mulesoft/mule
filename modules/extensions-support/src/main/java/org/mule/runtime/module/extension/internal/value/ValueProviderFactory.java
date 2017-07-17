@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.value;
 
-import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
+import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.values.ValueProvider;
 import org.mule.runtime.extension.api.values.ValueResolvingException;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
@@ -69,7 +69,7 @@ public class ValueProviderFactory {
       }
       return resolver;
     } catch (Exception e) {
-      throw new ValueResolvingException("An error occurred trying to create a ValueProvider", UNKNOWN);
+      throw new ValueResolvingException("An error occurred trying to create a ValueProvider", UNKNOWN, e);
     }
   }
 

@@ -9,6 +9,8 @@ package org.mule.runtime.core.internal.value;
 import static java.lang.String.format;
 import static org.mule.runtime.api.value.ResolvingFailure.Builder.newFailure;
 import static org.mule.runtime.api.value.ValueResult.resultFrom;
+import static org.mule.runtime.core.internal.value.MuleValueProviderServiceUtility.deleteLastPartFromLocation;
+import static org.mule.runtime.core.internal.value.MuleValueProviderServiceUtility.isConnection;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.INVALID_LOCATION;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.NOT_VALUE_PROVIDER_ENABLED;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
@@ -20,6 +22,7 @@ import org.mule.runtime.api.value.ValueResult;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.values.ComponentValueProvider;
 import org.mule.runtime.extension.api.values.ConfigurationParameterValueProvider;
+import org.mule.runtime.extension.api.values.ValueProvider;
 import org.mule.runtime.extension.api.values.ValueResolvingException;
 
 import javax.inject.Inject;
@@ -43,26 +46,8 @@ public class MuleValueProviderService implements ValueProviderService {
    * {@inheritDoc}
    */
   @Override
-  public ValueResult getComponentValues(Location location, String providerName) {
-    return getValueResult(() -> this.findValueProvider(location, ComponentValueProvider.class).getValues(providerName));
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public ValueResult getConfigurationValues(Location location, String providerName) {
-    return getValueResult(() -> this.findValueProvider(location, ConfigurationParameterValueProvider.class)
-        .getConfigValues(providerName));
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public ValueResult getConnectionProviderValues(Location location, String providerName) {
-    return getValueResult(() -> this.findValueProvider(location, ConfigurationParameterValueProvider.class)
-        .getConnectionValues(providerName));
+  public ValueResult getValues(Location location, String providerName) {
+    return getValueResult(() -> this.findValueProvider(location, providerName).resolve());
   }
 
   /**
@@ -93,14 +78,30 @@ public class MuleValueProviderService implements ValueProviderService {
     Set<Value> get() throws Exception;
   }
 
-  private <T> T findValueProvider(Location location, Class<T> valueProviderEnabled) throws ValueResolvingException {
-    T component = (T) findComponent(location);
-    if (!valueProviderEnabled.isAssignableFrom(component.getClass())) {
-      throw new ValueResolvingException(format("The found element in the Location [%s] is not capable of provide Values",
-                                               location),
-                                        NOT_VALUE_PROVIDER_ENABLED);
+  private ValueProvider findValueProvider(Location location, String providerName) throws ValueResolvingException {
+    boolean isConnection = isConnection(location);
+
+    if (isConnection) {
+      location = deleteLastPartFromLocation(location);
     }
-    return component;
+
+    Object component = findComponent(location);
+
+    if (component instanceof ComponentValueProvider) {
+      return () -> ((ComponentValueProvider) component).getValues(providerName);
+    }
+
+    if (component instanceof ConfigurationParameterValueProvider) {
+      if (isConnection) {
+        return () -> ((ConfigurationParameterValueProvider) component).getConnectionValues(providerName);
+      } else {
+        return () -> ((ConfigurationParameterValueProvider) component).getConfigValues(providerName);
+      }
+    }
+
+    throw new ValueResolvingException(format("The found element in the Location [%s] is not capable of provide Values",
+                                             location),
+                                      NOT_VALUE_PROVIDER_ENABLED);
   }
 
   private Object findComponent(Location location) throws ValueResolvingException {
