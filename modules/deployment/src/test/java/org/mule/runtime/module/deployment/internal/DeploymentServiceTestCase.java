@@ -2085,7 +2085,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
             .definedBy("app-providing-resource-for-plugin.xml")
             .dependingOn(pluginUsingAppResource)
             .configuredWith(EXPORTED_RESOURCES, "META-INF/app-resource.txt")
-            .usingResource("src/test/resources/test-resource.txt", "META-INF/app-resource.txt");
+            .usingResource(getResourceFile("/test-resource.txt").toString(), "META-INF/app-resource.txt");
     addPackedAppFromBuilder(artifactFileBuilder);
 
     startDeployment();
