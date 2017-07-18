@@ -6,15 +6,11 @@
  */
 package org.mule.runtime.core.api.retry.policy;
 
-import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 
-import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.internal.retry.policies.SimpleRetryPolicy;
 
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.function.Supplier;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
