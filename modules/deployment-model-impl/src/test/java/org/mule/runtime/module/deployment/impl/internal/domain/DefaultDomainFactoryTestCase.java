@@ -15,7 +15,6 @@ import static org.mockito.Matchers.anyList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
-import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
@@ -48,8 +47,6 @@ public class DefaultDomainFactoryTestCase extends AbstractDomainTestCase {
 
   @Before
   public void setUp() throws Exception {
-    domainFactory.setMuleContextListenerFactory(artifactName -> mock(MuleContextListener.class));
-
     when(pluginDependenciesResolver.resolve(anyList())).thenReturn(emptyList());
   }
 
