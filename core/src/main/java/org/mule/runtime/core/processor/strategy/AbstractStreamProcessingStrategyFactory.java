@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.processor.strategy;
 
+import static java.lang.Integer.getInteger;
+import static java.lang.System.getProperty;
 import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.core.processor.strategy.AbstractStreamProcessingStrategyFactory.AbstractStreamProcessingStrategy.WaitStrategy.LITE_BLOCKING;
@@ -46,9 +48,12 @@ import reactor.core.publisher.WorkQueueProcessor;
  */
 abstract class AbstractStreamProcessingStrategyFactory extends AbstractProcessingStrategyFactory {
 
-  public static final int DEFAULT_BUFFER_SIZE = SMALL_BUFFER_SIZE;
-  public static final int DEFAULT_SUBSCRIBER_COUNT = 1;
-  public static final String DEFAULT_WAIT_STRATEGY = LITE_BLOCKING.name();
+  private static final String SYSTEM_PROPERTY_PREFIX = AbstractStreamProcessingStrategyFactory.class.getName() + ".";
+
+  public static final int DEFAULT_BUFFER_SIZE = getInteger(SYSTEM_PROPERTY_PREFIX + "DEFAULT_BUFFER_SIZE", SMALL_BUFFER_SIZE);
+  public static final int DEFAULT_SUBSCRIBER_COUNT = getInteger(SYSTEM_PROPERTY_PREFIX + "DEFAULT_SUBSCRIBER_COUNT", 1);
+  public static final String DEFAULT_WAIT_STRATEGY =
+      getProperty(SYSTEM_PROPERTY_PREFIX + "DEFAULT_WAIT_STRATEGY", LITE_BLOCKING.name());
   protected static String RING_BUFFER_SCHEDULER_NAME_SUFFIX = ".ring-buffer";
   private int bufferSize = DEFAULT_BUFFER_SIZE;
   private int subscriberCount = DEFAULT_SUBSCRIBER_COUNT;
