@@ -232,14 +232,10 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable,
   }
 
   private void injectFlowInfo() {
+    // FlowInfoModelValidator assures that there's at most one field
     List<Field> fields = getFieldsOfType(source.getClass(), FlowInfo.class);
     if (fields.isEmpty()) {
       return;
-    } else if (fields.size() > 1) {
-      throw new MuleRuntimeException(createStaticMessage(format(
-                                                                "Source of type '%s' has %d fields of type '%s'. Only one is allowed",
-                                                                source.getClass().getName(), fields.size(),
-                                                                FlowInfo.class.getSimpleName())));
     }
 
     new FieldSetter<>(fields.get(0)).set(source, new ImmutableFlowInfo(flowConstruct.getName(),
