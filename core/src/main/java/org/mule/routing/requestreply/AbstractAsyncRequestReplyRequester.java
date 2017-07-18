@@ -48,9 +48,8 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.collections.buffer.BoundedFifoBuffer;
 
 public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterceptingMessageProcessorBase
-        implements RequestReplyRequesterMessageProcessor, FlowConstructAware, Initialisable, Startable, Stoppable, Disposable
+    implements RequestReplyRequesterMessageProcessor, FlowConstructAware, Initialisable, Startable, Stoppable, Disposable
 {
-
     public static final int MAX_PROCESSED_GROUPS = 50000;
     public static final int UNCLAIMED_TIME_TO_LIVE = 60000;
     public static int UNCLAIMED_INTERVAL = 60000;
@@ -98,7 +97,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
                     event.getSession().merge(resultEvent.getSession());
                 }
                 resultEvent = org.mule.RequestContext.setEvent(new DefaultMuleEvent(resultEvent.getMessage(),
-                                                                                    event));
+                    event));
             }
             return resultEvent;
         }
@@ -147,10 +146,10 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
     public void initialise() throws InitialisationException
     {
         name = String.format(NAME_TEMPLATE, storePrefix, ThreadNameHelper.getPrefix(muleContext),
-                             flowConstruct == null ? "" : flowConstruct.getName());
+            flowConstruct == null ? "" : flowConstruct.getName());
         store = ((ObjectStoreManager) muleContext.getRegistry().
-                get(MuleProperties.OBJECT_STORE_MANAGER)).
-                getObjectStore(name, false, MAX_PROCESSED_GROUPS, UNCLAIMED_TIME_TO_LIVE, UNCLAIMED_INTERVAL);
+            get(MuleProperties.OBJECT_STORE_MANAGER)).
+            getObjectStore(name, false, MAX_PROCESSED_GROUPS, UNCLAIMED_TIME_TO_LIVE, UNCLAIMED_INTERVAL);
     }
 
     @Override
@@ -177,7 +176,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
             try
             {
                 ((ObjectStoreManager) muleContext.getRegistry().
-                        get(MuleProperties.OBJECT_STORE_MANAGER)).disposeStore(store);
+                    get(MuleProperties.OBJECT_STORE_MANAGER)).disposeStore(store);
             }
             catch (ObjectStoreException e)
             {
@@ -286,12 +285,12 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
             if (failOnTimeout)
             {
                 event.getMuleContext()
-                        .fireNotification(
-                                new RoutingNotification(event.getMessage(), null,
-                                                        RoutingNotification.ASYNC_REPLY_TIMEOUT));
+                    .fireNotification(
+                        new RoutingNotification(event.getMessage(), null,
+                            RoutingNotification.ASYNC_REPLY_TIMEOUT));
 
                 throw new ResponseTimeoutException(CoreMessages.responseTimedOutWaitingForId((int) timeout,
-                                                                                             asyncReplyCorrelationId), event, null);
+                    asyncReplyCorrelationId), event, null);
             }
             else
             {
@@ -327,7 +326,6 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
 
     class InternalAsyncReplyMessageProcessor implements MessageProcessor
     {
-
         @Override
         public MuleEvent process(MuleEvent event) throws MuleException
         {
@@ -366,7 +364,6 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
 
     private class AsyncReplyMonitoringThread extends EventProcessingThread
     {
-
         AsyncReplyMonitoringThread(String name)
         {
             super(name, 100);
