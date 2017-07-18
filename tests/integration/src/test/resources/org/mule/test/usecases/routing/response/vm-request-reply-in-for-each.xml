@@ -32,7 +32,7 @@
         <flow-ref name="request-reply-flow"/>
     </flow>
 
-    <flow name="request-reply">
+    <flow name="request-reply" processingStrategy="synchronous">
         <vm:inbound-endpoint path="request" connector-ref="default"/>
         <test:component appendString="-processed"/>
     </flow>
