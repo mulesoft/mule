@@ -108,7 +108,7 @@ public class FunctionalTestProcessor extends AbstractAnnotatedObject implements 
     for (LifecycleCallback callback : lifecycleCallbacks) {
       callback.onTransition(id, Startable.PHASE_NAME);
     }
-    
+
     if (processor != null) {
       startIfNeeded(processor);
     }
