@@ -9,6 +9,10 @@ package org.mule.functional.api.component;
 import static org.apache.commons.lang3.SystemUtils.LINE_SEPARATOR;
 import static org.mule.functional.api.notification.FunctionalTestNotification.EVENT_RECEIVED;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
 import static org.mule.runtime.core.api.util.StringMessageUtils.getBoilerPlate;
 import static org.mule.runtime.core.api.util.StringMessageUtils.truncate;
@@ -19,6 +23,7 @@ import org.mule.functional.api.notification.FunctionalTestNotificationListener;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
@@ -53,7 +58,7 @@ import org.slf4j.Logger;
  */
 public class FunctionalTestProcessor extends AbstractAnnotatedObject implements Processor, Lifecycle, MuleContextAware {
 
-  private static final Logger logger = getLogger(FunctionalTestProcessor.class);
+  private static final Logger LOGGER = getLogger(FunctionalTestProcessor.class);
 
   private EventCallback eventCallback;
   private Object returnData = null;
@@ -66,6 +71,8 @@ public class FunctionalTestProcessor extends AbstractAnnotatedObject implements 
   private long waitTime = 0;
   private boolean logMessageDetails = false;
   private String id = "<none>";
+  private String processorClass;
+  private Processor processor;
   private MuleContext muleContext;
   private static List<LifecycleCallback> lifecycleCallbacks = new ArrayList<>();
 
@@ -78,12 +85,21 @@ public class FunctionalTestProcessor extends AbstractAnnotatedObject implements 
 
 
   @Override
-  public void initialise() {
+  public void initialise() throws InitialisationException {
     if (enableMessageHistory) {
       messageHistory = new CopyOnWriteArrayList<>();
     }
     for (LifecycleCallback callback : lifecycleCallbacks) {
       callback.onTransition(id, Initialisable.PHASE_NAME);
+    }
+
+    if (processorClass != null) {
+      try {
+        processor = (Processor) instantiateClass(processorClass);
+        initialiseIfNeeded(processor, true, muleContext);
+      } catch (Exception e) {
+        throw new InitialisationException(e, this);
+      }
     }
   }
 
@@ -91,6 +107,10 @@ public class FunctionalTestProcessor extends AbstractAnnotatedObject implements 
   public void start() throws MuleException {
     for (LifecycleCallback callback : lifecycleCallbacks) {
       callback.onTransition(id, Startable.PHASE_NAME);
+    }
+    
+    if (processor != null) {
+      startIfNeeded(processor);
     }
   }
 
@@ -104,12 +124,20 @@ public class FunctionalTestProcessor extends AbstractAnnotatedObject implements 
     for (LifecycleCallback callback : lifecycleCallbacks) {
       callback.onTransition(id, Stoppable.PHASE_NAME);
     }
+
+    if (processor != null) {
+      stopIfNeeded(processor);
+    }
   }
 
   @Override
   public void dispose() {
     for (LifecycleCallback callback : lifecycleCallbacks) {
       callback.onTransition(id, Disposable.PHASE_NAME);
+    }
+
+    if (processor != null) {
+      disposeIfNeeded(processor, LOGGER);
     }
   }
 
@@ -173,25 +201,29 @@ public class FunctionalTestProcessor extends AbstractAnnotatedObject implements 
     }
 
     final Message message = event.getMessage();
-    if (logger.isInfoEnabled()) {
+    if (LOGGER.isInfoEnabled()) {
       String msg = getBoilerPlate("Message Received in flow: "
           + getLocation().getRootContainerName() + ". Content is: "
           + truncate(message.getPayload().getValue().toString(), 100, true), '*', 80);
 
-      logger.info(msg);
+      LOGGER.info(msg);
     }
 
-    if (isLogMessageDetails() && logger.isInfoEnabled()) {
+    if (isLogMessageDetails() && LOGGER.isInfoEnabled()) {
       StringBuilder sb = new StringBuilder();
 
       sb.append("Full Message: ").append(LINE_SEPARATOR);
       sb.append(message.getPayload().getValue().toString()).append(LINE_SEPARATOR);
       sb.append(message.toString());
-      logger.info(sb.toString());
+      LOGGER.info(sb.toString());
     }
 
     if (eventCallback != null) {
       eventCallback.eventReceived(event, this, muleContext);
+    }
+
+    if (processor != null) {
+      return processor.process(event);
     }
 
     Builder replyBuilder = Message.builder(message);
@@ -220,7 +252,7 @@ public class FunctionalTestProcessor extends AbstractAnnotatedObject implements 
       try {
         Thread.sleep(waitTime);
       } catch (InterruptedException e) {
-        logger.info("FunctionalTestProcessor waitTime was interrupted");
+        LOGGER.info("FunctionalTestProcessor waitTime was interrupted");
       }
     }
     return replyMessage;
@@ -437,4 +469,7 @@ public class FunctionalTestProcessor extends AbstractAnnotatedObject implements 
     }
   }
 
+  public void setProcessorClass(String processorClass) {
+    this.processorClass = processorClass;
+  }
 }

@@ -56,6 +56,13 @@
                         </xsd:complexType>
                     </xsd:element>
                 </xsd:sequence>
+                <xsd:attribute name="class" type="mule:substitutableClass">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The class name of a processor to be instantiated and executed
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
                 <xsd:attribute name="throwException" type="xsd:boolean">
                     <xsd:annotation>
                         <xsd:documentation>

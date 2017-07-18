@@ -41,9 +41,9 @@ public class FlowInfoModelValidator implements ExtensionModelValidator {
               List<Field> fields = getFieldsOfType(sourceType, FlowInfo.class);
               if (fields.size() > 1) {
                 problemsReporter.addError(new Problem(model, format(
-                    "Source of type '%s' has %d fields of type '%s'. Only one is allowed",
-                    sourceType.getName(), fields.size(),
-                    FlowInfo.class.getSimpleName())));
+                                                                    "Source of type '%s' has %d fields of type '%s'. Only one is allowed",
+                                                                    sourceType.getName(), fields.size(),
+                                                                    FlowInfo.class.getSimpleName())));
               }
             });
       }

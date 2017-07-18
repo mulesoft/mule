@@ -14,6 +14,7 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -39,7 +40,7 @@ public class FlowInfoModelValidatorTestCase extends AbstractMuleTestCase {
   @Mock
   private ExtensionModel extensionModel;
 
-  @Mock
+  @Mock(answer = RETURNS_DEEP_STUBS)
   private SourceModel sourceModel;
 
   private FlowInfoModelValidator validator = new FlowInfoModelValidator();
@@ -49,6 +50,8 @@ public class FlowInfoModelValidatorTestCase extends AbstractMuleTestCase {
   public void before() {
     when(extensionModel.getName()).thenReturn("test");
     when(extensionModel.getSourceModels()).thenReturn(singletonList(sourceModel));
+    when(sourceModel.getSuccessCallback()).thenReturn(empty());
+    when(sourceModel.getErrorCallback()).thenReturn(empty());
   }
 
   @Test
@@ -75,8 +78,8 @@ public class FlowInfoModelValidatorTestCase extends AbstractMuleTestCase {
     validator.validate(extensionModel, reporter);
     assertThat(reporter.getErrors(), hasSize(1));
     assertThat(reporter.getErrors().get(0).getMessage(), allOf(
-        containsString(FlowInfo.class.getSimpleName()),
-        containsString("2")));
+                                                               containsString(FlowInfo.class.getSimpleName()),
+                                                               containsString("2")));
   }
 
   private void assertValid() {
@@ -86,7 +89,7 @@ public class FlowInfoModelValidatorTestCase extends AbstractMuleTestCase {
 
   private void mockSourceType(Class<? extends Source> sourceType) {
     when(sourceModel.getModelProperty(ImplementingTypeModelProperty.class)).thenReturn(
-        of(new ImplementingTypeModelProperty(sourceType)));
+                                                                                       of(new ImplementingTypeModelProperty(sourceType)));
   }
 
   private static abstract class TestSource extends Source<Void, Void> {
