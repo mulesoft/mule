@@ -86,6 +86,7 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
     componentBuildingDefinitions.add(baseComponentDefinition
         .withIdentifier("processor")
         .withTypeDefinition(fromType(FunctionalTestProcessor.class))
+        .withSetterParameterDefinition("processorClass", fromSimpleParameter("class").build())
         .build());
 
     componentBuildingDefinitions.add(baseDefinition

@@ -514,8 +514,7 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
                              of(configurationInstance),
                              new NullCursorStreamProviderFactory(new SimpleByteBufferManager(), streamingManager),
                              sourceCallbackFactory,
-                             null, callbackParameters, null,
-                             callbackParameters);
+                             null, callbackParameters, null);
   }
 
   private BaseMatcher<Throwable> exhaustedBecauseOf(Matcher<Throwable> causeMatcher) {

@@ -7,8 +7,6 @@
 package org.mule.runtime.core.routing.requestreply;
 
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY;
-import static org.mule.runtime.dsl.api.component.config.ComponentLocationUtils.getFlowNameFrom;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
@@ -47,7 +45,7 @@ public abstract class AbstractReplyToPropertyRequestReplyReplier extends Abstrac
       throws MuleException {
     if (result != null && replyToHandler != null) {
       String requestor = ((InternalMessage) result.getMessage()).getOutboundProperty(MULE_REPLY_TO_REQUESTOR_PROPERTY);
-      if ((requestor != null && !requestor.equals(getFlowNameFrom(getLocation()))) || requestor == null) {
+      if ((requestor != null && !requestor.equals(getLocation().getRootContainerName())) || requestor == null) {
         return replyToHandler.processReplyTo(event, result.getMessage(), replyTo);
       } else {
         return event;

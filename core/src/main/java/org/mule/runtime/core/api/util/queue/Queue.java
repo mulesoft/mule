@@ -9,7 +9,6 @@ package org.mule.runtime.core.api.util.queue;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.NamedObject;
-import org.mule.runtime.api.store.ObjectStoreException;
 
 import java.io.Serializable;
 
@@ -26,7 +25,7 @@ public interface Queue extends NamedObject {
   /**
    * Puts a new object in this queue and wait if necessary.
    */
-  void put(Serializable object) throws InterruptedException, ObjectStoreException;
+  void put(Serializable object) throws InterruptedException;
 
   /**
    * Blocks and retrieves an object from this queue.
@@ -35,13 +34,13 @@ public interface Queue extends NamedObject {
    */
   Serializable take() throws InterruptedException;
 
-  void untake(Serializable item) throws InterruptedException, ObjectStoreException;
+  void untake(Serializable item) throws InterruptedException;
 
   Serializable peek() throws InterruptedException;
 
   Serializable poll(long timeout) throws InterruptedException;
 
-  boolean offer(Serializable object, long timeout) throws InterruptedException, ObjectStoreException;
+  boolean offer(Serializable object, long timeout) throws InterruptedException;
 
   /**
    * Discards all the elements in the queue

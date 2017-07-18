@@ -6,11 +6,10 @@
  */
 package org.mule.runtime.core.internal.util.queue;
 
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.store.ObjectStoreException;
-import org.mule.runtime.core.api.util.queue.Queue;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.store.DeserializationPostInitialisable;
+import org.mule.runtime.core.api.util.queue.Queue;
 
 import java.io.Serializable;
 
@@ -38,7 +37,7 @@ public class TransactionAwareQueueStore implements Queue {
   }
 
   @Override
-  public void put(Serializable item) throws InterruptedException, ObjectStoreException {
+  public void put(Serializable item) throws InterruptedException {
     offer(item, Long.MAX_VALUE);
   }
 
@@ -52,7 +51,7 @@ public class TransactionAwareQueueStore implements Queue {
   }
 
   @Override
-  public boolean offer(Serializable item, long timeout) throws InterruptedException, ObjectStoreException {
+  public boolean offer(Serializable item, long timeout) throws InterruptedException {
     if (transactionContextProvider.isTransactional()) {
       return transactionContextProvider.getTransactionalContext().offer(queue, item, timeout);
     } else {
@@ -66,7 +65,7 @@ public class TransactionAwareQueueStore implements Queue {
   }
 
   @Override
-  public void untake(Serializable item) throws InterruptedException, ObjectStoreException {
+  public void untake(Serializable item) throws InterruptedException {
     if (transactionContextProvider.isTransactional()) {
       transactionContextProvider.getTransactionalContext().untake(queue, item);
     } else {

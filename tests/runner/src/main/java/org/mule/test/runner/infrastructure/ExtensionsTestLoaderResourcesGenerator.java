@@ -6,6 +6,7 @@
  */
 package org.mule.test.runner.infrastructure;
 
+import static org.mule.runtime.core.api.util.FileUtils.stringToFile;
 import static org.mule.runtime.core.api.util.collection.Collectors.toImmutableList;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
@@ -18,8 +19,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.io.FileUtils;
 
 /**
  * Implementation of an {@link AbstractResourcesGenerator} that writes the generated resources to the specified target directory
@@ -60,7 +59,7 @@ class ExtensionsTestLoaderResourcesGenerator extends AbstractResourcesGenerator 
     allResources.forEach(resource -> {
       File targetFile = new File(resource.getPath());
       try {
-        FileUtils.write(targetFile, new String(resource.getContent()));
+        stringToFile(targetFile.getAbsolutePath(), new String(resource.getContent()));
       } catch (IOException e) {
         throw new RuntimeException(e);
       }

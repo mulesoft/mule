@@ -95,6 +95,7 @@ public class DefaultComponentLocation implements ComponentLocation, Serializable
   /**
    * {@inheritDoc}
    */
+  @Override
   public List<LocationPart> getParts() {
     return unmodifiableList(parts);
   }
@@ -107,6 +108,7 @@ public class DefaultComponentLocation implements ComponentLocation, Serializable
   /**
    * {@inheritDoc}
    */
+  @Override
   public Optional<String> getFileName() {
     return parts.getLast().getFileName();
   }
@@ -114,6 +116,7 @@ public class DefaultComponentLocation implements ComponentLocation, Serializable
   /**
    * {@inheritDoc}
    */
+  @Override
   public Optional<Integer> getLineInFile() {
     return parts.getLast().getLineInFile();
   }
@@ -121,6 +124,7 @@ public class DefaultComponentLocation implements ComponentLocation, Serializable
   /**
    * @return a string representation of the {@link DefaultComponentLocation}.
    */
+  @Override
   public String getLocation() {
     if (location == null) {
       synchronized (this) {
@@ -134,6 +138,14 @@ public class DefaultComponentLocation implements ComponentLocation, Serializable
       }
     }
     return location;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String getRootContainerName() {
+    return getParts().get(0).getPartPath();
   }
 
   /**
@@ -202,6 +214,7 @@ public class DefaultComponentLocation implements ComponentLocation, Serializable
     /**
      * @return the string representation of the part
      */
+    @Override
     public String getPartPath() {
       return partPath;
     }
@@ -209,6 +222,7 @@ public class DefaultComponentLocation implements ComponentLocation, Serializable
     /**
      * @return if it's a synthetic part this is null, if not then it's the identifier of the configuration element.
      */
+    @Override
     public Optional<TypedComponentIdentifier> getPartIdentifier() {
       return ofNullable(partIdentifier);
     }

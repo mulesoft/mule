@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.util.queue;
 
+import static java.util.Optional.ofNullable;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -18,6 +19,7 @@ import org.mule.runtime.core.api.util.queue.QueueManager;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.slf4j.Logger;
@@ -34,8 +36,8 @@ public abstract class AbstractQueueManager
   protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
   private final ReentrantLock queuesLock = new ReentrantLock();
-  private final Map<String, CacheAwareQueueStore> queues = new HashMap<String, CacheAwareQueueStore>();
-  private final Map<String, QueueConfiguration> queueConfigurations = new HashMap<String, QueueConfiguration>();
+  private final Map<String, CacheAwareQueueStore> queues = new HashMap<>();
+  private final Map<String, QueueConfiguration> queueConfigurations = new HashMap<>();
   private QueueConfiguration defaultQueueConfiguration = new DefaultQueueConfiguration();
   private MuleContext muleContext;
 
@@ -65,6 +67,14 @@ public abstract class AbstractQueueManager
       }
     }
     queueConfigurations.put(queueName, newConfig);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Optional<QueueConfiguration> getQueueConfiguration(String queueName) {
+    return ofNullable(queueConfigurations.get(queueName));
   }
 
   private QueueStore getQueue(String name, QueueConfiguration config) {

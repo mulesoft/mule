@@ -8,10 +8,9 @@
 package org.mule.runtime.core.api.config;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.util.queue.DefaultQueueConfiguration;
 import org.mule.runtime.core.api.util.queue.QueueConfiguration;
 import org.mule.runtime.core.api.util.queue.QueueManager;
-import org.mule.runtime.core.api.util.queue.DefaultQueueConfiguration;
 
 /**
  * <code>QueueProfile</code> determines how an internal queue for a service will behave
@@ -21,11 +20,11 @@ public class QueueProfile {
   private int maxOutstandingMessages = 0;
   private boolean persistent;
 
-  public static QueueProfile newInstancePersistingToDefaultMemoryQueueStore(MuleContext muleContext) {
+  public static QueueProfile newInstancePersistingToDefaultMemoryQueueStore() {
     return new QueueProfile(false);
   }
 
-  public static QueueProfile newInstanceWithPersistentQueueStore(MuleContext muleContext) {
+  public static QueueProfile newInstanceWithPersistentQueueStore() {
     return new QueueProfile(true);
   }
 
@@ -56,7 +55,7 @@ public class QueueProfile {
     this.maxOutstandingMessages = maxOutstandingMessages;
   }
 
-  public QueueConfiguration configureQueue(MuleContext context, String component, QueueManager queueManager)
+  public QueueConfiguration configureQueue(String component, QueueManager queueManager)
       throws InitialisationException {
     QueueConfiguration qc = new DefaultQueueConfiguration(maxOutstandingMessages, persistent);
     queueManager.setQueueConfiguration(component, qc);

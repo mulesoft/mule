@@ -22,6 +22,7 @@ import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.heisenberg.extension.model.HealthStatus.DEAD;
 import static reactor.core.publisher.Mono.from;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -29,6 +30,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
@@ -89,6 +91,12 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
   @Mock
   private StreamingManager streamingManager;
 
+  @Mock
+  private Flow flow;
+
+  @Mock
+  private ComponentLocation location;
+
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private MuleContext muleContext;
 
@@ -108,7 +116,8 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
     when(muleEvent.getMessage().getPayload()).thenReturn(new TypedValue<>(null, DATA_TYPE));
     when(operationModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(Optional.empty());
     operationContext = new DefaultExecutionContext(extensionModel, of(configurationInstance), parameters.asMap(), operationModel,
-                                                   muleEvent, cursorProviderFactory, streamingManager, muleContext);
+                                                   muleEvent, cursorProviderFactory, streamingManager, flow, location,
+                                                   muleContext);
     operationContext = spy(operationContext);
   }
 

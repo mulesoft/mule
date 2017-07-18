@@ -13,8 +13,6 @@ import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.api.util.ExceptionUtils.NULL_ERROR_HANDLER;
 import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
-import static org.mule.runtime.dsl.api.component.config.ComponentLocationUtils.getFlowNameFrom;
-
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
@@ -271,7 +269,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
   @Override
   public String toString() {
     return getClass().getSimpleName() + " { id: " + id + "; correlationId: " + correlationId + "; flowName: "
-        + getFlowNameFrom(getOriginatingLocation()) + "; serverId: " + serverId + " }";
+        + getOriginatingLocation().getRootContainerName() + "; serverId: " + serverId + " }";
   }
 
   private static class ChildEventContext extends AbstractEventContext implements Serializable {
@@ -328,7 +326,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     @Override
     public String toString() {
       return getClass().getSimpleName() + " { id: " + getId() + "; correlationId: " + parent.getCorrelationId()
-          + "; flowName: " + getFlowNameFrom(parent.getOriginatingLocation()) + "; commponentLocation: "
+          + "; flowName: " + parent.getOriginatingLocation().getRootContainerName() + "; commponentLocation: "
           + (componentLocation != null ? componentLocation.getLocation() : EMPTY) + ";";
     }
 

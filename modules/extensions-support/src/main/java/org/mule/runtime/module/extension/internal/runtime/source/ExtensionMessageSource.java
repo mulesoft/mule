@@ -106,6 +106,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
           sourceAdapterFactory.createAdapter(getConfiguration(getInitialiserEvent(muleContext)), createSourceCallbackFactory());
       muleContext.getInjector().inject(sourceAdapter);
       sourceAdapter.setFlowConstruct(flowConstruct);
+      sourceAdapter.setComponentLocation(getLocation());
     }
   }
 
