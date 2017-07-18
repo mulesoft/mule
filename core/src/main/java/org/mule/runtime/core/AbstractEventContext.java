@@ -7,6 +7,7 @@
 package org.mule.runtime.core;
 
 import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.core.api.util.ExceptionUtils.NULL_ERROR_HANDLER;
 import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.from;
@@ -20,7 +21,6 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
@@ -34,7 +34,7 @@ import reactor.core.publisher.MonoProcessor;
  *
  * @since 4.0
  */
-abstract class AbstractEventContext implements EventContext {
+public abstract class AbstractEventContext implements EventContext {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AbstractEventContext.class);
 
@@ -44,14 +44,19 @@ abstract class AbstractEventContext implements EventContext {
   private transient Disposable completionSubscriberDisposable;
   private transient final List<EventContext> childContexts = new LinkedList<>();
   private transient Mono<Void> completionCallback = empty();
+  private transient MessagingExceptionHandler exceptionHandler;
 
   public AbstractEventContext() {
-    // Required for serialization
-    this(empty());
+    this(NULL_ERROR_HANDLER, empty());
   }
 
-  public AbstractEventContext(Publisher<Void> completionCallback) {
+  public AbstractEventContext(MessagingExceptionHandler exceptionHandler) {
+    this(exceptionHandler, empty());
+  }
+
+  public AbstractEventContext(MessagingExceptionHandler exceptionHandler, Publisher<Void> completionCallback) {
     this.completionCallback = from(completionCallback);
+    this.exceptionHandler = exceptionHandler;
     initCompletionProcessor();
   }
 
@@ -118,7 +123,6 @@ abstract class AbstractEventContext implements EventContext {
     synchronized (this) {
       if (responseProcessor.isTerminated()) {
         LOGGER.info(this + " response was already completed, ignoring.");
-        return;
       }
 
       if (LOGGER.isDebugEnabled()) {
@@ -132,33 +136,34 @@ abstract class AbstractEventContext implements EventContext {
    * {@inheritDoc}
    */
   @Override
-  public final void error(Throwable throwable) {
+  public final Publisher<Void> error(Throwable throwable) {
     synchronized (this) {
       if (responseProcessor.isTerminated()) {
         LOGGER.info(this + " error response was already completed, ignoring.");
-        return;
+        return empty();
       }
 
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug(this + " response completed with error.");
       }
-      responseProcessor.onError(throwable);
-    }
-  }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Publisher<Void> error(MessagingException messagingException, MessagingExceptionHandler handler) {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug(this + " handling messaging exception.");
+      if (throwable instanceof MessagingException) {
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug(this + " handling messaging exception.");
+        }
+        return just((MessagingException) throwable)
+            .flatMapMany(exceptionHandler)
+            .doOnNext(handled -> success(handled))
+            .doOnError(rethrown -> responseProcessor.onError(rethrown))
+            .materialize()
+            .then()
+            .subscribe();
+
+      } else {
+        responseProcessor.onError(throwable);
+        return empty();
+      }
     }
-    return just(messagingException).flatMapMany(handler)
-        .doOnNext(handled -> success(handled))
-        .doOnError(rethrown -> error(rethrown))
-        .materialize()
-        .then();
   }
 
   @Override
@@ -176,4 +181,7 @@ abstract class AbstractEventContext implements EventContext {
     return completionProcessor;
   }
 
+  protected MessagingExceptionHandler getExceptionHandler() {
+    return exceptionHandler;
+  }
 }

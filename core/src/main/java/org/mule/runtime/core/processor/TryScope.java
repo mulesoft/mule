@@ -17,10 +17,11 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
-import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContextHandleErrors;
+import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContext;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_INDIFFERENT;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static reactor.core.publisher.Flux.from;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -51,6 +52,7 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
 
   protected MessageProcessorChain nestedChain;
   protected MuleTransactionConfig transactionConfig;
+  private MessagingExceptionHandler messagingExceptionHandler;
 
   @Override
   public Event process(final Event event) throws MuleException {
@@ -62,9 +64,9 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
       ExecutionCallback<Event> processingCallback = () -> {
         try {
           Event e = processToApply(event, p -> from(p)
-              .flatMap(request -> processWithChildContextHandleErrors(request, nestedChain, ofNullable(getLocation()))));
+              .flatMap(request -> processWithChildContext(request, nestedChain, ofNullable(getLocation()),
+                                                          messagingExceptionHandler)));
           return e;
-
         } catch (Exception e) {
           throw e;
         }
@@ -88,7 +90,7 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
       return Scope.super.apply(publisher);
     } else {
       return from(publisher)
-          .flatMap(event -> processWithChildContextHandleErrors(event, nestedChain, ofNullable(getLocation())));
+          .flatMap(event -> processWithChildContext(event, nestedChain, ofNullable(getLocation()), messagingExceptionHandler));
     }
   }
 
@@ -158,11 +160,6 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
 
   protected List<Processor> getOwnedMessageProcessors() {
     return singletonList(nestedChain);
-  }
-
-  @Override
-  public void setMessagingExceptionHandler(MessagingExceptionHandler messagingExceptionHandler) {
-    // Ignore so that parent handler is not propagated and instead the exception listener configured for this scope is used.
   }
 
 }

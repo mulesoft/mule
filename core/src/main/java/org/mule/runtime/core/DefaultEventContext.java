@@ -11,6 +11,7 @@ import static java.time.OffsetTime.now;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
+import static org.mule.runtime.core.api.util.ExceptionUtils.NULL_ERROR_HANDLER;
 import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
 import static org.mule.runtime.dsl.api.component.config.ComponentLocationUtils.getFlowNameFrom;
 
@@ -31,7 +32,6 @@ import java.util.Optional;
 
 import org.reactivestreams.Publisher;
 
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -126,7 +126,33 @@ public final class DefaultEventContext extends AbstractEventContext implements S
    * @return a new child context
    */
   public static EventContext child(EventContext parent, Optional<ComponentLocation> componentLocation) {
-    return child(parent, componentLocation, false);
+    return child(parent, componentLocation, NULL_ERROR_HANDLER);
+  }
+
+  /**
+   * Builds a new child execution context from a parent context. A child context delegates all getters to the parent context but
+   * has it's own completion lifecycle. Completion of the child context will not cause the parent context to complete. This is
+   * typically used in {@code flow-ref} type scenarios where a the referenced Flow should complete the child context, but should
+   * not complete the parent context
+   * <p/>
+   * This implementation performs its own error-handling using the closet available error handler in parent contexts and should be
+   * used solely for async fire-and-forget processing that does not impact the main flow.
+   *
+   * @param parent the parent context
+   * @param componentLocation he location of the component that creates the child context and operates on result if available.
+   * @return a new child context
+   */
+  public static EventContext fireAndForgetChild(EventContext parent, Optional<ComponentLocation> componentLocation) {
+    EventContext context = parent;
+    MessagingExceptionHandler exceptionHandler = NULL_ERROR_HANDLER;
+
+    while (context != null && exceptionHandler == NULL_ERROR_HANDLER) {
+      exceptionHandler =
+          context instanceof AbstractEventContext ? ((AbstractEventContext) context).getExceptionHandler()
+              : NULL_ERROR_HANDLER;
+      context = context.getParentContext().orElse(null);
+    }
+    return child(parent, componentLocation, exceptionHandler);
   }
 
   /**
@@ -137,11 +163,12 @@ public final class DefaultEventContext extends AbstractEventContext implements S
    *
    * @param parent the parent context
    * @param componentLocation the location of the component that creates the child context and operates on result if available.
-   * @param handleErrors if the {@link MessagingExceptionHandler} should be used to handle errors.
+   * @param exceptionHandler used to handle {@link MessagingException}'s.
    * @return a new child context
    */
-  public static EventContext child(EventContext parent, Optional<ComponentLocation> componentLocation, boolean handleErrors) {
-    EventContext child = new ChildEventContext(parent, componentLocation.orElse(null), handleErrors);
+  public static EventContext child(EventContext parent, Optional<ComponentLocation> componentLocation,
+                                   MessagingExceptionHandler exceptionHandler) {
+    EventContext child = new ChildEventContext(parent, componentLocation.orElse(null), exceptionHandler);
     if (parent instanceof AbstractEventContext) {
       ((AbstractEventContext) parent).addChildContext(child);
     }
@@ -209,9 +236,10 @@ public final class DefaultEventContext extends AbstractEventContext implements S
    * @param externalCompletionPublisher void publisher that completes when source completes enabling completion of
    *        {@link EventContext} to depend on completion of source.
    */
-  private DefaultEventContext(FlowConstruct flow, ComponentLocation location, String correlationId,
+  private DefaultEventContext(FlowConstruct flow, ComponentLocation location,
+                              String correlationId,
                               Publisher<Void> externalCompletionPublisher) {
-    super(externalCompletionPublisher);
+    super(flow.getExceptionListener(), externalCompletionPublisher);
     this.id = flow.getUniqueIdString();
     this.serverId = flow.getServerId();
     this.location = location;
@@ -232,7 +260,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
    */
   private DefaultEventContext(String id, String serverId, ComponentLocation location, String correlationId,
                               Publisher<Void> externalCompletionPublisher) {
-    super(externalCompletionPublisher);
+    super(NULL_ERROR_HANDLER, externalCompletionPublisher);
     this.id = id;
     this.serverId = serverId;
     this.location = location;
@@ -252,18 +280,19 @@ public final class DefaultEventContext extends AbstractEventContext implements S
 
     private final EventContext parent;
     private final ComponentLocation componentLocation;
-    private final boolean handleErrors;
+    private final String id;
 
-    private ChildEventContext(EventContext parent, ComponentLocation componentLocation, boolean handleErrors) {
-      super(Mono.empty());
+    private ChildEventContext(EventContext parent, ComponentLocation componentLocation,
+                              MessagingExceptionHandler messagingExceptionHandler) {
+      super(messagingExceptionHandler, Mono.empty());
       this.parent = parent;
       this.componentLocation = componentLocation;
-      this.handleErrors = handleErrors;
+      this.id = parent.getId() + identityHashCode(this);
     }
 
     @Override
     public String getId() {
-      return parent.getId() + identityHashCode(this);
+      return id;
     }
 
     @Override
@@ -300,7 +329,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     public String toString() {
       return getClass().getSimpleName() + " { id: " + getId() + "; correlationId: " + parent.getCorrelationId()
           + "; flowName: " + getFlowNameFrom(parent.getOriginatingLocation()) + "; commponentLocation: "
-          + (componentLocation != null ? componentLocation.getLocation() : EMPTY) + "; handleErrors: " + handleErrors + " }";
+          + (componentLocation != null ? componentLocation.getLocation() : EMPTY) + ";";
     }
 
     @Override
@@ -308,15 +337,6 @@ public final class DefaultEventContext extends AbstractEventContext implements S
       return of(parent);
     }
 
-    @Override
-    public Publisher<Void> error(MessagingException messagingException, MessagingExceptionHandler handler) {
-      if (handleErrors) {
-        return super.error(messagingException, handler);
-      } else {
-        error(messagingException);
-        return Flux.empty();
-      }
-    }
   }
 
 }

@@ -14,19 +14,13 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.api.lifecycle.Startable;
-import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
-import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 
 import java.util.List;
 
@@ -39,13 +33,12 @@ import org.slf4j.LoggerFactory;
  * An object that owns Mule objects and delegates startup/shutdown events to them.
  */
 public abstract class AbstractMuleObjectOwner<T> extends AbstractAnnotatedObject
-    implements Lifecycle, MuleContextAware, FlowConstructAware, MessagingExceptionHandlerAware {
+    implements Lifecycle, MuleContextAware, FlowConstructAware {
 
   // TODO MULE-10332: Review MuleContextAware vs @Inject usage
   @Inject
   protected MuleContext muleContext;
   protected FlowConstruct flowConstruct;
-  protected MessagingExceptionHandler messagingExceptionHandler;
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
   @Override
@@ -58,13 +51,6 @@ public abstract class AbstractMuleObjectOwner<T> extends AbstractAnnotatedObject
   public void setFlowConstruct(FlowConstruct flowConstruct) {
     this.flowConstruct = flowConstruct;
     setFlowConstructIfNeeded(getOwnedObjects(), flowConstruct);
-  }
-
-  @Override
-  public void setMessagingExceptionHandler(MessagingExceptionHandler messagingExceptionHandler) {
-    if (this.messagingExceptionHandler == null) {
-      this.messagingExceptionHandler = messagingExceptionHandler;
-    }
   }
 
   public MuleContext getMuleContext() {
@@ -80,11 +66,6 @@ public abstract class AbstractMuleObjectOwner<T> extends AbstractAnnotatedObject
     // TODO TMULE-10764 This shouldn't happen here.
     setMuleContext(muleContext);
     setFlowConstruct(flowConstruct);
-    for (T object : getOwnedObjects()) {
-      if (messagingExceptionHandler != null && object instanceof MessagingExceptionHandlerAware) {
-        ((MessagingExceptionHandlerAware) object).setMessagingExceptionHandler(messagingExceptionHandler);
-      }
-    }
     initialiseIfNeeded(getOwnedObjects(), true, muleContext);
   }
 

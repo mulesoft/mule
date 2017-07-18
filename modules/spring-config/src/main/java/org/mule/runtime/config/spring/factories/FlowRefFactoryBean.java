@@ -12,7 +12,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
-import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContextHandleErrors;
+import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContext;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Flux.from;
@@ -33,7 +33,6 @@ import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.processor.AnnotatedProcessor;
@@ -109,9 +108,6 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
   }
 
   private void prepareProcessor(Processor p, FlowConstruct flowConstruct) {
-    if (p instanceof MessagingExceptionHandlerAware && flowConstruct != null) {
-      ((MessagingExceptionHandlerAware) p).setMessagingExceptionHandler(flowConstruct.getExceptionListener());
-    }
     if (p instanceof FlowConstructAware) {
       ((FlowConstructAware) p).setFlowConstruct(flowConstruct);
     }
@@ -180,8 +176,9 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
         if (referencedProcessor instanceof Flow) {
           return just(event)
               .flatMap(request -> Mono
-                  .from(processWithChildContextHandleErrors(request, referencedProcessor,
-                                                            ofNullable(FlowRefFactoryBean.this.getLocation()))));
+                  .from(processWithChildContext(request, referencedProcessor,
+                                                ofNullable(FlowRefFactoryBean.this.getLocation()),
+                                                ((Flow) referencedProcessor).getExceptionListener())));
         } else {
           return just(event).transform(referencedProcessor);
         }

@@ -11,27 +11,20 @@ import static org.apache.commons.lang3.builder.ToStringBuilder.reflectionToStrin
 import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.api.lifecycle.Startable;
-import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
-import org.mule.runtime.core.api.processor.Processor;
 
 /**
  * A holder for a pair of MessageProcessor and an expression.
  */
 public class MessageProcessorExpressionPair extends AbstractAnnotatedObject
-    implements FlowConstructAware, MuleContextAware, Lifecycle, MessagingExceptionHandlerAware {
+    implements FlowConstructAware, MuleContextAware, Lifecycle {
 
   private final String expression;
   private final MessageProcessorChain messageProcessor;
@@ -89,8 +82,4 @@ public class MessageProcessorExpressionPair extends AbstractAnnotatedObject
     messageProcessor.dispose();
   }
 
-  @Override
-  public void setMessagingExceptionHandler(MessagingExceptionHandler messagingExceptionHandler) {
-    messageProcessor.setMessagingExceptionHandler(messagingExceptionHandler);
-  }
 }

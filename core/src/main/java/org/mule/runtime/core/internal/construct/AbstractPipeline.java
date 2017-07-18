@@ -13,7 +13,7 @@ import static org.mule.runtime.core.api.context.notification.PipelineMessageNoti
 import static org.mule.runtime.core.api.context.notification.PipelineMessageNotification.PROCESS_END;
 import static org.mule.runtime.core.api.context.notification.PipelineMessageNotification.PROCESS_START;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
-import static org.mule.runtime.core.api.rx.Exceptions.UNEXPECTED_EXCEPTION_PREDICATE;
+import static org.mule.runtime.core.api.util.ExceptionUtils.updateMessagingExceptionWithError;
 import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
@@ -50,6 +50,7 @@ import org.mule.runtime.core.processor.strategy.DirectProcessingStrategyFactory;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.function.Consumer;
 
 import org.reactivestreams.Publisher;
@@ -185,16 +186,22 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         public Publisher<Event> apply(Publisher<Event> publisher) {
           return from(publisher)
               .doOnNext(assertStarted())
-              .doOnNext(event -> sink.accept(event))
+              .<Event>handle((event, handleSink) -> {
+                try {
+                  getSink().accept(event);
+                  handleSink.next(event);
+                } catch (RejectedExecutionException ree) {
+                  event.getContext()
+                      .error(updateMessagingExceptionWithError(new MessagingException(event, ree, this), this, getMuleContext()));
+                }
+              })
               .flatMap(event -> Mono.from(event.getContext().getResponsePublisher()));
         }
       });
     }
 
     injectFlowConstructMuleContext(source);
-    injectExceptionHandler(source);
     injectFlowConstructMuleContext(pipeline);
-    injectExceptionHandler(pipeline);
     initialiseIfInitialisable(source);
     initialiseIfInitialisable(pipeline);
 
@@ -204,8 +211,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     return stream -> from(stream)
         .transform(processingStrategy.onPipeline(pipeline))
         .doOnNext(response -> response.getContext().success(response))
-        .doOnError(UNEXPECTED_EXCEPTION_PREDICATE,
-                   throwable -> LOGGER.error("Unhandled exception in async processing ", throwable));
+        .doOnError(throwable -> LOGGER.error("Unhandled exception in Flow ", throwable));
   }
 
   protected void configureMessageProcessors(MessageProcessorChainBuilder builder) throws MuleException {
@@ -320,11 +326,13 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
       Mono.from(event.getContext().getBeforeResponsePublisher())
           .doOnSuccess(result -> fireCompleteNotification(result, null))
           .doOnError(MessagingException.class, messagingException -> fireCompleteNotification(null, messagingException))
-          .doOnError(UNEXPECTED_EXCEPTION_PREDICATE,
+          .doOnError(throwable -> !(throwable instanceof MessagingException),
                      throwable -> fireCompleteNotification(null, new MessagingException(event, throwable,
                                                                                         this instanceof Processor ? this : null))
 
-          ).doOnTerminate((result, throwable) -> event.getContext().getProcessingTime().ifPresent(time -> time.addFlowExecutionBranchTime(startTime)))
+          )
+          .doOnTerminate((result, throwable) -> event.getContext().getProcessingTime()
+              .ifPresent(time -> time.addFlowExecutionBranchTime(startTime)))
           .subscribe(requestUnbounded());
 
       return event;

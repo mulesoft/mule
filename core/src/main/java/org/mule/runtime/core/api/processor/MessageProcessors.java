@@ -147,7 +147,7 @@ public class MessageProcessors {
     try {
       return just(event)
           .transform(publisher -> from(publisher).then(request -> Mono
-              .from(internalProcessWithChildContext(request, processor, child(event.getContext(), empty(), false), false))))
+              .from(internalProcessWithChildContext(request, processor, child(event.getContext(), empty()), false))))
           .block();
     } catch (Throwable e) {
       throw rxExceptionToMuleException(e);
@@ -167,7 +167,7 @@ public class MessageProcessors {
    */
   public static Publisher<Event> processWithChildContext(Event event, ReactiveProcessor processor,
                                                          Optional<ComponentLocation> componentLocation) {
-    return internalProcessWithChildContext(event, processor, child(event.getContext(), componentLocation, false), true);
+    return internalProcessWithChildContext(event, processor, child(event.getContext(), componentLocation), true);
   }
 
   /**
@@ -180,11 +180,14 @@ public class MessageProcessors {
    * @param event the event to process.
    * @param processor the processor to process.
    * @param componentLocation
+   * @param exceptionHandler used to handle {@link MessagingException}'s.
    * @return the future result of processing processor.
    */
-  public static Publisher<Event> processWithChildContextHandleErrors(Event event, ReactiveProcessor processor,
-                                                                     Optional<ComponentLocation> componentLocation) {
-    return internalProcessWithChildContext(event, processor, child(event.getContext(), componentLocation, true), true);
+  public static Publisher<Event> processWithChildContext(Event event, ReactiveProcessor processor,
+                                                         Optional<ComponentLocation> componentLocation,
+                                                         MessagingExceptionHandler exceptionHandler) {
+    return internalProcessWithChildContext(event, processor, child(event.getContext(), componentLocation, exceptionHandler),
+                                           true);
   }
 
   private static Publisher<Event> internalProcessWithChildContext(Event event, ReactiveProcessor processor, EventContext child,

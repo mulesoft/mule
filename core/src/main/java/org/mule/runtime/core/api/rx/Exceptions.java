@@ -33,7 +33,6 @@ import java.util.function.Predicate;
  */
 public class Exceptions {
 
-  public static Predicate<Throwable> UNEXPECTED_EXCEPTION_PREDICATE = throwable -> !(throwable instanceof MessagingException);
   private static final String REACTIVE_EXCEPTION_CLASS_NAME = "reactor.core.Exceptions$ReactiveException";
 
   /**

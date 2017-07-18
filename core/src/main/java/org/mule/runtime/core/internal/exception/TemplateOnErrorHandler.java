@@ -32,7 +32,6 @@ import org.mule.runtime.core.api.exception.DisjunctiveErrorTypeMatcher;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
 import org.mule.runtime.core.api.exception.ErrorTypeRepository;
 import org.mule.runtime.core.api.exception.MessagingException;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
@@ -124,7 +123,8 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
             .message(InternalMessage.builder(event.getMessage()).exceptionPayload(new DefaultExceptionPayload(exception)).build())
             .build();
       }
-      return from(processWithChildContext(event, configuredMessageProcessors, ofNullable(getLocation())));
+      return from(processWithChildContext(event, configuredMessageProcessors, ofNullable(getLocation()),
+                                          new MessagingExceptionHandlerToSystemAdapter(muleContext)));
     };
   }
 
@@ -184,7 +184,6 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     if (configuredMessageProcessors != null) {
       configuredMessageProcessors.setFlowConstruct(flowConstruct);
       configuredMessageProcessors.setMuleContext(muleContext);
-      configuredMessageProcessors.setMessagingExceptionHandler(messagingExceptionHandler);
     }
 
     errorTypeMatcher = createErrorType(muleContext.getErrorTypeRepository(), errorType);
@@ -260,11 +259,6 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
         || this.muleContext.getExpressionManager().evaluateBoolean(logException, event, getLocation(), true, true)) {
       doLogException(t);
     }
-  }
-
-  @Override
-  public void setMessagingExceptionHandler(MessagingExceptionHandler messagingExceptionHandler) {
-    return;
   }
 
   public void setHandleException(boolean handleException) {
