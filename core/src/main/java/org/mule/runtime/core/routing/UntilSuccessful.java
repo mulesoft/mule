@@ -27,10 +27,9 @@ import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
-import org.mule.runtime.core.api.processor.Scope;
+import org.mule.runtime.core.api.processor.Router;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
-import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.processor.AbstractMuleObjectOwner;
 
 import java.util.List;
@@ -45,16 +44,8 @@ import reactor.core.publisher.Mono;
 /**
  * UntilSuccessful attempts to route a message to the message processor it contains. Routing is considered successful if no
  * exception has been raised and, optionally, if the response matches an expression.
- * <p>
- * UntilSuccessful internal route can be executed synchronously or asynchronously depending on the threading profile defined on
- * it. By default, if no threading profile is defined, then it will use the default threading profile configuration for the
- * application. This means that the default behavior is to process asynchronously.
- * <p>
- * UntilSuccessful can optionally be configured to synchronously return an acknowledgment message when it has scheduled the event
- * for processing. UntilSuccessful is backed by a {@link ListableObjectStore} for storing the events that are pending
- * (re)processing.
  */
-public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
+public class UntilSuccessful extends AbstractMuleObjectOwner implements Router {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(UntilSuccessful.class);
 
