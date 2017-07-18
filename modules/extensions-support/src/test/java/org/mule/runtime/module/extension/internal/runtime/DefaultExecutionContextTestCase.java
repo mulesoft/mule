@@ -141,7 +141,7 @@ public class DefaultExecutionContextTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void getFlow() {
-    assertThat(flow, is(operationContext.getFlow()));
+  public void getFlowConstruct() {
+    assertThat(flow, is(operationContext.getFlowConstruct()));
   }
 }
