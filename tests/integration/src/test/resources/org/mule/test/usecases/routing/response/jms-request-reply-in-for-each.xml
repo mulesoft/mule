@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+        xmlns:http="http://www.mulesoft.org/schema/mule/http"
+        xmlns:test="http://www.mulesoft.org/schema/mule/test"
+        xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+        xmlns="http://www.mulesoft.org/schema/mule/core"
+        xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+        http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
+
+    <vm:connector name="default"/>
+    <jms:activemq-connector name="jms-connector" />
+
+
+    <flow name="forEachCaseFlow">
+        <vm:inbound-endpoint path="foreach" connector-ref="default"/>
+        <foreach collection="#[payload]" >
+            <request-reply storePrefix="foo">
+                <jms:outbound-endpoint queue="request" connector-ref="jms-connector"/>
+                <jms:inbound-endpoint queue="foreach-reply" connector-ref="jms-connector"/>
+            </request-reply>
+            <vm:outbound-endpoint path="test-foreach-reply" connector-ref="default"/>
+        </foreach>
+    </flow>
+
+    <flow name="sequenceCaseFlow">
+        <vm:inbound-endpoint path="sequence-call" connector-ref="default"/>
+        <set-payload value="first-call"/>
+        <flow-ref name="request-reply-flow"/>
+        <set-payload value="second-call"/>
+        <flow-ref name="request-reply-flow"/>
+    </flow>
+
+    <flow name="request-reply">
+        <jms:inbound-endpoint queue="request" connector-ref="jms-connector"/>
+        <test:component appendString="-processed"/>
+    </flow>
+
+    <flow name="request-reply-flow" processingStrategy="synchronous">
+        <request-reply>
+            <jms:outbound-endpoint queue="request" connector-ref="jms-connector"/>
+            <jms:inbound-endpoint queue="reply" connector-ref="jms-connector"/>
+        </request-reply>
+        <vm:outbound-endpoint path="test-sequence-reply" connector-ref="default"/>
+    </flow>
+
+</mule>

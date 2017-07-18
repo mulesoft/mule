@@ -38,6 +38,7 @@ import org.mule.util.concurrent.ThreadNameHelper;
 import org.mule.util.store.DeserializationPostInitialisable;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -56,14 +57,14 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
 
     public static final String NAME_TEMPLATE = "%s.%s.%s.asyncReplies";
     protected String name;
-    
+
     protected volatile long timeout = -1;
     protected volatile boolean failOnTimeout = true;
     protected MessageSource replyMessageSource;
     protected FlowConstruct flowConstruct;
     private final MessageProcessor internalAsyncReplyMessageProcessor = new InternalAsyncReplyMessageProcessor();
     private AsyncReplyMonitoringThread replyThread;
-    protected final Map<String, Latch> locks = new ConcurrentHashMap<String, Latch>();
+    protected final Map<String, RequestReplyLatch> locks = new ConcurrentHashMap<String, RequestReplyLatch>();
     private String storePrefix = "";
 
     protected final ConcurrentMap<String, MuleEvent> responseEvents = new ConcurrentHashMap<String, MuleEvent>();
@@ -82,8 +83,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
         }
         else
         {
-            locks.put(getAsyncReplyCorrelationId(event), createEventLock());
-
+            addLock(event);
             sendAsyncRequest(event);
 
             MuleEvent resultEvent = receiveAsyncReply(event);
@@ -110,6 +110,18 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
     protected Latch createEventLock()
     {
         return new Latch();
+    }
+
+    private void addLock(MuleEvent event)
+    {
+        String correlationId = getAsyncReplyCorrelationId(event);
+        locks.put(correlationId, new RequestReplyLatch(event.getMessage().getCorrelationGroupSize(), event.getMessage().getCorrelationSequence()));
+    }
+
+    private Latch getLatch(String correlationId)
+    {
+        RequestReplyLatch requestReplyLatch = locks.get(correlationId);
+        return requestReplyLatch.latch;
     }
 
     public void setTimeout(long timeout)
@@ -196,10 +208,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
         {
             correlationId = event.getFlowConstruct().getMessageInfoMapping().getCorrelationId(event.getMessage());
         }
-        if (event.getMessage().getCorrelationSequence() > 0)
-        {
-            correlationId += event.getMessage().getCorrelationSequence();
-        }
+
         return correlationId;
     }
 
@@ -211,7 +220,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
     protected MuleEvent receiveAsyncReply(MuleEvent event) throws MessagingException
     {
         String asyncReplyCorrelationId = getAsyncReplyCorrelationId(event);
-        Latch asyncReplyLatch = locks.get(asyncReplyCorrelationId);
+        Latch asyncReplyLatch = getLatch(asyncReplyCorrelationId);
         // flag for catching the interrupted status of the Thread waiting for a
         // result
         boolean interruptedWhileWaiting = false;
@@ -271,7 +280,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
         }
         else
         {
-            addProcessed(asyncReplyCorrelationId);
+            addProcessed(new ProcessedEvents(asyncReplyCorrelationId, EndReason.FINISHED_BY_TIMEOUT));
 
             if (failOnTimeout)
             {
@@ -321,7 +330,21 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
         public MuleEvent process(MuleEvent event) throws MuleException
         {
             String messageId = getAsyncReplyCorrelationId(event);
-            store.store(messageId, event);
+            RequestReplyLatch requestReplyLatch = locks.get(messageId);
+            synchronized (store)
+            {
+                if (store.contains(messageId))
+                {
+                    MultipleEvent multipleEvent = (MultipleEvent) store.retrieve(messageId);
+                    multipleEvent.addEvent(event);
+                }
+                else
+                {
+                    MultipleEvent multipleEvent = new MultipleEvent();
+                    multipleEvent.addEvent(event);
+                    store.store(messageId, multipleEvent);
+                }
+            }
             replyThread.processNow();
             return null;
         }
@@ -359,29 +382,32 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
                     {
                         boolean deleteEvent = false;
                         String correlationId = (String) id;
+                        MultipleEvent multipleEvent = (MultipleEvent) store.retrieve(correlationId);
 
-                        if (isAlreadyProcessed(correlationId))
+                        if (isAlreadyProcessed(new ProcessedEvents(correlationId, EndReason.FINISHED_BY_TIMEOUT)))
                         {
                             deleteEvent = true;
-                            MuleEvent event = (MuleEvent) store.retrieve(correlationId);
+                            MuleEvent event;
+
+                            event = multipleEvent.getEvent();
+
                             if (logger.isDebugEnabled())
                             {
                                 logger.debug("An event was received for an event group that has already been processed, "
-                                    + "this is probably because the async-reply timed out. Correlation Id is: "
-                                    + correlationId + ". Dropping event");
+                                             + "this is because the async-reply timed out. Correlation Id is: "
+                                             + correlationId + ". Dropping event");
                             }
                             // Fire a notification to say we received this message
                             event.getMuleContext().fireNotification(
-                                new RoutingNotification(event.getMessage(), event.getMessageSourceURI().toString(),
-                                    RoutingNotification.MISSED_ASYNC_REPLY));
+                                    new RoutingNotification(event.getMessage(), event.getMessageSourceURI().toString(),
+                                                            RoutingNotification.MISSED_ASYNC_REPLY));
                         }
                         else
                         {
-                            Latch l = locks.get(correlationId);
-                            if (l != null)
+                            RequestReplyLatch requestReplyLatch = locks.get(correlationId);
+                            if (requestReplyLatch != null)
                             {
                                 MuleEvent event = retrieveEvent(correlationId);
-
                                 MuleEvent previousResult = responseEvents.putIfAbsent(correlationId, event);
                                 if (previousResult != null)
                                 {
@@ -390,9 +416,22 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
                                     // processed. Can this actually happen?
                                     throw new IllegalStateException("Detected duplicate result message with id: " + correlationId);
                                 }
-                                addProcessed(correlationId);
-                                deleteEvent = true;
-                                l.countDown();
+                                if (requestReplyLatch.isSequenceEvent())
+                                {
+                                    if (requestReplyLatch.isLastEvent())
+                                    {
+                                        addProcessed(new ProcessedEvents(correlationId));
+                                        deleteEvent = true;
+                                    }
+                                }
+                                else
+                                {
+                                    addProcessed(new ProcessedEvents(correlationId));
+                                    deleteEvent = true;
+                                }
+
+                                requestReplyLatch.countDown();
+                                multipleEvent.removeEvent();
                             }
                         }
                         if (deleteEvent)
@@ -414,8 +453,8 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
 
         private MuleEvent retrieveEvent(String correlationId) throws ObjectStoreException, DefaultMuleException
         {
-            MuleEvent event = (MuleEvent) store.retrieve(correlationId);
-
+            MultipleEvent multipleEvent = (MultipleEvent) store.retrieve(correlationId);
+            MuleEvent event = multipleEvent.getEvent();
             if (event.getMuleContext() == null)
             {
                 try
@@ -427,8 +466,110 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
                     throw new DefaultMuleException(e);
                 }
             }
-
             return event;
         }
+    }
+
+    private class RequestReplyLatch
+    {
+
+        private final int groupSize;
+        private final int correlationSequence;
+        private final Latch latch = createEventLock();
+
+        private RequestReplyLatch(int groupSize, int correlationSequence)
+        {
+            this.groupSize = groupSize;
+            this.correlationSequence = correlationSequence;
+        }
+
+        private boolean isSequenceEvent()
+        {
+            return groupSize != -1;
+        }
+
+        private void countDown()
+        {
+            latch.countDown();
+        }
+
+        private boolean isLastEvent()
+        {
+            return groupSize == correlationSequence;
+        }
+    }
+
+    private class MultipleEvent implements Serializable
+    {
+
+        private final List<MuleEvent> muleEvents = new ArrayList<>();
+
+        private synchronized void addEvent(MuleEvent event)
+        {
+            muleEvents.add(event);
+        }
+
+        private synchronized void removeEvent()
+        {
+            muleEvents.remove(0);
+        }
+
+        private synchronized MuleEvent getEvent()
+        {
+            return muleEvents.get(0);
+        }
+    }
+
+    private class ProcessedEvents
+    {
+        private String id;
+        private EndReason endReason;
+
+        public ProcessedEvents(String id, EndReason endReason)
+        {
+            this.id = id;
+            this.endReason = endReason;
+        }
+
+        public ProcessedEvents(String id)
+        {
+            this.id = id;
+            this.endReason = EndReason.PROCESSED;
+        }
+
+        @Override
+        public boolean equals(Object o)
+        {
+            if (this == o)
+            {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass())
+            {
+                return false;
+            }
+
+            ProcessedEvents that = (ProcessedEvents) o;
+
+            if (!id.equals(that.id))
+            {
+                return false;
+            }
+            return endReason == that.endReason;
+
+        }
+
+        @Override
+        public int hashCode()
+        {
+            int result = id.hashCode();
+            result = 31 * result + endReason.hashCode();
+            return result;
+        }
+    }
+
+    private enum EndReason
+    {
+        PROCESSED, FINISHED_BY_TIMEOUT
     }
 }

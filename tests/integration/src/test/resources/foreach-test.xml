@@ -346,7 +346,7 @@
 
     <flow name="request-reply-meddle" processingStrategy="synchronous">
         <vm:inbound-endpoint path="middle" exchange-pattern="one-way"/>
-        <vm:outbound-endpoint path="in" exchange-pattern="one-way"/>
+        <echo-component/>
     </flow>
     
     <flow name="foreachWithAsync">
