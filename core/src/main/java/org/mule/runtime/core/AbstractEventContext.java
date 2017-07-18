@@ -34,7 +34,7 @@ import reactor.core.publisher.MonoProcessor;
  *
  * @since 4.0
  */
-public abstract class AbstractEventContext implements EventContext {
+abstract class AbstractEventContext implements EventContext {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AbstractEventContext.class);
 
@@ -123,6 +123,7 @@ public abstract class AbstractEventContext implements EventContext {
     synchronized (this) {
       if (responseProcessor.isTerminated()) {
         LOGGER.info(this + " response was already completed, ignoring.");
+        return;
       }
 
       if (LOGGER.isDebugEnabled()) {
