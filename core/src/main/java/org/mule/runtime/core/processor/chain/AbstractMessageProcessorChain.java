@@ -18,7 +18,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setFlowConstruc
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
-import static org.mule.runtime.core.api.util.ExceptionUtils.NULL_ERROR_HANDLER;
 import static org.mule.runtime.core.api.util.ExceptionUtils.updateMessagingExceptionWithError;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -39,16 +38,14 @@ import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.context.notification.MessageProcessorNotification;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.exception.MessagingException;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.util.ExceptionUtils;
 import org.mule.runtime.core.processor.interceptor.ReactiveInterceptorAdapter;
-import org.mule.runtime.core.api.streaming.StreamingManager;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -60,7 +57,6 @@ import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
-
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -76,7 +72,6 @@ abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObject imp
   private final List<Processor> processors;
   private MuleContext muleContext;
   private ProcessingStrategy processingStrategy;
-  private MessagingExceptionHandler messagingExceptionHandler;
   private StreamingManager streamingManager;
 
   AbstractMessageProcessorChain(String name, List<Processor> processors) {
@@ -189,12 +184,10 @@ abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObject imp
         .onErrorResume(RejectedExecutionException.class,
                        throwable -> Mono.from(event.getContext()
                            .error(updateMessagingExceptionWithError(new MessagingException(event, throwable, processor),
-                                                                    processor, muleContext),
-                                  getMessagingExceptionHandler()))
+                                                                    processor, muleContext)))
                            .then(Mono.empty()))
         .onErrorResume(MessagingException.class,
-                       throwable -> Mono.from(event.getContext().error(throwable, getMessagingExceptionHandler()))
-                           .then(Mono.empty()))));
+                       throwable -> Mono.from(event.getContext().error(throwable)).then(Mono.empty()))));
 
     return interceptors;
   }
@@ -285,20 +278,6 @@ abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObject imp
 
   protected List<Processor> getMessageProcessorsForLifecycle() {
     return processors;
-  }
-
-  @Override
-  public void setMessagingExceptionHandler(MessagingExceptionHandler messagingExceptionHandler) {
-    this.messagingExceptionHandler = messagingExceptionHandler;
-    for (Processor processor : processors) {
-      if (processor instanceof MessagingExceptionHandlerAware) {
-        ((MessagingExceptionHandlerAware) processor).setMessagingExceptionHandler(messagingExceptionHandler);
-      }
-    }
-  }
-
-  public MessagingExceptionHandler getMessagingExceptionHandler() {
-    return messagingExceptionHandler != null ? messagingExceptionHandler : NULL_ERROR_HANDLER;
   }
 
   @Override

@@ -9,8 +9,6 @@ package org.mule.runtime.core.api;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
-import org.mule.runtime.core.api.exception.MessagingException;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.management.stats.ProcessingTime;
 
 import java.time.OffsetTime;
@@ -72,24 +70,11 @@ public interface EventContext {
   void success(Event event);
 
   /**
-   * Complete this {@link EventContext} unsuccessfully with an error
+   * Complete this {@link EventContext} unsuccessfully with an error.
    *
    * @param throwable the throwable.
    */
-  void error(Throwable throwable);
-
-  /**
-   * Allows handling of {@link MessagingException} using supplied {@link MessagingExceptionHandler} before completing this
-   * {@link EventContext} with {@link #success(Event)} or {@link #error(Throwable)} based on the result of handling.
-   * Implementation may decide not to perform error handling based on specific needs.
-   * <p>
-   * This is only available if the flow where this contexts's events are running calculates their processing time.
-   *
-   * @param messagingException the messaging exception.
-   * @param exceptionHandler the exception handler to handle messaging exception.
-   * @return publisher that completes when any error handling that is performed is complete.
-   */
-  Publisher<Void> error(MessagingException messagingException, MessagingExceptionHandler exceptionHandler);
+  Publisher<Void> error(Throwable throwable);
 
   /**
    * @returns information about the times spent processing the events for this context (so far).

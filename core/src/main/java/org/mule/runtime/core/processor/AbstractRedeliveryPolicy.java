@@ -14,7 +14,6 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 
@@ -25,12 +24,11 @@ import org.mule.runtime.core.api.config.i18n.CoreMessages;
  * to be considered "consumed".
  */
 public abstract class AbstractRedeliveryPolicy extends AbstractInterceptingMessageProcessor
-    implements Processor, Lifecycle, MuleContextAware, FlowConstructAware, MessagingExceptionHandlerAware {
+    implements Processor, Lifecycle, MuleContextAware, FlowConstructAware {
 
   protected FlowConstruct flowConstruct;
   protected int maxRedeliveryCount;
   public static final int REDELIVERY_FAIL_ON_FIRST = 0;
-  private MessagingExceptionHandler messagingExceptionHandler;
 
   @Override
   public void setFlowConstruct(FlowConstruct flowConstruct) {
@@ -59,10 +57,6 @@ public abstract class AbstractRedeliveryPolicy extends AbstractInterceptingMessa
 
   public void setMaxRedeliveryCount(int maxRedeliveryCount) {
     this.maxRedeliveryCount = maxRedeliveryCount;
-  }
-
-  public void setMessagingExceptionHandler(MessagingExceptionHandler messagingExceptionHandler) {
-    this.messagingExceptionHandler = messagingExceptionHandler;
   }
 
   @Override
