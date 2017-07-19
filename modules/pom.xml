@@ -41,7 +41,6 @@
         <!-- depends on spring-config so it has to go after it -->
         <module>extensions-spring-support</module>
         <module>repository</module>
-        <module>spring-security</module>
         <module>tls</module>
         <module>tooling-support</module>
         <module>soap-api</module>

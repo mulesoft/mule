@@ -211,7 +211,6 @@
         <slf4jVersion>1.7.25</slf4jVersion>
         <snakeYamlVersion>1.18</snakeYamlVersion>
         <springVersion>4.1.9.RELEASE</springVersion>
-        <springSecurityVersion>4.0.4.RELEASE</springSecurityVersion>
         <sshCoreVersion>1.4.0</sshCoreVersion>
         <staxUtilsVersion>20080702</staxUtilsVersion>
         <staxApiVersion>3.1.4</staxApiVersion>

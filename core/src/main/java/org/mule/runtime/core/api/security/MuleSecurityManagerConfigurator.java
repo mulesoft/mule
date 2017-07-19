@@ -4,14 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.security;
+package org.mule.runtime.core.api.security;
 
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.security.EncryptionStrategy;
-import org.mule.runtime.core.api.security.SecurityManager;
-import org.mule.runtime.core.api.security.SecurityProvider;
+import org.mule.runtime.core.security.DefaultMuleSecurityManager;
 import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
 
 import java.util.ArrayList;
