@@ -31,6 +31,11 @@ public interface AllureConstants {
       String COMPONENT_CONFIGURATION_TYPE = "Component type";
     }
 
+    interface ConfigurationComponentLocationStory {
+
+      String COMPONENT_LOCATION = "Component location";
+    }
+
     interface MUnitComponentLocatorStory {
 
       String MUNIT_COMPONENT_LOCATION = "MUnit component location";

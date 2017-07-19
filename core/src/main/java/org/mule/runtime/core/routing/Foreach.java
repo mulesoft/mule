@@ -14,7 +14,6 @@ import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContext;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static org.mule.runtime.core.routing.ExpressionSplittingStrategy.DEFAULT_SPIT_EXPRESSION;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -25,7 +24,7 @@ import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.processor.Router;
+import org.mule.runtime.core.api.processor.Scope;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.expression.ExpressionConfig;
 import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
@@ -53,7 +52,7 @@ import reactor.core.publisher.Mono;
  * <p>
  * The {@link Event} sent to the next message processor is the same that arrived to foreach.
  */
-public class Foreach extends AbstractMessageProcessorOwner implements Initialisable, Router {
+public class Foreach extends AbstractMessageProcessorOwner implements Initialisable, Scope {
 
   public static final String ROOT_MESSAGE_PROPERTY = "rootMessage";
   public static final String COUNTER_PROPERTY = "counter";
