@@ -8,16 +8,15 @@ package org.mule.runtime.core.construct;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.isA;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
@@ -50,6 +49,8 @@ public class FlowProcessingStrategyTestCase extends AbstractMuleTestCase {
   private MuleConfiguration configuration;
 
   private Flow flow;
+
+
 
   @Before
   public void before() throws RegistrationException {
@@ -103,13 +104,13 @@ public class FlowProcessingStrategyTestCase extends AbstractMuleTestCase {
 
   @Test
   public void processingStrategySetBySystemPropertyOverridesDefault() throws Exception {
-    System.setProperty("org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory",
-                       TestProcessingStrategyFactory.class.getName());
-    MuleConfiguration muleConfiguration = new DefaultMuleConfiguration();
-    when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
-    createFlow(null);
-    assertEquals(flow.getProcessingStrategy().getClass(), TestProcessingStrategy.class);
-
+    testWithSystemProperty("org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory",
+                           TestProcessingStrategyFactory.class.getName(), () -> {
+                             MuleConfiguration muleConfiguration = new DefaultMuleConfiguration();
+                             when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
+                             createFlow(null);
+                             assertEquals(flow.getProcessingStrategy().getClass(), TestProcessingStrategy.class);
+                           });
   }
 
 
