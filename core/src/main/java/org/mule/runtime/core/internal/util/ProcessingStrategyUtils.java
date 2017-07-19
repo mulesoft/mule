@@ -15,19 +15,7 @@ import org.mule.runtime.core.processor.strategy.BlockingProcessingStrategyFactor
 import org.mule.runtime.core.processor.strategy.TransactionAwareWorkQueueProcessingStrategyFactory;
 
 public class ProcessingStrategyUtils {
-
-  public static String DEFAULT_PROCESSING_STRATEGY = "default";
-  public static String SYNC_PROCESSING_STRATEGY = "synchronous";
-
-  public static ProcessingStrategyFactory parseProcessingStrategy(String processingStrategy) {
-    if (DEFAULT_PROCESSING_STRATEGY.equals(processingStrategy)) {
-      return new TransactionAwareWorkQueueProcessingStrategyFactory();
-    } else if (SYNC_PROCESSING_STRATEGY.equals(processingStrategy)) {
-      return new BlockingProcessingStrategyFactory();
-    }
-    return null;
-  }
-
+  
   /**
    * Determines if the {@link FlowConstruct} based on implementation and processing strategy configured is synchronous.
    *
