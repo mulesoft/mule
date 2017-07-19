@@ -29,6 +29,8 @@ import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.processor.strategy.AbstractProcessingStrategy;
+import org.mule.runtime.core.processor.strategy.AbstractProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.TransactionAwareWorkQueueProcessingStrategyFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -112,7 +114,7 @@ public class FlowProcessingStrategyTestCase extends AbstractMuleTestCase {
   }
 
 
-  public static class TestProcessingStrategyFactory implements ProcessingStrategyFactory {
+  public static class TestProcessingStrategyFactory extends AbstractProcessingStrategyFactory {
 
     public TestProcessingStrategyFactory() {}
 
@@ -122,7 +124,7 @@ public class FlowProcessingStrategyTestCase extends AbstractMuleTestCase {
     }
   }
 
-  private static class TestProcessingStrategy implements ProcessingStrategy {
+  private static class TestProcessingStrategy extends AbstractProcessingStrategy {
 
     @Override
     public Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor pipeline) {
