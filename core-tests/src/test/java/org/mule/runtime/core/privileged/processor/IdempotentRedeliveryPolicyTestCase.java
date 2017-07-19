@@ -11,9 +11,8 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
@@ -25,13 +24,13 @@ import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedConsumer;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.ObjectStoreManager;
+import org.mule.runtime.api.store.TemplateObjectStore;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleProperties;
@@ -45,16 +44,16 @@ import org.mule.tck.SerializationTestUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Answers;
 import org.reactivestreams.Publisher;
-
 import reactor.core.publisher.Mono;
 
 public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
@@ -64,11 +63,11 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
   private static final String UTF_8 = "utf-8";
   private static ObjectSerializer serializer;
 
-  private MuleContext mockMuleContext = mock(MuleContext.class, Answers.RETURNS_DEEP_STUBS.get());
-  private ObjectStoreManager mockObjectStoreManager = mock(ObjectStoreManager.class, Answers.RETURNS_DEEP_STUBS.get());
-  private Processor mockFailingMessageProcessor = mock(Processor.class, Answers.RETURNS_DEEP_STUBS.get());
-  private Processor mockWaitingMessageProcessor = mock(Processor.class, Answers.RETURNS_DEEP_STUBS.get());
-  private InternalMessage message = mock(InternalMessage.class, Answers.RETURNS_DEEP_STUBS.get());
+  private MuleContext mockMuleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS.get());
+  private ObjectStoreManager mockObjectStoreManager = mock(ObjectStoreManager.class, RETURNS_DEEP_STUBS.get());
+  private Processor mockFailingMessageProcessor = mock(Processor.class, RETURNS_DEEP_STUBS.get());
+  private Processor mockWaitingMessageProcessor = mock(Processor.class, RETURNS_DEEP_STUBS.get());
+  private InternalMessage message = mock(InternalMessage.class, RETURNS_DEEP_STUBS.get());
   private Event event;
   private Latch waitLatch = new Latch();
   private CountDownLatch waitingMessageProcessorExecutionLatch = new CountDownLatch(2);
@@ -97,8 +96,8 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
     when(mockMuleContext.getObjectStoreManager()).thenReturn(mockObjectStoreManager);
     when(mockMuleContext.getConfiguration().getDefaultEncoding()).thenReturn(UTF_8);
     final InMemoryObjectStore inMemoryObjectStore = new InMemoryObjectStore();
-    when(mockObjectStoreManager.getObjectStore(anyString(), anyBoolean(), anyInt(), anyInt(), anyInt()))
-        .thenAnswer(invocation -> inMemoryObjectStore);
+    when(mockObjectStoreManager.getObjectStore(anyString())).thenReturn(inMemoryObjectStore);
+    when(mockObjectStoreManager.createObjectStore(any(), any())).thenReturn(inMemoryObjectStore);
     when(event.getMessage()).thenReturn(message);
 
     IdempotentRedeliveryPolicyTestCase.serializer = SerializationTestUtils.getJavaSerializerWithMockContext();
@@ -132,8 +131,7 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
     when(message.getPayload()).thenReturn(new TypedValue<>(STRING_MESSAGE, STRING));
     reset(mockObjectStoreManager);
     final ObjectStore serializationObjectStore = new SerializationObjectStore();
-    when(mockObjectStoreManager.getObjectStore(anyString(), anyBoolean(), anyInt(), anyInt(), anyInt()))
-        .thenAnswer(invocation -> serializationObjectStore);
+    when(mockObjectStoreManager.createObjectStore(any(), any())).thenReturn(serializationObjectStore);
     irp.initialise();
     processUntilFailure();
     assertThat(count.get(), equalTo(MAX_REDELIVERY_COUNT + 1));
@@ -179,28 +177,28 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
     }
   }
 
-  public static class SerializationObjectStore implements ObjectStore<AtomicInteger> {
+  public static class SerializationObjectStore extends TemplateObjectStore<AtomicInteger> {
 
-    private Map<Serializable, Serializable> store = new HashMap<>();
+    private Map<String, Serializable> store = new HashMap<>();
 
     @Override
-    public boolean contains(Serializable key) throws ObjectStoreException {
+    protected boolean doContains(String key) throws ObjectStoreException {
       return store.containsKey(key);
     }
 
     @Override
-    public void store(Serializable key, AtomicInteger value) throws ObjectStoreException {
+    protected void doStore(String key, AtomicInteger value) throws ObjectStoreException {
       store.put(key, serializer.getExternalProtocol().serialize(value));
     }
 
     @Override
-    public AtomicInteger retrieve(Serializable key) throws ObjectStoreException {
+    protected AtomicInteger doRetrieve(String key) throws ObjectStoreException {
       Serializable serializable = store.get(key);
       return serializer.getExternalProtocol().deserialize((byte[]) serializable);
     }
 
     @Override
-    public AtomicInteger remove(Serializable key) throws ObjectStoreException {
+    protected AtomicInteger doRemove(String key) throws ObjectStoreException {
       Serializable serializable = store.remove(key);
       return serializer.getExternalProtocol().deserialize((byte[]) serializable);
     }
@@ -214,29 +212,44 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
     public void clear() throws ObjectStoreException {
       this.store.clear();
     }
-  }
-
-  public static class InMemoryObjectStore implements ObjectStore<AtomicInteger> {
-
-    private Map<Serializable, AtomicInteger> store = new HashMap<>();
 
     @Override
-    public boolean contains(Serializable key) throws ObjectStoreException {
+    public void open() throws ObjectStoreException {
+
+    }
+
+    @Override
+    public void close() throws ObjectStoreException {
+
+    }
+
+    @Override
+    public List<String> allKeys() throws ObjectStoreException {
+      return new ArrayList<>(store.keySet());
+    }
+  }
+
+  public static class InMemoryObjectStore extends TemplateObjectStore<AtomicInteger> {
+
+    private Map<String, AtomicInteger> store = new HashMap<>();
+
+    @Override
+    protected boolean doContains(String key) throws ObjectStoreException {
       return store.containsKey(key);
     }
 
     @Override
-    public void store(Serializable key, AtomicInteger value) throws ObjectStoreException {
+    protected void doStore(String key, AtomicInteger value) throws ObjectStoreException {
       store.put(key, value);
     }
 
     @Override
-    public AtomicInteger retrieve(Serializable key) throws ObjectStoreException {
+    protected AtomicInteger doRetrieve(String key) throws ObjectStoreException {
       return store.get(key);
     }
 
     @Override
-    public AtomicInteger remove(Serializable key) throws ObjectStoreException {
+    protected AtomicInteger doRemove(String key) throws ObjectStoreException {
       return store.remove(key);
     }
 
@@ -248,6 +261,21 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
     @Override
     public boolean isPersistent() {
       return false;
+    }
+
+    @Override
+    public void open() throws ObjectStoreException {
+
+    }
+
+    @Override
+    public void close() throws ObjectStoreException {
+
+    }
+
+    @Override
+    public List<String> allKeys() throws ObjectStoreException {
+      return new ArrayList<>(store.keySet());
     }
   }
 }

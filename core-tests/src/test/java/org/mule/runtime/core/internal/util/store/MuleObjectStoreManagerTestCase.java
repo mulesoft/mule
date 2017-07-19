@@ -7,31 +7,23 @@
 
 package org.mule.runtime.core.internal.util.store;
 
-import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.doThrow;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME;
 import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
-import static org.mule.runtime.api.store.ObjectStoreManager.UNBOUNDED;
 import static org.mule.tck.SerializationTestUtils.addJavaSerializerToMockMuleContext;
-
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.store.ObjectStoreException;
+import org.mule.runtime.api.store.ObjectStoreSettings;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.registry.MuleRegistry;
-import org.mule.runtime.api.store.ObjectStore;
-import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.store.PartitionableObjectStore;
 import org.mule.runtime.core.api.store.PartitionedInMemoryObjectStore;
 import org.mule.runtime.core.api.store.PartitionedPersistentObjectStore;
@@ -42,6 +34,7 @@ import org.mule.tck.probe.Probe;
 import org.mule.tck.size.SmallTest;
 
 import java.io.Serializable;
+import java.util.NoSuchElementException;
 
 import org.junit.After;
 import org.junit.Before;
@@ -70,6 +63,11 @@ public class MuleObjectStoreManagerTestCase extends AbstractMuleTestCase {
   public void setup() {
     schedulerService = new SimpleUnitTestSupportSchedulerService();
     muleContext = mock(MuleContext.class);
+    MuleConfiguration muleConfiguration = mock(MuleConfiguration.class);
+    when(muleConfiguration.getWorkingDirectory()).thenReturn(tempWorkDir.getRoot().getAbsolutePath());
+    when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
+
+    createRegistryAndBaseStore(muleContext);
     when(muleContext.getSchedulerService()).thenReturn(schedulerService);
     when(muleContext.getSchedulerBaseConfig())
         .thenReturn(config().withPrefix(MuleObjectStoreManagerTestCase.class.getName() + "#" + name.getMethodName()));
@@ -81,33 +79,6 @@ public class MuleObjectStoreManagerTestCase extends AbstractMuleTestCase {
   @After
   public void after() throws MuleException {
     schedulerService.stop();
-  }
-
-  @Test
-  public void disposeDisposableStore() throws ObjectStoreException {
-    @SuppressWarnings("unchecked")
-    ObjectStore<Serializable> store = mock(ObjectStore.class, withSettings().extraInterfaces(Disposable.class));
-
-    this.storeManager.disposeStore(store);
-
-    verify(store).clear();
-    verify((Disposable) store).dispose();
-  }
-
-  @Test
-  public void disposePartitionableStore() throws ObjectStoreException {
-    @SuppressWarnings("unchecked")
-    ObjectStorePartition<Serializable> store =
-        mock(ObjectStorePartition.class,
-             withSettings().extraInterfaces(Disposable.class).defaultAnswer(RETURNS_DEEP_STUBS));
-
-    when(store.getPartitionName()).thenReturn(TEST_PARTITION_NAME);
-
-    storeManager.disposeStore(store);
-
-    verify(store.getBaseStore()).disposePartition(TEST_PARTITION_NAME);
-    verify(store, never()).clear();
-    verify((Disposable) store).dispose();
   }
 
   @Test
@@ -128,7 +99,7 @@ public class MuleObjectStoreManagerTestCase extends AbstractMuleTestCase {
 
       assertThat(store.allKeys().size(), is(1));
 
-      storeManager.disposeStore(store);
+      storeManager.disposeStore(TEST_PARTITION_NAME);
 
       assertThat(store.allKeys().size(), is(0));
     } finally {
@@ -152,9 +123,14 @@ public class MuleObjectStoreManagerTestCase extends AbstractMuleTestCase {
 
       assertMonitorsCount(1);
 
-      storeManager.disposeStore(store);
+      storeManager.disposeStore(TEST_PARTITION_NAME);
 
-      assertThat(storeManager.stores.keySet(), not(hasItem(TEST_PARTITION_NAME)));
+      try {
+        storeManager.getObjectStore(TEST_PARTITION_NAME);
+        fail("ObjectStore should not exist");
+      } catch (NoSuchElementException e) {
+        // shake it baby
+      }
 
       assertMonitorsCount(0);
     } finally {
@@ -185,28 +161,26 @@ public class MuleObjectStoreManagerTestCase extends AbstractMuleTestCase {
       throws InitialisationException {
     addJavaSerializerToMockMuleContext(muleContext);
 
-    createRegistryAndBaseStore(muleContext, isPersistent);
-
     storeManager.setMuleContext(muleContext);
     storeManager.initialise();
 
     ObjectStorePartition<Serializable> store =
-        storeManager.getObjectStore(partitionName, isPersistent, UNBOUNDED, 10000, 50);
+        storeManager.createObjectStore(partitionName, ObjectStoreSettings.builder()
+            .persistent(isPersistent)
+            .entryTtl(10000L)
+            .expirationInterval(50L)
+            .build());
 
-    assertThat(storeManager.stores.keySet(), hasItem(partitionName));
+    assertThat(storeManager.getObjectStore(partitionName), is(sameInstance(store)));
 
     return store;
   }
 
-  private void createRegistryAndBaseStore(MuleContext muleContext, boolean isPersistent) {
+  private void createRegistryAndBaseStore(MuleContext muleContext) {
     MuleRegistry muleRegistry = mock(MuleRegistry.class);
-    if (isPersistent) {
-      PartitionableObjectStore<?> store = createPersistentPartitionableObjectStore(muleContext);
-      when(muleRegistry.lookupObject(OBJECT_STORE_DEFAULT_PERSISTENT_NAME)).thenReturn(store);
-    } else {
-      PartitionableObjectStore<?> store = createTransientPartitionableObjectStore();
-      when(muleRegistry.lookupObject(OBJECT_STORE_DEFAULT_IN_MEMORY_NAME)).thenReturn(store);
-    }
+    when(muleRegistry.lookupObject(OBJECT_STORE_DEFAULT_PERSISTENT_NAME))
+        .thenReturn(createPersistentPartitionableObjectStore(muleContext));
+    when(muleRegistry.lookupObject(OBJECT_STORE_DEFAULT_IN_MEMORY_NAME)).thenReturn(createTransientPartitionableObjectStore());
 
     when(muleContext.getRegistry()).thenReturn(muleRegistry);
   }
@@ -216,24 +190,6 @@ public class MuleObjectStoreManagerTestCase extends AbstractMuleTestCase {
   }
 
   private PartitionableObjectStore<?> createPersistentPartitionableObjectStore(MuleContext muleContext) {
-    MuleConfiguration muleConfiguration = mock(MuleConfiguration.class);
-    when(muleConfiguration.getWorkingDirectory()).thenReturn(tempWorkDir.getRoot().getAbsolutePath());
-    when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
-
     return new PartitionedPersistentObjectStore<>(muleContext);
   }
-
-  @Test
-  public void dontFailIfUnsupported() throws ObjectStoreException {
-    @SuppressWarnings("unchecked")
-    ObjectStore<Serializable> store = mock(ObjectStore.class, withSettings().extraInterfaces(Disposable.class));
-
-    doThrow(UnsupportedOperationException.class).when(store).clear();
-
-    storeManager.disposeStore(store);
-
-    verify(store).clear();
-    verify((Disposable) store).dispose();
-  }
-
 }

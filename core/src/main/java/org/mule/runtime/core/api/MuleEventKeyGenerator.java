@@ -6,9 +6,6 @@
  */
 package org.mule.runtime.core.api;
 
-import java.io.NotSerializableException;
-import java.io.Serializable;
-
 /**
  * Defines a way to generate cache keys for {@link Event} instances.
  */
@@ -21,7 +18,7 @@ public interface MuleEventKeyGenerator {
    *
    * @param event the event to generate the key for
    * @return the generated key
-   * @throws NotSerializableException if the generated key is not {@link Serializable}
+   * @throws IllegalStateException if the generated key is not a String
    */
-  Serializable generateKey(Event event) throws NotSerializableException;
+  String generateKey(Event event);
 }

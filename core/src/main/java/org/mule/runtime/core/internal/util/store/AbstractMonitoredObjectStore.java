@@ -7,15 +7,14 @@
 package org.mule.runtime.core.internal.util.store;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.store.TemplateObjectStore;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.util.UUID;
 
 import java.io.Serializable;
@@ -28,7 +27,7 @@ import org.slf4j.LoggerFactory;
  * TODO
  */
 public abstract class AbstractMonitoredObjectStore<T extends Serializable>
-    implements ObjectStore<T>, Runnable, MuleContextAware, Initialisable, Disposable {
+    extends TemplateObjectStore<T> implements Runnable, MuleContextAware, Initialisable, Disposable {
 
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.store;
 
+import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.store.ObjectStoreException;
@@ -24,9 +25,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class PartitionedPersistentObjectStore<T extends Serializable> extends AbstractPartitionedObjectStore<T>
-    implements MuleContextAware, PartitionableExpirableObjectStore<T> {
+import org.slf4j.Logger;
 
+public class PartitionedPersistentObjectStore<T extends Serializable> extends AbstractPartitionableObjectStore<T>
+    implements PartitionableExpirableObjectStore<T>, MuleContextAware {
+
+  private static final Logger LOGGER = getLogger(PartitionedPersistentObjectStore.class);
   public static final String OBJECT_STORE_DIR = "objectstore";
 
   private MuleContext muleContext;
@@ -54,8 +58,8 @@ public class PartitionedPersistentObjectStore<T extends Serializable> extends Ab
   }
 
   private void createDefaultPartition() throws ObjectStoreException {
-    if (!partitionsByName.containsKey(DEFAULT_PARTITION)) {
-      createPartition(DEFAULT_PARTITION);
+    if (!partitionsByName.containsKey(DEFAULT_PARTITION_NAME)) {
+      createPartition(DEFAULT_PARTITION_NAME);
     }
   }
 
@@ -87,33 +91,33 @@ public class PartitionedPersistentObjectStore<T extends Serializable> extends Ab
   }
 
   @Override
-  public boolean contains(Serializable key, String partitionName) throws ObjectStoreException {
+  protected boolean doContains(String key, String partitionName) throws ObjectStoreException {
     return getPartitionObjectStore(partitionName).contains(key.toString());
   }
 
   @Override
-  public void store(Serializable key, T value, String partitionName) throws ObjectStoreException {
+  protected void doStore(String key, T value, String partitionName) throws ObjectStoreException {
     getPartitionObjectStore(partitionName).store(key.toString(), value);
   }
 
   @Override
-  public T retrieve(Serializable key, String partitionName) throws ObjectStoreException {
+  protected T doRetrieve(String key, String partitionName) throws ObjectStoreException {
     return getPartitionObjectStore(partitionName).retrieve(key.toString());
   }
 
   @Override
-  public T remove(Serializable key, String partitionName) throws ObjectStoreException {
+  protected T doRemove(String key, String partitionName) throws ObjectStoreException {
     return getPartitionObjectStore(partitionName).remove(key.toString());
   }
 
   @Override
-  public List<Serializable> allKeys(String partitionName) throws ObjectStoreException {
+  public List<String> allKeys(String partitionName) throws ObjectStoreException {
     return getPartitionObjectStore(partitionName).allKeys();
   }
 
   @Override
   public void clear(String partitionName) throws ObjectStoreException {
-    this.getPartitionObjectStore(partitionName).clear();
+    getPartitionObjectStore(partitionName).clear();
   }
 
   private PersistentObjectStorePartition<T> getPartitionObjectStore(String partitionName) throws ObjectStoreException {
@@ -176,7 +180,7 @@ public class PartitionedPersistentObjectStore<T extends Serializable> extends Ab
         persistentObjectStorePartition.open();
         partitionsByName.put(persistentObjectStorePartition.getPartitionName(), persistentObjectStorePartition);
       } catch (Exception e) {
-        logger.error("Could not restore partition under directory " + partitionDirectory.getAbsolutePath());
+        LOGGER.error("Could not restore partition under directory " + partitionDirectory.getAbsolutePath());
       }
     }
   }
@@ -188,7 +192,7 @@ public class PartitionedPersistentObjectStore<T extends Serializable> extends Ab
 
   @Override
   public void expire(long entryTTL, int maxEntries) throws ObjectStoreException {
-    expire(entryTTL, maxEntries, DEFAULT_PARTITION);
+    expire(entryTTL, maxEntries, DEFAULT_PARTITION_NAME);
   }
 
   @Override

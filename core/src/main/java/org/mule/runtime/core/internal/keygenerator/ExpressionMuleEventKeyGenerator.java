@@ -12,9 +12,6 @@ import org.mule.runtime.core.api.MuleEventKeyGenerator;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.util.AttributeEvaluator;
 
-import java.io.NotSerializableException;
-import java.io.Serializable;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,18 +26,17 @@ public class ExpressionMuleEventKeyGenerator implements MuleEventKeyGenerator, M
   private AttributeEvaluator attributeEvaluator;
 
   @Override
-  public Serializable generateKey(Event event) throws NotSerializableException {
+  public String generateKey(Event event) {
     Object key = attributeEvaluator.resolveValue(event);
 
     if (logger.isDebugEnabled()) {
       logger.debug("Generated key for event: " + event + " key: " + key);
     }
 
-    if (key instanceof Serializable) {
-      return (Serializable) key;
+    if (key instanceof String) {
+      return (String) key;
     } else {
-      throw new NotSerializableException("Generated key must a serializable object but was "
-          + (key != null ? key.getClass().getName() : "null"));
+      throw new IllegalStateException("Generated key must a String but was " + (key != null ? key.getClass().getName() : "null"));
     }
   }
 

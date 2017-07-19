@@ -14,11 +14,10 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 import static org.slf4j.LoggerFactory.getLogger;
-
-import io.qameta.allure.Issue;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.Event;
@@ -26,11 +25,10 @@ import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.api.store.PartitionableObjectStore;
+import org.mule.runtime.core.api.store.PartitionedInMemoryObjectStore;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.internal.routing.EventGroup;
-import org.mule.runtime.core.api.store.PartitionedInMemoryObjectStore;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.probe.PollingProber;
@@ -38,6 +36,7 @@ import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
 import org.mule.tck.size.SmallTest;
 
+import io.qameta.allure.Issue;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -52,9 +51,7 @@ import org.slf4j.Logger;
 @RunWith(MockitoJUnitRunner.class)
 public class EventCorrelatorTestCase extends AbstractMuleTestCase {
 
-  public static final String OBJECT_STOR_NAME_PREFIX = "prefix";
   public static final String TEST_GROUP_ID = "groupId";
-  public static final boolean USE_PERSISTENT_STORE = false;
 
   private static final Logger LOGGER = getLogger(EventCorrelatorTestCase.class);
 
@@ -71,7 +68,7 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase {
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private EventGroup mockEventGroup;
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-  private ListableObjectStore mockProcessedGroups;
+  private ObjectStore mockProcessedGroups;
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private InternalMessage mockMessageCollection;
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
@@ -79,7 +76,6 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase {
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private FlowConstruct mockFlowConstruct;
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-  private EventContext mockExecutionContext;
   private PartitionableObjectStore memoryObjectStore = new PartitionedInMemoryObjectStore();
 
   @Before
@@ -189,7 +185,7 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase {
                                memoryObjectStore, "prefix", mockProcessedGroups);
   }
 
-  public interface DisposableListableObjectStore extends ListableObjectStore, Disposable {
+  public abstract class DisposableObjectStore implements ObjectStore, Disposable {
 
   }
 }

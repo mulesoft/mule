@@ -6,22 +6,25 @@
  */
 package org.mule.runtime.core.api.store;
 
+import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
 
 import java.io.Serializable;
 import java.util.List;
 
-public interface PartitionableObjectStore<T extends Serializable> extends ListableObjectStore<T> {
+public interface PartitionableObjectStore<T extends Serializable> extends ObjectStore<T> {
 
-  boolean contains(Serializable key, String partitionName) throws ObjectStoreException;
+  String DEFAULT_PARTITION_NAME = "DEFAULT_PARTITION";
 
-  void store(Serializable key, T value, String partitionName) throws ObjectStoreException;
+  boolean contains(String key, String partitionName) throws ObjectStoreException;
 
-  T retrieve(Serializable key, String partitionName) throws ObjectStoreException;
+  void store(String key, T value, String partitionName) throws ObjectStoreException;
 
-  T remove(Serializable key, String partitionName) throws ObjectStoreException;
+  T retrieve(String key, String partitionName) throws ObjectStoreException;
 
-  List<Serializable> allKeys(String partitionName) throws ObjectStoreException;
+  T remove(String key, String partitionName) throws ObjectStoreException;
+
+  List<String> allKeys(String partitionName) throws ObjectStoreException;
 
   List<String> allPartitions() throws ObjectStoreException;
 
@@ -31,5 +34,5 @@ public interface PartitionableObjectStore<T extends Serializable> extends Listab
 
   void disposePartition(String partitionName) throws ObjectStoreException;
 
-  public void clear(String partitionName) throws ObjectStoreException;
+  void clear(String partitionName) throws ObjectStoreException;
 }

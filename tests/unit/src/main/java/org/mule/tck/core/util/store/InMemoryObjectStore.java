@@ -7,6 +7,7 @@
 package org.mule.tck.core.util.store;
 
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
+import static java.util.stream.Collectors.toList;
 import org.mule.runtime.api.store.ObjectAlreadyExistsException;
 import org.mule.runtime.api.store.ObjectDoesNotExistException;
 import org.mule.runtime.api.store.ObjectStoreException;
@@ -14,6 +15,7 @@ import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.internal.util.store.AbstractMonitoredObjectStore;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 
@@ -36,18 +38,14 @@ public class InMemoryObjectStore<T extends Serializable> extends AbstractMonitor
   }
 
   @Override
-  public boolean contains(Serializable key) throws ObjectStoreException {
-    if (key == null) {
-      throw new ObjectStoreException(CoreMessages.objectIsNull("id"));
-    }
-
+  protected boolean doContains(String key) throws ObjectStoreException {
     synchronized (store) {
       return store.values().contains(new StoredObject<T>(key, null));
     }
   }
 
   @Override
-  public void store(Serializable id, T value) throws ObjectStoreException {
+  protected void doStore(String id, T value) throws ObjectStoreException {
     if (id == null) {
       throw new ObjectStoreException(CoreMessages.objectIsNull("id"));
     }
@@ -69,8 +67,7 @@ public class InMemoryObjectStore<T extends Serializable> extends AbstractMonitor
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public T retrieve(Serializable key) throws ObjectStoreException {
+  protected T doRetrieve(String key) throws ObjectStoreException {
     synchronized (store) {
       Map.Entry<?, ?> entry = findEntry(key);
       if (entry != null) {
@@ -96,7 +93,7 @@ public class InMemoryObjectStore<T extends Serializable> extends AbstractMonitor
   }
 
   @Override
-  public T remove(Serializable key) throws ObjectStoreException {
+  protected T doRemove(String key) throws ObjectStoreException {
     synchronized (store) {
       Map.Entry<?, ?> entry = findEntry(key);
       if (entry != null) {
@@ -113,6 +110,21 @@ public class InMemoryObjectStore<T extends Serializable> extends AbstractMonitor
     synchronized (store) {
       store.clear();
     }
+  }
+
+  @Override
+  public void open() throws ObjectStoreException {
+
+  }
+
+  @Override
+  public void close() throws ObjectStoreException {
+
+  }
+
+  @Override
+  public List<String> allKeys() throws ObjectStoreException {
+    return store.keySet().stream().map(String::valueOf).collect(toList());
   }
 
   private int expireAndCount() {
@@ -202,15 +214,15 @@ public class InMemoryObjectStore<T extends Serializable> extends AbstractMonitor
    */
   protected static class StoredObject<T> {
 
-    private Serializable id;
+    private String id;
     private T item;
 
-    StoredObject(Serializable id, T item) {
+    StoredObject(String id, T item) {
       this.id = id;
       this.item = item;
     }
 
-    public Serializable getId() {
+    public String getId() {
       return id;
     }
 

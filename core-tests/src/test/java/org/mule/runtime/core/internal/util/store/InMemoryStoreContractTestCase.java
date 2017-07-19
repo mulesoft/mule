@@ -7,12 +7,12 @@
 package org.mule.runtime.core.internal.util.store;
 
 import org.mule.runtime.api.store.ObjectStore;
-import org.mule.tck.core.util.store.AbstractObjectStoreContractTestCase;
+import org.mule.tck.core.util.store.TemplateObjectStoreContractTestCase;
 import org.mule.tck.core.util.store.InMemoryObjectStore;
 
 import java.io.Serializable;
 
-public class InMemoryStoreContractTestCase extends AbstractObjectStoreContractTestCase {
+public class InMemoryStoreContractTestCase extends TemplateObjectStoreContractTestCase {
 
   @Override
   public ObjectStore<Serializable> getObjectStore() {

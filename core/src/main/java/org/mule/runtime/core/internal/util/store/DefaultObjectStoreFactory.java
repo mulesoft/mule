@@ -28,18 +28,4 @@ public interface DefaultObjectStoreFactory {
    * @return persistent object store
    */
   ObjectStore<Serializable> createDefaultPersistentObjectStore();
-
-  /**
-   * Creates a persistent object store for custom components
-   *
-   * @return persistent object store
-   */
-  ObjectStore<Serializable> createDefaultUserObjectStore();
-
-  /**
-   * Creates a transient object store for custom components
-   *
-   * @return transient object store
-   */
-  ObjectStore<Serializable> createDefaultUserTransientObjectStore();
 }

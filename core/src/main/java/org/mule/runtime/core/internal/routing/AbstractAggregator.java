@@ -25,6 +25,7 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.ObjectStoreManager;
+import org.mule.runtime.api.store.ObjectStoreSettings;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
@@ -95,15 +96,18 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
   private Supplier<ObjectStore> internalProcessedGroupsObjectStoreFactory() {
     return () -> {
       ObjectStoreManager objectStoreManager = muleContext.getRegistry().get(OBJECT_STORE_MANAGER);
-      return objectStoreManager.getObjectStore(storePrefix + ".processedGroups", persistentStores, MAX_PROCESSED_GROUPS, -1,
-                                               1000);
+      return objectStoreManager.createObjectStore(storePrefix + ".processedGroups", ObjectStoreSettings.builder()
+          .persistent(persistentStores)
+          .maxEntries(MAX_PROCESSED_GROUPS)
+          .expirationInterval(1000L)
+          .build());
     };
   }
 
   protected void initEventGroupsObjectStore() throws InitialisationException {
     try {
       if (eventGroupsObjectStore == null) {
-        eventGroupsObjectStore = new ProvidedPartitionableObjectStoreWrapper<>(null, internalEventsGroupsObjectStoreSupplier());
+        eventGroupsObjectStore = new ProvidedPartitionableObjectStoreWrapper(null, internalEventsGroupsObjectStoreSupplier());
       }
       eventGroupsObjectStore.open(storePrefix + ".expiredAndDispatchedGroups");
       eventGroupsObjectStore.open(storePrefix + ".eventGroups");
@@ -192,7 +196,7 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
 
   public void setEventGroupsObjectStore(PartitionableObjectStore<Event> eventGroupsObjectStore) {
     this.eventGroupsObjectStore =
-        new ProvidedPartitionableObjectStoreWrapper<>(eventGroupsObjectStore, internalEventsGroupsObjectStoreSupplier());
+        new ProvidedPartitionableObjectStoreWrapper(eventGroupsObjectStore, internalEventsGroupsObjectStoreSupplier());
   }
 
   public boolean isPersistentStores() {

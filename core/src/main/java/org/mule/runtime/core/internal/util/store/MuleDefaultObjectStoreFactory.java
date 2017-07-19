@@ -23,14 +23,4 @@ public class MuleDefaultObjectStoreFactory implements DefaultObjectStoreFactory 
   public ObjectStore<Serializable> createDefaultPersistentObjectStore() {
     return new PartitionedPersistentObjectStore<>();
   }
-
-  @Override
-  public ObjectStore<Serializable> createDefaultUserObjectStore() {
-    return new PartitionedPersistentObjectStore<>();
-  }
-
-  @Override
-  public ObjectStore<Serializable> createDefaultUserTransientObjectStore() {
-    return new PartitionedInMemoryObjectStore<>();
-  }
 }

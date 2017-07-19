@@ -9,8 +9,10 @@ package org.mule.runtime.core.internal.util.store;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
+import org.mule.runtime.api.store.TemplateObjectStore;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.function.Supplier;
 
 /**
@@ -20,7 +22,7 @@ import java.util.function.Supplier;
  * In the case the factory is used and a fresh object store is created, its lifecycle management will be delegated by this
  * wrapper.
  */
-public class ProvidedObjectStoreWrapper<T extends Serializable> implements ObjectStore<T>, Disposable {
+public class ProvidedObjectStoreWrapper<T extends Serializable> extends TemplateObjectStore<T> implements Disposable {
 
   private ObjectStore<T> wrapped;
   private final boolean provided;
@@ -42,22 +44,22 @@ public class ProvidedObjectStoreWrapper<T extends Serializable> implements Objec
   }
 
   @Override
-  public boolean contains(Serializable key) throws ObjectStoreException {
+  protected boolean doContains(String key) throws ObjectStoreException {
     return getWrapped().contains(key);
   }
 
   @Override
-  public void store(Serializable key, T value) throws ObjectStoreException {
+  protected void doStore(String key, T value) throws ObjectStoreException {
     getWrapped().store(key, value);
   }
 
   @Override
-  public T retrieve(Serializable key) throws ObjectStoreException {
+  protected T doRetrieve(String key) throws ObjectStoreException {
     return getWrapped().retrieve(key);
   }
 
   @Override
-  public T remove(Serializable key) throws ObjectStoreException {
+  protected T doRemove(String key) throws ObjectStoreException {
     return getWrapped().remove(key);
   }
 
@@ -77,6 +79,21 @@ public class ProvidedObjectStoreWrapper<T extends Serializable> implements Objec
       ((Disposable) wrapped).dispose();
     }
     wrapped = null;
+  }
+
+  @Override
+  public void open() throws ObjectStoreException {
+    getWrapped().open();
+  }
+
+  @Override
+  public void close() throws ObjectStoreException {
+    getWrapped().close();
+  }
+
+  @Override
+  public List<String> allKeys() throws ObjectStoreException {
+    return getWrapped().allKeys();
   }
 
   protected ObjectStore<T> getWrapped() {

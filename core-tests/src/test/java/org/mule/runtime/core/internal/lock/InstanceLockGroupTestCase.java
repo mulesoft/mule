@@ -9,15 +9,12 @@ package org.mule.runtime.core.internal.lock;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import org.mule.runtime.core.api.lock.LockProvider;
-import org.mule.runtime.api.store.ObjectAlreadyExistsException;
-import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
+import org.mule.runtime.api.store.TemplateObjectStore;
+import org.mule.runtime.core.api.lock.LockProvider;
 import org.mule.runtime.core.api.util.concurrent.Latch;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -134,30 +131,27 @@ public class InstanceLockGroupTestCase extends AbstractMuleTestCase {
     }
   }
 
-  public static class InMemoryObjectStore implements ObjectStore<Integer> {
+  public static class InMemoryObjectStore extends TemplateObjectStore<Integer> {
 
-    private Map<Serializable, Integer> store = new ConcurrentHashMap<Serializable, Integer>();
+    private Map<String, Integer> store = new ConcurrentHashMap<>();
 
     @Override
-    public boolean contains(Serializable key) throws ObjectStoreException {
+    protected boolean doContains(String key) throws ObjectStoreException {
       return store.containsKey(key);
     }
 
     @Override
-    public void store(Serializable key, Integer value) throws ObjectStoreException {
-      if (store.containsKey(key)) {
-        throw new ObjectAlreadyExistsException(CoreMessages.createStaticMessage(""));
-      }
+    protected void doStore(String key, Integer value) throws ObjectStoreException {
       store.put(key, value);
     }
 
     @Override
-    public Integer retrieve(Serializable key) throws ObjectStoreException {
+    protected Integer doRetrieve(String key) throws ObjectStoreException {
       return store.get(key);
     }
 
     @Override
-    public Integer remove(Serializable key) throws ObjectStoreException {
+    protected Integer doRemove(String key) throws ObjectStoreException {
       return store.remove(key);
     }
 
@@ -169,6 +163,21 @@ public class InstanceLockGroupTestCase extends AbstractMuleTestCase {
     @Override
     public boolean isPersistent() {
       return false;
+    }
+
+    @Override
+    public void open() throws ObjectStoreException {
+
+    }
+
+    @Override
+    public void close() throws ObjectStoreException {
+
+    }
+
+    @Override
+    public List<String> allKeys() throws ObjectStoreException {
+      return new ArrayList<>(store.keySet());
     }
   }
 

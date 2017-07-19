@@ -48,7 +48,6 @@ import static org.mule.runtime.core.api.util.ExceptionUtils.getRootCauseExceptio
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.core.internal.util.JdkVersionUtils.getSupportedJdks;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
@@ -101,12 +100,10 @@ import org.mule.runtime.core.api.management.stats.ProcessingTimeWatcher;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.registry.Registry;
-import org.mule.runtime.core.api.rx.Exceptions;
 import org.mule.runtime.core.api.scheduler.SchedulerConfig;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.api.transformer.DataTypeConversionResolver;
 import org.mule.runtime.core.api.util.StreamCloserService;
 import org.mule.runtime.core.api.util.UUID;
@@ -149,8 +146,6 @@ public class DefaultMuleContext implements MuleContext {
    * TODO: Remove these constants. These constants only make sense until we have a reliable solution for durable persistence in
    * Clustering. These are not part of Mule's API and you should not use them in applications or extensions
    */
-  public static final String LOCAL_TRANSIENT_OBJECT_STORE_KEY = "_localInMemoryObjectStore";
-  public static final String LOCAL_PERSISTENT_OBJECT_STORE_KEY = "_localPersistentObjectStore";
   public static final String LOCAL_OBJECT_STORE_MANAGER_KEY = LOCAL_OBJECT_STORE_MANAGER;
   public static final String LOCAL_QUEUE_MANAGER_KEY = "_localQueueManager";
 
@@ -821,7 +816,7 @@ public class DefaultMuleContext implements MuleContext {
   }
 
   @Override
-  public void setObjectStore(String name, ListableObjectStore<Serializable> store) throws RegistrationException {
+  public void setObjectStore(String name, ObjectStore<Serializable> store) throws RegistrationException {
     checkLifecycleForPropertySet(name, Initialisable.PHASE_NAME);
     registryBroker.registerObject(name, store);
   }

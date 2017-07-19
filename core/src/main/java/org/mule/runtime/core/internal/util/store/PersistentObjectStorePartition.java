@@ -12,21 +12,20 @@ import static java.util.Collections.unmodifiableList;
 import static org.apache.commons.io.FileUtils.moveFileToDirectory;
 import static org.apache.commons.io.FileUtils.readFileToString;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.store.ObjectStoreManager.UNBOUNDED;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToCreate;
 import static org.mule.runtime.core.api.util.FileUtils.cleanDirectory;
 import static org.mule.runtime.core.api.util.FileUtils.newFile;
-
+import static org.mule.runtime.core.internal.util.store.MuleObjectStoreManager.UNBOUNDED;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.api.store.ObjectAlreadyExistsException;
 import org.mule.runtime.api.store.ObjectDoesNotExistException;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.ObjectStoreNotAvailableException;
+import org.mule.runtime.api.store.TemplateObjectStore;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.store.DeserializationPostInitialisable;
 import org.mule.runtime.core.api.store.ExpirableObjectStore;
-import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.api.util.UUID;
 
 import java.io.BufferedInputStream;
@@ -49,19 +48,19 @@ import org.apache.commons.collections.bidimap.TreeBidiMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PersistentObjectStorePartition<T extends Serializable> implements ListableObjectStore<T>, ExpirableObjectStore<T> {
+public class PersistentObjectStorePartition<T extends Serializable> extends TemplateObjectStore<T>
+    implements ExpirableObjectStore<T> {
 
   private static final String OBJECT_FILE_EXTENSION = ".obj";
   private static final String PARTITION_DESCRIPTOR_FILE = "partition-descriptor";
   public static final String CORRUPTED_FOLDER = "corrupted-files";
 
-  private static final Logger logger = LoggerFactory.getLogger(PersistentObjectStorePartition.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(PersistentObjectStorePartition.class);
 
   private final MuleContext muleContext;
   private final ObjectSerializer serializer;
 
   private boolean loaded = false;
-
 
   private File partitionDirectory;
   private String partitionName;
@@ -101,16 +100,16 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
   public void close() throws ObjectStoreException {}
 
   @Override
-  public List<Serializable> allKeys() throws ObjectStoreException {
+  public List<String> allKeys() throws ObjectStoreException {
     assureLoaded();
 
     synchronized (realKeyToUUIDIndex) {
-      return unmodifiableList(new ArrayList<Serializable>(realKeyToUUIDIndex.keySet()));
+      return unmodifiableList(new ArrayList<String>(realKeyToUUIDIndex.keySet()));
     }
   }
 
   @Override
-  public boolean contains(Serializable key) throws ObjectStoreException {
+  protected boolean doContains(String key) throws ObjectStoreException {
     assureLoaded();
 
     synchronized (realKeyToUUIDIndex) {
@@ -119,7 +118,7 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
   }
 
   @Override
-  public void store(Serializable key, T value) throws ObjectStoreException {
+  protected void doStore(String key, T value) throws ObjectStoreException {
     assureLoaded();
 
     synchronized (realKeyToUUIDIndex) {
@@ -146,7 +145,7 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
   }
 
   @Override
-  public T retrieve(Serializable key) throws ObjectStoreException {
+  protected T doRetrieve(String key) throws ObjectStoreException {
     assureLoaded();
 
     synchronized (realKeyToUUIDIndex) {
@@ -160,7 +159,7 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
   }
 
   @Override
-  public T remove(Serializable key) throws ObjectStoreException {
+  protected T doRemove(String key) throws ObjectStoreException {
     assureLoaded();
 
     synchronized (realKeyToUUIDIndex) {
@@ -239,8 +238,8 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
             StoreValue<T> storeValue = deserialize(file);
             realKeyToUUIDIndex.put(storeValue.getKey(), file.getName());
           } catch (ObjectStoreException e) {
-            if (logger.isWarnEnabled()) {
-              logger
+            if (LOGGER.isWarnEnabled()) {
+              LOGGER
                   .warn(format("Could not deserialize the ObjectStore file: %s. The file will be skipped and moved to the Garbage folder",
                                file.getName()));
             }

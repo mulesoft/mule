@@ -7,7 +7,7 @@
 
 package org.mule.runtime.core.internal.streaming.object.iterator;
 
-import org.mule.runtime.core.api.store.ListableObjectStore;
+import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectDoesNotExistException;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.streaming.iterator.Producer;
@@ -22,26 +22,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Implementation of {@link Producer} to stream the contents of a {@link ListableObjectStore}
+ * Implementation of {@link Producer} to stream the contents of a {@link ObjectStore}
  * 
  * @since 3.5.0
  */
-public class ListableObjectStoreProducer<T extends Serializable> implements Producer<T> {
+public class ObjectStoreProducer<T extends Serializable> implements Producer<T> {
 
-  private static final Logger logger = LoggerFactory.getLogger(ListableObjectStoreProducer.class);
+  private static final Logger logger = LoggerFactory.getLogger(ObjectStoreProducer.class);
 
-  private ListableObjectStore<T> objectStore;
-  private Iterator<Serializable> keys;
+  private ObjectStore<T> objectStore;
+  private Iterator<String> keys;
   private int size;
 
-  public ListableObjectStoreProducer(ListableObjectStore<T> objectStore) {
+  public ObjectStoreProducer(ObjectStore<T> objectStore) {
     if (objectStore == null) {
       throw new IllegalArgumentException("Cannot construct a producer with a null object store");
     }
 
     this.objectStore = objectStore;
     try {
-      List<Serializable> allKeys = new ArrayList<>(objectStore.allKeys());
+      List<String> allKeys = new ArrayList<>(objectStore.allKeys());
       this.keys = allKeys.iterator();
       this.size = allKeys.size();
     } catch (ObjectStoreException e) {
@@ -55,7 +55,7 @@ public class ListableObjectStoreProducer<T extends Serializable> implements Prod
       return null;
     }
 
-    Serializable key = this.keys.next();
+    String key = this.keys.next();
     try {
       return this.objectStore.retrieve(key);
     } catch (ObjectDoesNotExistException e) {

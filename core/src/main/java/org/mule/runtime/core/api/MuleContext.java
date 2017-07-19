@@ -41,7 +41,7 @@ import org.mule.runtime.core.api.registry.Registry;
 import org.mule.runtime.core.api.scheduler.SchedulerConfig;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.security.SecurityManager;
-import org.mule.runtime.core.api.store.ListableObjectStore;
+import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.core.api.transformer.DataTypeConversionResolver;
 import org.mule.runtime.core.api.util.StreamCloserService;
 import org.mule.runtime.core.api.util.queue.QueueManager;
@@ -247,7 +247,7 @@ public interface MuleContext extends Lifecycle {
 
   void setExceptionListener(SystemExceptionHandler exceptionListener);
 
-  void setObjectStore(String name, ListableObjectStore<Serializable> store) throws RegistrationException;
+  void setObjectStore(String name, ObjectStore<Serializable> store) throws RegistrationException;
 
   void handleException(Exception e, RollbackSourceCallback rollbackMethod);
 

@@ -191,7 +191,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
       if (eventsObjectStore.allKeys(eventsPartitionKey).isEmpty()) {
         return EMPTY_EVENTS_ARRAY;
       }
-      List<Serializable> keys = eventsObjectStore.allKeys(eventsPartitionKey);
+      List<String> keys = eventsObjectStore.allKeys(eventsPartitionKey);
       Event[] eventArray = new Event[keys.size()];
       for (int i = 0; i < keys.size(); i++) {
         eventArray[i] = eventsObjectStore.retrieve(keys.get(i), eventsPartitionKey);
@@ -214,7 +214,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
       event = Event.builder(event).addVariable(MULE_ARRIVAL_ORDER_PROPERTY, ++arrivalOrderCounter).build();
       // Using both event ID and CorrelationSequence since in certain instances
       // when an event is split up, the same event IDs are used.
-      Serializable key = getEventKey(event);
+      String key = getEventKey(event);
       eventsObjectStore.store(key, event, eventsPartitionKey);
     }
   }
@@ -292,9 +292,9 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
 
         if (currentSize > 0) {
           buf.append(" [");
-          Iterator<Serializable> i = eventsObjectStore.allKeys(eventsPartitionKey).iterator();
+          Iterator<String> i = eventsObjectStore.allKeys(eventsPartitionKey).iterator();
           while (i.hasNext()) {
-            Serializable id = i.next();
+            String id = i.next();
             buf.append(eventsObjectStore.retrieve(id, eventsPartitionKey).getCorrelationId());
             if (i.hasNext()) {
               buf.append(", ");

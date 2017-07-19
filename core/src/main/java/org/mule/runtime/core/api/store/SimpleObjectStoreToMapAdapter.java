@@ -6,30 +6,32 @@
  */
 package org.mule.runtime.core.api.store;
 
+import org.mule.runtime.api.store.ObjectStore;
+
 import java.io.Serializable;
 
 /**
  * Simple implementation of {@link ObjectStoreToMapAdapter} which operates on a
- * {@link ListableObjectStore} received in the constructor
+ * {@link ObjectStore} received in the constructor
  *
- * @param <T> the generic type of the instances contained in the {@link ListableObjectStore}
+ * @param <T> the generic type of the instances contained in the {@link ObjectStore}
  * @since 4.0
  */
 public class SimpleObjectStoreToMapAdapter<T extends Serializable> extends ObjectStoreToMapAdapter<T> {
 
-  private final ListableObjectStore<T> objectStore;
+  private final ObjectStore<T> objectStore;
 
   /**
    * Creates a new instance
    *
-   * @param objectStore the {@link ListableObjectStore} to be bridged
+   * @param objectStore the {@link ObjectStore} to be bridged
    */
-  public SimpleObjectStoreToMapAdapter(ListableObjectStore<T> objectStore) {
+  public SimpleObjectStoreToMapAdapter(ObjectStore<T> objectStore) {
     this.objectStore = objectStore;
   }
 
   @Override
-  public ListableObjectStore<T> getObjectStore() {
+  public ObjectStore<T> getObjectStore() {
     return objectStore;
   }
 }

@@ -6,6 +6,7 @@
  */
 package org.mule.tck.core.util.store;
 
+import static org.junit.Assert.fail;
 import org.mule.runtime.api.store.ObjectAlreadyExistsException;
 import org.mule.runtime.api.store.ObjectDoesNotExistException;
 import org.mule.runtime.api.store.ObjectStore;
@@ -15,15 +16,12 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import java.io.Serializable;
 
 import junit.framework.Assert;
-
 import org.junit.Test;
-
-import static org.junit.Assert.fail;
 
 /**
  * This test verifies the contract described in {@link ObjectStore}
  */
-public abstract class AbstractObjectStoreContractTestCase extends AbstractMuleContextTestCase {
+public abstract class TemplateObjectStoreContractTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void testContainsWithNullKey() {
@@ -71,7 +69,7 @@ public abstract class AbstractObjectStoreContractTestCase extends AbstractMuleCo
     try {
       // nothing was stored in the OS yet so using any key must trigger the
       // ObjectDoesNotExistException
-      Serializable key = createKey();
+      String key = createKey();
 
       getObjectStore().retrieve(key);
       fail("retrieve() with unbound key must throw ObjectDoesNotExistException");
@@ -85,7 +83,7 @@ public abstract class AbstractObjectStoreContractTestCase extends AbstractMuleCo
     try {
       // nothing was stored in the OS yet so using any key must trigger the
       // ObjectDoesNotExistException
-      Serializable key = createKey();
+      String key = createKey();
 
       getObjectStore().remove(key);
       fail("remove() with unbound key must throw ObjectDoesNotExistException");
@@ -96,7 +94,7 @@ public abstract class AbstractObjectStoreContractTestCase extends AbstractMuleCo
 
   @Test
   public void clear() throws ObjectStoreException {
-    Serializable key = this.createKey();
+    String key = this.createKey();
     Serializable value = this.getStorableValue();
     ObjectStore<Serializable> objectStore = this.getObjectStore();
 
@@ -114,7 +112,7 @@ public abstract class AbstractObjectStoreContractTestCase extends AbstractMuleCo
 
   @Test
   public void testStoreWithExistingKey() throws ObjectStoreException {
-    Serializable key = createKey();
+    String key = createKey();
     Serializable value = getStorableValue();
     ObjectStore<Serializable> objectStore = getObjectStore();
 
@@ -130,7 +128,7 @@ public abstract class AbstractObjectStoreContractTestCase extends AbstractMuleCo
     }
   }
 
-  protected Serializable createKey() {
+  protected String createKey() {
     return "theKey";
   }
 

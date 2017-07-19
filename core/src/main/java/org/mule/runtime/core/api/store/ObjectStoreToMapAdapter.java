@@ -7,6 +7,7 @@
 package org.mule.runtime.core.api.store;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
 
 import java.io.Serializable;
@@ -28,11 +29,11 @@ import java.util.Set;
  * <p>
  * Operations of this map are not thread safe so the user must synchronize access to this map properly.
  *
- * @param <T> the generic type of the instances contained in the {@link ListableObjectStore}
+ * @param <T> the generic type of the instances contained in the {@link ObjectStore}
  */
-public abstract class ObjectStoreToMapAdapter<T extends Serializable> implements Map<Serializable, T> {
+public abstract class ObjectStoreToMapAdapter<T extends Serializable> implements Map<String, T> {
 
-  protected abstract ListableObjectStore<T> getObjectStore();
+  protected abstract ObjectStore<T> getObjectStore();
 
   @Override
   public int size() {
@@ -55,7 +56,7 @@ public abstract class ObjectStoreToMapAdapter<T extends Serializable> implements
   @Override
   public boolean containsKey(Object key) {
     try {
-      return getObjectStore().contains((Serializable) key);
+      return getObjectStore().contains((String) key);
     } catch (ObjectStoreException e) {
       throw new MuleRuntimeException(e);
     }
@@ -69,17 +70,17 @@ public abstract class ObjectStoreToMapAdapter<T extends Serializable> implements
   @Override
   public T get(Object key) {
     try {
-      if (!getObjectStore().contains((Serializable) key)) {
+      if (!getObjectStore().contains((String) key)) {
         return null;
       }
-      return getObjectStore().retrieve((Serializable) key);
+      return getObjectStore().retrieve((String) key);
     } catch (ObjectStoreException e) {
       throw new MuleRuntimeException(e);
     }
   }
 
   @Override
-  public T put(Serializable key, T value) {
+  public T put(String key, T value) {
     T previousValue = null;
     try {
       if (getObjectStore().contains(key)) {
@@ -98,8 +99,8 @@ public abstract class ObjectStoreToMapAdapter<T extends Serializable> implements
   @Override
   public T remove(Object key) {
     try {
-      if (getObjectStore().contains((Serializable) key)) {
-        return getObjectStore().remove((Serializable) key);
+      if (getObjectStore().contains((String) key)) {
+        return getObjectStore().remove((String) key);
       }
     } catch (ObjectStoreException e) {
       throw new MuleRuntimeException(e);
@@ -108,8 +109,8 @@ public abstract class ObjectStoreToMapAdapter<T extends Serializable> implements
   }
 
   @Override
-  public void putAll(Map<? extends Serializable, ? extends T> mapToAdd) {
-    for (Serializable key : mapToAdd.keySet()) {
+  public void putAll(Map<? extends String, ? extends T> mapToAdd) {
+    for (String key : mapToAdd.keySet()) {
       put(key, mapToAdd.get(key));
     }
   }
@@ -124,9 +125,9 @@ public abstract class ObjectStoreToMapAdapter<T extends Serializable> implements
   }
 
   @Override
-  public Set<Serializable> keySet() {
+  public Set<String> keySet() {
     try {
-      final List<Serializable> allKeys = getObjectStore().allKeys();
+      final List<String> allKeys = getObjectStore().allKeys();
       return new HashSet(allKeys);
     } catch (ObjectStoreException e) {
       throw new MuleRuntimeException(e);
@@ -145,7 +146,7 @@ public abstract class ObjectStoreToMapAdapter<T extends Serializable> implements
    * This method is not supported for performance reasons
    */
   @Override
-  public Set<Entry<Serializable, T>> entrySet() {
+  public Set<Entry<String, T>> entrySet() {
     throw new UnsupportedOperationException("ObjectStoreToMapAdapter does not support entrySet() method");
   }
 }

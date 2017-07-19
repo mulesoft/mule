@@ -18,7 +18,7 @@ import static java.util.Calendar.WEEK_OF_MONTH;
 import static java.util.Calendar.WEEK_OF_YEAR;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
+import static org.mule.runtime.api.store.ObjectStoreSettings.unmanagedPersistent;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -228,7 +228,8 @@ public class DateTimeTestCase extends AbstractMuleContextTestCase {
   @Test
   public void serialization() throws Exception {
     final String key = "key";
-    ObjectStore<DateTime> os = muleContext.getObjectStoreManager().getObjectStore("DateTimeTestCase", true);
+    ObjectStore<DateTime> os =
+        muleContext.getObjectStoreManager().createObjectStore("DateTimeTestCase", unmanagedPersistent());
     try {
       os.store(key, now);
       DateTime recovered = os.retrieve(key);

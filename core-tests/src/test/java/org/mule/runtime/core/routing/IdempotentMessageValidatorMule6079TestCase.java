@@ -10,7 +10,6 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.store.ObjectAlreadyExistsException;
 import org.mule.runtime.api.store.ObjectStore;
@@ -18,11 +17,13 @@ import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.routing.ValidationException;
+import org.mule.runtime.api.store.TemplateObjectStore;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.internal.routing.IdempotentMessageValidator;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.CountDownLatch;
@@ -88,20 +89,17 @@ public class IdempotentMessageValidatorMule6079TestCase extends AbstractMuleCont
     }
   }
 
-  private class RaceConditionEnforcingObjectStore implements ObjectStore<String> {
+  private class RaceConditionEnforcingObjectStore extends TemplateObjectStore<String> {
 
     protected CountDownLatch barrier;
-    Map<Serializable, String> map = new TreeMap<>();
+    Map<String, String> map = new TreeMap<>();
 
     public RaceConditionEnforcingObjectStore(CountDownLatch latch) {
       barrier = latch;
     }
 
     @Override
-    public boolean contains(Serializable key) throws ObjectStoreException {
-      if (key == null) {
-        throw new ObjectStoreException();
-      }
+    protected boolean doContains(String key) throws ObjectStoreException {
       boolean containsKey;
       synchronized (this) {
         // avoiding deadlock with the latch (locks if the element was already added to map, see definition of
@@ -116,7 +114,7 @@ public class IdempotentMessageValidatorMule6079TestCase extends AbstractMuleCont
     }
 
     @Override
-    public void store(Serializable key, String value) throws ObjectStoreException {
+    protected void doStore(String key, String value) throws ObjectStoreException {
       boolean wasAdded;
       if (key == null) {
         throw new ObjectStoreException();
@@ -140,12 +138,12 @@ public class IdempotentMessageValidatorMule6079TestCase extends AbstractMuleCont
     }
 
     @Override
-    public String retrieve(Serializable key) throws ObjectStoreException {
+    protected String doRetrieve(String key) throws ObjectStoreException {
       return null;
     }
 
     @Override
-    public String remove(Serializable key) throws ObjectStoreException {
+    protected String doRemove(String key) throws ObjectStoreException {
       return null;
     }
 
@@ -157,6 +155,21 @@ public class IdempotentMessageValidatorMule6079TestCase extends AbstractMuleCont
     @Override
     public void clear() throws ObjectStoreException {
       this.map.clear();
+    }
+
+    @Override
+    public void open() throws ObjectStoreException {
+
+    }
+
+    @Override
+    public void close() throws ObjectStoreException {
+
+    }
+
+    @Override
+    public List<String> allKeys() throws ObjectStoreException {
+      return new ArrayList<>(map.keySet());
     }
   }
 }

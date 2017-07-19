@@ -7,13 +7,12 @@
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth;
 
 import static java.lang.String.format;
-import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.DefaultEventContext.create;
-import static org.mule.runtime.core.api.config.MuleProperties.DEFAULT_USER_OBJECT_STORE_NAME;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
@@ -33,10 +32,9 @@ import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.api.util.Pair;
-import org.mule.runtime.core.internal.util.LazyLookup;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
+import org.mule.runtime.core.internal.util.LazyLookup;
 import org.mule.runtime.core.internal.util.store.LazyObjectStoreToMapAdapter;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthCodeRequest;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
@@ -266,27 +264,14 @@ public class DefaultExtensionsOAuthManager implements Initialisable, Startable, 
     startIfNeeded(dancer);
   }
 
-  private Supplier<ListableObjectStore> getObjectStoreSupplier(OAuthConfig config) {
-    String storeName =
-        config.getStoreConfig().map(OAuthObjectStoreConfig::getObjectStoreName).orElse(DEFAULT_USER_OBJECT_STORE_NAME);
+  private Supplier<ObjectStore> getObjectStoreSupplier(OAuthConfig config) {
     return () -> {
-      ObjectStore objectStore = muleContext.getObjectStoreManager().getObjectStore(storeName);
-      if (objectStore instanceof ListableObjectStore) {
-        return (ListableObjectStore) objectStore;
-      }
+      String storeName = config.getStoreConfig()
+          .map(OAuthObjectStoreConfig::getObjectStoreName)
+          .orElse(OBJECT_STORE_DEFAULT_PERSISTENT_NAME);
 
-      throw new IllegalArgumentException(format("ObjectStore '%s' is not suitable for use in config '%s'. A %s is required",
-                                                storeName, config.getOwnerConfigName(),
-                                                ListableObjectStore.class.getSimpleName()));
+      return muleContext.getObjectStoreManager().getObjectStore(storeName);
     };
-  }
-
-  private URL url(String host, int port, String path) {
-    try {
-      return new URL("http", host, port, path);
-    } catch (MalformedURLException e) {
-      throw new IllegalArgumentException((asList(host, port, path) + " do not constitute a valid URL"), e);
-    }
   }
 
   private Map<String, String> getParameterExtractors(OAuthConfig config) {

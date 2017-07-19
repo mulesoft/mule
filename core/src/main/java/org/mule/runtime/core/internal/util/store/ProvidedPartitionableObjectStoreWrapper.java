@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.internal.util.store;
 
-import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
+import org.mule.runtime.core.api.store.AbstractPartitionableObjectStore;
 import org.mule.runtime.core.api.store.PartitionableObjectStore;
 
 import java.io.Serializable;
@@ -21,87 +21,99 @@ import java.util.function.Supplier;
  * In the case the factory is used and a fresh object store is created, its lifecycle management will be delegated by this
  * wrapper.
  */
-public class ProvidedPartitionableObjectStoreWrapper<T extends Serializable> extends ProvidedObjectStoreWrapper<T>
-    implements PartitionableObjectStore<T> {
+public class ProvidedPartitionableObjectStoreWrapper<T extends Serializable> extends AbstractPartitionableObjectStore<T> {
+
+  private PartitionableObjectStore<T> wrapped;
 
   /**
    * Wraps the {@code providedObjectStore} if given, or uses the {@code objectStoreSupplier} to create one.
-   * 
+   *
+   * @param providedObjectStore the objectStroe provided through config to use. May be null.
+   * @param objectStoreSupplier provides the object store to use if {@code providedObjectStore} is null.
+   */
+
+  /**
+   * Wraps the {@code providedObjectStore} if given, or uses the {@code objectStoreSupplier} to create one.
+   *
    * @param providedObjectStore the objectStroe provided through config to use. May be null.
    * @param objectStoreSupplier provides the object store to use if {@code providedObjectStore} is null.
    */
   public ProvidedPartitionableObjectStoreWrapper(PartitionableObjectStore<T> providedObjectStore,
-                                                 Supplier<ObjectStore> objectStoreSupplier) {
-    super(providedObjectStore, objectStoreSupplier);
+                                                 Supplier<PartitionableObjectStore> objectStoreSupplier) {
+    if (providedObjectStore == null) {
+      wrapped = objectStoreSupplier.get();
+    } else {
+      wrapped = providedObjectStore;
+    }
   }
 
   @Override
   public void open() throws ObjectStoreException {
-    getWrapped().open();
+    wrapped.open();
   }
 
   @Override
   public void close() throws ObjectStoreException {
-    getWrapped().close();
+    wrapped.close();
   }
 
   @Override
-  public List<Serializable> allKeys() throws ObjectStoreException {
-    return getWrapped().allKeys();
+  public List<String> allKeys() throws ObjectStoreException {
+    return wrapped.allKeys();
   }
 
   @Override
-  public boolean contains(Serializable key, String partitionName) throws ObjectStoreException {
-    return getWrapped().contains(key, partitionName);
+  protected boolean doContains(String key, String partitionName) throws ObjectStoreException {
+    return wrapped.contains(key, partitionName);
   }
 
   @Override
-  public void store(Serializable key, T value, String partitionName) throws ObjectStoreException {
-    getWrapped().store(key, value, partitionName);
+  protected void doStore(String key, T value, String partitionName) throws ObjectStoreException {
+    wrapped.store(key, value, partitionName);
   }
 
   @Override
-  public T retrieve(Serializable key, String partitionName) throws ObjectStoreException {
-    return getWrapped().retrieve(key, partitionName);
+  protected T doRetrieve(String key, String partitionName) throws ObjectStoreException {
+    return wrapped.retrieve(key, partitionName);
   }
 
   @Override
-  public T remove(Serializable key, String partitionName) throws ObjectStoreException {
-    return getWrapped().remove(key, partitionName);
+  protected T doRemove(String key, String partitionName) throws ObjectStoreException {
+    return wrapped.remove(key, partitionName);
   }
 
   @Override
-  public List<Serializable> allKeys(String partitionName) throws ObjectStoreException {
-    return getWrapped().allKeys(partitionName);
+  public List<String> allKeys(String partitionName) throws ObjectStoreException {
+    return wrapped.allKeys(partitionName);
   }
 
   @Override
   public List<String> allPartitions() throws ObjectStoreException {
-    return getWrapped().allPartitions();
+    return wrapped.allPartitions();
   }
 
   @Override
   public void open(String partitionName) throws ObjectStoreException {
-    getWrapped().open(partitionName);
+    wrapped.open(partitionName);
   }
 
   @Override
   public void close(String partitionName) throws ObjectStoreException {
-    getWrapped().close(partitionName);
+    wrapped.close(partitionName);
   }
 
   @Override
   public void disposePartition(String partitionName) throws ObjectStoreException {
-    getWrapped().disposePartition(partitionName);
+    wrapped.disposePartition(partitionName);
   }
 
   @Override
   public void clear(String partitionName) throws ObjectStoreException {
-    getWrapped().clear(partitionName);
+    wrapped.clear(partitionName);
   }
 
   @Override
-  protected PartitionableObjectStore<T> getWrapped() {
-    return (PartitionableObjectStore<T>) super.getWrapped();
+  public boolean isPersistent() {
+    return wrapped.isPersistent();
   }
 }

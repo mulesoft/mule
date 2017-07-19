@@ -6,20 +6,20 @@
  */
 package org.mule.runtime.core.api.store;
 
-import static java.util.Collections.synchronizedMap;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
-
+import org.mule.runtime.api.store.TemplateObjectStore;
+import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-public class SimpleMemoryObjectStore<T extends Serializable> extends AbstractObjectStore<T> implements ListableObjectStore<T> {
+public class SimpleMemoryObjectStore<T extends Serializable> extends TemplateObjectStore<T> implements ObjectStore<T> {
 
-  private Map<Serializable, T> map = synchronizedMap(new HashMap<Serializable, T>());
+  private Map<String, T> map = new ConcurrentHashMap<>();
 
   @Override
   public boolean isPersistent() {
@@ -27,12 +27,12 @@ public class SimpleMemoryObjectStore<T extends Serializable> extends AbstractObj
   }
 
   @Override
-  protected boolean doContains(Serializable key) {
+  protected boolean doContains(String key) throws ObjectStoreException {
     return map.containsKey(key);
   }
 
   @Override
-  protected void doStore(Serializable key, T value) throws ObjectStoreException {
+  protected void doStore(String key, T value) throws ObjectStoreException {
     if (value == null) {
       throw new ObjectStoreException(objectIsNull("value"));
     }
@@ -41,7 +41,7 @@ public class SimpleMemoryObjectStore<T extends Serializable> extends AbstractObj
   }
 
   @Override
-  protected T doRetrieve(Serializable key) {
+  protected T doRetrieve(String key) throws ObjectStoreException {
     return map.get(key);
   }
 
@@ -51,7 +51,7 @@ public class SimpleMemoryObjectStore<T extends Serializable> extends AbstractObj
   }
 
   @Override
-  protected T doRemove(Serializable key) {
+  protected T doRemove(String key) {
     return map.remove(key);
   }
 
@@ -66,7 +66,7 @@ public class SimpleMemoryObjectStore<T extends Serializable> extends AbstractObj
   }
 
   @Override
-  public List<Serializable> allKeys() throws ObjectStoreException {
+  public List<String> allKeys() throws ObjectStoreException {
     return new ArrayList<>(map.keySet());
   }
 }
