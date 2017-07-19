@@ -2003,6 +2003,9 @@
 
 		<profile>
             <id>release</id>
+            <modules>
+                <module>sources-community</module>
+            </modules>
             <properties>
                 <skipVerifications>false</skipVerifications>
                 <skipInstalls>false</skipInstalls>
