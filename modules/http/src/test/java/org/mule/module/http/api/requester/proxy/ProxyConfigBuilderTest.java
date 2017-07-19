@@ -21,6 +21,7 @@ public class ProxyConfigBuilderTest extends AbstractMuleTestCase
     public static final int PORT = 8080;
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";
+    public static final String NON_PROXY_HOSTS = "host1|host2";
 
     private ProxyConfigBuilder proxyConfigBuilder = new ProxyConfigBuilder();
 
@@ -51,10 +52,11 @@ public class ProxyConfigBuilderTest extends AbstractMuleTestCase
     public void fullConfig()
     {
         ProxyConfig config = proxyConfigBuilder
-                .setHost(HOST).setPort(PORT).setUsername(USERNAME).setPassword(PASSWORD).build();
+                .setHost(HOST).setPort(PORT).setUsername(USERNAME).setPassword(PASSWORD).setNonProxyHosts(NON_PROXY_HOSTS).build();
         assertThat(config.getHost(), is(HOST));
         assertThat(config.getPort(), is(PORT));
         assertThat(config.getPassword(), is(PASSWORD));
         assertThat(config.getUsername(), is(USERNAME));
+        assertThat(config.getNonProxyHosts(), is(NON_PROXY_HOSTS));
     }
 }

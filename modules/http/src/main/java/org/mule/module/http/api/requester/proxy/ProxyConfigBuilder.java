@@ -47,6 +47,12 @@ public class ProxyConfigBuilder
         return this;
     }
 
+    public ProxyConfigBuilder setNonProxyHosts(String nonProxyHosts)
+    {
+        proxyConfig.setNonProxyHosts(nonProxyHosts);
+        return this;
+    }
+
     public ProxyConfig build()
     {
         Preconditions.checkArgument(proxyConfig.getHost() != null, "Host must be not null");

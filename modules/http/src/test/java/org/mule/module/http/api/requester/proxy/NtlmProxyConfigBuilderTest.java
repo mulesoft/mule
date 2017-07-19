@@ -23,6 +23,7 @@ public class NtlmProxyConfigBuilderTest extends AbstractMuleTestCase
     public static final String NTLM_DOMAIN = "DOMAIN";
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";
+    public static final String NON_PROXY_HOST = "host1|host2";
 
     private NtlmProxyConfigBuilder ntlmProxyConfigBuilder = new NtlmProxyConfigBuilder();
 
@@ -66,5 +67,6 @@ public class NtlmProxyConfigBuilderTest extends AbstractMuleTestCase
         assertThat(config.getNtlmDomain(), is(NTLM_DOMAIN));
         assertThat(config.getPassword(), is(PASSWORD));
         assertThat(config.getUsername(), is(USERNAME));
+        assertThat(config.getNonProxyHosts(), is(NON_PROXY_HOST));
     }
 }
