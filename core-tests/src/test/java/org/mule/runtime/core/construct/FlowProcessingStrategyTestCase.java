@@ -49,7 +49,7 @@ public class FlowProcessingStrategyTestCase extends AbstractMuleTestCase {
   private MuleConfiguration configuration;
 
   private Flow flow;
-  
+
   @Before
   public void before() throws RegistrationException {
     when(muleContext.getConfiguration()).thenReturn(configuration);
@@ -102,7 +102,7 @@ public class FlowProcessingStrategyTestCase extends AbstractMuleTestCase {
 
   @Test
   public void processingStrategySetBySystemPropertyOverridesDefault() throws Exception {
-    testWithSystemProperty("org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory",
+    testWithSystemProperty(ProcessingStrategyFactory.class.getName(),
                            TestProcessingStrategyFactory.class.getName(), () -> {
                              MuleConfiguration muleConfiguration = new DefaultMuleConfiguration();
                              when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
