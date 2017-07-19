@@ -7,5 +7,16 @@
 package org.mule.test.heisenberg.extension.model;
 
 public enum HealthStatus {
-  HEALTHY, CANCER, DEAD
+  HEALTHY("Healthy"), CANCER("Cancer"), DEAD("Dead");
+
+  private String id;
+
+  HealthStatus(String id) {
+    this.id = id;
+  }
+
+  public String toString() {
+    return id;
+  }
+
 }
