@@ -41,7 +41,7 @@ public class ListableObjectStoreProducer<T extends Serializable> implements Prod
 
     this.objectStore = objectStore;
     try {
-      List<Serializable> allKeys = new ArrayList<Serializable>(objectStore.allKeys());
+      List<Serializable> allKeys = new ArrayList<>(objectStore.allKeys());
       this.keys = allKeys.iterator();
       this.size = allKeys.size();
     } catch (ObjectStoreException e) {

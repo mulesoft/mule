@@ -12,11 +12,14 @@ import static org.mule.runtime.module.extension.internal.ExtensionProperties.SOU
 import static reactor.core.publisher.Mono.create;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.error;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
@@ -54,6 +57,8 @@ class ReflectiveSourceCallbackExecutor implements SourceCallbackExecutor {
   private final MuleContext muleContext;
   private final boolean async;
   private final ReflectiveMethodComponentExecutor<SourceModel> executor;
+  private final Flow flow;
+  private final ComponentLocation location;
 
   /**
    * Creates a new instance
@@ -65,6 +70,8 @@ class ReflectiveSourceCallbackExecutor implements SourceCallbackExecutor {
    * @param method                the method to be executed
    * @param cursorProviderFactory the {@link CursorProviderFactory} that was configured on the owning source
    * @param streamingManager      the application's {@link StreamingManager}
+   * @param flow                  the {@link Flow} which owns the {@link MessageSource}
+   * @param location              the source {@link ComponentLocation}
    * @param muleContext           the current {@link MuleContext}
    * @param sourceCallbackModel   the callback's model
    */
@@ -75,6 +82,8 @@ class ReflectiveSourceCallbackExecutor implements SourceCallbackExecutor {
                                           Method method,
                                           CursorProviderFactory cursorProviderFactory,
                                           StreamingManager streamingManager,
+                                          Flow flow,
+                                          ComponentLocation location,
                                           MuleContext muleContext,
                                           SourceCallbackModelProperty sourceCallbackModel) {
 
@@ -83,6 +92,8 @@ class ReflectiveSourceCallbackExecutor implements SourceCallbackExecutor {
     this.sourceModel = sourceModel;
     this.cursorProviderFactory = cursorProviderFactory;
     this.streamingManager = streamingManager;
+    this.flow = flow;
+    this.location = location;
     this.muleContext = muleContext;
 
     executor = new ReflectiveMethodComponentExecutor<>(getAllGroups(sourceModel, method, sourceCallbackModel), method, source);
@@ -125,6 +136,8 @@ class ReflectiveSourceCallbackExecutor implements SourceCallbackExecutor {
                                                                                           event,
                                                                                           cursorProviderFactory,
                                                                                           streamingManager,
+                                                                                          flow,
+                                                                                          location,
                                                                                           muleContext);
 
     executionContext.setVariable(SOURCE_CALLBACK_CONTEXT_PARAM, callbackContext);

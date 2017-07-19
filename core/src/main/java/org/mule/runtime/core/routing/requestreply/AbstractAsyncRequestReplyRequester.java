@@ -15,8 +15,6 @@ import static org.mule.runtime.core.api.config.i18n.CoreMessages.responseTimedOu
 import static org.mule.runtime.core.api.context.notification.RoutingNotification.ASYNC_REPLY_TIMEOUT;
 import static org.mule.runtime.core.api.context.notification.RoutingNotification.MISSED_ASYNC_REPLY;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
-import static org.mule.runtime.dsl.api.component.config.ComponentLocationUtils.getFlowNameFrom;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -126,7 +124,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
 
   @Override
   public void initialise() throws InitialisationException {
-    name = format(NAME_TEMPLATE, storePrefix, muleContext.getConfiguration().getId(), getFlowNameFrom(getLocation()));
+    name = format(NAME_TEMPLATE, storePrefix, muleContext.getConfiguration().getId(), getLocation().getRootContainerName());
     store = ((ObjectStoreManager) muleContext.getRegistry().get(OBJECT_STORE_MANAGER))
         .getObjectStore(name, false, MAX_PROCESSED_GROUPS, UNCLAIMED_TIME_TO_LIVE, UNCLAIMED_INTERVAL);
   }

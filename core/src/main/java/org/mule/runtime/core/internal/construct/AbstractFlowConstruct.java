@@ -27,7 +27,6 @@ import org.mule.runtime.core.api.construct.FlowConstructInvalidException;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.Processor;
@@ -225,12 +224,6 @@ public abstract class AbstractFlowConstruct extends AbstractAnnotatedObject impl
     }
     if (candidate instanceof MuleContextAware) {
       ((MuleContextAware) candidate).setMuleContext(muleContext);
-    }
-  }
-
-  protected void injectExceptionHandler(Object candidate) {
-    if (candidate instanceof MessagingExceptionHandlerAware) {
-      ((MessagingExceptionHandlerAware) candidate).setMessagingExceptionHandler(this.getExceptionListener());
     }
   }
 

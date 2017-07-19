@@ -2813,7 +2813,6 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
         TestDomainFactory.createDomainFactory(new DomainClassLoaderFactory(containerClassLoader.getClassLoader()),
                                               containerClassLoader, serviceManager, moduleRepository,
                                               createDescriptorLoaderRepository());
-    testDomainFactory.setMuleContextListenerFactory(new DeploymentMuleContextListenerFactory(domainDeploymentListener));
     testDomainFactory.setFailOnStopApplication();
 
     deploymentService.setDomainFactory(testDomainFactory);
@@ -2836,7 +2835,6 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
         TestDomainFactory.createDomainFactory(new DomainClassLoaderFactory(containerClassLoader.getClassLoader()),
                                               containerClassLoader, serviceManager, moduleRepository,
                                               createDescriptorLoaderRepository());
-    testDomainFactory.setMuleContextListenerFactory(new DeploymentMuleContextListenerFactory(domainDeploymentListener));
     testDomainFactory.setFailOnDisposeApplication();
     deploymentService.setDomainFactory(testDomainFactory);
     startDeployment();

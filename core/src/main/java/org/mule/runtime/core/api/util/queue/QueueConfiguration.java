@@ -13,8 +13,8 @@ public interface QueueConfiguration {
 
   int MAXIMUM_CAPACITY = 0;
 
-  public boolean isPersistent();
+  boolean isPersistent();
 
-  public int getCapacity();
+  int getCapacity();
 
 }

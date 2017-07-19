@@ -14,6 +14,7 @@ import static org.junit.Assert.fail;
 import static org.junit.internal.matchers.ThrowableCauseMatcher.hasCause;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.Event.builder;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
@@ -58,6 +59,11 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
   @Before
   public void setup() throws MuleException {
     flow = mock(Flow.class, RETURNS_DEEP_STUBS);
+    OnErrorPropagateHandler exceptionHandler = new OnErrorPropagateHandler();
+    exceptionHandler.setMuleContext(muleContext);
+    exceptionHandler.setFlowConstruct(flow);
+    exceptionHandler.initialise();
+    when(flow.getExceptionListener()).thenReturn(exceptionHandler);
     eventContext = DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION);
     input = builder(eventContext).message(of(TEST_MESSAGE)).build();
     output = builder(eventContext).message(of(TEST_MESSAGE)).build();
@@ -226,11 +232,6 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
 
   private Processor createChain(ReactiveProcessor processor) throws InitialisationException {
     MessageProcessorChain chain = newChain(new ReactiveProcessorToProcessorAdaptor(processor));
-    OnErrorPropagateHandler exceptionHandler = new OnErrorPropagateHandler();
-    exceptionHandler.setMuleContext(muleContext);
-    exceptionHandler.setFlowConstruct(flow);
-    exceptionHandler.initialise();
-    chain.setMessagingExceptionHandler(exceptionHandler);
     chain.setMuleContext(muleContext);
     return chain;
   }

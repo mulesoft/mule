@@ -12,6 +12,7 @@ import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensi
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.toMap;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isParameterContainer;
 import org.mule.metadata.java.api.JavaTypeLoader;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
@@ -35,6 +36,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Parameter
 import org.mule.runtime.module.extension.internal.runtime.resolver.ArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ByParameterNameArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.CompletionCallbackArgumentResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ComponentLocationArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConfigurationArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ErrorArgumentResolver;
@@ -82,6 +84,8 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
       new StreamingHelperArgumentResolver();
   private static final ArgumentResolver<SourceResult> SOURCE_RESULT_ARGUMENT_RESOLVER =
       new SourceResultArgumentResolver(ERROR_ARGUMENT_RESOLVER, SOURCE_CALLBACK_CONTEXT_ARGUMENT_RESOLVER);
+  private static final ArgumentResolver<ComponentLocation> COMPONENT_LOCATION_ARGUMENT_RESOLVER =
+      new ComponentLocationArgumentResolver();
 
 
   private final Method method;
@@ -93,7 +97,7 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
    * Creates a new instance for the given {@code method}
    *
    * @param parameterGroupModels {@link List} of {@link ParameterGroupModel} from the corresponding model
-   * @param method the {@link Method} to be called
+   * @param method               the {@link Method} to be called
    */
   public MethodArgumentResolverDelegate(List<ParameterGroupModel> parameterGroupModels, Method method) {
     this.method = method;
@@ -151,6 +155,8 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
         argumentResolver = SOURCE_RESULT_ARGUMENT_RESOLVER;
       } else if (SourceCompletionCallback.class.equals(parameterType)) {
         argumentResolver = ASYNC_SOURCE_COMPLETION_CALLBACK_ARGUMENT_RESOLVER;
+      } else if (ComponentLocation.class.equals(parameterType)) {
+        argumentResolver = COMPONENT_LOCATION_ARGUMENT_RESOLVER;
       } else {
         argumentResolver = new ByParameterNameArgumentResolver<>(paramNames.get(i));
       }
@@ -218,7 +224,8 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
    * @param parameterGroupModels the parameter groups
    * @return mapping between the {@link Method}'s arguments which are parameters groups and their respective resolvers
    */
-  private Map<Parameter, ParameterGroupArgumentResolver<? extends Object>> getParameterGroupResolvers(List<ParameterGroupModel> parameterGroupModels) {
+  private Map<Parameter, ParameterGroupArgumentResolver<? extends Object>> getParameterGroupResolvers(
+                                                                                                      List<ParameterGroupModel> parameterGroupModels) {
     return parameterGroupModels.stream()
         .map(group -> group.getModelProperty(ParameterGroupModelProperty.class)
             .map(ParameterGroupModelProperty::getDescriptor).orElse(null))

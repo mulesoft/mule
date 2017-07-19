@@ -43,6 +43,7 @@ import org.mule.runtime.module.extension.internal.loader.enricher.ValueProviders
 import org.mule.runtime.module.extension.internal.loader.validation.ConfigurationModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.ConnectionProviderModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.ExportedTypesModelValidator;
+import org.mule.runtime.module.extension.internal.loader.validation.FlowInfoModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.JavaSubtypesModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.MetadataComponentModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.NullSafeModelValidator;
@@ -75,7 +76,8 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
                                                                                          new ParameterTypeModelValidator(),
                                                                                          new OAuthConnectionProviderModelValidator(),
                                                                                          new ValueProviderModelValidator(),
-                                                                                         new PrivilegedApiValidator()));
+                                                                                         new PrivilegedApiValidator(),
+                                                                                         new FlowInfoModelValidator()));
 
   private final List<DeclarationEnricher> customDeclarationEnrichers = unmodifiableList(asList(
                                                                                                new JavaXmlDeclarationEnricher(),

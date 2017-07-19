@@ -8,14 +8,14 @@ package org.mule.runtime.core.processor;
 
 import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
-import static org.mule.runtime.core.DefaultEventContext.child;
+import static org.mule.runtime.core.DefaultEventContext.fireAndForgetChild;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.api.context.notification.AsyncMessageNotification.PROCESS_ASYNC_COMPLETE;
 import static org.mule.runtime.core.api.context.notification.AsyncMessageNotification.PROCESS_ASYNC_SCHEDULED;
 import static org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
-import static org.mule.runtime.core.api.rx.Exceptions.UNEXPECTED_EXCEPTION_PREDICATE;
 import static org.mule.runtime.core.internal.util.ProcessingStrategyUtils.isSynchronousProcessing;
+import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
@@ -26,12 +26,11 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.context.notification.AsyncMessageNotification;
 import org.mule.runtime.core.api.exception.MessagingException;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
@@ -56,7 +55,7 @@ import org.slf4j.LoggerFactory;
  * exception is thrown.
  */
 public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
-    implements Scope, Initialisable, Startable, Stoppable, MessagingExceptionHandlerAware {
+    implements Scope, Initialisable, Startable, Stoppable {
 
   @Inject
   private SchedulerService schedulerService;
@@ -67,8 +66,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
 
   private Scheduler scheduler;
   private reactor.core.scheduler.Scheduler reactorScheduler;
-  private String name;
-  private MessagingExceptionHandler messagingExceptionHandler;
+  protected String name;
 
   public AsyncDelegateMessageProcessor(MessageProcessorChain delegate) {
     this.delegate = delegate;
@@ -123,19 +121,12 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
                 .doOnNext(asyncRequest -> just(asyncRequest)
                     .transform(scheduleAsync(delegate))
                     .doOnNext(event -> fireAsyncCompleteNotification(event, null))
-                    .doOnError(MessagingException.class,
-                               e -> fireAsyncCompleteNotification(e.getEvent(), e))
-                    .onErrorResume(MessagingException.class, messagingExceptionHandler)
-                    // Even though no response is ever used with this processor, complete the EventContext anyway, so
-                    // parent context completes when async processing is complete.
-                    .doOnNext(event -> asyncRequest.getContext().success(event))
-                    .doOnError(throwable -> asyncRequest.getContext().error(throwable))
-                    .subscribe()))
-            .onErrorResume(MessagingException.class, messagingExceptionHandler)
-            .doOnError(UNEXPECTED_EXCEPTION_PREDICATE,
-                       exception -> logger.error("Unhandled exception in async processing.", exception))
-            .subscribe());
+                    .doOnError(MessagingException.class, e -> fireAsyncCompleteNotification(e.getEvent(), e))
+                    .subscribe(event -> asyncRequest.getContext().success(event),
+                               throwable -> asyncRequest.getContext().error(throwable))))
+            .subscribe(requestUnbounded()));
   }
+
 
   private ReactiveProcessor scheduleAsync(Processor delegate) {
     if (!isSynchronousProcessing(flowConstruct) && flowConstruct instanceof Pipeline) {
@@ -149,7 +140,8 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
 
   private Event asyncEvent(Event event) {
     // Clone event, make it async and remove ReplyToHandler
-    return Event.builder(child(event.getContext(), ofNullable(getLocation()), true), event)
+    return Event
+        .builder(fireAndForgetChild(event.getContext(), ofNullable(getLocation())), event)
         .replyToHandler(null)
         .session(new DefaultMuleSession(event.getSession())).build();
   }
@@ -170,9 +162,4 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
     return singletonList(delegate);
   }
 
-  @Override
-  public void setMessagingExceptionHandler(MessagingExceptionHandler messagingExceptionHandler) {
-    this.messagingExceptionHandler = messagingExceptionHandler;
-    delegate.setMessagingExceptionHandler(messagingExceptionHandler);
-  }
 }

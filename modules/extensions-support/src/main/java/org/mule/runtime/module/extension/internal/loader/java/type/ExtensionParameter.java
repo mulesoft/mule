@@ -10,19 +10,20 @@ package org.mule.runtime.module.extension.internal.loader.java.type;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.assignableFromAny;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.extension.api.runtime.source.SourceCompletionCallback;
-import org.mule.runtime.extension.api.runtime.source.SourceResult;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.runtime.operation.FlowListener;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
+import org.mule.runtime.extension.api.runtime.source.SourceCompletionCallback;
+import org.mule.runtime.extension.api.runtime.source.SourceResult;
 import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.runtime.extension.api.security.AuthenticationHandler;
 
@@ -48,6 +49,7 @@ public interface ExtensionParameter extends WithType, WithAnnotations, NamedObje
       .add(FlowListener.class)
       .add(StreamingHelper.class)
       .add(SourceResult.class)
+      .add(ComponentLocation.class)
       .build();
 
   /**

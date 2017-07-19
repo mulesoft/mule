@@ -12,11 +12,13 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.rx.Exceptions.wrapFatal;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.COMPLETION_CALLBACK_CONTEXT_PARAM;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.justOrEmpty;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -24,6 +26,8 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
+import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
+import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.execution.OperationArgumentResolverFactory;
 import org.mule.runtime.module.extension.internal.runtime.execution.ReflectiveMethodComponentExecutor;
 
@@ -57,13 +61,27 @@ public final class ReflectiveMethodOperationExecutor
    */
   @Override
   public Publisher<Object> execute(ExecutionContext<OperationModel> executionContext) {
+    ExecutionContextAdapter<OperationModel> contextAdapter = (ExecutionContextAdapter<OperationModel>) executionContext;
     try {
       return justOrEmpty(executor.execute(executionContext));
     } catch (Exception e) {
-      return error(e);
+      return handleError(e, contextAdapter);
     } catch (Throwable t) {
-      return error(wrapFatal(t));
+      return handleError(wrapFatal(t), contextAdapter);
     }
+  }
+
+  private Publisher<Object> handleError(Throwable t, ExecutionContextAdapter<OperationModel> executionContext) {
+    CompletionCallback completionCallback = executionContext.getVariable(COMPLETION_CALLBACK_CONTEXT_PARAM);
+    if (completionCallback != null) {
+      if (t instanceof Exception) {
+        completionCallback.error((Exception) t);
+      } else {
+        completionCallback.error(new MuleRuntimeException(t));
+      }
+    }
+
+    return error(t);
   }
 
   @Override

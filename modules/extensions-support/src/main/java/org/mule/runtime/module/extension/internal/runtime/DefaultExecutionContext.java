@@ -11,16 +11,18 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.transaction.TransactionConfig;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
+import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
 import org.mule.runtime.extension.internal.property.TransactionalActionModelProperty;
@@ -51,6 +53,8 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
   private final CursorProviderFactory cursorProviderFactory;
   private final StreamingManager streamingManager;
   private final LazyValue<Optional<TransactionConfig>> transactionConfig;
+  private final FlowConstruct flowConstruct;
+  private final ComponentLocation location;
 
   /**
    * Creates a new instance with the given state
@@ -61,6 +65,8 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
    * @param event                 the current {@link Event}
    * @param cursorProviderFactory the {@link CursorProviderFactory} that was configured on the executed component
    * @param streamingManager      the application's {@link StreamingManager}
+   * @param flowConstruct                  the {@link FlowConstruct} which owns the executing component
+   * @param location              the {@link ComponentLocation location} of the executing component
    * @param muleContext           the current {@link MuleContext}
    */
   public DefaultExecutionContext(ExtensionModel extensionModel,
@@ -70,6 +76,8 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
                                  Event event,
                                  CursorProviderFactory cursorProviderFactory,
                                  StreamingManager streamingManager,
+                                 FlowConstruct flowConstruct,
+                                 ComponentLocation location,
                                  MuleContext muleContext) {
 
     this.extensionModel = extensionModel;
@@ -80,6 +88,8 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
     this.cursorProviderFactory = cursorProviderFactory;
     this.streamingManager = streamingManager;
     this.muleContext = muleContext;
+    this.flowConstruct = flowConstruct;
+    this.location = location;
     transactionConfig = new LazyValue<>(() -> componentModel.isTransactional() ? of(buildTransactionConfig()) : empty());
   }
 
@@ -192,6 +202,19 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
   @Override
   public StreamingManager getStreamingManager() {
     return streamingManager;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public FlowConstruct getFlowConstruct() {
+    return flowConstruct;
+  }
+
+  @Override
+  public ComponentLocation getComponentLocation() {
+    return location;
   }
 
   private TransactionConfig buildTransactionConfig() {

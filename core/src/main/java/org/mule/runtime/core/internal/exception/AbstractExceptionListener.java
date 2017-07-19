@@ -101,7 +101,6 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
   protected void doInitialise(MuleContext context) throws InitialisationException {
     requireNonNull(muleContext);
     logger.info("Initialising exception listener: " + toString());
-    super.setMessagingExceptionHandler(new MessagingExceptionHandlerToSystemAdapter(muleContext));
   }
 
   protected void fireNotification(Exception ex, Event event) {
@@ -178,11 +177,6 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
   @Override
   protected List<Processor> getOwnedMessageProcessors() {
     return messageProcessors;
-  }
-
-  @Override
-  public void setMessagingExceptionHandler(MessagingExceptionHandler messagingExceptionHandler) {
-    return;
   }
 
   protected void commit() {
