@@ -49,9 +49,7 @@ public class FlowProcessingStrategyTestCase extends AbstractMuleTestCase {
   private MuleConfiguration configuration;
 
   private Flow flow;
-
-
-
+  
   @Before
   public void before() throws RegistrationException {
     when(muleContext.getConfiguration()).thenReturn(configuration);
