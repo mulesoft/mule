@@ -25,7 +25,6 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.connector.ConnectException;
 import org.mule.runtime.core.api.construct.Pipeline;
@@ -115,9 +114,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
   /**
    * A fallback method for creating a {@link ProcessingStrategyFactory} to be used in case the user hasn't specified one through
-   * either {@link #setProcessingStrategyFactory(ProcessingStrategyFactory)}, through
-   * {@link MuleConfiguration#getDefaultProcessingStrategyFactory()} or the
-   * {@link MuleProperties#MULE_DEFAULT_PROCESSING_STRATEGY} system property
+   * either , through {@link MuleConfiguration#getDefaultProcessingStrategyFactory()} or the
+   * {@link ProcessingStrategyFactory} class name system property
    *
    * @return a {@link DirectProcessingStrategyFactory}
    */
@@ -128,7 +126,6 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   private ProcessingStrategyFactory defaultProcessingStrategy() {
     final ProcessingStrategyFactory defaultProcessingStrategyFactory =
         getMuleContext().getConfiguration().getDefaultProcessingStrategyFactory();
-
     if (defaultProcessingStrategyFactory == null) {
       return createDefaultProcessingStrategyFactory();
     } else {

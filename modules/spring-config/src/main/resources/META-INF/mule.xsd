@@ -93,7 +93,6 @@
             <xsd:element ref="processor-chain"/>
             <xsd:element ref="top-level-processor"/>
             <xsd:element ref="abstract-global-intercepting-message-processor"/>
-            <xsd:element ref="abstract-processing-strategy" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:choice>
     </xsd:group>
 
@@ -1014,13 +1013,6 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="defaultProcessingStrategy" type="flowProcessingStrategyType" use="optional">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The default processing strategy to use in all flows which don't specify otherwise
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -1517,37 +1509,6 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:simpleType name="flowProcessingStrategyType">
-        <xsd:union>
-            <xsd:simpleType>
-                <xsd:restriction base="xsd:string">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The name of a globally configured processing strategy
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:restriction>
-            </xsd:simpleType>
-            <xsd:simpleType>
-                <xsd:restriction base="xsd:NMTOKEN">
-                    <xsd:enumeration value="default">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                This processing strategy uses the 'asynchronous' strategy where possible, but if an event is synchronous it processes it synchronously rather than failing.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="synchronous">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                Processes all message processors in the calling thread, waiting for any IO operations (e.g. http request) before continuing processing.  This is also known as 'blocking'.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:enumeration>
-                </xsd:restriction>
-            </xsd:simpleType>
-        </xsd:union>
-    </xsd:simpleType>
     <xsd:complexType name="flowType">
         <xsd:complexContent>
             <xsd:extension base="annotatedType">
@@ -1581,17 +1542,6 @@
                     <xsd:annotation>
                         <xsd:documentation>
                             The name used to identify this flow construct.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                 <xsd:attribute name="processingStrategy" use="optional" type="flowProcessingStrategyType">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Strategy used to process the configured message processors when exchange pattern is 'one-way'.
-                            This attribute accepts either one of the enumerated strategies with default configuration options or a reference to a globally defined strategy.
-                            If not specified, it will be taken from the defaultProcessingStrategy attribute of the &lt;configuration&gt; element. If that one
-                            is not defined either, then the mule.default.processing.strategy system property will be checked. If that's not setup
-                            either, then the value 'default' will be used
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -1629,53 +1579,6 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <!--  Processing Strategies -->
-    
-    <xsd:element name="abstract-processing-strategy" type="processingStrategyType" abstract="true">
-        <xsd:annotation>
-            <xsd:documentation>
-                The processing strategy to be used for processing a pipeline of message processors (e.g. in a Flow)
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="processingStrategyType">
-        <xsd:complexContent>
-            <xsd:extension base="annotatedType">
-                <xsd:attribute name="name" type="nonBlankString" use="required">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The name used to identify the processing strategy.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-    
-    <xsd:element name="custom-processing-strategy" type="customProcessingStrategy" substitutionGroup="abstract-processing-strategy">
-        <xsd:annotation>
-            <xsd:documentation>
-                Allows for the configuration of a custom processing strategy.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="customProcessingStrategy">
-        <xsd:complexContent>
-            <xsd:extension base="processingStrategyType">
-                <xsd:sequence>
-                    <xsd:group ref="propertiesGroup"/>
-                </xsd:sequence>
-                <xsd:attribute name="class" type="substitutableClass" use="required">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Custom processing strategy factory fully qualified class name.  Custom processing strategy factories should implement 'org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory'.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-    
     <xsd:element name="flow-ref" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>

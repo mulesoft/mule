@@ -9,20 +9,25 @@ package org.mule.runtime.core.construct;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.Flow.Builder;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.processor.strategy.AbstractProcessingStrategy;
+import org.mule.runtime.core.processor.strategy.AbstractProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.TransactionAwareWorkQueueProcessingStrategyFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -93,6 +98,32 @@ public class FlowProcessingStrategyTestCase extends AbstractMuleTestCase {
     assertThat(flow.getProcessingStrategy(),
                is(instanceOf(new TransactionAwareWorkQueueProcessingStrategyFactory().getProcessingStrategyType())));
   }
+
+  @Test
+  public void processingStrategySetBySystemPropertyOverridesDefault() throws Exception {
+    testWithSystemProperty(ProcessingStrategyFactory.class.getName(),
+                           TestProcessingStrategyFactory.class.getName(), () -> {
+                             MuleConfiguration muleConfiguration = new DefaultMuleConfiguration();
+                             when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
+                             createFlow(null);
+                             assertEquals(flow.getProcessingStrategy().getClass(), TestProcessingStrategy.class);
+                           });
+  }
+
+
+  public static class TestProcessingStrategyFactory extends AbstractProcessingStrategyFactory {
+
+    public TestProcessingStrategyFactory() {}
+
+    @Override
+    public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
+      return new TestProcessingStrategy();
+    }
+  }
+
+  private static class TestProcessingStrategy extends AbstractProcessingStrategy {
+  }
+
 
   private void createFlow(ProcessingStrategyFactory configProcessingStrategyFactory) {
     Builder flowBuilder = builder("test", muleContext);

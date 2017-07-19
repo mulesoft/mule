@@ -7,6 +7,8 @@
 package org.mule.runtime.core.api.config;
 
 import static java.lang.String.format;
+import static java.lang.System.getProperty;
+import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
 import static org.mule.runtime.core.internal.util.StandaloneServerUtils.getMuleBase;
 import static org.mule.runtime.core.internal.util.StandaloneServerUtils.getMuleHome;
 
@@ -41,6 +43,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Configuration info. which can be set when creating the MuleContext but becomes immutable after starting the MuleContext.
+ * TODO MULE-13121 Cleanup MuleConfiguration removing redundant config in Mule 4
  */
 public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextAware {
 
@@ -218,61 +221,70 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
   protected void applySystemProperties() {
     String p;
 
-    p = System.getProperty(MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY);
+    p = getProperty(MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY);
     if (p != null) {
       encoding = p;
     } else {
       System.setProperty(MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY, encoding);
     }
-    p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "endpoints.synchronous");
+    p = getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "endpoints.synchronous");
     if (p != null) {
       synchronous = BooleanUtils.toBoolean(p);
     }
-    p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "systemModelType");
+    p = getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "systemModelType");
     if (p != null) {
       systemModelType = p;
     }
-    p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "workingDirectory");
+    p = getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "workingDirectory");
     if (p != null) {
       workingDirectory = p;
     }
-    p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "clientMode");
+    p = getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "clientMode");
     if (p != null) {
       clientMode = BooleanUtils.toBoolean(p);
     }
-    p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "serverId");
+    p = getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "serverId");
     if (p != null) {
       id = p;
     }
-    p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "domainId");
+    p = getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "domainId");
     if (p != null) {
       domainId = p;
     }
-    p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "message.cacheBytes");
+    p = getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "message.cacheBytes");
     if (p != null) {
       cacheMessageAsBytes = BooleanUtils.toBoolean(p);
     }
-    p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "streaming.enable");
+    p = getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "streaming.enable");
     if (p != null) {
       enableStreaming = BooleanUtils.toBoolean(p);
     }
-    p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "transform.autoWrap");
+    p = getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "transform.autoWrap");
     if (p != null) {
       autoWrapMessageAwareTransform = BooleanUtils.toBoolean(p);
     }
-    p = System.getProperty(MuleProperties.MULE_FLOW_TRACE);
+    p = getProperty(MuleProperties.MULE_FLOW_TRACE);
     if (p != null) {
       flowTrace = BooleanUtils.toBoolean(p);
     }
 
-    p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "validate.expressions");
+    p = getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "validate.expressions");
     if (p != null) {
       validateExpressions = Boolean.valueOf(p);
     }
 
-    p = System.getProperty(MuleProperties.MULE_DISABLE_RESPONSE_TIMEOUT);
+    p = getProperty(MuleProperties.MULE_DISABLE_RESPONSE_TIMEOUT);
     if (p != null) {
       disableTimeouts = Boolean.valueOf(p);
+    }
+    try {
+      String name = ProcessingStrategyFactory.class.getName();
+      p = getProperty(ProcessingStrategyFactory.class.getName());
+      if (p != null) {
+        defaultProcessingStrategyFactory = (ProcessingStrategyFactory) instantiateClass(p);
+      }
+    } catch (Throwable e) {
+      logger.warn("Unable to instantiate ProcessingStrategyFactory '" + p + "', default will be used instead.");
     }
   }
 
