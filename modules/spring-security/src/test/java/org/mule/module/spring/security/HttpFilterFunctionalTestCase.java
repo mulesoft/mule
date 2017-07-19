@@ -8,7 +8,6 @@ package org.mule.module.spring.security;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConstants;
@@ -87,7 +86,7 @@ public class HttpFilterFunctionalTestCase extends FunctionalTestCase
         doRequest(null, "localhost", "anonX", "anonX", getUrl(), false, 401);
     }
 
-    @Ignore // TODO Realm validataion seems to be completely ignored
+    @Ignore // TODO Realm validation seems to be completely ignored
     @Test
     public void testAuthenticationFailureBadRealm() throws Exception
     {
@@ -106,7 +105,7 @@ public class HttpFilterFunctionalTestCase extends FunctionalTestCase
         doRequest(null, "localhost", "anon", "anon", getUrl(), true, 200);
     }
 
-    @Ignore // TODO Realm validataion seems to be completely ignored
+    @Ignore // TODO Realm validation seems to be completely ignored
     @Test
     public void testAuthenticationAuthorisedWithHandshakeAndBadRealm() throws Exception
     {

@@ -79,6 +79,30 @@ public class AuthorizationFilterTestCase extends FunctionalTestCase
         doRequest(null, "localhost", "ross", "ross", getUrl(), false, 200);
     }
 
+    @Test
+    public void testAuthorizedAny() throws Exception
+    {
+        doRequest("mule-realm", "localhost", "max", "max", getUrl() + "any", false, 200);
+    }
+
+    @Test
+    public void testNotAuthorizedAny() throws Exception
+    {
+        doRequest("mule-realm", "localhost", "anon", "anon", getUrl() + "any", false, 403);
+    }
+
+    @Test
+    public void testAuthorizedAll() throws Exception
+    {
+        doRequest("mule-realm", "localhost", "ubermax", "ubermax", getUrl() + "all", false, 200);
+    }
+
+    @Test
+    public void testNotAuthorizedAll() throws Exception
+    {
+        doRequest("mule-realm", "localhost", "max", "max", getUrl() + "all", false, 403);
+    }
+
     protected String getUrl()
     {
         return "http://localhost:" + port1.getNumber() + "/authorize";
