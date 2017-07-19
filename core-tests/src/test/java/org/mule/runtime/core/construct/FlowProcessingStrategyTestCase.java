@@ -125,11 +125,6 @@ public class FlowProcessingStrategyTestCase extends AbstractMuleTestCase {
   }
 
   private static class TestProcessingStrategy extends AbstractProcessingStrategy {
-
-    @Override
-    public Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor pipeline) {
-      return null;
-    }
   }
 
 
