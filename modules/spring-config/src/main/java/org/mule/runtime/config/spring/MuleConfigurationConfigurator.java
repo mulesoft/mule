@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.config.spring;
 
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_DEFAULT_PROCESSING_STRATEGY;
-import static org.mule.runtime.core.internal.util.ProcessingStrategyUtils.parseProcessingStrategy;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.DefaultMuleContext;
@@ -18,7 +16,6 @@ import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
-import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.api.serialization.ObjectSerializer;
@@ -26,7 +23,6 @@ import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
 
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.SmartFactoryBean;
@@ -60,17 +56,6 @@ public class MuleConfigurationConfigurator extends AbstractAnnotatedObjectFactor
   @Override
   public boolean isPrototype() {
     return false;
-  }
-
-  private void determineDefaultProcessingStrategy(DefaultMuleConfiguration defaultConfig) {
-    if (config.getDefaultProcessingStrategyFactory() != null) {
-      defaultConfig.setDefaultProcessingStrategyFactory(config.getDefaultProcessingStrategyFactory());
-    } else {
-      String processingStrategyFromSystemProperty = System.getProperty(MULE_DEFAULT_PROCESSING_STRATEGY);
-      if (!StringUtils.isBlank(processingStrategyFromSystemProperty)) {
-        defaultConfig.setDefaultProcessingStrategyFactory(parseProcessingStrategy(processingStrategyFromSystemProperty));
-      }
-    }
   }
 
   private void validateDefaultErrorHandler() {
@@ -137,10 +122,6 @@ public class MuleConfigurationConfigurator extends AbstractAnnotatedObjectFactor
     config.setDefaultObjectSerializer(objectSerializer);
   }
 
-  public void setDefaultProcessingStrategy(ProcessingStrategyFactory processingStrategyFactory) {
-    config.setDefaultProcessingStrategyFactory(processingStrategyFactory);
-  }
-
   public void setMaxQueueTransactionFilesSize(int queueTransactionFilesSizeInMegabytes) {
     config.setMaxQueueTransactionFilesSize(queueTransactionFilesSizeInMegabytes);
   }
@@ -160,7 +141,6 @@ public class MuleConfigurationConfigurator extends AbstractAnnotatedObjectFactor
       defaultConfig.setDefaultErrorHandlerName(config.getDefaultErrorHandlerName());
       defaultConfig.addExtensions(config.getExtensions());
       defaultConfig.setMaxQueueTransactionFilesSize(config.getMaxQueueTransactionFilesSizeInMegabytes());
-      determineDefaultProcessingStrategy(defaultConfig);
       validateDefaultErrorHandler();
       applyDefaultIfNoObjectSerializerSet(defaultConfig);
 
