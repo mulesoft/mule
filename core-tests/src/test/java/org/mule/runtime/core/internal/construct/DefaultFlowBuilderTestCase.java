@@ -66,7 +66,7 @@ public class DefaultFlowBuilderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void buildsSimpleFlow() throws Exception {
-    Flow flow = flowBuilder.processingStrategyFactory(defaultProcessingStrategyFactory).build();
+    Flow flow = flowBuilder.build();
     assertThat(flow.getName(), equalTo(FLOW_NAME));
     assertThat(flow.getMuleContext(), is(muleContext));
     assertThat(flow.getProcessors(), is(empty()));
