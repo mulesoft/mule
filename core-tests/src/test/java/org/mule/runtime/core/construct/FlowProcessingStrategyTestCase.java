@@ -102,23 +102,23 @@ public class FlowProcessingStrategyTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void processingStrategySetBySystemPropertyOverridesDefault() throws  Exception {
-    System.setProperty("org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory",TestProcessingStrategyFactory.class.getName());
+  public void processingStrategySetBySystemPropertyOverridesDefault() throws Exception {
+    System.setProperty("org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory",
+                       TestProcessingStrategyFactory.class.getName());
     MuleConfiguration muleConfiguration = new DefaultMuleConfiguration();
     when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
     createFlow(null);
-    assertEquals(flow.getProcessingStrategy().getClass(),TestProcessingStrategy.class);
+    assertEquals(flow.getProcessingStrategy().getClass(), TestProcessingStrategy.class);
 
   }
 
 
-  public static class TestProcessingStrategyFactory implements  ProcessingStrategyFactory {
+  public static class TestProcessingStrategyFactory implements ProcessingStrategyFactory {
 
     public TestProcessingStrategyFactory() {}
 
     @Override
-    public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix)
-    {
+    public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
       return new TestProcessingStrategy();
     }
   }
@@ -126,8 +126,7 @@ public class FlowProcessingStrategyTestCase extends AbstractMuleTestCase {
   private static class TestProcessingStrategy implements ProcessingStrategy {
 
     @Override
-    public Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor pipeline)
-    {
+    public Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor pipeline) {
       return null;
     }
   }
