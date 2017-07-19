@@ -27,7 +27,7 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public class SimpleTypeBeanDefinitionCreator extends BeanDefinitionCreator {
+class SimpleTypeBeanDefinitionCreator extends BeanDefinitionCreator {
 
   @Override
   boolean handleRequest(CreateBeanDefinitionRequest createBeanDefinitionRequest) {

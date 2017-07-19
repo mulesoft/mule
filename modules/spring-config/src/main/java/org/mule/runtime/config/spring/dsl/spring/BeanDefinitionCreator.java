@@ -7,8 +7,9 @@
 package org.mule.runtime.config.spring.dsl.spring;
 
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
-import org.mule.runtime.dsl.api.component.TypeConverter;
+
 import org.mule.runtime.config.spring.factories.ConstantFactoryBean;
+import org.mule.runtime.dsl.api.component.TypeConverter;
 
 import java.util.Optional;
 

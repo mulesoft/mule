@@ -90,13 +90,8 @@
             <xsd:element ref="abstract-flow-construct" />
             <xsd:element ref="flow" />
             <xsd:element ref="sub-flow" />
-            <xsd:element ref="abstract-filter"/>
-            <xsd:element ref="abstract-transformer"/>
             <xsd:element ref="processor-chain"/>
-            <xsd:element ref="custom-processor"/>
-            <xsd:element ref="abstract-empty-processor"/>
-            <xsd:element ref="invoke"/>
-            <xsd:element ref="set-payload"/>
+            <xsd:element ref="top-level-processor"/>
             <xsd:element ref="abstract-global-intercepting-message-processor"/>
             <xsd:element ref="abstract-processing-strategy" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:choice>
@@ -379,10 +374,24 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="custom-processor" type="customMessageProcessorType" substitutionGroup="abstract-message-processor"/>
-    <xsd:complexType name="customMessageProcessorType">
+    <xsd:element name="top-level-processor" abstract="true" type="topLevelProcessorType" substitutionGroup="abstract-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                A placeholder for processors that can be defined as top level elements and referenced in flows.
+            </xsd:documentation>
+        </xsd:annotation>
+        </xsd:element>
+    <xsd:complexType name="topLevelProcessorType">
         <xsd:complexContent>
             <xsd:extension base="abstractMessageProcessorType">
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="custom-processor" type="customMessageProcessorType" substitutionGroup="top-level-processor"/>
+    <xsd:complexType name="customMessageProcessorType">
+        <xsd:complexContent>
+            <xsd:extension base="topLevelProcessorType">
                 <xsd:sequence>
                     <xsd:group ref="propertiesGroup"/>
                 </xsd:sequence>
@@ -395,13 +404,6 @@
                 </xsd:attribute>
                 <xsd:attribute name="class" type="substitutableClass" use="required"/>
             </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="abstract-empty-processor" type="abstractEmptyMessageProcessorType" substitutionGroup="abstract-message-processor"/>
-    <xsd:complexType name="abstractEmptyMessageProcessorType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractMessageProcessorType"/>
         </xsd:complexContent>
     </xsd:complexType>
 
@@ -508,7 +510,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="invoke" type="invokeType" substitutionGroup="abstract-message-processor">
+    <xsd:element name="invoke" type="invokeType" substitutionGroup="top-level-processor">
         <xsd:annotation>
             <xsd:documentation>
                 Invokes the method of a given object using method arguments expressed using mule expressions.
@@ -517,7 +519,7 @@
     </xsd:element>
     <xsd:complexType name="invokeType">
         <xsd:complexContent>
-            <xsd:extension base="abstractMessageProcessorType">
+            <xsd:extension base="topLevelProcessorType">
                 <xsd:attribute name="object-ref" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -809,12 +811,12 @@
 
     <xsd:complexType name="commonTransformerType">
         <xsd:complexContent>
-            <xsd:extension base="abstractMessageProcessorType">
+            <xsd:extension base="topLevelProcessorType">
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="abstract-transformer" abstract="true" type="commonTransformerType" substitutionGroup="abstract-message-processor">
+    <xsd:element name="abstract-transformer" abstract="true" type="commonTransformerType" substitutionGroup="top-level-processor">
         <xsd:annotation>
             <xsd:documentation>
                 A placeholder for transformer elements. Transformers convert message payloads.
@@ -877,35 +879,6 @@
                     <xsd:annotation>
                         <xsd:documentation>
                             The value of the property. This replaces each occurence of a Spring placeholder.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="abstract-filter" abstract="true" type="commonFilterType" substitutionGroup="abstract-message-processor">
-        <xsd:annotation>
-            <xsd:documentation>
-                A placeholder for filter elements, which control which messages are handled.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
-    <xsd:complexType name="commonFilterType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractMessageProcessorType">
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:complexType name="abstractFilterType">
-        <xsd:complexContent>
-            <xsd:extension base="commonFilterType">
-                <xsd:attribute name="name" type="substitutableName">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Identifies the filter so that other elements can reference it. Required if the filter is defined at the global level.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -1988,246 +1961,6 @@
     </xsd:complexType>
 
     <!--==============================================================-->
-    <!--   Filter elements                                            -->
-    <!--==============================================================-->
-
-    <xsd:element name="filter" type="refFilterType" substitutionGroup="abstract-filter">
-        <xsd:annotation>
-            <xsd:documentation>
-                A filter that is defined elsewhere (at the global level, or as a Spring bean).
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="refFilterType">
-        <xsd:complexContent>
-            <xsd:extension base="commonFilterType">
-                <xsd:attribute name="ref" type="xsd:string" use="required">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The name of the filter to use.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="not-filter" type="unitaryFilterType" substitutionGroup="abstract-filter">
-        <xsd:annotation>
-            <xsd:documentation>
-                Inverts the enclosed filter. For example, if the filter would normally return true for a specific message, it will now return false, and vice versa.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="unitaryFilterType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractFilterType">
-                <xsd:sequence>
-                    <xsd:element ref="abstract-filter"/>
-                </xsd:sequence>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="and-filter" type="collectionFilterType" substitutionGroup="abstract-filter">
-        <xsd:annotation>
-            <xsd:documentation>
-                Returns true only if all the enclosed filters return true.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:element name="or-filter" type="collectionFilterType" substitutionGroup="abstract-filter">
-        <xsd:annotation>
-            <xsd:documentation>
-                Returns true if any of the enclosed filters returns true.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="collectionFilterType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractFilterType">
-                <xsd:sequence>
-                    <xsd:element ref="abstract-filter" minOccurs="2" maxOccurs="unbounded"/>
-                </xsd:sequence>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="wildcard-filter" type="wildcardFilterType" substitutionGroup="abstract-filter">
-        <xsd:annotation>
-            <xsd:documentation>
-                A filter that matches string messages against wildcards. It performs matches with "*", for example, "jms.events.*" would catch "jms.events.customer" and "jms.events.receipts". This filter accepts a comma-separated list of patterns, so more than one filter pattern can be matched for a given argument: "jms.events.*, jms.actions.*" will match "jms.events.system" and "jms.actions" but not "jms.queue".
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="wildcardFilterType">
-        <xsd:complexContent>
-            <xsd:extension base="caseSensitivePatternFilterType"/>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="expression-filter" type="expressionFilterType" substitutionGroup="abstract-filter">
-        <xsd:annotation>
-            <xsd:documentation>
-                A filter that can evaluate a range of expressions. It supports some base expression types such as header, payload (payload type), regex, and wildcard.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="expressionFilterType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractFilterType">
-                <xsd:attribute name="expression" type="xsd:string" use="required">
-                    <xsd:annotation>
-                        <xsd:documentation>The expression that will be evaluated. This should always be a boolean expression. The syntax of the expression will be determined by the expression language being used.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="nullReturnsTrue" type="substitutableBoolean">
-                    <xsd:annotation>
-                        <xsd:documentation>Whether the filter should return true if the specified expression returns null.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-
-    <xsd:element name="regex-filter" type="regexFilterType" substitutionGroup="abstract-filter">
-        <xsd:annotation>
-            <xsd:documentation>
-                A filter that matches string messages against a regular expression. The Java regular expression engine (java.util.regex.Pattern) is used.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="regexFilterType">
-        <xsd:complexContent>
-            <xsd:extension base="patternFilterType">
-                <xsd:attribute name="flags" type="xsd:string" use="optional">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Comma-separated list of flags for compiling the pattern. Valid values are CASE_INSENSITIVE, MULTILINE, DOTALL, UNICODE_CASE and CANON_EQ.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-    <xsd:complexType name="patternFilterType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractFilterType">
-                <xsd:attribute name="pattern" type="xsd:string" use="required">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The property name and optionally a value to use when matching. If the expression is just a property name, the filter will check that the property exists. Users can also use '=' and '!=' to determine a specific value for a property.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="value" type="xsd:string" use="optional">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Value to validate.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="message-property-filter" type="scopedPropertyFilterType"
-                 substitutionGroup="abstract-filter">
-        <xsd:annotation>
-            <xsd:documentation>
-                A filter that matches properties on a message. This can be very useful, as the message properties represent all the meta information about the message from the underlying transport, so for a message received over HTTP, you can check for HTTP headers and so forth. The pattern should be expressed as a key/value pair, such as "propertyName=value". If you want to compare more than one property, you can use the logic filters for And, Or, and Not expressions. By default, the comparison is case sensitive, which you can override with the 'caseSensitive' property.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="scopedPropertyFilterType">
-        <xsd:complexContent>
-            <xsd:extension base="caseSensitivePatternFilterType">
-                <xsd:attribute name="scope" default="outbound">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Property scope to lookup the value from (default: outbound)
-                        </xsd:documentation>
-                    </xsd:annotation>
-                    <xsd:simpleType>
-                        <xsd:restriction base="xsd:NMTOKEN">
-                            <xsd:enumeration value="inbound"/>
-                            <xsd:enumeration value="outbound"/>
-                        </xsd:restriction>
-                    </xsd:simpleType>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-    <xsd:complexType name="caseSensitivePatternFilterType">
-        <xsd:complexContent>
-            <xsd:extension base="patternFilterType">
-                <xsd:attribute name="caseSensitive" type="substitutableBoolean" default="true">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            If false, the comparison ignores case.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="exception-type-filter" type="typeFilterType" substitutionGroup="abstract-filter">
-        <xsd:annotation>
-            <xsd:documentation>
-                A filter that matches the type of an exception.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:element name="payload-type-filter" type="typeFilterType" substitutionGroup="abstract-filter">
-        <xsd:annotation>
-            <xsd:documentation>
-                A filter that matches the type of the payload.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="typeFilterType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractFilterType">
-                <xsd:attribute name="expectedType" type="substitutableClass" use="required">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The expected class used in the comparison.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="custom-filter" type="customFilterType" substitutionGroup="abstract-filter">
-        <xsd:annotation>
-            <xsd:documentation>
-                A user-implemented filter.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="customFilterType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractFilterType">
-                <xsd:sequence>
-                    <xsd:group ref="propertiesGroup"/>
-                </xsd:sequence>
-                <xsd:attribute name="class" type="substitutableClass">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            An implementation of the Filter interface.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <!--==============================================================-->
     <!--   Interceptor elements                                       -->
     <!--==============================================================-->
 
@@ -2646,17 +2379,17 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="set-payload" type="setPayloadTransformerType" substitutionGroup="abstract-message-processor">
+    <xsd:element name="set-payload" type="setPayloadTransformerType" substitutionGroup="top-level-processor">
         <xsd:annotation>
             <xsd:documentation>
-                A transformer that sets the paylaod with the provided value
+                A transformer that sets the payload with the provided value
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
 
     <xsd:complexType name="setPayloadTransformerType">
         <xsd:complexContent>
-            <xsd:extension base="abstractMessageProcessorType">
+            <xsd:extension base="topLevelProcessorType">
                 <xsd:attributeGroup ref="mimeTypeAttributes">
                     <xsd:annotation>
                         <xsd:documentation>

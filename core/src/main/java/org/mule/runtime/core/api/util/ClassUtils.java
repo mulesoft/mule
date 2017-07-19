@@ -11,8 +11,8 @@ import static org.apache.commons.lang3.ClassUtils.primitiveToWrapper;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.ExceptionUtils.tryExpecting;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.routing.filters.WildcardFilter;
 
 import com.google.common.primitives.Primitives;
 
@@ -31,8 +31,6 @@ import java.net.URL;
 import java.security.AccessController;
 import java.security.CodeSource;
 import java.security.PrivilegedAction;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -493,61 +491,6 @@ public class ClassUtils {
   }
 
   /**
-   * A helper method that will find all matching methods on a class with the given parameter type
-   *
-   * @param implementation the class to build methods on
-   * @param parameterTypes the argument param types to look for
-   * @param voidOk whether void methods shouldbe included in the found list
-   * @param matchOnObject determines whether parameters of Object type are matched when they are of Object.class type
-   * @param ignoredMethodNames a Set of method names to ignore. Often 'equals' is not a desired match. This argument can be null.
-   * @return a List of methods on the class that match the criteria. If there are none, an empty list is returned
-   */
-  public static List<Method> getSatisfiableMethods(Class<?> implementation, Class<?>[] parameterTypes, boolean voidOk,
-                                                   boolean matchOnObject, Set<String> ignoredMethodNames) {
-    return getSatisfiableMethods(implementation, parameterTypes, voidOk, matchOnObject, ignoredMethodNames, null);
-  }
-
-  /**
-   * A helper method that will find all matching methods on a class with the given parameter type
-   *
-   * @param implementation the class to build methods on
-   * @param parameterTypes the argument param types to look for
-   * @param voidOk whether void methods shouldbe included in the found list
-   * @param matchOnObject determines whether parameters of Object type are matched when they are of Object.class type
-   * @param ignoredMethodNames a Set of method names to ignore. Often 'equals' is not a desired match. This argument can be null.
-   * @param filter Wildcard expression filter that allows methods to be matched using wildcards i.e. 'get*'
-   * @return a List of methods on the class that match the criteria. If there are none, an empty list is returned
-   */
-  public static List<Method> getSatisfiableMethods(Class<?> implementation, Class<?>[] parameterTypes, boolean voidOk,
-                                                   boolean matchOnObject, Collection<String> ignoredMethodNames,
-                                                   WildcardFilter filter) {
-    List<Method> result = new ArrayList<>();
-
-    if (ignoredMethodNames == null) {
-      ignoredMethodNames = Collections.emptySet();
-    }
-
-    for (Method method : implementation.getMethods()) {
-      // supporting wildcards
-      if (filter != null && filter.accept(method.getName())) {
-        continue;
-      }
-      Class<?>[] methodParams = method.getParameterTypes();
-
-      if (compare(methodParams, parameterTypes, matchOnObject)) {
-        if (!ignoredMethodNames.contains(method.getName())) {
-          String returnType = method.getReturnType().getName();
-          if ((returnType.equals("void") && voidOk) || !returnType.equals("void")) {
-            result.add(method);
-          }
-        }
-      }
-    }
-
-    return result;
-  }
-
-  /**
    * Can be used by serice endpoints to select which service to use based on what's loaded on the classpath
    *
    * @param className The class name to look for
@@ -600,10 +543,6 @@ public class ClassUtils {
     }
     String name = clazz.getName();
     return name.substring(name.lastIndexOf(".") + 1);
-  }
-
-  public static boolean compare(Class[] c1, Class[] c2, boolean matchOnObject) {
-    return compare(c1, c2, matchOnObject, false);
   }
 
   /**

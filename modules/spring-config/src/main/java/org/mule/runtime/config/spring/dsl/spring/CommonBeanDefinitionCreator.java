@@ -8,13 +8,11 @@ package org.mule.runtime.config.spring.dsl.spring;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
+import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.beanutils.BeanUtils.copyProperty;
 import static org.mule.runtime.api.meta.AnnotatedObject.PROPERTY_NAME;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.ANNOTATIONS_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.CUSTOM_TRANSFORMER_IDENTIFIER;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.FILTER_ELEMENT_SUFFIX;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MESSAGE_FILTER_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_PROPERTIES_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_PROPERTY_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.from;
@@ -32,10 +30,8 @@ import org.mule.runtime.config.spring.dsl.processor.ObjectTypeVisitor;
 import org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler;
 import org.mule.runtime.config.spring.parsers.XmlMetadataAnnotations;
 import org.mule.runtime.core.api.execution.LocationExecutionContextProvider;
-import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.security.SecurityFilter;
 import org.mule.runtime.core.processor.SecurityFilterMessageProcessor;
-import org.mule.runtime.core.routing.MessageFilter;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 
 import com.google.common.collect.ImmutableSet;
@@ -46,7 +42,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import javax.xml.namespace.QName;
 
@@ -69,11 +64,6 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
 
   private static final String TRANSPORT_BEAN_DEFINITION_POST_PROCESSOR_CLASS =
       "org.mule.compatibility.config.spring.parsers.specific.TransportElementBeanDefinitionPostProcessor";
-  private static final ImmutableSet<ComponentIdentifier> MESSAGE_FILTER_WRAPPERS =
-      new ImmutableSet.Builder<ComponentIdentifier>()
-          .add(MESSAGE_FILTER_ELEMENT_IDENTIFIER)
-          .add(MULE_IDENTIFIER)
-          .build();
 
   private static Set<ComponentIdentifier> genericPropertiesCustomProcessingIdentifiers =
       ImmutableSet.<ComponentIdentifier>builder()
@@ -229,8 +219,8 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
           ComponentIdentifier childIdentifier = innerComponent.getIdentifier();
           return childIdentifier.equals(MULE_PROPERTY_IDENTIFIER);
         })
-        .collect(Collectors.toMap(springComponent -> getPropertyValueFromPropertyComponent(springComponent).getName(),
-                                  springComponent -> getPropertyValueFromPropertyComponent(springComponent).getValue()));
+        .collect(toMap(springComponent -> getPropertyValueFromPropertyComponent(springComponent).getName(),
+                       springComponent -> getPropertyValueFromPropertyComponent(springComponent).getValue()));
   }
 
   private void processComponentDefinitionModel(final ComponentModel parentComponentModel, final ComponentModel componentModel,
@@ -243,7 +233,7 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
       beanDefinitionBuilder.setScope(SPRING_PROTOTYPE_OBJECT);
     }
     AbstractBeanDefinition originalBeanDefinition = beanDefinitionBuilder.getBeanDefinition();
-    AbstractBeanDefinition wrappedBeanDefinition = adaptFilterBeanDefinitions(parentComponentModel, originalBeanDefinition);
+    AbstractBeanDefinition wrappedBeanDefinition = adaptBeanDefinition(parentComponentModel, originalBeanDefinition);
     if (originalBeanDefinition != wrappedBeanDefinition) {
       componentModel.setType(wrappedBeanDefinition.getBeanClass());
     }
@@ -289,23 +279,12 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
 
   }
 
-  public static AbstractBeanDefinition adaptFilterBeanDefinitions(ComponentModel parentComponentModel,
-                                                                  AbstractBeanDefinition originalBeanDefinition) {
-    // TODO this condition may be removed
-    if (originalBeanDefinition == null) {
-      return null;
-    }
-    if (!filterWrapperRequired(parentComponentModel)) {
-      return originalBeanDefinition;
-    }
+  private AbstractBeanDefinition adaptBeanDefinition(ComponentModel parentComponentModel,
+                                                     AbstractBeanDefinition originalBeanDefinition) {
     Class beanClass;
     if (originalBeanDefinition instanceof RootBeanDefinition) {
       beanClass = ((RootBeanDefinition) originalBeanDefinition).getBeanClass();
     } else {
-      // TODO see if this condition can be removed.
-      if (originalBeanDefinition.getBeanClassName() == null) {
-        return originalBeanDefinition;
-      }
       try {
         beanClass = originalBeanDefinition.getBeanClass();
       } catch (IllegalStateException e) {
@@ -316,25 +295,15 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
         }
       }
     }
+
     BeanDefinition newBeanDefinition;
-    if (areMatchingTypes(Filter.class, beanClass)) {
-      boolean failOnUnaccepted = false;
-      Object processorWhenUnaccepted = null;
-      newBeanDefinition =
-          BeanDefinitionBuilder.rootBeanDefinition(MessageFilter.class).addConstructorArgValue(originalBeanDefinition)
-              .addConstructorArgValue(failOnUnaccepted).addConstructorArgValue(processorWhenUnaccepted).getBeanDefinition();
-      return (AbstractBeanDefinition) newBeanDefinition;
-    } else if (areMatchingTypes(SecurityFilter.class, beanClass)) {
+    if (areMatchingTypes(SecurityFilter.class, beanClass)) {
       newBeanDefinition = BeanDefinitionBuilder.rootBeanDefinition(SecurityFilterMessageProcessor.class)
           .addPropertyValue("filter", originalBeanDefinition).getBeanDefinition();
       return (AbstractBeanDefinition) newBeanDefinition;
+    } else {
+      return beanDefinitionPostProcessor.adaptBeanDefinition(parentComponentModel, beanClass, originalBeanDefinition);
     }
-    return originalBeanDefinition;
-  }
-
-  private static boolean filterWrapperRequired(ComponentModel parentComponentModel) {
-    return !MESSAGE_FILTER_WRAPPERS.contains(parentComponentModel.getIdentifier())
-        && !parentComponentModel.getIdentifier().getName().endsWith(FILTER_ELEMENT_SUFFIX);
   }
 
   public static boolean areMatchingTypes(Class<?> superType, Class<?> childType) {
@@ -342,6 +311,11 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
   }
 
   public interface BeanDefinitionPostProcessor {
+
+    default AbstractBeanDefinition adaptBeanDefinition(ComponentModel parentComponentModel, Class beanClass,
+                                                       AbstractBeanDefinition originalBeanDefinition) {
+      return originalBeanDefinition;
+    }
 
     void postProcess(ComponentModel componentModel, AbstractBeanDefinition beanDefinition);
 

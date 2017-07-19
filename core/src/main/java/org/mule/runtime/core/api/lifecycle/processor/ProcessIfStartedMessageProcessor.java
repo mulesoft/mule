@@ -6,13 +6,14 @@
  */
 package org.mule.runtime.core.api.lifecycle.processor;
 
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.isStopped;
+
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.LifecycleException;
+import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.meta.NameableObject;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
-import org.mule.runtime.api.lifecycle.Startable;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.processor.AbstractFilteringMessageProcessor;
 
 public class ProcessIfStartedMessageProcessor extends AbstractFilteringMessageProcessor {
@@ -37,7 +38,7 @@ public class ProcessIfStartedMessageProcessor extends AbstractFilteringMessagePr
 
   @Override
   protected MuleException filterUnacceptedException(Event event) {
-    return new LifecycleException(CoreMessages.isStopped(getStartableName(startable)), event.getMessage());
+    return new LifecycleException(isStopped(getStartableName(startable)), event.getMessage());
   }
 
   protected String getStartableName(Startable startableObject) {

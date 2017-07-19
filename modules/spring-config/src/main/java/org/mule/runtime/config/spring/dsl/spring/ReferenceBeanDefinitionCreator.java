@@ -40,7 +40,7 @@ import org.springframework.beans.factory.config.RuntimeBeanReference;
  *
  * @since 4.0
  */
-public class ReferenceBeanDefinitionCreator extends BeanDefinitionCreator {
+class ReferenceBeanDefinitionCreator extends BeanDefinitionCreator {
 
   private static final String REF_ATTRIBUTE = "ref";
   private ImmutableMap<ComponentIdentifier, Consumer<CreateBeanDefinitionRequest>> referenceConsumers =

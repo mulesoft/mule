@@ -26,6 +26,7 @@ import static org.mule.runtime.core.api.config.MuleManifest.getVendorName;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.module.extension.internal.resources.MuleExtensionModelProvider.MULE_VERSION;
 import static org.mule.runtime.module.extension.internal.resources.MuleExtensionModelProvider.getExtensionModel;
+
 import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.model.MetadataType;
@@ -119,7 +120,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(coreExtensionModel.getExternalLibraryModels(), empty());
     assertThat(coreExtensionModel.getImportedTypes(), empty());
     assertThat(coreExtensionModel.getConfigurationModels(), empty());
-    assertThat(coreExtensionModel.getOperationModels(), hasSize(15));
+    assertThat(coreExtensionModel.getOperationModels(), hasSize(14));
     assertThat(coreExtensionModel.getConnectionProviders(), empty());
 
     assertThat(coreExtensionModel.getErrorModels(),
@@ -321,17 +322,6 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
 
     assertPayload(flowRefModel.getAllParameterModels().get(1));
     assertTarget(flowRefModel.getAllParameterModels().get(2));
-  }
-
-  @Test
-  public void filter() {
-    final OperationModel filterModel = coreExtensionModel.getOperationModel("filter").get();
-
-    assertOutputSameAsInput(filterModel);
-
-    assertThat(filterModel.getAllParameterModels(), hasSize(2));
-
-    assertPayload(filterModel.getAllParameterModels().get(1));
   }
 
   @Test

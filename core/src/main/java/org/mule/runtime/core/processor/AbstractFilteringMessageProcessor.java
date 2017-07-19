@@ -10,15 +10,14 @@ import static org.mule.runtime.core.api.processor.MessageProcessors.processToApp
 import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.routing.filter.FilterUnacceptedException;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
-import org.mule.runtime.core.api.exception.MessagingException;
 
 import org.reactivestreams.Publisher;
 
@@ -90,9 +89,7 @@ public abstract class AbstractFilteringMessageProcessor extends AbstractIntercep
     return new MessagingException(event, ex, this);
   }
 
-  protected MuleException filterUnacceptedException(Event event) {
-    return new FilterUnacceptedException(CoreMessages.messageRejectedByFilter());
-  }
+  protected abstract MuleException filterUnacceptedException(Event event);
 
   public void setUnacceptedMessageProcessor(Processor unacceptedMessageProcessor) {
     this.unacceptedMessageProcessor = unacceptedMessageProcessor;

@@ -28,12 +28,12 @@ import static org.mule.runtime.extension.api.util.NameUtils.pluralize;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.DOMAIN_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.EE_DOMAIN_PREFIX;
+
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.app.declaration.ElementDeclaration;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
-import org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
@@ -119,10 +119,7 @@ public class ApplicationModel {
   public static final String VALUE_ATTRIBUTE = "value";
   public static final String PROCESSOR_REFERENCE_ELEMENT = "processor";
   public static final String TRANSFORMER_REFERENCE_ELEMENT = "transformer";
-  public static final String FILTER_REFERENCE_ELEMENT = "filter";
-  public static final String MESSAGE_FILTER_ELEMENT = "message-filter";
   public static final String ANNOTATION_ELEMENT = "annotations";
-  public static final String FILTER_ELEMENT_SUFFIX = "-filter";
   public static final String PROCESSING_STRATEGY_ATTRIBUTE = "processingStrategy";
   public static final String PROCESSING_STRATEGY_FACTORY_ATTRIBUTE = "processingStrategyFactory";
   public static final String CONFIGURATION_ELEMENT = "configuration";
@@ -176,8 +173,6 @@ public class ApplicationModel {
       builder().withNamespace(CORE_PREFIX).withName(PROPERTIES_ELEMENT).build();
   public static final ComponentIdentifier ANNOTATIONS_ELEMENT_IDENTIFIER =
       builder().withNamespace(CORE_PREFIX).withName(ANNOTATION_ELEMENT).build();
-  public static final ComponentIdentifier MESSAGE_FILTER_ELEMENT_IDENTIFIER =
-      builder().withNamespace(CORE_PREFIX).withName(MESSAGE_FILTER_ELEMENT).build();
   public static final ComponentIdentifier PROCESSOR_IDENTIFIER =
       builder().withNamespace(CORE_PREFIX).withName(PROCESSOR_REFERENCE_ELEMENT).build();
   public static final ComponentIdentifier TRANSFORMER_IDENTIFIER =

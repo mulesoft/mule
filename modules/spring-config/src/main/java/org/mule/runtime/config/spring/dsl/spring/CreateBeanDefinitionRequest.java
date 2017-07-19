@@ -15,7 +15,7 @@ import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
  *
  * @since 4.0
  */
-class CreateBeanDefinitionRequest {
+public class CreateBeanDefinitionRequest {
 
   private final ComponentModel parentComponentModel;
   private final ComponentModel componentModel;

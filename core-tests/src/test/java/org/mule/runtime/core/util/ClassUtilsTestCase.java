@@ -7,6 +7,7 @@
 package org.mule.runtime.core.util;
 
 import static java.lang.Thread.currentThread;
+import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
@@ -19,8 +20,8 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
-import static org.mule.runtime.core.api.util.ClassUtils.getSatisfiableMethods;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -31,14 +32,10 @@ import org.mule.tck.testmodels.fruit.Fruit;
 import org.mule.tck.testmodels.fruit.FruitBowl;
 import org.mule.tck.testmodels.fruit.Kiwi;
 import org.mule.tck.testmodels.fruit.Orange;
-import org.mule.tck.testmodels.fruit.WaterMelon;
 
-import java.lang.reflect.Method;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.junit.Test;
@@ -48,7 +45,7 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase {
 
   // we do not want to match these methods when looking for a service method to
   // invoke
-  protected final Set<String> ignoreMethods = new HashSet<String>(Arrays.asList("equals", "getInvocationHandler"));
+  protected final Set<String> ignoreMethods = new HashSet<String>(asList("equals", "getInvocationHandler"));
 
   @Test
   public void testIsConcrete() throws Exception {
@@ -168,39 +165,6 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void testGetSatisfiableMethods() throws Exception {
-    List methods = getSatisfiableMethods(FruitBowl.class, new Class[] {Apple.class}, true, true, ignoreMethods);
-    assertNotNull(methods);
-    assertEquals(2, methods.size());
-
-    methods = getSatisfiableMethods(FruitBowl.class, new Class[] {Apple.class}, false, true, ignoreMethods);
-    assertNotNull(methods);
-    assertEquals(0, methods.size());
-
-    // Test object param being unacceptible
-    methods = getSatisfiableMethods(DummyObject.class, new Class[] {WaterMelon.class}, true, false, ignoreMethods);
-    assertNotNull(methods);
-    assertEquals(0, methods.size());
-
-    // Test object param being acceptible
-    methods = getSatisfiableMethods(DummyObject.class, new Class[] {WaterMelon.class}, true, true, ignoreMethods);
-    assertNotNull(methods);
-    assertEquals(2, methods.size());
-
-    // Test object param being acceptible but not void
-    methods = getSatisfiableMethods(DummyObject.class, new Class[] {WaterMelon.class}, false, true, ignoreMethods);
-    assertNotNull(methods);
-    assertEquals(1, methods.size());
-    assertEquals("doSomethingElse", ((Method) methods.get(0)).getName());
-
-    // Test object param being acceptible by interface Type
-    methods = getSatisfiableMethods(FruitBowl.class, new Class[] {WaterMelon[].class}, true, true, ignoreMethods);
-    assertNotNull(methods);
-    assertEquals(1, methods.size());
-    assertEquals("setFruit", ((Method) methods.get(0)).getName());
-  }
-
-  @Test
   public void testSimpleName() {
     simpleNameHelper("String", "foo".getClass());
     simpleNameHelper("int[]", (new int[0]).getClass());
@@ -242,14 +206,6 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase {
     assertEquals(String.class, classTypes[0]);
     assertEquals(null, classTypes[1]);
     assertEquals(String.class, classTypes[2]);
-  }
-
-  @Test
-  public void testCompareWithNull() {
-    Class[] c1 = new Class[] {String.class, Integer.class};
-    Class[] c2 = new Class[] {String.class, null};
-    assertFalse(ClassUtils.compare(c1, c2, true));
-    assertFalse(ClassUtils.compare(c2, c1, true));
   }
 
   @Test
@@ -367,17 +323,6 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase {
     assertEquals(target, ClassUtils.getSimpleName(clazz));
   }
 
-  private static class DummyObject {
-
-    public void doSomething(Object object) {
-      // do nothing
-    }
-
-    public Object doSomethingElse(Object object) {
-      return object;
-    }
-  }
-
   private static class HashBlob {
 
     private int hash;
@@ -390,10 +335,12 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase {
       return hash;
     }
 
+    @Override
     public int hashCode() {
       return hash;
     }
 
+    @Override
     public boolean equals(Object other) {
       if (null == other || !getClass().equals(other.getClass())) {
         return false;
