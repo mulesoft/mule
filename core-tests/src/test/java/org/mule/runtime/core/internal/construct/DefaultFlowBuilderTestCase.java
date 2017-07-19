@@ -28,7 +28,6 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
-import org.mule.runtime.core.api.scheduler.SchedulerConfig;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -37,7 +36,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -61,7 +59,6 @@ public class DefaultFlowBuilderTestCase extends AbstractMuleTestCase {
     when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
     when(muleConfiguration.getDefaultProcessingStrategyFactory()).thenReturn(defaultProcessingStrategyFactory);
     when(defaultProcessingStrategyFactory.create(any(), any())).thenReturn(processingStrategy);
-    when(muleContext.getSchedulerBaseConfig()).thenReturn(SchedulerConfig.config());
   }
 
   @Test
