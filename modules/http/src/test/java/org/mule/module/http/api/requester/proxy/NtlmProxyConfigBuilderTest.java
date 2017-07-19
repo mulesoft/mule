@@ -61,7 +61,7 @@ public class NtlmProxyConfigBuilderTest extends AbstractMuleTestCase
     public void fullConfig()
     {
         NtlmProxyConfig config = (NtlmProxyConfig) ntlmProxyConfigBuilder
-                .setHost(HOST).setPort(PORT).setNtlmDomain(NTLM_DOMAIN).setUsername(USERNAME).setPassword(PASSWORD).build();
+                .setHost(HOST).setPort(PORT).setNtlmDomain(NTLM_DOMAIN).setUsername(USERNAME).setPassword(PASSWORD).setNonProxyHosts(NON_PROXY_HOST).build();
         assertThat(config.getHost(), is(HOST));
         assertThat(config.getPort(), is(PORT));
         assertThat(config.getNtlmDomain(), is(NTLM_DOMAIN));

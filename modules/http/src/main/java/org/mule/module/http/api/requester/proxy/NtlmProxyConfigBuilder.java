@@ -78,4 +78,14 @@ public class NtlmProxyConfigBuilder
         return this;
     }
 
+    /**
+     * @param nonProxyHosts A list of hosts separated by |, which specifies that the proxy must not be used
+     * @return the builder
+     */
+    public NtlmProxyConfigBuilder setNonProxyHosts(String nonProxyHosts)
+    {
+        ntlmProxyConfig.setNonProxyHosts(nonProxyHosts);
+        return this;
+    }
+
 }
