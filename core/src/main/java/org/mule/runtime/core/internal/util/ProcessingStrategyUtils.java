@@ -15,7 +15,7 @@ import org.mule.runtime.core.processor.strategy.BlockingProcessingStrategyFactor
 import org.mule.runtime.core.processor.strategy.TransactionAwareWorkQueueProcessingStrategyFactory;
 
 public class ProcessingStrategyUtils {
-  
+
   /**
    * Determines if the {@link FlowConstruct} based on implementation and processing strategy configured is synchronous.
    *
