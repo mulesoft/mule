@@ -6,17 +6,10 @@
  */
 package org.mule.test.module.extension;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.mule.functional.junit4.rules.ExpectedError;
-import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.core.api.construct.Pipeline;
-import org.mule.runtime.core.api.exception.MessagingException;
-import org.mule.runtime.core.api.exception.MuleFatalException;
-import org.mule.runtime.core.api.processor.Processor;
-import org.mule.test.heisenberg.extension.exception.HeisenbergException;
-
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mule.functional.junit4.rules.ExpectedError.none;
@@ -25,6 +18,16 @@ import static org.mule.runtime.core.api.exception.Errors.Identifiers.CONNECTIVIT
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.test.heisenberg.extension.HeisenbergErrors.HEALTH;
+import org.mule.functional.junit4.rules.ExpectedError;
+import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.core.api.construct.Pipeline;
+import org.mule.runtime.core.api.exception.MessagingException;
+import org.mule.runtime.core.api.exception.MuleFatalException;
+import org.mule.runtime.core.api.processor.Processor;
+import org.mule.test.heisenberg.extension.exception.HeisenbergException;
+
+import org.junit.Rule;
+import org.junit.Test;
 
 public class OperationErrorHandlingTestCase extends AbstractExtensionFunctionalTestCase {
 
