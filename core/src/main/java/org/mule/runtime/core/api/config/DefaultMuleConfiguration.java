@@ -278,6 +278,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
       disableTimeouts = Boolean.valueOf(p);
     }
     try {
+      String name = ProcessingStrategyFactory.class.getName();
       p = getProperty(ProcessingStrategyFactory.class.getName());
       if (p != null) {
         defaultProcessingStrategyFactory = (ProcessingStrategyFactory) instantiateClass(p);
