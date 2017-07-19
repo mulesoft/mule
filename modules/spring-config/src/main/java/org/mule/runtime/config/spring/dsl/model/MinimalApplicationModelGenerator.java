@@ -7,16 +7,19 @@
 package org.mule.runtime.config.spring.dsl.model;
 
 
+import static java.util.Arrays.stream;
 import static java.util.Collections.reverse;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.config.spring.dsl.processor.AbstractAttributeDefinitionVisitor;
+import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -201,26 +204,25 @@ public class MinimalApplicationModelGenerator {
   private Set<String> resolveComponentDependencies(ComponentModel requestedComponentModel) {
     Set<String> otherDependencies = new HashSet<>();
     requestedComponentModel.getInnerComponents()
-        .stream().forEach(childComponent -> {
-          otherDependencies.addAll(resolveComponentDependencies(childComponent));
-        });
+        .stream().forEach(childComponent -> otherDependencies.addAll(resolveComponentDependencies(childComponent)));
     final Set<String> parametersReferencingDependencies = new HashSet<>();
-    // TODO MULE-10516 - Remove one the config-ref attribute is defined as a reference
-    parametersReferencingDependencies.add("config-ref");
     componentBuildingDefinitionRegistry.getBuildingDefinition(requestedComponentModel.getIdentifier())
-        .ifPresent(buildingDefinition -> {
-          buildingDefinition.getAttributesDefinitions()
-              .stream().forEach(attributeDefinition -> {
-                attributeDefinition.accept(new AbstractAttributeDefinitionVisitor() {
+        .ifPresent(buildingDefinition -> buildingDefinition.getAttributesDefinitions()
+            .stream().forEach(attributeDefinition -> {
+              attributeDefinition.accept(new AbstractAttributeDefinitionVisitor() {
 
-                  @Override
-                  public void onReferenceSimpleParameter(String reference) {
-                    parametersReferencingDependencies.add(reference);
-                  }
-                });
+                @Override
+                public void onMultipleValues(KeyAttributeDefinitionPair[] definitions) {
+                  stream(definitions)
+                      .forEach(keyAttributeDefinitionPair -> keyAttributeDefinitionPair.getAttributeDefinition().accept(this));
+                }
+
+                @Override
+                public void onReferenceSimpleParameter(String reference) {
+                  parametersReferencingDependencies.add(reference);
+                }
               });
-
-        });
+            }));
 
     for (String parametersReferencingDependency : parametersReferencingDependencies) {
       if (requestedComponentModel.getParameters().containsKey(parametersReferencingDependency)) {
