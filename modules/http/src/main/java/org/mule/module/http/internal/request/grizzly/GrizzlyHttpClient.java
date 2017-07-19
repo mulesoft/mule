@@ -234,6 +234,12 @@ public class GrizzlyHttpClient implements HttpClient
         {
             proxyServer = new ProxyServer(proxyConfig.getHost(),proxyConfig.getPort());
         }
+
+        if (proxyConfig.getNonProxyHosts() != null && !proxyConfig.getNonProxyHosts().isEmpty()) {
+            for (final String host : proxyConfig.getNonProxyHosts().split("\\|")) {
+                proxyServer.addNonProxyHost(host);
+            }
+        }
         return proxyServer;
     }
 

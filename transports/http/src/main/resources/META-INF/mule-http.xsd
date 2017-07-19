@@ -111,6 +111,13 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="nonProxyHosts" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A list of hosts, which are separated by |, which a proxy must not be used
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

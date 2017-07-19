@@ -891,6 +891,7 @@
                 <xsd:attribute name="port" type="mule:substitutableInt" />
                 <xsd:attribute name="username" type="xsd:string" use="optional" />
                 <xsd:attribute name="password" type="xsd:string" use="optional" />
+                <xsd:attribute name="nonProxyHosts" type="xsd:string" use="optional" />
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
