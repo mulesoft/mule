@@ -13,6 +13,10 @@
         <marvel:read-stream config-ref="drStrange"/>
     </flow>
 
+    <flow name="readStreamNonBlocking">
+        <marvel:read-stream-non-blocking config-ref="drStrange"/>
+    </flow>
+
     <flow name="rewind">
         <flow-ref name="toStream" />
         <marvel:read-stream config-ref="drStrange" target="firstRead" />
@@ -56,6 +60,21 @@
             <error-handler>
                 <on-error-continue type="STREAM_MAXIMUM_SIZE_EXCEEDED">
                     <set-payload value="Too big!" />
+                </on-error-continue>
+            </error-handler>
+        </try>
+    </flow>
+
+    <flow name="bufferExceededNonBlocking">
+        <try>
+            <marvel:to-stream config-ref="drStrange">
+                <repeatable-in-memory-stream initialBufferSize="10" bufferSizeIncrement="5" maxBufferSize="50" bufferUnit="KB"/>
+            </marvel:to-stream>
+            <flow-ref name="readStreamNonBlocking"/>
+            <object-to-string-transformer/>
+            <error-handler>
+                <on-error-continue type="STREAM_MAXIMUM_SIZE_EXCEEDED">
+                    <set-payload value="Too big!"/>
                 </on-error-continue>
             </error-handler>
         </try>

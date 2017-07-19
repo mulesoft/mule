@@ -16,6 +16,7 @@ import static org.mule.runtime.extension.api.ExtensionConstants.STREAMING_STRATE
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingStory.BYTES_STREAMING;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.assertType;
+
 import org.mule.metadata.api.model.UnionType;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
@@ -28,18 +29,16 @@ import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
-
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+import org.junit.Test;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-
-import org.junit.Test;
-import io.qameta.allure.Description;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 
 @Feature(STREAMING)
 @Story(BYTES_STREAMING)
@@ -128,6 +127,14 @@ public class BytesStreamingExtensionTestCase extends AbstractStreamingExtensionT
   public void throwsBufferSizeExceededError() throws Exception {
     data = randomAlphabetic(KB.toBytes(60));
     Object value = flowRunner("bufferExceeded").withPayload(data).run().getMessage().getPayload().getValue();
+    assertThat(value, is(TOO_BIG));
+  }
+
+  @Test
+  @Description("When the max buffer size is exceeded, the correct type of error is mapped, even for non blocking operations")
+  public void throwsBufferSizeExceededErrorWhenNonBlocking() throws Exception {
+    data = randomAlphabetic(KB.toBytes(60));
+    Object value = flowRunner("bufferExceededNonBlocking").withPayload(data).run().getMessage().getPayload().getValue();
     assertThat(value, is(TOO_BIG));
   }
 

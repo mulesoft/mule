@@ -61,7 +61,9 @@ public class OnErrorContinueHandler extends TemplateOnErrorHandler {
 
   @Override
   protected Event nullifyExceptionPayloadIfRequired(Event event) {
-    return Event.builder(event).error(null).message(InternalMessage.builder(event.getMessage()).exceptionPayload(null).build())
+    return Event.builder(event)
+        .error(event.getError().orElse(null))
+        .message(InternalMessage.builder(event.getMessage()).exceptionPayload(null).build())
         .build();
   }
 

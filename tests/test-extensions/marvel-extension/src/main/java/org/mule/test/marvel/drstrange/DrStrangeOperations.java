@@ -20,6 +20,8 @@ import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -47,6 +49,17 @@ public class DrStrangeOperations {
       return IOUtils.toString(stream);
     } catch (Exception e) {
       throw new CustomErrorException(e, CUSTOM_ERROR);
+    }
+  }
+
+  @Throws(CustomErrorProvider.class)
+  public void readStreamNonBlocking(@Config DrStrange dr, @Optional(defaultValue = PAYLOAD) InputStream stream,
+                                    CompletionCallback<String, Object> callback)
+      throws IOException {
+    try {
+      callback.success(Result.<String, Object>builder().output(IOUtils.toString(stream)).build());
+    } catch (Exception e) {
+      callback.error(new CustomErrorException(e, CUSTOM_ERROR));
     }
   }
 

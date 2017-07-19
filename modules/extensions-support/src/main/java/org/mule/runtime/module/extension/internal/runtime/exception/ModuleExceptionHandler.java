@@ -80,9 +80,9 @@ public class ModuleExceptionHandler {
         .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("The component '%s' from the connector '%s' attempted to throw '%s', but it was not registered "
             + "in the Error Repository", componentModel.getName(), extensionModel.getName(),
                                                                         extensionNamespace + ":" + errorDefinition),
-                                                    getExceptionCause(exception)));
+                                                    unwrapModuleException(exception)));
 
-    return new TypedException(getExceptionCause(exception), errorType);
+    return new TypedException(unwrapModuleException(exception), errorType);
   }
 
 
@@ -93,7 +93,7 @@ public class ModuleExceptionHandler {
             && errorModel.getNamespace().equals(extensionNamespace));
   }
 
-  private Throwable getExceptionCause(Throwable throwable) {
+  private Throwable unwrapModuleException(Throwable throwable) {
     return throwable.getClass().equals(ModuleException.class) ? throwable.getCause() : throwable;
   }
 }
