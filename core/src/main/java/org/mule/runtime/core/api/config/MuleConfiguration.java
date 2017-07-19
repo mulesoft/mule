@@ -14,6 +14,7 @@ import org.mule.runtime.api.serialization.ObjectSerializer;
 
 /**
  * Configuration info. which can be set when creating the MuleContext but becomes immutable after startup.
+ * TODO MULE-13121 Cleanup MuleConfiguration removing redundant config in Mule 4
  */
 public interface MuleConfiguration {
 

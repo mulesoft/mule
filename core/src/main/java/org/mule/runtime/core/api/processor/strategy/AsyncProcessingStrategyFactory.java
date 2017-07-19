@@ -7,6 +7,7 @@
 package org.mule.runtime.core.api.processor.strategy;
 
 import static java.lang.Integer.MAX_VALUE;
+import static java.lang.Integer.getInteger;
 
 /**
  *
@@ -16,7 +17,8 @@ import static java.lang.Integer.MAX_VALUE;
  */
 public interface AsyncProcessingStrategyFactory extends ProcessingStrategyFactory {
 
-  int DEFAULT_MAX_CONCURRENCY = MAX_VALUE;
+  int DEFAULT_MAX_CONCURRENCY =
+      getInteger(AsyncProcessingStrategyFactory.class.getName() + ".DEFAULT_MAX_CONCURRENCY", MAX_VALUE);
 
   /**
    * Configures the maximum concurrency permitted. This will typically be used to limit the number of concurrent blocking tasks in
