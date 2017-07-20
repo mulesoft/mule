@@ -31,7 +31,7 @@ import org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandle
 import org.mule.runtime.config.spring.parsers.XmlMetadataAnnotations;
 import org.mule.runtime.core.api.execution.LocationExecutionContextProvider;
 import org.mule.runtime.core.api.security.SecurityFilter;
-import org.mule.runtime.core.processor.SecurityFilterMessageProcessor;
+import org.mule.runtime.core.privileged.processor.SecurityFilterMessageProcessor;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 
 import com.google.common.collect.ImmutableSet;

@@ -35,6 +35,7 @@ import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.routing.RouterResultsHandler;
 import org.mule.runtime.core.internal.construct.DefaultFlowBuilder;
 import org.mule.runtime.core.internal.message.InternalMessage;
+import org.mule.runtime.core.privileged.routing.DefaultRouterResultsHandler;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.ArrayList;

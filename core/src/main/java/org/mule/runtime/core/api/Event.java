@@ -20,7 +20,7 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.internal.message.DefaultEventBuilder;
 import org.mule.runtime.core.api.message.GroupCorrelation;
-import org.mule.runtime.core.processor.chain.ModuleOperationMessageProcessorChainBuilder;
+import org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder;
 
 import java.io.Serializable;
 import java.nio.charset.Charset;

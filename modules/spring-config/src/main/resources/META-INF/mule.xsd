@@ -3296,7 +3296,8 @@
                 <xsd:attribute name="class" type="substitutableClass" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The canonical name of a class that implements org.mule.runtime.core.routing.AggregationStrategy.
+                            The canonical name of a class that implements
+                            org.mule.runtime.core.internal.routing.AggregationStrategy.
                             Such a class is required to have a default constructor.
                             This property cannot be set at the same time as 'ref'
                         </xsd:documentation>
@@ -3305,7 +3306,8 @@
                 <xsd:attribute name="ref" type="xsd:string" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
-                            A reference to a registered bean that implements org.mule.runtime.core.routing.AggregationStrategy.
+                            A reference to a registered bean that implements
+                            org.mule.runtime.core.internal.routing.AggregationStrategy.
                             This property cannot be set at the same time as 'class'
                         </xsd:documentation>
                     </xsd:annotation>

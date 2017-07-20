@@ -8,7 +8,7 @@ package org.mule.runtime.config.spring.factories;
 
 import org.mule.runtime.config.spring.factories.processor.MessageProcessorChainFactoryBean;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
-import org.mule.runtime.core.processor.chain.SubflowMessageProcessorChainBuilder;
+import org.mule.runtime.core.internal.processor.chain.SubflowMessageProcessorChainBuilder;
 
 /**
  * Uses a custom message processor chain builder for subflows in order to genearte the proper message processor ids.

@@ -34,8 +34,8 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.construct.processor.FlowConstructStatisticsMessageProcessor;
-import org.mule.runtime.core.processor.strategy.TransactionAwareWorkQueueProcessingStrategyFactory;
-import org.mule.runtime.core.routing.requestreply.AsyncReplyToPropertyRequestReplyReplier;
+import org.mule.runtime.core.internal.routing.requestreply.SimpleAsyncRequestReplyRequester;
+import org.mule.runtime.core.internal.processor.strategy.TransactionAwareWorkQueueProcessingStrategyFactory;
 
 import java.util.List;
 import java.util.Optional;
@@ -270,7 +270,7 @@ public class DefaultFlowBuilder implements Builder {
 
     @Override
     protected void configurePostProcessors(MessageProcessorChainBuilder builder) throws MuleException {
-      builder.chain(new AsyncReplyToPropertyRequestReplyReplier());
+      builder.chain(new SimpleAsyncRequestReplyRequester.AsyncReplyToPropertyRequestReplyReplier());
       super.configurePostProcessors(builder);
     }
 

@@ -21,8 +21,8 @@ import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
-import org.mule.runtime.core.processor.strategy.AbstractProcessingStrategyFactory;
-import org.mule.runtime.core.processor.strategy.ReactorStreamProcessingStrategyFactory;
+import org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyFactory;
+import org.mule.runtime.core.internal.processor.strategy.ReactorStreamProcessingStrategyFactory;
 import org.mule.tck.TriggerableMessageSource;
 
 import java.util.List;
@@ -85,15 +85,15 @@ public abstract class AbstractFlowBenchmark extends AbstractBenchmark {
   protected TriggerableMessageSource source;
 
   @Param({
-      "org.mule.runtime.core.processor.strategy.DirectProcessingStrategyFactory",
-      "org.mule.runtime.core.processor.strategy.DirectStreamPerThreadProcessingStrategyFactory",
-      "org.mule.runtime.core.processor.strategy.ReactorProcessingStrategyFactory",
-      "org.mule.runtime.core.processor.strategy.ReactorStreamProcessingStrategyFactory",
+      "org.mule.runtime.core.api.processor.strategy.DirectProcessingStrategyFactory",
+      "org.mule.runtime.core.internal.processor.strategy.DirectStreamPerThreadProcessingStrategyFactory",
+      "org.mule.runtime.core.internal.processor.strategy.ReactorProcessingStrategyFactory",
+      "org.mule.runtime.core.internal.processor.strategy.ReactorStreamProcessingStrategyFactory",
       "org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory",
       "org.mule.runtime.core.processor.strategy.TransactionAwareProactorStreamProcessingStrategyFactory",
-      "org.mule.runtime.core.processor.strategy.WorkQueueProcessingStrategyFactory",
+      "org.mule.runtime.core.internal.processor.strategy.WorkQueueProcessingStrategyFactory",
       // Skipping due MULE-12662.
-      // "org.mule.runtime.core.processor.strategy.WorkQueueStreamProcessingStrategyFactory",
+      // "org.mule.runtime.core.internal.processor.strategy.WorkQueueStreamProcessingStrategyFactory",
   })
   public String processingStrategyFactory;
 

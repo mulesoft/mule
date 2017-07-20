@@ -13,7 +13,7 @@ import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 import org.mule.runtime.config.spring.factories.processor.MessageProcessorChainFactoryBean;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
-import org.mule.runtime.core.processor.chain.ModuleOperationMessageProcessorChainBuilder;
+import org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder;
 
 import javax.inject.Inject;
 import java.util.HashMap;

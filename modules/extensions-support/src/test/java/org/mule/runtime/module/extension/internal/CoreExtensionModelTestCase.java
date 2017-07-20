@@ -54,7 +54,7 @@ import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.core.api.processor.LoggerMessageProcessor;
 import org.mule.runtime.core.api.processor.LoggerMessageProcessor.LogLevel;
 import org.mule.runtime.core.api.source.SchedulingStrategy;
-import org.mule.runtime.core.routing.AggregationStrategy;
+import org.mule.runtime.core.internal.routing.AggregationStrategy;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.Iterator;

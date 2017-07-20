@@ -31,19 +31,23 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.ResponseTimeoutException;
 import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.api.store.SimpleMemoryObjectStore;
 import org.mule.runtime.core.api.util.concurrent.Latch;
+import org.mule.runtime.core.internal.routing.requestreply.AbstractAsyncRequestReplyRequester;
 import org.mule.runtime.core.internal.util.store.MuleObjectStoreManager;
-import org.mule.runtime.core.processor.AsyncDelegateMessageProcessor;
-import org.mule.runtime.core.routing.correlation.EventCorrelatorTestCase;
+import org.mule.runtime.core.internal.processor.AsyncDelegateMessageProcessor;
+import org.mule.runtime.core.internal.routing.correlation.EventCorrelatorTestCase;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 
 import java.beans.ExceptionListener;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -221,6 +225,27 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     }));
   }
 
+  @Test
+  public void testResponseEventsCleanedUp() throws Exception {
+    RelaxedAsyncReplyMP mp = new RelaxedAsyncReplyMP(muleContext);
+
+    try {
+      Event event =
+          eventBuilder().message(of("message1")).groupCorrelation(new GroupCorrelation(1, null)).build();
+
+      SensingNullMessageProcessor listener = getSensingNullMessageProcessor();
+      mp.setListener(listener);
+      mp.setReplySource(listener.getMessageSource());
+
+      mp.process(event);
+
+      Map<String, Event> responseEvents = mp.getResponseEvents();
+      assertTrue("Response events should be cleaned up.", responseEvents.isEmpty());
+    } finally {
+      mp.stop();
+    }
+  }
+
   private AsyncDelegateMessageProcessor asyncMP;
 
   @After
@@ -250,6 +275,23 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
       setMuleContext(muleContext);
       initialise();
       start();
+    }
+  }
+
+  /**
+   * This class opens up the access to responseEvents map for testing
+   */
+  private static final class RelaxedAsyncReplyMP extends AbstractAsyncRequestReplyRequester {
+
+    private RelaxedAsyncReplyMP(MuleContext muleContext) throws MuleException {
+      store = new SimpleMemoryObjectStore<>();
+      name = "asyncReply";
+      setMuleContext(muleContext);
+      start();
+    }
+
+    public Map<String, Event> getResponseEvents() {
+      return responseEvents;
     }
   }
 }

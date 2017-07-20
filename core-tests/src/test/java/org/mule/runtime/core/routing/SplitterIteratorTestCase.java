@@ -24,6 +24,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.expression.ExpressionConfig;
+import org.mule.runtime.core.internal.routing.Splitter;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.ArrayList;

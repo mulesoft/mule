@@ -27,7 +27,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.Scope;
 import org.mule.runtime.core.api.session.DefaultMuleSession;
 import org.mule.runtime.core.api.util.StringUtils;
-import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
+import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +56,6 @@ import org.reactivestreams.Publisher;
  * <p/>
  * <b>EIP Reference:</b> <a href="http://eaipatterns.com/DataEnricher.html">http://eaipatterns.com/DataEnricher.html<a/>
  */
-// TODO(pablo.kraan): MULE-12609 - remove org.mule.runtime.core.internal.enricher from exported packages
 public class MessageEnricher extends AbstractMessageProcessorOwner implements Scope {
 
   private List<EnrichExpressionPair> enrichExpressionPairs = new ArrayList<>();

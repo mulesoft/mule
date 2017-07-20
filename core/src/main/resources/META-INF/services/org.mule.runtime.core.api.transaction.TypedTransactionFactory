@@ -1,1 +1,1 @@
-org.mule.runtime.core.processor.DelegateTransactionFactory
+org.mule.runtime.core.api.transaction.DelegateTransactionFactory
