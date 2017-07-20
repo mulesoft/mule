@@ -114,7 +114,11 @@ public abstract class JaxpXPathEvaluator implements XPathEvaluator, XPathVariabl
         {
             evaluationEvent.set(event);
             XPathExpression xpath = expressionCache.getUnchecked(xpathExpression);
-            return xpath.evaluate(input, returnType.toQName());
+            // XPathExpression is not thread-safe.
+            synchronized (xpath)
+            {
+                return xpath.evaluate(input, returnType.toQName());
+            }
         }
         catch (XPathExpressionException e)
         {
