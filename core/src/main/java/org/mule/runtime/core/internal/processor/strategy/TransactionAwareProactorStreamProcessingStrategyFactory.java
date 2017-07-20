@@ -10,6 +10,7 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
+import static org.mule.runtime.core.internal.processor.strategy.BlockingProcessingStrategyFactory.BLOCKING_PROCESSING_STRATEGY_INSTANCE;
 
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.Event;
@@ -92,7 +93,7 @@ class TransactionAwareProactorStreamProcessingStrategyFactory extends ReactorStr
     @Override
     public Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor pipeline) {
       Sink proactorSink = super.createSink(flowConstruct, pipeline);
-      Sink syncSink = BlockingProcessingStrategyFactory.BLOCKING_PROCESSING_STRATEGY_INSTANCE.createSink(flowConstruct, pipeline);
+      Sink syncSink = BLOCKING_PROCESSING_STRATEGY_INSTANCE.createSink(flowConstruct, pipeline);
       return new TransactionAwareWorkQueueProcessingStrategyFactory.TransactionAwareWorkQueueProcessingStrategy.DelegateSink(syncSink,
                                                                                                                              proactorSink);
     }

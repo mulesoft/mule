@@ -18,7 +18,6 @@ import static org.mule.runtime.core.api.processor.MessageProcessors.processToApp
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static org.mule.runtime.core.api.util.ExceptionUtils.updateMessagingExceptionWithError;
 import static reactor.core.publisher.Flux.from;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
@@ -34,15 +33,14 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.construct.processor.FlowConstructStatisticsMessageProcessor;
-import org.mule.runtime.core.internal.routing.requestreply.SimpleAsyncRequestReplyRequester;
 import org.mule.runtime.core.internal.processor.strategy.TransactionAwareWorkQueueProcessingStrategyFactory;
+import org.mule.runtime.core.internal.routing.requestreply.SimpleAsyncRequestReplyRequester.AsyncReplyToPropertyRequestReplyReplier;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.RejectedExecutionException;
 
 import org.reactivestreams.Publisher;
-
 import reactor.core.publisher.Mono;
 
 /**
@@ -270,7 +268,7 @@ public class DefaultFlowBuilder implements Builder {
 
     @Override
     protected void configurePostProcessors(MessageProcessorChainBuilder builder) throws MuleException {
-      builder.chain(new SimpleAsyncRequestReplyRequester.AsyncReplyToPropertyRequestReplyReplier());
+      builder.chain(new AsyncReplyToPropertyRequestReplyReplier());
       super.configurePostProcessors(builder);
     }
 

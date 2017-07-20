@@ -32,6 +32,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Router;
 import org.mule.runtime.core.api.routing.AggregationContext;
+import org.mule.runtime.core.api.routing.AggregationStrategy;
 import org.mule.runtime.core.api.routing.RoutePathNotFoundException;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 

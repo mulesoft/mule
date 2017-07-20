@@ -10,6 +10,7 @@ package org.mule.runtime.core.internal.routing;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.routing.AggregationContext;
+import org.mule.runtime.core.api.routing.AggregationStrategy;
 import org.mule.runtime.core.api.routing.RouterResultsHandler;
 import org.mule.runtime.core.privileged.routing.DefaultRouterResultsHandler;
 

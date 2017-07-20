@@ -12,6 +12,7 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.processor.Sink;
+import org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy.ReactorSink;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -26,7 +27,7 @@ import reactor.core.publisher.DirectProcessor;
  */
 class DirectSink implements Sink, Disposable {
 
-  private AbstractProcessingStrategy.ReactorSink reactorSink;
+  private ReactorSink reactorSink;
 
   /**
    * Create new {@link DirectSink}.
@@ -38,10 +39,8 @@ class DirectSink implements Sink, Disposable {
   public DirectSink(Function<Publisher<Event>, Publisher<Event>> function, Consumer<Event> eventConsumer) {
     DirectProcessor<Event> directProcessor = create();
     reactorSink =
-        new AbstractProcessingStrategy.ReactorSink(directProcessor.serialize().connectSink(),
-                                                   directProcessor.transform(function).doOnError(throwable -> {
-                                                   }).subscribe(),
-                                                   eventConsumer);
+        new ReactorSink(directProcessor.serialize().connectSink(), directProcessor.transform(function).doOnError(throwable -> {
+        }).subscribe(), eventConsumer);
   }
 
   @Override

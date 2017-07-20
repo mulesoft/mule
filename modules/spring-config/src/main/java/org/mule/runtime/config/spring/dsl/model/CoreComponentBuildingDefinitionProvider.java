@@ -158,7 +158,7 @@ import org.mule.runtime.core.privileged.processor.IdempotentRedeliveryPolicy;
 import org.mule.runtime.core.privileged.processor.simple.AbstractAddVariablePropertyProcessor;
 import org.mule.runtime.core.privileged.processor.SecurityFilterMessageProcessor;
 import org.mule.runtime.core.internal.processor.TryScope;
-import org.mule.runtime.core.internal.routing.AggregationStrategy;
+import org.mule.runtime.core.api.routing.AggregationStrategy;
 import org.mule.runtime.core.internal.routing.ChoiceRouter;
 import org.mule.runtime.core.internal.routing.FirstSuccessful;
 import org.mule.runtime.core.internal.routing.Foreach;

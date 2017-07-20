@@ -105,10 +105,10 @@ public class FirstSuccessfulRoutingStrategy implements RoutingStrategy {
 
     if (failed) {
       if (failExceptionCause != null) {
-        throw new RoutingFailedException(createStaticMessage("all processors failed during first-successful routing strategy"),
+        throw new RoutingFailedException(createStaticMessage("All processors failed during 'first-successful' routing strategy"),
                                          failExceptionCause);
       } else {
-        throw new RoutingFailedException(createStaticMessage("all processors failed during first-successful routing strategy"));
+        throw new RoutingFailedException(createStaticMessage("All processors failed during 'first-successful' routing strategy"));
       }
     }
 

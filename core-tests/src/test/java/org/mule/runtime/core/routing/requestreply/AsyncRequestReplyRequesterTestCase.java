@@ -9,6 +9,7 @@ package org.mule.runtime.core.routing.requestreply;
 import static java.util.Collections.singletonMap;
 import static junit.framework.Assert.assertNull;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
@@ -240,7 +241,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
       mp.process(event);
 
       Map<String, Event> responseEvents = mp.getResponseEvents();
-      assertTrue("Response events should be cleaned up.", responseEvents.isEmpty());
+      assertThat(responseEvents.entrySet(), empty());
     } finally {
       mp.stop();
     }

@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.core.internal.routing;
+package org.mule.runtime.core.api.routing;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
@@ -27,6 +27,6 @@ public interface AggregationStrategy {
    *         <code>null</code>, return {@link VoidMuleEvent} instead
    * @throws MuleException if unexpected exception occurs or business error condition is met
    */
-  public Event aggregate(AggregationContext context) throws MuleException;
+  Event aggregate(AggregationContext context) throws MuleException;
 
 }

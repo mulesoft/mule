@@ -10,6 +10,7 @@ import static java.lang.Integer.MAX_VALUE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
+import static org.mule.runtime.core.internal.processor.strategy.BlockingProcessingStrategyFactory.BLOCKING_PROCESSING_STRATEGY_INSTANCE;
 import static org.slf4j.helpers.NOPLogger.NOP_LOGGER;
 
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -59,7 +60,7 @@ public class TransactionAwareWorkQueueProcessingStrategyFactory extends WorkQueu
     @Override
     public Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor pipeline) {
       Sink workQueueSink = super.createSink(flowConstruct, pipeline);
-      Sink syncSink = BlockingProcessingStrategyFactory.BLOCKING_PROCESSING_STRATEGY_INSTANCE.createSink(flowConstruct, pipeline);
+      Sink syncSink = BLOCKING_PROCESSING_STRATEGY_INSTANCE.createSink(flowConstruct, pipeline);
       return new DelegateSink(syncSink, workQueueSink);
     }
 
