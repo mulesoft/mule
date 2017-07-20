@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.api.security;
 
+import static java.util.Collections.unmodifiableMap;
+
 import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.api.security.Credentials;
 
@@ -18,30 +20,20 @@ import java.util.Map;
  */
 public class DefaultMuleAuthentication implements Authentication {
 
-  private boolean authenticated;
-  private char[] credentials;
-  private String user;
-  private Map<String, Object> properties;
+  private final char[] credentials;
+  private final String user;
+  private final Map<String, Object> properties;
 
   public DefaultMuleAuthentication(Credentials credentials) {
     this.user = credentials.getUsername();
     this.credentials = credentials.getPassword();
+    this.properties = null;
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void setAuthenticated(boolean authenticated) {
-    this.authenticated = authenticated;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public boolean isAuthenticated() {
-    return authenticated;
+  private DefaultMuleAuthentication(String user, char[] credentials, Map<String, Object> properties) {
+    this.user = user;
+    this.credentials = credentials;
+    this.properties = properties != null ? unmodifiableMap(properties) : null;
   }
 
   /**
@@ -72,7 +64,7 @@ public class DefaultMuleAuthentication implements Authentication {
    * {@inheritDoc}
    */
   @Override
-  public void setProperties(Map<String, Object> properties) {
-    this.properties = properties;
+  public DefaultMuleAuthentication setProperties(Map<String, Object> properties) {
+    return new DefaultMuleAuthentication(user, credentials, properties);
   }
 }
