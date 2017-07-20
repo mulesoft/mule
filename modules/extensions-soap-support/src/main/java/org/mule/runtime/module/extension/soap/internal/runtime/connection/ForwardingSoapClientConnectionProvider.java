@@ -75,6 +75,10 @@ public class ForwardingSoapClientConnectionProvider implements ConnectionProvide
    */
   @Override
   public ForwardingSoapClient connect() throws ConnectionException {
+    ConnectionValidationResult result = serviceProvider.validate();
+    if (!result.isValid()) {
+      throw new ConnectionException(result.getMessage(), result.getException(), result.getErrorType().orElse(null));
+    }
     return new ForwardingSoapClient(soapService, serviceProvider, transportProvider);
   }
 
