@@ -132,7 +132,7 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
         "output text/plain\n" +
         "import dw::Crypto\n" +
         "---\n" +
-        "Crypto::SHA1(payload)";
+        "Crypto::hashWith(payload,'SHA-256')";
     String payload = "payload to be hashed";
     final EventContext context = mock(EventContext.class);
     when(context.getCorrelationId()).thenReturn("1");
