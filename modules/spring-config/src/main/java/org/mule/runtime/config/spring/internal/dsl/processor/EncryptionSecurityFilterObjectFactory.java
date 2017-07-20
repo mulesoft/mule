@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.config.spring.internal.dsl.processor;
 
-import org.mule.runtime.config.spring.privileged.dsl.processor.AbstractSecurityFilterObjectFactory;
+import org.mule.runtime.config.spring.api.dsl.processor.AbstractSecurityFilterObjectFactory;
 import org.mule.runtime.core.api.security.EncryptionStrategy;
 import org.mule.runtime.core.security.filters.MuleEncryptionEndpointSecurityFilter;
 

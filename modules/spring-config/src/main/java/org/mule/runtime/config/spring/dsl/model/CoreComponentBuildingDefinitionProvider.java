@@ -23,9 +23,9 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STARTED;
 import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
-import static org.mule.runtime.core.privileged.routing.outbound.AbstractOutboundRouter.DEFAULT_FAILURE_EXPRESSION;
 import static org.mule.runtime.core.api.transaction.MuleTransactionConfig.ACTION_INDIFFERENT_STRING;
 import static org.mule.runtime.core.api.transaction.TransactionType.LOCAL;
+import static org.mule.runtime.core.privileged.routing.outbound.AbstractOutboundRouter.DEFAULT_FAILURE_EXPRESSION;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildCollectionConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildMapConfiguration;
@@ -65,12 +65,9 @@ import org.mule.runtime.config.spring.CustomSecurityProviderDelegate;
 import org.mule.runtime.config.spring.MuleConfigurationConfigurator;
 import org.mule.runtime.config.spring.NotificationConfig;
 import org.mule.runtime.config.spring.ServerNotificationManagerConfigurator;
-import org.mule.runtime.config.spring.internal.dsl.processor.CustomSecurityFilterObjectFactory;
-import org.mule.runtime.config.spring.internal.dsl.processor.EncryptionSecurityFilterObjectFactory;
 import org.mule.runtime.config.spring.dsl.processor.EnvironmentPropertyObjectFactory;
 import org.mule.runtime.config.spring.dsl.processor.RetryPolicyTemplateObjectFactory;
 import org.mule.runtime.config.spring.dsl.processor.TransformerConfigurator;
-import org.mule.runtime.config.spring.internal.dsl.processor.UsernamePasswordFilterObjectFactory;
 import org.mule.runtime.config.spring.dsl.processor.factory.MessageEnricherObjectFactory;
 import org.mule.runtime.config.spring.dsl.spring.ConfigurableInstanceFactory;
 import org.mule.runtime.config.spring.dsl.spring.ConfigurableObjectFactory;
@@ -91,6 +88,9 @@ import org.mule.runtime.config.spring.factories.streaming.InMemoryCursorStreamPr
 import org.mule.runtime.config.spring.factories.streaming.NullCursorIteratorProviderObjectFactory;
 import org.mule.runtime.config.spring.factories.streaming.NullCursorStreamProviderObjectFactory;
 import org.mule.runtime.config.spring.internal.dsl.processor.AddVariablePropertyConfigurator;
+import org.mule.runtime.config.spring.internal.dsl.processor.CustomSecurityFilterObjectFactory;
+import org.mule.runtime.config.spring.internal.dsl.processor.EncryptionSecurityFilterObjectFactory;
+import org.mule.runtime.config.spring.internal.dsl.processor.UsernamePasswordFilterObjectFactory;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationExtension;
 import org.mule.runtime.core.api.config.MuleConfiguration;
@@ -103,6 +103,7 @@ import org.mule.runtime.core.api.processor.LoggerMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.RetryNotifier;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
+import org.mule.runtime.core.api.routing.AggregationStrategy;
 import org.mule.runtime.core.api.security.EncryptionStrategy;
 import org.mule.runtime.core.api.security.MuleSecurityManagerConfigurator;
 import org.mule.runtime.core.api.security.SecurityManager;
@@ -138,27 +139,12 @@ import org.mule.runtime.core.internal.processor.AnnotatedProcessor;
 import org.mule.runtime.core.internal.processor.AsyncDelegateMessageProcessor;
 import org.mule.runtime.core.internal.processor.InvokerMessageProcessor;
 import org.mule.runtime.core.internal.processor.ResponseMessageProcessorAdapter;
+import org.mule.runtime.core.internal.processor.TryScope;
 import org.mule.runtime.core.internal.processor.simple.AddFlowVariableProcessor;
 import org.mule.runtime.core.internal.processor.simple.AddPropertyProcessor;
 import org.mule.runtime.core.internal.processor.simple.RemoveFlowVariableProcessor;
 import org.mule.runtime.core.internal.processor.simple.RemovePropertyProcessor;
 import org.mule.runtime.core.internal.processor.simple.SetPayloadMessageProcessor;
-import org.mule.runtime.core.internal.routing.requestreply.SimpleAsyncRequestReplyRequester;
-import org.mule.runtime.core.internal.source.scheduler.DefaultSchedulerMessageSource;
-import org.mule.runtime.core.internal.transformer.codec.XmlEntityDecoder;
-import org.mule.runtime.core.internal.transformer.codec.XmlEntityEncoder;
-import org.mule.runtime.core.internal.transformer.compression.GZipCompressTransformer;
-import org.mule.runtime.core.internal.transformer.compression.GZipUncompressTransformer;
-import org.mule.runtime.core.internal.transformer.encryption.AbstractEncryptionTransformer;
-import org.mule.runtime.core.internal.transformer.encryption.DecryptionTransformer;
-import org.mule.runtime.core.internal.transformer.encryption.EncryptionTransformer;
-import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
-import org.mule.runtime.core.internal.transformer.simple.ObjectToString;
-import org.mule.runtime.core.privileged.processor.IdempotentRedeliveryPolicy;
-import org.mule.runtime.core.privileged.processor.simple.AbstractAddVariablePropertyProcessor;
-import org.mule.runtime.core.privileged.processor.SecurityFilterMessageProcessor;
-import org.mule.runtime.core.internal.processor.TryScope;
-import org.mule.runtime.core.api.routing.AggregationStrategy;
 import org.mule.runtime.core.internal.routing.ChoiceRouter;
 import org.mule.runtime.core.internal.routing.FirstSuccessful;
 import org.mule.runtime.core.internal.routing.Foreach;
@@ -172,6 +158,19 @@ import org.mule.runtime.core.internal.routing.ScatterGatherRouter;
 import org.mule.runtime.core.internal.routing.SimpleCollectionAggregator;
 import org.mule.runtime.core.internal.routing.Splitter;
 import org.mule.runtime.core.internal.routing.UntilSuccessful;
+import org.mule.runtime.core.internal.routing.requestreply.SimpleAsyncRequestReplyRequester;
+import org.mule.runtime.core.internal.source.scheduler.DefaultSchedulerMessageSource;
+import org.mule.runtime.core.internal.transformer.codec.XmlEntityDecoder;
+import org.mule.runtime.core.internal.transformer.codec.XmlEntityEncoder;
+import org.mule.runtime.core.internal.transformer.compression.GZipCompressTransformer;
+import org.mule.runtime.core.internal.transformer.compression.GZipUncompressTransformer;
+import org.mule.runtime.core.internal.transformer.encryption.AbstractEncryptionTransformer;
+import org.mule.runtime.core.internal.transformer.encryption.DecryptionTransformer;
+import org.mule.runtime.core.internal.transformer.encryption.EncryptionTransformer;
+import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
+import org.mule.runtime.core.internal.transformer.simple.ObjectToString;
+import org.mule.runtime.core.privileged.processor.IdempotentRedeliveryPolicy;
+import org.mule.runtime.core.privileged.processor.simple.AbstractAddVariablePropertyProcessor;
 import org.mule.runtime.core.security.PasswordBasedEncryptionStrategy;
 import org.mule.runtime.core.security.SecretKeyEncryptionStrategy;
 import org.mule.runtime.core.transformer.AbstractTransformer;
@@ -598,7 +597,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withConstructorParameterDefinition(fromSimpleParameter("subscription").build()).build());
 
     componentBuildingDefinitions.add(baseDefinition.withIdentifier("username-password-filter")
-        .withTypeDefinition(fromType(SecurityFilterMessageProcessor.class))
+        .withTypeDefinition(fromType(Processor.class))
         .withObjectFactoryType(UsernamePasswordFilterObjectFactory.class)
         .withSetterParameterDefinition("username", fromSimpleParameter("username").build())
         .withSetterParameterDefinition("password", fromSimpleParameter("password").build())
@@ -606,14 +605,14 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .build());
 
     componentBuildingDefinitions.add(baseDefinition.withIdentifier("custom-security-filter")
-        .withTypeDefinition(fromType(SecurityFilterMessageProcessor.class))
+        .withTypeDefinition(fromType(Processor.class))
         .withObjectFactoryType(CustomSecurityFilterObjectFactory.class)
         .withConstructorParameterDefinition(fromSimpleReferenceParameter("ref").build())
         .withIgnoredConfigurationParameter(NAME)
         .build());
 
     componentBuildingDefinitions.add(baseDefinition.withIdentifier("encryption-security-filter")
-        .withTypeDefinition(fromType(SecurityFilterMessageProcessor.class))
+        .withTypeDefinition(fromType(Processor.class))
         .withObjectFactoryType(EncryptionSecurityFilterObjectFactory.class)
         .withConstructorParameterDefinition(fromSimpleReferenceParameter("strategy-ref").build())
         .withIgnoredConfigurationParameter(NAME)

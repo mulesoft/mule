@@ -4,8 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.spring.privileged.dsl.processor;
+package org.mule.runtime.config.spring.api.dsl.processor;
 
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.security.SecurityFilter;
 import org.mule.runtime.core.privileged.processor.SecurityFilterMessageProcessor;
 import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
@@ -16,10 +17,10 @@ import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
  * @since 4.0
  */
 public abstract class AbstractSecurityFilterObjectFactory<T extends SecurityFilter>
-    extends AbstractAnnotatedObjectFactory<SecurityFilterMessageProcessor> {
+    extends AbstractAnnotatedObjectFactory<Processor> {
 
   @Override
-  public SecurityFilterMessageProcessor doGetObject() throws Exception {
+  public Processor doGetObject() throws Exception {
     return new SecurityFilterMessageProcessor(getFilter());
   }
 

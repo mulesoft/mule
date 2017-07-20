@@ -10,10 +10,15 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.security.SecurityFilter;
 
 import org.reactivestreams.Publisher;
@@ -22,35 +27,25 @@ import org.reactivestreams.Publisher;
  * Filters the flow using the specified {@link SecurityFilter}. If unauthorised the flow is stopped and therefore the message is
  * not send or dispatched by the transport. When unauthorised the request message is returned as the response.
  */
-public class SecurityFilterMessageProcessor extends AbstractInterceptingMessageProcessor
-    implements Initialisable {
+public class SecurityFilterMessageProcessor extends AbstractAnnotatedObject
+    implements Processor, Initialisable, MuleContextAware {
+
+  private MuleContext muleContext;
 
   private SecurityFilter filter;
 
-  /**
-   * For IoC only
-   * 
-   * @deprecated Use SecurityFilterMessageProcessor(SecurityFilter filter) instead
-   */
-  @Deprecated
-  public SecurityFilterMessageProcessor() {
-    super();
+  public SecurityFilterMessageProcessor(SecurityFilter filter) {
+    this.filter = filter;
   }
 
   @Override
   public void initialise() throws InitialisationException {
     try {
-      if (filter != null) {
-        muleContext.getInjector().inject(filter);
-        initialiseIfNeeded(filter, muleContext);
-      }
+      muleContext.getInjector().inject(filter);
+      initialiseIfNeeded(filter, muleContext);
     } catch (MuleException e) {
       throw new InitialisationException(e, this);
     }
-  }
-
-  public SecurityFilterMessageProcessor(SecurityFilter filter) {
-    this.filter = filter;
   }
 
   public SecurityFilter getFilter() {
@@ -64,21 +59,25 @@ public class SecurityFilterMessageProcessor extends AbstractInterceptingMessageP
 
   @Override
   public Publisher<Event> apply(Publisher<Event> publisher) {
-    if (filter == null) {
-      return from(publisher).transform(applyNext());
-    } else {
-      return from(publisher).doOnNext(event -> {
-        try {
-          filter.doFilter(event);
-        } catch (Exception e) {
-          throw propagate(e);
-        }
-      }).transform(applyNext());
-    }
+    return from(publisher).doOnNext(event -> {
+      try {
+        filter.doFilter(event);
+      } catch (Exception e) {
+        throw propagate(e);
+      }
+    });
   }
 
   public void setFilter(SecurityFilter filter) {
     this.filter = filter;
   }
 
+  @Override
+  public void setMuleContext(MuleContext context) {
+    this.muleContext = context;
+  }
+
+  public MuleContext getMuleContext() {
+    return muleContext;
+  }
 }
