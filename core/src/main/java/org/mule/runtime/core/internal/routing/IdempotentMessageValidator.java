@@ -41,9 +41,10 @@ import org.mule.runtime.core.api.routing.DuplicateMessageException;
 import org.slf4j.Logger;
 
 /**
- * <code>IdempotentMessageValidator</code> ensures that only unique messages are passed on. It does this by checking the unique ID
- * of the incoming message. Note that the underlying endpoint must support unique message IDs for this to work, otherwise a
- * <code>UniqueIdNotSupportedException</code> is thrown.<br>
+ * <code>IdempotentMessageValidator</code> ensures that only unique messages are passed on. It does this by checking the
+ * unique ID of the incoming message.To compute the unique ID any MEL or DataWeave expression can be used, even Crypto functions
+ * from DW capable of computing hashes(SHA,MD5) from the data Note that the underlying endpoint must support unique
+ * message IDs for this to work, otherwise a <code>UniqueIdNotSupportedException</code> is thrown.<br>
  * <p>
  * <b>EIP Reference:</b> <a href="http://www.eaipatterns.com/IdempotentReceiver.html">
  * http://www.eaipatterns.com/IdempotentReceiver.html</a>
