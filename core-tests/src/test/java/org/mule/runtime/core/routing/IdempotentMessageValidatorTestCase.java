@@ -31,7 +31,6 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.weave.v2.el.ByteArrayBasedCursorStreamProvider;
 import org.mule.weave.v2.el.WeaveDefaultExpressionLanguageFactoryService;
 
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -134,15 +133,14 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
         "import dw::Crypto\n" +
         "---\n" +
         "Crypto::SHA1(payload)";
-    String payload = "payload to be encrypted";
+    String payload = "payload to be hashed";
     final EventContext context = mock(EventContext.class);
     when(context.getCorrelationId()).thenReturn("1");
-    Message okMessage = of(payload);
-    Event event = Event.builder(context).message(okMessage).build();
+    Message message = of(payload);
+    Event event = Event.builder(context).message(message).build();
 
     //Set DW expression to hash value
     idempotent.setIdExpression(dwHashExpression);
-
 
     //Evaluate DW expression outside MessageValidator
     ExpressionLanguageAdaptor expressionLanguageAdaptor = new DataWeaveExpressionLanguageAdaptor(muleContext,new WeaveDefaultExpressionLanguageFactoryService());
@@ -154,13 +152,44 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
     assertEquals(idempotent.getObjectStore().retrieve(IOUtils.toString((ByteArrayBasedCursorStreamProvider) hashedValue.getValue())), "1");
 
     // This will not process, because the message is a duplicate
-    okMessage = of(payload);
-    event = Event.builder(context).message(okMessage).build();
+    message = of(payload);
+    event = Event.builder(context).message(message).build();
 
     expected.expect(ValidationException.class);
     processedEvent = idempotent.process(event);
+  }
 
+  @Test
+  public void differentIdsShouldBeStored() throws Exception{
+    String dwHashExpression = "%dw 2.0\n" +
+                              "output text/plain\n" +
+                              "import dw::Crypto\n" +
+                              "---\n" +
+                              "Crypto::SHA1(payload)";
+    String payload = "payload to be hashed";
+    String otherPayload = "this is another payload to be hashed";
+    final EventContext context = mock(EventContext.class);
+    when(context.getCorrelationId()).thenReturn("1");
+    Message message = of(payload);
+    Event event = Event.builder(context).message(message).build();
 
+    //Set DW expression to hash value
+    idempotent.setIdExpression(dwHashExpression);
 
+    //Evaluate DW expression outside MessageValidator
+    ExpressionLanguageAdaptor expressionLanguageAdaptor = new DataWeaveExpressionLanguageAdaptor(muleContext,new WeaveDefaultExpressionLanguageFactoryService());
+    TypedValue hashedValue = expressionLanguageAdaptor.evaluate(dwHashExpression, event,NULL_BINDING_CONTEXT);
+
+    // This one will process the event on the target endpoint
+    Event processedEvent = idempotent.process(event);
+    assertNotNull(processedEvent);
+    assertEquals(idempotent.getObjectStore().retrieve(IOUtils.toString((ByteArrayBasedCursorStreamProvider) hashedValue.getValue())), "1");
+
+    // This will process, because the message is a new one
+    Message otherMessage = of(otherPayload);
+    event = Event.builder(context).message(otherMessage).build();
+    
+    processedEvent = idempotent.process(event);
+    assertNotNull(processedEvent);
   }
 }
