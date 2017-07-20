@@ -6,7 +6,11 @@
  */
 package org.mule.runtime.module.launcher;
 
+import static java.lang.ClassLoader.getSystemClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
+
+import org.mule.module.artifact.classloader.DefaultResourceInitializer;
 import org.mule.runtime.api.exception.ExceptionHelper;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -14,10 +18,10 @@ import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.core.internal.config.StartupContext;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.util.StringMessageUtils;
 import org.mule.runtime.core.api.util.SystemUtils;
+import org.mule.runtime.core.internal.config.StartupContext;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.net.MuleArtifactUrlStreamHandler;
 import org.mule.runtime.module.artifact.classloader.net.MuleUrlStreamHandlerFactory;
@@ -187,6 +191,8 @@ public class MuleContainer {
     }
     showSplashScreen();
     try {
+      doResourceInitialization();
+
       createExecutionMuleFolder();
 
       coreExtensionManager.setDeploymentService(deploymentService);
@@ -204,6 +210,16 @@ public class MuleContainer {
     } catch (Throwable e) {
       shutdown(e);
     }
+  }
+
+  private void doResourceInitialization() {
+    withContextClassLoader(getSystemClassLoader(), () -> {
+      try {
+        new DefaultResourceInitializer().initialize();
+      } catch (Exception e) {
+        logger.error("Cannot create resource initializer instance", e);
+      }
+    });
   }
 
   protected void showSplashScreen() {
