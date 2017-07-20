@@ -188,7 +188,7 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
     // This will process, because the message is a new one
     Message otherMessage = of(otherPayload);
     event = Event.builder(context).message(otherMessage).build();
-    
+
     processedEvent = idempotent.process(event);
     assertNotNull(processedEvent);
   }
