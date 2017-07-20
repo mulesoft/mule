@@ -27,7 +27,7 @@ public class TestSingleUserSecurityProvider extends AbstractSecurityProvider {
 
   private Authentication authentication;
 
-  protected transient final Logger logger = LoggerFactory.getLogger(getClass());
+  private static final Logger LOGGER = LoggerFactory.getLogger(TestSingleUserSecurityProvider.class);
 
   public TestSingleUserSecurityProvider() {
     super("single-user-test");
@@ -40,7 +40,7 @@ public class TestSingleUserSecurityProvider extends AbstractSecurityProvider {
   @Override
   public Authentication authenticate(Authentication authenticationRequest) throws SecurityException {
     String user = (String) authenticationRequest.getPrincipal();
-    logger.debug("Authenticating user: " + user);
+    LOGGER.debug("Authenticating user: " + user);
 
     // Check to see if user has already been authenticated
     if (authentication != null) {
@@ -48,17 +48,16 @@ public class TestSingleUserSecurityProvider extends AbstractSecurityProvider {
       int numberLogins = (Integer) props.get(PROPERTY_NUMBER_LOGINS);
       String favoriteColor = (String) props.get(PROPERTY_FAVORITE_COLOR);
       props.put(PROPERTY_NUMBER_LOGINS, numberLogins + 1);
-      authentication.setProperties(props);
-      logger.info("Welcome back " + user + " (" + numberLogins + 1 + " logins), we remembered your favorite color: "
+      authentication = authentication.setProperties(props);
+      LOGGER.info("Welcome back " + user + " (" + numberLogins + 1 + " logins), we remembered your favorite color: "
           + favoriteColor);
     } else {
       String favoriteColor = getFavoriteColor(user);
-      logger.info("First login for user: " + user + ", favorite color is " + favoriteColor);
+      LOGGER.info("First login for user: " + user + ", favorite color is " + favoriteColor);
       Map<String, Object> props = new HashMap<String, Object>();
       props.put(PROPERTY_NUMBER_LOGINS, 1);
       props.put(PROPERTY_FAVORITE_COLOR, favoriteColor);
-      authenticationRequest.setProperties(props);
-      authentication = authenticationRequest;
+      authentication = authenticationRequest.setProperties(props);
     }
 
     return authentication;

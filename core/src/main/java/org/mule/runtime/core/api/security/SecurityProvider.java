@@ -13,22 +13,21 @@ import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
 
 /**
- * {@code SecurityProvider} is a target security provider that actually does the work of authenticating credentials and
- * populating the Authentication object.
+ * {@code SecurityProvider} is a target security provider that actually does the work of authenticating credentials and populating
+ * the Authentication object.
  *
  * @since 4.0
  */
 public interface SecurityProvider extends Initialisable, NameableObject {
 
   /**
-   * Performs the authentication of a security request based either on the security realm configured
-   * in the {@link Authentication} request or the default realm for the current context
+   * Performs the authentication of a security request based either on the security realm configured in the {@link Authentication}
+   * request or the default realm for the current context
    *
    * @param authentication The {@link Authentication} request
    * @return The authenticated response
    * @throws SecurityException In case authentication fails
    * @see SecurityProvider#authenticate(Authentication)
-   * @see Authentication#isAuthenticated()
    */
   Authentication authenticate(Authentication authentication) throws SecurityException;
 
