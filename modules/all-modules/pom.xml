@@ -50,23 +50,16 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-        <groupId>org.mule.runtime</groupId>
-        <artifactId>mule-module-http-policy-api</artifactId>
-        <version>${muleHttpPolicyApiVersion}</version>
-    </dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-module-http-policy-api</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-policy-api</artifactId>
-            <version>${mulePolicyApiVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-spring-config</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-spring-security</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

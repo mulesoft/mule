@@ -1,1 +1,0 @@
-org.springframework.security.access.method.MethodSecurityMetadataSource=org.mule.runtime.module.spring.security.editors.MethodSecurityMetadataSourceEditor
