@@ -163,7 +163,6 @@ import org.mule.runtime.core.internal.routing.ChoiceRouter;
 import org.mule.runtime.core.internal.routing.FirstSuccessful;
 import org.mule.runtime.core.internal.routing.Foreach;
 import org.mule.runtime.core.internal.routing.IdempotentMessageValidator;
-import org.mule.runtime.core.internal.routing.IdempotentSecureHashMessageValidator;
 import org.mule.runtime.core.internal.routing.MessageChunkAggregator;
 import org.mule.runtime.core.internal.routing.MessageChunkSplitter;
 import org.mule.runtime.core.internal.routing.MessageProcessorExpressionPair;
@@ -762,12 +761,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     definitions.add(baseIdempotentMessageFilterDefinition
         .withIdentifier("idempotent-message-validator")
         .withTypeDefinition(fromType(IdempotentMessageValidator.class))
-        .build());
-
-    definitions.add(baseIdempotentMessageFilterDefinition
-        .withIdentifier("idempotent-secure-hash-message-validator")
-        .withTypeDefinition(fromType(IdempotentSecureHashMessageValidator.class))
-        .withSetterParameterDefinition("messageDigestAlgorithm", fromSimpleParameter("messageDigestAlgorithm").build())
         .build());
 
     return definitions;
