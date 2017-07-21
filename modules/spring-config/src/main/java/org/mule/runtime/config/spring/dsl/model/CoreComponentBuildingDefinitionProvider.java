@@ -305,20 +305,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
             .withSetterParameterDefinition("level", fromSimpleParameter("level").build()).build());
 
     componentBuildingDefinitions
-        .add(getSetVariablePropertyBaseBuilder(getAddFlowVariableTransformerInstanceFactory(AddPropertyProcessor.class),
-                                               AddPropertyProcessor.class,
-                                               newBuilder()
-                                                   .withKey("identifier")
-                                                   .withAttributeDefinition(fromSimpleParameter("propertyName").build())
-                                                   .build(),
-                                               newBuilder()
-                                                   .withKey("value")
-                                                   .withAttributeDefinition(fromSimpleParameter("value").build())
-                                                   .build())
-                                                       .withIdentifier("set-property")
-                                                       .withTypeDefinition(fromType(AddPropertyProcessor.class))
-                                                       .build());
-    componentBuildingDefinitions
         .add(getSetVariablePropertyBaseBuilder(getAddFlowVariableTransformerInstanceFactory(AddFlowVariableProcessor.class),
                                                AddFlowVariableProcessor.class,
                                                newBuilder()
@@ -332,20 +318,11 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
                                                        .withIdentifier("set-variable")
                                                        .withTypeDefinition(fromType(AddFlowVariableProcessor.class))
                                                        .build());
-    componentBuildingDefinitions.add(getMuleMessageTransformerBaseBuilder()
-        .withIdentifier("remove-property")
-        .withTypeDefinition(fromType(RemovePropertyProcessor.class))
-        .withSetterParameterDefinition("identifier", fromSimpleParameter("propertyName").build())
-        .build());
+
     componentBuildingDefinitions.add(getMuleMessageTransformerBaseBuilder()
         .withIdentifier("remove-variable")
         .withTypeDefinition(fromType(RemoveFlowVariableProcessor.class))
         .withSetterParameterDefinition("identifier", fromSimpleParameter("variableName").build())
-        .build());
-    componentBuildingDefinitions.add(getMuleMessageTransformerBaseBuilder()
-        .withIdentifier("copy-properties")
-        .withTypeDefinition(fromType(CopyPropertiesProcessor.class))
-        .withSetterParameterDefinition("propertyName", fromSimpleParameter("propertyName").build())
         .build());
 
     componentBuildingDefinitions.add(baseDefinition
