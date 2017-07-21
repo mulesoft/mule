@@ -35,10 +35,10 @@ public abstract class AbstractCustomerTest extends FunctionalTestCase
         Factory factory = abdera.getFactory();
 
         AbderaClient client = new AbderaClient(abdera);
-        String base = "http://localhost:9002" + basePath + "/";
+        String base = "http://localhost:9002" + basePath;
 
         // Testing of entry creation
-        IRI colUri = new IRI(base).resolve("customers");
+        IRI colUri = new IRI(base).trailingSlash().resolve("customers");
         Entry entry = factory.newEntry();
         entry.setTitle("Hmmm this is ignored right now");
         entry.setUpdated(new Date());
@@ -56,7 +56,7 @@ public abstract class AbstractCustomerTest extends FunctionalTestCase
         assertEquals(201, res.getStatus());
 
         IRI location = res.getLocation();
-        assertEquals(basePath + "/customers/1001-Dan_Diephouse", location.toString());
+        assertEquals(base + "/customers/1001-Dan_Diephouse", location.toString());
 
         // GET the entry
         res = client.get(colUri.resolve(location.toString()).toString());
