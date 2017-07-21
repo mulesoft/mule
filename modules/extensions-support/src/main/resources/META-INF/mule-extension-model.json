@@ -1678,7 +1678,7 @@
                 "format": "java",
                 "type": "Object",
                 "annotations": {
-                  "typeId": "org.mule.runtime.core.internal.routing.AggregationStrategy",
+                  "typeId": "org.mule.runtime.core.api.routing.AggregationStrategy",
                   "classInformation": {
                     "hasDefaultConstructor": false,
                     "isInterface": true,
