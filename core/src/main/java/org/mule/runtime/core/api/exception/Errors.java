@@ -14,6 +14,7 @@ import static org.mule.runtime.core.api.exception.Errors.Identifiers.CRITICAL_ID
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.DUPLICATE_MESSAGE_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.EXPRESSION_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.FATAL_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.api.exception.Errors.Identifiers.NOT_PERMITTED_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.OVERLOAD_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.REDELIVERY_EXHAUSTED_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.RETRY_EXHAUSTED_ERROR_IDENTIFIER;
@@ -99,6 +100,11 @@ public abstract class Errors {
      * Indicates a security type problem enforced by the mule runtime
      */
     public static final String SERVER_SECURITY_ERROR_IDENTIFIER = "SERVER_SECURITY";
+
+    /**
+     * Indicates a security restriction enforced by a filter
+     */
+    public static final String NOT_PERMITTED_ERROR_IDENTIFIER = "NOT_PERMITTED";
 
     /**
      * Indicates that an error occurred in the source of the flow processing a successful response.
@@ -188,6 +194,8 @@ public abstract class Errors {
         builder().withNamespace(CORE_NAMESPACE_NAME).withName(CLIENT_SECURITY_ERROR_IDENTIFIER).build();
     public static final ComponentIdentifier SERVER_SECURITY =
         builder().withNamespace(CORE_NAMESPACE_NAME).withName(SERVER_SECURITY_ERROR_IDENTIFIER).build();
+    public static final ComponentIdentifier NOT_PERMITTED =
+        builder().withNamespace(CORE_NAMESPACE_NAME).withName(NOT_PERMITTED_ERROR_IDENTIFIER).build();
     public static final ComponentIdentifier OVERLOAD =
         builder().withNamespace(CORE_NAMESPACE_NAME).withName(OVERLOAD_ERROR_IDENTIFIER).build();
 
