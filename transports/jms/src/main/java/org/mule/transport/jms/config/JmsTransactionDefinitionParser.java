@@ -7,7 +7,6 @@
 
 package org.mule.transport.jms.config;
 
-import static java.lang.String.format;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.mule.util.StringUtils.isEmpty;
 import org.mule.config.spring.parsers.specific.TransactionDefinitionParser;
@@ -22,7 +21,7 @@ import org.w3c.dom.Element;
 public class JmsTransactionDefinitionParser extends TransactionDefinitionParser
 {
 
-    private static final String TIMEOUT_WARNING_MESSAGE = format("The timeout attribute on the <jms:transaction> element will be ignored since it is only taken into account in XA Transactions.");
+    private static final String TIMEOUT_WARNING_MESSAGE = "The timeout attribute on the <jms:transaction> element will be ignored since it is only taken into account in XA Transactions.";
     private static final OneTimeWarning timeoutAttributeWarning = new OneTimeWarning(getLogger(JmsTransactionDefinitionParser.class), TIMEOUT_WARNING_MESSAGE);
 
     public JmsTransactionDefinitionParser()
