@@ -25,6 +25,7 @@ import org.junit.Test;
 public abstract class RequestReplyInForEachTestCase extends FunctionalTestCase
 {
 
+    private static final int TIMEOUT = 5000;
     private final List<String> values = new ArrayList<>();
 
     @Before
@@ -59,7 +60,7 @@ public abstract class RequestReplyInForEachTestCase extends FunctionalTestCase
 
     private void assertResult(MuleClient client, String payload, String queueName) throws Exception
     {
-        MuleMessage reply = client.request("vm://" + queueName, 1000);
+        MuleMessage reply = client.request("vm://" + queueName, TIMEOUT);
         assertThat(reply, is(notNullValue()));
         assertThat(reply.getPayloadAsString(), is(payload));
     }
