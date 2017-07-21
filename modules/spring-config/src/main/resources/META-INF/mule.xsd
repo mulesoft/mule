@@ -3298,7 +3298,7 @@
         <xsd:attribute name="timeout" type="substitutableInt">
             <xsd:annotation>
                 <xsd:documentation>
-                    Timeout for the transaction (ms).
+                    Timeout for the transaction (ms). This attribute is only taken into account in XA Transactions.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
