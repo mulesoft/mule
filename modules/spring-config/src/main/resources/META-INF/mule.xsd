@@ -2916,26 +2916,6 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="idempotent-secure-hash-message-validator" substitutionGroup="abstract-message-processor">
-        <xsd:annotation>
-            <xsd:documentation>
-                Ensures that only unique messages are received by a service by calculating the hash of the message itself using a message digest algorithm. This provides a value with an infinitesimally small chance of a collision. This can be used to filter message duplicates. Keep in mind that the hash is calculated over the entire byte array representing the message, so any leading or trailing spaces or extraneous bytes (like padding) can produce different hash values for the same semantic message content. Care should be taken to ensure that messages do not contain extraneous bytes. This class is useful when the message does not support unique identifiers.
-            </xsd:documentation>
-        </xsd:annotation>
-        <xsd:complexType>
-            <xsd:complexContent>
-                <xsd:extension base="idempotentMessageValidatorType">
-                    <xsd:attribute name="messageDigestAlgorithm" type="xsd:string">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                The secure hashing algorithm to use. If not set, the default is SHA-256.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:attribute>
-                </xsd:extension>
-            </xsd:complexContent>
-        </xsd:complexType>
-    </xsd:element>
     <xsd:complexType name="baseAggregatorType">
         <xsd:complexContent>
             <xsd:extension base="abstractInterceptingMessageProcessorType">
