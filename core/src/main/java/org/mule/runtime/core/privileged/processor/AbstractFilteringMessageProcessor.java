@@ -25,6 +25,7 @@ import org.reactivestreams.Publisher;
  * Abstract {@link InterceptingMessageProcessor} that can be easily be extended and used for filtering message flow through a
  * {@link Processor} chain. The default behaviour when the filter is not accepted is to return the request event.
  */
+// TODO(pablo.kraan): MULE-13154: this class has to be moved to compatibility
 public abstract class AbstractFilteringMessageProcessor extends AbstractInterceptingMessageProcessor {
 
   /**
