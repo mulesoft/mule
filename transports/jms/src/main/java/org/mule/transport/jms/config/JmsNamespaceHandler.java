@@ -67,7 +67,7 @@ public class JmsNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("weblogic-connector", new JmsConnectorDefinitionParser(WeblogicJmsConnector.class));
         registerBeanDefinitionParser("websphere-connector", new JmsConnectorDefinitionParser(WebsphereJmsConnector.class));
 
-        registerBeanDefinitionParser("transaction", new TransactionDefinitionParser(JmsTransactionFactory.class));
+        registerBeanDefinitionParser("transaction", new JmsTransactionDefinitionParser());
         registerBeanDefinitionParser("client-ack-transaction", new TransactionDefinitionParser(JmsClientAcknowledgeTransactionFactory.class));
         
         registerBeanDefinitionParser("jmsmessage-to-object-transformer", new MessageProcessorDefinitionParser(JMSMessageToObject.class));
