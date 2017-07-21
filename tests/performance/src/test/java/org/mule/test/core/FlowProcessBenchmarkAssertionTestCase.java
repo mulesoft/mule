@@ -11,8 +11,8 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import org.mule.AbstractBenchmarkAssertionTestCase;
 import org.mule.FlowNullProcessorBenchmark;
-import org.mule.runtime.core.processor.strategy.BlockingProcessingStrategyFactory;
-import org.mule.runtime.core.processor.strategy.TransactionAwareWorkQueueProcessingStrategyFactory;
+import org.mule.runtime.core.internal.processor.strategy.BlockingProcessingStrategyFactory;
+import org.mule.runtime.core.internal.processor.strategy.TransactionAwareWorkQueueProcessingStrategyFactory;
 
 import org.junit.Test;
 

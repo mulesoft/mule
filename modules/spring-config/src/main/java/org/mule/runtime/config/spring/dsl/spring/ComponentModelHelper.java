@@ -20,7 +20,7 @@ import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.internal.exception.TemplateOnErrorHandler;
 import org.mule.runtime.core.api.processor.Scope;
-import org.mule.runtime.core.routing.AbstractSelectiveRouter;
+import org.mule.runtime.core.internal.routing.AbstractSelectiveRouter;
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
 
 import org.springframework.beans.PropertyValue;

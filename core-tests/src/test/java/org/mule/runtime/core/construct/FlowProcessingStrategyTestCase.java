@@ -15,9 +15,8 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.construct.Flow.builder;
-import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
-
+import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.config.MuleConfiguration;
@@ -26,9 +25,9 @@ import org.mule.runtime.core.api.construct.Flow.Builder;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.processor.strategy.AbstractProcessingStrategy;
-import org.mule.runtime.core.processor.strategy.AbstractProcessingStrategyFactory;
-import org.mule.runtime.core.processor.strategy.TransactionAwareWorkQueueProcessingStrategyFactory;
+import org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy;
+import org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyFactory;
+import org.mule.runtime.core.internal.processor.strategy.TransactionAwareWorkQueueProcessingStrategyFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -123,7 +122,6 @@ public class FlowProcessingStrategyTestCase extends AbstractMuleTestCase {
 
   private static class TestProcessingStrategy extends AbstractProcessingStrategy {
   }
-
 
   private void createFlow(ProcessingStrategyFactory configProcessingStrategyFactory) {
     Builder flowBuilder = builder("test", muleContext);

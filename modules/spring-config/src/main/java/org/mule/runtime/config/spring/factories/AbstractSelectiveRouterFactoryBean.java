@@ -10,9 +10,8 @@ import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
-import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.routing.AbstractSelectiveRouter;
-import org.mule.runtime.core.routing.MessageProcessorExpressionPair;
+import org.mule.runtime.core.internal.routing.AbstractSelectiveRouter;
+import org.mule.runtime.core.internal.routing.MessageProcessorExpressionPair;
 
 import java.util.Collection;
 

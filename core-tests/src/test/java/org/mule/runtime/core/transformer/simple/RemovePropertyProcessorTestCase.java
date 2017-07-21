@@ -15,7 +15,7 @@ import static org.mockito.Mockito.when;
 import org.mule.functional.transformer.simple.AbstractRemoveVariablePropertyProcessorTestCase;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.internal.message.InternalMessage;
-import org.mule.runtime.core.processor.simple.RemovePropertyProcessor;
+import org.mule.runtime.core.internal.processor.simple.RemovePropertyProcessor;
 import org.mule.tck.size.SmallTest;
 
 import java.util.Set;

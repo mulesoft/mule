@@ -14,7 +14,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.NestedProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.processor.chain.NestedProcessorChain;
+import org.mule.runtime.core.internal.processor.chain.NestedProcessorChain;
 import org.mule.runtime.core.api.util.ObjectNameHelper;
 
 /**

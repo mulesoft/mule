@@ -26,7 +26,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.processor.simple.AbstractRemoveVariablePropertyProcessor;
+import org.mule.runtime.core.privileged.processor.simple.AbstractRemoveVariablePropertyProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 

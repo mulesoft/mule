@@ -13,7 +13,7 @@ import static org.springframework.beans.factory.support.BeanDefinitionBuilder.ro
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.processor.ObjectTypeVisitor;
-import org.mule.runtime.core.processor.ReferenceProcessor;
+import org.mule.runtime.core.internal.processor.ReferenceProcessor;
 
 import com.google.common.collect.ImmutableMap;
 

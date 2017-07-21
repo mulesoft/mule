@@ -29,7 +29,7 @@ import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.config.ExceptionHelper;
-import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
+import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;

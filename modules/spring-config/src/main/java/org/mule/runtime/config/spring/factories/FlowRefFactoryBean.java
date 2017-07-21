@@ -35,7 +35,7 @@ import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.processor.AnnotatedProcessor;
+import org.mule.runtime.core.internal.processor.AnnotatedProcessor;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;

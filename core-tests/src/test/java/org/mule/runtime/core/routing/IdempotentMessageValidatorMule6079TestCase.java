@@ -19,6 +19,7 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.routing.ValidationException;
 import org.mule.runtime.core.internal.message.InternalMessage;
+import org.mule.runtime.core.internal.routing.IdempotentMessageValidator;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.Serializable;

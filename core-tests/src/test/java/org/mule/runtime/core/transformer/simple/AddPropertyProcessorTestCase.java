@@ -14,7 +14,7 @@ import org.mule.functional.transformer.simple.AbstractAddVariablePropertyProcess
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.internal.message.InternalMessage;
-import org.mule.runtime.core.processor.simple.AddPropertyProcessor;
+import org.mule.runtime.core.internal.processor.simple.AddPropertyProcessor;
 import org.mule.tck.size.SmallTest;
 
 @SmallTest

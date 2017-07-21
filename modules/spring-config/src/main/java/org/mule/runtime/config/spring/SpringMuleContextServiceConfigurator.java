@@ -121,7 +121,7 @@ import org.mule.runtime.core.internal.util.queue.TransactionalQueueManager;
 import org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean;
 import org.mule.runtime.core.internal.util.store.MuleObjectStoreManager;
 import org.mule.runtime.core.internal.value.MuleValueProviderService;
-import org.mule.runtime.core.processor.interceptor.DefaultProcessorInterceptorManager;
+import org.mule.runtime.core.internal.processor.interceptor.DefaultProcessorInterceptorManager;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.core.security.DefaultMuleSecurityManager;
 import com.google.common.collect.ImmutableList;

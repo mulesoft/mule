@@ -20,7 +20,7 @@ import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.processor.strategy.DirectProcessingStrategyFactory;
+import org.mule.runtime.core.api.processor.strategy.DirectProcessingStrategyFactory;
 
 import java.util.HashMap;
 import java.util.Map;

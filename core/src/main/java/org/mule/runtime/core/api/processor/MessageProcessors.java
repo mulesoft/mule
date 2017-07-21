@@ -21,9 +21,9 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
-import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
-import org.mule.runtime.core.processor.chain.ExplicitMessageProcessorChainBuilder;
-import org.mule.runtime.core.processor.chain.ExplicitMessageProcessorChainBuilder.ExplicitMessageProcessorChain;
+import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
+import org.mule.runtime.core.internal.processor.chain.ExplicitMessageProcessorChainBuilder;
+import org.mule.runtime.core.internal.processor.chain.ExplicitMessageProcessorChainBuilder.ExplicitMessageProcessorChain;
 
 import java.util.List;
 import java.util.Optional;

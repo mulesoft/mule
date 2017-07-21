@@ -26,7 +26,7 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
 import org.mule.runtime.core.internal.message.InternalMessage;
-import org.mule.runtime.core.processor.AbstractMuleObjectOwner;
+import org.mule.runtime.core.api.processor.AbstractMuleObjectOwner;
 
 import java.util.List;
 import java.util.Optional;

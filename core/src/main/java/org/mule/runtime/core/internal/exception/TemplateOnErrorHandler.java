@@ -40,7 +40,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
 import org.mule.runtime.core.internal.message.InternalMessage;
-import org.mule.runtime.core.routing.requestreply.ReplyToPropertyRequestReplyReplier;
+import org.mule.runtime.core.privileged.routing.requestreply.ReplyToPropertyRequestReplyReplier;
 
 import java.util.ArrayList;
 import java.util.List;
