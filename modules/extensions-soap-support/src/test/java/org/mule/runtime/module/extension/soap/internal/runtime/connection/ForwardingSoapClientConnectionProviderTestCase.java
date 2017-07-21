@@ -7,24 +7,17 @@
 package org.mule.runtime.module.extension.soap.internal.runtime.connection;
 
 import static java.util.Arrays.asList;
-import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
-import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 
-import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.connection.ConnectionValidationResult;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.soap.MessageDispatcherProvider;
 import org.mule.runtime.extension.api.soap.SoapServiceProvider;
+import org.mule.runtime.extension.api.soap.SoapServiceProviderConfigurationException;
 import org.mule.runtime.extension.api.soap.WebServiceDefinition;
-import org.mule.runtime.soap.api.client.SoapClient;
-import org.mule.runtime.soap.api.client.SoapClientConfiguration;
-import org.mule.runtime.soap.api.client.SoapClientFactory;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -54,21 +47,11 @@ public class ForwardingSoapClientConnectionProviderTestCase {
   }
 
   @Test
-  public void invalidProvider() throws ConnectionException {
+  public void invalidProvider() throws Exception {
     expectedException.expectMessage(ERROR_MESSAGE);
-    expectedException.expect(ConnectionException.class);
-    expectedException.expectCause(instanceOf(RuntimeException.class));
-    ForwardingSoapClientConnectionProvider provider =
-      new ForwardingSoapClientConnectionProvider(new ValidableServiceProvider(false), dispatcherProvider, muleContext);
-    provider.connect();
-  }
-
-  @Test
-  public void validProvider() throws ConnectionException {
-    ForwardingSoapClientConnectionProvider provider =
-      new ForwardingSoapClientConnectionProvider(new ValidableServiceProvider(true), dispatcherProvider, muleContext);
-    ForwardingSoapClient client = provider.connect();
-    assertThat(client.getAllWebServices(), hasSize(1));
+    expectedException.expect(InitialisationException.class);
+    expectedException.expectCause(instanceOf(SoapServiceProviderConfigurationException.class));
+    new ForwardingSoapClientConnectionProvider(new ValidableServiceProvider(false), dispatcherProvider, muleContext).initialise();
   }
 
   private class ValidableServiceProvider implements SoapServiceProvider {
@@ -94,8 +77,10 @@ public class ForwardingSoapClientConnectionProviderTestCase {
     }
 
     @Override
-    public ConnectionValidationResult validate() {
-      return valid ? success() : failure(ERROR_MESSAGE, ERROR_TYPE, EXCEPTION);
+    public void validateConfiguration() {
+      if (!valid) {
+        throw new SoapServiceProviderConfigurationException(ERROR_MESSAGE, EXCEPTION);
+      }
     }
   }
 }

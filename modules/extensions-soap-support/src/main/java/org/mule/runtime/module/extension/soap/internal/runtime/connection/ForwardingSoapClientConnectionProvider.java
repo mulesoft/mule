@@ -19,6 +19,7 @@ import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.soap.MessageDispatcherProvider;
 import org.mule.runtime.extension.api.soap.SoapServiceProvider;
+import org.mule.runtime.extension.api.soap.SoapServiceProviderConfigurationException;
 import org.mule.runtime.extension.api.soap.WebServiceDefinition;
 import org.mule.runtime.extension.api.soap.message.MessageDispatcher;
 import org.mule.runtime.http.api.HttpService;
@@ -75,10 +76,6 @@ public class ForwardingSoapClientConnectionProvider implements ConnectionProvide
    */
   @Override
   public ForwardingSoapClient connect() throws ConnectionException {
-    ConnectionValidationResult result = serviceProvider.validate();
-    if (!result.isValid()) {
-      throw new ConnectionException(result.getMessage(), result.getException(), result.getErrorType().orElse(null));
-    }
     return new ForwardingSoapClient(soapService, serviceProvider, transportProvider);
   }
 
@@ -101,6 +98,11 @@ public class ForwardingSoapClientConnectionProvider implements ConnectionProvide
 
   @Override
   public void initialise() throws InitialisationException {
+    try {
+      serviceProvider.validateConfiguration();
+    } catch(SoapServiceProviderConfigurationException e) {
+      throw new InitialisationException(e, this);
+    }
     initialiseIfNeeded(asList(transportProvider, serviceProvider), true, muleContext);
   }
 
