@@ -762,7 +762,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withIdentifier("idempotent-message-validator")
         .withTypeDefinition(fromType(IdempotentMessageValidator.class))
         .build());
-    
+
     return definitions;
   }
 

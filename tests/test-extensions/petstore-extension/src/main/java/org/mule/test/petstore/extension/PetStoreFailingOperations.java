@@ -7,13 +7,14 @@
 
 package org.mule.test.petstore.extension;
 
-import java.io.IOException;
+import org.mule.runtime.api.connection.ConnectionException;
+
 import java.util.Map;
 
 public class PetStoreFailingOperations extends PetStoreOperations {
 
   public String fail(Map<String, String> petNames) throws Exception {
-    throw new IOException("Failed operation");
+    throw new ConnectionException("Failed operation");
   }
 
 }

@@ -11,6 +11,7 @@ import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.CO
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.DUPLICATE_MESSAGE;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.EXPRESSION;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.FATAL;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.NOT_PERMITTED;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.OVERLOAD;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.REDELIVERY_EXHAUSTED;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.RETRY_EXHAUSTED;
@@ -54,6 +55,7 @@ public class ErrorTypeRepositoryFactory {
     errorTypeRepository.addErrorType(SECURITY, errorTypeRepository.getAnyErrorType());
     errorTypeRepository.addErrorType(CLIENT_SECURITY, errorTypeRepository.getErrorType(SECURITY).get());
     errorTypeRepository.addErrorType(SERVER_SECURITY, errorTypeRepository.getErrorType(SECURITY).get());
+    errorTypeRepository.addErrorType(NOT_PERMITTED, errorTypeRepository.getErrorType(SERVER_SECURITY).get());
     errorTypeRepository.addInternalErrorType(OVERLOAD, errorTypeRepository.getCriticalErrorType());
     errorTypeRepository.addErrorType(STREAM_MAXIMUM_SIZE_EXCEEDED, errorTypeRepository.getAnyErrorType());
     errorTypeRepository.addInternalErrorType(FATAL, errorTypeRepository.getCriticalErrorType());
