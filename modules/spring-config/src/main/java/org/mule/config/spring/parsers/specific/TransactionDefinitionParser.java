@@ -36,7 +36,7 @@ public class TransactionDefinitionParser extends AbstractSingleParentFamilyDefin
     public static final String TIMEOUT = "timeout";
     public static final String INTERACT_WTH_EXTERNAL = "interactWithExternal";
     private static final String TIMEOUT_WARNING_MESSAGE = "The timeout attribute on the <transaction> element will be ignored since it is only taken into account in XA Transactions.";
-    private static Logger LOGGER = getLogger(TransactionDefinitionParser.class);
+    private static final Logger LOGGER = getLogger(TransactionDefinitionParser.class);
     private static final OneTimeWarning timeoutAttributeWarning = new OneTimeWarning(LOGGER, TIMEOUT_WARNING_MESSAGE);
 
     private static String[] IGNORED_ATTRIBUTES = new String[] {FACTORY_REF, ACTION, TIMEOUT, INTERACT_WTH_EXTERNAL};
