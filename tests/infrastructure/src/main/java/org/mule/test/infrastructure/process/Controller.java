@@ -239,8 +239,8 @@ public class Controller {
     if (log.exists() && log.isFile()) {
       return log;
     }
-    throw new MuleControllerException(String.format("There is no mule log available at %s/logs/",
-                                                    osSpecificController.getMuleHome()));
+    throw new MuleControllerException(String.format("There is no app log available at %s/logs/%s",
+                                                    osSpecificController.getMuleHome(), appName));
   }
 
   public void addConfProperty(String value) {
