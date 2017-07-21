@@ -6,12 +6,20 @@
  */
 package org.mule.config.spring.parsers.specific;
 
+import static org.apache.commons.lang.StringUtils.isEmpty;
+import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.config.spring.parsers.MuleDefinitionParser;
 import org.mule.config.spring.parsers.MuleDefinitionParserConfiguration;
 import org.mule.config.spring.parsers.delegate.AbstractSingleParentFamilyDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.processors.BlockAttribute;
+import org.mule.util.OneTimeWarning;
+
+import org.slf4j.Logger;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
+import org.springframework.beans.factory.xml.ParserContext;
+import org.w3c.dom.Element;
 
 /**
  * Generates a transaction config with embedded factory.  If no factory is defined, it's taken from the
@@ -27,6 +35,9 @@ public class TransactionDefinitionParser extends AbstractSingleParentFamilyDefin
     public static final String ACTION = "action";
     public static final String TIMEOUT = "timeout";
     public static final String INTERACT_WTH_EXTERNAL = "interactWithExternal";
+    private static final String TIMEOUT_WARNING_MESSAGE = "The timeout attribute on the <transaction> element will be ignored since it is only taken into account in XA Transactions.";
+    private static Logger logger = getLogger(TransactionDefinitionParser.class);
+    private static final OneTimeWarning timeoutAttributeWarning = new OneTimeWarning(logger, TIMEOUT_WARNING_MESSAGE);
 
     private static String[] IGNORED_ATTRIBUTES = new String[] {FACTORY_REF, ACTION, TIMEOUT, INTERACT_WTH_EXTERNAL};
 
@@ -65,6 +76,17 @@ public class TransactionDefinitionParser extends AbstractSingleParentFamilyDefin
         addIgnored(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME);
         addHandledException(BlockAttribute.BlockAttributeException.class);
     }
+
+    @Override
+    protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext)
+    {
+        if (!isEmpty(element.getAttribute(TIMEOUT)))
+        {
+            timeoutAttributeWarning.warn();
+        }
+        return super.parseInternal(element, parserContext);
+    }
+
 
     protected String[] getIgnoredAttributes()
     {
