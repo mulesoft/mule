@@ -25,6 +25,9 @@
                 <configuration>
                     <!-- TODO: We should be able to remove the PermGen config after we fix MULE-10010 -->
                     <argLine>-Xmx512m -XX:MaxPermSize=256m</argLine>
+                    <systemPropertyVariables>
+                        <org.apache.activemq.SERIALIZABLE_PACKAGES>*</org.apache.activemq.SERIALIZABLE_PACKAGES>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
         </plugins>

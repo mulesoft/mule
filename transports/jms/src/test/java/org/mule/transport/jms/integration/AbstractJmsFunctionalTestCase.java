@@ -18,6 +18,7 @@ import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.transaction.Transaction;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.util.ClassUtils;
 import org.mule.util.CollectionUtils;
@@ -50,6 +51,7 @@ import javax.transaction.SystemException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.ClassRule;
 
 /**
  * This is the base class for all integration tests that are part of the JMS integration test suite.  This is
@@ -95,6 +97,9 @@ import org.apache.commons.logging.LogFactory;
  */
 public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 {
+
+    @ClassRule
+    public static SystemProperty serializablePackages = new SystemProperty("org.apache.activemq.SERIALIZABLE_PACKAGES", "*");
 
     public static final String DEFAULT_INPUT_MESSAGE = "INPUT MESSAGE";
     public static final String DEFAULT_OUTPUT_MESSAGE = "OUTPUT MESSAGE";
