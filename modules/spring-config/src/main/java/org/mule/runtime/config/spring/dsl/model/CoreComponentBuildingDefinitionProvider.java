@@ -139,9 +139,7 @@ import org.mule.runtime.core.internal.processor.InvokerMessageProcessor;
 import org.mule.runtime.core.internal.processor.ResponseMessageProcessorAdapter;
 import org.mule.runtime.core.internal.processor.TryScope;
 import org.mule.runtime.core.internal.processor.simple.AddFlowVariableProcessor;
-import org.mule.runtime.core.internal.processor.simple.AddPropertyProcessor;
 import org.mule.runtime.core.internal.processor.simple.RemoveFlowVariableProcessor;
-import org.mule.runtime.core.internal.processor.simple.RemovePropertyProcessor;
 import org.mule.runtime.core.internal.processor.simple.SetPayloadMessageProcessor;
 import org.mule.runtime.core.internal.routing.ChoiceRouter;
 import org.mule.runtime.core.internal.routing.FirstSuccessful;
@@ -305,7 +303,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
             .withSetterParameterDefinition("level", fromSimpleParameter("level").build()).build());
 
     componentBuildingDefinitions
-        .add(getSetVariablePropertyBaseBuilder(getAddFlowVariableTransformerInstanceFactory(AddFlowVariableProcessor.class),
+        .add(getSetVariablePropertyBaseBuilder(getAddVariableTransformerInstanceFactory(AddFlowVariableProcessor.class),
                                                AddFlowVariableProcessor.class,
                                                newBuilder()
                                                    .withKey("identifier")
@@ -926,7 +924,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     return transformerComponentBuildingDefinitions;
   }
 
-  private ConfigurableInstanceFactory getAddFlowVariableTransformerInstanceFactory(Class<? extends AbstractAddVariablePropertyProcessor> transformerType) {
+  private ConfigurableInstanceFactory getAddVariableTransformerInstanceFactory(Class<? extends AbstractAddVariablePropertyProcessor> transformerType) {
     return parameters -> {
       AbstractAddVariablePropertyProcessor transformer =
           (AbstractAddVariablePropertyProcessor) createNewInstance(transformerType);
