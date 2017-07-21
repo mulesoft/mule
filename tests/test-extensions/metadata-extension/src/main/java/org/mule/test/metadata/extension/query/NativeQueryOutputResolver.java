@@ -6,9 +6,6 @@
  */
 package org.mule.test.metadata.extension.query;
 
-import static org.mule.metadata.api.model.MetadataFormat.JAVA;
-import org.mule.metadata.api.builder.ArrayTypeBuilder;
-import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.builder.ObjectTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -19,13 +16,6 @@ import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 public class NativeQueryOutputResolver implements OutputTypeResolver<String> {
 
   public static final String NATIVE_QUERY = "SELECT FIELDS: field-id FROM TYPE: Circle DO WHERE field-diameter < 18";
-  public static final MetadataType CIRCLE_TYPE;
-  static {
-    final ArrayTypeBuilder arrayType = BaseTypeBuilder.create(JAVA).arrayType();
-    final ObjectTypeBuilder objectType = arrayType.of().objectType();
-    objectType.addField().key("id").value().numberType();
-    CIRCLE_TYPE = arrayType.build();
-  }
 
   @Override
   public String getCategoryName() {
@@ -40,6 +30,8 @@ public class NativeQueryOutputResolver implements OutputTypeResolver<String> {
       throw new IllegalArgumentException("Native Query Key was not the expected one");
     }
 
-    return CIRCLE_TYPE;
+    final ObjectTypeBuilder objectType = context.getTypeBuilder().objectType();
+    objectType.addField().key("id").value().numberType();
+    return objectType.build();
   }
 }

@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.metadata;
 
-import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.builder.ObjectFieldTypeBuilder;
 import org.mule.metadata.api.builder.ObjectTypeBuilder;
@@ -69,17 +68,17 @@ final class DsqlQueryMetadataResolver implements OutputTypeResolver {
       DsqlQuery dsqlQuery = (DsqlQuery) query;
       MetadataType entityMetadata = entityResolver.getEntityMetadata(context, dsqlQuery.getType().getName());
 
-      BaseTypeBuilder builder = BaseTypeBuilder.create(JAVA);
+      BaseTypeBuilder builder = context.getTypeBuilder();
       final List<Field> fields = dsqlQuery.getFields();
       if (fields.size() == 1 && fields.get(0).getName().equals("*")) {
-        return builder.arrayType().of(entityMetadata).build();
+        return entityMetadata;
       }
 
       entityMetadata.accept(new MetadataTypeVisitor() {
 
         @Override
         public void visitObject(ObjectType objectType) {
-          ObjectTypeBuilder objectTypeBuilder = builder.arrayType().of().objectType();
+          ObjectTypeBuilder objectTypeBuilder = builder.objectType();
           objectType.getFields()
               .stream()
               .filter(p -> fields.stream().anyMatch(f -> f.getName().equalsIgnoreCase(p.getKey().getName().getLocalPart())))

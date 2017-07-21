@@ -185,16 +185,36 @@
                                            animal="#[mel:new org.mule.test.metadata.extension.model.animals.Bear()]"/>
     </flow>
 
-    <flow name="queryOperation">
+    <flow name="pagedOperationMetadataResult">
+        <metadata:paged-operation-result config-ref="config" type="PERSON"/>
+    </flow>
+
+    <flow name="pagedOperationMetadataResultWithAttributesResolver">
+        <metadata:paged-operation-result-with-attributes-resolver config-ref="config" type="PERSON"/>
+    </flow>
+
+    <flow name="queryListOperation">
         <metadata:do-query>
             <metadata:query><![CDATA[dsql:SELECT id FROM Circle WHERE diameter < 18]]></metadata:query>
         </metadata:do-query>
     </flow>
 
-    <flow name="nativeQueryOperation">
+    <flow name="nativeQueryListOperation">
         <metadata:do-query>
             <metadata:query><![CDATA[SELECT FIELDS: field-id FROM TYPE: Circle DO WHERE field-diameter < 18]]></metadata:query>
         </metadata:do-query>
+    </flow>
+
+    <flow name="nativeQueryOperation">
+        <metadata:return-query>
+            <metadata:query><![CDATA[SELECT FIELDS: field-id FROM TYPE: Circle DO WHERE field-diameter < 18]]></metadata:query>
+        </metadata:return-query>
+    </flow>
+
+    <flow name="queryOperation">
+        <metadata:return-query>
+            <metadata:query><![CDATA[dsql:SELECT id FROM Circle WHERE diameter < 18]]></metadata:query>
+        </metadata:return-query>
     </flow>
 
     <flow name="listOfMessages">
@@ -203,6 +223,10 @@
     
     <flow name="dynamicListOfMessages">
         <metadata:dynamic-list-of-messages type="PERSON"/>
+    </flow>
+
+    <flow name="dynamicListOfObjects">
+        <metadata:dynamic-list-of-objects type="PERSON"/>
     </flow>
 
 </mule>

@@ -84,7 +84,9 @@ public abstract class MetadataExtensionFunctionalTestCase<T extends ComponentMod
   protected static final String CONTENT_AND_OUTPUT_CACHE_RESOLVER_WITH_ALTERNATIVE_CONFIG =
       "contentAndOutputWithCacheResolverWithSpecificConfig";
   protected static final String QUERY_FLOW = "queryOperation";
+  protected static final String QUERY_LIST_FLOW = "queryListOperation";
   protected static final String NATIVE_QUERY_FLOW = "nativeQueryOperation";
+  protected static final String NATIVE_QUERY_LIST_FLOW = "nativeQueryListOperation";
 
   protected static final String CONTENT_ONLY_CACHE_RESOLVER = "contentOnlyCacheResolver";
   protected static final String OUTPUT_AND_METADATA_KEY_CACHE_RESOLVER = "outputAndMetadataKeyCacheResolver";
@@ -234,7 +236,7 @@ public abstract class MetadataExtensionFunctionalTestCase<T extends ComponentMod
     assertExpectedType(attributes.getType(), attributesType);
   }
 
-  private void assertExpectedType(MetadataType type, MetadataType expectedType) {
+  protected void assertExpectedType(MetadataType type, MetadataType expectedType) {
     assertThat(type, is(expectedType));
   }
 
