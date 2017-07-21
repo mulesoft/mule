@@ -100,7 +100,7 @@ public class ForwardingSoapClientConnectionProvider implements ConnectionProvide
   public void initialise() throws InitialisationException {
     try {
       serviceProvider.validateConfiguration();
-    } catch(SoapServiceProviderConfigurationException e) {
+    } catch (SoapServiceProviderConfigurationException e) {
       throw new InitialisationException(e, this);
     }
     initialiseIfNeeded(asList(transportProvider, serviceProvider), true, muleContext);

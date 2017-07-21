@@ -66,11 +66,11 @@ public class ForwardingSoapClientConnectionProviderTestCase {
     public List<WebServiceDefinition> getWebServiceDefinitions() {
       try {
         return asList(WebServiceDefinition.builder()
-                        .withId("dos")
-                        .withFriendlyName("Another Service Name")
-                        .withWsdlUrl(new URL("http://localhost.com/dos"))
-                        .withService("Service")
-                        .withPort("Port2").build());
+            .withId("dos")
+            .withFriendlyName("Another Service Name")
+            .withWsdlUrl(new URL("http://localhost.com/dos"))
+            .withService("Service")
+            .withPort("Port2").build());
       } catch (MalformedURLException e) {
         throw new RuntimeException(e);
       }
