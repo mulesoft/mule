@@ -179,7 +179,6 @@ import org.mule.runtime.core.transformer.simple.BeanToMap;
 import org.mule.runtime.core.transformer.simple.ByteArrayToHexString;
 import org.mule.runtime.core.transformer.simple.ByteArrayToObject;
 import org.mule.runtime.core.transformer.simple.ByteArrayToSerializable;
-import org.mule.runtime.core.transformer.simple.CopyPropertiesProcessor;
 import org.mule.runtime.core.transformer.simple.HexStringToByteArray;
 import org.mule.runtime.core.transformer.simple.MapToBean;
 import org.mule.runtime.core.transformer.simple.ParseTemplateTransformer;
