@@ -9,10 +9,10 @@
     <artifactId>mule-module-atom</artifactId>
     <packaging>jar</packaging>
     <name>ATOM Module</name>
-    <description>Mule ATOM Endpoints and Serivce Component</description>
+    <description>Mule ATOM Endpoints and Service Component</description>
 
     <properties>
-        <abderaVersion>0.4.0-incubating</abderaVersion>
+        <abderaVersion>1.1.3</abderaVersion>
     </properties>
 
     <!-- Common Dependencies -->
@@ -62,7 +62,11 @@
                 </exclusion>
                 <exclusion>
                     <groupId>org.apache.geronimo.specs</groupId>
-                    <artifactId>geronimo-activation_1.0.2_spec</artifactId>
+                    <artifactId>geronimo-activation_1.1_spec</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-javamail_1.4_spec</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>jaxen</groupId>
@@ -80,6 +84,10 @@
                     <groupId>commons-logging</groupId>
                     <artifactId>commons-logging</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.apache.james</groupId>
+                    <artifactId>apache-mime4j-core</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -93,7 +101,11 @@
                 </exclusion>
                 <exclusion>
                     <groupId>org.apache.geronimo.specs</groupId>
-                    <artifactId>geronimo-activation_1.0.2_spec</artifactId>
+                    <artifactId>geronimo-activation_1.1_spec</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-javamail_1.4_spec</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>jaxen</groupId>
@@ -126,7 +138,11 @@
                 </exclusion>
                 <exclusion>
                     <groupId>org.apache.geronimo.specs</groupId>
-                    <artifactId>geronimo-activation_1.0.2_spec</artifactId>
+                    <artifactId>geronimo-activation_1.1_spec</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-javamail_1.4_spec</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>jaxen</groupId>
@@ -153,7 +169,11 @@
                 </exclusion>
                 <exclusion>
                     <groupId>org.apache.geronimo.specs</groupId>
-                    <artifactId>geronimo-activation_1.0.2_spec</artifactId>
+                    <artifactId>geronimo-activation_1.1_spec</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-javamail_1.4_spec</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>jaxen</groupId>
