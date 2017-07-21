@@ -6,8 +6,6 @@
  */
 package org.mule.module.http.functional.requester;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.HttpHeaders.Values.CHUNKED;
 
 import org.mule.api.MuleEvent;
@@ -18,8 +16,6 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -53,7 +49,7 @@ public class HttpRequestResponseHeadersTestCase extends AbstractHttpRequestTestC
     protected void writeResponse(HttpServletResponse response) throws IOException
     {
         response.addHeader("Upgrade", "h2,h2c");
-//        response.addHeader("Conection", "Upgrade, close");
+        response.addHeader("Conection", "Upgrade, close");
         super.writeResponse(response);
     }
 }
