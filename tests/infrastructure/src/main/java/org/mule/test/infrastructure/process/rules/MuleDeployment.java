@@ -17,6 +17,8 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.apache.commons.io.FilenameUtils.removeExtension;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
+import io.qameta.allure.Attachment;
+import org.mule.runtime.core.api.util.MapUtils;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.test.infrastructure.process.MuleProcessController;
@@ -385,4 +387,41 @@ public class MuleDeployment extends MuleInstallation {
     Runtime.getRuntime().removeShutdownHook(shutdownHookThread);
   }
 
+  /***
+   * Utility method to generate System properties attachment for the Allure report
+   * @return a formatted String of the Mule system properties of the given instance.
+   */
+  @Attachment(value = "Properties")
+  public String attachProperties() {
+    return MapUtils.toString(properties, true).replaceAll("(?<=\\.password=)(.*)", "****");
+  }
+
+  /***
+   * Utility method to generate Runtime server log attachment for the Allure report
+   * @return a ByteArray representation of the log.
+   */
+  @Attachment(value = "Server log ", type = "text/plain", fileExtension = ".log")
+  public byte[] attachServerLog() {
+    try {
+      return Files.readAllBytes(mule.getLog().toPath());
+    } catch (IOException ignored) {
+
+    }
+    return null;
+  }
+
+  /***
+   * Utility method to generate Application log attachment for the Allure report
+   * @param appName the application name
+   * @return a ByteArray representation of the log.
+   */
+  @Attachment(value = "Application {appName} log", type = "text/plain", fileExtension = ".log")
+  public byte[] attachAppLog(String appName) {
+    try {
+      return Files.readAllBytes(mule.getLog(appName).toPath());
+    } catch (IOException ignored) {
+
+    }
+    return null;
+  }
 }

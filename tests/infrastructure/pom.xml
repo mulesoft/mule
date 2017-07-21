@@ -88,5 +88,10 @@
             <artifactId>bcprov-jdk15on</artifactId>
             <version>${bouncycastleVersion}</version>
         </dependency>
-	</dependencies>
+        <dependency>
+            <groupId>io.qameta.allure</groupId>
+            <artifactId>allure-junit4</artifactId>
+            <version>${allureJunitVersion}</version>
+        </dependency>
+    </dependencies>
 </project>
