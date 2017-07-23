@@ -6,6 +6,8 @@
  */
 package org.mule.transport.vm.functional.transactions;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
@@ -61,10 +63,7 @@ public class VmExceptionStrategyOneWayTestCase extends FunctionalTestCase
             fail("dead letter queue must be reached");
         }
         assertThat(outboundComponentReached, Is.is(false));
-        assertThat(response, IsNull.<Object>notNullValue());
-        assertThat(response.getPayload(),IsInstanceOf.instanceOf(NullPayload.class));
-        assertThat(response.getExceptionPayload(), IsNull.<Object>notNullValue());
-        assertThat(response.getExceptionPayload(), IsInstanceOf.instanceOf(DefaultExceptionPayload.class));
+        assertThat(response, is(nullValue()));
     }
 
     @Test
@@ -95,10 +94,7 @@ public class VmExceptionStrategyOneWayTestCase extends FunctionalTestCase
             fail("dead letter queue must be reached");
         }
         assertThat(outboundComponentReached, Is.is(false));
-        assertThat(response, IsNull.<Object>notNullValue());
-        assertThat(response.getPayload(),IsInstanceOf.instanceOf(NullPayload.class));
-        assertThat(response.getExceptionPayload(), IsNull.<Object>notNullValue());
-        assertThat(response.getExceptionPayload(), IsInstanceOf.instanceOf(DefaultExceptionPayload.class));
+        assertThat(response, is(nullValue()));
     }
 
     @Test
@@ -110,10 +106,7 @@ public class VmExceptionStrategyOneWayTestCase extends FunctionalTestCase
             fail("dead letter queue must be reached");
         }
         assertThat(outboundComponentReached, Is.is(false));
-        assertThat(response, IsNull.<Object>notNullValue());
-        assertThat(response.getPayload(),IsInstanceOf.instanceOf(NullPayload.class));
-        assertThat(response.getExceptionPayload(), IsNull.<Object>notNullValue());
-        assertThat(response.getExceptionPayload(), IsInstanceOf.instanceOf(DefaultExceptionPayload.class));
+        assertThat(response, is(nullValue()));
     }
 
     public static class FailingTransformer extends AbstractTransformer

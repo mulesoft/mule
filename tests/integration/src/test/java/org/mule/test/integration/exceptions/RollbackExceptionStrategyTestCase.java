@@ -6,6 +6,7 @@
  */
 package org.mule.test.integration.exceptions;
 
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -153,8 +154,7 @@ public class RollbackExceptionStrategyTestCase extends AbstractServiceAndFlowTes
 	        fail("message should have been delivered at least 5 times");
 	    }
         MuleMessage result = client.send("vm://in5", MESSAGE, null, TIMEOUT);
-        assertThat(result,IsNull.<Object>notNullValue());
-        assertThat(result.getPayloadAsString(),is(MESSAGE + " Rolled Back"));
+        assertThat(result,is(nullValue()));
 	}
 
     @Test

@@ -64,7 +64,7 @@
 
         <service name="dlqExceptionComponent">
             <inbound>
-                <vm:inbound-endpoint path="in3">
+                <vm:inbound-endpoint path="in3" exchange-pattern="request-response">
                     <vm:transaction action="ALWAYS_BEGIN"/>
                 </vm:inbound-endpoint>
             </inbound>
@@ -86,7 +86,7 @@
 
         <service name="dlqExceptionOutboundEndpoint">
             <inbound>
-                <vm:inbound-endpoint path="in4">
+                <vm:inbound-endpoint path="in4" exchange-pattern="request-response">
                     <vm:transaction action="ALWAYS_BEGIN"/>
                 </vm:inbound-endpoint>
             </inbound>
@@ -110,7 +110,7 @@
 
         <service name="dlqExceptionOutboundEndpointResponse">
             <inbound>
-                <vm:inbound-endpoint path="in5">
+                <vm:inbound-endpoint path="in5" exchange-pattern="request-response">
                     <vm:transaction action="ALWAYS_BEGIN"/>
                 </vm:inbound-endpoint>
             </inbound>
