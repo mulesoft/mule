@@ -13,8 +13,8 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME;
+import static org.mule.runtime.api.store.ObjectStoreManager.BASE_IN_MEMORY_OBJECT_STORE_KEY;
+import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
 import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static org.mule.tck.SerializationTestUtils.addJavaSerializerToMockMuleContext;
 import org.mule.runtime.api.exception.MuleException;
@@ -178,9 +178,9 @@ public class MuleObjectStoreManagerTestCase extends AbstractMuleTestCase {
 
   private void createRegistryAndBaseStore(MuleContext muleContext) {
     MuleRegistry muleRegistry = mock(MuleRegistry.class);
-    when(muleRegistry.lookupObject(OBJECT_STORE_DEFAULT_PERSISTENT_NAME))
+    when(muleRegistry.lookupObject(BASE_PERSISTENT_OBJECT_STORE_KEY))
         .thenReturn(createPersistentPartitionableObjectStore(muleContext));
-    when(muleRegistry.lookupObject(OBJECT_STORE_DEFAULT_IN_MEMORY_NAME)).thenReturn(createTransientPartitionableObjectStore());
+    when(muleRegistry.lookupObject(BASE_IN_MEMORY_OBJECT_STORE_KEY)).thenReturn(createTransientPartitionableObjectStore());
 
     when(muleContext.getRegistry()).thenReturn(muleRegistry);
   }

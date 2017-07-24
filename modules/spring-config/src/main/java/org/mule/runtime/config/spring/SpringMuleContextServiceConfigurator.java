@@ -45,8 +45,8 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SCHEDULER_B
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SCHEDULER_POOLS_CONFIG;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SERVICE_DISCOVERER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME;
+import static org.mule.runtime.api.store.ObjectStoreManager.BASE_IN_MEMORY_OBJECT_STORE_KEY;
+import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STREAMING_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
@@ -162,8 +162,8 @@ class SpringMuleContextServiceConfigurator {
           .add(OBJECT_EXCEPTION_LOCATION_PROVIDER).add(OBJECT_MESSAGE_PROCESSING_FLOW_TRACE_MANAGER).build();
 
   private static final ImmutableMap<String, String> OBJECT_STORE_NAME_TO_LOCAL_OBJECT_STORE_NAME =
-      ImmutableMap.<String, String>builder().put(OBJECT_STORE_DEFAULT_IN_MEMORY_NAME, OBJECT_LOCAL_STORE_IN_MEMORY)
-          .put(OBJECT_STORE_DEFAULT_PERSISTENT_NAME, OBJECT_LOCAL_STORE_PERSISTENT)
+      ImmutableMap.<String, String>builder().put(BASE_IN_MEMORY_OBJECT_STORE_KEY, OBJECT_LOCAL_STORE_IN_MEMORY)
+          .put(BASE_PERSISTENT_OBJECT_STORE_KEY, OBJECT_LOCAL_STORE_PERSISTENT)
           .build();
 
   // Do not use static field. BeanDefinitions are reused and produce weird behaviour
@@ -183,12 +183,12 @@ class SpringMuleContextServiceConfigurator {
       .put(OBJECT_PROCESSOR_INTERCEPTOR_MANAGER, getBeanDefinition(DefaultProcessorInterceptorManager.class))
       .put(OBJECT_POLICY_MANAGER_STATE_HANDLER, getBeanDefinition(DefaultPolicyStateHandler.class))
       .put(OBJECT_NOTIFICATION_MANAGER, createNotificationManagerBeanDefinition())
-      .put(OBJECT_STORE_DEFAULT_IN_MEMORY_NAME,
+      .put(BASE_IN_MEMORY_OBJECT_STORE_KEY,
            getBeanDefinitionBuilder(ConstantFactoryBean.class).addConstructorArgReference(OBJECT_LOCAL_STORE_IN_MEMORY)
                .getBeanDefinition())
       .put(OBJECT_LOCAL_STORE_IN_MEMORY,
            getBeanDefinition(DefaultObjectStoreFactoryBean.class, "createDefaultInMemoryObjectStore"))
-      .put(OBJECT_STORE_DEFAULT_PERSISTENT_NAME,
+      .put(BASE_PERSISTENT_OBJECT_STORE_KEY,
            getBeanDefinitionBuilder(ConstantFactoryBean.class).addConstructorArgReference(OBJECT_LOCAL_STORE_PERSISTENT)
                .getBeanDefinition())
       .put(OBJECT_LOCAL_STORE_PERSISTENT,
@@ -354,8 +354,8 @@ class SpringMuleContextServiceConfigurator {
     if (anyBaseStoreWasRedefined.get()) {
       beanDefinitionRegistry
           .registerBeanDefinition(LOCAL_OBJECT_STORE_MANAGER, getBeanDefinitionBuilder(MuleObjectStoreManager.class)
-              .addPropertyValue("basePersistentStoreKey", OBJECT_STORE_DEFAULT_PERSISTENT_NAME)
-              .addPropertyValue("baseTransientStoreKey", OBJECT_STORE_DEFAULT_IN_MEMORY_NAME)
+              .addPropertyValue("basePersistentStoreKey", BASE_PERSISTENT_OBJECT_STORE_KEY)
+              .addPropertyValue("baseTransientStoreKey", BASE_IN_MEMORY_OBJECT_STORE_KEY)
               .getBeanDefinition());
     } else {
       beanDefinitionRegistry.registerAlias(OBJECT_STORE_MANAGER, LOCAL_OBJECT_STORE_MANAGER);

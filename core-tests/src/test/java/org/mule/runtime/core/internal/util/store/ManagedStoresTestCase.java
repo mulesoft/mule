@@ -15,8 +15,8 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.api.store.ObjectStoreSettings.unmanagedPersistent;
 import static org.mule.runtime.api.store.ObjectStoreSettings.unmanagedTransient;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME;
+import static org.mule.runtime.api.store.ObjectStoreManager.BASE_IN_MEMORY_OBJECT_STORE_KEY;
+import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 import org.mule.runtime.api.store.ObjectAlreadyExistsException;
 import org.mule.runtime.api.store.ObjectDoesNotExistException;
@@ -47,7 +47,7 @@ public class ManagedStoresTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void testInMemoryStore() throws ObjectStoreException, InterruptedException, RegistrationException {
-    muleContext.getRegistry().registerObject(OBJECT_STORE_DEFAULT_IN_MEMORY_NAME, new SimpleMemoryObjectStore<String>());
+    muleContext.getRegistry().registerObject(BASE_IN_MEMORY_OBJECT_STORE_KEY, new SimpleMemoryObjectStore<String>());
     ObjectStoreManager manager = muleContext.getRegistry().lookupObject(OBJECT_STORE_MANAGER);
     ObjectStore<String> store = manager.createObjectStore("inMemoryPart1", unmanagedTransient());
     testObjectStore(store);
@@ -68,7 +68,7 @@ public class ManagedStoresTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void testClearPartition() throws ObjectStoreException, InterruptedException, RegistrationException {
-    muleContext.getRegistry().registerObject(OBJECT_STORE_DEFAULT_IN_MEMORY_NAME, new SimpleMemoryObjectStore<String>());
+    muleContext.getRegistry().registerObject(BASE_IN_MEMORY_OBJECT_STORE_KEY, new SimpleMemoryObjectStore<String>());
     ObjectStoreManager manager = muleContext.getRegistry().lookupObject(OBJECT_STORE_MANAGER);
 
     ObjectStore<String> partition1 = manager.createObjectStore("inMemoryPart1", unmanagedTransient());
@@ -86,7 +86,7 @@ public class ManagedStoresTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void testPartitionableInMemoryStore() throws ObjectStoreException, RegistrationException, InterruptedException {
-    muleContext.getRegistry().registerObject(OBJECT_STORE_DEFAULT_IN_MEMORY_NAME, new PartitionedInMemoryObjectStore<String>());
+    muleContext.getRegistry().registerObject(BASE_IN_MEMORY_OBJECT_STORE_KEY, new PartitionedInMemoryObjectStore<String>());
     ObjectStoreManager manager = muleContext.getRegistry().lookupObject(OBJECT_STORE_MANAGER);
     ObjectStore<String> store = manager.createObjectStore("inMemoryPart2", unmanagedTransient());
     assertTrue(store instanceof ObjectStorePartition);
@@ -112,13 +112,13 @@ public class ManagedStoresTestCase extends AbstractMuleContextTestCase {
   public void testPartitionablePersistenceStore() throws ObjectStoreException, RegistrationException, InterruptedException {
     PartitionedPersistentObjectStore<String> partitionedStore = new PartitionedPersistentObjectStore<>(muleContext);
     partitionedStore.open();
-    muleContext.getRegistry().registerObject(OBJECT_STORE_DEFAULT_PERSISTENT_NAME, partitionedStore);
+    muleContext.getRegistry().registerObject(BASE_PERSISTENT_OBJECT_STORE_KEY, partitionedStore);
     ObjectStoreManager manager = muleContext.getRegistry().lookupObject(OBJECT_STORE_MANAGER);
     ObjectStore<String> store = manager.createObjectStore("persistencePart2", unmanagedPersistent());
     assertTrue(store instanceof ObjectStorePartition);
     ObjectStore<String> baseStore = ((ObjectStorePartition<String>) store).getBaseStore();
     assertTrue(baseStore instanceof PartitionedPersistentObjectStore);
-    assertSame(baseStore, muleContext.getRegistry().lookupObject(OBJECT_STORE_DEFAULT_PERSISTENT_NAME));
+    assertSame(baseStore, muleContext.getRegistry().lookupObject(BASE_PERSISTENT_OBJECT_STORE_KEY));
     testObjectStore(store);
     testObjectStoreExpiry(manager, "persistenceExpPart2", ObjectStoreSettings.builder()
         .persistent(true)

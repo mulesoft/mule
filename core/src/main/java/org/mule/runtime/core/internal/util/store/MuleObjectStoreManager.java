@@ -10,8 +10,6 @@ package org.mule.runtime.core.internal.util.store;
 import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -45,8 +43,8 @@ public class MuleObjectStoreManager implements ObjectStoreManager, MuleContextAw
   private final ConcurrentMap<String, ObjectStore<?>> stores = new ConcurrentHashMap<>();
   private final ConcurrentMap<String, ScheduledFuture<?>> monitors = new ConcurrentHashMap<>();
 
-  private String baseTransientStoreKey = OBJECT_STORE_DEFAULT_IN_MEMORY_NAME;
-  private String basePersistentStoreKey = OBJECT_STORE_DEFAULT_PERSISTENT_NAME;
+  private String baseTransientStoreKey = BASE_IN_MEMORY_OBJECT_STORE_KEY;
+  private String basePersistentStoreKey = BASE_PERSISTENT_OBJECT_STORE_KEY;
 
   private ObjectStore<?> baseTransientStore;
   private ObjectStore<?> basePersistentStore;

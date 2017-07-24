@@ -7,8 +7,8 @@
 package org.mule.runtime.core.internal.routing;
 
 import static java.lang.String.format;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME;
+import static org.mule.runtime.api.store.ObjectStoreManager.BASE_IN_MEMORY_OBJECT_STORE_KEY;
+import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
@@ -120,9 +120,9 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
     return () -> {
       ObjectStore objectStore;
       if (persistentStores) {
-        objectStore = muleContext.getRegistry().lookupObject(OBJECT_STORE_DEFAULT_PERSISTENT_NAME);
+        objectStore = muleContext.getRegistry().lookupObject(BASE_PERSISTENT_OBJECT_STORE_KEY);
       } else {
-        objectStore = muleContext.getRegistry().lookupObject(OBJECT_STORE_DEFAULT_IN_MEMORY_NAME);
+        objectStore = muleContext.getRegistry().lookupObject(BASE_IN_MEMORY_OBJECT_STORE_KEY);
       }
       if (objectStore instanceof MuleContextAware) {
         ((MuleContextAware) objectStore).setMuleContext(muleContext);

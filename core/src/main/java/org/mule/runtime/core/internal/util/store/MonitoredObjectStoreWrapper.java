@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.util.store;
 
 import static java.util.Comparator.comparing;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME;
+import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -129,7 +129,7 @@ public class MonitoredObjectStoreWrapper<T extends Serializable> extends Templat
 
   private ObjectStore<StoredObject<T>> getStore() {
     if (baseStore == null) {
-      baseStore = context.getRegistry().lookupObject(OBJECT_STORE_DEFAULT_PERSISTENT_NAME);
+      baseStore = context.getRegistry().lookupObject(BASE_PERSISTENT_OBJECT_STORE_KEY);
     }
     return baseStore;
   }

@@ -14,8 +14,8 @@ import static org.mule.runtime.core.DefaultMuleContext.LOCAL_QUEUE_MANAGER_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCAL_STORE_IN_MEMORY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCAL_STORE_PERSISTENT;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_QUEUE_MANAGER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME;
+import static org.mule.runtime.api.store.ObjectStoreManager.BASE_IN_MEMORY_OBJECT_STORE_KEY;
+import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
@@ -32,12 +32,12 @@ public class LocalStoreAliasConfigTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void inMemoryObjectStore() throws Exception {
-    this.testSame(OBJECT_STORE_DEFAULT_IN_MEMORY_NAME, OBJECT_LOCAL_STORE_IN_MEMORY);
+    this.testSame(BASE_IN_MEMORY_OBJECT_STORE_KEY, OBJECT_LOCAL_STORE_IN_MEMORY);
   }
 
   @Test
   public void persistentObjectStore() throws Exception {
-    this.testSame(OBJECT_STORE_DEFAULT_PERSISTENT_NAME, OBJECT_LOCAL_STORE_PERSISTENT);
+    this.testSame(BASE_PERSISTENT_OBJECT_STORE_KEY, OBJECT_LOCAL_STORE_PERSISTENT);
   }
 
   @Test

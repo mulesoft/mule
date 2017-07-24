@@ -12,7 +12,7 @@ import static java.util.Optional.of;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.DefaultEventContext.create;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME;
+import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
@@ -268,7 +268,7 @@ public class DefaultExtensionsOAuthManager implements Initialisable, Startable, 
     return () -> {
       String storeName = config.getStoreConfig()
           .map(OAuthObjectStoreConfig::getObjectStoreName)
-          .orElse(OBJECT_STORE_DEFAULT_PERSISTENT_NAME);
+          .orElse(BASE_PERSISTENT_OBJECT_STORE_KEY);
 
       return muleContext.getObjectStoreManager().getObjectStore(storeName);
     };

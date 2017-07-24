@@ -12,6 +12,7 @@ import static org.mule.runtime.module.extension.internal.runtime.objectbuilder.O
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.hasAnyDynamic;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.injectRefName;
 import static org.springframework.util.ReflectionUtils.setField;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
@@ -31,6 +32,7 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T> {
 
   private final Class<T> prototypeClass;
   private final Map<Field, ValueResolver<Object>> resolvers = new HashMap<>();
+  private String name = null;
 
   /**
    * Creates a new instance that will build instances of {@code prototypeClass}.
@@ -80,6 +82,10 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T> {
       setField(entry.getKey(), object, resolve(entry.getValue(), context));
     }
 
+    if (name != null) {
+      injectRefName(object, name);
+    }
+
     return object;
   }
 
@@ -97,4 +103,7 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T> {
     return value;
   }
 
+  public void setName(String name) {
+    this.name = name;
+  }
 }

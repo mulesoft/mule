@@ -26,8 +26,8 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_QUEUE_MANAG
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SCHEDULER_BASE_CONFIG;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SCHEDULER_POOLS_CONFIG;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME;
+import static org.mule.runtime.api.store.ObjectStoreManager.BASE_IN_MEMORY_OBJECT_STORE_KEY;
+import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STREAMING_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
@@ -90,8 +90,8 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder {
     registry.registerObject(OBJECT_MULE_CONTEXT, muleContext);
     registerObject(OBJECT_SECURITY_MANAGER, new DefaultMuleSecurityManager(), muleContext);
 
-    registerObject(OBJECT_STORE_DEFAULT_IN_MEMORY_NAME, createDefaultInMemoryObjectStore(), muleContext);
-    registerObject(OBJECT_STORE_DEFAULT_PERSISTENT_NAME, createDefaultPersistentObjectStore(), muleContext);
+    registerObject(BASE_IN_MEMORY_OBJECT_STORE_KEY, createDefaultInMemoryObjectStore(), muleContext);
+    registerObject(BASE_PERSISTENT_OBJECT_STORE_KEY, createDefaultPersistentObjectStore(), muleContext);
 
     registerLocalObjectStoreManager(muleContext, registry);
 
@@ -134,8 +134,8 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder {
 
   private void registerLocalObjectStoreManager(MuleContext muleContext, MuleRegistry registry) throws RegistrationException {
     MuleObjectStoreManager osm = new MuleObjectStoreManager();
-    osm.setBasePersistentStoreKey(OBJECT_STORE_DEFAULT_PERSISTENT_NAME);
-    osm.setBaseTransientStoreKey(OBJECT_STORE_DEFAULT_IN_MEMORY_NAME);
+    osm.setBasePersistentStoreKey(BASE_PERSISTENT_OBJECT_STORE_KEY);
+    osm.setBaseTransientStoreKey(BASE_IN_MEMORY_OBJECT_STORE_KEY);
     osm.setMuleContext(muleContext);
     registry.registerObject(OBJECT_STORE_MANAGER, osm);
   }
