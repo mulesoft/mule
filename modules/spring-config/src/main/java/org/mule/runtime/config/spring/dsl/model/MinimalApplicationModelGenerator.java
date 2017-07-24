@@ -227,9 +227,12 @@ public class MinimalApplicationModelGenerator {
     for (String parametersReferencingDependency : parametersReferencingDependencies) {
       if (requestedComponentModel.getParameters().containsKey(parametersReferencingDependency)) {
         appendDependency(otherDependencies, requestedComponentModel, parametersReferencingDependency);
-      } else if (isFlowRef(requestedComponentModel.getIdentifier())) {
-        appendDependency(otherDependencies, requestedComponentModel, "name");
       }
+    }
+
+    // Just case for flow-ref
+    if (isFlowRef(requestedComponentModel.getIdentifier())) {
+      appendDependency(otherDependencies, requestedComponentModel, "name");
     }
     return otherDependencies;
   }
