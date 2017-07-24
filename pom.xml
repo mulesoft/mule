@@ -217,16 +217,16 @@
         <allureReportVersion>2.2.1</allureReportVersion>
 
         <!-- Mule Snapshot Dependencies -->
-        <muleDslApiVersion>1.0.0-SNAPSHOT</muleDslApiVersion>
-        <muleExtensionsApiVersion>1.0.0-SNAPSHOT</muleExtensionsApiVersion>
-        <muleHttpPolicyApiVersion>1.0.0-SNAPSHOT</muleHttpPolicyApiVersion>
-        <muleMavenClientApi>1.0.0-SNAPSHOT</muleMavenClientApi>
-        <muleMavenClientImpl>1.0.0-SNAPSHOT</muleMavenClientImpl>
+        <muleDslApiVersion>1.0.0-rc.batman</muleDslApiVersion>
+        <muleExtensionsApiVersion>1.0.0-rc.batman</muleExtensionsApiVersion>
+        <muleHttpPolicyApiVersion>1.0.0-rc.batman</muleHttpPolicyApiVersion>
+        <muleMavenClientApi>1.0.0-rc.batman</muleMavenClientApi>
+        <muleMavenClientImpl>1.0.0-rc.batman</muleMavenClientImpl>
         <muleMavenClientTest>1.0.0-rc.batman</muleMavenClientTest>
-        <mulePolicyApiVersion>1.0.0-SNAPSHOT</mulePolicyApiVersion>
-        <muleApiVersion>1.0.0-SNAPSHOT</muleApiVersion>
-        <muleMetadataModelVersion>1.0.0-SNAPSHOT</muleMetadataModelVersion>
-        <metadataModelApiVersion>1.0.0-SNAPSHOT</metadataModelApiVersion>
+        <mulePolicyApiVersion>1.0.0-rc.batman</mulePolicyApiVersion>
+        <muleApiVersion>1.0.0-rc.batman</muleApiVersion>
+        <muleMetadataModelVersion>1.0.0-rc.batman</muleMetadataModelVersion>
+        <metadataModelApiVersion>1.0.0-rc.batman</metadataModelApiVersion>
         <metadataModelApiVersion>${muleMetadataModelVersion}</metadataModelApiVersion>
 
         <muleHttpConnectorTestVersion>0.9.0-SNAPSHOT</muleHttpConnectorTestVersion>
