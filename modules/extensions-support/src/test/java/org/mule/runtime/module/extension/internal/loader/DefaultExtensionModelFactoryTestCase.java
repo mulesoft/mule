@@ -25,6 +25,7 @@ import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG_
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG_LIB_DESCRIPTION;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG_LIB_FILE_NAME;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG_LIB_NAME;
+import static org.mule.test.marvel.ironman.IronMan.CONFIG_NAME;
 import static org.mule.test.vegan.extension.VeganExtension.APPLE;
 import static org.mule.test.vegan.extension.VeganExtension.BANANA;
 import org.mule.metadata.api.ClassTypeLoader;
@@ -117,7 +118,7 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
   public void nonBlockingExecutionType() {
     ExtensionModel extensionModel = createExtension(MarvelExtension.class);
     OperationModel operation =
-        extensionModel.getConfigurationModel("iron-man").get().getOperationModel("fireMissile").get();
+        extensionModel.getConfigurationModel(CONFIG_NAME).get().getOperationModel("fireMissile").get();
     assertThat(operation.isBlocking(), is(false));
     assertThat(operation.getExecutionType(), is(CPU_LITE));
     assertThat(operation.getOutput().getType(), equalTo(typeLoader.load(String.class)));

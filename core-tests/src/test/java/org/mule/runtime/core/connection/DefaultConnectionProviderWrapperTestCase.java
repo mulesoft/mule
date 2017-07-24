@@ -7,14 +7,15 @@
 package org.mule.runtime.core.connection;
 
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
-import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.core.internal.connection.LifecycleAwareConnectionProviderWrapper;
+import org.mule.runtime.core.api.Injector;
+import org.mule.runtime.core.internal.connection.DefaultConnectionProviderWrapper;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -23,13 +24,12 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
-import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class LifecycleAwareConnectionProviderWrapperTestCase extends AbstractMuleContextTestCase {
+public class DefaultConnectionProviderWrapperTestCase extends AbstractMuleContextTestCase {
 
   private static final String ERROR_MESSAGE = "BOOM ><";
 
@@ -37,40 +37,36 @@ public class LifecycleAwareConnectionProviderWrapperTestCase extends AbstractMul
   public ExpectedException exception = ExpectedException.none();
 
   @Mock
-  private ConnectionProvider<Lifecycle> connectionProvider;
+  private ConnectionProvider<Object> connectionProvider;
 
   @Mock
-  private Lifecycle connection;
+  private Object connection;
 
-  private LifecycleAwareConnectionProviderWrapper<Lifecycle> wrapper;
+  private DefaultConnectionProviderWrapper<Object> wrapper;
+
+  @Mock
+  private Injector injector;
 
   @Before
   public void before() throws Exception {
+    muleContext = spy(muleContext);
+    when(muleContext.getInjector()).thenReturn(injector);
     when(connectionProvider.connect()).thenReturn(connection);
-
-    wrapper = new LifecycleAwareConnectionProviderWrapper<>(connectionProvider, muleContext);
-    muleContext.start();
+    wrapper = new DefaultConnectionProviderWrapper<>(connectionProvider, muleContext);
   }
 
   @Test
   public void connect() throws Exception {
     wrapper.connect();
-    InOrder inOrder = inOrder(connection);
-    inOrder.verify(connection).initialise();
-    inOrder.verify(connection).start();
+    verify(connectionProvider).connect();
+    verify(injector).inject(connection);
   }
 
 
   @Test
   public void disconnect() throws Exception {
-    wrapper.connect();
     wrapper.disconnect(connection);
-
-    InOrder inOrder = inOrder(connection);
-    inOrder.verify(connection).initialise();
-    inOrder.verify(connection).start();
-    inOrder.verify(connection).stop();
-    inOrder.verify(connection).dispose();
+    verify(connectionProvider).disconnect(connection);
   }
 
   @Test
@@ -78,7 +74,7 @@ public class LifecycleAwareConnectionProviderWrapperTestCase extends AbstractMul
     exception.expect(ConnectionException.class);
     exception.expectCause(instanceOf(NullPointerException.class));
     exception.expectMessage(ERROR_MESSAGE);
-    wrapper = new LifecycleAwareConnectionProviderWrapper(new TestProvider(), muleContext);
+    wrapper = new DefaultConnectionProviderWrapper(new TestProvider(), muleContext);
     wrapper.connect();
   }
 

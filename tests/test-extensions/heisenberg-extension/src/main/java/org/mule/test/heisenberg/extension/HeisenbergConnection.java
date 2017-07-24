@@ -6,11 +6,7 @@
  */
 package org.mule.test.heisenberg.extension;
 
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.lifecycle.Lifecycle;
-
-public class HeisenbergConnection implements Lifecycle {
+public class HeisenbergConnection {
 
   private boolean connected = true;
   private final String saulPhoneNumber;
@@ -38,40 +34,5 @@ public class HeisenbergConnection implements Lifecycle {
 
   public String getSaulPhoneNumber() {
     return saulPhoneNumber;
-  }
-
-  @Override
-  public void dispose() {
-    dispose++;
-  }
-
-  @Override
-  public void initialise() throws InitialisationException {
-    initialise++;
-  }
-
-  @Override
-  public void start() throws MuleException {
-    start++;
-  }
-
-  @Override
-  public void stop() throws MuleException {
-    stop++;
-  }
-
-  public void verifyLifecycle(int init, int start, int stop, int dispose) {
-    verifyLifecycle("init", initialise, init);
-    verifyLifecycle("start", this.start, start);
-    verifyLifecycle("stop", this.stop, stop);
-    verifyLifecycle("dispose", this.dispose, dispose);
-  }
-
-  private void verifyLifecycle(String phaseName, int value, int expected) {
-    if (value != expected) {
-      throw new IllegalStateException(String.format(
-                                                    "lifecycle phase '%s' wrongfully applied. Was expecting to be applied %d times but %d found instead",
-                                                    phaseName, expected, value));
-    }
   }
 }

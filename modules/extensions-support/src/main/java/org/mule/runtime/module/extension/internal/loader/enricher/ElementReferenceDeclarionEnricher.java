@@ -12,13 +12,15 @@ import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.meta.model.parameter.ElementReference.ElementType.CONFIG;
 import static org.mule.runtime.api.meta.model.parameter.ElementReference.ElementType.FLOW;
+import static org.mule.runtime.api.meta.model.parameter.ElementReference.ElementType.OBJECT_STORE;
 
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclaration;
 import org.mule.runtime.api.meta.model.parameter.ElementReference;
-import org.mule.runtime.extension.api.annotation.ConfigReference;
+import org.mule.runtime.extension.api.annotation.param.reference.ConfigReference;
 import org.mule.runtime.extension.api.annotation.ElementReferences;
-import org.mule.runtime.extension.api.annotation.FlowReference;
+import org.mule.runtime.extension.api.annotation.param.reference.FlowReference;
+import org.mule.runtime.extension.api.annotation.param.reference.ObjectStoreReference;
 import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarationWalker;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
@@ -59,14 +61,20 @@ public final class ElementReferenceDeclarionEnricher extends AbstractAnnotatedDe
     if (references != null) {
       return stream(references.value()).map(ref -> new ElementReference(ref.namespace(), ref.name(), CONFIG)).collect(toList());
     }
+
     ConfigReference ref = element.getAnnotation(ConfigReference.class);
     if (ref != null) {
       return singletonList(new ElementReference(ref.namespace(), ref.name(), CONFIG));
     }
-    FlowReference flowRef = element.getAnnotation(FlowReference.class);
-    if (flowRef != null) {
+
+    if (element.getAnnotation(FlowReference.class) != null) {
       return singletonList(new ElementReference("mule", "flow", FLOW));
     }
+
+    if (element.getAnnotation(ObjectStoreReference.class) != null) {
+      return singletonList(new ElementReference("os", "objectStore", OBJECT_STORE));
+    }
+
     return emptyList();
   }
 }

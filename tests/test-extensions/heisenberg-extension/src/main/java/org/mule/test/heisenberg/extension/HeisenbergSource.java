@@ -98,7 +98,6 @@ public class HeisenbergSource extends Source<String, Object> {
   @Override
   public void onStart(SourceCallback<String, Object> sourceCallback) throws MuleException {
     checkArgument(heisenberg != null, "config not injected");
-    connection.verifyLifecycle(1, 1, 0, 0);
     HeisenbergExtension.sourceTimesStarted++;
 
     if (corePoolSize < 0) {

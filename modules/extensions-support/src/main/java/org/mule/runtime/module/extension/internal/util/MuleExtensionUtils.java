@@ -55,7 +55,7 @@ import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.internal.management.stats.DefaultFlowConstructStatistics;
 import org.mule.runtime.core.internal.metadata.NullMetadataResolverFactory;
-import org.mule.runtime.extension.api.annotation.param.ConfigName;
+import org.mule.runtime.extension.api.annotation.param.RefName;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthModelProperty;
 import org.mule.runtime.extension.api.exception.IllegalConfigurationModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalConnectionProviderModelDefinitionException;
@@ -338,7 +338,7 @@ public class MuleExtensionUtils {
         throw new IllegalConfigurationModelDefinitionException(
                                                                format("field '%s' is annotated with @%s but not defined on an instance of type '%s'",
                                                                       configNameField.toString(),
-                                                                      ConfigName.class.getSimpleName(),
+                                                                      RefName.class.getSimpleName(),
                                                                       target.getClass().getName()));
       }
       new FieldSetter<>(configNameField).set(target, configName);
@@ -347,13 +347,13 @@ public class MuleExtensionUtils {
 
   public static void injectRefName(Object target, String refName) {
     final Class<?> type = target.getClass();
-    List<Field> fields = getAnnotatedFields(type, ConfigName.class);
+    List<Field> fields = getAnnotatedFields(type, RefName.class);
     if (fields.isEmpty()) {
       return;
     } else if (fields.size() > 1) {
       throw new IllegalModelDefinitionException(format(
                                                        "Class '%s' has %d fields annotated with @%s. Only one field may carry that annotation",
-                                                       type.getName(), fields.size(), ConfigName.class));
+                                                       type.getName(), fields.size(), RefName.class));
     }
 
     new FieldSetter<>(fields.get(0)).set(target, refName);

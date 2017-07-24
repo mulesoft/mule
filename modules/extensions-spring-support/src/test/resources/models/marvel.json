@@ -50,11 +50,46 @@
               "elementReferences": [
                 {
                   "namespace": "Marvel",
-                  "name": "iron-man",
+                  "name": "ironMan",
                   "type": "CONFIG"
                 }
               ],
               "name": "ironManConfig",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "java.lang.String"
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
+              "elementReferences": [
+                {
+                  "namespace": "os",
+                  "name": "objectStore",
+                  "type": "OBJECT_STORE"
+                }
+              ],
+              "name": "spellStore",
               "description": "",
               "modelProperties": {}
             }
@@ -1293,7 +1328,7 @@
                     },
                     {
                       "namespace": "Marvel",
-                      "name": "iron-man",
+                      "name": "ironMan",
                       "type": "CONFIG"
                     }
                   ],
@@ -2797,7 +2832,7 @@
       ],
       "messageSources": [],
       "functions": [],
-      "name": "iron-man",
+      "name": "ironMan",
       "description": "",
       "modelProperties": {}
     }
