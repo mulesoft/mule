@@ -9,26 +9,15 @@ package org.mule.module.http.functional.requester;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
-import static org.mule.module.http.api.HttpHeaders.Values.CHUNKED;
-
-import org.mule.api.MuleEvent;
-import org.mule.construct.Flow;
-import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Rule;
 import org.junit.Test;
 
 public class HttpRequestResponseHeadersTestCase extends AbstractHttpRequestTestCase
 {
-
-    @Rule
-    public SystemProperty encoding = new SystemProperty("encoding" , CHUNKED);
 
     @Override
     protected String getConfigFile()
@@ -41,7 +30,8 @@ public class HttpRequestResponseHeadersTestCase extends AbstractHttpRequestTestC
      * but in any case, it shouldn't cause the request to fail. 
      */
     @Test
-    public void responseWithUpgradeToHttp2Header() throws Exception {
+    public void responseWithUpgradeToHttp2Header() throws Exception
+    {
         assertThat(runFlow("responseWithUpgradeToHttp2Header", getTestEvent(TEST_MESSAGE)), not(nullValue()));
     }
 
