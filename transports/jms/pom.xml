@@ -30,6 +30,9 @@
                         <include>**/*TestCase.java</include>
                         <include>**/*Test.java</include>
                     </includes>
+                    <systemPropertyVariables>
+                        <org.apache.activemq.SERIALIZABLE_PACKAGES>*</org.apache.activemq.SERIALIZABLE_PACKAGES>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
         </plugins>
