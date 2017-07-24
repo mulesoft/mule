@@ -7,24 +7,26 @@
 package org.mule.runtime.core.security;
 
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.authSecurityManagerNotSet;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectNotRegistered;
+import static org.mule.runtime.core.api.util.StringUtils.splitAndTrim;
+
 import org.mule.runtime.api.artifact.ServiceDiscoverer;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.api.security.SecurityProviderNotFoundException;
 import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.security.CryptoFailureException;
 import org.mule.runtime.core.api.security.EncryptionStrategyNotFoundException;
 import org.mule.runtime.core.api.security.SecurityFilter;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.security.SecurityProvider;
-import org.mule.runtime.core.api.util.StringUtils;
+
+import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
 
 /**
  * <code>AbstractSecurityFilter</code> provides basic initialisation for all security filters, namely configuring the
@@ -47,20 +49,20 @@ public abstract class AbstractSecurityFilter implements SecurityFilter {
     }
 
     if (securityManager == null) {
-      throw new InitialisationException(CoreMessages.authSecurityManagerNotSet(), this);
+      throw new InitialisationException(authSecurityManagerNotSet(), this);
     }
 
     // This filter may only allow authentication on a subset of registered
     // security providers
     if (securityProviders != null) {
       SecurityManager localManager = new DefaultMuleSecurityManager();
-      String[] securityProviders = StringUtils.splitAndTrim(this.securityProviders, ",");
+      String[] securityProviders = splitAndTrim(this.securityProviders, ",");
       for (String sp : securityProviders) {
         SecurityProvider provider = securityManager.getProvider(sp);
         if (provider != null) {
           localManager.addProvider(provider);
         } else {
-          throw new InitialisationException(CoreMessages.objectNotRegistered("Security Provider", sp), this);
+          throw new InitialisationException(objectNotRegistered("Security Provider", sp), this);
         }
       }
       securityManager = localManager;
@@ -71,12 +73,6 @@ public abstract class AbstractSecurityFilter implements SecurityFilter {
 
   protected void doInitialise() throws InitialisationException {}
 
-  /** @param manager */
-  @Override
-  public void setSecurityManager(SecurityManager manager) {
-    securityManager = manager;
-  }
-
   @Override
   public SecurityManager getSecurityManager() {
     return securityManager;
@@ -85,11 +81,6 @@ public abstract class AbstractSecurityFilter implements SecurityFilter {
   @Override
   public String getSecurityProviders() {
     return securityProviders;
-  }
-
-  @Override
-  public void setSecurityProviders(String providers) {
-    securityProviders = providers;
   }
 
   @Override

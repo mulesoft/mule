@@ -6,15 +6,14 @@
  */
 package org.mule.runtime.core.security;
 
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.security.AuthenticationFilter;
-import org.mule.runtime.core.api.security.CredentialsAccessor;
-import org.mule.runtime.core.api.security.CryptoFailureException;
-import org.mule.runtime.core.api.security.EncryptionStrategyNotFoundException;
 import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.api.security.SecurityProviderNotFoundException;
 import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.security.AuthenticationFilter;
+import org.mule.runtime.core.api.security.CryptoFailureException;
+import org.mule.runtime.core.api.security.EncryptionStrategyNotFoundException;
 
 /**
  * <code>AbstractEndpointSecurityFilter</code> provides a framework to perform inbound or outbound authentication for messages.
@@ -22,24 +21,9 @@ import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
 public abstract class AbstractAuthenticationFilter extends AbstractSecurityFilter implements AuthenticationFilter {
 
   private boolean authenticate;
-  private CredentialsAccessor credentialsAccessor;
-
-  @Override
-  public CredentialsAccessor getCredentialsAccessor() {
-    return credentialsAccessor;
-  }
-
-  @Override
-  public void setCredentialsAccessor(CredentialsAccessor credentialsAccessor) {
-    this.credentialsAccessor = credentialsAccessor;
-  }
 
   public boolean isAuthenticate() {
     return authenticate;
-  }
-
-  public void setAuthenticate(boolean authenticate) {
-    this.authenticate = authenticate;
   }
 
   @Override
