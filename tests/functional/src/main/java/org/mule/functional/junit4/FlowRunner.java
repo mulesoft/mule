@@ -211,6 +211,18 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> implements Dispo
   }
 
   /**
+   * Verifies asserts on flowNamesToVerify
+   * @param flowNamesToVerify
+   * @throws Exception
+   * */
+  private void verify(String... flowNamesToVerify) throws Exception {
+    for (String flowNameToVerify : flowNamesToVerify) {
+      FlowAssert.verify(flowNameToVerify);
+    }
+  }
+
+
+  /**
    * Runs the specified flow with the provided event and configuration expecting a failure. Will fail if there's no failure
    * running the flow.
    *
@@ -219,10 +231,11 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> implements Dispo
    */
   public MessagingException runExpectingException() throws Exception {
     try {
-      run();
+      runNoVerify();
       fail("Flow executed successfully. Expecting exception");
       return null;
     } catch (MessagingException e) {
+      verify(getFlowConstructName());
       return e;
     }
   }
