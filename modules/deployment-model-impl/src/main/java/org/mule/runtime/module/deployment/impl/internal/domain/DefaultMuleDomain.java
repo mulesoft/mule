@@ -6,20 +6,23 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.domain;
 
+import static java.lang.String.format;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCause;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.newBuilder;
+import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.getMuleDomainsDir;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.value.ValueProviderService;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.deployment.model.api.DeploymentInitException;
@@ -32,15 +35,15 @@ import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder;
-import org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils;
 import org.mule.runtime.module.service.ServiceRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Scanner;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DefaultMuleDomain implements Domain {
 
@@ -65,6 +68,7 @@ public class DefaultMuleDomain implements Domain {
     this.artifactPlugins = artifactPlugins;
   }
 
+  @Override
   public void setMuleContextListener(MuleContextListener muleContextListener) {
     checkArgument(muleContextListener != null, "muleContextListener cannot be null");
 
@@ -108,7 +112,7 @@ public class DefaultMuleDomain implements Domain {
   @Override
   public void install() {
     if (logger.isInfoEnabled()) {
-      logger.info(miniSplash(String.format("New domain '%s'", getArtifactName())));
+      logger.info(miniSplash(format("New domain '%s'", getArtifactName())));
     }
   }
 
@@ -125,14 +129,14 @@ public class DefaultMuleDomain implements Domain {
 
   public void doInit(boolean lazy) throws DeploymentInitException {
     if (logger.isInfoEnabled()) {
-      logger.info(miniSplash(String.format("Initializing domain '%s'", getArtifactName())));
+      logger.info(miniSplash(format("Initializing domain '%s'", getArtifactName())));
     }
 
     try {
       ArtifactContextBuilder artifactBuilder = newBuilder().setArtifactName(getArtifactName())
           .setArtifactPlugins(artifactPlugins)
           .setExecutionClassloader(deploymentClassLoader.getClassLoader())
-          .setArtifactInstallationDirectory(new File(MuleContainerBootstrapUtils.getMuleDomainsDir(), getArtifactName()))
+          .setArtifactInstallationDirectory(new File(getMuleDomainsDir(), getArtifactName()))
           .setArtifactType(DOMAIN)
           .setEnableLazyInit(lazy).setClassLoaderRepository(classLoaderRepository).setServiceRepository(serviceRepository);
 
@@ -148,7 +152,7 @@ public class DefaultMuleDomain implements Domain {
     } catch (Exception e) {
       // log it here so it ends up in app log, sys log will only log a message without stacktrace
       logger.error(null, getRootCause(e));
-      throw new DeploymentInitException(CoreMessages.createStaticMessage(getRootCauseMessage(e)), e);
+      throw new DeploymentInitException(createStaticMessage(getRootCauseMessage(e)), e);
     }
   }
 
@@ -158,8 +162,7 @@ public class DefaultMuleDomain implements Domain {
         while (scanner.hasNextLine()) {
           final String lineFromFile = scanner.nextLine();
           if (lineFromFile.contains("<mule ")) {
-            throw new MuleRuntimeException(CoreMessages
-                .createStaticMessage("Domain configuration file can not be created using core namespace. Use mule-domain namespace instead."));
+            throw new MuleRuntimeException(createStaticMessage("Domain configuration file can not be created using core namespace. Use mule-domain namespace instead."));
           }
         }
       }
@@ -174,7 +177,7 @@ public class DefaultMuleDomain implements Domain {
           this.artifactContext.getMuleContext().start();
         } catch (MuleException e) {
           logger.error(null, getRootCause(e));
-          throw new DeploymentStartException(CoreMessages.createStaticMessage(getRootCauseMessage(e)), e);
+          throw new DeploymentStartException(createStaticMessage(getRootCauseMessage(e)), e);
         }
       }
       // null CCL ensures we log at 'system' level
@@ -185,8 +188,7 @@ public class DefaultMuleDomain implements Domain {
         logger.info(splashScreen.toString());
       });
     } catch (Exception e) {
-      throw new DeploymentStartException(CoreMessages.createStaticMessage("Failure trying to start domain " + getArtifactName()),
-                                         e);
+      throw new DeploymentStartException(createStaticMessage("Failure trying to start domain " + getArtifactName()), e);
     }
   }
 
@@ -194,21 +196,20 @@ public class DefaultMuleDomain implements Domain {
   public void stop() {
     try {
       if (logger.isInfoEnabled()) {
-        logger.info(miniSplash(String.format("Stopping domain '%s'", getArtifactName())));
+        logger.info(miniSplash(format("Stopping domain '%s'", getArtifactName())));
       }
       if (this.artifactContext != null) {
         this.artifactContext.getMuleContext().stop();
       }
     } catch (Exception e) {
-      throw new DeploymentStopException(CoreMessages.createStaticMessage("Failure trying to stop domain " + getArtifactName()),
-                                        e);
+      throw new DeploymentStopException(createStaticMessage("Failure trying to stop domain " + getArtifactName()), e);
     }
   }
 
   @Override
   public void dispose() {
     if (logger.isInfoEnabled()) {
-      logger.info(miniSplash(String.format("Disposing domain '%s'", getArtifactName())));
+      logger.info(miniSplash(format("Disposing domain '%s'", getArtifactName())));
     }
     if (this.artifactContext != null) {
       this.artifactContext.getMuleContext().dispose();
@@ -247,8 +248,7 @@ public class DefaultMuleDomain implements Domain {
         this.artifactContext.getMuleContext().initialise();
       }
     } catch (InitialisationException e) {
-      throw new DeploymentInitException(CoreMessages
-          .createStaticMessage("Failure trying to initialise domain " + getArtifactName()), e);
+      throw new DeploymentInitException(createStaticMessage("Failure trying to initialise domain " + getArtifactName()), e);
     }
   }
 
