@@ -220,8 +220,7 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> implements Dispo
       FlowAssert.verify(flowNameToVerify);
     }
   }
-
-
+  
   /**
    * Runs the specified flow with the provided event and configuration expecting a failure. Will fail if there's no failure
    * running the flow.
