@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.internal.config.dsl.parameter;
 import static java.lang.String.format;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedValue;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromReferenceObject;
-import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
@@ -71,8 +70,7 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser {
         .withObjectFactoryType(TopLevelParameterObjectFactory.class)
         .withConstructorParameterDefinition(fromFixedValue(type).build())
         .withConstructorParameterDefinition(fromFixedValue(classLoader).build())
-        .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
-        .withSetterParameterDefinition("name", fromSimpleParameter("name").build());
+        .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build());
 
     parseFields(type, typeDsl);
 
