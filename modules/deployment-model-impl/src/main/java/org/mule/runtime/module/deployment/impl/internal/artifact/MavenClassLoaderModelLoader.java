@@ -28,10 +28,6 @@ import java.util.concurrent.locks.StampedLock;
 /**
  * This class is responsible of returning the {@link BundleDescriptor} of a given plugin's location and also creating a
  * {@link ClassLoaderModel}
- * <p>
- * TODO(fernandezlautaro): MULE-11094 this class is the default implementation for discovering dependencies and URLs, which
- * happens to be Maven based. There could be other ways to look for dependencies and URLs (probably for testing purposes where the
- * plugins are done by hand and without maven) which will imply implementing the jira pointed out in this comment.
  *
  * @since 4.0
  */

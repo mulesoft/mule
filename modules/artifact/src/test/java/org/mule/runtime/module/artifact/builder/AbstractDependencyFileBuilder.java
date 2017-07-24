@@ -223,6 +223,16 @@ public abstract class AbstractDependencyFileBuilder<T extends AbstractDependency
   }
 
   /**
+   * @return the path of the folder within the maven repository where this artifact is located in.
+   */
+  public String getArtifactFileRepositoryFolderPath() {
+    return getGroupId().replace(".", File.separator) + File.separator
+        + Paths
+            .get(getArtifactId(), getVersion())
+            .toString();
+  }
+
+  /**
    * @return the path within the maven repository this artifact pom is located in.
    */
   public String getArtifactFilePomRepositoryPath() {

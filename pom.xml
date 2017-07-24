@@ -281,7 +281,7 @@
         <mule.extensions.maven.plugin.version>1.0.0-SNAPSHOT</mule.extensions.maven.plugin.version>
         <mule.app.plugins.maven.plugin.version>1.0.0-SNAPSHOT</mule.app.plugins.maven.plugin.version>
         <mule.jmh.elasticsearch.maven.plugin.version>1.0.0-SNAPSHOT</mule.jmh.elasticsearch.maven.plugin.version>
-
+        <mule-packager-version>3.0.0-SNAPSHOT</mule-packager-version>
         <maven.replacer.plugin>1.5.3</maven.replacer.plugin>
 
         <!-- v1.1.0 has an issue with Optional dependencies, whenjbpmVersion resolving the graph it overrides the optionality of a transitive
@@ -1424,6 +1424,11 @@
                 <groupId>org.powermock</groupId>
                 <artifactId>powermock-module-junit4</artifactId>
                 <version>${powermockVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mule.tools.maven</groupId>
+                <artifactId>mule-packager</artifactId>
+                <version>${mule-packager-version}</version>
             </dependency>
         </dependencies>
 

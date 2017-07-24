@@ -16,6 +16,7 @@ import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.mule.maven.client.api.model.BundleScope.PROVIDED;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getMuleHomeFolder;
+import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.REPOSITORY_FOLDER;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.EXPORTED_PACKAGES;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.EXPORTED_RESOURCES;
@@ -23,6 +24,7 @@ import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConst
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.PRIVILEGED_ARTIFACTS_IDS;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.PRIVILEGED_EXPORTED_PACKAGES;
 import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.isStandalone;
+import static org.mule.tools.api.ContentGenerator.createClassLoaderModelFromJson;
 import org.mule.maven.client.api.LocalRepositorySupplierFactory;
 import org.mule.maven.client.api.MavenClient;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
@@ -36,14 +38,17 @@ import org.mule.runtime.module.artifact.descriptor.BundleScope;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModelLoader;
 import org.mule.runtime.module.artifact.descriptor.InvalidDescriptorLoaderException;
+import org.mule.tools.api.classloader.model.Artifact;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.apache.maven.model.Model;
@@ -57,6 +62,10 @@ import org.slf4j.LoggerFactory;
  * @since 4.0
  */
 public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoaderModelLoader {
+
+  public static final String CLASSLOADER_MODEL_JSON_DESCRIPTOR = "classloader-model.json";
+  public static final String CLASSLOADER_MODEL_JSON_DESCRIPTOR_LOCATION =
+      Paths.get("META-INF", "mule-artifact", CLASSLOADER_MODEL_JSON_DESCRIPTOR).toString();
 
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());
   private final LocalRepositorySupplierFactory localRepositorySupplierFactory;
@@ -97,7 +106,82 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
 
   private ClassLoaderModel createClassLoaderModel(File artifactFile, Map<String, Object> attributes)
       throws InvalidDescriptorLoaderException {
+    if (isHeavyPackage(artifactFile)) {
+      return createHeavyPackageClassLoaderModel(artifactFile, attributes);
+    } else {
+      return createLightPackageClassLoaderModel(artifactFile, attributes);
+    }
+  }
 
+  private ClassLoaderModel createHeavyPackageClassLoaderModel(File artifactFile, Map<String, Object> attributes) {
+    File classLoaderModelDescriptor = getClassLoaderModelDescriptor(artifactFile);
+
+    org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel =
+        createClassLoaderModelFromJson(classLoaderModelDescriptor);
+
+
+    final ClassLoaderModel.ClassLoaderModelBuilder classLoaderModelBuilder = new ClassLoaderModel.ClassLoaderModelBuilder();
+    classLoaderModelBuilder
+        .exportingPackages(new HashSet<>(getAttribute(attributes, EXPORTED_PACKAGES)))
+        .exportingPrivilegedPackages(new HashSet<>(getAttribute(attributes, PRIVILEGED_EXPORTED_PACKAGES)),
+                                     new HashSet<>(getAttribute(attributes, PRIVILEGED_ARTIFACTS_IDS)))
+        .exportingResources(new HashSet<>(getAttribute(attributes, EXPORTED_RESOURCES)));
+
+    Set<BundleDependency> bundleDependencies =
+        packagerClassLoaderModel.getDependencies().stream().map(createBundleDependencyFromPackagerDependency(
+                                                                                                             getDeployableArtifactBaseFolder(artifactFile)))
+            .collect(toSet());
+
+    loadUrls(artifactFile, classLoaderModelBuilder, bundleDependencies);
+    classLoaderModelBuilder.dependingOn(bundleDependencies);
+
+    return classLoaderModelBuilder.build();
+  }
+
+  private File getDeployableArtifactBaseFolder(File artifactFile) {
+    if (artifactFile.isDirectory()) {
+      return artifactFile;
+    }
+
+    return findRepositoryFolder(artifactFile).getParentFile();
+  }
+
+  private File findRepositoryFolder(File artifactFile) {
+    while (!getMuleHomeFolder().equals(artifactFile) && !REPOSITORY_FOLDER.equals(artifactFile.getName())) {
+      artifactFile = artifactFile.getParentFile();
+    }
+
+    if (!REPOSITORY_FOLDER.equals(artifactFile.getName()) || !artifactFile.isDirectory()) {
+      throw new IllegalStateException("Unable to find repository folder for artifact " + artifactFile.getAbsolutePath());
+    }
+
+    return artifactFile;
+  }
+
+  private Function<Artifact, BundleDependency> createBundleDependencyFromPackagerDependency(File artifactFile) {
+    return d -> {
+      File bundle = new File(artifactFile, d.getUri().toString());
+
+      return new BundleDependency.Builder()
+          .setDescriptor(new BundleDescriptor.Builder().setArtifactId(d.getArtifactCoordinates().getArtifactId())
+              .setGroupId(d.getArtifactCoordinates().getGroupId())
+              .setClassifier(d.getArtifactCoordinates().getClassifier())
+              .setType(d.getArtifactCoordinates().getType()).setVersion(d.getArtifactCoordinates().getVersion())
+              .build())
+          .setBundleUri(bundle.toURI())
+          .build();
+    };
+  }
+
+  private boolean isHeavyPackage(File artifactFile) {
+    return getClassLoaderModelDescriptor(artifactFile).exists();
+  }
+
+  protected File getClassLoaderModelDescriptor(File artifactFile) {
+    return new File(artifactFile, CLASSLOADER_MODEL_JSON_DESCRIPTOR_LOCATION);
+  }
+
+  private ClassLoaderModel createLightPackageClassLoaderModel(File artifactFile, Map<String, Object> attributes) {
     File containerRepository = null;
     if (isStandalone() && !getBoolean("mule.mode.embedded")) {
       containerRepository = new File(getMuleHomeFolder(), "repository");

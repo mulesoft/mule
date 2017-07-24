@@ -10,8 +10,11 @@ package org.mule.runtime.module.deployment.impl.internal.maven;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.EXTENSION_BUNDLE_TYPE;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MAVEN;
+import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader.CLASSLOADER_MODEL_JSON_DESCRIPTOR;
+import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader.CLASSLOADER_MODEL_JSON_DESCRIPTOR_LOCATION;
 import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.getPomModelFolder;
 import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.getPomModelFromJar;
+import static org.mule.tools.api.ContentGenerator.createClassLoaderModelFromJson;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
@@ -49,19 +52,46 @@ public class MavenBundleDescriptorLoader implements BundleDescriptorLoader {
   @Override
   public BundleDescriptor load(File artifactFile, Map<String, Object> attributes, ArtifactType artifactType)
       throws InvalidDescriptorLoaderException {
-    Model model;
-    if (artifactFile.isDirectory()) {
-      model = getPomModelFolder(artifactFile);
-    } else {
-      model = getPomModelFromJar(artifactFile);
-    }
+    if (isHeavyPackage(artifactFile)) {
+      File classLoaderModelDescriptor = getClassLoaderModelDescriptor(artifactFile);
 
-    return new BundleDescriptor.Builder()
-        .setArtifactId(model.getArtifactId())
-        .setGroupId(model.getGroupId() != null ? model.getGroupId() : model.getParent().getGroupId())
-        .setVersion(model.getVersion() != null ? model.getVersion() : model.getParent().getVersion())
-        .setType(EXTENSION_BUNDLE_TYPE)
-        .setClassifier(MULE_PLUGIN_CLASSIFIER)
-        .build();
+      org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel =
+          createClassLoaderModelFromJson(classLoaderModelDescriptor);
+
+      return new BundleDescriptor.Builder()
+          .setArtifactId(packagerClassLoaderModel.getArtifactCoordinates().getArtifactId())
+          .setGroupId(packagerClassLoaderModel.getArtifactCoordinates().getGroupId())
+          .setVersion(packagerClassLoaderModel.getArtifactCoordinates().getVersion())
+          .setType(packagerClassLoaderModel.getArtifactCoordinates().getType())
+          .setClassifier(packagerClassLoaderModel.getArtifactCoordinates().getClassifier())
+          .build();
+    } else {
+      Model model;
+      if (artifactFile.isDirectory()) {
+        model = getPomModelFolder(artifactFile);
+      } else {
+        model = getPomModelFromJar(artifactFile);
+      }
+
+      return new BundleDescriptor.Builder()
+          .setArtifactId(model.getArtifactId())
+          .setGroupId(model.getGroupId() != null ? model.getGroupId() : model.getParent().getGroupId())
+          .setVersion(model.getVersion() != null ? model.getVersion() : model.getParent().getVersion())
+          .setType(EXTENSION_BUNDLE_TYPE)
+          .setClassifier(MULE_PLUGIN_CLASSIFIER)
+          .build();
+    }
+  }
+
+  private boolean isHeavyPackage(File artifactFile) {
+    return getClassLoaderModelDescriptor(artifactFile).exists();
+  }
+
+  protected File getClassLoaderModelDescriptor(File artifactFile) {
+    if (artifactFile.isDirectory()) {
+      return new File(artifactFile, CLASSLOADER_MODEL_JSON_DESCRIPTOR_LOCATION);
+    } else {
+      return new File(artifactFile.getParent(), CLASSLOADER_MODEL_JSON_DESCRIPTOR);
+    }
   }
 }

@@ -151,23 +151,22 @@ public class DefaultApplicationFactory implements ArtifactFactory<Application> {
     return new ApplicationWrapper(delegate);
   }
 
-  private List<ArtifactPluginDescriptor> getArtifactPluginDescriptors(Set<ArtifactPluginDescriptor> domainPlugins,
+  private List<ArtifactPluginDescriptor> getArtifactPluginDescriptors(Set<ArtifactPluginDescriptor> plugins,
                                                                       ApplicationDescriptor descriptor) {
     List<ArtifactPluginDescriptor> artifactPluginDescriptors = new ArrayList<>();
 
     for (ArtifactPluginDescriptor appPluginDescriptor : getArtifactPluginDescriptors(descriptor)) {
-      Optional<ArtifactPluginDescriptor> domainPluginDescriptor =
-          findPlugin(domainPlugins, appPluginDescriptor.getBundleDescriptor());
+      Optional<ArtifactPluginDescriptor> pluginDescriptor = findPlugin(plugins, appPluginDescriptor.getBundleDescriptor());
 
-      if (!domainPluginDescriptor.isPresent()) {
+      if (!pluginDescriptor.isPresent()) {
         artifactPluginDescriptors.add(appPluginDescriptor);
-      } else if (!isCompatibleVersion(domainPluginDescriptor.get().getBundleDescriptor().getVersion(),
+      } else if (!isCompatibleVersion(pluginDescriptor.get().getBundleDescriptor().getVersion(),
                                       appPluginDescriptor.getBundleDescriptor().getVersion())) {
         throw new IllegalStateException(
                                         format("Incompatible version of plugin '%s' found. Application requires version'%s' but domain provides version'%s'",
                                                appPluginDescriptor.getName(),
                                                appPluginDescriptor.getBundleDescriptor().getVersion(),
-                                               domainPluginDescriptor.get().getBundleDescriptor().getVersion()));
+                                               pluginDescriptor.get().getBundleDescriptor().getVersion()));
       }
     }
     return artifactPluginDescriptors;
