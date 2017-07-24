@@ -21,7 +21,6 @@ import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Processor;
@@ -59,23 +58,31 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase {
 
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private EventCorrelatorCallback mockEventCorrelatorCallback;
+
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private Processor mockTimeoutMessageProcessor;
+
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private MuleContext mockMuleContext;
+
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private ObjectStoreManager mockObjectStoreManager;
+
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private EventGroup mockEventGroup;
+
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private ObjectStore mockProcessedGroups;
+
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private InternalMessage mockMessageCollection;
+
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private Event mockMuleEvent;
+
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private FlowConstruct mockFlowConstruct;
-  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+
   private PartitionableObjectStore memoryObjectStore = new PartitionedInMemoryObjectStore();
 
   @Before
