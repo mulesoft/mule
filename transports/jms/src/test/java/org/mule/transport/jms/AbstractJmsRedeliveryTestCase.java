@@ -24,6 +24,7 @@ import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.exceptions.FunctionalTestException;
 import org.mule.tck.functional.CounterCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.util.concurrent.Latch;
 
 import java.util.Arrays;
@@ -31,11 +32,15 @@ import java.util.Collection;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.runners.Parameterized;
 import org.slf4j.Logger;
 
 public abstract class AbstractJmsRedeliveryTestCase extends AbstractServiceAndFlowTestCase
 {
+
+    @ClassRule
+    public static SystemProperty serializablePackages = new SystemProperty("org.apache.activemq.SERIALIZABLE_PACKAGES", "*");
 
     protected static final String JMS_INPUT_QUEUE = "jms://in?connector=jmsConnectorLimitedRedelivery";
     protected static final String JMS_INPUT_QUEUE2 = "jms://in2?connector=jmsConnectorNoRedelivery";
