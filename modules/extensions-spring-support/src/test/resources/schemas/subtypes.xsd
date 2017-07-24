@@ -14,7 +14,7 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" type="subtypes:org.mule.test.subtypes.extension.ParentShape" substitutionGroup="mule:abstract-extension" abstract="true" name="global-abstract-parent-shape"></xs:element>
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" type="subtypes:org.mule.test.subtypes.extension.ParentShape" substitutionGroup="mule:abstract-shared-extension" abstract="true" name="global-abstract-parent-shape"></xs:element>
   <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" type="subtypes:org.mule.test.subtypes.extension.ParentShape" abstract="true" name="abstract-parent-shape"></xs:element>
   <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" substitutionGroup="subtypes:abstract-parent-shape" name="parent-shape">
     <xs:complexType>
@@ -62,7 +62,7 @@
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType"></xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" type="subtypes:org.mule.test.subtypes.extension.Door" substitutionGroup="mule:abstract-extension" abstract="true" name="global-abstract-door"></xs:element>
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" type="subtypes:org.mule.test.subtypes.extension.Door" substitutionGroup="mule:abstract-shared-extension" abstract="true" name="global-abstract-door"></xs:element>
   <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" type="subtypes:org.mule.test.subtypes.extension.Door" abstract="true" name="abstract-door"></xs:element>
   <xs:complexType name="org.mule.test.subtypes.extension.HouseDoor">
     <xs:complexContent>
@@ -117,7 +117,7 @@
       </xs:complexContent>
     </xs:complexType>
   </xs:element>
-  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" name="config">
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-shared-extension" name="config">
     <xs:complexType>
       <xs:complexContent>
         <xs:extension base="mule:abstractExtensionType">
@@ -280,7 +280,7 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" type="subtypes:org.mule.test.subtypes.extension.ExtensiblePojo" substitutionGroup="mule:abstract-extension" abstract="true" name="global-abstract-extensible-pojo"></xs:element>
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" type="subtypes:org.mule.test.subtypes.extension.ExtensiblePojo" substitutionGroup="mule:abstract-shared-extension" abstract="true" name="global-abstract-extensible-pojo"></xs:element>
   <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" type="subtypes:org.mule.test.subtypes.extension.ExtensiblePojo" abstract="true" name="abstract-extensible-pojo"></xs:element>
   <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" substitutionGroup="subtypes:abstract-extensible-pojo" name="extensible-pojo">
     <xs:complexType>
@@ -296,7 +296,7 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" type="subtypes:org.mule.test.subtypes.extension.PojoForList" substitutionGroup="mule:abstract-extension" abstract="true" name="global-abstract-pojo-for-list"></xs:element>
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" type="subtypes:org.mule.test.subtypes.extension.PojoForList" substitutionGroup="mule:abstract-shared-extension" abstract="true" name="global-abstract-pojo-for-list"></xs:element>
   <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" type="subtypes:org.mule.test.subtypes.extension.PojoForList" abstract="true" name="abstract-pojo-for-list"></xs:element>
   <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" substitutionGroup="subtypes:abstract-pojo-for-list" name="pojo-for-list">
     <xs:complexType>

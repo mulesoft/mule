@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.exception;
 
+import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.CLIENT_SECURITY;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.CONNECTIVITY;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.DUPLICATE_MESSAGE;
@@ -26,6 +27,8 @@ import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.ST
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.TRANSFORMATION;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.VALIDATION;
 import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.core.api.exception.CompositeErrorTypeRepository;
+import org.mule.runtime.core.api.exception.DefaultErrorTypeRepository;
 import org.mule.runtime.core.api.exception.ErrorTypeRepository;
 
 /**
@@ -43,7 +46,7 @@ public class ErrorTypeRepositoryFactory {
    * @return a new {@link ErrorTypeRepository}.
    */
   public static ErrorTypeRepository createDefaultErrorTypeRepository() {
-    ErrorTypeRepository errorTypeRepository = new ErrorTypeRepository();
+    ErrorTypeRepository errorTypeRepository = new DefaultErrorTypeRepository();
     errorTypeRepository.addErrorType(TRANSFORMATION, errorTypeRepository.getAnyErrorType());
     errorTypeRepository.addErrorType(EXPRESSION, errorTypeRepository.getAnyErrorType());
     final ErrorType validationErrorType = errorTypeRepository.addErrorType(VALIDATION, errorTypeRepository.getAnyErrorType());
@@ -69,4 +72,19 @@ public class ErrorTypeRepositoryFactory {
     return errorTypeRepository;
   }
 
+  /**
+   * Creates a new {@link CompositeErrorTypeRepository} to use in mule.
+   * <p>
+   * The created repository will have a {@link ErrorTypeRepository} as child created by {@link ErrorTypeRepositoryFactory#createDefaultErrorTypeRepository()}
+   * and the given {@code parentErrorTypeRepository} as parent.
+   *
+   * @param parentErrorTypeRepository {@link ErrorTypeRepository} to be used as the parent repository
+   * @return a new {@link CompositeErrorTypeRepository} with the given {@code parentErrorTypeRepository} as the parent
+   * repository
+   */
+  public static ErrorTypeRepository createCompositeErrorTypeRepository(ErrorTypeRepository parentErrorTypeRepository) {
+    checkNotNull(parentErrorTypeRepository, "'parentErrorTypeRepository' can't be null");
+
+    return new CompositeErrorTypeRepository(createDefaultErrorTypeRepository(), parentErrorTypeRepository);
+  }
 }

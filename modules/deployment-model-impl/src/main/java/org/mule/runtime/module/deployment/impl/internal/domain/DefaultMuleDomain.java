@@ -16,7 +16,6 @@ import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.newBuilder;
 import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.getMuleDomainsDir;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -35,15 +34,15 @@ import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder;
+import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderManager;
 import org.mule.runtime.module.service.ServiceRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Scanner;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class DefaultMuleDomain implements Domain {
 
@@ -52,20 +51,22 @@ public class DefaultMuleDomain implements Domain {
   private final DomainDescriptor descriptor;
   private final ServiceRepository serviceRepository;
   private final List<ArtifactPlugin> artifactPlugins;
-  private MuleContextListener muleContextListener;
-  private ArtifactClassLoader deploymentClassLoader;
+  private final ExtensionModelLoaderManager extensionModelLoaderManager;
   private final ClassLoaderRepository classLoaderRepository;
+  private final ArtifactClassLoader deploymentClassLoader;
 
+  private MuleContextListener muleContextListener;
   private ArtifactContext artifactContext;
 
   public DefaultMuleDomain(DomainDescriptor descriptor, ArtifactClassLoader deploymentClassLoader,
                            ClassLoaderRepository classLoaderRepository, ServiceRepository serviceRepository,
-                           List<ArtifactPlugin> artifactPlugins) {
+                           List<ArtifactPlugin> artifactPlugins, ExtensionModelLoaderManager extensionModelLoaderManager) {
     this.deploymentClassLoader = deploymentClassLoader;
     this.classLoaderRepository = classLoaderRepository;
     this.descriptor = descriptor;
     this.serviceRepository = serviceRepository;
     this.artifactPlugins = artifactPlugins;
+    this.extensionModelLoaderManager = extensionModelLoaderManager;
   }
 
   @Override
@@ -116,7 +117,6 @@ public class DefaultMuleDomain implements Domain {
     }
   }
 
-
   @Override
   public void init() {
     doInit(false);
@@ -137,8 +137,11 @@ public class DefaultMuleDomain implements Domain {
           .setArtifactPlugins(artifactPlugins)
           .setExecutionClassloader(deploymentClassLoader.getClassLoader())
           .setArtifactInstallationDirectory(new File(getMuleDomainsDir(), getArtifactName()))
+          .setExtensionModelLoaderRepository(extensionModelLoaderManager)
           .setArtifactType(DOMAIN)
-          .setEnableLazyInit(lazy).setClassLoaderRepository(classLoaderRepository).setServiceRepository(serviceRepository);
+          .setEnableLazyInit(lazy)
+          .setClassLoaderRepository(classLoaderRepository)
+          .setServiceRepository(serviceRepository);
 
       if (descriptor.getAbsoluteResourcePaths().length > 0) {
         validateConfigurationFileDoNotUsesCoreNamespace();

@@ -15,8 +15,8 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.MAX_ONE;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.MULE_ABSTRACT_EXTENSION;
 import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE;
+import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.MULE_ABSTRACT_SHARED_EXTENSION;
 import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.UNBOUNDED;
 import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getExpressionSupport;
 import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getLayoutModel;
@@ -24,7 +24,6 @@ import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getParam
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isFlattenedParameterGroup;
 import static org.mule.runtime.extension.api.util.NameUtils.sanitizeName;
-
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
@@ -43,6 +42,7 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Lo
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ObjectFactory;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelComplexType;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelElement;
+
 import javax.xml.namespace.QName;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -423,7 +423,7 @@ final class ObjectTypeSchemaDelegate {
       if (typeDsl.isWrapped()) {
         substitutionGroup = new QName(typeDsl.getNamespace(), getGlobalAbstractName(typeDsl), typeDsl.getPrefix());
       } else {
-        substitutionGroup = MULE_ABSTRACT_EXTENSION;
+        substitutionGroup = MULE_ABSTRACT_SHARED_EXTENSION;
       }
     }
     return substitutionGroup;
@@ -436,7 +436,7 @@ final class ObjectTypeSchemaDelegate {
       DslElementSyntax base = baseDsl.get();
       globalSubGroup = new QName(base.getNamespace(), getGlobalAbstractName(base), base.getPrefix());
     } else {
-      globalSubGroup = MULE_ABSTRACT_EXTENSION;
+      globalSubGroup = MULE_ABSTRACT_SHARED_EXTENSION;
     }
 
     TopLevelElement abstractElement = new TopLevelElement();

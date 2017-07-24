@@ -39,6 +39,8 @@ public final class SchemaConstants {
       new QName(CORE_NAMESPACE, "abstractMessageSourceType", CORE_PREFIX);
   public static final QName MULE_ABSTRACT_EXTENSION =
       new QName(CORE_NAMESPACE, "abstract-extension", CORE_PREFIX);
+  public static final QName MULE_ABSTRACT_SHARED_EXTENSION =
+      new QName(CORE_NAMESPACE, "abstract-shared-extension", CORE_PREFIX);
   public static final QName MULE_PROPERTY_PLACEHOLDER_TYPE =
       new QName(CORE_NAMESPACE, "propertyPlaceholderType", CORE_PREFIX);
   public static final QName MULE_EXTENSION_CONNECTION_PROVIDER_ELEMENT =

@@ -10,7 +10,7 @@
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType"></xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="metadata:org.mule.test.metadata.extension.model.animals.Animal" substitutionGroup="mule:abstract-extension" abstract="true" name="global-abstract-animal"></xs:element>
+  <xs:element xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="metadata:org.mule.test.metadata.extension.model.animals.Animal" substitutionGroup="mule:abstract-shared-extension" abstract="true" name="global-abstract-animal"></xs:element>
   <xs:element xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" type="metadata:org.mule.test.metadata.extension.model.animals.Animal" abstract="true" name="abstract-animal"></xs:element>
   <xs:complexType name="org.mule.test.metadata.extension.model.animals.Bear">
     <xs:complexContent>
@@ -36,7 +36,7 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="metadata:org.mule.test.metadata.extension.model.shapes.Shape" substitutionGroup="mule:abstract-extension" abstract="true" name="global-abstract-shape"></xs:element>
+  <xs:element xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="metadata:org.mule.test.metadata.extension.model.shapes.Shape" substitutionGroup="mule:abstract-shared-extension" abstract="true" name="global-abstract-shape"></xs:element>
   <xs:element xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" type="metadata:org.mule.test.metadata.extension.model.shapes.Shape" abstract="true" name="abstract-shape"></xs:element>
   <xs:complexType name="org.mule.test.metadata.extension.model.shapes.Circle">
     <xs:complexContent>
@@ -76,7 +76,7 @@
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType"></xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="metadata:org.mule.test.metadata.extension.model.attribute.AbstractOutputAttributes" substitutionGroup="mule:abstract-extension" abstract="true" name="global-abstract-abstract-output-attributes"></xs:element>
+  <xs:element xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="metadata:org.mule.test.metadata.extension.model.attribute.AbstractOutputAttributes" substitutionGroup="mule:abstract-shared-extension" abstract="true" name="global-abstract-abstract-output-attributes"></xs:element>
   <xs:element xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" type="metadata:org.mule.test.metadata.extension.model.attribute.AbstractOutputAttributes" abstract="true" name="abstract-abstract-output-attributes"></xs:element>
   <xs:complexType name="org.mule.test.metadata.extension.model.attribute.AnimalsOutputAttributes">
     <xs:complexContent>
@@ -127,7 +127,7 @@
       </xs:complexContent>
     </xs:complexType>
   </xs:element>
-  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" name="config">
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-shared-extension" name="config">
     <xs:complexType>
       <xs:complexContent>
         <xs:extension base="mule:abstractExtensionType">

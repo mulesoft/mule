@@ -82,6 +82,8 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
 
   protected ObjectSerializer objectSerializer;
 
+  private ErrorTypeRepository errorTypeRepository;
+
   /**
    * {@inheritDoc}
    */
@@ -106,9 +108,13 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
         .setBootstrapServiceDiscoverer(injectMuleContextIfRequired(getBootstrapPropertiesServiceDiscoverer(), muleContext));
 
     getObjectSerializer(muleContext);
-    ErrorTypeRepository defaultErrorTypeRepository = createDefaultErrorTypeRepository();
-    muleContext.setErrorTypeRepository(defaultErrorTypeRepository);
-    muleContext.setErrorTypeLocator(createDefaultErrorTypeLocator(defaultErrorTypeRepository));
+
+    if (errorTypeRepository == null) {
+      errorTypeRepository = createDefaultErrorTypeRepository();
+    }
+
+    muleContext.setErrorTypeRepository(errorTypeRepository);
+    muleContext.setErrorTypeLocator(createDefaultErrorTypeLocator(errorTypeRepository));
 
     muleContext.setProcessorInterceptorManager(new DefaultProcessorInterceptorManager());
 
@@ -173,6 +179,14 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
     } else {
       return Thread.currentThread().getContextClassLoader();
     }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void setErrorTypeRepository(ErrorTypeRepository errorTypeRepository) {
+    this.errorTypeRepository = errorTypeRepository;
   }
 
   public <T> T injectMuleContextIfRequired(T object, MuleContext muleContext) {

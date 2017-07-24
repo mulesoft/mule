@@ -107,13 +107,13 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.exception.MessagingException;
+import org.mule.runtime.core.api.policy.PolicyParametrization;
+import org.mule.runtime.core.api.policy.PolicyPointcut;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.api.util.concurrent.Latch;
 import org.mule.runtime.core.internal.config.StartupContext;
-import org.mule.runtime.core.api.policy.PolicyParametrization;
-import org.mule.runtime.core.api.policy.PolicyPointcut;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
@@ -154,6 +154,16 @@ import org.mule.tck.probe.file.FileExists;
 import org.mule.tck.util.CompilerUtils.ExtensionCompiler;
 import org.mule.tck.util.CompilerUtils.JarCompiler;
 import org.mule.tck.util.CompilerUtils.SingleClassCompiler;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.mockito.verification.VerificationMode;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -169,17 +179,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.mockito.verification.VerificationMode;
 
 @RunWith(Parameterized.class)
 public class DeploymentServiceTestCase extends AbstractMuleTestCase {
@@ -3934,7 +3933,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
                                  new DomainClassLoaderFactory(getClass().getClassLoader())
                                      .create("domain/" + DEFAULT_DOMAIN_NAME, containerClassLoader,
                                              new DomainDescriptor(DEFAULT_DOMAIN_NAME), emptyList()),
-                                 artifactClassLoaderManager, serviceManager, emptyList());
+                                 artifactClassLoaderManager, serviceManager, emptyList(), extensionModelLoaderManager);
   }
 
   /**

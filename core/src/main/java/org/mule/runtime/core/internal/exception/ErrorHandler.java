@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.exception;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.exception.ErrorTypeRepository.CRITICAL_ERROR_TYPE;
+import static org.mule.runtime.core.api.exception.DefaultErrorTypeRepository.CRITICAL_ERROR_TYPE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static reactor.core.publisher.Mono.error;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -24,14 +24,13 @@ import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
+import org.mule.runtime.core.api.processor.AbstractMuleObjectOwner;
 import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
 import org.mule.runtime.core.internal.message.InternalMessage;
-import org.mule.runtime.core.api.processor.AbstractMuleObjectOwner;
+import org.reactivestreams.Publisher;
 
 import java.util.List;
 import java.util.Optional;
-
-import org.reactivestreams.Publisher;
 
 /**
  * Selects which "on error" handler to execute based on filtering. Replaces the choice-exception-strategy from Mule 3. On error

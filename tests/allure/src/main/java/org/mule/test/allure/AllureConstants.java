@@ -256,6 +256,15 @@ public interface AllureConstants {
 
   }
 
+  interface VMFeature {
+
+    String VM_EXTENSION = "VM Extension";
+
+    interface VMStory {
+    }
+
+  }
+
   interface IntegrationTestsFeature {
 
     String INTEGRATIONS_TESTS = "Integration Tests";
@@ -432,6 +441,12 @@ public interface AllureConstants {
       String LICENSE_MANAGEMENT = "License Management";
 
     }
+
+  }
+
+  interface DomainSupport {
+
+    String DOMAIN_SUPPORT = "Domain Support";
 
   }
 

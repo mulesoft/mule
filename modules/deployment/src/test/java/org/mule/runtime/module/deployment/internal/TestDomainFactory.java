@@ -25,6 +25,8 @@ import org.mule.runtime.module.deployment.impl.internal.domain.DomainDescriptorF
 import org.mule.runtime.module.deployment.impl.internal.domain.TestDomainWrapper;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
+import org.mule.runtime.module.deployment.impl.internal.plugin.MuleExtensionModelLoaderManager;
+import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderManager;
 import org.mule.runtime.module.service.ServiceRepository;
 
 import java.io.File;
@@ -58,16 +60,17 @@ public class TestDomainFactory extends DefaultDomainFactory {
 
     return new TestDomainFactory(artifactClassLoaderManager, serviceRepository, domainDescriptorFactory,
                                  pluginDependenciesResolver,
-                                 domainClassLoaderBuilderFactory);
+                                 domainClassLoaderBuilderFactory, new MuleExtensionModelLoaderManager(containerClassLoader));
   }
 
   private TestDomainFactory(ClassLoaderRepository classLoaderRepository,
                             ServiceRepository serviceRepository, DomainDescriptorFactory domainDescriptorFactory,
                             PluginDependenciesResolver pluginDependenciesResolver,
-                            DomainClassLoaderBuilderFactory domainClassLoaderBuilderFactory) {
+                            DomainClassLoaderBuilderFactory domainClassLoaderBuilderFactory,
+                            ExtensionModelLoaderManager extensionModelLoaderManager) {
     super(domainDescriptorFactory, new DefaultDomainManager(),
           classLoaderRepository, serviceRepository,
-          pluginDependenciesResolver, domainClassLoaderBuilderFactory);
+          pluginDependenciesResolver, domainClassLoaderBuilderFactory, extensionModelLoaderManager);
   }
 
   @Override

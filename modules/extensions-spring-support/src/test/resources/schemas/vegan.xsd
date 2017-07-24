@@ -10,7 +10,7 @@
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType"></xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" type="vegan:org.mule.test.vegan.extension.FarmedFood" substitutionGroup="mule:abstract-extension" abstract="true" name="global-abstract-farmed-food"></xs:element>
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" type="vegan:org.mule.test.vegan.extension.FarmedFood" substitutionGroup="mule:abstract-shared-extension" abstract="true" name="global-abstract-farmed-food"></xs:element>
   <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" type="vegan:org.mule.test.vegan.extension.FarmedFood" abstract="true" name="abstract-farmed-food"></xs:element>
   <xs:complexType name="org.mule.test.vegan.extension.RottenFood">
     <xs:complexContent>
@@ -75,7 +75,7 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" abstract="true" name="abstract-grouped-food"></xs:element>
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-shared-extension" abstract="true" name="abstract-grouped-food"></xs:element>
   <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" substitutionGroup="vegan:abstract-grouped-food" name="grouped-food">
     <xs:complexType>
       <xs:complexContent>
@@ -85,7 +85,7 @@
       </xs:complexContent>
     </xs:complexType>
   </xs:element>
-  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" name="pear-config">
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-shared-extension" name="pear-config">
     <xs:complexType>
       <xs:complexContent>
         <xs:extension base="mule:abstractExtensionType">
@@ -94,7 +94,7 @@
       </xs:complexContent>
     </xs:complexType>
   </xs:element>
-  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" name="apple-config">
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-shared-extension" name="apple-config">
     <xs:complexType>
       <xs:complexContent>
         <xs:extension base="mule:abstractExtensionType">
@@ -160,7 +160,7 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" type="vegan:org.mule.test.vegan.extension.VeganCookBook" substitutionGroup="mule:abstract-extension" abstract="true" name="global-abstract-vegan-cook-book"></xs:element>
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" type="vegan:org.mule.test.vegan.extension.VeganCookBook" substitutionGroup="mule:abstract-shared-extension" abstract="true" name="global-abstract-vegan-cook-book"></xs:element>
   <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" type="vegan:org.mule.test.vegan.extension.VeganCookBook" abstract="true" name="abstract-vegan-cook-book"></xs:element>
   <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" substitutionGroup="vegan:abstract-vegan-cook-book" name="vegan-cook-book">
     <xs:complexType>
@@ -416,7 +416,7 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" name="banana-config">
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-shared-extension" name="banana-config">
     <xs:complexType>
       <xs:complexContent>
         <xs:extension base="mule:abstractExtensionType">
@@ -544,7 +544,7 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" name="grape-config">
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-shared-extension" name="grape-config">
     <xs:complexType>
       <xs:complexContent>
         <xs:extension base="mule:abstractExtensionType">
@@ -603,7 +603,7 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" name="kiwi-config">
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-shared-extension" name="kiwi-config">
     <xs:complexType>
       <xs:complexContent>
         <xs:extension base="mule:abstractExtensionType">
@@ -644,7 +644,7 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" name="peach-config">
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-shared-extension" name="peach-config">
     <xs:complexType>
       <xs:complexContent>
         <xs:extension base="mule:abstractExtensionType">
