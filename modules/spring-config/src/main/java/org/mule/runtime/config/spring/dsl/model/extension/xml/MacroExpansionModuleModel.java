@@ -12,11 +12,12 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.NAME_ATTRIBUTE;
+import static org.mule.runtime.core.el.BindingContextUtils.PARAMETERS;
+import static org.mule.runtime.core.el.BindingContextUtils.PROPERTIES;
 import static org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder.MODULE_CONFIG_GLOBAL_ELEMENT_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
-
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -29,8 +30,7 @@ import org.mule.runtime.config.spring.dsl.model.ComponentLocationVisitor;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor;
-import org.apache.commons.lang3.StringUtils;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,6 +38,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * A {@link MacroExpansionModuleModel} works tightly with a {@link ApplicationModel} to go over all the registered
@@ -273,14 +275,13 @@ public class MacroExpansionModuleModel {
   private Map<String, String> getLiteralParameters(Map<String, String> propertiesMap, Map<String, String> parametersMap) {
     final Map<String, String> literalsParameters = propertiesMap.entrySet().stream()
         .filter(entry -> !isExpression(entry.getValue()))
-        .collect(Collectors.toMap(e -> getReplaceableExpression(e.getKey(), DataWeaveExpressionLanguageAdaptor.PROPERTIES),
+        .collect(Collectors.toMap(e -> getReplaceableExpression(e.getKey(), PROPERTIES),
                                   Map.Entry::getValue));
     literalsParameters.putAll(
                               parametersMap.entrySet().stream()
                                   .filter(entry -> !isExpression(entry.getValue()))
                                   .collect(Collectors.toMap(
-                                                            e -> getReplaceableExpression(e.getKey(),
-                                                                                          DataWeaveExpressionLanguageAdaptor.PARAMETERS),
+                                                            e -> getReplaceableExpression(e.getKey(), PARAMETERS),
                                                             Map.Entry::getValue)));
     return literalsParameters;
   }

@@ -32,13 +32,13 @@
     
     <flow name="seekStream">
         <flow-ref name="toStream" />
-        <marvel:seek-stream config-ref="drStrange" position="#[position]" />
+        <marvel:seek-stream config-ref="drStrange" position="#[vars.position]" />
     </flow>
     
     <flow name="seekStreamTx">
         <try transactionalAction="BEGIN_OR_JOIN">
             <flow-ref name="toStream" />
-            <marvel:seek-stream config-ref="drStrange" position="#[position]" />
+            <marvel:seek-stream config-ref="drStrange" position="#[vars.position]" />
         </try>
     </flow>
 

@@ -30,19 +30,18 @@ import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
+import static org.mule.runtime.core.el.BindingContextUtils.ATTRIBUTES;
 import static org.mule.runtime.core.el.BindingContextUtils.AUTHENTICATION;
-import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.ATTRIBUTES;
-import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.DATA_TYPE;
-import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.ERROR;
+import static org.mule.runtime.core.el.BindingContextUtils.DATA_TYPE;
+import static org.mule.runtime.core.el.BindingContextUtils.ERROR;
+import static org.mule.runtime.core.el.BindingContextUtils.PARAMETERS;
+import static org.mule.runtime.core.el.BindingContextUtils.PAYLOAD;
+import static org.mule.runtime.core.el.BindingContextUtils.PROPERTIES;
+import static org.mule.runtime.core.el.BindingContextUtils.VARS;
 import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.FLOW;
-import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.PARAMETERS;
-import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.PAYLOAD;
-import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.PROPERTIES;
-import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.VARIABLES;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.EXPRESSION_LANGUAGE;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.ExpressionLanguageStory.SUPPORT_DW;
-
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.el.ExpressionLanguage;
@@ -71,11 +70,11 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 
 @Feature(EXPRESSION_LANGUAGE)
 @Story(SUPPORT_DW)
@@ -197,35 +196,16 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
     when(event.getVariable(var1)).thenReturn(varValue);
     when(event.getVariable(var2)).thenReturn(varValue);
 
-    TypedValue result = expressionLanguage.evaluate(VARIABLES, event, BindingContext.builder().build());
+    TypedValue result = expressionLanguage.evaluate(VARS, event, BindingContext.builder().build());
     assertThat(result.getValue(), is(instanceOf(Map.class)));
     assertThat((Map<String, TypedValue>) result.getValue(), hasEntry(var1, varValue));
     assertThat((Map<String, TypedValue>) result.getValue(), hasEntry(var2, varValue));
   }
 
   @Test
-  public void singleVariableBindings() throws Exception {
-    Event event = getEventWithError(empty());
-    String var1 = "var1";
-    String var2 = "var2";
-    when(event.getVariableNames()).thenReturn(Sets.newHashSet(var1, var2));
-    String varValue = "mangoose";
-    TypedValue var = new TypedValue<>(varValue, STRING);
-    when(event.getVariable(var1)).thenReturn(var);
-    when(event.getVariable(var2)).thenReturn(var);
-
-    TypedValue resultVar1 = expressionLanguage.evaluate(var1, event, BindingContext.builder().build());
-    assertThat(resultVar1.getValue(), is(varValue));
-    assertThat(resultVar1.getDataType(), is(STRING));
-    TypedValue resultVar2 = expressionLanguage.evaluate(var2, event, BindingContext.builder().build());
-    assertThat(resultVar2.getValue(), is(varValue));
-    assertThat(resultVar2.getDataType(), is(STRING));
-  }
-
-  @Test
   public void variablesCannotOverrideEventBindings() throws MuleException {
     Event event = spy(testEvent());
-    HashSet<String> variables = Sets.newHashSet(PAYLOAD, ATTRIBUTES, ERROR, VARIABLES, FLOW);
+    HashSet<String> variables = Sets.newHashSet(PAYLOAD, ATTRIBUTES, ERROR, VARS, FLOW);
     when(event.getVariableNames()).thenReturn(variables);
     TypedValue<String> varValue = new TypedValue<>("", STRING);
     variables.forEach(var -> doReturn(varValue).when(event).getVariable(var));
@@ -234,7 +214,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
     assertThat(expressionLanguage.evaluate(PAYLOAD, event, BindingContext.builder().build()).getValue(), is(TEST_PAYLOAD));
     assertThat(expressionLanguage.evaluate(ATTRIBUTES, event, BindingContext.builder().build()).getValue(), is(nullValue()));
     assertThat(expressionLanguage.evaluate(ERROR, event, BindingContext.builder().build()).getValue(), is(nullValue()));
-    assertThat(expressionLanguage.evaluate(VARIABLES, event, BindingContext.builder().build()).getValue(),
+    assertThat(expressionLanguage.evaluate(VARS, event, BindingContext.builder().build()).getValue(),
                is(instanceOf(Map.class)));
     assertThat(expressionLanguage.evaluate("flow.name", event, fromSingleComponent(flowName), BindingContext.builder().build())
         .getValue(),

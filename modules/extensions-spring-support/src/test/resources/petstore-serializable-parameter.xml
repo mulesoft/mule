@@ -18,7 +18,7 @@
     </flow>
 
     <flow name="dynamicSerializableParameter">
-        <petstore:describe-serialized-animal animal="#[animal]" />
+        <petstore:describe-serialized-animal animal="#[vars.animal]" />
     </flow>
 
 </mule>

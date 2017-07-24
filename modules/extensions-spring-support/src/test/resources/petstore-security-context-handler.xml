@@ -10,7 +10,7 @@
     </flow>
 
     <flow name="setSecureCageFilterProviders">
-        <petstore:set-secure-cage user="user" pass="pass" providers="#[providers]"/>
+        <petstore:set-secure-cage user="user" pass="pass" providers="#[vars.providers]"/>
     </flow>
 
 </mule>

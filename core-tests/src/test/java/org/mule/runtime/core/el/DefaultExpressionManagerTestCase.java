@@ -182,7 +182,7 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
   @Description("Verifies that flowVars work, returning null for non existent ones and it's value for those that do.")
   public void flowVars() throws MuleException {
     Event.Builder eventBuilder = Event.builder(testEvent());
-    String flowVars = "variables.myVar";
+    String flowVars = "vars.myVar";
     assertThat(expressionManager.evaluate(flowVars, eventBuilder.build()).getValue(), nullValue());
     String value = "Leda";
     eventBuilder.addVariable(MY_VAR, value);

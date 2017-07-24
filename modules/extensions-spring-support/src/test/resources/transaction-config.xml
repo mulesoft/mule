@@ -81,7 +81,7 @@
 
     <sub-flow name="accumulatePages">
         <foreach>
-            <set-variable variableName="accumulator" value="#[accumulator ++ [payload]]" />
+            <set-variable variableName="accumulator" value="#[vars.accumulator ++ [payload]]" />
         </foreach>
     </sub-flow>
 </mule>

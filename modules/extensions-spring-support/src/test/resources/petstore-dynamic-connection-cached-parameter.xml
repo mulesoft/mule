@@ -6,7 +6,7 @@
                http://www.mulesoft.org/schema/mule/petstore http://www.mulesoft.org/schema/mule/petstore/current/mule-petstore.xsd">
 
     <petstore:config name="petstore" cashierName="jim">
-        <petstore:connection username="#[username]" password="#[password]" openingDate="#[date]"/>
+        <petstore:connection username="#[vars.username]" password="#[vars.password]" openingDate="#[vars.date]"/>
         <petstore:pets>
             <petstore:pet value="Lassie" />
             <petstore:pet value="Sapo Pepe" />

@@ -285,7 +285,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
     List<Processor> processors = getSimpleMessageProcessors(new TestMessageProcessor("zas"));
     foreachMp.setMessageProcessors(processors);
     foreachMp.setBatchSize(2);
-    foreachMp.setCollectionExpression("collection");
+    foreachMp.setCollectionExpression("vars.collection");
     foreachMp.initialise();
 
     foreachMp.process(eventBuilder().addVariable("collection", asList(1, 2, 3)).message(of(null)).build());

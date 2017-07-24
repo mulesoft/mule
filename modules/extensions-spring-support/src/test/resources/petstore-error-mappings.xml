@@ -13,7 +13,7 @@
     </petstore:config>
 
     <flow name="noMapping">
-        <petstore:fail petNames="#[names]"/>
+        <petstore:fail petNames="#[vars.names]"/>
         <error-handler>
             <on-error-continue>
                 <set-payload value="Error."/>
@@ -22,7 +22,7 @@
     </flow>
 
     <flow name="simpleMapping">
-        <petstore:fail petNames="#[names]">
+        <petstore:fail petNames="#[vars.names]">
             <error-mapping targetType="MY_REQUESTER"/>
         </petstore:fail>
         <error-handler>
@@ -36,7 +36,7 @@
     </flow>
 
     <flow name="complexMapping">
-        <petstore:fail petNames="#[names]">
+        <petstore:fail petNames="#[vars.names]">
             <error-mapping sourceType="CONNECTIVITY" targetType="MY_REQUESTER"/>
         </petstore:fail>
         <error-handler>
@@ -50,7 +50,7 @@
     </flow>
 
     <flow name="multipleMappings">
-        <petstore:fail petNames="#[names]">
+        <petstore:fail petNames="#[vars.names]">
             <error-mapping sourceType="CONNECTIVITY" targetType="MY_REQUESTER"/>
             <error-mapping sourceType="EXPRESSION" targetType="MY_OTHER_ERROR"/>
         </petstore:fail>

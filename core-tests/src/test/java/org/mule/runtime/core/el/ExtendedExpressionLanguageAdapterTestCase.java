@@ -169,7 +169,7 @@ public class ExtendedExpressionLanguageAdapterTestCase extends AbstractWeaveExpr
     assertThat(builder1.build().getVariableNames(), contains("key"));
 
     Event.Builder builder2 = builder(event);
-    TypedValue result2 = expressionLanguageAdapter.evaluate("variables.put(\'key\',\'value\')",
+    TypedValue result2 = expressionLanguageAdapter.evaluate("vars.put(\'key\',\'value\')",
                                                             event,
                                                             builder2,
                                                             TEST_CONNECTOR_LOCATION,
