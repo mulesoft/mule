@@ -142,7 +142,7 @@
         -->
         <jdk7Name>JavaSE-1.7</jdk7Name>
 
-        <activemqVersion>5.14.5</activemqVersion>
+        <activemqVersion>5.15.0</activemqVersion>
         <antVersion>1.9.6</antVersion>
         <antlrVersion>3.5</antlrVersion>
         <asmVersion>3.3.1</asmVersion>
