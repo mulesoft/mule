@@ -6,6 +6,9 @@
  */
 package org.mule.module.http.functional.requester;
 
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.HttpHeaders.Values.CHUNKED;
 
 import org.mule.api.MuleEvent;
@@ -16,14 +19,14 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.hamcrest.Matchers;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 
 public class HttpRequestResponseHeadersTestCase extends AbstractHttpRequestTestCase
 {
 
-    @Rule
-    public SystemProperty host = new SystemProperty("host", "localhost");
     @Rule
     public SystemProperty encoding = new SystemProperty("encoding" , CHUNKED);
 
@@ -39,10 +42,7 @@ public class HttpRequestResponseHeadersTestCase extends AbstractHttpRequestTestC
      */
     @Test
     public void responseWithUpgradeToHttp2Header() throws Exception {
-        Flow flow = (Flow) getFlowConstruct("responseWithUpgradeToHttp2Header");
-
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
-        flow.process(event);
+        assertThat(runFlow("responseWithUpgradeToHttp2Header", getTestEvent(TEST_MESSAGE)), not(nullValue()));
     }
 
     @Override
