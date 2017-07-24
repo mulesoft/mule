@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.api.cache;
 
-import java.io.Serializable;
-
 /**
  * Provides invalidation capability to a {@link CachingStrategy}
  */
@@ -28,5 +26,5 @@ public interface InvalidatableCachingStrategy {
    * @throws InvalidateCacheException if there is any error invalidating the cache strategy
    * @throws IllegalArgumentException if key has an invalid value
    */
-  void invalidate(Serializable key) throws InvalidateCacheException;
+  void invalidate(String key) throws InvalidateCacheException;
 }

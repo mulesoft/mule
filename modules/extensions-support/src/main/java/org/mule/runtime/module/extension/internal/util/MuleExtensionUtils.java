@@ -27,7 +27,7 @@ import static org.mule.runtime.core.api.util.collection.Collectors.toImmutableLi
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.VERSION;
-import static org.springframework.util.ReflectionUtils.setField;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedFields;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.dsl.DslResolvingContext;
@@ -59,9 +59,11 @@ import org.mule.runtime.extension.api.annotation.param.ConfigName;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthModelProperty;
 import org.mule.runtime.extension.api.exception.IllegalConfigurationModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalConnectionProviderModelDefinitionException;
+import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalSourceModelDefinitionException;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
+import org.mule.runtime.extension.api.property.ClassLoaderModelProperty;
 import org.mule.runtime.extension.api.runtime.InterceptorFactory;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationFactory;
 import org.mule.runtime.extension.api.runtime.connectivity.ConnectionProviderFactory;
@@ -70,7 +72,6 @@ import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory
 import org.mule.runtime.extension.api.runtime.source.SourceFactory;
 import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
 import org.mule.runtime.extension.api.tx.SourceTransactionalAction;
-import org.mule.runtime.extension.api.property.ClassLoaderModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConfigurationFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectionProviderFactoryModelProperty;
@@ -329,7 +330,7 @@ public class MuleExtensionUtils {
     return withContextClassLoader(getClassLoader(extensionModel), callable);
   }
 
-  public static void injectConfigName(EnrichableModel model, Object target, String configName) {
+  public static void injectRefName(EnrichableModel model, Object target, String configName) {
     model.getModelProperty(RequireNameField.class).ifPresent(property -> {
       final Field configNameField = property.getConfigNameField();
 
@@ -340,10 +341,22 @@ public class MuleExtensionUtils {
                                                                       ConfigName.class.getSimpleName(),
                                                                       target.getClass().getName()));
       }
-
-      configNameField.setAccessible(true);
-      setField(configNameField, target, configName);
+      new FieldSetter<>(configNameField).set(target, configName);
     });
+  }
+
+  public static void injectRefName(Object target, String refName) {
+    final Class<?> type = target.getClass();
+    List<Field> fields = getAnnotatedFields(type, ConfigName.class);
+    if (fields.isEmpty()) {
+      return;
+    } else if (fields.size() > 1) {
+      throw new IllegalModelDefinitionException(format(
+                                                       "Class '%s' has %d fields annotated with @%s. Only one field may carry that annotation",
+                                                       type.getName(), fields.size(), ConfigName.class));
+    }
+
+    new FieldSetter<>(fields.get(0)).set(target, refName);
   }
 
   /**

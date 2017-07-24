@@ -14,7 +14,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
-
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
@@ -22,7 +21,6 @@ import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import java.io.NotSerializableException;
 import java.io.Serializable;
 
 import org.junit.Before;
@@ -74,7 +72,7 @@ public class ExpressionKeyGeneratorTestCase extends AbstractMuleTestCase {
     assertThat(key, equalTo(RESOLVED_KEY));
   }
 
-  @Test(expected = NotSerializableException.class)
+  @Test(expected = IllegalStateException.class)
   public void testThrowsExceptionOnNonSerializableKey() throws Exception {
     keyGenerator.setExpression(SINGLE_EXPRESSION);
     keyGenerator.setMuleContext(muleContext);

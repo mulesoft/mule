@@ -21,7 +21,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_SIMPLE_REGISTRY_BOOTSTRAP;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_QUEUE_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME;
+import static org.mule.runtime.api.store.ObjectStoreManager.BASE_IN_MEMORY_OBJECT_STORE_KEY;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
@@ -197,14 +197,14 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
     // Asert existance of defauts in registry
     assertNotNull(context.getRegistry().lookupObject(OBJECT_QUEUE_MANAGER));
     assertNotNull(context.getRegistry().lookupObject(OBJECT_SECURITY_MANAGER));
-    assertNotNull(context.getRegistry().lookupObject(OBJECT_STORE_DEFAULT_IN_MEMORY_NAME));
+    assertNotNull(context.getRegistry().lookupObject(BASE_IN_MEMORY_OBJECT_STORE_KEY));
   }
 
   private void assertNoDefaults(MuleContext context) {
     // Asert non-existance of defauts in registry
     assertNull(context.getRegistry().lookupObject(OBJECT_QUEUE_MANAGER));
     assertNull(context.getRegistry().lookupObject(OBJECT_SECURITY_MANAGER));
-    assertNull(context.getRegistry().lookupObject(OBJECT_STORE_DEFAULT_IN_MEMORY_NAME));
+    assertNull(context.getRegistry().lookupObject(BASE_IN_MEMORY_OBJECT_STORE_KEY));
     assertNull(context.getRegistry().lookupObject(OBJECT_MULE_SIMPLE_REGISTRY_BOOTSTRAP));
   }
 

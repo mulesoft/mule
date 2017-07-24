@@ -7,11 +7,11 @@
 
 package org.mule.runtime.core.streaming;
 
+import static org.mockito.Mockito.when;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
-
-import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.api.store.ObjectDoesNotExistException;
-import org.mule.runtime.core.internal.streaming.object.iterator.ListableObjectStoreProducer;
+import org.mule.runtime.api.store.ObjectStore;
+import org.mule.runtime.core.internal.streaming.object.iterator.ObjectStoreProducer;
 import org.mule.tck.size.SmallTest;
 
 import java.io.Serializable;
@@ -22,59 +22,52 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import io.qameta.allure.Feature;
 import junit.framework.Assert;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
-import io.qameta.allure.Feature;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
 @Feature(STREAMING)
-public class ListableObjectStoreProducerTestCase {
+public class ObjectStoreProducerTestCase {
 
   @Mock
-  private ListableObjectStore<Serializable> objectStore;
+  private ObjectStore<Serializable> objectStore;
 
   private Map<String, String> values;
 
-  private ListableObjectStoreProducer<Serializable> producer;
+  private ObjectStoreProducer<Serializable> producer;
 
   @Before
   public void setUp() throws Exception {
-    this.values = new HashMap<String, String>();
+    this.values = new HashMap<>();
     this.values.put("fruit", "banana");
     this.values.put("icecream", "chocolate");
     this.values.put("drink", "coke");
 
-    Mockito.when(this.objectStore.retrieve(Mockito.anyString())).thenAnswer(new Answer<Serializable>() {
-
-      @Override
-      public Serializable answer(InvocationOnMock invocation) throws Throwable {
-        Serializable value = values.get(invocation.getArguments()[0]);
-        if (value == null) {
-          throw new ObjectDoesNotExistException();
-        }
-
-        return value;
+    when(this.objectStore.retrieve(Mockito.anyString())).thenAnswer(invocation -> {
+      Serializable value = values.get(invocation.getArguments()[0]);
+      if (value == null) {
+        throw new ObjectDoesNotExistException();
       }
+
+      return value;
     });
 
-    Mockito.when(this.objectStore.allKeys()).thenReturn(new ArrayList<Serializable>(this.values.keySet()));
+    when(this.objectStore.allKeys()).thenReturn(new ArrayList<>(this.values.keySet()));
 
-    this.producer = new ListableObjectStoreProducer<Serializable>(this.objectStore);
+    this.producer = new ObjectStoreProducer<>(this.objectStore);
   }
 
   @Test
   public void happyPath() throws Exception {
-    Set<Serializable> returnedValues = new HashSet<Serializable>();
+    Set<Serializable> returnedValues = new HashSet<>();
 
     Serializable item = this.producer.produce();
     while (item != null) {

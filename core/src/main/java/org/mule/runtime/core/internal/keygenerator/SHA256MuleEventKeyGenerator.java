@@ -6,14 +6,13 @@
  */
 package org.mule.runtime.core.internal.keygenerator;
 
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEventKeyGenerator;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.util.StringUtils;
 
-import java.io.NotSerializableException;
-import java.io.Serializable;
 import java.security.MessageDigest;
 
 import org.slf4j.Logger;
@@ -28,7 +27,7 @@ public class SHA256MuleEventKeyGenerator implements MuleEventKeyGenerator, MuleC
   private MuleContext muleContext;
 
   @Override
-  public Serializable generateKey(Event event) throws NotSerializableException {
+  public String generateKey(Event event) {
     try {
       byte[] bytesOfMessage = event.getMessageAsBytes(muleContext);
       MessageDigest md = MessageDigest.getInstance("SHA-256");
@@ -40,13 +39,7 @@ public class SHA256MuleEventKeyGenerator implements MuleEventKeyGenerator, MuleC
 
       return key;
     } catch (Exception e) {
-      // TODO: The exception may not necessarily be caused by a serialization problem, but we still throw
-      // NotSerializableException to keep backwards compatibility. The interface needs to be changed.
-
-      NotSerializableException notSerializableException = new NotSerializableException(e.getMessage());
-      notSerializableException.initCause(e);
-
-      throw notSerializableException;
+      throw new MuleRuntimeException(e);
     }
   }
 

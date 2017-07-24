@@ -10,10 +10,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.store.ObjectStoreException;
-import org.mule.runtime.api.store.ObjectStoreNotAvailableException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-import java.io.Serializable;
+import java.util.List;
 
 import org.junit.Test;
 
@@ -66,22 +65,22 @@ public class MonitoredObjectStoreTestCase extends AbstractMuleContextTestCase {
     }
 
     @Override
-    public boolean contains(Serializable id) throws ObjectStoreNotAvailableException {
+    protected boolean doContains(String key) throws ObjectStoreException {
       return false;
     }
 
     @Override
-    public String remove(Serializable id) throws ObjectStoreException {
+    protected String doRemove(String key) throws ObjectStoreException {
       return null;
     }
 
     @Override
-    public String retrieve(Serializable id) throws ObjectStoreException {
+    protected String doRetrieve(String key) throws ObjectStoreException {
       return null;
     }
 
     @Override
-    public void store(Serializable id, String item) throws ObjectStoreException {
+    protected void doStore(String key, String value) throws ObjectStoreException {
       // does nothing
     }
 
@@ -93,6 +92,21 @@ public class MonitoredObjectStoreTestCase extends AbstractMuleContextTestCase {
     @Override
     public boolean isPersistent() {
       return false;
+    }
+
+    @Override
+    public void open() throws ObjectStoreException {
+
+    }
+
+    @Override
+    public void close() throws ObjectStoreException {
+
+    }
+
+    @Override
+    public List<String> allKeys() throws ObjectStoreException {
+      return null;
     }
   }
 }

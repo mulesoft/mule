@@ -23,8 +23,10 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.ObjectStoreManager;
+import org.mule.runtime.api.store.ObjectStoreSettings;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.context.notification.RoutingNotification;
@@ -34,7 +36,6 @@ import org.mule.runtime.core.api.processor.RequestReplyRequesterMessageProcessor
 import org.mule.runtime.core.api.routing.ResponseTimeoutException;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.store.DeserializationPostInitialisable;
-import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.api.util.ObjectUtils;
 import org.mule.runtime.core.api.util.concurrent.Latch;
 import org.mule.runtime.core.internal.message.InternalMessage;
@@ -53,8 +54,8 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
     implements RequestReplyRequesterMessageProcessor, Initialisable, Startable, Stoppable, Disposable {
 
   private static final int MAX_PROCESSED_GROUPS = 50000;
-  private static final int UNCLAIMED_TIME_TO_LIVE = 60000;
-  private static final int UNCLAIMED_INTERVAL = 60000;
+  private static final long UNCLAIMED_TIME_TO_LIVE = 60000;
+  private static final long UNCLAIMED_INTERVAL = 60000;
   private static final String NAME_TEMPLATE = "%s.%s.%s.asyncReplies";
 
   protected String name;
@@ -73,7 +74,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
   // @GuardedBy processedLock
   private final BoundedFifoBuffer processed = new BoundedFifoBuffer(MAX_PROCESSED_GROUPS);
 
-  protected ListableObjectStore store;
+  protected ObjectStore store;
 
   @Override
   public Event process(Event event) throws MuleException {
@@ -112,7 +113,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
 
   /**
    * Creates the lock used to synchronize a given event
-   * 
+   *
    * @return a new Latch instance
    */
   protected Latch createEventLock() {
@@ -138,13 +139,19 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
   public void initialise() throws InitialisationException {
     name = format(NAME_TEMPLATE, storePrefix, muleContext.getConfiguration().getId(), getLocation().getRootContainerName());
     store = ((ObjectStoreManager) muleContext.getRegistry().get(OBJECT_STORE_MANAGER))
-        .getObjectStore(name, false, MAX_PROCESSED_GROUPS, UNCLAIMED_TIME_TO_LIVE, UNCLAIMED_INTERVAL);
+        .createObjectStore(name, ObjectStoreSettings.builder()
+            .persistent(false)
+            .maxEntries(MAX_PROCESSED_GROUPS)
+            .entryTtl(UNCLAIMED_TIME_TO_LIVE)
+            .expirationInterval(UNCLAIMED_INTERVAL)
+            .build());
   }
 
   @Override
   public void start() throws MuleException {
     scheduler = muleContext.getSchedulerService().customScheduler(muleContext.getSchedulerBaseConfig().withName(name)
-        .withMaxConcurrentTasks(1).withShutdownTimeout(0, MILLISECONDS));
+        .withMaxConcurrentTasks(1)
+        .withShutdownTimeout(0, MILLISECONDS));
     replyRunnable = new AsyncReplyMonitoringRunnable();
     scheduler.scheduleWithFixedDelay(replyRunnable, 0, 100, MILLISECONDS);
   }
@@ -158,9 +165,9 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
   public void dispose() {
     if (store != null) {
       try {
-        ((ObjectStoreManager) muleContext.getRegistry().get(OBJECT_STORE_MANAGER)).disposeStore(store);
+        ((ObjectStoreManager) muleContext.getRegistry().get(OBJECT_STORE_MANAGER)).disposeStore(name);
       } catch (ObjectStoreException e) {
-        logger.debug("Exception disposingg of store", e);
+        logger.debug("Exception disposing of store", e);
       }
     }
   }

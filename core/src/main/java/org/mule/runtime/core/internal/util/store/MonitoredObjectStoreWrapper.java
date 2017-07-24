@@ -6,22 +6,23 @@
  */
 package org.mule.runtime.core.internal.util.store;
 
+import static java.util.Comparator.comparing;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.mule.runtime.api.store.ObjectStoreManager.UNBOUNDED;
-
+import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
+import org.mule.runtime.api.store.ObjectStoreSettings;
+import org.mule.runtime.api.store.TemplateObjectStore;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.store.DeserializationPostInitialisable;
-import org.mule.runtime.core.api.store.ListableObjectStore;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.util.UUID;
 
 import java.io.Serializable;
@@ -35,64 +36,59 @@ import org.slf4j.LoggerFactory;
 /**
  * The MonitoredObjectStoreWrapper wraps an ObjectStore which does not support direct expiry and adds this behavior
  */
-public class MonitoredObjectStoreWrapper<T extends Serializable>
-    implements ListableObjectStore<T>, Runnable, MuleContextAware, Initialisable, Disposable {
+public class MonitoredObjectStoreWrapper<T extends Serializable> extends TemplateObjectStore<T>
+    implements Runnable, MuleContextAware, Initialisable, Disposable {
 
   private static Logger logger = LoggerFactory.getLogger(MonitoredObjectStoreWrapper.class);
 
   protected MuleContext context;
   private Scheduler scheduler;
   private ScheduledFuture<?> scheduledTask;
-  ListableObjectStore<StoredObject<T>> baseStore;
+  ObjectStore<StoredObject<T>> baseStore;
 
   /**
    * the maximum number of entries that this store keeps around. Specify <em>-1</em> if the store is supposed to be "unbounded".
    */
-  protected int maxEntries = 4000;
+  private Integer maxEntries = null;
 
   /**
    * The time-to-live for each message ID, specified in milliseconds, or <em>-1</em> for entries that should never expire. <b>DO
    * NOT</b> combine this with an unbounded store!
    */
-  protected long entryTTL = -1;
+  private Long entryTtl = null;
 
   /**
    * The interval for periodic bounded size enforcement and entry expiration, specified in milliseconds. Arbitrary positive values
    * between 1 millisecond and several hours or days are possible, but should be chosen carefully according to the expected
    * message rate to prevent out of memory conditions.
    */
-  protected long expirationInterval = 1000;
+  private long expirationInterval = 1000;
 
   /**
    * A name for this store, can be used for logging and identification purposes.
    */
   protected String name = null;
 
-  public MonitoredObjectStoreWrapper(ListableObjectStore<StoredObject<T>> baseStore) {
+  public MonitoredObjectStoreWrapper(ObjectStore<StoredObject<T>> baseStore, ObjectStoreSettings settings) {
     this.baseStore = baseStore;
-  }
-
-  public MonitoredObjectStoreWrapper(ListableObjectStore<StoredObject<T>> baseStore, int maxEntries, long entryTTL,
-                                     long expirationInterval) {
-    this.baseStore = baseStore;
-    this.maxEntries = maxEntries;
-    this.entryTTL = entryTTL;
-    this.expirationInterval = expirationInterval;
+    maxEntries = settings.getMaxEntries().orElse(null);
+    entryTtl = settings.getEntryTTL().orElse(null);
+    expirationInterval = settings.getExpirationInterval();
   }
 
   @Override
-  public boolean contains(Serializable key) throws ObjectStoreException {
+  protected boolean doContains(String key) throws ObjectStoreException {
     return getStore().contains(key);
   }
 
   @Override
-  public void store(Serializable key, T value) throws ObjectStoreException {
+  protected void doStore(String key, T value) throws ObjectStoreException {
     Long time = Long.valueOf(System.currentTimeMillis());
-    getStore().store(key, new StoredObject<T>(value, time, key));
+    getStore().store(key, new StoredObject<>(value, time, key));
   }
 
   @Override
-  public T retrieve(Serializable key) throws ObjectStoreException {
+  protected T doRetrieve(String key) throws ObjectStoreException {
     return getStore().retrieve(key).getItem();
   }
 
@@ -102,7 +98,7 @@ public class MonitoredObjectStoreWrapper<T extends Serializable>
   }
 
   @Override
-  public T remove(Serializable key) throws ObjectStoreException {
+  protected T doRemove(String key) throws ObjectStoreException {
     StoredObject<T> object = getStore().remove(key);
     if (object == null) {
       return null;
@@ -127,13 +123,13 @@ public class MonitoredObjectStoreWrapper<T extends Serializable>
   }
 
   @Override
-  public List<Serializable> allKeys() throws ObjectStoreException {
+  public List<String> allKeys() throws ObjectStoreException {
     return getStore().allKeys();
   }
 
-  private ListableObjectStore<StoredObject<T>> getStore() {
+  private ObjectStore<StoredObject<T>> getStore() {
     if (baseStore == null) {
-      baseStore = context.getRegistry().lookupObject(MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME);
+      baseStore = context.getRegistry().lookupObject(BASE_PERSISTENT_OBJECT_STORE_KEY);
     }
     return baseStore;
   }
@@ -153,24 +149,23 @@ public class MonitoredObjectStoreWrapper<T extends Serializable>
   public void expire() {
     try {
       final long now = System.currentTimeMillis();
-      List<Serializable> keys = allKeys();
+      List<String> keys = allKeys();
       int excess = (allKeys().size() - maxEntries);
 
       PriorityQueue<StoredObject<T>> sortedMaxEntries = null;
 
       if (excess > 0) {
-        sortedMaxEntries =
-            new PriorityQueue<StoredObject<T>>(excess, (paramT1, paramT2) -> paramT1.timestamp.compareTo(paramT2.timestamp));
+        sortedMaxEntries = new PriorityQueue<>(excess, comparing(paramT -> paramT.timestamp));
       }
 
-      ListableObjectStore<StoredObject<T>> store = getStore();
-      for (Serializable key : keys) {
+      ObjectStore<StoredObject<T>> store = getStore();
+      for (String key : keys) {
         StoredObject<T> obj = store.retrieve(key);
 
-        if (entryTTL != UNBOUNDED && now - obj.getTimestamp() >= entryTTL) {
+        if (entryTtl != null && now - obj.getTimestamp() >= entryTtl) {
           remove(key);
           excess--;
-        } else if (maxEntries != UNBOUNDED && excess > 0) {
+        } else if (maxEntries != null && excess > 0) {
           sortedMaxEntries.offer(obj);
         }
       }
@@ -184,7 +179,7 @@ public class MonitoredObjectStoreWrapper<T extends Serializable>
         }
       }
     } catch (Exception e) {
-      logger.warn("Running expiry on " + baseStore + " threw " + e + ":" + e.getMessage());
+      logger.warn("Running expiry on " + baseStore + " threw " + e + ":" + e.getMessage(), e);
     }
   }
 
@@ -219,9 +214,9 @@ public class MonitoredObjectStoreWrapper<T extends Serializable>
     private static final long serialVersionUID = 8656763235928199259L;
     final private T item;
     final private Long timestamp;
-    final private Serializable key;
+    final private String key;
 
-    public StoredObject(T item, Long timestamp, Serializable key) {
+    public StoredObject(T item, Long timestamp, String key) {
       super();
       this.item = item;
       this.timestamp = timestamp;
@@ -236,7 +231,7 @@ public class MonitoredObjectStoreWrapper<T extends Serializable>
       return timestamp;
     }
 
-    public Serializable getKey() {
+    public String getKey() {
       return key;
     }
 

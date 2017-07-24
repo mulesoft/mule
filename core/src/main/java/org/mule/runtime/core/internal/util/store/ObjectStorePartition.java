@@ -6,17 +6,24 @@
  */
 package org.mule.runtime.core.internal.util.store;
 
-import org.mule.runtime.core.api.store.ListableObjectStore;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.slf4j.LoggerFactory.getLogger;
+import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.store.ObjectStoreException;
+import org.mule.runtime.api.store.TemplateObjectStore;
 import org.mule.runtime.core.api.store.PartitionableObjectStore;
 
 import java.io.Serializable;
 import java.util.List;
 
-public class ObjectStorePartition<T extends Serializable> implements ListableObjectStore<T> {
+import org.slf4j.Logger;
 
-  final String partitionName;
-  final PartitionableObjectStore<T> partitionedObjectStore;
+public class ObjectStorePartition<T extends Serializable> extends TemplateObjectStore<T> implements Disposable {
+
+  private static final Logger LOGGER = getLogger(ObjectStorePartition.class);
+
+  private final String partitionName;
+  private final PartitionableObjectStore<T> partitionedObjectStore;
 
   public ObjectStorePartition(String partitionName, PartitionableObjectStore<T> partitionedObjectStore) {
     this.partitionName = partitionName;
@@ -24,17 +31,22 @@ public class ObjectStorePartition<T extends Serializable> implements ListableObj
   }
 
   @Override
-  public boolean contains(Serializable key) throws ObjectStoreException {
+  public void dispose() {
+    disposeIfNeeded(partitionedObjectStore, LOGGER);
+  }
+
+  @Override
+  protected boolean doContains(String key) throws ObjectStoreException {
     return partitionedObjectStore.contains(key, partitionName);
   }
 
   @Override
-  public void store(Serializable key, T value) throws ObjectStoreException {
+  protected void doStore(String key, T value) throws ObjectStoreException {
     partitionedObjectStore.store(key, value, partitionName);
   }
 
   @Override
-  public T retrieve(Serializable key) throws ObjectStoreException {
+  protected T doRetrieve(String key) throws ObjectStoreException {
     return partitionedObjectStore.retrieve(key, partitionName);
   }
 
@@ -44,7 +56,7 @@ public class ObjectStorePartition<T extends Serializable> implements ListableObj
   }
 
   @Override
-  public T remove(Serializable key) throws ObjectStoreException {
+  protected T doRemove(String key) throws ObjectStoreException {
     return partitionedObjectStore.remove(key, partitionName);
   }
 
@@ -64,7 +76,7 @@ public class ObjectStorePartition<T extends Serializable> implements ListableObj
   }
 
   @Override
-  public List<Serializable> allKeys() throws ObjectStoreException {
+  public List<String> allKeys() throws ObjectStoreException {
     return partitionedObjectStore.allKeys(partitionName);
   }
 

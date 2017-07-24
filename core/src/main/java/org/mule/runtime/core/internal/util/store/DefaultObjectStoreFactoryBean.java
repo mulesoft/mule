@@ -29,16 +29,4 @@ public class DefaultObjectStoreFactoryBean {
   public static ObjectStore<Serializable> createDefaultPersistentObjectStore() {
     return delegate.createDefaultPersistentObjectStore();
   }
-
-  public static ObjectStore<Serializable> createDefaultUserObjectStore() {
-    // TODO MULE-12685 is this used/documented anywhere?
-    if ("true".equals(System.getProperty("mule.objectstore.user.transient"))) {
-      return delegate.createDefaultUserTransientObjectStore();
-    }
-    return delegate.createDefaultUserObjectStore();
-  }
-
-  public static ObjectStore<Serializable> createDefaultUserTransientObjectStore() {
-    return delegate.createDefaultUserTransientObjectStore();
-  }
 }

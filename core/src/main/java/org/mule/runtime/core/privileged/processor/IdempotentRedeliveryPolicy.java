@@ -17,6 +17,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.ObjectStoreManager;
+import org.mule.runtime.api.store.ObjectStoreSettings;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
@@ -99,8 +100,11 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
   private Supplier<ObjectStore> internalObjectStoreSupplier() {
     return () -> {
       ObjectStoreManager objectStoreManager = muleContext.getObjectStoreManager();
-      return objectStoreManager.getObjectStore(flowConstruct.getName() + "." + getClass().getName(), false, -1, 60 * 5 * 1000,
-                                               6000);
+      return objectStoreManager.createObjectStore(flowConstruct.getName() + "." + getClass().getName(),
+                                                  ObjectStoreSettings.builder()
+                                                      .persistent(false)
+                                                      .entryTtl((long) 60 * 5 * 1000)
+                                                      .expirationInterval(6000L).build());
     };
   }
 

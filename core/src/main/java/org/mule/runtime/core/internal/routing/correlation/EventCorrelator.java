@@ -15,7 +15,6 @@ import static org.mule.runtime.core.api.context.notification.RoutingNotification
 import static org.mule.runtime.core.api.context.notification.RoutingNotification.MISSED_AGGREGATION_GROUP_EVENT;
 import static org.mule.runtime.core.api.message.GroupCorrelation.NOT_SET;
 import static org.mule.runtime.core.api.util.StringMessageUtils.truncate;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Startable;
@@ -25,6 +24,7 @@ import org.mule.runtime.api.store.ObjectAlreadyExistsException;
 import org.mule.runtime.api.store.ObjectDoesNotExistException;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
+import org.mule.runtime.core.api.store.PartitionableObjectStore;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
@@ -35,13 +35,11 @@ import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.api.store.DeserializationPostInitialisable;
-import org.mule.runtime.core.api.store.PartitionableObjectStore;
 import org.mule.runtime.core.api.util.StringMessageUtils;
 import org.mule.runtime.core.api.util.monitor.Expirable;
 import org.mule.runtime.core.api.util.monitor.ExpiryMonitor;
 import org.mule.runtime.core.internal.routing.EventGroup;
 
-import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -219,7 +217,7 @@ public class EventCorrelator implements Startable, Stoppable {
     }
   }
 
-  protected EventGroup getEventGroup(Serializable groupId) throws ObjectStoreException {
+  protected EventGroup getEventGroup(String groupId) throws ObjectStoreException {
     try {
       EventGroup eventGroup = (EventGroup) correlatorStore.retrieve(groupId, getEventGroupsPartitionKey());
       if (!eventGroup.isInitialised()) {
@@ -238,7 +236,7 @@ public class EventCorrelator implements Startable, Stoppable {
 
   protected EventGroup addEventGroup(EventGroup group) throws ObjectStoreException {
     try {
-      correlatorStore.store((Serializable) group.getGroupId(), group, getEventGroupsPartitionKey());
+      correlatorStore.store((String) group.getGroupId(), group, getEventGroupsPartitionKey());
       return group;
     } catch (ObjectAlreadyExistsException e) {
       return getEventGroup((String) group.getGroupId());
@@ -249,7 +247,7 @@ public class EventCorrelator implements Startable, Stoppable {
     final Object groupId = group.getGroupId();
     synchronized (groupsLock) {
       if (!isGroupAlreadyProcessed(groupId)) {
-        correlatorStore.remove((Serializable) groupId, getEventGroupsPartitionKey());
+        correlatorStore.remove((String) groupId, getEventGroupsPartitionKey());
         addProcessedGroup(groupId);
       }
     }
@@ -257,13 +255,13 @@ public class EventCorrelator implements Startable, Stoppable {
 
   protected void addProcessedGroup(Object id) throws ObjectStoreException {
     synchronized (groupsLock) {
-      processedGroups.store((Serializable) id, currentTimeMillis());
+      processedGroups.store((String) id, currentTimeMillis());
     }
   }
 
   protected boolean isGroupAlreadyProcessed(Object id) throws ObjectStoreException {
     synchronized (groupsLock) {
-      return processedGroups.contains((Serializable) id);
+      return processedGroups.contains((String) id);
     }
   }
 
@@ -314,7 +312,7 @@ public class EventCorrelator implements Startable, Stoppable {
           Event newEvent = Event.builder(callback.aggregateEvents(group)).build();
           group.clear();
 
-          if (!correlatorStore.contains((Serializable) group.getGroupId(), getExpiredAndDispatchedPartitionKey())) {
+          if (!correlatorStore.contains((String) group.getGroupId(), getExpiredAndDispatchedPartitionKey())) {
             // TODO which use cases would need a sync reply event
             // returned?
             if (timeoutMessageProcessor != null) {
@@ -324,7 +322,7 @@ public class EventCorrelator implements Startable, Stoppable {
                   .format("Group {0} timed out, but no timeout message processor was " + "configured.", group.getGroupId())),
                                            newEvent);
             }
-            correlatorStore.store((Serializable) group.getGroupId(), group.getCreated(), getExpiredAndDispatchedPartitionKey());
+            correlatorStore.store((String) group.getGroupId(), group.getCreated(), getExpiredAndDispatchedPartitionKey());
           } else {
             logger.warn(MessageFormat.format("Discarding group {0}", group.getGroupId()));
           }
@@ -375,7 +373,7 @@ public class EventCorrelator implements Startable, Stoppable {
     @Override
     public void expired() {
       try {
-        for (Serializable o : (List<Serializable>) correlatorStore.allKeys(getExpiredAndDispatchedPartitionKey())) {
+        for (String o : (List<String>) correlatorStore.allKeys(getExpiredAndDispatchedPartitionKey())) {
           Long time = (Long) correlatorStore.retrieve(o, getExpiredAndDispatchedPartitionKey());
           if (time + DAYS.toMillis(1) < currentTimeMillis()) {
             correlatorStore.remove(o, getExpiredAndDispatchedPartitionKey());
@@ -399,7 +397,7 @@ public class EventCorrelator implements Startable, Stoppable {
 
       List<EventGroup> expired = new ArrayList<>(1);
       try {
-        for (Serializable o : (List<Serializable>) correlatorStore.allKeys(getEventGroupsPartitionKey())) {
+        for (String o : (List<String>) correlatorStore.allKeys(getEventGroupsPartitionKey())) {
           EventGroup group = getEventGroup(o);
           // group may have been removed by another thread right after eventGroups.allKeys()
           if (group != null && group.getCreated() + getTimeout() < currentTimeMillis()) {

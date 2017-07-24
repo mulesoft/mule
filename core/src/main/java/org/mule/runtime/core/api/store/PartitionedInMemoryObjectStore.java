@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api.store;
 
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
-import static org.mule.runtime.api.store.ObjectStoreManager.UNBOUNDED;
+import static org.mule.runtime.core.internal.util.store.MuleObjectStoreManager.UNBOUNDED;
 import org.mule.runtime.api.store.ObjectAlreadyExistsException;
 import org.mule.runtime.api.store.ObjectDoesNotExistException;
 import org.mule.runtime.api.store.ObjectStoreException;
@@ -21,13 +21,16 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentMap;
 
-public class PartitionedInMemoryObjectStore<T extends Serializable> extends AbstractPartitionedObjectStore<T>
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class PartitionedInMemoryObjectStore<T extends Serializable> extends AbstractPartitionableObjectStore<T>
     implements PartitionableExpirableObjectStore<T> {
 
-  private ConcurrentMap<String, ConcurrentMap<Serializable, T>> partitions =
-      new ConcurrentHashMap<String, ConcurrentMap<Serializable, T>>();
-  private ConcurrentMap<String, ConcurrentLinkedQueue<ExpiryEntry>> expiryInfoPartition =
-      new ConcurrentHashMap<String, ConcurrentLinkedQueue<ExpiryEntry>>();
+  private static final Logger LOGGER = LoggerFactory.getLogger(PartitionedInMemoryObjectStore.class);
+
+  private ConcurrentMap<String, ConcurrentMap<String, T>> partitions = new ConcurrentHashMap<>();
+  private ConcurrentMap<String, ConcurrentLinkedQueue<ExpiryEntry>> expiryInfoPartition = new ConcurrentHashMap<>();
 
   @Override
   public boolean isPersistent() {
@@ -35,7 +38,7 @@ public class PartitionedInMemoryObjectStore<T extends Serializable> extends Abst
   }
 
   @Override
-  public boolean contains(Serializable key, String partitionName) throws ObjectStoreException {
+  protected boolean doContains(String key, String partitionName) throws ObjectStoreException {
     if (partitions.containsKey(partitionName)) {
       return partitions.get(partitionName).containsKey(key);
     } else {
@@ -44,7 +47,7 @@ public class PartitionedInMemoryObjectStore<T extends Serializable> extends Abst
   }
 
   @Override
-  public void store(Serializable key, T value, String partitionName) throws ObjectStoreException {
+  protected void doStore(String key, T value, String partitionName) throws ObjectStoreException {
     T oldValue = getPartition(partitionName).putIfAbsent(key, value);
     if (oldValue != null) {
       throw new ObjectAlreadyExistsException();
@@ -53,7 +56,7 @@ public class PartitionedInMemoryObjectStore<T extends Serializable> extends Abst
   }
 
   @Override
-  public T retrieve(Serializable key, String partitionName) throws ObjectStoreException {
+  protected T doRetrieve(String key, String partitionName) throws ObjectStoreException {
     T value = getPartition(partitionName).get(key);
     if (value == null) {
       throw new ObjectDoesNotExistException();
@@ -62,7 +65,7 @@ public class PartitionedInMemoryObjectStore<T extends Serializable> extends Abst
   }
 
   @Override
-  public T remove(Serializable key, String partitionName) throws ObjectStoreException {
+  protected T doRemove(String key, String partitionName) throws ObjectStoreException {
     T removedValue = getPartition(partitionName).remove(key);
     if (removedValue == null) {
       throw new ObjectDoesNotExistException();
@@ -81,25 +84,25 @@ public class PartitionedInMemoryObjectStore<T extends Serializable> extends Abst
   }
 
   @Override
-  public List<Serializable> allKeys(String partitionName) throws ObjectStoreException {
-    return new ArrayList<Serializable>(getPartition(partitionName).keySet());
+  public List<String> allKeys(String partitionName) throws ObjectStoreException {
+    return new ArrayList<>(getPartition(partitionName).keySet());
   }
 
   @Override
   public void clear(String partitionName) throws ObjectStoreException {
-    this.getPartition(partitionName).clear();
+    getPartition(partitionName).clear();
   }
 
   @Override
   public List<String> allPartitions() throws ObjectStoreException {
-    return new ArrayList<String>(partitions.keySet());
+    return new ArrayList<>(partitions.keySet());
   }
 
-  private ConcurrentMap<Serializable, T> getPartition(String partitionName) {
-    ConcurrentMap<Serializable, T> partition = partitions.get(partitionName);
+  private ConcurrentMap<String, T> getPartition(String partitionName) {
+    ConcurrentMap<String, T> partition = partitions.get(partitionName);
     if (partition == null) {
-      partition = new ConcurrentHashMap<Serializable, T>();
-      ConcurrentMap<Serializable, T> previous = partitions.putIfAbsent(partitionName, partition);
+      partition = new ConcurrentHashMap<>();
+      ConcurrentMap<String, T> previous = partitions.putIfAbsent(partitionName, partition);
       if (previous != null) {
         partition = previous;
       }
@@ -110,7 +113,7 @@ public class PartitionedInMemoryObjectStore<T extends Serializable> extends Abst
   private ConcurrentLinkedQueue<ExpiryEntry> getExpiryInfoPartition(String partitionName) {
     ConcurrentLinkedQueue<ExpiryEntry> partition = expiryInfoPartition.get(partitionName);
     if (partition == null) {
-      partition = new ConcurrentLinkedQueue<ExpiryEntry>();
+      partition = new ConcurrentLinkedQueue<>();
       ConcurrentLinkedQueue<ExpiryEntry> previous = expiryInfoPartition.putIfAbsent(partitionName, partition);
       if (previous != null) {
         partition = previous;
@@ -131,7 +134,7 @@ public class PartitionedInMemoryObjectStore<T extends Serializable> extends Abst
 
   @Override
   public void expire(long entryTTL, int maxEntries) throws ObjectStoreException {
-    expire(entryTTL, maxEntries, DEFAULT_PARTITION);
+    expire(entryTTL, maxEntries, DEFAULT_PARTITION_NAME);
   }
 
   @Override
@@ -140,7 +143,7 @@ public class PartitionedInMemoryObjectStore<T extends Serializable> extends Abst
     int expiredEntries = 0;
     ExpiryEntry oldestEntry;
     ConcurrentLinkedQueue<ExpiryEntry> store = getExpiryInfoPartition(partitionName);
-    ConcurrentMap<Serializable, T> partition = getPartition(partitionName);
+    ConcurrentMap<String, T> partition = getPartition(partitionName);
 
     trimToMaxSize(store, maxEntries, partition);
 
@@ -158,12 +161,12 @@ public class PartitionedInMemoryObjectStore<T extends Serializable> extends Abst
       }
     }
 
-    if (logger.isDebugEnabled()) {
-      logger.debug("Expired " + expiredEntries + " old entries");
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Expired " + expiredEntries + " old entries");
     }
   }
 
-  private void trimToMaxSize(ConcurrentLinkedQueue<ExpiryEntry> store, int maxEntries, ConcurrentMap<Serializable, T> partition) {
+  private void trimToMaxSize(ConcurrentLinkedQueue<ExpiryEntry> store, int maxEntries, ConcurrentMap<String, T> partition) {
     if (maxEntries == UNBOUNDED) {
       return;
     }
@@ -177,8 +180,8 @@ public class PartitionedInMemoryObjectStore<T extends Serializable> extends Abst
         currentSize--;
       }
 
-      if (logger.isDebugEnabled()) {
-        logger.debug("Expired " + excess + " excess entries");
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Expired " + excess + " excess entries");
       }
     }
   }

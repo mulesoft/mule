@@ -29,6 +29,7 @@ import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.store.ObjectStoreNotAvailableException;
+import org.mule.runtime.api.store.ObjectStoreSettings;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -93,7 +94,11 @@ public class IdempotentMessageValidator extends AbstractAnnotatedObject
 
   protected ObjectStore<String> createMessageIdStore() throws InitialisationException {
     ObjectStoreManager objectStoreManager = muleContext.getRegistry().get(OBJECT_STORE_MANAGER);
-    return objectStoreManager.getObjectStore(storePrefix, false, -1, MINUTES.toMillis(5), SECONDS.toMillis(6));
+    return objectStoreManager.createObjectStore(storePrefix, ObjectStoreSettings.builder()
+        .persistent(false)
+        .entryTtl(MINUTES.toMillis(5))
+        .expirationInterval(SECONDS.toMillis(6))
+        .build());
   }
 
   protected String getValueForEvent(Event event) throws MessagingException {

@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.config;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getConnectedComponents;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.createInterceptors;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.injectConfigName;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.injectRefName;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -141,14 +141,14 @@ public final class ConfigurationInstanceFactory<T> {
 
   private T createConfigurationInstance(String name, ResolverSetResult resolverSetResult) throws MuleException {
     T config = configurationObjectBuilder.build(resolverSetResult);
-    injectConfigName(configurationModel, config, name);
+    injectRefName(configurationModel, config, name);
 
     return config;
   }
 
   private T createConfigurationInstance(String name, Event event) throws MuleException {
     T config = configurationObjectBuilder.build(from(event));
-    injectConfigName(configurationModel, config, name);
+    injectRefName(configurationModel, config, name);
 
     return config;
   }

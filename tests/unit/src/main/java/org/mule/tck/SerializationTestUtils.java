@@ -10,6 +10,7 @@ package org.mule.tck;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import org.mule.runtime.api.store.ObjectStoreSettings;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.api.store.ObjectStore;
@@ -37,7 +38,8 @@ public abstract class SerializationTestUtils {
   }
 
   private static <T extends Exception> ObjectStore<T> getObjectStore(MuleContext muleContext) {
-    return muleContext.getObjectStoreManager().getObjectStore("SerializationTestUtils", true);
+    return muleContext.getObjectStoreManager().createObjectStore("SerializationTestUtils",
+                                                                 ObjectStoreSettings.builder().persistent(true).build());
   }
 
   public static ObjectSerializer getJavaSerializerWithMockContext() {
