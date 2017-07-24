@@ -6,11 +6,9 @@
  */
 package org.mule.runtime.config.spring.internal;
 
-import static com.google.common.collect.ImmutableMap.copyOf;
 import org.mule.runtime.api.component.ConfigurationProperties;
+import org.mule.runtime.api.ioc.ObjectProvider;
 import org.mule.runtime.api.ioc.ObjectProviderConfiguration;
-
-import java.util.Map;
 
 /**
  * Immutable implementation of {@link ObjectProviderConfiguration}
@@ -19,22 +17,23 @@ import java.util.Map;
  */
 public class ImmutableObjectProviderConfiguration implements ObjectProviderConfiguration {
 
-  private Map<String, Object> artifactObjects;
-  private ConfigurationProperties configurationProperties;
+  private final ObjectProvider artifactObjectProvider;
+  private final ConfigurationProperties configurationProperties;
 
-  public ImmutableObjectProviderConfiguration(Map<String, Object> artifactObjects,
-                                              ConfigurationProperties configurationProperties) {
-    this.artifactObjects = copyOf(artifactObjects);
+  public ImmutableObjectProviderConfiguration(ConfigurationProperties configurationProperties,
+                                              ObjectProvider artifactObjectProvider) {
     this.configurationProperties = configurationProperties;
+    this.artifactObjectProvider = artifactObjectProvider;
   }
 
   @Override
-  public Map<String, Object> getArtifactObjects() {
-    return artifactObjects;
+  public ObjectProvider getArtifactObjectProvider() {
+    return artifactObjectProvider;
   }
 
   @Override
   public ConfigurationProperties getConfigurationProperties() {
     return configurationProperties;
   }
+
 }

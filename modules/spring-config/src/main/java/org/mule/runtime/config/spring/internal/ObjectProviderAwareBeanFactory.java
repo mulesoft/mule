@@ -6,9 +6,12 @@
  */
 package org.mule.runtime.config.spring.internal;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.unmodifiableMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.ioc.ConfigurableObjectProvider;
 import org.mule.runtime.api.ioc.ObjectProvider;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
 
@@ -17,12 +20,11 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
-
-import com.google.common.collect.ImmutableMap;
 
 /**
  * {@link org.springframework.beans.factory.ListableBeanFactory} implementation that will resolve beans using a list of
@@ -32,13 +34,13 @@ import com.google.common.collect.ImmutableMap;
  */
 public class ObjectProviderAwareBeanFactory extends DefaultListableBeanFactory {
 
-  private List<ObjectProvider> objectProviders;
+  private List<ConfigurableObjectProvider> objectProviders = emptyList();
 
   public ObjectProviderAwareBeanFactory(BeanFactory parentBeanFactory) {
     super(parentBeanFactory);
   }
 
-  public void setObjectProviders(List<ObjectProvider> objectProviders) {
+  public void setObjectProviders(List<ConfigurableObjectProvider> objectProviders) {
     this.objectProviders = objectProviders;
   }
 
@@ -95,23 +97,29 @@ public class ObjectProviderAwareBeanFactory extends DefaultListableBeanFactory {
 
   @Override
   public <T> Map<String, T> getBeansOfType(Class<T> type) throws BeansException {
-    ImmutableMap.Builder<String, T> builder = ImmutableMap.builder();
+    Map<String, T> beans = new HashMap<>();
     for (ObjectProvider objectProvider : objectProviders) {
-      builder.putAll(objectProvider.getObjectsByType(type));
+      beans.putAll(objectProvider.getObjectsByType(type));
     }
-    builder.putAll(super.getBeansOfType(type));
-    return builder.build();
+    beans.putAll(super.getBeansOfType(type));
+    return unmodifiableMap(beans);
   }
 
   @Override
   public <T> Map<String, T> getBeansOfType(Class<T> type, boolean includeNonSingletons, boolean allowEagerInit)
       throws BeansException {
-    ImmutableMap.Builder<String, T> objectsMap = ImmutableMap.builder();
-    objectsMap.putAll(super.getBeansOfType(type, includeNonSingletons, allowEagerInit));
+    Map<String, T> beans = new HashMap<>();
     for (ObjectProvider objectProvider : objectProviders) {
-      objectsMap.putAll(objectProvider.getObjectsByType(type));
+      beans.putAll(objectProvider.getObjectsByType(type));
     }
-    return objectsMap.build();
+    beans.putAll(super.getBeansOfType(type, includeNonSingletons, allowEagerInit));
+    return unmodifiableMap(beans);
+  }
+
+  public <T> Map<String, T> getBeansOfTypeWithObjectProviderObjects(Class<T> type, boolean includeNonSingletons,
+                                                                    boolean allowEagerInit)
+      throws BeansException {
+    return super.getBeansOfType(type, includeNonSingletons, allowEagerInit);
   }
 
   private <T> Optional<T> doWithFallbackInObjectProvider(CheckedSupplier<T> thisSupplier,

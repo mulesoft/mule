@@ -16,8 +16,6 @@
 
 package org.springframework.beans.factory.support;
 
-import com.google.common.base.Optional;
-
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
@@ -41,9 +39,9 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
 import javax.inject.Provider;
 
 import org.springframework.beans.BeansException;
@@ -1327,7 +1325,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
         }
       };
       descriptorToUse.increaseNestingLevel();
-      return Optional.fromNullable(doResolveDependency(descriptorToUse, beanName, null, null));
+      return Optional.ofNullable(doResolveDependency(descriptorToUse, beanName, null, null));
     }
   }
 

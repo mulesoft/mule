@@ -14,6 +14,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.config.spring.factories.ConstantFactoryBean;
+import org.mule.runtime.config.spring.internal.ObjectProviderAwareBeanFactory;
 import org.mule.runtime.config.spring.internal.SpringRegistryLifecycleManager;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
@@ -23,12 +24,6 @@ import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.core.registry.AbstractRegistry;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.FatalBeanException;
@@ -42,6 +37,12 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class SpringRegistry extends AbstractRegistry implements LifecycleRegistry, Injector {
 
@@ -218,7 +219,7 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
 
   @Override
   public <T> Collection<T> lookupLocalObjects(Class<T> type) {
-    return internalLookupByTypeWithoutAncestors(type, true, true).values();
+    return internalLookupByTypeWithoutAncestorsAndObjectProviders(type, true, true).values();
   }
 
   /**
@@ -322,9 +323,11 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
     }
   }
 
-  protected <T> Map<String, T> internalLookupByTypeWithoutAncestors(Class<T> type, boolean nonSingletons, boolean eagerInit) {
+  protected <T> Map<String, T> internalLookupByTypeWithoutAncestorsAndObjectProviders(Class<T> type, boolean nonSingletons,
+                                                                                      boolean eagerInit) {
     try {
-      return applicationContext.getBeansOfType(type, nonSingletons, eagerInit);
+      return ((ObjectProviderAwareBeanFactory) applicationContext.getAutowireCapableBeanFactory())
+          .getBeansOfTypeWithObjectProviderObjects(type, nonSingletons, eagerInit);
     } catch (FatalBeanException fbex) {
       // FBE is a result of a broken config, propagate it (see MULE-3297 for more details)
       String message = String.format("Failed to lookup beans of type %s from the Spring registry", type);
@@ -339,7 +342,7 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
 
   // TODO(pablo.kraan): MULE-12609 - making public to be able to use it from a different package
   public <T> Map<String, T> lookupEntriesForLifecycle(Class<T> type) {
-    return internalLookupByTypeWithoutAncestors(type, false, false);
+    return internalLookupByTypeWithoutAncestorsAndObjectProviders(type, false, false);
   }
 
   // TODO(pablo.kraan): MULE-12609 - making public to be able to use it from a different package
