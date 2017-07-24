@@ -27,6 +27,7 @@ abstract class ValidationTestCase extends ExtensionsFunctionalTestCase
     static final String VALID_URL = "http://localhost:8080";
     static final String INVALID_URL = "here";
 
+    static final String VALID_EMAIL_WITHOUT_TOP_DOMAIN = "mariano.gonzalez@mulesoft";
     static final String VALID_EMAIL = "mariano.gonzalez@mulesoft.com";
     static final String INVALID_EMAIL = "@mulesoft.com";
 
