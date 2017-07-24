@@ -156,7 +156,7 @@ public class MuleArtifactResourcesRegistry {
     domainFactory =
         new DefaultDomainFactory(domainDescriptorFactory, domainManager,
                                  artifactClassLoaderManager, serviceManager,
-                                 pluginDependenciesResolver, domainClassLoaderBuilderFactory);
+                                 pluginDependenciesResolver, domainClassLoaderBuilderFactory, extensionModelLoaderManager);
 
     DeployableArtifactClassLoaderFactory<PolicyTemplateDescriptor> policyClassLoaderFactory =
         trackDeployableArtifactClassLoaderFactory(new PolicyTemplateClassLoaderFactory());

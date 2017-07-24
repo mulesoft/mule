@@ -6,32 +6,31 @@
  */
 package org.mule.runtime.core.internal.exception;
 
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.CONNECTIVITY;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.ANY_IDENTIFIER;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.CRITICAL_IDENTIFIER;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.ERROR_TYPES;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.core.api.exception.DefaultErrorTypeRepository;
 import org.mule.runtime.core.api.exception.ErrorTypeRepository;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.util.Optional;
 
-import org.junit.Before;
-import org.junit.Test;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
-
 @Feature(ERROR_HANDLING)
 @Story(ERROR_TYPES)
-public class ErrorTypeRepositoryTestCase extends AbstractMuleTestCase {
+public class DefaultErrorTypeRepositoryTestCase extends AbstractMuleTestCase {
 
-  private ErrorTypeRepository errorTypeRepository = new ErrorTypeRepository();
+  private ErrorTypeRepository errorTypeRepository = new DefaultErrorTypeRepository();
   private ComponentIdentifier MY_ERROR =
       ComponentIdentifier.builder().withNamespace("ns").withName("name").build();
 

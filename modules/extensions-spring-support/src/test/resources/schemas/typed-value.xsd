@@ -14,7 +14,7 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" abstract="true" name="abstract-differed-knockable-door"></xs:element>
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-shared-extension" abstract="true" name="abstract-differed-knockable-door"></xs:element>
   <xs:element xmlns:typed-value="http://www.mulesoft.org/schema/mule/typed-value" substitutionGroup="typed-value:abstract-differed-knockable-door" name="differed-knockable-door">
     <xs:complexType>
       <xs:complexContent>
@@ -24,7 +24,7 @@
       </xs:complexContent>
     </xs:complexType>
   </xs:element>
-  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" abstract="true" name="abstract-door"></xs:element>
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-shared-extension" abstract="true" name="abstract-door"></xs:element>
   <xs:element xmlns:typed-value="http://www.mulesoft.org/schema/mule/typed-value" substitutionGroup="typed-value:abstract-door" name="door">
     <xs:complexType>
       <xs:complexContent>
@@ -52,7 +52,7 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" name="config">
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-shared-extension" name="config">
     <xs:complexType>
       <xs:complexContent>
         <xs:extension base="mule:abstractExtensionType">

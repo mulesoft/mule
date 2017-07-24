@@ -10,7 +10,7 @@
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType"></xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:ram="http://www.mulesoft.org/schema/mule/ram" type="ram:org.mule.runtime.extension.api.soap.MessageDispatcherProvider" substitutionGroup="mule:abstract-extension" abstract="true" name="global-abstract-message-dispatcher-provider"></xs:element>
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:ram="http://www.mulesoft.org/schema/mule/ram" type="ram:org.mule.runtime.extension.api.soap.MessageDispatcherProvider" substitutionGroup="mule:abstract-shared-extension" abstract="true" name="global-abstract-message-dispatcher-provider"></xs:element>
   <xs:element xmlns:ram="http://www.mulesoft.org/schema/mule/ram" type="ram:org.mule.runtime.extension.api.soap.MessageDispatcherProvider" abstract="true" name="abstract-message-dispatcher-provider"></xs:element>
   <xs:complexType name="org.mule.test.ram.MiniverseDispatcherProvider">
     <xs:complexContent>
@@ -55,7 +55,7 @@
       </xs:complexContent>
     </xs:complexType>
   </xs:element>
-  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" name="config">
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-shared-extension" name="config">
     <xs:complexType>
       <xs:complexContent>
         <xs:extension base="mule:abstractExtensionType">
