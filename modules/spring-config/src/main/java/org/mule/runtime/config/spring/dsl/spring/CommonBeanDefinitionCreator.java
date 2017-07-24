@@ -299,7 +299,8 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
     BeanDefinition newBeanDefinition;
     if (areMatchingTypes(SecurityFilter.class, beanClass)) {
       newBeanDefinition = rootBeanDefinition(SecurityFilterMessageProcessor.class)
-          .addPropertyValue("filter", originalBeanDefinition).getBeanDefinition();
+          .addConstructorArgValue(originalBeanDefinition)
+          .getBeanDefinition();
       return (AbstractBeanDefinition) newBeanDefinition;
     } else {
       return beanDefinitionPostProcessor.adaptBeanDefinition(parentComponentModel, beanClass, originalBeanDefinition);

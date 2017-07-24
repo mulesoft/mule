@@ -7,13 +7,15 @@
 package org.mule.runtime.core.security;
 
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_MANAGER;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.authFailedForUser;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.authNoCredentials;
+
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.api.security.SecurityProviderNotFoundException;
 import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.security.DefaultMuleAuthentication;
 import org.mule.runtime.core.api.security.DefaultMuleCredentials;
@@ -30,10 +32,6 @@ public class UsernamePasswordAuthenticationFilter extends AbstractAuthentication
 
   private String username = "#[mel:message.inboundProperties.username]";
   private String password = "#[mel:message.inboundProperties.password]";
-
-  public UsernamePasswordAuthenticationFilter() {
-    super();
-  }
 
   /**
    * Authenticates the current message.
@@ -53,7 +51,7 @@ public class UsernamePasswordAuthenticationFilter extends AbstractAuthentication
       if (logger.isDebugEnabled()) {
         logger.debug("Authentication request for user: " + username + " failed: " + e.toString());
       }
-      throw new UnauthorisedException(CoreMessages.authFailedForUser(authentication.getPrincipal().toString()), e);
+      throw new UnauthorisedException(authFailedForUser(authentication.getPrincipal().toString()), e);
     }
 
     // Authentication success
@@ -75,11 +73,11 @@ public class UsernamePasswordAuthenticationFilter extends AbstractAuthentication
     Object passwordEval = expressionManager.evaluate(password, event).getValue();
 
     if (usernameEval == null) {
-      throw new UnauthorisedException(CoreMessages.authNoCredentials());
+      throw new UnauthorisedException(authNoCredentials());
     }
 
     if (passwordEval == null) {
-      throw new UnauthorisedException(CoreMessages.authNoCredentials());
+      throw new UnauthorisedException(authNoCredentials());
     }
 
     return new DefaultMuleAuthentication(new DefaultMuleCredentials(usernameEval.toString(),

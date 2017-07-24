@@ -89,8 +89,6 @@ import org.mule.runtime.config.spring.factories.streaming.NullCursorIteratorProv
 import org.mule.runtime.config.spring.factories.streaming.NullCursorStreamProviderObjectFactory;
 import org.mule.runtime.config.spring.internal.dsl.processor.AddVariablePropertyConfigurator;
 import org.mule.runtime.config.spring.internal.dsl.processor.CustomSecurityFilterObjectFactory;
-import org.mule.runtime.config.spring.internal.dsl.processor.EncryptionSecurityFilterObjectFactory;
-import org.mule.runtime.config.spring.internal.dsl.processor.UsernamePasswordFilterObjectFactory;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationExtension;
 import org.mule.runtime.core.api.config.MuleConfiguration;
@@ -173,6 +171,8 @@ import org.mule.runtime.core.privileged.processor.IdempotentRedeliveryPolicy;
 import org.mule.runtime.core.privileged.processor.simple.AbstractAddVariablePropertyProcessor;
 import org.mule.runtime.core.security.PasswordBasedEncryptionStrategy;
 import org.mule.runtime.core.security.SecretKeyEncryptionStrategy;
+import org.mule.runtime.core.security.UsernamePasswordAuthenticationFilter;
+import org.mule.runtime.core.security.filters.MuleEncryptionEndpointSecurityFilter;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.runtime.core.transformer.codec.Base64Decoder;
 import org.mule.runtime.core.transformer.codec.Base64Encoder;
@@ -597,8 +597,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withConstructorParameterDefinition(fromSimpleParameter("subscription").build()).build());
 
     componentBuildingDefinitions.add(baseDefinition.withIdentifier("username-password-filter")
-        .withTypeDefinition(fromType(Processor.class))
-        .withObjectFactoryType(UsernamePasswordFilterObjectFactory.class)
+        .withTypeDefinition(fromType(UsernamePasswordAuthenticationFilter.class))
         .withSetterParameterDefinition("username", fromSimpleParameter("username").build())
         .withSetterParameterDefinition("password", fromSimpleParameter("password").build())
         .withIgnoredConfigurationParameter(NAME)
@@ -612,8 +611,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .build());
 
     componentBuildingDefinitions.add(baseDefinition.withIdentifier("encryption-security-filter")
-        .withTypeDefinition(fromType(Processor.class))
-        .withObjectFactoryType(EncryptionSecurityFilterObjectFactory.class)
+        .withTypeDefinition(fromType(MuleEncryptionEndpointSecurityFilter.class))
         .withConstructorParameterDefinition(fromSimpleReferenceParameter("strategy-ref").build())
         .withIgnoredConfigurationParameter(NAME)
         .build());
