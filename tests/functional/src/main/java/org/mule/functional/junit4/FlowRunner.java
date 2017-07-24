@@ -147,11 +147,7 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> implements Dispo
         throw cause instanceof Exception ? (Exception) cause : new RuntimeException(cause);
       }
     }
-
-    for (String flowNameToVerify : flowNamesToVerify) {
-      FlowAssert.verify(flowNameToVerify);
-    }
-
+    verify(flowNamesToVerify);
     return (Event) responseEventTransformer.transform(response);
   }
 
