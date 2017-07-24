@@ -100,9 +100,9 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
         MuleMessage newMessage = new DefaultMuleMessage(message.getPayload(), message, endpoint.getMuleContext());
         routeMessage(newMessage);
     }
-    
+
     @Override
-    protected void pollMessagesOutsideTransactions() throws Exception 
+    protected void pollMessagesOutsideTransactions() throws Exception
     {
         ExecutionTemplate<MuleEvent> pt = createExecutionTemplate();
         List messages = getMessages();
@@ -122,7 +122,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
             }
         }
     }
-    
+
     protected class MessageProcessorWorker implements Work, ExecutionCallback<MuleEvent>
     {
         private final ExecutionTemplate<MuleEvent> pt;
@@ -184,7 +184,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
                 public MuleEvent process() throws Exception
                 {
                     MuleEvent event = routeMessage(message);
-                    if (event != null && !VoidMuleEvent.getInstance().equals(event) && getEndpoint().getExchangePattern().hasResponse())
+                    if (returnEvent(event))
                     {
                         MuleMessage returnedMessage = event.getMessage();
                         if (returnedMessage != null)
@@ -211,7 +211,8 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
         catch (MessagingException e)
         {
             //Already handled by TransactionTemplate, return ES result
-            return e.getMuleMessage();
+            MuleEvent event = e.getEvent();
+            return returnEvent(event) ? event.getMessage() : null;
         }
         catch (MuleException e)
         {
@@ -229,6 +230,11 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
             message.release();
             Thread.currentThread().setContextClassLoader(originalClassLoader);
         }
+    }
+
+    private boolean returnEvent(MuleEvent event)
+    {
+        return event != null && !VoidMuleEvent.getInstance().equals(event) && getEndpoint().getExchangePattern().hasResponse();
     }
 
     /**

@@ -12,7 +12,7 @@
     <custom-transformer class="org.mule.test.integration.exceptions.DummyTransformer" name="otherTransformer"/>
 
     <flow name="main" processingStrategy="synchronous">
-        <vm:inbound-endpoint path="in"/>
+        <vm:inbound-endpoint path="in" exchange-pattern="request-response"/>
         <expression-transformer evaluator="groovy"
                                 expression="message.setCorrelationId(message.getUniqueId()); message.setCorrelationGroupSize(2); return message;"/>
         <request-reply>
