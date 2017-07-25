@@ -30,6 +30,7 @@ import static org.reflections.ReflectionUtils.getAllSuperTypes;
 import static org.reflections.ReflectionUtils.withName;
 import static org.springframework.core.ResolvableType.forMethodReturnType;
 import static org.springframework.core.ResolvableType.forType;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.AnyType;
@@ -129,7 +130,7 @@ public final class IntrospectionUtils {
   /**
    * Returns a {@link MetadataType} representing the given {@link Class} type.
    *
-   * @param type       the {@link Class} being introspected
+   * @param type the {@link Class} being introspected
    * @param typeLoader a {@link ClassTypeLoader} used to create the {@link MetadataType}
    * @return a {@link MetadataType}
    */
@@ -197,14 +198,13 @@ public final class IntrospectionUtils {
 
   /**
    * Returns a {@link MetadataType} representing the given {@link Method}'s return type. If the {@code method} returns an
-   * {@link Result}, then it returns the type of the first generic. If the {@link Result} type is being used in its raw
-   * form, then an {@link AnyType} will be returned.
+   * {@link Result}, then it returns the type of the first generic. If the {@link Result} type is being used in its raw form, then
+   * an {@link AnyType} will be returned.
    * <p>
-   * If the {@code method} returns a collection of {@link Result} instances, then it will
-   * return an {@link ArrayType} which inner value represent a {@link Message} which payload
-   * and attributes matches the types of the Result generics.
+   * If the {@code method} returns a collection of {@link Result} instances, then it will return an {@link ArrayType} which inner
+   * value represent a {@link Message} which payload and attributes matches the types of the Result generics.
    *
-   * @param method     the {@link Method} being introspected
+   * @param method the {@link Method} being introspected
    * @param typeLoader a {@link ClassTypeLoader} used to create the {@link MetadataType}
    * @return a {@link MetadataType}
    * @throws IllegalArgumentException is method is {@code null}
@@ -216,9 +216,8 @@ public final class IntrospectionUtils {
   /**
    * Returns the {@link MetadataType} for a source's output.
    * <p>
-   * If the {@code type} is a collection of {@link Result} instances, then it will
-   * return an {@link ArrayType} which inner value represent a {@link Message} which payload
-   * and attributes matches the types of the Result generics.
+   * If the {@code type} is a collection of {@link Result} instances, then it will return an {@link ArrayType} which inner value
+   * represent a {@link Message} which payload and attributes matches the types of the Result generics.
    *
    * @param returnType the source output type
    * @param typeLoader a {@link ClassTypeLoader} used to create the {@link MetadataType}
@@ -301,10 +300,10 @@ public final class IntrospectionUtils {
    * If the {@code method} returns a {@link Result}, then it returns the type of the {@code Attributes} generic. In any other case
    * (including raw uses of {@link Result}) it will return a {@link VoidType}
    * <p>
-   * If the {@code method} returns a collection or a {@link PagingProvider} of {@link Result}, then this will return {@link VoidType} since the messages in the
-   * main output already contain an attributes for each item.
+   * If the {@code method} returns a collection or a {@link PagingProvider} of {@link Result}, then this will return
+   * {@link VoidType} since the messages in the main output already contain an attributes for each item.
    *
-   * @param method     the {@link Method} being introspected
+   * @param method the {@link Method} being introspected
    * @param typeLoader a {@link ClassTypeLoader} used to create the {@link MetadataType}
    * @return a {@link MetadataType}
    * @throws IllegalArgumentException is method is {@code null}
@@ -347,36 +346,13 @@ public final class IntrospectionUtils {
     return new LinkedList<>();
   }
 
-  public static ResolvableType getMethodType(Method method) {
+  private static ResolvableType getMethodType(Method method) {
     checkArgument(method != null, "Can't introspect a null method");
     return forMethodReturnType(method);
   }
 
-  public static ResolvableType unwrapGenericFromClass(Class<?> clazz, ResolvableType type, int genericIndex) {
-    if (!isEmpty(type.getGenerics())) {
-      ResolvableType genericType = type.getGenerics()[genericIndex];
-      if (genericType.getRawClass() != null) {
-        type = genericType;
-      }
-    } else {
-      if (clazz.isAssignableFrom(type.getRawClass().getSuperclass())) {
-        return unwrapGenericFromClass(clazz, type.getSuperType(), genericIndex);
-      } else {
-        ResolvableType interfaceType = stream(type.getInterfaces())
-            .filter(i -> clazz.isAssignableFrom(i.getRawClass()))
-            .findFirst()
-            .orElse(forType(Object.class));
-
-        return unwrapGenericFromClass(clazz, interfaceType, genericIndex);
-      }
-
-    }
-    return type;
-  }
-
   /**
-   * Determines if the given {@code type} implements any of the lifecycle
-   * annotations
+   * Determines if the given {@code type} implements any of the lifecycle annotations
    *
    * @param type the class to evaluate
    * @return whether it implements lifecycle or not
@@ -399,10 +375,10 @@ public final class IntrospectionUtils {
   /**
    * Returns an array of {@link MetadataType} representing each of the given {@link Method}'s argument types.
    *
-   * @param method     a not {@code null} {@link Method}
+   * @param method a not {@code null} {@link Method}
    * @param typeLoader a {@link ClassTypeLoader} to be used to create the returned {@link MetadataType}s
    * @return an array of {@link MetadataType} matching the method's arguments. If the method doesn't take any, then the array will
-   * be empty
+   *         be empty
    * @throws IllegalArgumentException is method is {@code null}
    */
   public static MetadataType[] getMethodArgumentTypes(Method method, ClassTypeLoader typeLoader) {
@@ -424,7 +400,7 @@ public final class IntrospectionUtils {
   /**
    * Returns a {@link MetadataType} describing the given {@link Field}'s type
    *
-   * @param field      a not {@code null} {@link Field}
+   * @param field a not {@code null} {@link Field}
    * @param typeLoader a {@link ClassTypeLoader} used to create the {@link MetadataType}
    * @return a {@link MetadataType} matching the field's type
    * @throws IllegalArgumentException if field is {@code null}
@@ -459,11 +435,11 @@ public final class IntrospectionUtils {
   /**
    * Resolves and returns the field value of an object instance
    *
-   * @param object    The object where grab the field value
+   * @param object The object where grab the field value
    * @param fieldName The name of the field to obtain the value
    * @return The value of the field with the given fieldName and object instance
    * @throws IllegalAccessException if is unavailable to access to the field
-   * @throws NoSuchFieldException   if the field doesn't exist in the given object instance
+   * @throws NoSuchFieldException if the field doesn't exist in the given object instance
    */
   public static Object getFieldValue(Object object, String fieldName) throws IllegalAccessException, NoSuchFieldException {
     final Optional<Field> fieldOptional = getField(object.getClass(), fieldName);
@@ -584,7 +560,7 @@ public final class IntrospectionUtils {
   /**
    * Determines if the given {@code type} is assignable from any of the {@code matchingTypes}
    *
-   * @param type          a {@link Class}
+   * @param type a {@link Class}
    * @param matchingTypes a collection of {@link Class classes} to test against
    * @return whether the type is assignable or not
    */
@@ -630,8 +606,8 @@ public final class IntrospectionUtils {
   }
 
   /**
-   * Returns all the methods in the {@code declaringClass} which are annotated with {@code annotationType}, including
-   * those declared in super classes.
+   * Returns all the methods in the {@code declaringClass} which are annotated with {@code annotationType}, including those
+   * declared in super classes.
    *
    * @param declaringClass the type to introspect
    * @param annotationType the annotation you're looking for
@@ -646,7 +622,7 @@ public final class IntrospectionUtils {
    *
    * @param declaringClass the type to introspect
    * @param annotationType the annotation you're looking for
-   * @param superClasses   whether to consider supper classes or not
+   * @param superClasses whether to consider supper classes or not
    * @return a {@link Collection} of {@link Method}s
    */
   public static Collection<Method> getMethodsAnnotatedWith(Class<?> declaringClass,
@@ -707,7 +683,7 @@ public final class IntrospectionUtils {
    * return
    *
    * @param element an annotated member
-   * @param <T>     the generic type of the element
+   * @param <T> the generic type of the element
    * @return an alias name
    */
   public static <T extends AnnotatedElement & Member> String getAlias(T element) {
@@ -806,7 +782,7 @@ public final class IntrospectionUtils {
    * Given a {@link MetadataType} it adds all the {@link Class} that are related from that type. This includes generics of an
    * {@link ArrayType}, open restriction of an {@link ObjectType} as well as its fields.
    *
-   * @param type                 {@link MetadataType} to inspect
+   * @param type {@link MetadataType} to inspect
    * @param extensionClassLoader extension class loader
    * @return {@link Set<Class<?>>} with the classes reachable from the {@code type}
    */
@@ -869,7 +845,7 @@ public final class IntrospectionUtils {
    * Given a {@link Set} of Annotation classes and a {@link MetadataType} that describes a component parameter, indicates if the
    * parameter is considered as a multilevel {@link MetadataKeyId}
    *
-   * @param annotations   of the parameter
+   * @param annotations of the parameter
    * @param parameterType of the parameter
    * @return a boolean indicating if the Parameter is considered as a multilevel {@link MetadataKeyId}
    */
@@ -883,7 +859,7 @@ public final class IntrospectionUtils {
    * <p>
    * To be a parameter container means that the parameter is a {@link ParameterGroup} or a multilevel {@link MetadataKeyId}.
    *
-   * @param annotations   of the component parameter
+   * @param annotations of the component parameter
    * @param parameterType of the component parameter
    * @return a boolean indicating if the parameter is considered as a parameter container
    */
@@ -992,7 +968,7 @@ public final class IntrospectionUtils {
   /**
    * Resolves the correspondent {@link ConnectionProviderModel} for a given {@link ConnectionProvider} instance.
    *
-   * @param connectionProvider     connection provider class
+   * @param connectionProvider connection provider class
    * @param allConnectionProviders list of available {@link ConnectionProviderModel}
    * @return an {@link Optional} value of the {@link ConnectionProviderModel}
    */

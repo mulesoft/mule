@@ -9,6 +9,7 @@ package org.mule.test.runner.api;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
+
 import org.mule.test.runner.utils.RunnerModuleUtils;
 
 import java.io.File;
@@ -79,13 +80,13 @@ public class ClassPathClassifierContext {
   public ClassPathClassifierContext(final Artifact rootArtifact,
                                     final File pluginResourcesFolder,
                                     final List<URL> classPathURLs,
-                                    final List<String> excludedArtifacts,
+                                    final Set<String> excludedArtifacts,
                                     final List<String> extraBootPackages,
-                                    final List<String> providedExclusions,
-                                    final List<String> testExclusions,
-                                    final List<String> testInclusions,
-                                    final List<String> sharedPluginLibCoordinates,
-                                    final List<Class> exportPluginClasses,
+                                    final Set<String> providedExclusions,
+                                    final Set<String> testExclusions,
+                                    final Set<String> testInclusions,
+                                    final Set<String> sharedPluginLibCoordinates,
+                                    final Set<Class> exportPluginClasses,
                                     final List<URL> applicationUrls,
                                     final boolean extensionMetadataGenerationEnabled)
       throws IOException {
@@ -186,7 +187,7 @@ public class ClassPathClassifierContext {
 
   /**
    * @return {@link List} of {@link Class classes} that are going to be exported in addition to the ones already exported by
-   * rootArtifact. For testing purposes only.
+   *         rootArtifact. For testing purposes only.
    */
   public List<Class> getExportPluginClasses() {
     return this.exportPluginClasses;
@@ -202,7 +203,7 @@ public class ClassPathClassifierContext {
 
   /**
    * @return {@link List} of {@link URL}s to be appended to the application
-   *          {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader} in addition to the ones classified.
+   *         {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader} in addition to the ones classified.
    */
   public List<URL> getApplicationUrls() {
     return this.applicationUrls;

@@ -14,21 +14,23 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.MAX_ONE;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.MULE_EXTENSION_NAMESPACE;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.MULE_EXTENSION_OPERATION_TRANSACTIONAL_ACTION_TYPE;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.MULE_EXTENSION_SCHEMA_LOCATION;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.MULE_SCHEMA_LOCATION;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.MULE_TLS_NAMESPACE;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.MULE_TLS_SCHEMA_LOCATION;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.SPRING_FRAMEWORK_NAMESPACE;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.SPRING_FRAMEWORK_SCHEMA_LOCATION;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.STRING;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.TLS_CONTEXT_TYPE;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.USE_OPTIONAL;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.USE_REQUIRED;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.XML_NAMESPACE;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.ENUM_TYPE_SUFFIX;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MAX_ONE;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_EXTENSION_NAMESPACE;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_EXTENSION_OPERATION_TRANSACTIONAL_ACTION_TYPE;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_EXTENSION_SCHEMA_LOCATION;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_PROPERTY_PLACEHOLDER_TYPE;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_SCHEMA_LOCATION;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_TLS_NAMESPACE;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_TLS_SCHEMA_LOCATION;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.SPRING_FRAMEWORK_NAMESPACE;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.SPRING_FRAMEWORK_SCHEMA_LOCATION;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.STRING;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.TLS_CONTEXT_TYPE;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.USE_OPTIONAL;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.USE_REQUIRED;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.XML_NAMESPACE;
 import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.declaration.type.TypeUtils.isContent;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
@@ -39,6 +41,7 @@ import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.capability.xml.schema.builder.ObjectTypeSchemaDelegate.getAbstractElementName;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.model.ArrayType;
@@ -60,7 +63,6 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.type.TypeCatalog;
-import org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
@@ -299,7 +301,7 @@ public final class SchemaBuilder {
 
   private void registerEnum(Schema schema, StringType enumType) {
     TopLevelSimpleType enumSimpleType = new TopLevelSimpleType();
-    enumSimpleType.setName(sanitizeName(getId(enumType)) + SchemaConstants.ENUM_TYPE_SUFFIX);
+    enumSimpleType.setName(sanitizeName(getId(enumType)) + ENUM_TYPE_SUFFIX);
 
     Union union = new Union();
     union.getSimpleType().add(createEnumSimpleType(enumType));
@@ -313,7 +315,7 @@ public final class SchemaBuilder {
     LocalSimpleType expression = new LocalSimpleType();
     Restriction restriction = new Restriction();
     expression.setRestriction(restriction);
-    restriction.setBase(SchemaConstants.MULE_PROPERTY_PLACEHOLDER_TYPE);
+    restriction.setBase(MULE_PROPERTY_PLACEHOLDER_TYPE);
 
     return expression;
   }
@@ -373,7 +375,7 @@ public final class SchemaBuilder {
         if (OperationTransactionalAction.class.getName().equals(typeName)) {
           attribute.setType(MULE_EXTENSION_OPERATION_TRANSACTIONAL_ACTION_TYPE);
         } else {
-          attribute.setType(new QName(schema.getTargetNamespace(), sanitizeName(typeName) + SchemaConstants.ENUM_TYPE_SUFFIX));
+          attribute.setType(new QName(schema.getTargetNamespace(), sanitizeName(typeName) + ENUM_TYPE_SUFFIX));
           registeredEnums.add(enumType);
         }
       }
@@ -394,23 +396,19 @@ public final class SchemaBuilder {
 
 
   /**
-   * Creates a {@link ExplicitGroup Choice} group that supports {@code refs} to both the {@code global} and {@code local}
-   * abstract elements for the given {@code type}.
-   * This is required in order to allow subtypes that support top-level declaration along with other subtypes that
-   * support only local declarations as childs.
+   * Creates a {@link ExplicitGroup Choice} group that supports {@code refs} to both the {@code global} and {@code local} abstract
+   * elements for the given {@code type}. This is required in order to allow subtypes that support top-level declaration along
+   * with other subtypes that support only local declarations as childs.
    * <p/>
    * For example, a resulting choice group for a type of name {@code TypeName} will look like:
    * <p>
-   * <xs:complexType>
-   * <xs:choice minOccurs="1" maxOccurs="1">
+   * <xs:complexType> <xs:choice minOccurs="1" maxOccurs="1">
    * <xs:element minOccurs="0" maxOccurs="1" ref="ns:abstract-type-name"></xs:element>
-   * <xs:element minOccurs="0" maxOccurs="1" ref="ns:global-abstract-type-name"></xs:element>
-   * </xs:choice>
-   * </xs:complexType>
+   * <xs:element minOccurs="0" maxOccurs="1" ref="ns:global-abstract-type-name"></xs:element> </xs:choice> </xs:complexType>
    * <p/>
    *
-   * @param typeDsl   {@link DslElementSyntax} of the referenced type
-   * @param type      the {@link MetadataType type} of the base element that will be referenced
+   * @param typeDsl {@link DslElementSyntax} of the referenced type
+   * @param type the {@link MetadataType type} of the base element that will be referenced
    * @param minOccurs {@link BigInteger#ZERO} if the {@code group} is optional or {@link BigInteger#ONE} if required
    * @param maxOccurs the maximum number of occurrences for this group
    * @return a {@link ExplicitGroup Choice} group with the necessary options for this case
@@ -452,9 +450,9 @@ public final class SchemaBuilder {
   }
 
   /**
-   * Creates a {@code ref} to the abstract element of the given {@code type} based on its {@code typeDsl} declaration.
-   * Anywhere this ref element is used, the schema will allow to declare an xml element with a substitution group that matches
-   * the referenced abstract-element
+   * Creates a {@code ref} to the abstract element of the given {@code type} based on its {@code typeDsl} declaration. Anywhere
+   * this ref element is used, the schema will allow to declare an xml element with a substitution group that matches the
+   * referenced abstract-element
    * <p/>
    * For example, if we create this ref element to the type of name {@code TypeName}:
    * <p>
@@ -467,8 +465,8 @@ public final class SchemaBuilder {
    * <p>
    * <xs:element type="ns:org.mule.test.OtherType" substitutionGroup="ns:abstract-type-name" name="other-type"></xs:element>
    *
-   * @param typeDsl    {@link DslElementSyntax} of the referenced {@code type}
-   * @param type       {@link MetadataType} of the referenced {@code type}
+   * @param typeDsl {@link DslElementSyntax} of the referenced {@code type}
+   * @param type {@link MetadataType} of the referenced {@code type}
    * @param isRequired whether or not the element element is required
    * @return the {@link TopLevelElement element} representing the reference
    */

@@ -8,7 +8,9 @@
 package org.mule.test.runner.api;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static java.util.Collections.emptySet;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
+
 import org.mule.test.runner.classloader.IsolatedClassLoaderFactory;
 import org.mule.test.runner.maven.MavenModelFactory;
 
@@ -16,6 +18,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.maven.model.Model;
 import org.eclipse.aether.artifact.Artifact;
@@ -51,25 +54,25 @@ public class ArtifactIsolatedClassLoaderBuilder {
 
   private Artifact rootArtifact;
   private File pluginResourcesFolder;
-  private List<String> excludedArtifacts = newArrayList();
-  private List<String> providedExclusions = newArrayList();
-  private List<String> testExclusions = newArrayList();
-  private List<String> testInclusions = newArrayList();
-  private List<String> sharedPluginLibCoordinates = newArrayList();
-  private List<Class> exportPluginClasses = newArrayList();
+  private Set<String> excludedArtifacts = emptySet();
+  private Set<String> providedExclusions = emptySet();
+  private Set<String> testExclusions = emptySet();
+  private Set<String> testInclusions = emptySet();
+  private Set<String> sharedPluginLibCoordinates = emptySet();
+  private Set<Class> exportPluginClasses = emptySet();
   private boolean extensionMetadataGenerationEnabled = false;
-  private List<String> providedInclusions = newArrayList();
+  private Set<String> providedInclusions = emptySet();
   private List<URL> applicationUrls = newArrayList();
   private List<String> extraBootPackages;
 
   /**
-   * Sets the {@link List} of Maven coordinates in format {@code <groupId>:<artifactId>} in order to be
-   * added to the sharedLib {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader}
+   * Sets the {@link Set} of Maven coordinates in format {@code <groupId>:<artifactId>} in order to be added to the sharedLib
+   * {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader}
    *
    * @param sharedPluginLibCoordinates {@link List} of Maven coordinates in format {@code <groupId>:<artifactId>}
    * @return this
    */
-  public ArtifactIsolatedClassLoaderBuilder setSharedPluginLibCoordinates(List<String> sharedPluginLibCoordinates) {
+  public ArtifactIsolatedClassLoaderBuilder setSharedPluginLibCoordinates(Set<String> sharedPluginLibCoordinates) {
     this.sharedPluginLibCoordinates = sharedPluginLibCoordinates;
     return this;
   }
@@ -126,7 +129,7 @@ public class ArtifactIsolatedClassLoaderBuilder {
    *        added as boot packages. In format {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    * @return this
    */
-  public ArtifactIsolatedClassLoaderBuilder setExcludedArtifacts(List<String> excludedArtifacts) {
+  public ArtifactIsolatedClassLoaderBuilder setExcludedArtifacts(Set<String> excludedArtifacts) {
     this.excludedArtifacts = excludedArtifacts;
     return this;
   }
@@ -153,46 +156,46 @@ public class ArtifactIsolatedClassLoaderBuilder {
    *        rootArtifact. In format {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    * @return this
    */
-  public ArtifactIsolatedClassLoaderBuilder setProvidedExclusions(final List<String> providedExclusions) {
+  public ArtifactIsolatedClassLoaderBuilder setProvidedExclusions(final Set<String> providedExclusions) {
     this.providedExclusions = providedExclusions;
     return this;
   }
 
   /**
-   * Sets the {@link List} of exclusion Maven coordinates to be excluded from test dependencies of rootArtifact. In format
+   * Sets the {@link Set} of exclusion Maven coordinates to be excluded from test dependencies of rootArtifact. In format
    * {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    *
-   * @param testExclusions {@link List} of exclusion Maven coordinates to be excluded from test dependencies of rootArtifact. In
+   * @param testExclusions {@link Set} of exclusion Maven coordinates to be excluded from test dependencies of rootArtifact. In
    *        format {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    * @return this
    */
-  public ArtifactIsolatedClassLoaderBuilder setTestExclusions(final List<String> testExclusions) {
+  public ArtifactIsolatedClassLoaderBuilder setTestExclusions(final Set<String> testExclusions) {
     this.testExclusions = testExclusions;
     return this;
   }
 
   /**
-   * Sets the {@link List} of inclusion Maven coordinates to be included from test dependencies of rootArtifact. In format
+   * Sets the {@link Set} of inclusion Maven coordinates to be included from test dependencies of rootArtifact. In format
    * {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    *
-   * @param testInclusions {@link List} of inclusion Maven coordinates to be excluded from test dependencies of rootArtifact. In
+   * @param testInclusions {@link Set} of inclusion Maven coordinates to be excluded from test dependencies of rootArtifact. In
    *        format {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    * @return this
    */
-  public ArtifactIsolatedClassLoaderBuilder setTestInclusions(final List<String> testInclusions) {
+  public ArtifactIsolatedClassLoaderBuilder setTestInclusions(final Set<String> testInclusions) {
     this.testInclusions = testInclusions;
     return this;
   }
 
   /**
-   * Sets the {@link List} of {@link Class}es to be exported by rootArtifact (if it is a Mule plugin) in addition to their APIs,
+   * Sets the {@link Set} of {@link Class}es to be exported by rootArtifact (if it is a Mule plugin) in addition to their APIs,
    * for testing purposes only.
    *
-   * @param exportPluginClasses of {@link Class}es to be exported by rootArtifact (if it is a Mule plugin) in addition to their APIs,
-   *                            for testing purposes only.
+   * @param exportPluginClasses of {@link Class}es to be exported by rootArtifact (if it is a Mule plugin) in addition to their
+   *        APIs, for testing purposes only.
    * @return this
    */
-  public ArtifactIsolatedClassLoaderBuilder setExportPluginClasses(final List<Class> exportPluginClasses) {
+  public ArtifactIsolatedClassLoaderBuilder setExportPluginClasses(final Set<Class> exportPluginClasses) {
     this.exportPluginClasses = exportPluginClasses;
     return this;
   }

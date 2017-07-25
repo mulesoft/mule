@@ -6,7 +6,8 @@
  */
 package org.mule.runtime.config.spring.internal.processor;
 
-import static org.mule.runtime.config.spring.MuleArtifactContext.INNER_BEAN_PREFIX;
+import static org.mule.runtime.config.spring.internal.MuleArtifactContext.INNER_BEAN_PREFIX;
+
 import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
 
 import java.util.HashSet;

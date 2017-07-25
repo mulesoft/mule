@@ -1,1 +1,1 @@
-org.mule.runtime.config.spring.artifact.SpringArtifactConfigurationProcessor
+org.mule.runtime.config.spring.api.dsl.artifact.SpringArtifactConfigurationProcessor

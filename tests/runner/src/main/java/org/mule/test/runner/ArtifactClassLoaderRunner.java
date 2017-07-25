@@ -17,11 +17,31 @@ import static org.mule.test.runner.utils.RunnerModuleUtils.EXCLUDED_PROPERTIES_F
 import static org.mule.test.runner.utils.RunnerModuleUtils.EXTRA_BOOT_PACKAGES;
 import static org.mule.test.runner.utils.RunnerModuleUtils.getExcludedProperties;
 
+import org.mule.maven.client.api.MavenClientProvider;
+import org.mule.maven.client.api.SettingsSupplierFactory;
+import org.mule.maven.client.api.model.MavenConfiguration;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.test.runner.api.AetherClassPathClassifier;
+import org.mule.test.runner.api.ArtifactClassLoaderHolder;
+import org.mule.test.runner.api.ArtifactClassificationTypeResolver;
+import org.mule.test.runner.api.ArtifactIsolatedClassLoaderBuilder;
+import org.mule.test.runner.api.ClassPathClassifier;
+import org.mule.test.runner.api.ClassPathUrlProvider;
+import org.mule.test.runner.api.DependencyResolver;
+import org.mule.test.runner.api.WorkspaceLocationResolver;
+import org.mule.test.runner.classification.DefaultWorkspaceReader;
+import org.mule.test.runner.maven.AutoDiscoverWorkspaceLocationResolver;
+import org.mule.test.runner.utils.AnnotationUtils;
+
+import com.google.common.base.Throwables;
+import com.google.common.collect.Sets;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.net.URL;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
@@ -39,28 +59,8 @@ import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.RunnerBuilder;
 import org.junit.runners.model.TestClass;
-
-import org.mule.maven.client.api.MavenClientProvider;
-import org.mule.maven.client.api.SettingsSupplierFactory;
-import org.mule.maven.client.api.model.MavenConfiguration;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.test.runner.api.AetherClassPathClassifier;
-import org.mule.test.runner.api.ArtifactClassLoaderHolder;
-import org.mule.test.runner.api.ArtifactClassificationTypeResolver;
-import org.mule.test.runner.api.ArtifactIsolatedClassLoaderBuilder;
-import org.mule.test.runner.api.ClassPathClassifier;
-import org.mule.test.runner.api.ClassPathUrlProvider;
-import org.mule.test.runner.api.DependencyResolver;
-import org.mule.test.runner.api.WorkspaceLocationResolver;
-import org.mule.test.runner.classification.DefaultWorkspaceReader;
-import org.mule.test.runner.maven.AutoDiscoverWorkspaceLocationResolver;
-import org.mule.test.runner.utils.AnnotationUtils;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Throwables;
-import com.google.common.collect.Sets;
 
 /**
  * A {@link org.junit.runner.Runner} that mimics the class loading model used in a Mule Standalone distribution. In order to
@@ -210,7 +210,7 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
     } catch (IOException e) {
       throw new RuntimeException("Error while reading excluded properties", e);
     }
-    List<String> excludedArtifactsList = getExcludedArtifacts(excludedProperties);
+    Set<String> excludedArtifactsList = getExcludedArtifacts(excludedProperties);
     builder.setExcludedArtifacts(excludedArtifactsList);
     builder.setExtraBootPackages(getExtraBootPackages(excludedProperties));
 
@@ -268,9 +268,9 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
    * @param excludedProperties {@link Properties }that has the list of extra boot packages definitions
    * @return a {@link List} of {@link String}s with the excluded artifacts
    */
-  private static List<String> getExcludedArtifacts(Properties excludedProperties) {
+  private static Set<String> getExcludedArtifacts(Properties excludedProperties) {
     String excludedArtifacts = excludedProperties.getProperty(EXCLUDED_ARTIFACTS);
-    List<String> excludedArtifactsList = newArrayList();
+    Set<String> excludedArtifactsList = new HashSet<>();
     if (excludedArtifacts != null) {
       for (String exclusion : excludedArtifacts.split(",")) {
         excludedArtifactsList.add(exclusion);

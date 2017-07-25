@@ -14,8 +14,11 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.isNull;
-import static org.mule.runtime.config.spring.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
+import static org.mule.runtime.config.spring.api.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.config.spring.api.XmlConfigurationDocumentLoader;
+import org.mule.runtime.config.spring.api.XmlGathererErrorHandler;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.InputStream;

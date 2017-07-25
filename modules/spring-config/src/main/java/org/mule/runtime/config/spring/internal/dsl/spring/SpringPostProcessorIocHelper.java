@@ -6,18 +6,22 @@
  */
 package org.mule.runtime.config.spring.internal.dsl.spring;
 
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_PROPERTY_IDENTIFIER;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROPERTIES_ELEMENT;
-import static org.mule.runtime.config.spring.dsl.spring.CommonBeanDefinitionCreator.areMatchingTypes;
-import static org.mule.runtime.config.spring.dsl.spring.CommonBeanDefinitionCreator.getPropertyValueFromPropertiesComponent;
-import static org.mule.runtime.config.spring.dsl.spring.PropertyComponentUtils.getPropertyValueFromPropertyComponent;
+import static org.mule.runtime.config.spring.api.dsl.model.ApplicationModel.MULE_PROPERTY_IDENTIFIER;
+import static org.mule.runtime.config.spring.api.dsl.model.ApplicationModel.PROPERTIES_ELEMENT;
+import static org.mule.runtime.config.spring.internal.dsl.spring.CommonBeanDefinitionCreator.areMatchingTypes;
+import static org.mule.runtime.config.spring.internal.dsl.spring.CommonBeanDefinitionCreator.getPropertyValueFromPropertiesComponent;
+import static org.mule.runtime.config.spring.internal.dsl.spring.PropertyComponentUtils.getPropertyValueFromPropertyComponent;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
+import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.rootBeanDefinition;
 
-import org.mule.runtime.config.spring.dsl.model.ComponentModel;
+import org.mule.runtime.config.spring.api.dsl.model.ComponentModel;
+import org.mule.runtime.config.spring.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.spring.privileged.dsl.PostProcessorIocHelper;
 import org.mule.runtime.core.api.util.Pair;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
+import org.mule.runtime.dsl.api.component.ObjectFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -30,12 +34,14 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.ManagedMap;
 
-//TODO MULE-9638 set visibility to package
-public class SpringPostProcessorIocHelper implements PostProcessorIocHelper {
+class SpringPostProcessorIocHelper implements PostProcessorIocHelper {
 
+  private ObjectFactoryClassRepository objectFactoryClassRepository;
   private AbstractBeanDefinition beanDefinition;
 
-  public SpringPostProcessorIocHelper(AbstractBeanDefinition beanDefinition) {
+  public SpringPostProcessorIocHelper(ObjectFactoryClassRepository objectFactoryClassRepository,
+                                      AbstractBeanDefinition beanDefinition) {
+    this.objectFactoryClassRepository = objectFactoryClassRepository;
     this.beanDefinition = beanDefinition;
   }
 
@@ -73,7 +79,22 @@ public class SpringPostProcessorIocHelper implements PostProcessorIocHelper {
   @Override
   public void addDefinitionPropertyValue(String propertyName, Class beanClass, Map<String, Object> properties, boolean addContext,
                                          Object... constructorArgs) {
-    BeanDefinitionBuilder builder = genericBeanDefinition(beanClass);
+    BeanDefinitionBuilder builder;
+    if (ObjectFactory.class.isAssignableFrom(beanClass)) {
+      final ComponentBuildingDefinition definition = new ComponentBuildingDefinition.Builder()
+          .withTypeDefinition(fromType(Object.class))
+          .withObjectFactoryType(beanClass)
+          .withNamespace("helper")
+          .withIdentifier(propertyName)
+          .build();
+      builder = genericBeanDefinition(objectFactoryClassRepository.getObjectFactoryClass(definition, beanClass, Object.class,
+                                                                                         () -> true, b -> {
+                                                                                         }));
+    } else {
+      builder = genericBeanDefinition(beanClass);
+    }
+
+
     for (Object constructorArg : constructorArgs) {
       builder = builder.addConstructorArgValue(constructorArg);
     }
@@ -103,9 +124,9 @@ public class SpringPostProcessorIocHelper implements PostProcessorIocHelper {
   public List toBeanDefinitions(List<ComponentModel> components) {
     ManagedList responseMessageProcessorsBeanList = new ManagedList();
     components.forEach(responseProcessorComponentModel -> {
-      BeanDefinition beanDefinition = responseProcessorComponentModel.getBeanDefinition();
-      responseMessageProcessorsBeanList
-          .add(beanDefinition != null ? beanDefinition : responseProcessorComponentModel.getBeanReference());
+      BeanDefinition beanDefinition = ((SpringComponentModel) responseProcessorComponentModel).getBeanDefinition();
+      responseMessageProcessorsBeanList.add(beanDefinition != null ? beanDefinition
+          : ((SpringComponentModel) responseProcessorComponentModel).getBeanReference());
     });
 
     return responseMessageProcessorsBeanList;

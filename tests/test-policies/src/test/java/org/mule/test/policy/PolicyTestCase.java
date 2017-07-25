@@ -18,6 +18,7 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
+import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -63,6 +64,11 @@ public class PolicyTestCase extends MuleArtifactFunctionalTestCase {
       @Override
       public boolean isConfigured() {
         return false;
+      }
+
+      @Override
+      public void addServiceConfigurator(ServiceConfigurator serviceConfigurator) {
+        // Nothing to do
       }
     };
   }

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.config;
 
+import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.core.api.MuleContext;
 
 /**
@@ -24,6 +25,13 @@ import org.mule.runtime.core.api.MuleContext;
  * used.
  */
 public interface ConfigurationBuilder {
+
+  /**
+   * Adds a service configurator to be used on the context being built.
+   *
+   * @param serviceConfigurator service to add. Non null.
+   */
+  void addServiceConfigurator(ServiceConfigurator serviceConfigurator);
 
   /**
    * Will configure a MuleContext based on the configuration provided. The configuration will be set on the

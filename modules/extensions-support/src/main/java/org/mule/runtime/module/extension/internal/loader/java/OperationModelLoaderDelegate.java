@@ -8,11 +8,14 @@ package org.mule.runtime.module.extension.internal.loader.java;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isInputStream;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getGenerics;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodReturnAttributesType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodReturnType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
+import static org.springframework.core.ResolvableType.forMethodReturnType;
+
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.declaration.fluent.Declarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
@@ -37,7 +40,6 @@ import org.mule.runtime.module.extension.internal.loader.java.type.OperationCont
 import org.mule.runtime.module.extension.internal.loader.java.type.WithOperationContainers;
 import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
 import org.mule.runtime.module.extension.internal.runtime.execution.ReflectiveOperationExecutorFactory;
-import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -221,7 +223,8 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
   }
 
   private void processPagingTx(OperationDeclarer operation, Method method) {
-    ResolvableType connectionType = IntrospectionUtils.getMethodType(method).getGeneric(0);
+    checkArgument(method != null, "Can't introspect a null method");
+    ResolvableType connectionType = forMethodReturnType(method).getGeneric(0);
     operation.transactional(TransactionalConnection.class.isAssignableFrom(connectionType.getRawClass()));
   }
 

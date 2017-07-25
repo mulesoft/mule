@@ -25,8 +25,9 @@ import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.core.api.config.MuleManifest.getVendorName;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.TRANSFORMATION;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
-import static org.mule.runtime.module.extension.internal.resources.MuleExtensionModelProvider.MULE_VERSION;
-import static org.mule.runtime.module.extension.internal.resources.MuleExtensionModelProvider.getExtensionModel;
+import static org.mule.runtime.module.extension.api.resources.MuleExtensionModelProvider.MULE_VERSION;
+import static org.mule.runtime.module.extension.api.resources.MuleExtensionModelProvider.getExtensionModel;
+
 import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.model.MetadataType;

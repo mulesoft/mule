@@ -16,14 +16,10 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import org.springframework.context.ApplicationContext;
-
 public class LifecycleObject implements Lifecycle {
 
   @Inject
   private MuleContext muleContext;
-  @Inject
-  private ApplicationContext applicationContext;
   @Inject
   private LifecycleObject otherLifecycleObject;
 
@@ -74,10 +70,6 @@ public class LifecycleObject implements Lifecycle {
 
   public LifecycleObject getOtherLifecycleObject() {
     return otherLifecycleObject;
-  }
-
-  public ApplicationContext getApplicationContext() {
-    return applicationContext;
   }
 
   public MuleContext getMuleContext() {

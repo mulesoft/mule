@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.config.spring.privileged.dsl;
 
-import org.mule.runtime.config.spring.dsl.model.ComponentModel;
+import org.mule.runtime.config.spring.api.dsl.model.ComponentModel;
 
 import java.util.List;
 import java.util.Map;

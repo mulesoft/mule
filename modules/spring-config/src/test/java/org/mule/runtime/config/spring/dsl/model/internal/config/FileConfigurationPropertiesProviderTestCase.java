@@ -11,8 +11,11 @@ import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.test.allure.AllureConstants.ConfigurationProperties.CONFIGURATION_PROPERTIES;
 import static org.mule.test.allure.AllureConstants.ConfigurationProperties.ComponentConfigurationAttributesStory.CONFIGURATION_PROPERTIES_RESOLVER_STORY;
-import org.mule.runtime.config.spring.dsl.model.ClassLoaderResourceProvider;
-import org.mule.runtime.config.spring.dsl.model.ResourceProvider;
+
+import org.mule.runtime.config.spring.api.dsl.model.ResourceProvider;
+import org.mule.runtime.config.spring.internal.dsl.model.ClassLoaderResourceProvider;
+import org.mule.runtime.config.spring.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
+import org.mule.runtime.config.spring.internal.dsl.model.config.FileConfigurationPropertiesProvider;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.Optional;

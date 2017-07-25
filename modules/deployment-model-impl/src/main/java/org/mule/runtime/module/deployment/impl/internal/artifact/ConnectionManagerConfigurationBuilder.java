@@ -9,6 +9,8 @@ package org.mule.runtime.module.deployment.impl.internal.artifact;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
+
+import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -21,8 +23,8 @@ import org.mule.runtime.core.internal.connection.DefaultConnectionManager;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 
 /**
- * {@link ConfigurationBuilder} implementation which enriches the {@link MuleContext}'s registry injecting
- * the correspondent {@link ConnectionManager}
+ * {@link ConfigurationBuilder} implementation which enriches the {@link MuleContext}'s registry injecting the correspondent
+ * {@link ConnectionManager}
  *
  * @since 4.0
  */
@@ -79,5 +81,10 @@ public class ConnectionManagerConfigurationBuilder implements ConfigurationBuild
   private void registerConnectionManager(MuleContext muleContext, ConnectionManager connectionManager)
       throws RegistrationException {
     muleContext.getRegistry().registerObject(OBJECT_CONNECTION_MANAGER, connectionManager);
+  }
+
+  @Override
+  public void addServiceConfigurator(ServiceConfigurator serviceConfigurator) {
+    // Nothing to do
   }
 }

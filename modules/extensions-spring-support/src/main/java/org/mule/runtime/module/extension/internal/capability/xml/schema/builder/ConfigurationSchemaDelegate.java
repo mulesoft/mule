@@ -9,11 +9,11 @@ package org.mule.runtime.module.extension.internal.capability.xml.schema.builder
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
 import static java.util.Optional.empty;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.MAX_ONE;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.MULE_ABSTRACT_SHARED_EXTENSION;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.MULE_EXTENSION_CONNECTION_PROVIDER_ELEMENT;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.MULE_EXTENSION_DYNAMIC_CONFIG_POLICY_ELEMENT;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MAX_ONE;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_ABSTRACT_SHARED_EXTENSION;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_EXTENSION_CONNECTION_PROVIDER_ELEMENT;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_EXTENSION_DYNAMIC_CONFIG_POLICY_ELEMENT;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getDynamicParameters;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getFirstImplicit;
 import org.mule.runtime.api.meta.model.ExtensionModel;

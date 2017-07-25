@@ -6,8 +6,9 @@
  */
 package org.mule.functional.junit4;
 
+import static org.mule.runtime.config.spring.api.SpringXmlConfigurationBuilderFactory.createConfigurationBuilder;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
-import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
+
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
@@ -69,11 +70,7 @@ public class ApplicationContextBuilder {
   }
 
   protected ConfigurationBuilder getAppBuilder(String[] configResource) throws Exception {
-    SpringXmlConfigurationBuilder springXmlConfigurationBuilder = new SpringXmlConfigurationBuilder(configResource, false);
-    if (domainContext != null) {
-      springXmlConfigurationBuilder.setParentContext(domainContext);
-    }
-    return springXmlConfigurationBuilder;
+    return createConfigurationBuilder(configResource, domainContext);
   }
 
   /**

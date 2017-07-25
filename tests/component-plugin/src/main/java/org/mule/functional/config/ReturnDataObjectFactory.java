@@ -6,13 +6,14 @@
  */
 package org.mule.functional.config;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsString;
+
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
 
 import java.io.IOException;
-
-import org.springframework.beans.factory.BeanCreationException;
 
 /**
  * {@link ObjectFactory} for test:component return-data element.
@@ -39,7 +40,7 @@ public class ReturnDataObjectFactory extends AbstractAnnotatedObjectFactory<Obje
       try {
         returnData = getResourceAsString(file, getClass());
       } catch (IOException e) {
-        throw new BeanCreationException("Failed to load test-data resource: " + file, e);
+        throw new MuleRuntimeException(createStaticMessage("Failed to load test-data resource: " + file), e);
       }
     }
     return returnData;

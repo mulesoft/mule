@@ -135,8 +135,6 @@
         <activemqVersion>5.11.1</activemqVersion>
         <antVersion>1.9.6</antVersion>
         <assertJVersion>3.5.2</assertJVersion>
-        <asmVersion>3.3.1</asmVersion>
-        <asmCommonsVersion>3.1</asmCommonsVersion>
         <aspectjVersion>1.8.10</aspectjVersion>
         <apacheHttpClientVersion>4.5.2</apacheHttpClientVersion>
         <awaitilityVersion>1.7.0</awaitilityVersion>
@@ -187,7 +185,6 @@
         <mockitoVersion>1.10.19</mockitoVersion>
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
         <muleMvelVersion>2.1.9-MULE-012</muleMvelVersion>
-        <mx4jVersion>2.1.1</mx4jVersion>
         <mysqlDriverVersion>5.1.33</mysqlDriverVersion>
         <projectReactorVersion>3.0.7.RELEASE</projectReactorVersion>
         <reflectionsVersion>0.9.10</reflectionsVersion>
@@ -1104,36 +1101,6 @@
                 <groupId>jaxen</groupId>
                 <artifactId>jaxen</artifactId>
                 <version>${jaxenVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>mx4j</groupId>
-                <artifactId>mx4j-jmx</artifactId>
-                <version>${mx4jVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>mx4j</groupId>
-                <artifactId>mx4j-impl</artifactId>
-                <version>${mx4jVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>mx4j</groupId>
-                <artifactId>mx4j-tools</artifactId>
-                <version>${mx4jVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>mx4j</groupId>
-                <artifactId>mx4j-remote</artifactId>
-                <version>${mx4jVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>asm</groupId>
-                <artifactId>asm</artifactId>
-                <version>${asmVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>asm</groupId>
-                <artifactId>asm-commons</artifactId>
-                <version>${asmCommonsVersion}</version>
             </dependency>
 
             <dependency>

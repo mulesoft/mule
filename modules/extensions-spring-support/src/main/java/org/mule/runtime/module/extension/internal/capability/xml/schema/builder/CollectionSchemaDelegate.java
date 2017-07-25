@@ -9,10 +9,11 @@ package org.mule.runtime.module.extension.internal.capability.xml.schema.builder
 import static java.lang.String.format;
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MAX_ONE;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.UNBOUNDED;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.MAX_ONE;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.UNBOUNDED;
+
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
