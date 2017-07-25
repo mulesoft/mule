@@ -32,6 +32,9 @@ public class MuleArtifactObjectProvider extends AbstractAnnotatedObject implemen
   @Override
   public Optional<Object> getObject(String name) {
     try {
+      if (!muleArtifactContext.containsBeanDefinition(name)) {
+        return empty();
+      }
       Object bean = muleArtifactContext.getBean(name);
       return of(bean);
     } catch (NoSuchBeanDefinitionException e) {
