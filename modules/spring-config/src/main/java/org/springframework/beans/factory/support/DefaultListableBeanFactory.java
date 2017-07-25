@@ -16,6 +16,8 @@
 
 package org.springframework.beans.factory.support;
 
+import static java.util.Optional.ofNullable;
+
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
@@ -1325,7 +1327,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
         }
       };
       descriptorToUse.increaseNestingLevel();
-      return Optional.ofNullable(doResolveDependency(descriptorToUse, beanName, null, null));
+      return ofNullable(doResolveDependency(descriptorToUse, beanName, null, null));
     }
   }
 
