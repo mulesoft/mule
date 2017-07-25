@@ -55,7 +55,7 @@ public class PGPSecurityFilterTestCase extends AbstractServiceAndFlowTestCase
         byte[] msg = loadEncryptedMessage();
         Map<String, Object> props = createMessageProperties();
 
-        client.dispatch("vm://echo", new String(msg), props);
+        client.send("vm://echo", new String(msg), props);
 
         MuleMessage message = client.request("vm://output", RECEIVE_TIMEOUT);
         assertEquals("This is a test message.\r\nThis is another line.\r\n", message.getPayloadAsString());
