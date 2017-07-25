@@ -120,8 +120,9 @@ public class LazyMetadataService implements MetadataService {
     try {
       lazyMuleArtifactContext.initializeComponent(location);
     } catch (Exception e) {
-      if (getRootException(e) instanceof NoSuchComponentModelException) {
-        return of(failure(newFailure(e).withFailureCode(COMPONENT_NOT_FOUND).onComponent()));
+      Throwable rootCause = getRootException(e);
+      if (rootCause instanceof NoSuchComponentModelException) {
+        return of(failure(newFailure(e).withMessage(rootCause.getMessage()).withFailureCode(COMPONENT_NOT_FOUND).onComponent()));
       }
       return of(failure(newFailure(e).onComponent()));
     }
