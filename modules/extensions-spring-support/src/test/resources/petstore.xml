@@ -23,7 +23,7 @@
     </flow>
 
     <flow name="getClientOnLatch">
-        <petstore:get-client-on-latch config-ref="${configName}" latch="#[connectionLatch]" countDownLatch="#[testLatch]"/>
+        <petstore:get-client-on-latch config-ref="${configName}" latch="#[vars.connectionLatch]" countDownLatch="#[vars.testLatch]"/>
     </flow>
 
 </mule>

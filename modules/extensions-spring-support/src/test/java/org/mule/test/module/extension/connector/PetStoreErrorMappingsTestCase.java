@@ -56,13 +56,13 @@ public class PetStoreErrorMappingsTestCase extends AbstractExtensionFunctionalTe
   @Test
   @Description("Verifies that an unmapped error is handled as ANY.")
   public void noMatchingMappedRequest() throws Exception {
-    verify("complexMapping", UNMATCHED_ERROR_MESSAGE, "Potato!");
+    verify("complexMapping", UNMATCHED_ERROR_MESSAGE, new Object());
   }
 
   @Test
   @Description("Verifies that each error is correctly handled given an operation with multiple mappings.")
   public void multipleMappingsRequest() throws Exception {
-    verify("multipleMappings", EXPRESSION_ERROR_MESSAGE, "Potato!");
+    verify("multipleMappings", EXPRESSION_ERROR_MESSAGE, new Object());
     verify("multipleMappings", CONNECT_ERROR_MESSAGE);
   }
 

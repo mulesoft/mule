@@ -9,7 +9,7 @@
     <module-using-jms:config name="aConfigName"/>
 
     <flow name="producer-flow">
-        <module-using-jms:do-publish config-ref="aConfigName" destination="someDestination" content="#[variables.content]"/>
+        <module-using-jms:do-publish config-ref="aConfigName" destination="someDestination" content="#[vars.content]"/>
     </flow>
 
     <flow name="consumer-flow">

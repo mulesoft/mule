@@ -46,7 +46,7 @@
     </flow>
 
     <flow name="timeToPeelOverrideOperationWithBananaDynamic">
-        <vegan:get-time-to-peel config-ref="bananaDynamic" timeToPeel="#[variables.declaredVar]"/>
+        <vegan:get-time-to-peel config-ref="bananaDynamic" timeToPeel="#[vars.declaredVar]"/>
     </flow>
 
 

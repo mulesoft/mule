@@ -42,7 +42,7 @@
     <flow name="eatComplexListOfMaps">
         <vegan:try-to-eat-this-list-of-maps>
             <vegan:foods>
-                #[mel:payload]
+                #[payload]
             </vegan:foods>
         </vegan:try-to-eat-this-list-of-maps>
     </flow>

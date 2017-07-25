@@ -134,15 +134,15 @@
     </heisenberg:config>
 
     <heisenberg:config name="expressionHeisenberg"
-                       myName="#[myName]"
-                       age="#[age]"
+                       myName="#[vars.myName]"
+                       age="#[vars.age]"
                        cancer="#[true]"
-                       initialHealth="#[initialHealth]"
-                       finalHealth="#[finalHealth]"
+                       initialHealth="#[vars.initialHealth]"
+                       finalHealth="#[vars.finalHealth]"
                        dateOfBirth="#[java!org::mule::test::module::extension::config::ParameterizedConfigParserTestCase::getDateOfBirth() as Date]"
                        dateOfDeath="#[java!org::mule::test::module::extension::config::ParameterizedConfigParserTestCase::getDateOfDeath()]"
                        dateOfConception="#[java!org::mule::test::module::extension::config::ParameterizedConfigParserTestCase::getDateOfConception()]"
-                       money="#[money]"
+                       money="#[vars.money]"
                        recipe="#[app.registry.recipes]"
                        candidateDoors="#[app.registry.candidateDoors]"
                        labAddress="#['Pollos Hermanos']"
@@ -151,30 +151,30 @@
                        labeledRicin="#[app.registry.labeledRicins]"
                        knownAddresses="#[[]]">
         <heisenberg:enemies>
-            <heisenberg:enemy value="#[gustavoFring]"/>
-            <heisenberg:enemy value="#[hank]"/>
+            <heisenberg:enemy value="#[vars.gustavoFring]"/>
+            <heisenberg:enemy value="#[vars.hank]"/>
         </heisenberg:enemies>
         <heisenberg:first-endevour><![CDATA[Gray Matter Technologies]]></heisenberg:first-endevour>
-        <heisenberg:next-door address="#[pollosHermanos]" victim="#[gustavoFring]">
-            <heisenberg:previous victim="#[krazy8]" address="#[jesses]"/>
+        <heisenberg:next-door address="#[vars.pollosHermanos]" victim="#[vars.gustavoFring]">
+            <heisenberg:previous victim="#[vars.krazy8]" address="#[vars.jesses]"/>
         </heisenberg:next-door>
         <heisenberg:ricin-packs>
-            <heisenberg:ricin microgramsPerKilo="#[microgramsPerKilo]">
-                <heisenberg:destination victim="#[lidia]" address="#[steviaCoffeShop]"/>
+            <heisenberg:ricin microgramsPerKilo="#[vars.microgramsPerKilo]">
+                <heisenberg:destination victim="#[vars.lidia]" address="#[vars.steviaCoffeShop]"/>
             </heisenberg:ricin>
         </heisenberg:ricin-packs>
     </heisenberg:config>
 
     <heisenberg:config name="expressionHeisenbergByRef"
-                       myName="#[myName]"
-                       age="#[age]"
+                       myName="#[vars.myName]"
+                       age="#[vars.age]"
                        cancer="#[true]"
-                       initialHealth="#[initialHealth]"
-                       finalHealth="#[finalHealth]"
+                       initialHealth="#[vars.initialHealth]"
+                       finalHealth="#[vars.finalHealth]"
                        dateOfBirth="#[java!org::mule::test::module::extension::config::ParameterizedConfigParserTestCase::getDateOfBirth() as Date]"
                        dateOfDeath="#[java!org::mule::test::module::extension::config::ParameterizedConfigParserTestCase::getDateOfDeath()]"
                        dateOfConception="#[java!org::mule::test::module::extension::config::ParameterizedConfigParserTestCase::getDateOfConception()]"
-                       money="#[money]"
+                       money="#[vars.money]"
                        recipe="#[app.registry.recipes]"
                        candidateDoors="#[app.registry.candidateDoors]"
                        enemies="#[app.registry.enemies]"
@@ -184,7 +184,7 @@
                        monthlyIncomes="#[app.registry.monthlyIncomes]"
                        deathsBySeasons="#[app.registry.deathsBySeasons]"
                        labeledRicin="#[app.registry.labeledRicins]"
-                       weapon="#[weapon]"
+                       weapon="#[vars.weapon]"
                        knownAddresses="#[[]]">
         <heisenberg:first-endevour><![CDATA[Gray Matter Technologies]]></heisenberg:first-endevour>
     </heisenberg:config>

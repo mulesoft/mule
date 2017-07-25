@@ -58,7 +58,7 @@ import org.reactivestreams.Publisher;
  *    <module-operation-properties/>
  *    <module-operation-parameters>
  *      <module-operation-parameter-entry value="howdy" key="value1"/>
- *      <module-operation-parameter-entry value="#[variables.person]" key="value2"/>
+ *      <module-operation-parameter-entry value="#[vars.person]" key="value2"/>
  *    </module-operation-parameters>
  *    <set-payload value="#[param.value1 ++ param.value2]"/>
  * </module-operation-chain>

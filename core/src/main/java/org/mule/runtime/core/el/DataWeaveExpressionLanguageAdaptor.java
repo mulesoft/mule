@@ -10,6 +10,7 @@ import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.expressionEvaluationFailed;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
+import static org.mule.runtime.core.el.BindingContextUtils.PAYLOAD;
 import static org.mule.runtime.core.el.BindingContextUtils.addEventBindings;
 import static org.mule.runtime.core.el.DefaultExpressionManager.DW_PREFIX;
 import static org.mule.runtime.core.el.DefaultExpressionManager.PREFIX_EXPR_SEPARATOR;
@@ -39,15 +40,6 @@ import javax.inject.Inject;
 
 public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLanguageAdaptor {
 
-  public static final String PAYLOAD = "payload";
-  public static final String DATA_TYPE = "dataType";
-  public static final String ATTRIBUTES = "attributes";
-  public static final String ERROR = "error";
-  public static final String ID = "id";
-  public static final String CORRELATION_ID = "correlationId";
-  public static final String VARIABLES = "variables";
-  public static final String PROPERTIES = "properties";
-  public static final String PARAMETERS = "parameters";
   public static final String FLOW = "flow";
   public static final String SERVER = "server";
   public static final String MULE = "mule";

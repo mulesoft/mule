@@ -176,7 +176,7 @@
                 second: { user: 'user2', pass: 'pass2' }
                 }]</typed-value:map-of-complex-values>
             <typed-value:map-of-complex-typed-values>#[{
-                third: variables.complexPojo
+                third: vars.complexPojo
                 }]</typed-value:map-of-complex-typed-values>
             <typed-value:simple-pojo user="groupUser" pass="groupPass"/>
         </typed-value:mixed-typed-values>

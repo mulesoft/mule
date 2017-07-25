@@ -16,7 +16,7 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 public class ImplicitConnectionProvider implements ConnectionProvider<Counter> {
 
   @Parameter
-  @Optional(defaultValue = "#[number]")
+  @Optional(defaultValue = "#[vars.number]")
   private int number;
 
   @Override

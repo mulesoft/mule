@@ -9,7 +9,7 @@
 
     <heisenberg:door victim="Top Level Skyler" address="308 Negra Arroyo Lane" name="door"/>
 
-    <heisenberg:door victim="#[variables.victim]" address="308 Negra Arroyo Lane" name="dynamicDoor"/>
+    <heisenberg:door victim="#[vars.victim]" address="308 Negra Arroyo Lane" name="dynamicDoor"/>
 
     <heisenberg:ricin microgramsPerKilo="22" name="ricin-weapon">
         <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
@@ -90,16 +90,16 @@
     </flow>
 
     <flow name="killFromPayload">
-        <heisenberg:kill goodbyeMessage="#[variables.goodbye]"/>
+        <heisenberg:kill goodbyeMessage="#[vars.goodbye]"/>
     </flow>
 
     <flow name="customKillWithDefault">
-        <heisenberg:kill-with-custom-message goodbyeMessage="#[variables.goodbye]"/>
+        <heisenberg:kill-with-custom-message goodbyeMessage="#[vars.goodbye]"/>
     </flow>
 
     <flow name="customKillWithoutDefault">
-        <heisenberg:kill-with-custom-message goodbyeMessage="#[variables.goodbye]"
-                                             victim="#[variables.victim]"/>
+        <heisenberg:kill-with-custom-message goodbyeMessage="#[vars.goodbye]"
+                                             victim="#[vars.victim]"/>
     </flow>
 
     <flow name="killMany">
@@ -159,7 +159,7 @@
 
     <flow name="knockDynamicInlineDoor">
         <heisenberg:knock>
-            <heisenberg:knocked-door victim="#[variables.victim]" address="308 Negra Arroyo Lane"/>
+            <heisenberg:knocked-door victim="#[vars.victim]" address="308 Negra Arroyo Lane"/>
         </heisenberg:knock>
     </flow>
 
@@ -167,7 +167,7 @@
         <heisenberg:knock-many>
             <heisenberg:doors>
                 <heisenberg:door victim="Inline Skyler" address="308 Negra Arroyo Lane"/>
-                <heisenberg:door victim="#[variables.victim]" address="308 Negra Arroyo Lane"/>
+                <heisenberg:door victim="#[vars.victim]" address="308 Negra Arroyo Lane"/>
             </heisenberg:doors>
         </heisenberg:knock-many>
     </flow>
@@ -181,17 +181,17 @@
     </flow>
 
     <flow name="killWithWeapon">
-        <heisenberg:kill-with-weapon weapon="#[variables.weapon]" type="MELEE_WEAPON">
+        <heisenberg:kill-with-weapon weapon="#[vars.weapon]" type="MELEE_WEAPON">
             <heisenberg:attributes-of-weapon brand="Pizza on the rooftop"/>
         </heisenberg:kill-with-weapon>
     </flow>
 
     <flow name="killWithMultipleWeapons">
-        <heisenberg:kill-with-multiples-weapons weapons="#[variables.weapons]"/>
+        <heisenberg:kill-with-multiples-weapons weapons="#[vars.weapons]"/>
     </flow>
 
     <flow name="killWithMultipleWildCardWeapons">
-        <heisenberg:kill-with-multiple-wild-card-weapons wildCardWeapons="#[variables.weapons]"/>
+        <heisenberg:kill-with-multiple-wild-card-weapons wildCardWeapons="#[vars.weapons]"/>
     </flow>
 
     <flow name="killWithRicinDefaultPayload">
@@ -288,7 +288,7 @@
     <flow name="operationWithInputStreamContentParam">
         <heisenberg:operation-with-input-stream-content-param>
             <heisenberg:test>
-                <heisenberg:input-stream-content>#[msg]</heisenberg:input-stream-content>
+                <heisenberg:input-stream-content>#[vars.msg]</heisenberg:input-stream-content>
             </heisenberg:test>
         </heisenberg:operation-with-input-stream-content-param>
     </flow>

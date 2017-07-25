@@ -16,7 +16,7 @@
     <flow name="getFish">
         <set-payload value="goldfish"/>
         <string-to-byte-array-transformer/>
-        <petstore:get-fish-from-river-stream pollutedStream="#[herring]">
+        <petstore:get-fish-from-river-stream pollutedStream="#[vars.herring]">
             <petstore:river>#[payload]</petstore:river>
         </petstore:get-fish-from-river-stream>
     </flow>

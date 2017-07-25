@@ -10,7 +10,6 @@ import static java.util.Collections.unmodifiableMap;
 import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.DataType.fromType;
-
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
@@ -34,14 +33,10 @@ public class BindingContextUtils {
   public static final String ATTRIBUTES = "attributes";
   public static final String ERROR = "error";
   public static final String CORRELATION_ID = "correlationId";
-  public static final String VARIABLES = "variables";
+  public static final String VARS = "vars";
   public static final String PROPERTIES = "properties";
   public static final String PARAMETERS = "parameters";
   public static final String AUTHENTICATION = "authentication";
-  public static final String FLOW = "flow";
-  public static final String SERVER = "server";
-  public static final String MULE = "mule";
-  public static final String APP = "app";
 
   public static final BindingContext NULL_BINDING_CONTEXT = BindingContext.builder().build();
 
@@ -64,14 +59,17 @@ public class BindingContextUtils {
 
     BindingContext.Builder contextBuilder = BindingContext.builder(baseContext);
 
-    Map<String, TypedValue> flowVars = new HashMap<>();
+    Map<String, TypedValue<?>> flowVars = new HashMap<>();
     event.getVariableNames().forEach(name -> {
-      TypedValue value = event.getVariable(name);
+      TypedValue<?> value = event.getVariable(name);
       flowVars.put(name, value);
-      contextBuilder.addBinding(name, value);
     });
-    contextBuilder.addBinding(VARIABLES,
-                              new TypedValue<>(unmodifiableMap(flowVars), fromType(flowVars.getClass())));
+    contextBuilder.addBinding(VARS,
+                              new TypedValue<>(unmodifiableMap(flowVars), DataType.builder()
+                                  .mapType(flowVars.getClass())
+                                  .keyType(String.class)
+                                  .valueType(TypedValue.class)
+                                  .build()));
     contextBuilder.addBinding(PROPERTIES,
                               new TypedValue<>(unmodifiableMap(event.getProperties()),
                                                fromType(event.getProperties().getClass())));

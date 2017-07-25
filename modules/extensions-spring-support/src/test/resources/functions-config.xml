@@ -13,7 +13,7 @@
 
     <flow name="variableGlobalEcho">
         <fn:evaluate>
-            <fn:payload>#[Fn::customEcho(variables.myMessage)]</fn:payload>
+            <fn:payload>#[Fn::customEcho(vars.myMessage)]</fn:payload>
         </fn:evaluate>
     </flow>
 
@@ -37,13 +37,13 @@
 
     <flow name="xpathWithDefaultNode">
         <fn:evaluate>
-            <fn:payload>#[Fn::xpath("/mule/flow[6]/@name", variables.xmlPayload)]</fn:payload>
+            <fn:payload>#[Fn::xpath("/mule/flow[6]/@name", vars.xmlPayload)]</fn:payload>
         </fn:evaluate>
     </flow>
 
     <flow name="xpathWithOverrides">
         <fn:evaluate>
-            <fn:payload>#[Fn::xpath("/mule/flow", variables.xmlPayload, 'NODESET')]</fn:payload>
+            <fn:payload>#[Fn::xpath("/mule/flow", vars.xmlPayload, 'NODESET')]</fn:payload>
         </fn:evaluate>
     </flow>
 
