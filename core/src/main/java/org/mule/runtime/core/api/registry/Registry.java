@@ -67,6 +67,11 @@ public interface Registry extends Initialisable, Disposable {
    */
   <T> Map<String, T> lookupByType(Class<T> type);
 
+  /**
+   * @return whether the bean for the given key is declared as a singleton.
+   */
+  boolean isSingleton(String key);
+
   // /////////////////////////////////////////////////////////////////////////
   // Registration methods
   // /////////////////////////////////////////////////////////////////////////

@@ -9,6 +9,7 @@ package org.mule.runtime.config.spring;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -200,7 +201,7 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
         return null;
       }
 
-      if (applyLifecycle && !applicationContext.isSingleton(key)) {
+      if (applyLifecycle && !isSingleton(key)) {
         try {
           getLifecycleManager().applyCompletedPhases(object);
         } catch (Exception e) {
@@ -233,6 +234,11 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
   @Override
   public <T> Map<String, T> lookupByType(Class<T> type) {
     return internalLookupByType(type, true, true);
+  }
+
+  @Override
+  public boolean isSingleton(String key) {
+    return applicationContext.isSingleton(key);
   }
 
   @Override

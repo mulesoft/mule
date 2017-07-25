@@ -6,13 +6,11 @@
  */
 package org.mule.runtime.core.registry;
 
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
 import org.mule.runtime.api.lifecycle.LifecycleException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.registry.LifecycleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.registry.Registry;
@@ -42,24 +40,18 @@ public abstract class AbstractRegistryBroker implements RegistryBroker, Registry
 
   @Override
   public void initialise() throws InitialisationException {
-    lifecycleManager.fireInitialisePhase(new LifecycleCallback<AbstractRegistryBroker>() {
-
-      public void onTransition(String phaseName, AbstractRegistryBroker broker) throws MuleException {
-        for (Registry registry : broker.getRegistries()) {
-          registry.initialise();
-        }
+    lifecycleManager.fireInitialisePhase((phaseName, broker) -> {
+      for (Registry registry : broker.getRegistries()) {
+        registry.initialise();
       }
     });
   }
 
   @Override
   public void dispose() {
-    lifecycleManager.fireDisposePhase(new LifecycleCallback<AbstractRegistryBroker>() {
-
-      public void onTransition(String phaseName, AbstractRegistryBroker broker) throws MuleException {
-        for (Registry registry : broker.getRegistries()) {
-          registry.dispose();
-        }
+    lifecycleManager.fireDisposePhase((phaseName, broker) -> {
+      for (Registry registry : broker.getRegistries()) {
+        registry.dispose();
       }
     });
   }
@@ -196,6 +188,16 @@ public abstract class AbstractRegistryBroker implements RegistryBroker, Registry
     return objects;
   }
 
+  @Override
+  public boolean isSingleton(String key) {
+    boolean singleton = false;
+    for (Registry registry : getRegistries()) {
+      singleton = singleton || registry.isSingleton(key);
+    }
+
+    return singleton;
+  }
+
   /**
    * {@inheritDoc}
    */
@@ -245,6 +247,7 @@ public abstract class AbstractRegistryBroker implements RegistryBroker, Registry
   /**
    * {@inheritDoc}
    */
+  @Override
   @Deprecated
   public Object unregisterObject(String key, Object metadata) throws RegistrationException {
     return unregisterObject(key);

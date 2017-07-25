@@ -7,7 +7,6 @@
 package org.mule.runtime.config.spring.dsl.spring;
 
 import static java.util.Collections.emptyMap;
-import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.beanutils.BeanUtils.copyProperty;
 import static org.mule.runtime.api.meta.AnnotatedObject.PROPERTY_NAME;
@@ -28,10 +27,14 @@ import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.processor.ObjectTypeVisitor;
 import org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler;
+import org.mule.runtime.config.spring.internal.dsl.spring.SpringPostProcessorIocHelper;
 import org.mule.runtime.config.spring.parsers.XmlMetadataAnnotations;
+import org.mule.runtime.config.spring.privileged.dsl.spring.BeanDefinitionPostProcessor;
 import org.mule.runtime.core.api.execution.LocationExecutionContextProvider;
 import org.mule.runtime.core.api.security.SecurityFilter;
+import org.mule.runtime.core.api.util.Pair;
 import org.mule.runtime.core.privileged.processor.SecurityFilterMessageProcessor;
+import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 
 import com.google.common.collect.ImmutableSet;
@@ -40,12 +43,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ServiceConfigurationError;
 import java.util.Set;
 import java.util.function.Consumer;
 
 import javax.xml.namespace.QName;
 
-import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -62,9 +65,6 @@ import org.w3c.dom.Node;
  */
 public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
 
-  private static final String TRANSPORT_BEAN_DEFINITION_POST_PROCESSOR_CLASS =
-      "org.mule.compatibility.config.spring.parsers.specific.TransportElementBeanDefinitionPostProcessor";
-
   private static Set<ComponentIdentifier> genericPropertiesCustomProcessingIdentifiers =
       ImmutableSet.<ComponentIdentifier>builder()
           .add(CUSTOM_TRANSFORMER_IDENTIFIER)
@@ -79,18 +79,19 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
     this.beanDefinitionPostProcessor = resolvePostProcessor();
   }
 
-  // TODO MULE-9728 - Provide a mechanism to hook per transport in the endpoint address parsing
   private BeanDefinitionPostProcessor resolvePostProcessor() {
     for (ClassLoader classLoader : resolveContextArtifactPluginClassLoaders()) {
       try {
-        return (BeanDefinitionPostProcessor) org.apache.commons.lang3.ClassUtils
-            .getClass(classLoader, TRANSPORT_BEAN_DEFINITION_POST_PROCESSOR_CLASS)
-            .newInstance();
-      } catch (Exception e) {
+        final BeanDefinitionPostProcessor foundProvider =
+            new SpiServiceRegistry().lookupProvider(BeanDefinitionPostProcessor.class, classLoader);
+        if (foundProvider != null) {
+          return foundProvider;
+        }
+      } catch (Exception | ServiceConfigurationError e) {
         // Nothing to do, we just don't have compatibility plugin in the app
       }
     }
-    return (componentModel, beanDefinition) -> {
+    return (componentModel, helper) -> {
     };
   }
 
@@ -155,7 +156,7 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
 
   private Map<QName, Object> processMetadataAnnotationsHelper(Element element, String configFileIdentifier,
                                                               BeanDefinitionBuilder builder) {
-    Map annotations = new HashMap();
+    Map<QName, Object> annotations = new HashMap<>();
     if (element == null) {
       return annotations;
     } else {
@@ -213,14 +214,10 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
     if (!identifier.equals(CUSTOM_TRANSFORMER_IDENTIFIER)) {
       return emptyMap();
     }
-    return componentModel.getInnerComponents()
-        .stream()
-        .filter(innerComponent -> {
-          ComponentIdentifier childIdentifier = innerComponent.getIdentifier();
-          return childIdentifier.equals(MULE_PROPERTY_IDENTIFIER);
-        })
-        .collect(toMap(springComponent -> getPropertyValueFromPropertyComponent(springComponent).getName(),
-                       springComponent -> getPropertyValueFromPropertyComponent(springComponent).getValue()));
+    return componentModel.getInnerComponents().stream()
+        .filter(innerComponent -> innerComponent.getIdentifier().equals(MULE_PROPERTY_IDENTIFIER))
+        .map(springComponent -> getPropertyValueFromPropertyComponent(springComponent))
+        .collect(toMap(propValue -> propValue.getFirst(), propValue -> propValue.getSecond()));
   }
 
   private void processComponentDefinitionModel(final ComponentModel parentComponentModel, final ComponentModel componentModel,
@@ -237,8 +234,9 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
     if (originalBeanDefinition != wrappedBeanDefinition) {
       componentModel.setType(wrappedBeanDefinition.getBeanClass());
     }
-    beanDefinitionPostProcessor.postProcess(componentModel, wrappedBeanDefinition);
-    componentModel.setBeanDefinition(wrappedBeanDefinition);
+    final SpringPostProcessorIocHelper iocHelper = new SpringPostProcessorIocHelper(wrappedBeanDefinition);
+    beanDefinitionPostProcessor.postProcess(componentModel, iocHelper);
+    componentModel.setBeanDefinition(iocHelper.getBeanDefinition());
   }
 
   static void processMuleProperties(ComponentModel componentModel, BeanDefinitionBuilder beanDefinitionBuilder,
@@ -257,16 +255,16 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
               || identifier.equals(MULE_PROPERTIES_IDENTIFIER);
         })
         .forEach(propertyComponentModel -> {
-          PropertyValue propertyValue = getPropertyValueFromPropertyComponent(propertyComponentModel);
-          beanDefinitionBuilder.addPropertyValue(propertyValue.getName(), propertyValue.getValue());
+          Pair<String, Object> propertyValue = getPropertyValueFromPropertyComponent(propertyComponentModel);
+          beanDefinitionBuilder.addPropertyValue(propertyValue.getFirst(), propertyValue.getSecond());
         });
   }
 
-  public static List<PropertyValue> getPropertyValueFromPropertiesComponent(ComponentModel propertyComponentModel) {
-    List<PropertyValue> propertyValues = new ArrayList<>();
+  public static List<Pair<String, Object>> getPropertyValueFromPropertiesComponent(ComponentModel propertyComponentModel) {
+    List<Pair<String, Object>> propertyValues = new ArrayList<>();
     propertyComponentModel.getInnerComponents().stream().forEach(entryComponentModel -> {
-      propertyValues.add(new PropertyValue(entryComponentModel.getParameters().get("key"),
-                                           entryComponentModel.getParameters().get("value")));
+      propertyValues.add(new Pair<>(entryComponentModel.getParameters().get("key"),
+                                    entryComponentModel.getParameters().get("value")));
     });
     return propertyValues;
   }
@@ -303,26 +301,14 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
           .getBeanDefinition();
       return (AbstractBeanDefinition) newBeanDefinition;
     } else {
-      return beanDefinitionPostProcessor.adaptBeanDefinition(parentComponentModel, beanClass, originalBeanDefinition);
+      final SpringPostProcessorIocHelper iocHelper = new SpringPostProcessorIocHelper(originalBeanDefinition);
+      beanDefinitionPostProcessor.adaptBeanDefinition(parentComponentModel, beanClass, iocHelper);
+      return iocHelper.getBeanDefinition();
     }
   }
 
   public static boolean areMatchingTypes(Class<?> superType, Class<?> childType) {
     return superType.isAssignableFrom(childType);
-  }
-
-  public interface BeanDefinitionPostProcessor {
-
-    default AbstractBeanDefinition adaptBeanDefinition(ComponentModel parentComponentModel, Class beanClass,
-                                                       AbstractBeanDefinition originalBeanDefinition) {
-      return originalBeanDefinition;
-    }
-
-    void postProcess(ComponentModel componentModel, AbstractBeanDefinition beanDefinition);
-
-    default Set<ComponentIdentifier> getGenericPropertiesCustomProcessingIdentifiers() {
-      return emptySet();
-    }
   }
 
 }

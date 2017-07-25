@@ -13,7 +13,6 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.endpoint.LegacyImmutableEndpoint;
 import org.mule.runtime.core.api.registry.InjectProcessor;
@@ -160,6 +159,11 @@ public class TransientRegistry extends AbstractRegistry {
   public <T> Collection<T> lookupLocalObjects(Class<T> type) {
     // just delegate to lookupObjects since there's no parent ever
     return lookupObjects(type);
+  }
+
+  @Override
+  public boolean isSingleton(String key) {
+    return true;
   }
 
   /**
