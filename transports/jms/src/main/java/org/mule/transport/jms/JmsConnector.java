@@ -83,6 +83,8 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     
     public static final int PREFETCH_DEFAULT = -1;
 
+    public static final String CONNECTION_STOPPING_ERROR_MESSAGE = "It is not possible to create a session since connection is being stopped.";
+
     private AtomicInteger receiverReportedExceptionCount = new AtomicInteger();
 
     ////////////////////////////////////////////////////////////////////////
@@ -679,7 +681,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     {
         if(stopping)
         {
-            throw new IllegalStateException("It is not possible to create a session since connection is being stopped.");
+            throw new IllegalStateException(CONNECTION_STOPPING_ERROR_MESSAGE);
         }
 
         return jmsSupport.createSession(connection, topic, transacted, acknowledgementMode, noLocal);
