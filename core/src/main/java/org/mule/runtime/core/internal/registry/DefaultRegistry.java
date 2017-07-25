@@ -7,7 +7,7 @@
 package org.mule.runtime.core.internal.registry;
 
 import static java.util.Optional.ofNullable;
-import org.mule.runtime.api.artifact.ServiceDiscoverer;
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.registry.RegistrationException;
@@ -16,22 +16,22 @@ import java.util.Collection;
 import java.util.Optional;
 
 /**
- * Default implementation for {@link ServiceDiscoverer}.
+ * Default implementation for {@link Registry}.
  * 
  * @since 4.0
  */
-public class DefaultServiceDiscoverer implements ServiceDiscoverer {
+public class DefaultRegistry implements Registry {
 
   private MuleContext muleContext;
 
-  public DefaultServiceDiscoverer(MuleContext muleContext) {
+  public DefaultRegistry(MuleContext muleContext) {
     this.muleContext = muleContext;
   }
 
   @Override
-  public <T> Optional<T> lookup(Class<T> serviceType) {
+  public <T> Optional<T> lookup(Class<T> objectType) {
     try {
-      return ofNullable(muleContext.getRegistry().lookupObject(serviceType));
+      return ofNullable(muleContext.getRegistry().lookupObject(objectType));
     } catch (RegistrationException e) {
       throw new MuleRuntimeException(e);
     }

@@ -31,9 +31,9 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class TestBootstrapServiceDiscovererConfigurationBuilderTestCase extends AbstractMuleContextTestCase {
+public class TestBootstrapRegistryConfigurationBuilderTestCase extends AbstractMuleContextTestCase {
 
-  public TestBootstrapServiceDiscovererConfigurationBuilderTestCase() {
+  public TestBootstrapRegistryConfigurationBuilderTestCase() {
     setStartContext(false);
   }
 

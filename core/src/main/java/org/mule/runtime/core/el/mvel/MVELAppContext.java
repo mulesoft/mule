@@ -4,12 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.el.context;
+package org.mule.runtime.core.el.mvel;
 
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.el.context.AbstractAppContext;
+import org.mule.runtime.core.el.context.AbstractMapContext;
 
 import java.util.Map;
 import java.util.Set;
@@ -22,35 +24,22 @@ import java.util.Set;
  * <li><b>standalone</b> <i>If Mule is running standalone</i>
  * <li><b>workdir</b> <i>Application work directory</i>
  */
-public class AppContext {
+public class MVELAppContext extends AbstractAppContext {
 
-  protected MuleContext muleContext;
-
-  public AppContext(MuleContext muleContext) {
-    this.muleContext = muleContext;
-  }
-
-  public String getName() {
-    return muleContext.getConfiguration().getId();
-  }
-
-  public String getWorkDir() {
-    return muleContext.getConfiguration().getWorkingDirectory();
-  }
-
-  public String getEncoding() {
-    return muleContext.getConfiguration().getDefaultEncoding();
-  }
-
-  public boolean isStandalone() {
-    return muleContext.getConfiguration().isStandalone();
+  public MVELAppContext(MuleContext muleContext) {
+    super(muleContext);
   }
 
   public Map<String, Object> getRegistry() {
     return new RegistryWrapperMap(muleContext.getRegistry());
   }
 
-  private static class RegistryWrapperMap extends AbstractMapContext<Object> {
+  @Override
+  protected Map<String, Object> createRegistry(MuleRegistry registry) {
+    return new RegistryWrapperMap(muleContext.getRegistry());
+  }
+
+  protected static class RegistryWrapperMap extends AbstractMapContext<Object> {
 
     private MuleRegistry registry;
 

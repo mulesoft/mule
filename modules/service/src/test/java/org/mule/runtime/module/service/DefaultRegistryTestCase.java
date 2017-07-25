@@ -22,7 +22,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class DefaultServiceDiscovererTestCase extends AbstractMuleTestCase {
+public class DefaultRegistryTestCase extends AbstractMuleTestCase {
 
   private final ServiceResolver serviceResolver = mock(ServiceResolver.class);
   private final ServiceProviderDiscoverer serviceProviderDiscoverer = mock(ServiceProviderDiscoverer.class);

@@ -81,7 +81,7 @@ import org.mule.runtime.core.component.config.ClassLoaderResourceProvider;
 import org.mule.runtime.core.component.config.DefaultConfigurationPropertiesResolver;
 import org.mule.runtime.core.component.config.ResourceProvider;
 import org.mule.runtime.core.component.config.SystemPropertiesConfigurationProvider;
-import org.mule.runtime.core.internal.registry.DefaultServiceDiscoverer;
+import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.core.registry.MuleRegistryHelper;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
@@ -135,7 +135,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
   private final ArtifactDeclaration artifactDeclaration;
   private final XmlConfigurationDocumentLoader xmlConfigurationDocumentLoader;
   private final Optional<ConfigurationProperties> parentConfigurationProperties;
-  private final DefaultServiceDiscoverer serviceDiscoverer;
+  private final DefaultRegistry serviceDiscoverer;
   protected ApplicationModel applicationModel;
   protected MuleContext muleContext;
   private Resource[] artifactConfigResources;
@@ -185,7 +185,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
     this.artifactDeclaration = artifactDeclaration;
     this.parentConfigurationProperties = parentConfigurationProperties;
     this.xmlConfigurationDocumentLoader = newXmlConfigurationDocumentLoader();
-    this.serviceDiscoverer = new DefaultServiceDiscoverer(muleContext);
+    this.serviceDiscoverer = new DefaultRegistry(muleContext);
 
     serviceRegistry.lookupProviders(ComponentBuildingDefinitionProvider.class, MuleArtifactContext.class.getClassLoader())
         .forEach(componentBuildingDefinitionProvider -> {

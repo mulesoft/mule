@@ -11,7 +11,7 @@ import static org.mule.runtime.core.api.config.i18n.CoreMessages.authSecurityMan
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectNotRegistered;
 import static org.mule.runtime.core.api.util.StringUtils.splitAndTrim;
 
-import org.mule.runtime.api.artifact.ServiceDiscoverer;
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.api.security.SecurityProviderNotFoundException;
@@ -38,14 +38,14 @@ public abstract class AbstractSecurityFilter implements SecurityFilter {
 
   protected SecurityManager securityManager;
   @Inject
-  protected ServiceDiscoverer serviceDiscoverer;
+  protected Registry registry;
 
   private String securityProviders;
 
   @Override
   public final void initialise() throws InitialisationException {
     if (securityManager == null) {
-      securityManager = (SecurityManager) serviceDiscoverer.lookupByName(OBJECT_SECURITY_MANAGER).get();
+      securityManager = (SecurityManager) registry.lookupByName(OBJECT_SECURITY_MANAGER).get();
     }
 
     if (securityManager == null) {
