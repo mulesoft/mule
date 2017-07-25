@@ -138,7 +138,6 @@
         <asmVersion>3.3.1</asmVersion>
         <asmCommonsVersion>3.1</asmCommonsVersion>
         <aspectjVersion>1.8.10</aspectjVersion>
-        <asyncHttpClientVersion>1.12</asyncHttpClientVersion>
         <apacheHttpClientVersion>4.5.2</apacheHttpClientVersion>
         <awaitilityVersion>1.7.0</awaitilityVersion>
         <bouncycastleVersion>1.56</bouncycastleVersion>
@@ -164,7 +163,6 @@
         <geronimoSpecsJmsVersion>1.1.1</geronimoSpecsJmsVersion>
         <geronimoSpecsServletApiVersion>1.0</geronimoSpecsServletApiVersion>
         <greenmailVersion>1.5.0</greenmailVersion>
-        <grizzlyVersion>2.3.29</grizzlyVersion>
         <groovyVersion>2.4.4</groovyVersion>
         <gsonVersion>2.5</gsonVersion>
         <guavaVersion>18.0</guavaVersion>
@@ -1265,38 +1263,6 @@
                 </exclusions>
             </dependency>
 
-            <dependency>
-                <groupId>org.glassfish.grizzly</groupId>
-                <artifactId>grizzly-framework</artifactId>
-                <version>${grizzlyVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.glassfish.grizzly</groupId>
-                <artifactId>grizzly-http-server</artifactId>
-                <version>${grizzlyVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.glassfish.grizzly</groupId>
-                <artifactId>grizzly-websockets</artifactId>
-                <version>${grizzlyVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.glassfish.grizzly</groupId>
-                <artifactId>connection-pool</artifactId>
-                <version>${grizzlyVersion}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.glassfish.grizzly</groupId>
-                <artifactId>grizzly-http-client</artifactId>
-                <version>${asyncHttpClientVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>io.netty</groupId>
-                        <artifactId>netty</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
             <dependency>
                 <groupId>org.reflections</groupId>
                 <artifactId>reflections</artifactId>
