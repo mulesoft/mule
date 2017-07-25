@@ -16,6 +16,7 @@ import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.meta.NameableObject;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.registry.LifecycleRegistry;
 import org.mule.runtime.core.api.registry.MuleRegistry;
@@ -27,10 +28,9 @@ import org.mule.runtime.core.api.registry.TransformerResolver;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
-import org.mule.runtime.core.internal.registry.TypeBasedTransformerResolver;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.api.util.UUID;
+import org.mule.runtime.core.internal.registry.TypeBasedTransformerResolver;
 
 import com.google.common.collect.ImmutableList;
 
@@ -238,6 +238,11 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider {
   @Override
   public Collection<FlowConstruct> lookupFlowConstructs() {
     return lookupObjects(FlowConstruct.class);
+  }
+
+  @Override
+  public boolean isSingleton(String key) {
+    return registry.isSingleton(key);
   }
 
   /**

@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.config.spring.factories.processor;
 
+import static java.lang.String.format;
+
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -43,7 +45,8 @@ public class MessageProcessorChainFactoryBean extends AbstractAnnotatedObject im
       } else if (processor instanceof MessageProcessorBuilder) {
         builder.chain((MessageProcessorBuilder) processor);
       } else {
-        throw new IllegalArgumentException("MessageProcessorBuilder should only have MessageProcessor's or MessageProcessorBuilder's configured");
+        throw new IllegalArgumentException(format("MessageProcessorBuilder should only have MessageProcessor's or MessageProcessorBuilder's configured. Found a %s",
+                                                  processor.getClass().getName()));
       }
     }
     MessageProcessorChain messageProcessorChain = builder.build();

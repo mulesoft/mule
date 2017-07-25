@@ -8,11 +8,12 @@ package org.mule.runtime.config.spring.dsl.spring;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_PROPERTY_IDENTIFIER;
+
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
+import org.mule.runtime.core.api.util.Pair;
 
-import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.ManagedMap;
 
@@ -31,13 +32,13 @@ public class PropertyComponentUtils {
   private static final String REFERENCE_SPRING_PROPERTY_ATTRIBUTE = "ref";
 
   /**
-   * Creates a {@link PropertyValue} from a generic property/ies component in the configuration.
+   * Creates a {@link Pair} from a generic property/ies component in the configuration.
    *
    * @param propertyComponentModel the component model for spring:property, spring:properties or property.
    * @return a {@code PropertyValue} with the parsed content of the component.
    */
-  public static PropertyValue getPropertyValueFromPropertyComponent(ComponentModel propertyComponentModel) {
-    PropertyValue propertyValue;
+  public static Pair<String, Object> getPropertyValueFromPropertyComponent(ComponentModel propertyComponentModel) {
+    Pair<String, Object> propertyValue;
     String refKey = getReferenceAttributeName(propertyComponentModel.getIdentifier());
     String nameKey = getNameAttributeName(propertyComponentModel.getIdentifier());
     if (propertyComponentModel.getInnerComponents().isEmpty()) {
@@ -48,10 +49,10 @@ public class PropertyComponentUtils {
         value = propertyComponentModel.getParameters().get(VALUE_PARAMETER_NAME);
       }
       if (!propertyComponentModel.getParameters().containsKey(nameKey)) {
-        propertyValue = new PropertyValue(PROPERTY_NAME_PROPERTY_ATTRIBUTE,
-                                          new RuntimeBeanReference(propertyComponentModel.getParameters().get("ref")));
+        propertyValue = new Pair<>(PROPERTY_NAME_PROPERTY_ATTRIBUTE,
+                                   new RuntimeBeanReference(propertyComponentModel.getParameters().get("ref")));
       } else {
-        propertyValue = new PropertyValue(propertyComponentModel.getParameters().get(nameKey), value);
+        propertyValue = new Pair<>(propertyComponentModel.getParameters().get(nameKey), value);
       }
     } else if (propertyComponentModel.getInnerComponents().get(0).getIdentifier().getName().equals("map")) {
       ComponentModel springMap = propertyComponentModel.getInnerComponents().get(0);
@@ -65,7 +66,7 @@ public class PropertyComponentUtils {
         }
         propertiesMap.put(mapEntry.getParameters().get(PROPERTY_NAME_MULE_PROPERTY_ATTRIBUTE), value);
       });
-      propertyValue = new PropertyValue(propertyComponentModel.getNameAttribute(), propertiesMap);
+      propertyValue = new Pair<>(propertyComponentModel.getNameAttribute(), propertiesMap);
     } else {
       throw new MuleRuntimeException(createStaticMessage("Unrecognized property model identifier: "
           + propertyComponentModel.getInnerComponents().get(0).getIdentifier()));
