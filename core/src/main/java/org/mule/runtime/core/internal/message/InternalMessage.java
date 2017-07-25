@@ -10,8 +10,8 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.message.DefaultMultiPartPayload;
 import org.mule.runtime.core.api.message.ExceptionPayload;
+import org.mule.runtime.core.api.message.DefaultMultiPartPayload;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -64,9 +64,6 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
     Builder value(Object payload);
 
     @Override
-    Builder mediaType(MediaType mediaType);
-
-    @Override
     CollectionBuilder streamValue(Iterator payload, Class<?> itemType);
 
     @Override
@@ -76,7 +73,10 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
     CollectionBuilder collectionValue(Object[] payload);
   }
 
-  interface AttributesBuilder extends Message.AttributesBuilder {
+  interface Builder extends Message.Builder, PayloadBuilder {
+
+    @Override
+    Builder mediaType(MediaType mediaType);
 
     @Override
     Builder attributes(TypedValue<?> typedValue);
@@ -89,9 +89,6 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
 
     @Override
     Builder attributesMediaType(MediaType mediaType);
-  }
-
-  interface Builder extends Message.Builder, PayloadBuilder, AttributesBuilder {
 
     /**
      * @param exceptionPayload

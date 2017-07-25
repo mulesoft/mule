@@ -6,10 +6,14 @@
  */
 package org.mule.runtime.core.api.util;
 
+import static java.util.Optional.of;
 import static org.apache.commons.lang3.math.NumberUtils.toInt;
+import static org.mule.runtime.api.metadata.DataType.fromObject;
+
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
@@ -39,8 +43,6 @@ import javax.activation.FileDataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-// @ThreadSafe
 
 /**
  * Mule input/output utilities.
@@ -328,7 +330,8 @@ public class IOUtils {
     final Message.Builder builder;
 
     if (object instanceof File) {
-      builder = Message.builder().value(new FileInputStream((File) object));
+      builder = Message.builder()
+          .payload(new TypedValue(new FileInputStream((File) object), fromObject(object), of(((File) object).length())));
     } else if (object instanceof URL) {
       builder = Message.builder().value(((URL) object).openStream());
     } else if (object instanceof String) {

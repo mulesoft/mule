@@ -165,7 +165,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
 
     Object payload = value.getValue();
     if (payload instanceof CursorProvider) {
-      value = new TypedValue<>(streamingManager.manage((CursorProvider) payload, event), value.getDataType());
+      value = new TypedValue<>(streamingManager.manage((CursorProvider) payload, event), value.getDataType(), value.getLength());
     }
 
     return value;
