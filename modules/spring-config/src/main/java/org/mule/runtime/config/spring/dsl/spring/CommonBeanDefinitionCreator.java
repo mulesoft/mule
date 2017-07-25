@@ -29,7 +29,7 @@ import org.mule.runtime.config.spring.dsl.processor.ObjectTypeVisitor;
 import org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler;
 import org.mule.runtime.config.spring.internal.dsl.spring.SpringPostProcessorIocHelper;
 import org.mule.runtime.config.spring.parsers.XmlMetadataAnnotations;
-import org.mule.runtime.config.spring.privileged.dsl.spring.BeanDefinitionPostProcessor;
+import org.mule.runtime.config.spring.privileged.dsl.BeanDefinitionPostProcessor;
 import org.mule.runtime.core.api.execution.LocationExecutionContextProvider;
 import org.mule.runtime.core.api.security.SecurityFilter;
 import org.mule.runtime.core.api.util.Pair;

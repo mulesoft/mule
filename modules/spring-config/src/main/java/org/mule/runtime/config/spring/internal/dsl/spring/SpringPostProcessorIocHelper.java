@@ -16,7 +16,7 @@ import static org.springframework.beans.factory.support.BeanDefinitionBuilder.ge
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.rootBeanDefinition;
 
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
-import org.mule.runtime.config.spring.privileged.dsl.spring.PostProcessorIocHelper;
+import org.mule.runtime.config.spring.privileged.dsl.PostProcessorIocHelper;
 import org.mule.runtime.core.api.util.Pair;
 
 import java.util.List;
