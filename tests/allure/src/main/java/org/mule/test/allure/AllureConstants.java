@@ -444,6 +444,24 @@ public interface AllureConstants {
 
   }
 
+  interface RegistryFeature {
+
+    String REGISTRY = "Registry";
+
+    interface ObjectRegistrationStory {
+
+      String OBJECT_REGISTRATION = "Object Registration";
+
+    }
+
+    interface DomainObjectRegistrationStory {
+
+      String OBJECT_REGISTRATION = "Object Registration";
+
+    }
+
+  }
+
   interface DomainSupport {
 
     String DOMAIN_SUPPORT = "Domain Support";
