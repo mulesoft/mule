@@ -157,20 +157,20 @@ public abstract class AbstractDeployableDescriptorFactory<M extends MuleDeployab
     return MULE_CONFIG_FILES_FOLDER + File.separator + configFile;
   }
 
-  protected ClassLoaderModel getClassLoaderModel(File domainFolder,
+  protected ClassLoaderModel getClassLoaderModel(File artifactFolder,
                                                  MuleArtifactLoaderDescriptor classLoaderModelLoaderDescriptor) {
     ClassLoaderModelLoader classLoaderModelLoader;
     try {
       classLoaderModelLoader =
           descriptorLoaderRepository.get(classLoaderModelLoaderDescriptor.getId(), APP, ClassLoaderModelLoader.class);
     } catch (LoaderNotFoundException e) {
-      throw new ArtifactDescriptorCreateException(invalidClassLoaderModelIdError(domainFolder,
+      throw new ArtifactDescriptorCreateException(invalidClassLoaderModelIdError(artifactFolder,
                                                                                  classLoaderModelLoaderDescriptor));
     }
 
     final ClassLoaderModel classLoaderModel;
     try {
-      classLoaderModel = classLoaderModelLoader.load(domainFolder, classLoaderModelLoaderDescriptor.getAttributes(),
+      classLoaderModel = classLoaderModelLoader.load(artifactFolder, classLoaderModelLoaderDescriptor.getAttributes(),
                                                      getArtifactType());
     } catch (InvalidDescriptorLoaderException e) {
       throw new ArtifactDescriptorCreateException(e);
