@@ -104,7 +104,11 @@ public class MuleObjectStoreManager implements ObjectStoreManager, MuleContextAw
       return (T) baseTransientPartition;
     }
 
-    T store = (T) stores.get(name);
+    T store;
+    synchronized (stores) {
+      store = (T) stores.get(name);
+    }
+    
     if (store == null) {
       throw noSuchStoreException(name);
     }
@@ -126,6 +130,21 @@ public class MuleObjectStoreManager implements ObjectStoreManager, MuleContextAw
 
       return store;
     }
+  }
+
+  @Override
+  public <T extends ObjectStore<? extends Serializable>> T getOrCreateObjectStore(String name, ObjectStoreSettings settings) {
+    T objectStore;
+
+    synchronized (stores) {
+      try {
+        objectStore = getObjectStore(name);
+      } catch (NoSuchElementException e) {
+        objectStore = createObjectStore(name, settings);
+      }
+    }
+
+    return objectStore;
   }
 
   private <T extends ObjectStore<?>> T doCreateObjectStore(String name, ObjectStoreSettings settings) {
