@@ -20,6 +20,7 @@ import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
+import org.mule.runtime.api.metadata.resolving.MetadataFailure;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.config.spring.dsl.model.NoSuchComponentModelException;
 
@@ -121,10 +122,11 @@ public class LazyMetadataService implements MetadataService {
       lazyMuleArtifactContext.initializeComponent(location);
     } catch (Exception e) {
       Throwable rootCause = getRootException(e);
+      MetadataFailure.Builder builder = newFailure(e).withMessage(rootCause.getMessage());
       if (rootCause instanceof NoSuchComponentModelException) {
-        return of(failure(newFailure(e).withMessage(rootCause.getMessage()).withFailureCode(COMPONENT_NOT_FOUND).onComponent()));
+        builder.withFailureCode(COMPONENT_NOT_FOUND);
       }
-      return of(failure(newFailure(e).withMessage(rootCause.getMessage()).onComponent()));
+      return of(failure(builder.onComponent()));
     }
     return empty();
   }
