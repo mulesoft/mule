@@ -53,10 +53,25 @@ public class HttpProxyParamsTestCase extends AbstractHttpRequestTestCase {
     }
 
     @Test
+    public void proxyWithMultipleHostsNonProxyHostsParam() throws Exception {
+        final MuleEvent event = runFlow("innerNonProxyParamProxyMultipleHosts");
+        assertThat((int) event.getMessage().getInboundProperty(HTTP_STATUS_PROPERTY), is(SC_OK));
+        assertThat(event.getMessage().getPayloadAsString(), equalTo(DEFAULT_RESPONSE));
+    }
+
+    @Test
     public void proxyWithoutNonProxyHostsParam() throws Exception {
         expectedException.expectCause(isA(ConnectException.class));
         expectedException.expectMessage(containsString("Error sending HTTP request"));
         runFlow("refAnonymousProxy");
+        fail("Request should fail as there is no proxy configured");
+    }
+
+    @Test
+    public void proxyWithAnotherHostNonProxyHostsParam() throws Exception {
+        expectedException.expectCause(isA(ConnectException.class));
+        expectedException.expectMessage(containsString("Error sending HTTP request"));
+        runFlow("innerNonProxyParamProxyAnotherHost");
         fail("Request should fail as there is no proxy configured");
     }
 

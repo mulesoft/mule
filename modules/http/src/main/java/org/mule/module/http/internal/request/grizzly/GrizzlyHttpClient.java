@@ -100,7 +100,7 @@ public class GrizzlyHttpClient implements HttpClient
             CONTENT_ID.toLowerCase()
     );
 
-    private static final String HOST_SEPARATOR = ",";
+    public static final String HOST_SEPARATOR = ",";
 
     private final TlsContextFactory tlsContextFactory;
     private final ProxyConfig proxyConfig;
