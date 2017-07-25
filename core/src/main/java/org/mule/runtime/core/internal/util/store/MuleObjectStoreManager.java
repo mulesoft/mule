@@ -108,7 +108,7 @@ public class MuleObjectStoreManager implements ObjectStoreManager, MuleContextAw
     synchronized (stores) {
       store = (T) stores.get(name);
     }
-    
+
     if (store == null) {
       throw noSuchStoreException(name);
     }
