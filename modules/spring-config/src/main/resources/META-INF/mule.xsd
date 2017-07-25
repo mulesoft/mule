@@ -2006,52 +2006,6 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="set-property" type="setPropertyType" substitutionGroup="abstract-message-processor">
-        <xsd:annotation>
-            <xsd:documentation>
-                A processor that adds outbound message properties.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="setPropertyType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractAddPropertyProcessorType">
-                <xsd:attribute name="propertyName" type="nonEmptyAttributeType" use="required"/>
-                <xsd:attribute name="value" type="attributeType" use="required"/>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="remove-property" type="removePropertyType" substitutionGroup="abstract-message-processor">
-        <xsd:annotation>
-            <xsd:documentation>
-                A processor that remove outbound message properties by name or regular expression.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="removePropertyType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractMessageProcessorType">
-                <xsd:attribute name="propertyName" type="attributeType" use="required"/>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="copy-properties" type="copyPropertiesType" substitutionGroup="abstract-message-processor">
-        <xsd:annotation>
-            <xsd:documentation>
-                A processor that copy properties from inbound to outbound scope by name or regular expression.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="copyPropertiesType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractMessageProcessorType">
-                <xsd:attribute name="propertyName" type="attributeType" use="required"/>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
     <xsd:element name="set-variable" type="setVariableType" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>

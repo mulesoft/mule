@@ -87,7 +87,7 @@ import org.mule.runtime.config.spring.factories.streaming.InMemoryCursorIterator
 import org.mule.runtime.config.spring.factories.streaming.InMemoryCursorStreamProviderObjectFactory;
 import org.mule.runtime.config.spring.factories.streaming.NullCursorIteratorProviderObjectFactory;
 import org.mule.runtime.config.spring.factories.streaming.NullCursorStreamProviderObjectFactory;
-import org.mule.runtime.config.spring.internal.dsl.processor.AddVariablePropertyConfigurator;
+import org.mule.runtime.config.spring.privileged.dsl.processor.AddVariablePropertyConfigurator;
 import org.mule.runtime.config.spring.internal.dsl.processor.CustomSecurityFilterObjectFactory;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationExtension;
@@ -139,9 +139,7 @@ import org.mule.runtime.core.internal.processor.InvokerMessageProcessor;
 import org.mule.runtime.core.internal.processor.ResponseMessageProcessorAdapter;
 import org.mule.runtime.core.internal.processor.TryScope;
 import org.mule.runtime.core.internal.processor.simple.AddFlowVariableProcessor;
-import org.mule.runtime.core.internal.processor.simple.AddPropertyProcessor;
 import org.mule.runtime.core.internal.processor.simple.RemoveFlowVariableProcessor;
-import org.mule.runtime.core.internal.processor.simple.RemovePropertyProcessor;
 import org.mule.runtime.core.internal.processor.simple.SetPayloadMessageProcessor;
 import org.mule.runtime.core.internal.routing.ChoiceRouter;
 import org.mule.runtime.core.internal.routing.FirstSuccessful;
@@ -181,7 +179,6 @@ import org.mule.runtime.core.transformer.simple.BeanToMap;
 import org.mule.runtime.core.transformer.simple.ByteArrayToHexString;
 import org.mule.runtime.core.transformer.simple.ByteArrayToObject;
 import org.mule.runtime.core.transformer.simple.ByteArrayToSerializable;
-import org.mule.runtime.core.transformer.simple.CopyPropertiesProcessor;
 import org.mule.runtime.core.transformer.simple.HexStringToByteArray;
 import org.mule.runtime.core.transformer.simple.MapToBean;
 import org.mule.runtime.core.transformer.simple.ParseTemplateTransformer;
@@ -305,21 +302,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
             .withSetterParameterDefinition("level", fromSimpleParameter("level").build()).build());
 
     componentBuildingDefinitions
-        .add(getSetVariablePropertyBaseBuilder(getAddFlowVariableTransformerInstanceFactory(AddPropertyProcessor.class),
-                                               AddPropertyProcessor.class,
-                                               newBuilder()
-                                                   .withKey("identifier")
-                                                   .withAttributeDefinition(fromSimpleParameter("propertyName").build())
-                                                   .build(),
-                                               newBuilder()
-                                                   .withKey("value")
-                                                   .withAttributeDefinition(fromSimpleParameter("value").build())
-                                                   .build())
-                                                       .withIdentifier("set-property")
-                                                       .withTypeDefinition(fromType(AddPropertyProcessor.class))
-                                                       .build());
-    componentBuildingDefinitions
-        .add(getSetVariablePropertyBaseBuilder(getAddFlowVariableTransformerInstanceFactory(AddFlowVariableProcessor.class),
+        .add(getSetVariablePropertyBaseBuilder(getAddVariableTransformerInstanceFactory(AddFlowVariableProcessor.class),
                                                AddFlowVariableProcessor.class,
                                                newBuilder()
                                                    .withKey("identifier")
@@ -332,20 +315,11 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
                                                        .withIdentifier("set-variable")
                                                        .withTypeDefinition(fromType(AddFlowVariableProcessor.class))
                                                        .build());
-    componentBuildingDefinitions.add(getMuleMessageTransformerBaseBuilder()
-        .withIdentifier("remove-property")
-        .withTypeDefinition(fromType(RemovePropertyProcessor.class))
-        .withSetterParameterDefinition("identifier", fromSimpleParameter("propertyName").build())
-        .build());
+
     componentBuildingDefinitions.add(getMuleMessageTransformerBaseBuilder()
         .withIdentifier("remove-variable")
         .withTypeDefinition(fromType(RemoveFlowVariableProcessor.class))
         .withSetterParameterDefinition("identifier", fromSimpleParameter("variableName").build())
-        .build());
-    componentBuildingDefinitions.add(getMuleMessageTransformerBaseBuilder()
-        .withIdentifier("copy-properties")
-        .withTypeDefinition(fromType(CopyPropertiesProcessor.class))
-        .withSetterParameterDefinition("propertyName", fromSimpleParameter("propertyName").build())
         .build());
 
     componentBuildingDefinitions.add(baseDefinition
@@ -949,7 +923,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     return transformerComponentBuildingDefinitions;
   }
 
-  private ConfigurableInstanceFactory getAddFlowVariableTransformerInstanceFactory(Class<? extends AbstractAddVariablePropertyProcessor> transformerType) {
+  private ConfigurableInstanceFactory getAddVariableTransformerInstanceFactory(Class<? extends AbstractAddVariablePropertyProcessor> transformerType) {
     return parameters -> {
       AbstractAddVariablePropertyProcessor transformer =
           (AbstractAddVariablePropertyProcessor) createNewInstance(transformerType);
