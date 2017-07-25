@@ -21,7 +21,7 @@ public class ProxyConfigBuilderTest extends AbstractMuleTestCase
     public static final int PORT = 8080;
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";
-    public static final String NON_PROXY_HOSTS = "host1|host2";
+    public static final String NON_PROXY_HOSTS = "host1,host2";
 
     private ProxyConfigBuilder proxyConfigBuilder = new ProxyConfigBuilder();
 

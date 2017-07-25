@@ -100,6 +100,8 @@ public class GrizzlyHttpClient implements HttpClient
             CONTENT_ID.toLowerCase()
     );
 
+    private static final String HOST_SEPARATOR = ",";
+
     private final TlsContextFactory tlsContextFactory;
     private final ProxyConfig proxyConfig;
     private final TcpClientSocketProperties clientSocketProperties;
@@ -236,8 +238,8 @@ public class GrizzlyHttpClient implements HttpClient
         }
 
         if (proxyConfig.getNonProxyHosts() != null && !proxyConfig.getNonProxyHosts().isEmpty()) {
-            for (final String host : proxyConfig.getNonProxyHosts().split("\\|")) {
-                proxyServer.addNonProxyHost(host);
+            for (final String host : proxyConfig.getNonProxyHosts().split(HOST_SEPARATOR)) {
+                proxyServer.addNonProxyHost(host.trim());
             }
         }
         return proxyServer;

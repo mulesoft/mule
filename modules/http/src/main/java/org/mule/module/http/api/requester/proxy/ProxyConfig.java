@@ -38,7 +38,7 @@ public interface ProxyConfig
     public String getPassword();
 
     /**
-     * @return A list of hosts separated by |, which specifies that the proxy must not be used against those
+     * @return A list of hosts separated by ",", which specifies that the proxy must not be used against those
      */
     public String getNonProxyHosts();
 

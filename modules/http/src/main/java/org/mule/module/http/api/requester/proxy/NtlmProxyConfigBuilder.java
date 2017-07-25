@@ -79,7 +79,7 @@ public class NtlmProxyConfigBuilder
     }
 
     /**
-     * @param nonProxyHosts A list of hosts separated by |, which specifies that the proxy must not be used against those
+     * @param nonProxyHosts A list of hosts separated by ",", which specifies that the proxy must not be used against those
      * @return the builder
      */
     public NtlmProxyConfigBuilder setNonProxyHosts(String nonProxyHosts)
