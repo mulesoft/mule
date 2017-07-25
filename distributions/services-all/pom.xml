@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.mule.distributions</groupId>
         <artifactId>mule-distributions</artifactId>
-        <version>4.0.0-BETA.4</version>
+        <version>4.0.0-FD</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
