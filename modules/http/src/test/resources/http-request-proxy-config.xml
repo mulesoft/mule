@@ -53,4 +53,25 @@
         <http:request config-ref="configInnerNtlmProxy" path="requestPath" />
     </flow>
 
+    <!-- nonProxyParam Param -->
+    <http:proxy name="configNonProxyParamProxy" host="localhost" port="${proxyPort}" username="theUsername" password="thePassword" nonProxyHosts="localhost" />
+    <http:request-config name="configNonProxyParam" host="localhost" port="${httpPort}" basePath="basePath" proxy-ref="configNonProxyParamProxy" />
+    <flow name="nonProxyParamProxy">
+        <http:request config-ref="configNonProxyParam" path="requestPath" />
+    </flow>
+
+    <!-- nonProxyParam Param Inner -->
+    <http:request-config name="configInnerNonProxyParamProxy" host="localhost" port="${httpPort}" basePath="basePath">
+        <http:proxy host="localhost" port="${proxyPort}" username="theUsername" password="thePassword" nonProxyHosts="localhost"/>
+    </http:request-config>
+    <flow name="innerNonProxyParamProxy">
+        <http:request config-ref="configInnerNonProxyParamProxy" path="requestPath" />
+    </flow>
+
+    <!-- No Proxy -->
+    <http:request-config name="configNoProxy" host="localhost" port="${httpPort}" basePath="basePath"/>
+    <flow name="noProxy">
+        <http:request config-ref="configNoProxy" path="requestPath" />
+    </flow>
+
 </mule>
