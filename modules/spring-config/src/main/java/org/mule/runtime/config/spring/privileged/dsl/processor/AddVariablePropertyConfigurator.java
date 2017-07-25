@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.spring.internal.dsl.processor;
+package org.mule.runtime.config.spring.privileged.dsl.processor;
 
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 

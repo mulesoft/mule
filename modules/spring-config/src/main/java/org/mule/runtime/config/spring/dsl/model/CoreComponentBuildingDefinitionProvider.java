@@ -87,7 +87,7 @@ import org.mule.runtime.config.spring.factories.streaming.InMemoryCursorIterator
 import org.mule.runtime.config.spring.factories.streaming.InMemoryCursorStreamProviderObjectFactory;
 import org.mule.runtime.config.spring.factories.streaming.NullCursorIteratorProviderObjectFactory;
 import org.mule.runtime.config.spring.factories.streaming.NullCursorStreamProviderObjectFactory;
-import org.mule.runtime.config.spring.internal.dsl.processor.AddVariablePropertyConfigurator;
+import org.mule.runtime.config.spring.privileged.dsl.processor.AddVariablePropertyConfigurator;
 import org.mule.runtime.config.spring.internal.dsl.processor.CustomSecurityFilterObjectFactory;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationExtension;
