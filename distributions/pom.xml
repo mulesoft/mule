@@ -26,7 +26,7 @@
 	<properties>
         <muleEmbeddedApiVersion>1.0.0-BETA.4</muleEmbeddedApiVersion>
 
-        <muleSchedulerServiceVersion>1.0.0-BETA.4</muleSchedulerServiceVersion>
+        <muleSchedulerServiceVersion>1.0.0-FD</muleSchedulerServiceVersion>
         <muleHttpServiceVersion>1.0.0-FD</muleHttpServiceVersion>
         <muleOAuthServiceVersion>1.0.0-FD</muleOAuthServiceVersion>
         <muleSoapServiceVersion>1.0.0-BETA.4</muleSoapServiceVersion>
