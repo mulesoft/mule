@@ -27,9 +27,9 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_METADATA_SE
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_VALUE_PROVIDER_SERVICE;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
-import static org.springframework.context.annotation.AnnotationConfigUtils.AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
@@ -38,7 +38,9 @@ import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.ioc.ConfigurableObjectProvider;
 import org.mule.runtime.api.ioc.ObjectProvider;
+import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.value.ValueProviderService;
@@ -65,7 +67,6 @@ import org.mule.runtime.config.spring.processors.PostRegistrationActionsPostProc
 import org.mule.runtime.config.spring.util.LaxInstantiationStrategyWrapper;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigResource;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.config.RuntimeConfigurationException;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
@@ -75,6 +76,7 @@ import org.mule.runtime.core.api.registry.TransformerResolver;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.api.util.Pair;
+import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.core.component.config.ClassLoaderResourceProvider;
 import org.mule.runtime.core.component.config.DefaultConfigurationPropertiesResolver;
 import org.mule.runtime.core.component.config.ResourceProvider;
@@ -84,9 +86,7 @@ import org.mule.runtime.core.registry.MuleRegistryHelper;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.module.extension.internal.config.ExtensionBuildingDefinitionProvider;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -94,7 +94,6 @@ import org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostPr
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.CglibSubclassingInstantiationStrategy;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
@@ -115,6 +114,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 /**
  * <code>MuleArtifactContext</code> is a simple extension application context that allows resources to be loaded from the
@@ -143,7 +145,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
   private ArtifactType artifactType;
   private List<ComponentIdentifier> componentNotSupportedByNewParsers = new ArrayList<>();
   private SpringConfigurationComponentLocator componentLocator = new SpringConfigurationComponentLocator();
-  private List<ObjectProvider> objectProviders = new ArrayList<>();
+  private List<ConfigurableObjectProvider> objectProviders = new ArrayList<>();
 
   /**
    * Parses configuration files creating a spring ApplicationContext which is used as a parent registry using the SpringRegistry
@@ -355,7 +357,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
 
     registerEditors(beanFactory);
 
-    registerAnnotationConfigProcessors((BeanDefinitionRegistry) beanFactory);
+    registerAnnotationConfigProcessors((BeanDefinitionRegistry) beanFactory, beanFactory);
 
     addBeanPostProcessors(beanFactory,
                           new MuleContextPostProcessor(muleContext),
@@ -374,11 +376,11 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
 
 
   private void prepareObjectProviders() {
+    MuleArtifactObjectProvider muleArtifactObjectProvider = new MuleArtifactObjectProvider(this);
     ImmutableObjectProviderConfiguration providerConfiguration =
-        new ImmutableObjectProviderConfiguration(ImmutableMap.<String, Object>builder()
-            .put(MuleProperties.OBJECT_SERVICE_DISCOVERER, serviceDiscoverer).build(),
-                                                 applicationModel.getConfigurationProperties());
-    for (ObjectProvider objectProvider : objectProviders) {
+        new ImmutableObjectProviderConfiguration(applicationModel.getConfigurationProperties(),
+                                                 muleArtifactObjectProvider);
+    for (ConfigurableObjectProvider objectProvider : objectProviders) {
       objectProvider.configure(providerConfiguration);
     }
   }
@@ -392,13 +394,18 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
   private void registerObjectFromObjectProviders(ConfigurableListableBeanFactory beanFactory) {
     this.objectProviders.addAll(lookObjectProviders());
     ((ObjectProviderAwareBeanFactory) beanFactory).setObjectProviders(objectProviders);
+    for (ObjectProvider objectProvider : objectProviders) {
+      beanFactory
+          .registerSingleton(objectProvider instanceof NamedObject ? ((NamedObject) objectProvider).getName() : UUID.getUUID(),
+                             objectProvider);
+    }
   }
 
-  private List<ObjectProvider> lookObjectProviders() {
-    List<ObjectProvider> objectProviders = new ArrayList<>();
+  private List<ConfigurableObjectProvider> lookObjectProviders() {
+    List<ConfigurableObjectProvider> objectProviders = new ArrayList<>();
     applicationModel.executeOnEveryRootElement(componentModel -> {
-      if (componentModel.getType() != null && ObjectProvider.class.isAssignableFrom(componentModel.getType())) {
-        objectProviders.add((ObjectProvider) componentModel.getObjectInstance());
+      if (componentModel.getType() != null && ConfigurableObjectProvider.class.isAssignableFrom(componentModel.getType())) {
+        objectProviders.add((ConfigurableObjectProvider) componentModel.getObjectInstance());
       }
     });
     return objectProviders;
@@ -451,6 +458,18 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
 
   protected void createInitialApplicationComponents(DefaultListableBeanFactory beanFactory) {
     createApplicationComponents(beanFactory, applicationModel, true);
+  }
+
+  @Override
+  public void destroy() {
+    try {
+      super.destroy();
+    } catch (Exception e) {
+      for (ObjectProvider objectProvider : objectProviders) {
+        disposeIfNeeded(objectProvider, LOGGER);
+      }
+      throw new MuleRuntimeException(e);
+    }
   }
 
   protected List<String> createApplicationComponents(DefaultListableBeanFactory beanFactory, ApplicationModel applicationModel,
@@ -512,21 +531,24 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
                                                   genericBeanDefinition(MuleConfigurationConfigurator.class).getBeanDefinition());
   }
 
-  private void registerAnnotationConfigProcessors(BeanDefinitionRegistry registry) {
+  private void registerAnnotationConfigProcessors(BeanDefinitionRegistry registry, ConfigurableListableBeanFactory beanFactory) {
     registerAnnotationConfigProcessor(registry, CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME,
                                       ConfigurationClassPostProcessor.class, null);
     registerAnnotationConfigProcessor(registry, REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME,
                                       RequiredAnnotationBeanPostProcessor.class, null);
-    registerInjectorProcessor(registry);
+    registerInjectorProcessor(beanFactory);
   }
 
-  protected void registerInjectorProcessor(BeanDefinitionRegistry registry) {
+  protected void registerInjectorProcessor(ConfigurableListableBeanFactory beanFactory) {
+    MuleInjectorProcessor muleInjectorProcessor = null;
     if (artifactType.equals(ArtifactType.APP)) {
-      registerAnnotationConfigProcessor(registry, AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME, MuleInjectorProcessor.class, null);
+      muleInjectorProcessor = new MuleInjectorProcessor();
     } else if (artifactType.equals(ArtifactType.DOMAIN)) {
-      BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(ContextExclusiveInjectorProcessor.class);
-      builder.addConstructorArgValue(this);
-      registerPostProcessor(registry, (RootBeanDefinition) builder.getBeanDefinition(), AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME);
+      muleInjectorProcessor = new ContextExclusiveInjectorProcessor(this);
+    }
+    if (muleInjectorProcessor != null) {
+      muleInjectorProcessor.setBeanFactory(beanFactory);
+      beanFactory.addBeanPostProcessor(muleInjectorProcessor);
     }
   }
 

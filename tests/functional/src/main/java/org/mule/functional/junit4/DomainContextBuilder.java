@@ -22,7 +22,8 @@ import java.util.List;
 
 public class DomainContextBuilder {
 
-  private String[] domainConfig;
+  private String[] domainConfig = new String[0];
+
   private MuleContextBuilder muleContextBuilder = new DefaultMuleContextBuilder() {
 
     @Override
