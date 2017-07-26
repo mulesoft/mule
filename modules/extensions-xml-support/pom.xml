@@ -30,6 +30,10 @@
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-metadata-model-catalog</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-extensions-api</artifactId>
         </dependency>
         <dependency>
