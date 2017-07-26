@@ -115,10 +115,6 @@
             <artifactId>mule-packager</artifactId>
             <exclusions>
                 <exclusion>
-                    <groupId>org.apache.maven</groupId>
-                    <artifactId>maven-compat</artifactId>
-                </exclusion>
-                <exclusion>
                     <groupId>org.codehaus.plexus</groupId>
                     <artifactId>plexus-archiver</artifactId>
                 </exclusion>
