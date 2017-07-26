@@ -62,7 +62,7 @@ public class ArtifactPluginDescriptorLoaderTestCase extends AbstractMuleTestCase
   @Test
   public void load() throws Exception {
     String pluginName = "plugin";
-    File plugin = pluginsFolder.newFile(pluginName + ".zip");
+    File plugin = pluginsFolder.newFile(pluginName + ".jar");
     compress(plugin, new ZipUtils.ZipResource[] {});
     pluginDescriptorLoader.load(plugin);
     verify(artifactPluginDescriptorFactory).create(plugin);
