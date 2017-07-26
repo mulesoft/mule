@@ -42,7 +42,6 @@ import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.privileged.processor.AbstractInterceptingMessageProcessorBase;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -278,10 +277,10 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
 
       RequestReplyLatch requestReplyLatch = locks.get(messageId);
       if (requestReplyLatch != null && requestReplyLatch.isSequenceEvent() && store.contains(messageId)) {
-        MultipleEvent multipleEvent = (MultipleEvent) store.retrieve(messageId);
+        MultipleRequestReplierEvent multipleEvent = (MultipleRequestReplierEvent) store.retrieve(messageId);
         multipleEvent.addEvent(event);
       } else {
-        MultipleEvent multipleEvent = new MultipleEvent();
+        MultipleRequestReplierEvent multipleEvent = new MultipleRequestReplierEvent();
         multipleEvent.addEvent(event);
         store.store(messageId, multipleEvent);
       }
@@ -306,7 +305,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
           try {
             boolean deleteEvent = false;
             String correlationId = (String) id;
-            MultipleEvent multipleEvent = (MultipleEvent) store.retrieve(correlationId);
+            MultipleRequestReplierEvent multipleEvent = (MultipleRequestReplierEvent) store.retrieve(correlationId);
 
             if (isAlreadyProcessed(new ProcessedEvents(correlationId, EndReason.FINISHED_BY_TIMEOUT))) {
               deleteEvent = true;
@@ -362,7 +361,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
   }
 
   private Event retrieveEvent(String correlationId) throws ObjectStoreException, DefaultMuleException {
-    MultipleEvent multipleEvent = (MultipleEvent) store.retrieve(correlationId);
+    MultipleRequestReplierEvent multipleEvent = (MultipleRequestReplierEvent) store.retrieve(correlationId);
     Event event = multipleEvent.getEvent();
     // TODO MULE-10302 remove this.
     if (event.getFlowConstruct() == null) {
@@ -403,23 +402,6 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
 
     private boolean isLastEvent() {
       return groupSize == correlationSequence;
-    }
-  }
-
-  private class MultipleEvent implements Serializable {
-
-    private final List<Event> muleEvents = new ArrayList<>();
-
-    private synchronized void addEvent(Event event) {
-      muleEvents.add(event);
-    }
-
-    private synchronized void removeEvent() {
-      muleEvents.remove(0);
-    }
-
-    private synchronized Event getEvent() {
-      return muleEvents.get(0);
     }
   }
 
