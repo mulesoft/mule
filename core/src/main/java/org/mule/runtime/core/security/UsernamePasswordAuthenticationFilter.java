@@ -67,7 +67,7 @@ public class UsernamePasswordAuthenticationFilter extends AbstractAuthentication
   }
 
   protected Authentication getAuthenticationToken(Event event) throws UnauthorisedException {
-    ExpressionManager expressionManager = (ExpressionManager) serviceDiscoverer.lookupByName(OBJECT_EXPRESSION_MANAGER).get();
+    ExpressionManager expressionManager = (ExpressionManager) registry.lookupByName(OBJECT_EXPRESSION_MANAGER).get();
 
     Object usernameEval = expressionManager.evaluate(username, event).getValue();
     Object passwordEval = expressionManager.evaluate(password, event).getValue();

@@ -472,8 +472,9 @@
     <xsd:element name="object" type="objectType" substitutionGroup="abstract-shared-extension">
         <xsd:annotation>
             <xsd:documentation>
-                Element to declare a java object. Objects declared globally can be referenced from other parts of the configuration or recovered programmatically
-                through org.mule.runtime.api.artifact.ServiceDiscoverer.
+                Element to declare a java object. Objects declared globally can be referenced from other parts of the
+                configuration or recovered programmatically
+                through org.mule.runtime.api.artifact.Registry.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>

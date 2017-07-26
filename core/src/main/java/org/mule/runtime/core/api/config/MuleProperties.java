@@ -163,7 +163,7 @@ public class MuleProperties {
   public static final String OBJECT_POLICY_MANAGER_STATE_HANDLER = "_mulePolicyStateHandler";
   public static final String OBJECT_PROCESSOR_INTERCEPTOR_MANAGER = "_muleProcessorInterceptorManager";
   public static final String OBJECT_STREAMING_MANAGER = "_muleStreamingManager";
-  public static final String OBJECT_SERVICE_DISCOVERER = "_muleServiceDiscoverer";
+  public static final String OBJECT_REGISTRY = "_muleRegistry";
   public static final String OBJECT_CURSOR_MANAGER = "_muleStreamingManager";
   public static final String OBJECT_TRANSFORMATION_SERVICE = "_muleTransformationService";
   public static final String OBJECT_COMPONENT_INITIAL_STATE_MANAGER = ComponentInitialStateManager.SERVICE_ID;

@@ -28,7 +28,7 @@ import java.util.Properties;
 import org.junit.Test;
 
 @SmallTest
-public class PropertiesBootstrapServiceDiscovererTestCase extends AbstractMuleTestCase {
+public class PropertiesBootstrapRegistryTestCase extends AbstractMuleTestCase {
 
   @Test
   public void discoversServiceOnDefaultClassLoader() throws Exception {

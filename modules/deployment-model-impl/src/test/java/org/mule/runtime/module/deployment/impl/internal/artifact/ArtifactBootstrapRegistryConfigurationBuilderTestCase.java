@@ -27,9 +27,9 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class ArtifactBootstrapServiceDiscovererConfigurationBuilderTestCase extends AbstractMuleContextTestCase {
+public class ArtifactBootstrapRegistryConfigurationBuilderTestCase extends AbstractMuleContextTestCase {
 
-  public ArtifactBootstrapServiceDiscovererConfigurationBuilderTestCase() {
+  public ArtifactBootstrapRegistryConfigurationBuilderTestCase() {
     setStartContext(false);
   }
 

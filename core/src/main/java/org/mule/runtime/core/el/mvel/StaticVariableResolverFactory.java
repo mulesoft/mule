@@ -8,7 +8,6 @@ package org.mule.runtime.core.el.mvel;
 
 import org.mule.mvel2.ParserConfiguration;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.el.context.AppContext;
 import org.mule.runtime.core.el.context.ExtendedServerContext;
 import org.mule.runtime.core.el.context.MuleInstanceContext;
 import org.mule.runtime.core.el.function.DateTimeExpressionLanguageFuntion;
@@ -23,7 +22,7 @@ public class StaticVariableResolverFactory extends MVELExpressionLanguageContext
     super(parserConfiguration, muleContext);
     addFinalVariable("server", new ExtendedServerContext());
     addFinalVariable("mule", new MuleInstanceContext(muleContext));
-    addFinalVariable("app", new AppContext(muleContext));
+    addFinalVariable("app", new MVELArtifactContext(muleContext));
     addFinalVariable(MVELExpressionLanguageContext.MULE_CONTEXT_INTERNAL_VARIABLE, muleContext);
     declareFunction("regex", new RegexExpressionLanguageFuntion());
     declareFunction("wildcard", new WildcardExpressionLanguageFuntion());

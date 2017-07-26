@@ -44,7 +44,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_QUEUE_MANAG
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SCHEDULER_BASE_CONFIG;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SCHEDULER_POOLS_CONFIG;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SERVICE_DISCOVERER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_REGISTRY;
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_IN_MEMORY_OBJECT_STORE_KEY;
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
@@ -56,7 +56,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_VALUE_PROVI
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 
-import org.mule.runtime.api.artifact.ServiceDiscoverer;
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -219,7 +219,7 @@ class SpringMuleContextServiceConfigurator {
 
   private final SpringConfigurationComponentLocator componentLocator;
   private final ConfigurationProperties configurationProperties;
-  private final ServiceDiscoverer serviceDiscoverer;
+  private final Registry registry;
 
   public SpringMuleContextServiceConfigurator(MuleContext muleContext,
                                               ConfigurationProperties configurationProperties,
@@ -227,7 +227,7 @@ class SpringMuleContextServiceConfigurator {
                                               OptionalObjectsController optionalObjectsController,
                                               BeanDefinitionRegistry beanDefinitionRegistry,
                                               SpringConfigurationComponentLocator componentLocator,
-                                              ServiceDiscoverer serviceDiscoverer) {
+                                              Registry registry) {
     this.muleContext = muleContext;
     this.configurationProperties = configurationProperties;
     this.customServiceRegistry = (CustomServiceRegistry) muleContext.getCustomizationService();
@@ -235,7 +235,7 @@ class SpringMuleContextServiceConfigurator {
     this.optionalObjectsController = optionalObjectsController;
     this.beanDefinitionRegistry = beanDefinitionRegistry;
     this.componentLocator = componentLocator;
-    this.serviceDiscoverer = serviceDiscoverer;
+    this.registry = registry;
   }
 
   void createArtifactServices() {
@@ -244,7 +244,7 @@ class SpringMuleContextServiceConfigurator {
                            getConstantObjectBeanDefinition(configurationProperties));
     registerBeanDefinition(OBJECT_CONFIGURATION_COMPONENT_LOCATOR, getConstantObjectBeanDefinition(componentLocator));
     registerBeanDefinition(OBJECT_NOTIFICATION_HANDLER, getConstantObjectBeanDefinition(muleContext.getNotificationManager()));
-    registerBeanDefinition(OBJECT_SERVICE_DISCOVERER, getConstantObjectBeanDefinition(serviceDiscoverer));
+    registerBeanDefinition(OBJECT_REGISTRY, getConstantObjectBeanDefinition(registry));
     loadServiceConfigurators();
 
     defaultContextServices.entrySet().stream()

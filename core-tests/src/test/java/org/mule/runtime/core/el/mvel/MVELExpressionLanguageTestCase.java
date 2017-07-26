@@ -51,7 +51,6 @@ import org.mule.runtime.core.api.el.ExpressionLanguageContext;
 import org.mule.runtime.core.api.el.ExpressionLanguageExtension;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.el.context.AppContext;
 import org.mule.runtime.core.el.context.MessageContext;
 import org.mule.runtime.core.el.function.RegexExpressionLanguageFuntion;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
@@ -223,7 +222,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
     muleContext.getRegistry().registerObject("foo",
                                              (ExpressionLanguageExtension) context -> context.addVariable("app", "otherc"));
     mvel.initialise();
-    assertEquals(AppContext.class, evaluate("app", event).getClass());
+    assertEquals(MVELArtifactContext.class, evaluate("app", event).getClass());
   }
 
   @Test
