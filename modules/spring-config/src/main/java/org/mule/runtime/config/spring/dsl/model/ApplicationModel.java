@@ -218,6 +218,16 @@ public class ApplicationModel {
   public static final ComponentIdentifier MUNIT_AFTER_SUITE_IDENTIFIER =
       builder().withNamespace(MUNIT_PREFIX).withName("after-suite").build();
 
+  public static final String HTTP_POLICY = "http-policy";
+  public static final ComponentIdentifier HTTP_PROXY_SOURCE_POLICY_IDENTIFIER =
+      builder().withNamespace(HTTP_POLICY).withName("source").build();
+  public static final ComponentIdentifier HTTP_PROXY_OPERATION_IDENTIFIER =
+      builder().withNamespace(HTTP_POLICY).withName("operation").build();
+  public static final ComponentIdentifier HTTP_PROXY_POLICY_IDENTIFIER =
+      builder().withNamespace(HTTP_POLICY).withName("proxy").build();
+
+
+
   public static final String CLASS_ATTRIBUTE = "class";
 
   private static ImmutableSet<ComponentIdentifier> ignoredNameValidationComponentList =

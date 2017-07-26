@@ -14,6 +14,9 @@ import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentT
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.UNKNOWN;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.builder;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.FLOW_IDENTIFIER;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.HTTP_PROXY_OPERATION_IDENTIFIER;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.HTTP_PROXY_POLICY_IDENTIFIER;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.HTTP_PROXY_SOURCE_POLICY_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MODULE_OPERATION_CHAIN;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MUNIT_AFTER_SUITE_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MUNIT_AFTER_TEST_IDENTIFIER;
@@ -78,10 +81,15 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
                                            componentModel.getLineNumber()))
               .build();
       componentLocation = new DefaultComponentLocation(ofNullable(componentModelNameAttribute), parts);
-    } else if (existsWithinFlow(componentModel) || existsWithinSubflow(componentModel)) {
+    } else if (existsWithinRootContainer(componentModel) || existsWithinSubflow(componentModel)) {
       ComponentModel parentComponentModel = componentModel.getParent();
       DefaultComponentLocation parentComponentLocation = parentComponentModel.getComponentLocation();
-      if (isRootProcessorScope(parentComponentModel)) {
+      if (isHttpProxyPart(componentModel)) {
+        componentLocation =
+            parentComponentLocation.appendLocationPart(componentModel.getIdentifier().getName(), typedComponentIdentifier,
+                                                       componentModel.getConfigFileName(),
+                                                       componentModel.getLineNumber());
+      } else if (isRootProcessorScope(parentComponentModel)) {
         componentLocation = processFlowDirectChild(componentModel, parentComponentLocation, typedComponentIdentifier);
       } else if (isMunitFlowIdentifier(parentComponentModel)) {
         componentLocation = parentComponentLocation
@@ -132,6 +140,11 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
                                                      componentModel.getConfigFileName(), componentModel.getLineNumber());
     }
     componentModel.setComponentLocation(componentLocation);
+  }
+
+  private boolean isHttpProxyPart(ComponentModel componentModel) {
+    return componentModel.getIdentifier().equals(HTTP_PROXY_SOURCE_POLICY_IDENTIFIER)
+        || componentModel.getIdentifier().equals(HTTP_PROXY_OPERATION_IDENTIFIER);
   }
 
   private boolean isMunitFlowIdentifier(ComponentModel componentModel) {
@@ -276,11 +289,13 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
     return String.valueOf(i);
   }
 
-  private boolean existsWithinFlow(ComponentModel componentModel) {
+  private boolean existsWithinRootContainer(ComponentModel componentModel) {
     return existsWithin(componentModel, FLOW_IDENTIFIER) || existsWithin(componentModel, MUNIT_TEST_IDENTIFIER) ||
-        existsWithin(componentModel, MUNIT_BEFORE_SUITE_IDENTIFIER) || existsWithin(componentModel, MUNIT_BEFORE_TEST_IDENTIFIER)
-        ||
-        existsWithin(componentModel, MUNIT_AFTER_SUITE_IDENTIFIER) || existsWithin(componentModel, MUNIT_AFTER_TEST_IDENTIFIER);
+        existsWithin(componentModel, MUNIT_BEFORE_SUITE_IDENTIFIER)
+        || existsWithin(componentModel, MUNIT_BEFORE_TEST_IDENTIFIER)
+        || existsWithin(componentModel, MUNIT_AFTER_SUITE_IDENTIFIER)
+        || existsWithin(componentModel, MUNIT_AFTER_TEST_IDENTIFIER)
+        || existsWithin(componentModel, HTTP_PROXY_POLICY_IDENTIFIER);
   }
 
   private boolean existsWithinSubflow(ComponentModel componentModel) {
