@@ -90,7 +90,6 @@
             <xsd:element ref="abstract-flow-construct" />
             <xsd:element ref="flow" />
             <xsd:element ref="sub-flow" />
-            <xsd:element ref="processor-chain"/>
             <xsd:element ref="top-level-processor"/>
             <xsd:element ref="abstract-global-intercepting-message-processor"/>
         </xsd:choice>
@@ -408,14 +407,16 @@
 
     <xsd:element name="processor-chain" type="messageProcessorChainType" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
-            <xsd:documentation>The use of globally defined processor-chain element is deprecated since Mule 3.2.  Use sub-flow instead.</xsd:documentation>
+            <xsd:documentation>
+                A chain of message processors that can be used within other processors or routers.
+            </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
 
     <xsd:element name="sub-flow" type="subFlowType">
         <xsd:annotation>
             <xsd:documentation>
-                A chain of message processors processed synchronously that can be referenced and reused.
+                A chain of message processors declared globally that can be referenced and reused.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
