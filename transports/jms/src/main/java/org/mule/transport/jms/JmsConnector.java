@@ -82,6 +82,8 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     
     public static final int PREFETCH_DEFAULT = -1;
 
+    public static final String CONNECTION_STOPPING_ERROR_MESSAGE = "It is not possible to create a session since connection is being stopped.";
+
     private AtomicInteger receiverReportedExceptionCount = new AtomicInteger();
 
     ////////////////////////////////////////////////////////////////////////
@@ -192,6 +194,9 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
      * connection/disconnection state.
      */
     private volatile boolean disconnecting;
+
+    private volatile boolean stopping = false;
+
 
     ////////////////////////////////////////////////////////////////////////
     // Methods
@@ -670,9 +675,12 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
 
     private Session createSession(boolean transacted, boolean topic) throws JMSException
     {
-        Session session;
-        session = jmsSupport.createSession(connection, topic, transacted, acknowledgementMode, noLocal);
-        return session;
+        if(stopping)
+        {
+            throw new IllegalStateException(CONNECTION_STOPPING_ERROR_MESSAGE);
+        }
+
+        return jmsSupport.createSession(connection, topic, transacted, acknowledgementMode, noLocal);
     }
 
     @Override
@@ -728,6 +736,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         {
             try
             {
+                stopping = true;
                 connection.stop();
             }
             catch (Exception e)
@@ -735,6 +744,10 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
                 // this exception may be thrown when the broker is shut down, but the
                 // stop process should continue all the same
                 logger.warn("Jms connection failed to stop properly: ", e);
+            }
+            finally
+            {
+                stopping = false;
             }
         }
 
