@@ -7,6 +7,8 @@
 package org.mule.runtime.module.deployment.impl.internal.builder;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.REPOSITORY_FOLDER;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.deployment.impl.internal.plugin.PluginMavenClassLoaderModelLoader.CLASSLOADER_MODEL_JSON_DESCRIPTOR;
@@ -145,8 +147,11 @@ public abstract class DeployableFileBuilder<T extends DeployableFileBuilder<T>> 
 
     classLoaderModel.setDependencies(artifactDependencies);
 
-    Path rootFolder = Paths.get(getTempFolder());
+    Path rootFolder = Paths.get(getTempFolder(), getArtifactId());
     File destinationFolder = rootFolder.resolve(META_INF).resolve(MULE_ARTIFACT).toFile();
+    if (!destinationFolder.exists()) {
+      assertThat(destinationFolder.mkdirs(), is(true));
+    }
     return ContentGenerator.createClassLoaderModelJsonFile(classLoaderModel, destinationFolder);
   }
 
