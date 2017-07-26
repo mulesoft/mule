@@ -6,20 +6,30 @@
  */
 package org.mule.module.cxf;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transport.OutputHandler;
 import org.mule.module.cxf.builder.WebServiceMessageProcessorBuilder;
+import org.mule.module.cxf.support.ProxySchemaValidationInInterceptor;
+import org.mule.module.cxf.support.StreamClosingInterceptor;
 import org.mule.module.cxf.testmodels.Echo;
+import org.mule.module.xml.stax.DelegateXMLStreamReader;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-import org.junit.Test;
+import javax.xml.stream.XMLStreamReader;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import org.apache.cxf.endpoint.Server;
+import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.interceptor.StaxInInterceptor;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.AbstractPhaseInterceptor;
+import org.apache.cxf.phase.Phase;
+import org.junit.Test;
 
 public class CxfInboundMessageProcessorTestCase extends AbstractMuleContextTestCase
 {
@@ -105,4 +115,78 @@ public class CxfInboundMessageProcessorTestCase extends AbstractMuleContextTestC
         return processor;
     }
 
+    @Test
+    public void testInboundWithValidationEnabled() throws Exception
+    {
+        CxfInboundMessageProcessor processor = createMessageProcessorWithValidationEnabled();
+
+        MessageProcessor messageProcessor = new MessageProcessor()
+        {
+            public MuleEvent process(MuleEvent event) throws MuleException
+            {
+                payload = event.getMessage().getPayload();
+                assertEquals("echo", payload);
+                event.getMessage().setPayload("echo");
+                gotEvent = true;
+                return event;
+            }
+        };
+        processor.setListener(messageProcessor);
+
+        MuleEvent event = getTestEvent(msg, getTestInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE));
+
+        MuleEvent response = processor.process(event);
+
+        Object payload = response.getMessage().getPayload();
+        assertTrue(payload instanceof OutputHandler);
+        ((OutputHandler) payload).write(response, System.out);
+        assertTrue(gotEvent);
+    }
+
+
+    private CxfInboundMessageProcessor createMessageProcessorWithValidationEnabled() throws MuleException
+    {
+        CxfConfiguration config = new CxfConfiguration();
+        config.setMuleContext(muleContext);
+        config.initialise();
+
+        // Build a CXF MessageProcessor
+        WebServiceMessageProcessorBuilder builder = new WebServiceMessageProcessorBuilder();
+        builder.setConfiguration(config);
+        builder.setServiceClass(Echo.class);
+        builder.setMuleContext(muleContext);
+        builder.getInInterceptors().add(new CustomInterceptorWithDelegateStreamReader());
+        builder.setValidationEnabled(true);
+
+        CxfInboundMessageProcessor processor = builder.build();
+        Server server = processor.getServer();
+        // adding a proxy schema validation interceptor, simulating SOAP Kit behavior
+        server.getEndpoint().getInInterceptors().add(new ProxySchemaValidationInInterceptor(config.getCxfBus(), server.getEndpoint(),
+                                                                    server.getEndpoint().getService().getServiceInfos().get(0)));
+        processor.start();
+        return processor;
+    }
+
+
+    private class CustomInterceptorWithDelegateStreamReader extends AbstractPhaseInterceptor<Message>
+    {
+        CustomInterceptorWithDelegateStreamReader()
+        {
+            super(Phase.POST_STREAM);
+            getAfter().add(StreamClosingInterceptor.class.getName());
+            getAfter().add(StaxInInterceptor.class.getName());
+        }
+
+        public void handleMessage(Message message) throws Fault
+        {
+            XMLStreamReader reader = message.getContent(XMLStreamReader.class);
+
+            if (reader != null)
+            {
+                XMLStreamReader replacement = new DelegateXMLStreamReader(reader);
+                message.setContent(XMLStreamReader.class, replacement);
+            }
+        }
+
+    }
 }

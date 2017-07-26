@@ -66,9 +66,9 @@ public class ProxySchemaValidationInInterceptor extends AbstractPhaseInterceptor
                 if (reader instanceof DelegateXMLStreamReader ) {
                     DelegateXMLStreamReader r = (DelegateXMLStreamReader) reader;
                     mgr.setupValidation(r.getDelegateReader(), endpoint, service);
-                 } else {
+                } else {
                     mgr.setupValidation(reader, endpoint, service);
-	         }
+                }
             }
         }
     }
