@@ -26,7 +26,8 @@ import static org.hamcrest.core.Is.isA;
 import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 
 // TODO - MULE-9563 - improve this suite starting a proxy-server and checking that the request went through
-public class HttpProxyParamsTestCase extends AbstractHttpRequestTestCase {
+public class HttpProxyParamsTestCase extends AbstractHttpRequestTestCase
+{
 
     @Rule
     public DynamicPort proxyPort = new DynamicPort("proxyPort");
@@ -39,28 +40,32 @@ public class HttpProxyParamsTestCase extends AbstractHttpRequestTestCase {
     }
 
     @Test
-    public void proxyWithNonProxyHostsParam() throws Exception {
+    public void proxyWithNonProxyHostsParam() throws Exception
+    {
         final MuleEvent event = runFlow("nonProxyParamProxy");
         assertThat((int) event.getMessage().getInboundProperty(HTTP_STATUS_PROPERTY), is(SC_OK));
         assertThat(event.getMessage().getPayloadAsString(), equalTo(DEFAULT_RESPONSE));
     }
 
     @Test
-    public void innerProxyWithNonProxyHostsParam() throws Exception {
+    public void innerProxyWithNonProxyHostsParam() throws Exception
+    {
         final MuleEvent event = runFlow("innerNonProxyParamProxy");
         assertThat((int) event.getMessage().getInboundProperty(HTTP_STATUS_PROPERTY), is(SC_OK));
         assertThat(event.getMessage().getPayloadAsString(), equalTo(DEFAULT_RESPONSE));
     }
 
     @Test
-    public void proxyWithMultipleHostsNonProxyHostsParam() throws Exception {
+    public void proxyWithMultipleHostsNonProxyHostsParam() throws Exception
+    {
         final MuleEvent event = runFlow("innerNonProxyParamProxyMultipleHosts");
         assertThat((int) event.getMessage().getInboundProperty(HTTP_STATUS_PROPERTY), is(SC_OK));
         assertThat(event.getMessage().getPayloadAsString(), equalTo(DEFAULT_RESPONSE));
     }
 
     @Test
-    public void proxyWithoutNonProxyHostsParam() throws Exception {
+    public void proxyWithoutNonProxyHostsParam() throws Exception
+    {
         expectedException.expectCause(isA(ConnectException.class));
         expectedException.expectMessage(containsString("Error sending HTTP request"));
         runFlow("refAnonymousProxy");
@@ -68,7 +73,8 @@ public class HttpProxyParamsTestCase extends AbstractHttpRequestTestCase {
     }
 
     @Test
-    public void proxyWithAnotherHostNonProxyHostsParam() throws Exception {
+    public void proxyWithAnotherHostNonProxyHostsParam() throws Exception
+    {
         expectedException.expectCause(isA(ConnectException.class));
         expectedException.expectMessage(containsString("Error sending HTTP request"));
         runFlow("innerNonProxyParamProxyAnotherHost");
@@ -76,7 +82,8 @@ public class HttpProxyParamsTestCase extends AbstractHttpRequestTestCase {
     }
 
     @Test
-    public void noProxy() throws Exception {
+    public void noProxy() throws Exception
+    {
         final MuleEvent event = runFlow("noProxy");
         assertThat((int) event.getMessage().getInboundProperty(HTTP_STATUS_PROPERTY), is(SC_OK));
         assertThat(event.getMessage().getPayloadAsString(), equalTo(DEFAULT_RESPONSE));

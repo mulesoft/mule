@@ -71,11 +71,13 @@ public class DefaultProxyConfig implements ProxyConfig
         this.password = password;
     }
 
-    public String getNonProxyHosts() {
+    public String getNonProxyHosts()
+    {
         return nonProxyHosts;
     }
 
-    public void setNonProxyHosts(String nonProxyHosts) {
+    public void setNonProxyHosts(String nonProxyHosts)
+    {
         this.nonProxyHosts = nonProxyHosts;
     }
 
