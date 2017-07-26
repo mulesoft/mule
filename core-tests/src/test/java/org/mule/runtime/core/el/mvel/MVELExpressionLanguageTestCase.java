@@ -222,7 +222,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
     muleContext.getRegistry().registerObject("foo",
                                              (ExpressionLanguageExtension) context -> context.addVariable("app", "otherc"));
     mvel.initialise();
-    assertEquals(MVELAppContext.class, evaluate("app", event).getClass());
+    assertEquals(MVELArtifactContext.class, evaluate("app", event).getClass());
   }
 
   @Test

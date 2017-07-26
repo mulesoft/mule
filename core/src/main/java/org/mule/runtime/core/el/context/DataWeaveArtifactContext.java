@@ -15,16 +15,13 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Exposes information about the current Mule Application:
- * <li><b>encoding</b> <i>Application default encoding</i>
- * <li><b>name</b> <i>Application name</i>
- * <li><b>registry</b> <i>Mule registry (as a map)</i>
- * <li><b>standalone</b> <i>If Mule is running standalone</i>
- * <li><b>workdir</b> <i>Application work directory</i>
+ * Implementation of {@link AbstractArtifactContext} for exposing DataWeave EL artifact context.
+ *
+ * @since 4.0
  */
-public class DataWeaveAppContext extends AbstractAppContext {
+public class DataWeaveArtifactContext extends AbstractArtifactContext {
 
-  public DataWeaveAppContext(MuleContext muleContext) {
+  public DataWeaveArtifactContext(MuleContext muleContext) {
     super(muleContext);
   }
 

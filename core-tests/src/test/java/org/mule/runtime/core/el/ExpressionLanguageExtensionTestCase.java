@@ -29,7 +29,7 @@ import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.config.builders.DefaultsConfigurationBuilder;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.el.context.AbstractELTestCase;
-import org.mule.runtime.core.el.mvel.MVELAppContext;
+import org.mule.runtime.core.el.mvel.MVELArtifactContext;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguageContext;
 
 import java.text.DateFormat;
@@ -189,7 +189,7 @@ public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase {
         // continue - test will fail.
       }
       context.declareFunction("f", (params, context1) -> "called param[0]=" + params[0] + ",param[1]=" + params[1] + ",app.name="
-          + ((MVELAppContext) context1.getVariable("app")).getName());
+          + ((MVELArtifactContext) context1.getVariable("app")).getName());
       context.declareFunction("muleContext", (params, context1) -> context1
           .getVariable(MVELExpressionLanguageContext.MULE_CONTEXT_INTERNAL_VARIABLE));
       context.declareFunction("muleMessage", (params, context1) -> context1

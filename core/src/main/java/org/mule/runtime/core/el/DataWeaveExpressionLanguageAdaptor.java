@@ -28,7 +28,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExtendedExpressionLanguageAdaptor;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.el.context.DataWeaveAppContext;
+import org.mule.runtime.core.el.context.DataWeaveArtifactContext;
 import org.mule.runtime.core.el.context.MuleInstanceContext;
 import org.mule.runtime.core.el.context.ServerContext;
 
@@ -77,7 +77,8 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
     contextBuilder.addBinding(MULE,
                               new TypedValue<>(new MuleInstanceContext(muleContext), fromType(MuleInstanceContext.class)));
     contextBuilder.addBinding(SERVER, new TypedValue<>(new ServerContext(), fromType(ServerContext.class)));
-    contextBuilder.addBinding(APP, new TypedValue<>(new DataWeaveAppContext(muleContext), fromType(DataWeaveAppContext.class)));
+    contextBuilder
+        .addBinding(APP, new TypedValue<>(new DataWeaveArtifactContext(muleContext), fromType(DataWeaveArtifactContext.class)));
     addGlobalBindings(contextBuilder.build());
   }
 

@@ -12,18 +12,22 @@ import org.mule.runtime.core.api.registry.MuleRegistry;
 import java.util.Map;
 
 /**
+ * Base class for exposing the artifact context to the expression language.
+ * 
  * Exposes information about the current Mule Application:
- * <li><b>encoding</b> <i>Application default encoding</i>
- * <li><b>name</b> <i>Application name</i>
- * <li><b>registry</b> <i>Mule registry (as a map)</i>
+ * <li><b>encoding</b> <i>Artifact default encoding</i>
+ * <li><b>name</b> <i>Artifact name</i>
+ * <li><b>registry</b> <i>Artifact registry (as a map)</i>
  * <li><b>standalone</b> <i>If Mule is running standalone</i>
- * <li><b>workdir</b> <i>Application work directory</i>
+ * <li><b>workdir</b> <i>Artifact work directory</i>
+ * 
+ * @since 4.0
  */
-public abstract class AbstractAppContext {
+public abstract class AbstractArtifactContext {
 
   protected MuleContext muleContext;
 
-  public AbstractAppContext(MuleContext muleContext) {
+  public AbstractArtifactContext(MuleContext muleContext) {
     this.muleContext = muleContext;
   }
 

@@ -22,7 +22,7 @@ public class StaticVariableResolverFactory extends MVELExpressionLanguageContext
     super(parserConfiguration, muleContext);
     addFinalVariable("server", new ExtendedServerContext());
     addFinalVariable("mule", new MuleInstanceContext(muleContext));
-    addFinalVariable("app", new MVELAppContext(muleContext));
+    addFinalVariable("app", new MVELArtifactContext(muleContext));
     addFinalVariable(MVELExpressionLanguageContext.MULE_CONTEXT_INTERNAL_VARIABLE, muleContext);
     declareFunction("regex", new RegexExpressionLanguageFuntion());
     declareFunction("wildcard", new WildcardExpressionLanguageFuntion());
