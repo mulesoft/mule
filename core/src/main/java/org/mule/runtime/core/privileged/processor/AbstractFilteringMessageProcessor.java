@@ -7,11 +7,10 @@
 package org.mule.runtime.core.privileged.processor;
 
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
-import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static reactor.core.publisher.Flux.error;
-import static reactor.core.publisher.Flux.empty;
 import static reactor.core.publisher.Flux.from;
-import static reactor.core.publisher.Flux.just;
+import static reactor.core.publisher.Mono.empty;
+import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
@@ -77,9 +76,9 @@ public abstract class AbstractFilteringMessageProcessor extends AbstractIntercep
           if (accept(event, builder)) {
             return just(event).transform(applyNext());
           } else {
-            just(event).transform(unacceptedMessageProcessor).subscribe(requestUnbounded());
-            event.getContext().success();
-            return empty();
+            return just(event).transform(unacceptedMessageProcessor).doFinally(signalType -> event.getContext().success())
+                .materialize()
+                .then(s -> empty());
           }
         } catch (Exception ex) {
           return error(filterFailureException(builder.build(), ex));
