@@ -196,6 +196,7 @@
         <jettyVersion>9.0.7.v20131107</jettyVersion>
         <jodaTimeVersion>2.9.1</jodaTimeVersion>
         <jschVersion>0.1.54</jschVersion>
+        <jsonSchemaValidatorVersion>2.2.8</jsonSchemaValidatorVersion>
         <junitVersion>4.12</junitVersion>
         <jythonVersion>2.7.1b3</jythonVersion>
         <log4jVersion>2.8.2</log4jVersion>
