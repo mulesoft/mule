@@ -35,7 +35,8 @@ public class HttpProxyParamsTestCase extends AbstractHttpRequestTestCase
     public ExpectedException expectedException = ExpectedException.none();
 
     @Override
-    protected String getConfigFile() {
+    protected String getConfigFile()
+    {
         return "http-request-proxy-params-config.xml";
     }
 
