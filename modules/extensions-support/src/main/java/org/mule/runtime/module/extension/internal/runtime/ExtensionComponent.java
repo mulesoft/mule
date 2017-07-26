@@ -10,22 +10,23 @@ import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
+import static org.mule.runtime.api.exception.ExceptionHelper.getRootException;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_CONFIGURATION;
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
-import static org.mule.runtime.extension.api.values.ValueResolvingException.CONNECTION_FAILURE;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.TemplateParser.createMuleStyleParser;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.requiresConfig;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
+import static org.mule.runtime.extension.api.values.ValueResolvingException.CONNECTION_FAILURE;
+import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import org.mule.metadata.api.ClassTypeLoader;
-import org.mule.runtime.api.value.Value;
-import org.mule.runtime.api.resolving.ExtensionResolvingContext;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
@@ -39,9 +40,9 @@ import org.mule.runtime.api.metadata.MetadataProvider;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
-import org.mule.runtime.extension.api.values.ComponentValueProvider;
-import org.mule.runtime.extension.api.values.ValueResolvingException;
+import org.mule.runtime.api.resolving.ExtensionResolvingContext;
 import org.mule.runtime.api.util.LazyValue;
+import org.mule.runtime.api.value.Value;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
@@ -49,25 +50,27 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.core.api.streaming.CursorProviderFactory;
+import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.util.TemplateParser;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
-import org.mule.runtime.core.internal.resolving.DefaultExtensionResolvingContext;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.metadata.DefaultMetadataContext;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
-import org.mule.runtime.core.api.streaming.CursorProviderFactory;
-import org.mule.runtime.core.api.streaming.StreamingManager;
+import org.mule.runtime.core.internal.resolving.DefaultExtensionResolvingContext;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
+import org.mule.runtime.extension.api.values.ComponentValueProvider;
+import org.mule.runtime.extension.api.values.ValueResolvingException;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.internal.metadata.MetadataMediator;
-import org.mule.runtime.module.extension.internal.value.ValueProviderMediator;
 import org.mule.runtime.module.extension.internal.runtime.config.DynamicConfigurationProvider;
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.source.ExtensionMessageSource;
+import org.mule.runtime.module.extension.internal.value.ValueProviderMediator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -298,6 +301,17 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     } catch (ConnectionException e) {
       throw new ValueResolvingException("An error occurred obtaining the connection for the ValueProvider", CONNECTION_FAILURE,
                                         e);
+    } catch (MuleRuntimeException e) {
+      Throwable rootException = getRootException(e);
+      if (rootException instanceof ValueResolvingException) {
+        throw (ValueResolvingException) rootException;
+      } else {
+        throw new ValueResolvingException("An unknown error occurred trying to resolve values. " + e.getCause().getMessage(),
+                                          UNKNOWN, e);
+      }
+    } catch (Exception e) {
+      throw new ValueResolvingException("An unknown error occurred trying to resolve values. " + e.getCause().getMessage(),
+                                        UNKNOWN, e);
     }
   }
 

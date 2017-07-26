@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.value;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
-import static org.mule.runtime.extension.api.values.ValueResolvingException.INVALID_PARAMETER;
+import static org.mule.runtime.extension.api.values.ValueResolvingException.INVALID_VALUE_RESOLVER_NAME;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.EnrichableModel;
@@ -88,7 +88,7 @@ public final class ValueProviderMediator<T extends ParameterizedModel & Enrichab
     if (parameters.isEmpty()) {
       throw new ValueResolvingException(format("Unable to find model for parameter or parameter group with name '%s'.",
                                                parameterName),
-                                        INVALID_PARAMETER);
+                                        INVALID_VALUE_RESOLVER_NAME);
     }
 
     ParameterModel parameterModel = parameters.get(0);
@@ -97,7 +97,7 @@ public final class ValueProviderMediator<T extends ParameterizedModel & Enrichab
         parameterModel.getModelProperty(ValueProviderFactoryModelProperty.class)
             .orElseThrow(() -> new ValueResolvingException(format("The parameter with name '%s' is not an Values Provider",
                                                                   parameterName),
-                                                           INVALID_PARAMETER));
+                                                           INVALID_VALUE_RESOLVER_NAME));
 
     try {
       return resolveValues(parameters, factoryModelProperty, parameterValueResolver, connectionSupplier, configurationSupplier);
