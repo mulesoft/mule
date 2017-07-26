@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <!-- Global Anonymous Proxy -->
+    <http:proxy name="anonymousProxyConfig" host="localhost" port="${proxyPort}" />
+    <http:request-config name="configRefAnonymousProxy" host="localhost" port="${httpPort}" basePath="basePath" proxy-ref="anonymousProxyConfig" />
+    <flow name="refAnonymousProxy">
+        <http:request config-ref="configRefAnonymousProxy" path="requestPath" />
+    </flow>
+
+    <!-- nonProxyHosts Param -->
+    <http:proxy name="configNonProxyParamProxy" host="localhost" port="${proxyPort}" username="theUsername" password="thePassword" nonProxyHosts="localhost" />
+    <http:request-config name="configNonProxyParam" host="localhost" port="${httpPort}" basePath="basePath" proxy-ref="configNonProxyParamProxy" />
+    <flow name="nonProxyParamProxy">
+        <http:request config-ref="configNonProxyParam" path="requestPath" />
+    </flow>
+
+    <!-- nonProxyHosts Param Inner -->
+    <http:request-config name="configInnerNonProxyParamProxy" host="localhost" port="${httpPort}" basePath="basePath">
+        <http:proxy host="localhost" port="${proxyPort}" username="theUsername" password="thePassword" nonProxyHosts="localhost"/>
+    </http:request-config>
+    <flow name="innerNonProxyParamProxy">
+        <http:request config-ref="configInnerNonProxyParamProxy" path="requestPath" />
+    </flow>
+
+    <!-- Multple Hosts nonProxyHosts Param Inner -->
+    <http:request-config name="configInnerNonProxyParamProxyMultipleHosts" host="localhost" port="${httpPort}" basePath="basePath">
+        <http:proxy host="localhost" port="${proxyPort}" username="theUsername" password="thePassword" nonProxyHosts="test, another, localhost "/>
+    </http:request-config>
+    <flow name="innerNonProxyParamProxyMultipleHosts">
+        <http:request config-ref="configInnerNonProxyParamProxyMultipleHosts" path="requestPath" />
+    </flow>
+
+    <!-- nonProxyHosts another host  -->
+    <http:request-config name="configInnerNonProxyParamProxyAnotherHost" host="localhost" port="${httpPort}" basePath="basePath">
+        <http:proxy host="localhost" port="${proxyPort}" username="theUsername" password="thePassword" nonProxyHosts="anotherhost"/>
+    </http:request-config>
+    <flow name="innerNonProxyParamProxyAnotherHost">
+        <http:request config-ref="configInnerNonProxyParamProxyAnotherHost" path="requestPath" />
+    </flow>
+
+    <!-- No Proxy -->
+    <http:request-config name="configNoProxy" host="localhost" port="${httpPort}" basePath="basePath"/>
+    <flow name="noProxy">
+        <http:request config-ref="configNoProxy" path="requestPath" />
+    </flow>
+
+</mule>

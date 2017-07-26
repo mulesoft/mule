@@ -19,6 +19,7 @@ public class DefaultProxyConfig implements ProxyConfig
     private int port = Integer.MAX_VALUE;
     private String username;
     private String password;
+    private String nonProxyHosts;
 
     public String getName()
     {
@@ -68,6 +69,16 @@ public class DefaultProxyConfig implements ProxyConfig
     public void setPassword(String password)
     {
         this.password = password;
+    }
+
+    public String getNonProxyHosts()
+    {
+        return nonProxyHosts;
+    }
+
+    public void setNonProxyHosts(String nonProxyHosts)
+    {
+        this.nonProxyHosts = nonProxyHosts;
     }
 
 }
