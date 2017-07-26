@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.metadata;
 
+import static org.mule.metadata.api.utils.MetadataTypeUtils.isCollection;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.isVoid;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.NO_DYNAMIC_TYPE_AVAILABLE;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.UNKNOWN;
@@ -15,6 +16,7 @@ import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.message.MessageMetadataType;
 import org.mule.metadata.message.MessageMetadataTypeBuilder;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -34,7 +36,9 @@ import org.mule.runtime.extension.api.metadata.MetadataResolverUtils;
 import com.google.common.collect.ImmutableList;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * Metadata service delegate implementations that handles the resolution
@@ -137,9 +141,14 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
     if (isVoid(attributes.getType()) || !attributes.hasDynamicType()) {
       return success(attributes.getType());
     }
+    return resolveOutputAttributesMetadata(context, key, (metadata) -> isMetadataResolvedCorrectly(metadata, false));
+  }
+
+  private MetadataResult<MetadataType> resolveOutputAttributesMetadata(MetadataContext context, Object key,
+                                                                       Function<MetadataType, Boolean> metadataValidator) {
     try {
       MetadataType metadata = resolverFactory.getOutputAttributesResolver().getAttributesType(context, key);
-      if (isMetadataResolvedCorrectly(metadata, false)) {
+      if (metadataValidator.apply(metadata)) {
         return success(metadata);
       }
       MetadataFailure failure = newFailure()
@@ -147,9 +156,9 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
           .withFailureCode(NO_DYNAMIC_TYPE_AVAILABLE)
           .withReason(NULL_TYPE_ERROR)
           .onOutputAttributes();
-      return failure(attributes.getType(), failure);
+      return failure(failure);
     } catch (Exception e) {
-      return failure(attributes.getType(), newFailure(e).onOutputAttributes());
+      return failure(newFailure(e).onOutputAttributes());
     }
   }
 
@@ -167,7 +176,7 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
 
   private MetadataType adaptToListIfNecessary(MetadataType resolvedType, Object key, MetadataContext metadataContext)
       throws MetadataResolvingException {
-    if (!(component.getOutput().getType() instanceof ArrayType)) {
+    if (!isCollection(component.getOutput().getType())) {
       return resolvedType;
     }
 
@@ -175,27 +184,32 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
     String typeId = getId(outputType);
 
     if (Message.class.getName().equals(typeId)) {
-      resolvedType = wrapInMessageType(resolvedType, key, metadataContext);
-      return metadataContext.getTypeBuilder().arrayType().id(typeId).of(resolvedType).build();
+      MessageMetadataType message = (MessageMetadataType) outputType;
+      resolvedType = wrapInMessageType(resolvedType, key, metadataContext, message.getAttributesType());
     }
 
-    return resolvedType;
+    return metadataContext.getTypeBuilder().arrayType().id(typeId).of(resolvedType).build();
   }
 
-  private MetadataType wrapInMessageType(MetadataType type, Object key, MetadataContext context)
+  private MetadataType wrapInMessageType(MetadataType type, Object key, MetadataContext context,
+                                         Optional<MetadataType> staticAttributes)
       throws MetadataResolvingException {
-    MetadataResult<MetadataType> attributes = getOutputAttributesMetadata(context, key);
-    if (attributes.isSuccess()) {
-      return new MessageMetadataTypeBuilder()
-          .payload(type)
-          .attributes(attributes.get())
-          .build();
-    } else {
-      throw new MetadataResolvingException("Could not resolve attributes of List<Message> output",
-                                           attributes.getFailures().stream()
-                                               .map(MetadataFailure::getFailureCode)
-                                               .findFirst()
-                                               .orElse(UNKNOWN));
+
+    MessageMetadataTypeBuilder message = new MessageMetadataTypeBuilder().payload(type);
+    staticAttributes.ifPresent(message::attributes);
+
+    if (component.getOutputAttributes().hasDynamicType()) {
+      MetadataResult<MetadataType> attributes = resolveOutputAttributesMetadata(context, key, Objects::nonNull);
+      if (!attributes.isSuccess()) {
+        throw new MetadataResolvingException("Could not resolve attributes of List<Message> output",
+                                             attributes.getFailures().stream()
+                                                 .map(MetadataFailure::getFailureCode)
+                                                 .findFirst()
+                                                 .orElse(UNKNOWN));
+      }
+      message.attributes(attributes.get());
     }
+
+    return message.build();
   }
 }

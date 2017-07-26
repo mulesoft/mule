@@ -9,8 +9,9 @@ package org.mule.runtime.module.extension.internal.loader.validation;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
-import static org.apache.commons.lang3.StringUtils.join;
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.join;
+import static org.mule.metadata.api.utils.MetadataTypeUtils.isCollection;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.isVoid;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.extension.api.metadata.MetadataResolverUtils.getAllResolvers;
@@ -164,7 +165,8 @@ public class MetadataComponentModelValidator implements ExtensionModelValidator 
   private void validateMetadataOutputAttributes(ComponentModel component, MetadataResolverFactory resolverFactory,
                                                 ProblemsReporter problemsReporter) {
     if (isVoid(component.getOutputAttributes().getType())
-        && !(resolverFactory.getOutputAttributesResolver() instanceof NullMetadataResolver)) {
+        && !(resolverFactory.getOutputAttributesResolver() instanceof NullMetadataResolver)
+        && (!isCollection(component.getOutput().getType()))) {
       problemsReporter.addError(new Problem(component, String
           .format("%s '%s' has an attributes metadata resolver defined but it doesn't set any attributes",
                   getComponentModelTypeName(component), component.getName())));

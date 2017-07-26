@@ -16,7 +16,6 @@ import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
 import static org.mule.tck.junit4.matcher.MetadataKeyMatcher.metadataKeyWithId;
 import static org.mule.test.metadata.extension.query.MetadataExtensionEntityResolver.CIRCLE;
 import static org.mule.test.metadata.extension.query.MetadataExtensionEntityResolver.SQUARE;
-import static org.mule.test.metadata.extension.query.NativeQueryOutputResolver.CIRCLE_TYPE;
 import static org.mule.test.metadata.extension.query.NativeQueryOutputResolver.NATIVE_QUERY;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import org.mule.metadata.api.model.ArrayType;
@@ -41,7 +40,7 @@ public class QueryMetadataTestCase extends AbstractMetadataOperationTestCase {
 
   private static final MetadataKey CIRCLE_METADATA_KEY = newKey(CIRCLE).build();
   private static final Location QUERY_LOCATION =
-      builder().globalName(QUERY_FLOW).addProcessorsPart().addIndexPart(0).build();
+      builder().globalName(QUERY_LIST_FLOW).addProcessorsPart().addIndexPart(0).build();
 
   public QueryMetadataTestCase(ResolutionType resolutionType) {
     super(resolutionType);
@@ -80,12 +79,18 @@ public class QueryMetadataTestCase extends AbstractMetadataOperationTestCase {
 
     MetadataType generatedType = entityMetadata.get().getModel().getOutput().getType();
     assertThat(generatedType, is(instanceOf(ArrayType.class)));
+    assertCircleType((ObjectType) ((ArrayType) generatedType).getType());
+  }
 
-    ObjectType fields = (ObjectType) ((ArrayType) generatedType).getType();
-    assertThat(fields.getFields(), hasSize(1));
-    ObjectFieldType field = fields.getFields().iterator().next();
-    assertThat(field.getKey().getName().getLocalPart(), is("id"));
-    assertThat(field.getValue(), is(instanceOf(NumberType.class)));
+  @Test
+  public void getNativeQueryOutputArrayMetadata() throws Exception {
+    location = builder().globalName(NATIVE_QUERY_LIST_FLOW).addProcessorsPart().addIndexPart(0).build();
+    MetadataKey nativeKey = newKey(NATIVE_QUERY).build();
+    MetadataResult<ComponentMetadataDescriptor<OperationModel>> entityMetadata = getComponentDynamicMetadata(nativeKey);
+    assertThat(entityMetadata.isSuccess(), is(true));
+    MetadataType generatedType = entityMetadata.get().getModel().getOutput().getType();
+    assertThat(generatedType, is(instanceOf(ArrayType.class)));
+    assertCircleType((ObjectType) ((ArrayType) generatedType).getType());
   }
 
   @Test
@@ -93,8 +98,15 @@ public class QueryMetadataTestCase extends AbstractMetadataOperationTestCase {
     location = builder().globalName(NATIVE_QUERY_FLOW).addProcessorsPart().addIndexPart(0).build();
     MetadataKey nativeKey = newKey(NATIVE_QUERY).build();
     MetadataResult<ComponentMetadataDescriptor<OperationModel>> entityMetadata = getComponentDynamicMetadata(nativeKey);
-
     assertThat(entityMetadata.isSuccess(), is(true));
-    assertThat(entityMetadata.get().getModel().getOutput().getType(), is(CIRCLE_TYPE));
+    MetadataType generatedType = entityMetadata.get().getModel().getOutput().getType();
+    assertCircleType((ObjectType) generatedType);
+  }
+
+  private void assertCircleType(ObjectType fields) {
+    assertThat(fields.getFields(), hasSize(1));
+    ObjectFieldType field = fields.getFields().iterator().next();
+    assertThat(field.getKey().getName().getLocalPart(), is("id"));
+    assertThat(field.getValue(), is(instanceOf(NumberType.class)));
   }
 }

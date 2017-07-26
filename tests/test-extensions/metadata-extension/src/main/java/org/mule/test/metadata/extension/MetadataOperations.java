@@ -6,16 +6,17 @@
  */
 package org.mule.test.metadata.extension;
 
+import static java.util.Collections.emptyList;
 import static org.mule.test.metadata.extension.MetadataConnection.CAR;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.metadata.TypeResolver;
+import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.Query;
-import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.tck.message.StringAttributes;
@@ -28,6 +29,7 @@ import org.mule.test.metadata.extension.model.shapes.Shape;
 import org.mule.test.metadata.extension.query.MetadataExtensionEntityResolver;
 import org.mule.test.metadata.extension.query.MetadataExtensionQueryTranslator;
 import org.mule.test.metadata.extension.query.NativeQueryOutputResolver;
+import org.mule.test.metadata.extension.resolver.TestAttributesResolverWithKeyResolver;
 import org.mule.test.metadata.extension.resolver.TestBooleanMetadataResolver;
 import org.mule.test.metadata.extension.resolver.TestEnumMetadataResolver;
 import org.mule.test.metadata.extension.resolver.TestInputAndOutputResolverWithKeyResolver;
@@ -194,6 +196,11 @@ public class MetadataOperations {
     return null;
   }
 
+  @OutputResolver(output = TestOutputResolverWithoutKeyResolver.class)
+  public List<Object> dynamicListOfObjects(@MetadataKeyId String type) {
+    return null;
+  }
+
   public boolean typeWithDeclaredSubtypesMetadata(Shape plainShape, Rectangle rectangleSubtype, Animal animal) {
     return false;
   }
@@ -210,8 +217,25 @@ public class MetadataOperations {
   @Query(translator = MetadataExtensionQueryTranslator.class,
       entityResolver = MetadataExtensionEntityResolver.class,
       nativeOutputResolver = NativeQueryOutputResolver.class)
-  public String doQuery(@MetadataKeyId String query) {
+  public List<Object> doQuery(@MetadataKeyId String query) {
+    return emptyList();
+  }
+
+  @Query(translator = MetadataExtensionQueryTranslator.class,
+      entityResolver = MetadataExtensionEntityResolver.class,
+      nativeOutputResolver = NativeQueryOutputResolver.class)
+  public String returnQuery(@MetadataKeyId String query) {
     return query;
+  }
+
+  @OutputResolver(output = TestOutputResolverWithoutKeyResolver.class)
+  public PagingProvider<MetadataConnection, Result<Object, Animal>> pagedOperationResult(@MetadataKeyId String type) {
+    return generateDummyPagingProvider();
+  }
+
+  @OutputResolver(output = TestOutputResolverWithoutKeyResolver.class, attributes = TestAttributesResolverWithKeyResolver.class)
+  public PagingProvider<MetadataConnection, Result<Object, Object>> pagedOperationResultWithAttributesResolver(@MetadataKeyId String type) {
+    return generateDummyPagingProvider();
   }
 
   public PagingProvider<MetadataConnection, Animal> pagedOperationMetadata(Animal animal) {
@@ -225,6 +249,24 @@ public class MetadataOperations {
       @Override
       public java.util.Optional<Integer> getTotalResults(MetadataConnection connection) {
         return java.util.Optional.of(1);
+      }
+
+      @Override
+      public void close() throws IOException {}
+    };
+  }
+
+  private <T> PagingProvider<MetadataConnection, T> generateDummyPagingProvider() {
+    return new PagingProvider<MetadataConnection, T>() {
+
+      @Override
+      public List<T> getPage(MetadataConnection connection) {
+        return emptyList();
+      }
+
+      @Override
+      public java.util.Optional<Integer> getTotalResults(MetadataConnection connection) {
+        return java.util.Optional.empty();
       }
 
       @Override

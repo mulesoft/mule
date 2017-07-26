@@ -12,7 +12,9 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.isIn;
 import static org.hamcrest.core.Is.is;
-import org.mule.metadata.api.model.ArrayType;
+import static org.mockito.Mockito.when;
+import org.mule.metadata.api.builder.BaseTypeBuilder;
+import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.NumberType;
 import org.mule.metadata.api.model.ObjectFieldType;
@@ -26,6 +28,7 @@ import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.metadata.extension.query.MetadataExtensionEntityResolver;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -40,12 +43,17 @@ public class DsqlQueryMetadataResolverTestCase {
   @Mock
   private MetadataContext context;
 
+  @Before
+  public void setUp() {
+    when(context.getTypeBuilder()).thenReturn(new BaseTypeBuilder(MetadataFormat.JAVA));
+  }
+
   @Test
   public void getTrimmedOutputMetadata() throws MetadataResolvingException, ConnectionException {
     DsqlQuery dsqlQuery = dsqlParser.parse("dsql:SELECT id FROM Circle WHERE (diameter < 18)");
     MetadataType outputMetadata = getQueryMetadataResolver().getOutputType(context, dsqlQuery);
 
-    ObjectType type = getAndAssertArrayTypeOf(outputMetadata);
+    ObjectType type = getAndAssertTypeOf(outputMetadata);
     assertThat(type.getFields(), hasSize(1));
     ObjectFieldType onlyField = type.getFields().iterator().next();
     assertThat(onlyField.getValue(), is(instanceOf(NumberType.class)));
@@ -57,7 +65,7 @@ public class DsqlQueryMetadataResolverTestCase {
     DsqlQuery dsqlQuery = dsqlParser.parse("dsql:SELECT * FROM Circle WHERE (diameter < 18)");
     MetadataType outputMetadata = getQueryMetadataResolver().getOutputType(context, dsqlQuery);
 
-    ObjectType type = getAndAssertArrayTypeOf(outputMetadata);
+    ObjectType type = getAndAssertTypeOf(outputMetadata);
     assertThat(type.getFields(), hasSize(3));
 
     type.getFields().forEach(f -> {
@@ -66,11 +74,9 @@ public class DsqlQueryMetadataResolverTestCase {
     });
   }
 
-  private ObjectType getAndAssertArrayTypeOf(MetadataType outputMetadata) {
-    assertThat(outputMetadata, is(instanceOf(ArrayType.class)));
-    ArrayType arrayType = (ArrayType) outputMetadata;
-    assertThat(arrayType.getType(), is(instanceOf(ObjectType.class)));
-    return (ObjectType) arrayType.getType();
+  private ObjectType getAndAssertTypeOf(MetadataType outputMetadata) {
+    assertThat(outputMetadata, is(instanceOf(ObjectType.class)));
+    return (ObjectType) outputMetadata;
   }
 
   private DsqlQueryMetadataResolver getQueryMetadataResolver() {
