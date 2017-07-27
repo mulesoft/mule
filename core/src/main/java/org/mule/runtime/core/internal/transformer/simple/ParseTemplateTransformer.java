@@ -6,11 +6,13 @@
  */
 package org.mule.runtime.core.internal.transformer.simple;
 
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.api.transformer.AbstractMessageTransformer;
+import org.mule.runtime.core.internal.message.DefaultEventBuilder;
+import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 import org.mule.runtime.core.api.util.IOUtils;
 
 import java.nio.charset.Charset;
@@ -21,8 +23,8 @@ import java.nio.charset.Charset;
  */
 public class ParseTemplateTransformer extends AbstractMessageTransformer {
 
-  private String location;
-  private String template;
+  private String content;
+  private String encoding;
   private String target;
 
   public ParseTemplateTransformer() {
@@ -33,37 +35,40 @@ public class ParseTemplateTransformer extends AbstractMessageTransformer {
   @Override
   public void initialise() throws InitialisationException {
     super.initialise();
-    loadTemplate();
+    //loadTemplate();
   }
 
-  private void loadTemplate() throws InitialisationException {
-    try {
-      if (location == null) {
-        throw new IllegalArgumentException("Location cannot be null");
-      }
-      template = IOUtils.getResourceAsString(location, this.getClass());
-
-    } catch (Exception e) {
-      throw new InitialisationException(e, this);
-    }
-  }
+  //private void loadTemplate() throws InitialisationException {
+  //  try {
+  //    if (location == null) {
+  //      throw new IllegalArgumentException("Location cannot be null");
+  //    }
+  //    template = IOUtils.getResourceAsString(location, this.getClass());
+  //
+  //  } catch (Exception e) {
+  //    throw new InitialisationException(e, this);
+  //  }
+  //}
 
 
   @Override
   public Object transformMessage(Event event, Charset outputEncoding) throws TransformerException {
-    if (template == null) {
+    if (content == null) {
       throw new IllegalArgumentException("Template cannot be null");
     }
-
-    return muleContext.getExpressionManager().parse(template, event, null);
+    return muleContext.getExpressionManager().parse(content, event, null);
   }
 
-  public void setLocation(String location) {
-    this.location = location;
+  public void setContent(String content) {
+    this.content = content;
   }
 
   public void setTarget(String target) {
     this.target = target;
+  }
+
+  public void setEncoding(String encoding) {
+    this.encoding = encoding;
   }
 
 }

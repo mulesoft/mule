@@ -788,9 +788,12 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     transformerComponentBuildingDefinitions.add(getMuleMessageTransformerBaseBuilder()
         .withIdentifier("parse-template")
         .withTypeDefinition(fromType(ParseTemplateTransformer.class))
-        .withSetterParameterDefinition("content", fromSimpleParameter("content").build())
-        .withSetterParameterDefinition("target", fromSimpleParameter("target").build()).withSetterParameterDefinition("encoding", fromSimpleParameter("encoding").build())
+        .withSetterParameterDefinition("content", fromChildConfiguration(String.class).withIdentifier("content").build())
+        .withSetterParameterDefinition("target", fromSimpleParameter("target").build())
+        .withSetterParameterDefinition("encoding", fromSimpleParameter("encoding").build())
         .build());
+    transformerComponentBuildingDefinitions
+        .add(getMuleMessageTransformerBaseBuilder().withIdentifier("content").withTypeDefinition(fromType(String.class)).build());
     transformerComponentBuildingDefinitions.add(getTransformerBaseBuilder(AutoTransformer.class)
         .withIdentifier("auto-transformer")
         .build());
