@@ -7,8 +7,10 @@
 package org.mule.runtime.module.artifact.builder;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static java.lang.System.currentTimeMillis;
 import static java.util.Collections.singletonList;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.apache.commons.lang3.SystemUtils.JAVA_IO_TMPDIR;
 import static org.mule.runtime.module.artifact.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_ARTIFACT_ID;
 import static org.mule.runtime.module.artifact.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_GROUP_ID;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -57,10 +59,16 @@ public abstract class AbstractDependencyFileBuilder<T extends AbstractDependency
   }
 
   protected String getTempFolder() {
-    if (tempFolder != null) {
-      return tempFolder.getAbsolutePath();
+    if (tempFolder == null) {
+      tempFolder = new File(JAVA_IO_TMPDIR, getArtifactId() + currentTimeMillis());
+      tempFolder.deleteOnExit();
+      if (tempFolder.exists()) {
+        tempFolder.delete();
+      }
+      tempFolder.mkdir();
     }
-    return System.getProperty("java.io.tmpdir");
+
+    return tempFolder.getAbsolutePath();
   }
 
   /**

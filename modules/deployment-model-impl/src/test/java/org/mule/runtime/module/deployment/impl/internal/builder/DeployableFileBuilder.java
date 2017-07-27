@@ -147,8 +147,8 @@ public abstract class DeployableFileBuilder<T extends DeployableFileBuilder<T>> 
 
     classLoaderModel.setDependencies(artifactDependencies);
 
-    Path rootFolder = Paths.get(getTempFolder(), getArtifactId());
-    File destinationFolder = rootFolder.resolve(META_INF).resolve(MULE_ARTIFACT).toFile();
+    File destinationFolder = Paths.get(getTempFolder()).resolve(META_INF).resolve(MULE_ARTIFACT).toFile();
+
     if (!destinationFolder.exists()) {
       assertThat(destinationFolder.mkdirs(), is(true));
     }
