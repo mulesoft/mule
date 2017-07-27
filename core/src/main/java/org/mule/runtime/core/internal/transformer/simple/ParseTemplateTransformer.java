@@ -23,6 +23,7 @@ public class ParseTemplateTransformer extends AbstractMessageTransformer {
 
   private String location;
   private String template;
+  private String target;
 
   public ParseTemplateTransformer() {
     registerSourceType(DataType.OBJECT);
@@ -60,4 +61,9 @@ public class ParseTemplateTransformer extends AbstractMessageTransformer {
   public void setLocation(String location) {
     this.location = location;
   }
+
+  public void setTarget(String target) {
+    this.target = target;
+  }
+
 }
