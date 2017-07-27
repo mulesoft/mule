@@ -91,7 +91,8 @@ final class XmlExtensionLoaderDelegate {
   private static final String MODULE_NAMESPACE_NAME = "module";
   protected static final String CONFIG_NAME = "config";
 
-  private static final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
+  private static final ClassTypeLoader typeLoader =
+      ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(XmlExtensionLoaderDelegate.class.getClassLoader());
   private static final Map<String, MetadataType> defaultInputTypes = getCommonTypesBuilder()
       .build();
   private static final Map<String, MetadataType> defaultOutputTypes = getCommonTypesBuilder()
