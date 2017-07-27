@@ -2178,21 +2178,37 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="parse-template" type="parseTemplateTransformerType" substitutionGroup="abstract-transformer">
+    <xsd:element name="parse-template" type="parseTemplateProcessorType" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
-                A transformer that parses a template in a given location
+                A transformer that parses a template defined inline
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:complexType name="parseTemplateTransformerType">
+    <xsd:complexType name="parseTemplateProcessorType">
         <xsd:complexContent>
-            <xsd:extension base="abstractTransformerType">
-                <xsd:attribute name="location" type="xsd:string" use="required">
+            <xsd:extension base="abstractMessageProcessorType">
+                <xsd:sequence>
+                    <xsd:element name="content" type="xsd:string">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Template to be processed
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
+                <xsd:attribute name="target" type="xsd:string" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The location of the template. The order in which the transformer will attempt to load the file are: from the file system, from a URL or from the classpath.
+                            Variable where to save processed payload
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="encoding" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            String encoding used for transformer output.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -2207,6 +2223,7 @@
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
+
 
     <xsd:complexType name="setPayloadTransformerType">
         <xsd:complexContent>
