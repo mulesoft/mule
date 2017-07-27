@@ -11,20 +11,18 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.internal.message.DefaultEventBuilder;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
-import org.mule.runtime.core.api.util.IOUtils;
 
 import java.nio.charset.Charset;
 
 /**
- * Loads a template and parses its content to resolve expressions. The order in which attempts to load the resource is the
- * following: from the file system, from a URL or from the classpath.
+ * Loads a template and parses its content to resolve expressions.
  */
 public class ParseTemplateTransformer extends AbstractMessageTransformer {
 
   private String content;
   private String encoding;
+  private Charset encoder;
   private String target;
 
   public ParseTemplateTransformer() {
@@ -35,28 +33,36 @@ public class ParseTemplateTransformer extends AbstractMessageTransformer {
   @Override
   public void initialise() throws InitialisationException {
     super.initialise();
-    //loadTemplate();
+    if(encoding != null) {
+      try
+      {
+        encoder = Charset.forName(encoding);
+      }catch (Exception e) {
+        throw new InitialisationException(e,this);
+      }
+    }
   }
 
-  //private void loadTemplate() throws InitialisationException {
-  //  try {
-  //    if (location == null) {
-  //      throw new IllegalArgumentException("Location cannot be null");
-  //    }
-  //    template = IOUtils.getResourceAsString(location, this.getClass());
-  //
-  //  } catch (Exception e) {
-  //    throw new InitialisationException(e, this);
-  //  }
-  //}
-
-
   @Override
-  public Object transformMessage(Event event, Charset outputEncoding) throws TransformerException {
+  public Event process(Event event) {
     if (content == null) {
       throw new IllegalArgumentException("Template cannot be null");
     }
-    return muleContext.getExpressionManager().parse(content, event, null);
+    Object result = muleContext.getExpressionManager().parse(content, event, null);
+    if (encoder != null) {
+      result = encoder.encode((String) result);
+    }
+    Message resultMessage = Message.builder(event.getMessage()).payload(result).build();
+    if (target == null) {
+      return Event.builder(event).message(resultMessage).build();
+    } else {
+      return Event.builder(event).addVariable(target, resultMessage).build();
+    }
+  }
+
+  @Override
+  public Object transformMessage(Event event, Charset outputEncoding) throws TransformerException {
+    return event;
   }
 
   public void setContent(String content) {
