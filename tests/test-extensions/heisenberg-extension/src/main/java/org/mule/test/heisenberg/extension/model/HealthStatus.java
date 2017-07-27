@@ -6,9 +6,8 @@
  */
 package org.mule.test.heisenberg.extension.model;
 
-//TODO : MULE-13189 - EL returns String instead of Enum instance when accessing a variable
 public enum HealthStatus {
-  HEALTHY("HEALTHY"), CANCER("CANCER"), DEAD("DEAD");
+  HEALTHY("Healthy"), CANCER("Cancer"), DEAD("Dead");
 
   private String id;
 
