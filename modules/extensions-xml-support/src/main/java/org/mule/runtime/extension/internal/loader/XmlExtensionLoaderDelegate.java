@@ -23,8 +23,11 @@ import static org.mule.runtime.api.meta.model.display.LayoutModel.builder;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.config.spring.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
+import com.google.common.collect.ImmutableMap;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.catalog.api.TypeResolver;
+import org.mule.metadata.catalog.api.TypeResolverException;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.Category;
@@ -54,10 +57,8 @@ import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFacto
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.extension.internal.loader.catalog.loader.xml.TypesCatalogXmlLoader;
 import org.mule.runtime.extension.internal.loader.catalog.model.TypesCatalog;
-
-import com.google.common.collect.ImmutableMap;
+import org.w3c.dom.Document;
 
 import java.io.IOException;
 import java.net.URL;
@@ -71,8 +72,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
-import org.w3c.dom.Document;
 
 /**
  * Describes an {@link ExtensionModel} by scanning an XML provided in the constructor
@@ -90,8 +89,10 @@ final class XmlExtensionLoaderDelegate {
   private static final String MODULE_NAMESPACE_NAME = "module";
   protected static final String CONFIG_NAME = "config";
 
+  //TODO lautaro cambiar estop
   private static final ClassTypeLoader typeLoader =
       ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(XmlExtensionLoaderDelegate.class.getClassLoader());
+
   private static final Map<String, MetadataType> defaultInputTypes = getCommonTypesBuilder()
       .build();
   private static final Map<String, MetadataType> defaultOutputTypes = getCommonTypesBuilder()
@@ -160,7 +161,8 @@ final class XmlExtensionLoaderDelegate {
   private static final String TYPES_XML_SUFFIX = "-catalog" + XML_SUFFIX;
 
   private final String modulePath;
-  private Optional<TypesCatalog> typesCatalog;
+//  private Optional<TypesCatalog> typesCatalog;
+  private TypeResolver typeResolver;
 
   /**
    * @param modulePath relative path to a file that will be loaded from the current {@link ClassLoader}. Non null.
@@ -184,7 +186,6 @@ final class XmlExtensionLoaderDelegate {
                                                 getCustomTypeFilename(), modulePath),
                                          e);
     }
-
 
     Document moduleDocument = getModuleDocument(context, resource);
     XmlApplicationParser xmlApplicationParser =
@@ -218,11 +219,20 @@ final class XmlExtensionLoaderDelegate {
     TypesCatalog typesCatalog = null;
     final String customTypes = getCustomTypeFilename();
     final URL resourceCustomType = getResource(customTypes);
-    if (resourceCustomType != null) {
-      TypesCatalogXmlLoader typesCatalogXmlLoader = new TypesCatalogXmlLoader();
-      typesCatalog = typesCatalogXmlLoader.load(resourceCustomType);
+//    if (resourceCustomType != null) {
+//      TypesCatalogXmlLoader typesCatalogXmlLoader = new TypesCatalogXmlLoader();
+//      typesCatalog = typesCatalogXmlLoader.load(resourceCustomType);
+//    }
+
+    if (true){
+
+//      typeResolver = TypeResolver.fromFile(new File(resourceCustomType.getFile()));
+      typeResolver = TypeResolver.fromContent("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+                                             + "<catalogs xmlns=\"http://www.mulesoft.org/schema/mule/types\" >\n"
+                                             + "\n"
+                                             + "</catalogs>\n");
     }
-    this.typesCatalog = ofNullable(typesCatalog);
+//    this.typesCatalog = ofNullable(typesCatalog);
   }
 
   /**
@@ -418,20 +428,32 @@ final class XmlExtensionLoaderDelegate {
 
   private MetadataType extractType(Map<String, MetadataType> types, String receivedType) {
     Optional<MetadataType> metadataType = empty();
-    if (types.containsKey(receivedType)) {
-      metadataType = of(types.get(receivedType));
-    } else if (typesCatalog.isPresent()) {
-      metadataType = typesCatalog.get().resolveType(receivedType);
+
+    try {
+      metadataType = typeResolver.resolveType(receivedType);
+    } catch (TypeResolverException e) {
+      e.printStackTrace();
+      throw new RuntimeException(e);
     }
+
+
+
+//    if (types.containsKey(receivedType)) { //TODO lautaro this must change to delegate the catalog entirely
+//      metadataType = of(types.get(receivedType));
+//    } else if (typesCatalog.isPresent()) {    //TODO lautaro this must change to delegate the catalog entirely
+//      metadataType = typesCatalog.get().resolveType(receivedType);
+//    }
+
     if (!metadataType.isPresent()) {
       String errorMessage = format(
                                    "should not have reach here. Type obtained [%s] when supported default types are [%s].",
                                    receivedType,
                                    join(", ", types.keySet()));
-      if (typesCatalog.isPresent()) {
+//      if (typesCatalog.isPresent()) {
+      //TODO lautaro improve this stuff with better error messages
         errorMessage +=
             format(" Custom types [%s] doesn't have support for the specified [%s] type", getCustomTypeFilename(), receivedType);
-      }
+//      }
       throw new IllegalParameterModelDefinitionException(errorMessage);
     }
     return metadataType.get();
