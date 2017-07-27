@@ -295,9 +295,10 @@ public abstract class AbstractRegistryBootstrap implements Initialisable {
 
   private void registerTransformers(List<TransformerBootstrapProperty> props) throws Exception {
     for (TransformerBootstrapProperty bootstrapProperty : props) {
-      final Class<? extends Transformer> transformerClass =
-          bootstrapProperty.getService().forName(bootstrapProperty.getClassName());
       try {
+        final Class<? extends Transformer> transformerClass =
+            bootstrapProperty.getService().forName(bootstrapProperty.getClassName());
+
         Class<?> returnClass = null;
         String returnClassString = bootstrapProperty.getReturnClassName();
         if (returnClassString != null) {

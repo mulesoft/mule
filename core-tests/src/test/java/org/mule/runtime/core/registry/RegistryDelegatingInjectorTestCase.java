@@ -17,6 +17,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.registry.Registry;
 import org.mule.runtime.core.api.registry.RegistryProvider;
+import org.mule.runtime.core.internal.registry.RegistryDelegatingInjector;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

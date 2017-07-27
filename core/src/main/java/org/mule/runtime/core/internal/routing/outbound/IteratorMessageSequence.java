@@ -8,7 +8,6 @@ package org.mule.runtime.core.internal.routing.outbound;
 
 import org.mule.runtime.core.internal.routing.AbstractMessageSequence;
 import org.mule.runtime.core.api.routing.MessageSequence;
-import org.mule.runtime.core.routing.outbound.EventBuilderConfigurerIterator;
 
 import java.util.Iterator;
 

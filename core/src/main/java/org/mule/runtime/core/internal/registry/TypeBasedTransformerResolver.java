@@ -21,8 +21,7 @@ import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.transformer.TransformerChain;
-import org.mule.runtime.core.transformer.TransformerWeighting;
-import org.mule.runtime.core.transformer.graph.GraphTransformerResolver;
+import org.mule.runtime.core.internal.transformer.graph.GraphTransformerResolver;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToString;
 
