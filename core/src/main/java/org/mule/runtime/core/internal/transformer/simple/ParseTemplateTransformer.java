@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.transformer.simple;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
@@ -33,12 +34,11 @@ public class ParseTemplateTransformer extends AbstractMessageTransformer {
   @Override
   public void initialise() throws InitialisationException {
     super.initialise();
-    if(encoding != null) {
-      try
-      {
+    if (encoding != null) {
+      try {
         encoder = Charset.forName(encoding);
-      }catch (Exception e) {
-        throw new InitialisationException(e,this);
+      } catch (Exception e) {
+        throw new InitialisationException(createStaticMessage("%s is not a valid charset for encoding", encoding), e, this);
       }
     }
   }
