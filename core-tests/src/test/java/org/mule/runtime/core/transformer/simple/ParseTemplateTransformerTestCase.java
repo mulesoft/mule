@@ -18,6 +18,7 @@ import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.util.IOUtils;
+import org.mule.runtime.core.internal.transformer.simple.ParseTemplateTransformer;
 import org.mule.tck.size.SmallTest;
 
 import java.io.IOException;

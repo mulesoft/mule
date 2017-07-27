@@ -238,10 +238,7 @@ public class MonitoredObjectStoreWrapper<T extends Serializable> extends Templat
     /**
      * Invoked after deserialization. This is called when the marker interface
      * {@link DeserializationPostInitialisable} is used. This will get invoked after the object
-     * has been deserialized passing in the current MuleContext when using either
-     * {@link org.mule.runtime.core.transformer.wire.SerializationWireFormat},
-     * {@link org.mule.runtime.core.transformer.wire.SerializedMuleMessageWireFormat} or the
-     * {@link org.mule.runtime.core.transformer.simple.ByteArrayToSerializable} transformer.
+     * has been deserialized passing in the current MuleContext.
      *
      * @param muleContext the current muleContext instance
      * @throws MuleException if there is an error initializing

@@ -28,8 +28,8 @@ import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractTransformer;
-import org.mule.runtime.core.transformer.simple.ByteArrayToObject;
-import org.mule.runtime.core.transformer.simple.SerializableToByteArray;
+import org.mule.runtime.core.privileged.transformer.simple.ByteArrayToObject;
+import org.mule.runtime.core.privileged.transformer.simple.SerializableToByteArray;
 import org.mule.runtime.core.internal.util.SerializationUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 

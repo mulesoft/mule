@@ -56,7 +56,6 @@ import static org.mule.runtime.internal.dsl.DslConstants.POOLING_PROFILE_ELEMENT
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
-
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.DataUnit;
@@ -87,8 +86,8 @@ import org.mule.runtime.config.spring.factories.streaming.InMemoryCursorIterator
 import org.mule.runtime.config.spring.factories.streaming.InMemoryCursorStreamProviderObjectFactory;
 import org.mule.runtime.config.spring.factories.streaming.NullCursorIteratorProviderObjectFactory;
 import org.mule.runtime.config.spring.factories.streaming.NullCursorStreamProviderObjectFactory;
-import org.mule.runtime.config.spring.privileged.dsl.processor.AddVariablePropertyConfigurator;
 import org.mule.runtime.config.spring.internal.dsl.processor.CustomSecurityFilterObjectFactory;
+import org.mule.runtime.config.spring.privileged.dsl.processor.AddVariablePropertyConfigurator;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationExtension;
 import org.mule.runtime.core.api.config.MuleConfiguration;
@@ -163,10 +162,17 @@ import org.mule.runtime.core.internal.transformer.compression.GZipUncompressTran
 import org.mule.runtime.core.internal.transformer.encryption.AbstractEncryptionTransformer;
 import org.mule.runtime.core.internal.transformer.encryption.DecryptionTransformer;
 import org.mule.runtime.core.internal.transformer.encryption.EncryptionTransformer;
+import org.mule.runtime.core.internal.transformer.simple.AutoTransformer;
+import org.mule.runtime.core.internal.transformer.simple.ByteArrayToHexString;
+import org.mule.runtime.core.internal.transformer.simple.HexStringToByteArray;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToString;
+import org.mule.runtime.core.internal.transformer.simple.ParseTemplateTransformer;
 import org.mule.runtime.core.privileged.processor.IdempotentRedeliveryPolicy;
 import org.mule.runtime.core.privileged.processor.simple.AbstractAddVariablePropertyProcessor;
+import org.mule.runtime.core.privileged.transformer.simple.ByteArrayToObject;
+import org.mule.runtime.core.privileged.transformer.simple.ByteArrayToSerializable;
+import org.mule.runtime.core.privileged.transformer.simple.SerializableToByteArray;
 import org.mule.runtime.core.security.PasswordBasedEncryptionStrategy;
 import org.mule.runtime.core.security.SecretKeyEncryptionStrategy;
 import org.mule.runtime.core.security.UsernamePasswordAuthenticationFilter;
@@ -174,15 +180,6 @@ import org.mule.runtime.core.security.filters.MuleEncryptionEndpointSecurityFilt
 import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.runtime.core.transformer.codec.Base64Decoder;
 import org.mule.runtime.core.transformer.codec.Base64Encoder;
-import org.mule.runtime.core.transformer.simple.AutoTransformer;
-import org.mule.runtime.core.transformer.simple.BeanToMap;
-import org.mule.runtime.core.transformer.simple.ByteArrayToHexString;
-import org.mule.runtime.core.transformer.simple.ByteArrayToObject;
-import org.mule.runtime.core.transformer.simple.ByteArrayToSerializable;
-import org.mule.runtime.core.transformer.simple.HexStringToByteArray;
-import org.mule.runtime.core.transformer.simple.MapToBean;
-import org.mule.runtime.core.transformer.simple.ParseTemplateTransformer;
-import org.mule.runtime.core.transformer.simple.SerializableToByteArray;
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
 import org.mule.runtime.dsl.api.component.AttributeDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
@@ -805,12 +802,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .build());
     transformerComponentBuildingDefinitions.add(getTransformerBaseBuilder(AutoTransformer.class)
         .withIdentifier("auto-transformer")
-        .build());
-    transformerComponentBuildingDefinitions.add(getTransformerBaseBuilder(MapToBean.class)
-        .withIdentifier("map-to-bean-transformer")
-        .build());
-    transformerComponentBuildingDefinitions.add(getTransformerBaseBuilder(BeanToMap.class)
-        .withIdentifier("bean-to-map-transformer")
         .build());
     transformerComponentBuildingDefinitions.add(getMuleMessageTransformerBaseBuilder()
         .withIdentifier("append-string-transformer")

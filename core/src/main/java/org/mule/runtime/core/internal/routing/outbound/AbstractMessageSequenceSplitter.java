@@ -25,7 +25,6 @@ import org.mule.runtime.core.privileged.processor.AbstractInterceptingMessagePro
 import org.mule.runtime.core.internal.routing.AbstractSplitter;
 import org.mule.runtime.core.privileged.routing.DefaultRouterResultsHandler;
 import org.mule.runtime.core.api.routing.MessageSequence;
-import org.mule.runtime.core.routing.outbound.EventBuilderConfigurer;
 
 import java.util.ArrayList;
 import java.util.Collection;

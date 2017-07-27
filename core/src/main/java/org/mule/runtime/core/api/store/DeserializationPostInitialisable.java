@@ -16,14 +16,8 @@ import java.security.PrivilegedAction;
  * A marker interface used to trigger post-deserialization initialization of an object. This works in the same way as
  * {@link Cloneable} interface. Implementors of this interface must add the method
  * <code>private void initAfterDeserialization(MuleContext muleContext) throws MuleException</code> to their class (note that it's
- * private). This will get invoked after the object has been deserialized passing in the current mulecontext when using either
- * {@link org.mule.runtime.core.transformer.wire.SerializationWireFormat},
- * {@link org.mule.runtime.core.transformer.wire.SerializedMuleMessageWireFormat}, or the
- * {@link org.mule.runtime.core.transformer.simple.ByteArrayToSerializable} transformer.
+ * private). This will get invoked after the object has been deserialized passing in the current mulecontext.
  *
- * @see org.mule.runtime.core.transformer.simple.ByteArrayToSerializable
- * @see org.mule.runtime.core.transformer.wire.SerializationWireFormat
- * @see org.mule.runtime.core.transformer.wire.SerializedMuleMessageWireFormat
  * @deprecated TODO MULE-10013 Move message serialization logic from within the message to an external service
  */
 @Deprecated

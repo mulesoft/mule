@@ -56,7 +56,7 @@ import org.mule.runtime.core.internal.lifecycle.MuleContextLifecycleManager;
 import org.mule.runtime.core.internal.processor.interceptor.DefaultProcessorInterceptorManager;
 import org.mule.runtime.core.registry.DefaultRegistryBroker;
 import org.mule.runtime.core.registry.MuleRegistryHelper;
-import org.mule.runtime.core.registry.RegistryDelegatingInjector;
+import org.mule.runtime.core.internal.registry.RegistryDelegatingInjector;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
