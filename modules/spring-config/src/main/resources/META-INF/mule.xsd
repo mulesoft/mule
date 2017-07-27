@@ -2262,6 +2262,13 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="target" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Variable name where the transformed message will be stored
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
