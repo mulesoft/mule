@@ -32,7 +32,6 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Router;
 import org.mule.runtime.core.api.routing.AggregationContext;
-import org.mule.runtime.core.api.routing.AggregationStrategy;
 import org.mule.runtime.core.api.routing.RoutePathNotFoundException;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 
@@ -63,11 +62,6 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
   private SchedulerService schedulerService;
 
   /**
-   * Whether the configured routes will run in parallel (default is true).
-   */
-  private boolean parallel = true;
-
-  /**
    * Timeout in milliseconds to be applied to each route. Values lower or equal to zero means no timeout
    */
   private long timeout = 0;
@@ -90,7 +84,7 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
   /**
    * The aggregation strategy. By default is this instance
    */
-  private AggregationStrategy aggregationStrategy;
+  private AggregationStrategy aggregationStrategy = new CollectAllAggregationStrategy();
 
   private Scheduler scheduler;
   private reactor.core.scheduler.Scheduler reactorScheduler;
@@ -130,10 +124,6 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
   public void initialise() throws InitialisationException {
     try {
       buildRouteChains();
-
-      if (aggregationStrategy == null) {
-        aggregationStrategy = new CollectAllAggregationStrategy();
-      }
 
       if (timeout <= 0) {
         timeout = Long.MAX_VALUE;
@@ -191,14 +181,6 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
   @Override
   protected List<Processor> getOwnedMessageProcessors() {
     return routeChains;
-  }
-
-  public void setAggregationStrategy(AggregationStrategy aggregationStrategy) {
-    this.aggregationStrategy = aggregationStrategy;
-  }
-
-  public void setParallel(boolean parallel) {
-    this.parallel = parallel;
   }
 
   public void setTimeout(long timeout) {

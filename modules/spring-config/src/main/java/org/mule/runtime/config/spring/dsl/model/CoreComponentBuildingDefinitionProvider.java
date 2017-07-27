@@ -99,7 +99,7 @@ import org.mule.runtime.core.api.processor.LoggerMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.RetryNotifier;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
-import org.mule.runtime.core.api.routing.AggregationStrategy;
+import org.mule.runtime.core.internal.routing.AggregationStrategy;
 import org.mule.runtime.core.api.security.EncryptionStrategy;
 import org.mule.runtime.core.api.security.MuleSecurityManagerConfigurator;
 import org.mule.runtime.core.api.security.SecurityManager;
@@ -207,6 +207,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   private static final String SET_PAYLOAD = "set-payload";
   private static final String LOGGER = "logger";
   private static final String PROCESSOR_CHAIN = "processor-chain";
+  private static final String ROUTE = "route";
   private static final String PROCESSOR = "processor";
   private static final String TRANSFORMER = "transformer";
   private static final String CUSTOM_PROCESSOR = "custom-processor";
@@ -333,6 +334,10 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withTypeDefinition(fromType(Processor.class)).withObjectFactoryType(MessageProcessorChainFactoryBean.class)
         .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
         .asPrototype().build());
+    componentBuildingDefinitions.add(baseDefinition.withIdentifier(ROUTE)
+        .withTypeDefinition(fromType(Processor.class)).withObjectFactoryType(MessageProcessorChainFactoryBean.class)
+        .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
+        .asPrototype().build());
     addModuleOperationChainParser(componentBuildingDefinitions);
     componentBuildingDefinitions.add(baseDefinition.withIdentifier(SUB_FLOW)
         .withTypeDefinition(fromType(Processor.class)).withObjectFactoryType(SubflowMessageProcessorChainFactoryBean.class)
@@ -363,9 +368,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .build());
     componentBuildingDefinitions.add(baseDefinition.withIdentifier(SCATTER_GATHER)
         .withTypeDefinition(fromType(ScatterGatherRouter.class)).withObjectFactoryType(ScatterGatherRouterFactoryBean.class)
-        .withSetterParameterDefinition("parallel", fromSimpleParameter("parallel").build())
         .withSetterParameterDefinition("timeout", fromSimpleParameter("timeout").build())
-        .withSetterParameterDefinition("aggregationStrategy", fromChildConfiguration(AggregationStrategy.class).build())
         .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
         .asScope().build());
     componentBuildingDefinitions.add(baseDefinition.withIdentifier(ENRICHER)
