@@ -6,14 +6,12 @@
  */
 package org.mule.runtime.core.internal.util.message;
 
-import static org.mule.runtime.core.internal.util.message.MessageUtils.toMessage;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
+import java.util.List;
 import java.util.ListIterator;
-import java.util.function.Consumer;
+import java.util.NoSuchElementException;
 
 /**
  * Wraps an {@link ListIterator} of {@link Result} instances and exposes
@@ -26,64 +24,69 @@ import java.util.function.Consumer;
  */
 final class ResultToMessageListIterator implements ListIterator<Message> {
 
-  private final ListIterator<Result> delegate;
-  private final CursorProviderFactory cursorProviderFactory;
-  private final Event event;
+  private final List<Message> delegate;
+  private final int size;
+  private int index;
+  private int lastIndex = 0;
 
-  ResultToMessageListIterator(ListIterator<Result> delegate,
-                              CursorProviderFactory cursorProviderFactory,
-                              Event event) {
+  ResultToMessageListIterator(List<Message> delegate) {
+    this(delegate, 0);
+  }
+
+  ResultToMessageListIterator(List<Message> delegate, int startIndex) {
     this.delegate = delegate;
-    this.cursorProviderFactory = cursorProviderFactory;
-    this.event = event;
+    index = startIndex;
+    size = delegate.size();
   }
 
   @Override
   public boolean hasNext() {
-    return delegate.hasNext();
+    return index < size;
   }
 
   @Override
   public Message next() {
-    return toMessage(delegate.next(), cursorProviderFactory, event);
+    lastIndex = index++;
+    return delegate.get(lastIndex);
   }
 
   @Override
   public boolean hasPrevious() {
-    return delegate.hasPrevious();
+    return index > 0;
   }
 
   @Override
   public Message previous() {
-    return toMessage(delegate.previous(), cursorProviderFactory, event);
+    if (index == 0) {
+      throw new NoSuchElementException();
+    }
+
+    lastIndex = this.index - 1;
+    return delegate.get(lastIndex);
   }
 
   @Override
   public int nextIndex() {
-    return delegate.nextIndex();
+    return index < size ? index : size;
   }
 
   @Override
   public int previousIndex() {
-    return delegate.previousIndex();
+    return index > 0 ? index - 1 : -1;
   }
 
   @Override
   public void remove() {
-    delegate.remove();
+    delegate.remove(lastIndex);
   }
 
   @Override
   public void set(Message message) {
-    delegate.set(Result.builder(message).build());
+    delegate.set(lastIndex, message);
   }
 
   @Override
   public void add(Message message) {
-    delegate.add(Result.builder(message).build());
-  }
-
-  public void forEachRemaining(Consumer<? super Message> action) {
-    delegate.forEachRemaining(result -> action.accept(toMessage(result, cursorProviderFactory, event)));
+    delegate.add(index, message);
   }
 }

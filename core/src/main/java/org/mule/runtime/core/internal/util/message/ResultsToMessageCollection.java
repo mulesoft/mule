@@ -7,10 +7,11 @@
 package org.mule.runtime.core.internal.util.message;
 
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.core.internal.util.message.MessageUtils.toMessage;
+import static org.mule.runtime.core.api.util.concurrent.FunctionalReadWriteLock.readWriteLock;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
+import org.mule.runtime.core.api.util.concurrent.FunctionalReadWriteLock;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.util.Collection;
@@ -29,13 +30,14 @@ import java.util.stream.Stream;
  *
  * @since 4.0
  */
-public class ResultsToMessageCollection implements Collection<Message> {
+abstract class ResultsToMessageCollection implements Collection<Message> {
 
-  private final Collection<Result> delegate;
+  private final Collection<Object> delegate;
   protected final CursorProviderFactory cursorProviderFactory;
   protected final Event event;
+  protected final FunctionalReadWriteLock lock = readWriteLock();
 
-  public ResultsToMessageCollection(Collection<Result> delegate,
+  public ResultsToMessageCollection(Collection<Object> delegate,
                                     CursorProviderFactory cursorProviderFactory,
                                     Event event) {
     this.delegate = delegate;
@@ -45,75 +47,104 @@ public class ResultsToMessageCollection implements Collection<Message> {
 
   @Override
   public int size() {
-    return delegate.size();
+    return lock.withReadLock(r -> delegate.size());
   }
 
   @Override
   public boolean isEmpty() {
-    return delegate.isEmpty();
+    return lock.withReadLock(r -> delegate.isEmpty());
   }
 
   @Override
   public boolean contains(Object o) {
-    return delegate.contains(o);
+    return lock.withReadLock(r -> {
+      boolean contains = delegate.contains(o);
+      if (!contains && o instanceof Message) {
+        contains = delegate.contains(Result.builder((Message) o));
+      }
+
+      return contains;
+    });
   }
 
   @Override
   public Iterator<Message> iterator() {
-    Iterator<Result> iterator = delegate.iterator();
-    return new ResultToMessageIterator(iterator, cursorProviderFactory, event);
+    return new ResultToMessageIterator(delegate.iterator(), cursorProviderFactory, event);
   }
 
   @Override
   public Object[] toArray() {
-    return transformArray(delegate.toArray());
+    return lock.withReadLock(r -> transformArray(delegate.toArray()));
   }
 
   @Override
   public <T> T[] toArray(T[] a) {
-    return transformArray(delegate.toArray(a));
+    return lock.withReadLock(r -> transformArray(delegate.toArray(a)));
   }
 
   private <T> T[] transformArray(T[] array) {
     return (T[]) Stream.of(array)
-        .map(result -> toMessage((Result) result, cursorProviderFactory, event))
+        .map(result -> toMessage(result, cursorProviderFactory, event))
         .toArray(Object[]::new);
   }
 
   @Override
   public boolean add(Message message) {
-    return delegate.add(Result.builder(message).build());
+    return lock.withWriteLock(() -> delegate.add(message));
   }
 
   @Override
   public boolean remove(Object o) {
-    return delegate.remove(o);
+    return lock.withWriteLock(() -> delegate.remove(o));
   }
 
   @Override
   public boolean containsAll(Collection<?> c) {
-    return delegate.containsAll(toResults((Collection<Message>) c));
+    if (c == null) {
+      throw new NullPointerException();
+    }
+    return lock.withReadLock(r -> delegate.stream().allMatch(delegate::contains));
   }
 
-  protected Collection<Result> toResults(Collection<? extends Message> messages) {
+  protected Collection<?> toResults(Collection<?> messages) {
     return messages.stream()
-        .map(message -> Result.builder(message).build())
-        .collect(toList());
+        .map(o -> {
+          if (o instanceof Message) {
+            return o;
+          } else {
+            return toMessage(o, cursorProviderFactory, event);
+          }
+        }).collect(toList());
   }
 
   @Override
   public boolean addAll(Collection<? extends Message> c) {
-    return delegate.addAll(toResults(c));
+    return lock.withWriteLock(() -> delegate.addAll(c));
   }
 
   @Override
   public boolean removeAll(Collection<?> c) {
-    return delegate.removeAll(toResults((Collection<Message>) c));
+    if (c == null) {
+      throw new NullPointerException();
+    }
+    return lock.withWriteLock(() -> {
+      boolean removed = false;
+      for (Object value : c) {
+        boolean itemRemoved = delegate.remove(c);
+        if (!itemRemoved) {
+          itemRemoved = delegate.remove(toMessage(value, cursorProviderFactory, event));
+        }
+
+        removed = removed || itemRemoved;
+      }
+
+      return removed;
+    });
   }
 
   @Override
   public boolean removeIf(Predicate<? super Message> filter) {
-    return delegate.removeIf(result -> filter.test(toMessage(result)));
+    return delegate.removeIf(result -> filter.test(toMessage(result, cursorProviderFactory, event)));
   }
 
   @Override
@@ -123,17 +154,17 @@ public class ResultsToMessageCollection implements Collection<Message> {
 
   @Override
   public void clear() {
-    delegate.clear();
+    lock.withWriteLock(delegate::clear);
   }
 
   @Override
   public boolean equals(Object o) {
-    return delegate.equals(o);
+    return lock.withReadLock(r -> delegate.equals(o));
   }
 
   @Override
   public int hashCode() {
-    return delegate.hashCode();
+    return lock.withReadLock(r -> delegate.hashCode());
   }
 
   @Override
@@ -155,5 +186,13 @@ public class ResultsToMessageCollection implements Collection<Message> {
   @Override
   public void forEach(Consumer<? super Message> action) {
     stream().forEach(action);
+  }
+
+  protected Message toMessage(Object value, CursorProviderFactory cursorProviderFactory, Event event) {
+    if (value instanceof Message) {
+      return (Message) value;
+    } else {
+      return MessageUtils.toMessage((Result) value, cursorProviderFactory, event);
+    }
   }
 }

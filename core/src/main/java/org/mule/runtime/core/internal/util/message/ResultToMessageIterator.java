@@ -26,11 +26,11 @@ import java.util.function.Consumer;
  */
 final class ResultToMessageIterator implements Iterator<Message> {
 
-  private final Iterator<Result> delegate;
+  private final Iterator<Object> delegate;
   private final CursorProviderFactory cursorProviderFactory;
   private final Event event;
 
-  ResultToMessageIterator(Iterator<Result> delegate,
+  ResultToMessageIterator(Iterator<Object> delegate,
                           CursorProviderFactory cursorProviderFactory,
                           Event event) {
     this.delegate = delegate;
@@ -46,7 +46,12 @@ final class ResultToMessageIterator implements Iterator<Message> {
 
   @Override
   public Message next() {
-    return toMessage(delegate.next(), cursorProviderFactory, event);
+    Object value = delegate.next();
+    if (value instanceof Message) {
+      return (Message) value;
+    }
+
+    return toMessage((Result) delegate.next(), cursorProviderFactory, event);
   }
 
   @Override
@@ -56,6 +61,11 @@ final class ResultToMessageIterator implements Iterator<Message> {
 
   @Override
   public void forEachRemaining(Consumer<? super Message> action) {
-    delegate.forEachRemaining(result -> action.accept(toMessage(result, cursorProviderFactory, event)));
+    delegate.forEachRemaining(value -> {
+      if (value instanceof Result) {
+        value = toMessage((Result) value, cursorProviderFactory, event);
+      }
+      action.accept((Message) value);
+    });
   }
 }
