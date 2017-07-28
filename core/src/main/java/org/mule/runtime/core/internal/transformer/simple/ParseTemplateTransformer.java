@@ -37,8 +37,10 @@ public class ParseTemplateTransformer extends AbstractMessageTransformer {
   public void initialise() throws InitialisationException {
     super.initialise();
     //Check if both content and location are defined. If so, raise exception due to ambiguity.
-    if(content != null && location != null) throw new InitialisationException(createStaticMessage("Can't define both location and content at the same time"),this);
-    if(location != null) {
+    if (content != null && location != null) {
+      throw new InitialisationException(createStaticMessage("Can't define both location and content at the same time"), this);
+    }
+    if (location != null) {
       loadContentFromLocation();
     }
     if (encoding != null) {
@@ -65,7 +67,7 @@ public class ParseTemplateTransformer extends AbstractMessageTransformer {
   @Override
   public Event process(Event event) {
     if (content == null) {
-      throw new IllegalArgumentException("Template cannot be null");
+      throw new IllegalArgumentException("Template content cannot be null");
     }
     Object result = muleContext.getExpressionManager().parse(content, event, null);
     if (encoder != null) {
