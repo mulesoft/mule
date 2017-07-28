@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.util.message;
 
-import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.api.util.StreamingUtils.streamingContent;
 import org.mule.runtime.api.message.Message;
@@ -18,11 +17,11 @@ import org.mule.runtime.core.streaming.CursorProviderFactory;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * Utility methods for handling {@link Message messages}
@@ -79,36 +78,37 @@ public final class MessageUtils {
    *
    * @return a {@link Message}
    */
-  public static Message toMessage(Result result,
+  public static Message toMessage(Result<?, ?> result,
                                   MediaType mediaType,
                                   CursorProviderFactory cursorProviderFactory,
                                   Event event) {
-    return Message.builder()
+    Message.Builder builder = Message.builder()
         .payload(streamingContent(result.getOutput(), cursorProviderFactory, event))
-        .mediaType(mediaType)
-        .attributes(result.getAttributes().orElse(NULL_ATTRIBUTES))
-        .build();
+        .mediaType(mediaType);
+
+    result.getAttributes().ifPresent(builder::attributes);
+    result.getAttributesMediaType().ifPresent(builder::attributesMediaType);
+
+    return builder.build();
   }
 
   /**
-   * Transforms the given {@code results} into a similar collection of {@link Message}
+   * Transforms the given {@code results} into a list of {@link Message}
    * objects
    *
    * @param results               a collection of {@link Result} items
    * @param cursorProviderFactory the {@link CursorProviderFactory} used to handle streaming cursors
    * @param event                 the {@link Event} which originated the results being transformed
-   * @return a similar collection of {@link Message}
+   * @return a {@link List} of {@link Message}
    */
-  public static Collection<Message> toMessageCollection(Collection<Result> results,
-                                                        CursorProviderFactory cursorProviderFactory,
-                                                        Event event) {
-    if (results instanceof List) {
-      return new ResultsToMessageList((List<Result>) results, cursorProviderFactory, event);
-    } else if (results instanceof Set) {
-      return new ResultsToMessageSet((Set<Result>) results, cursorProviderFactory, event);
-    } else {
-      return new ResultsToMessageCollection(results, cursorProviderFactory, event);
+  public static List<Message> toMessageCollection(Collection<Result> results,
+                                                  CursorProviderFactory cursorProviderFactory,
+                                                  Event event) {
+    if (!(results instanceof List)) {
+      results = new ArrayList<>(results);
     }
+
+    return new ResultsToMessageList((List) results, cursorProviderFactory, event);
   }
 
   /**
