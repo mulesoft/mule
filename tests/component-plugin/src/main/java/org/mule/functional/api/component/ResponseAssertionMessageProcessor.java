@@ -12,10 +12,12 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import static org.mule.functional.api.component.FlowAssert.addAssertion;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setFlowConstructIfNeeded;
+import static org.mule.tck.junit4.AbstractMuleContextTestCase.RECEIVE_TIMEOUT;
+import static org.mule.tck.processor.FlowAssert.addAssertion;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
+
 import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -28,11 +30,12 @@ import org.mule.runtime.core.api.expression.InvalidExpressionException;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 
-import com.eaio.uuid.UUID;
-
 import java.util.concurrent.CountDownLatch;
 
 import org.reactivestreams.Publisher;
+
+import com.eaio.uuid.UUID;
+
 import reactor.core.publisher.Flux;
 
 public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
@@ -40,7 +43,7 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
 
   private static final ThreadLocal<String> taskTokenInThread = new ThreadLocal<>();
 
-  protected String responseExpression = "#[mel:true]";
+  protected String responseExpression = "#[true]";
   private int responseCount = 1;
   private boolean responseSameTask = true;
 
@@ -183,7 +186,7 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
    * @throws InterruptedException
    */
   synchronized private boolean isResponseProcessesCountCorrect() throws InterruptedException {
-    boolean countReached = responseLatch.await(timeout, MILLISECONDS);
+    boolean countReached = responseLatch.await(RECEIVE_TIMEOUT, MILLISECONDS);
     if (needToMatchCount) {
       return responseCount == responseInvocationCount;
     } else {

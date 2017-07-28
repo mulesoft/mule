@@ -10,7 +10,6 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
 
-import org.mule.functional.api.component.FlowAssert;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.streaming.Cursor;
@@ -21,6 +20,7 @@ import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
+import org.mule.tck.processor.FlowAssert;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 
