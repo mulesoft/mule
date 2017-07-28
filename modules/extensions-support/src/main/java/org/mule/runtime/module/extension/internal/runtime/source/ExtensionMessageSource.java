@@ -397,8 +397,8 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
             return entry.getValue().resolve(ctx);
           } catch (MuleException e) {
             throw new MuleRuntimeException(createStaticMessage(format(
-                                                                      "Could not resolve parameter '%s'", entry.getKey())),
-                                           e);
+                "Could not resolve parameter '%s' for message source at location '%s'",
+                entry.getKey()), getLocation().toString()), e);
           }
         }));
   }
