@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.artifact.classloader;
+package org.mule.runtime.module.artifact.internal.classloader;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

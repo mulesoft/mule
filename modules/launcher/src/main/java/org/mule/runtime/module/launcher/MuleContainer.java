@@ -10,7 +10,7 @@ import static java.lang.ClassLoader.getSystemClassLoader;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
 
-import org.mule.module.artifact.classloader.DefaultResourceInitializer;
+import org.mule.runtime.module.artifact.internal.classloader.DefaultResourceInitializer;
 import org.mule.runtime.api.exception.ExceptionHelper;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
