@@ -8,6 +8,7 @@ package org.mule.module.cxf;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -33,21 +34,22 @@ import org.apache.cxf.interceptor.StaxInInterceptor;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
-import org.hamcrest.Matchers;
 import org.junit.Test;
 
 public class CxfInboundMessageProcessorTestCase extends AbstractMuleContextTestCase
 {
     private String msg =
-        "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"><soap:Body>" +
+            "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"><soap:Body>" +
             "<ns1:echo xmlns:ns1=\"http://testmodels.cxf.module.mule.org/\">" +
-                "<text>echo</text>" +
+            "<text>echo</text>" +
             "</ns1:echo>" +
-        "</soap:Body></soap:Envelope>";
+            "</soap:Body></soap:Envelope>";
+
+    private static final String ANOTHER_VALUE = "another value";
     private String responseMsg =
         "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"><soap:Body>" +
             "<ns2:echoResponse xmlns:ns2=\"http://testmodels.cxf.module.mule.org/\">" +
-                "<text>echo</text>" +
+                "<text>another value</text>" +
             "</ns2:echoResponse>" +
         "</soap:Body></soap:Envelope>";
 
@@ -127,7 +129,7 @@ public class CxfInboundMessageProcessorTestCase extends AbstractMuleContextTestC
     }
 
     @Test
-    public void testInboundWithValidationEnabled() throws Exception
+    public void inboundWithValidationEnabled() throws Exception
     {
         CxfInboundMessageProcessor processor = createMessageProcessorWithValidationEnabled();
 
@@ -137,8 +139,7 @@ public class CxfInboundMessageProcessorTestCase extends AbstractMuleContextTestC
             {
                 payload = event.getMessage().getPayload();
                 assertThat("echo", equalTo(payload));
-                event.getMessage().setPayload("echo");
-                gotEvent = true;
+                event.getMessage().setPayload(ANOTHER_VALUE);
                 return event;
             }
         };
@@ -149,7 +150,7 @@ public class CxfInboundMessageProcessorTestCase extends AbstractMuleContextTestC
         MuleEvent response = processor.process(event);
 
         Object payload = response.getMessage().getPayload();
-        assertThat(payload, Matchers.instanceOf(OutputHandler.class));
+        assertThat(payload, instanceOf(OutputHandler.class));
         assertThat(response.getMessage().getPayloadAsString(), is(responseMsg));
     }
 
@@ -170,7 +171,7 @@ public class CxfInboundMessageProcessorTestCase extends AbstractMuleContextTestC
 
         CxfInboundMessageProcessor processor = builder.build();
         Server server = processor.getServer();
-        // adding a proxy schema validation interceptor, simulating SOAP Kit behavior
+        // adding a proxy schema validation interceptor
         server.getEndpoint().getInInterceptors().add(new ProxySchemaValidationInInterceptor(config.getCxfBus(), server.getEndpoint(),
                                                                     server.getEndpoint().getService().getServiceInfos().get(0)));
         processor.start();
