@@ -84,6 +84,7 @@ public final class SchemaConstants {
   public static final QName EXPRESSION_LIST = new QName(CORE_NAMESPACE, "expressionList", CORE_PREFIX);
   public static final QName EXPRESSION_MAP = new QName(CORE_NAMESPACE, "expressionMap", CORE_PREFIX);
   public static final QName EXPRESSION_DATE_TIME = new QName(CORE_NAMESPACE, "expressionDateTime", CORE_PREFIX);
+  public static final QName TARGET_OUTPUT_ENUM = new QName(CORE_NAMESPACE, "targetTypeEnumType", CORE_PREFIX);
 
   // ATTRIBUTES
   public static final String USE_REQUIRED = "required";

@@ -10,6 +10,7 @@ import static org.mule.runtime.core.api.rx.Exceptions.wrapFatal;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.meta.TargetType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.Event;
@@ -43,12 +44,13 @@ public class PagedOperationMessageProcessor extends OperationMessageProcessor {
                                         OperationModel operationModel,
                                         ConfigurationProvider configurationProvider,
                                         String target,
+                                        TargetType targetType,
                                         ResolverSet resolverSet,
                                         CursorProviderFactory cursorProviderFactory,
                                         ExtensionManager extensionManager,
                                         PolicyManager policyManager,
                                         ExtensionConnectionSupplier connectionSupplier) {
-    super(extensionModel, operationModel, configurationProvider, target, resolverSet, cursorProviderFactory,
+    super(extensionModel, operationModel, configurationProvider, target, targetType, resolverSet, cursorProviderFactory,
           extensionManager, policyManager);
     this.connectionSupplier = connectionSupplier;
   }
@@ -59,7 +61,7 @@ public class PagedOperationMessageProcessor extends OperationMessageProcessor {
       Event resultEvent = super.doProcess(event, operationContext).block();
       PagingProvider<?, ?> pagingProvider = getTarget()
           .map(target -> getPagingProvider(
-                                           (Message) resultEvent.getVariable(target).getValue()))
+                                           resultEvent.getVariable(target).getValue()))
           .orElseGet(() -> getPagingProvider(resultEvent.getMessage()));
 
       if (pagingProvider == null) {
@@ -79,7 +81,7 @@ public class PagedOperationMessageProcessor extends OperationMessageProcessor {
     }
   }
 
-  private PagingProvider getPagingProvider(Message message) {
-    return (PagingProvider) message.getPayload().getValue();
+  private PagingProvider getPagingProvider(Object target) {
+    return target instanceof Message ? (PagingProvider) ((Message) target).getPayload().getValue() : (PagingProvider) target;
   }
 }

@@ -30,6 +30,7 @@ import static org.mule.runtime.api.meta.model.tck.TestHttpConnectorDeclarer.VERS
 import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.REDELIVERY_POLICY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.STREAMING_STRATEGY_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_TYPE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.assertType;
 import org.mule.metadata.api.model.BinaryType;
@@ -37,6 +38,7 @@ import org.mule.metadata.api.model.NumberType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.model.UnionType;
+import org.mule.runtime.api.meta.TargetType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
@@ -145,7 +147,7 @@ public class ComplexExtensionDeclarationTestCase extends AbstractJavaExtensionDe
     assertThat(operation.getName(), is(REQUEST_OPERATION_NAME));
     assertType(operation.getOutput().getType(), InputStream.class, BinaryType.class);
     List<ParameterModel> parameterModels = operation.getAllParameterModels();
-    assertThat(parameterModels, hasSize(3));
+    assertThat(parameterModels, hasSize(4));
 
     ParameterModel parameter = parameterModels.get(0);
     assertStreamingStrategyParameter(parameter);
@@ -154,13 +156,15 @@ public class ComplexExtensionDeclarationTestCase extends AbstractJavaExtensionDe
     assertThat(parameter.getName(), is(PATH));
     assertType(parameter.getType(), String.class, StringType.class);
 
-    parameter = parameterModels.get(2);
-    assertTargetParameter(parameter);
+    assertTargetParameter(parameterModels.get(2), parameterModels.get(3));
   }
 
-  private void assertTargetParameter(ParameterModel parameter) {
-    assertThat(parameter.getName(), is(TARGET_PARAMETER_NAME));
-    assertType(parameter.getType(), String.class, StringType.class);
+  private void assertTargetParameter(ParameterModel target, ParameterModel targetType) {
+    assertThat(target.getName(), is(TARGET_PARAMETER_NAME));
+    assertType(target.getType(), String.class, StringType.class);
+
+    assertThat(targetType.getName(), is(TARGET_TYPE_PARAMETER_NAME));
+    assertType(targetType.getType(), TargetType.class, StringType.class);
   }
 
   private void assertStreamingStrategyParameter(ParameterModel parameter) {
@@ -174,7 +178,7 @@ public class ComplexExtensionDeclarationTestCase extends AbstractJavaExtensionDe
     assertThat(operation.getName(), is(STATIC_RESOURCE_OPERATION_NAME));
     assertType(operation.getOutput().getType(), InputStream.class, BinaryType.class);
     final List<ParameterModel> parameters = operation.getAllParameterModels();
-    assertThat(parameters, hasSize(3));
+    assertThat(parameters, hasSize(4));
 
     assertStreamingStrategyParameter(parameters.get(0));
 
@@ -182,7 +186,7 @@ public class ComplexExtensionDeclarationTestCase extends AbstractJavaExtensionDe
     assertThat(parameter.getName(), is(PATH));
     assertType(parameter.getType(), String.class, StringType.class);
 
-    assertTargetParameter(parameters.get(2));
+    assertTargetParameter(parameters.get(2), parameters.get(3));
   }
 
   @Test

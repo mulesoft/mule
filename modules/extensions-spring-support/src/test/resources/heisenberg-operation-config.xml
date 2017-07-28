@@ -50,7 +50,7 @@
     </flow>
 
     <flow name="sayMyNameOnTarget">
-        <heisenberg:say-my-name config-ref="heisenberg" target="myFace"/>
+        <heisenberg:say-my-name config-ref="heisenberg" target="myFace" targetType="MESSAGE"/>
     </flow>
 
     <flow name="die">

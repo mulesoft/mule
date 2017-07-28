@@ -52,7 +52,6 @@ import org.mule.test.heisenberg.extension.model.types.WeaponType;
 import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 
 import java.io.ByteArrayInputStream;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -70,9 +69,7 @@ public class OperationExecutionTestCase extends AbstractExtensionFunctionalTestC
   public static final String HEISENBERG = "heisenberg";
   public static final String KILL_RESULT = String.format("Killed with: %s , Type %s and attribute %s", RICIN_KILL_MESSAGE,
                                                          WeaponType.MELEE_WEAPON.name(), "Pizza on the rooftop");
-  public static final long PAYMENT = 100;
   private static final String GUSTAVO_FRING = "Gustavo Fring";
-  private static final BigDecimal MONEY = BigDecimal.valueOf(1000000);
   private static final String GOODBYE_MESSAGE = "Say hello to my little friend";
   private static final String VICTIM = "Skyler";
   private static final String EMPTY_STRING = "";
