@@ -37,6 +37,7 @@ import org.slf4j.Logger;
  *
  * @since 4.0
  */
+// TODO: MULE-13219: Should not need to implement lifecycle
 public class TopLevelParameterObjectFactory extends AbstractExtensionObjectFactory<Object> implements Lifecycle {
 
   private static final Logger LOGGER = getLogger(TopLevelParameterObjectFactory.class);
