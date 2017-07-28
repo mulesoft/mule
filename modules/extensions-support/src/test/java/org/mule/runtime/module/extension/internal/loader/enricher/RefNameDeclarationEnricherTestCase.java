@@ -19,7 +19,7 @@ import static org.reflections.ReflectionUtils.withAnnotation;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
-import org.mule.runtime.extension.api.annotation.param.ConfigName;
+import org.mule.runtime.extension.api.annotation.param.RefName;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
@@ -45,7 +45,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class ConfigNameDeclarationEnricherTestCase extends AbstractMuleTestCase {
+public class RefNameDeclarationEnricherTestCase extends AbstractMuleTestCase {
 
   @Mock(answer = RETURNS_DEEP_STUBS)
   private ExtensionLoadingContext extensionLoadingContext;
@@ -64,7 +64,7 @@ public class ConfigNameDeclarationEnricherTestCase extends AbstractMuleTestCase 
 
   private Field configNameField;
   private Field providerNameField;
-  private final ConfigNameDeclarationEnricher enricher = new ConfigNameDeclarationEnricher();
+  private final RefNameDeclarationEnricher enricher = new RefNameDeclarationEnricher();
 
   @Before
   public void before() throws Exception {
@@ -75,8 +75,8 @@ public class ConfigNameDeclarationEnricherTestCase extends AbstractMuleTestCase 
 
     mockImplementingProperty(configurationDeclaration, TestNameAwareConfig.class);
     mockImplementingProperty(connectionProviderDeclaration, TestNameAwareConnectionProvider.class);
-    configNameField = getAllFields(TestNameAwareConfig.class, withAnnotation(ConfigName.class)).iterator().next();
-    providerNameField = getAllFields(TestNameAwareConnectionProvider.class, withAnnotation(ConfigName.class)).iterator().next();
+    configNameField = getAllFields(TestNameAwareConfig.class, withAnnotation(RefName.class)).iterator().next();
+    providerNameField = getAllFields(TestNameAwareConnectionProvider.class, withAnnotation(RefName.class)).iterator().next();
   }
 
   @Test
@@ -125,7 +125,7 @@ public class ConfigNameDeclarationEnricherTestCase extends AbstractMuleTestCase 
 
   public static class TestNameAwareConfig {
 
-    @ConfigName
+    @RefName
     private String name;
 
     public String getName() {
@@ -135,22 +135,22 @@ public class ConfigNameDeclarationEnricherTestCase extends AbstractMuleTestCase 
 
   public static class TestMultipleNameAwareConfig {
 
-    @ConfigName
+    @RefName
     private String name;
 
-    @ConfigName
+    @RefName
     private String redundantName;
   }
 
   public static class TestIllegalNameAwareConfig {
 
-    @ConfigName
+    @RefName
     private Apple name;
   }
 
   public static class TestNameAwareConnectionProvider implements ConnectionProvider<Object> {
 
-    @ConfigName
+    @RefName
     private String name;
 
     @Override

@@ -23,7 +23,7 @@ import org.mule.test.marvel.model.Missile;
 @ConnectionProviders({MissileProvider.class, OddMissileProvider.class})
 public class IronMan {
 
-  public static final String CONFIG_NAME = "iron-man";
+  public static final String CONFIG_NAME = "ironMan";
 
   @Path(acceptsUrls = true)
   @Parameter

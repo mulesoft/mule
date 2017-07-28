@@ -9,13 +9,14 @@ package org.mule.test.marvel.drstrange;
 import static org.mule.test.marvel.MarvelExtension.MARVEL_EXTENSION;
 import static org.mule.test.marvel.drstrange.DrStrange.CONFIG_NAME;
 
-import org.mule.runtime.extension.api.annotation.ConfigReference;
+import org.mule.runtime.extension.api.annotation.param.reference.ConfigReference;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.reference.ObjectStoreReference;
 import org.mule.test.marvel.ironman.IronMan;
 
 /**
@@ -34,4 +35,9 @@ public class DrStrange {
   @Parameter
   @Optional
   private String ironManConfig;
+
+  @Parameter
+  @Optional
+  @ObjectStoreReference
+  private String spellStore;
 }

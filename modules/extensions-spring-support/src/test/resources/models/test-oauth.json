@@ -234,7 +234,7 @@
                   "displayModel": {
                     "displayName": "Target Variable"
                   },
-                  "description": "The name of a variable on which the operation\u0027s output will be placed",
+                  "description": "The name of a variable on which the operation's output will be placed",
                   "modelProperties": {}
                 }
               ],
@@ -374,7 +374,7 @@
             }
           ],
           "name": "unauthorize",
-          "description": "Deletes all the access token information of a given resource owner id so that it\u0027s impossible to execute any operation for that user without doing the authorization dance again",
+          "description": "Deletes all the access token information of a given resource owner id so that it's impossible to execute any operation for that user without doing the authorization dance again",
           "modelProperties": {},
           "kind": "operation"
         }
@@ -728,7 +728,7 @@
                   },
                   "elementReferences": [],
                   "name": "authorizationUrl",
-                  "description": "The service provider\u0027s authorization endpoint URL",
+                  "description": "The service provider's authorization endpoint URL",
                   "modelProperties": {}
                 },
                 {
@@ -752,7 +752,7 @@
                   },
                   "elementReferences": [],
                   "name": "accessTokenUrl",
-                  "description": "The service provider\u0027s accessToken endpoint URL",
+                  "description": "The service provider's accessToken endpoint URL",
                   "modelProperties": {}
                 },
                 {
@@ -799,7 +799,7 @@
                   },
                   "elementReferences": [],
                   "name": "resourceOwnerId",
-                  "description": "The resourceOwnerId which each component should use if it doesn\u0027t reference otherwise.",
+                  "description": "The resourceOwnerId which each component should use if it doesn't reference otherwise.",
                   "modelProperties": {}
                 },
                 {
@@ -883,7 +883,7 @@
                     }
                   ],
                   "name": "listenerConfig",
-                  "description": "A reference to a \u003chttp:listener-config /\u003e to be used in order to create the listener that will catch the access token callback endpoint.",
+                  "description": "A reference to a <http:listener-config /> to be used in order to create the listener that will catch the access token callback endpoint.",
                   "modelProperties": {}
                 },
                 {
@@ -982,9 +982,15 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
-                  "elementReferences": [],
+                  "elementReferences": [
+                    {
+                      "namespace": "os",
+                      "name": "objectStore",
+                      "type": "OBJECT_STORE"
+                    }
+                  ],
                   "name": "objectStore",
-                  "description": "A reference to the object store that should be used to store each resource owner id\u0027s data. If not specified, runtime will automatically provision the default one.",
+                  "description": "A reference to the object store that should be used to store each resource owner id's data. If not specified, runtime will automatically provision the default one.",
                   "modelProperties": {}
                 }
               ],
@@ -1360,7 +1366,7 @@
                   },
                   "elementReferences": [],
                   "name": "authorizationUrl",
-                  "description": "The service provider\u0027s authorization endpoint URL",
+                  "description": "The service provider's authorization endpoint URL",
                   "modelProperties": {}
                 },
                 {
@@ -1384,7 +1390,7 @@
                   },
                   "elementReferences": [],
                   "name": "accessTokenUrl",
-                  "description": "The service provider\u0027s accessToken endpoint URL",
+                  "description": "The service provider's accessToken endpoint URL",
                   "modelProperties": {}
                 },
                 {
@@ -1430,7 +1436,7 @@
                   },
                   "elementReferences": [],
                   "name": "resourceOwnerId",
-                  "description": "The resourceOwnerId which each component should use if it doesn\u0027t reference otherwise.",
+                  "description": "The resourceOwnerId which each component should use if it doesn't reference otherwise.",
                   "modelProperties": {}
                 },
                 {
@@ -1514,7 +1520,7 @@
                     }
                   ],
                   "name": "listenerConfig",
-                  "description": "A reference to a \u003chttp:listener-config /\u003e to be used in order to create the listener that will catch the access token callback endpoint.",
+                  "description": "A reference to a <http:listener-config /> to be used in order to create the listener that will catch the access token callback endpoint.",
                   "modelProperties": {}
                 },
                 {
@@ -1613,9 +1619,15 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
-                  "elementReferences": [],
+                  "elementReferences": [
+                    {
+                      "namespace": "os",
+                      "name": "objectStore",
+                      "type": "OBJECT_STORE"
+                    }
+                  ],
                   "name": "objectStore",
-                  "description": "A reference to the object store that should be used to store each resource owner id\u0027s data. If not specified, runtime will automatically provision the default one.",
+                  "description": "A reference to the object store that should be used to store each resource owner id's data. If not specified, runtime will automatically provision the default one.",
                   "modelProperties": {}
                 }
               ],
@@ -2001,7 +2013,7 @@
               },
               "elementReferences": [],
               "name": "authorizationUrl",
-              "description": "The service provider\u0027s authorization endpoint URL",
+              "description": "The service provider's authorization endpoint URL",
               "modelProperties": {}
             },
             {
@@ -2025,7 +2037,7 @@
               },
               "elementReferences": [],
               "name": "accessTokenUrl",
-              "description": "The service provider\u0027s accessToken endpoint URL",
+              "description": "The service provider's accessToken endpoint URL",
               "modelProperties": {}
             },
             {
@@ -2072,7 +2084,7 @@
               },
               "elementReferences": [],
               "name": "resourceOwnerId",
-              "description": "The resourceOwnerId which each component should use if it doesn\u0027t reference otherwise.",
+              "description": "The resourceOwnerId which each component should use if it doesn't reference otherwise.",
               "modelProperties": {}
             },
             {
@@ -2156,7 +2168,7 @@
                 }
               ],
               "name": "listenerConfig",
-              "description": "A reference to a \u003chttp:listener-config /\u003e to be used in order to create the listener that will catch the access token callback endpoint.",
+              "description": "A reference to a <http:listener-config /> to be used in order to create the listener that will catch the access token callback endpoint.",
               "modelProperties": {}
             },
             {
@@ -2255,9 +2267,15 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
-              "elementReferences": [],
+              "elementReferences": [
+                {
+                  "namespace": "os",
+                  "name": "objectStore",
+                  "type": "OBJECT_STORE"
+                }
+              ],
               "name": "objectStore",
-              "description": "A reference to the object store that should be used to store each resource owner id\u0027s data. If not specified, runtime will automatically provision the default one.",
+              "description": "A reference to the object store that should be used to store each resource owner id's data. If not specified, runtime will automatically provision the default one.",
               "modelProperties": {}
             }
           ],
@@ -2633,7 +2651,7 @@
               },
               "elementReferences": [],
               "name": "authorizationUrl",
-              "description": "The service provider\u0027s authorization endpoint URL",
+              "description": "The service provider's authorization endpoint URL",
               "modelProperties": {}
             },
             {
@@ -2657,7 +2675,7 @@
               },
               "elementReferences": [],
               "name": "accessTokenUrl",
-              "description": "The service provider\u0027s accessToken endpoint URL",
+              "description": "The service provider's accessToken endpoint URL",
               "modelProperties": {}
             },
             {
@@ -2703,7 +2721,7 @@
               },
               "elementReferences": [],
               "name": "resourceOwnerId",
-              "description": "The resourceOwnerId which each component should use if it doesn\u0027t reference otherwise.",
+              "description": "The resourceOwnerId which each component should use if it doesn't reference otherwise.",
               "modelProperties": {}
             },
             {
@@ -2787,7 +2805,7 @@
                 }
               ],
               "name": "listenerConfig",
-              "description": "A reference to a \u003chttp:listener-config /\u003e to be used in order to create the listener that will catch the access token callback endpoint.",
+              "description": "A reference to a <http:listener-config /> to be used in order to create the listener that will catch the access token callback endpoint.",
               "modelProperties": {}
             },
             {
@@ -2886,9 +2904,15 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
-              "elementReferences": [],
+              "elementReferences": [
+                {
+                  "namespace": "os",
+                  "name": "objectStore",
+                  "type": "OBJECT_STORE"
+                }
+              ],
               "name": "objectStore",
-              "description": "A reference to the object store that should be used to store each resource owner id\u0027s data. If not specified, runtime will automatically provision the default one.",
+              "description": "A reference to the object store that should be used to store each resource owner id's data. If not specified, runtime will automatically provision the default one.",
               "modelProperties": {}
             }
           ],

@@ -7,16 +7,26 @@
 package org.mule.runtime.module.extension.internal.config.dsl.parameter;
 
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
+import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ObjectBuilderValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
+
+import org.slf4j.Logger;
 
 /**
  * An {@link AbstractExtensionObjectFactory} to resolve extension objects that can be defined as named top level elements and be
@@ -27,12 +37,17 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver
  *
  * @since 4.0
  */
-public class TopLevelParameterObjectFactory extends AbstractExtensionObjectFactory<Object> {
+// TODO: MULE-13219: Should not need to implement lifecycle
+public class TopLevelParameterObjectFactory extends AbstractExtensionObjectFactory<Object> implements Lifecycle {
+
+  private static final Logger LOGGER = getLogger(TopLevelParameterObjectFactory.class);
 
   private DefaultObjectBuilder builder;
   private Class<Object> objectClass;
   private final ObjectType objectType;
   private final ClassLoader classLoader;
+  private String name;
+  private Object staticProduct = null;
 
   public TopLevelParameterObjectFactory(ObjectType type, ClassLoader classLoader, MuleContext muleContext) {
     super(muleContext);
@@ -45,6 +60,34 @@ public class TopLevelParameterObjectFactory extends AbstractExtensionObjectFacto
   }
 
   @Override
+  public void initialise() throws InitialisationException {
+    if (staticProduct != null) {
+      initialiseIfNeeded(staticProduct, true, muleContext);
+    }
+  }
+
+  @Override
+  public void start() throws MuleException {
+    if (staticProduct != null) {
+      startIfNeeded(staticProduct);
+    }
+  }
+
+  @Override
+  public void stop() throws MuleException {
+    if (staticProduct != null) {
+      stopIfNeeded(staticProduct);
+    }
+  }
+
+  @Override
+  public void dispose() {
+    if (staticProduct != null) {
+      disposeIfNeeded(staticProduct, LOGGER);
+    }
+  }
+
+  @Override
   public Object doGetObject() throws Exception {
     return withContextClassLoader(classLoader, () -> {
       // TODO MULE-10919 - This logic is similar to that of the resolverset object builder and should
@@ -53,10 +96,23 @@ public class TopLevelParameterObjectFactory extends AbstractExtensionObjectFacto
       resolveParameters(objectType, builder);
       resolveParameterGroups(objectType, builder);
 
+      if (name != null) {
+        builder.setName(name);
+      }
+
       ValueResolver<Object> resolver = new ObjectBuilderValueResolver<>(builder, muleContext);
-      return resolver.isDynamic() ? resolver : resolver.resolve(from(getInitialiserEvent(muleContext)));
+      if (resolver.isDynamic()) {
+        return resolver;
+      }
+
+      staticProduct = resolver.resolve(from(getInitialiserEvent(muleContext)));
+      return staticProduct;
     }, Exception.class, exception -> {
       throw exception;
     });
+  }
+
+  public void setName(String name) {
+    this.name = name;
   }
 }

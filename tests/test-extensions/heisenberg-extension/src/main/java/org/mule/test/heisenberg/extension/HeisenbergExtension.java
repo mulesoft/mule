@@ -27,7 +27,7 @@ import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
-import org.mule.runtime.extension.api.annotation.param.ConfigName;
+import org.mule.runtime.extension.api.annotation.param.RefName;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
@@ -94,7 +94,7 @@ public class HeisenbergExtension implements Lifecycle {
   @Inject
   private ExtensionManager extensionManager;
 
-  @ConfigName
+  @RefName
   private String configName;
 
   @Parameter

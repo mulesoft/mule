@@ -7,32 +7,24 @@
 package org.mule.runtime.core.internal.connection;
 
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
-import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.retry.policy.RetryPolicy;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
-import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 
 import java.util.Optional;
 
-import org.slf4j.Logger;
-
 /**
- * A {@link ConnectionProviderWrapper} which performs lifecycle and dependency injection operations on the generated connections
+ * A {@link ConnectionProviderWrapper} which performs base tasks as handling reconnection strategies, DI, etc.
  *
  * @param <C> the generic type of the connections that the {@link #delegate} produces
  * @since 4.0
  */
-public class LifecycleAwareConnectionProviderWrapper<C> extends ConnectionProviderWrapper<C> {
-
-  private static final Logger LOGGER = getLogger(LifecycleAwareConnectionProviderWrapper.class);
+public class DefaultConnectionProviderWrapper<C> extends ConnectionProviderWrapper<C> {
 
   private final MuleContext muleContext;
   private final ConnectionManagerAdapter connectionManager;
@@ -43,7 +35,7 @@ public class LifecycleAwareConnectionProviderWrapper<C> extends ConnectionProvid
    * @param delegate the {@link ConnectionProvider} to be wrapped
    * @param muleContext the owning {@link MuleContext}
    */
-  public LifecycleAwareConnectionProviderWrapper(ConnectionProvider<C> delegate, MuleContext muleContext) {
+  public DefaultConnectionProviderWrapper(ConnectionProvider<C> delegate, MuleContext muleContext) {
     super(delegate);
     this.muleContext = muleContext;
     connectionManager = muleContext.getRegistry().get(OBJECT_CONNECTION_MANAGER);
@@ -61,31 +53,11 @@ public class LifecycleAwareConnectionProviderWrapper<C> extends ConnectionProvid
     C connection = super.connect();
     try {
       muleContext.getInjector().inject(connection);
-      muleContext.getRegistry().applyLifecycle(connection, NotInLifecyclePhase.PHASE_NAME, Startable.PHASE_NAME);
     } catch (MuleException e) {
       throw new ConnectionException("Could not initialise connection", e);
     }
 
     return connection;
-  }
-
-  /**
-   * Disconnects the {@code connection} and then applies all the necessary {@link Lifecycle} phases until the
-   * {@link Disposable#PHASE_NAME} transition is reached
-   *
-   * @param connection the {@code Connection} to be destroyed
-   */
-  @Override
-  public void disconnect(C connection) {
-    try {
-      super.disconnect(connection);
-    } finally {
-      try {
-        muleContext.getRegistry().applyLifecycle(connection, Startable.PHASE_NAME, Disposable.PHASE_NAME);
-      } catch (MuleException e) {
-        LOGGER.warn("Exception was found trying to dispose connection", e);
-      }
-    }
   }
 
   /**

@@ -22,7 +22,7 @@ import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.module.extension.internal.loader.enricher.BooleanParameterDeclarationEnricher;
-import org.mule.runtime.module.extension.internal.loader.enricher.ConfigNameDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.enricher.RefNameDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ConnectionDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.MimeTypeParametersDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.DisplayDeclarationEnricher;
@@ -82,7 +82,7 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
   private final List<DeclarationEnricher> customDeclarationEnrichers = unmodifiableList(asList(
                                                                                                new JavaXmlDeclarationEnricher(),
                                                                                                new BooleanParameterDeclarationEnricher(),
-                                                                                               new ConfigNameDeclarationEnricher(),
+                                                                                               new RefNameDeclarationEnricher(),
                                                                                                new ConnectionDeclarationEnricher(),
                                                                                                new ErrorsDeclarationEnricher(),
                                                                                                new ExtensionsErrorsDeclarationEnricher(),

@@ -48,17 +48,16 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
 
   private static final int MAX_ACTIVE = 2;
 
-  private ConnectionProvider<Lifecycle> connectionProvider;
+  private ConnectionProvider<Object> connectionProvider;
 
-  private Object config = new Object();
   private PoolingProfile poolingProfile =
       new PoolingProfile(MAX_ACTIVE, MAX_ACTIVE, DEFAULT_MAX_POOL_WAIT, WHEN_EXHAUSTED_WAIT, INITIALISE_NONE);
-  private PoolingConnectionManagementStrategy<Lifecycle> strategy;
-  private PoolingListener<Lifecycle> poolingListener;
+  private PoolingConnectionManagementStrategy<Object> strategy;
+  private PoolingListener<Object> poolingListener;
   private Injector injector;
 
-  private ConnectionHandler<Lifecycle> connection1;
-  private ConnectionHandler<Lifecycle> connection2;
+  private ConnectionHandler<Object> connection1;
+  private ConnectionHandler<Object> connection2;
 
   @Before
   public void before() throws Exception {
@@ -81,9 +80,6 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
 
     verify(poolingListener).onBorrow(connection1.getConnection());
     verify(poolingListener).onBorrow(connection2.getConnection());
-
-    verifyThat(Lifecycle::initialise);
-    verifyThat(Lifecycle::start);
   }
 
   @Test
@@ -114,7 +110,7 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
     poolingProfile = new PoolingProfile(1, 1, DEFAULT_MAX_POOL_WAIT, WHEN_EXHAUSTED_FAIL, INITIALISE_NONE);
     initStrategy();
 
-    ConnectionHandler<Lifecycle> connectionHandler = strategy.getConnectionHandler();
+    ConnectionHandler<Object> connectionHandler = strategy.getConnectionHandler();
     try {
       strategy.getConnectionHandler();
       fail("Was expecting the pool to be exhausted");
@@ -133,10 +129,7 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
 
     strategy.close();
 
-    verify(connectionProvider, times(2)).disconnect(any(Lifecycle.class));
-
-    verifyThat(Lifecycle::stop);
-    verifyThat(Lifecycle::dispose);
+    verify(connectionProvider, times(2)).disconnect(any(Object.class));
   }
 
   @Test(expected = ConnectionException.class)
@@ -154,10 +147,10 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
   }
 
   private void resetConnectionProvider() throws ConnectionException {
-    ConnectionProvider<Lifecycle> connectionProvider = mock(ConnectionProvider.class);
+    ConnectionProvider<Object> connectionProvider = mock(ConnectionProvider.class);
     when(connectionProvider.connect()).thenAnswer(i -> mock(Lifecycle.class));
     when(connectionProvider.validate(anyObject())).thenReturn(ConnectionValidationResult.success());
-    this.connectionProvider = spy(new LifecycleAwareConnectionProviderWrapper<>(connectionProvider, muleContext));
+    this.connectionProvider = spy(new DefaultConnectionProviderWrapper<>(connectionProvider, muleContext));
   }
 
   private void initStrategy() {
