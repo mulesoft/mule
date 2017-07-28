@@ -7,23 +7,29 @@
 
 package org.mule.module.artifact.classloader;
 
-import org.mule.runtime.module.artifact.classloader.ResourceInitializer;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Default implementation used for every Mule container.
+ * Implementations of this class should take care of resources initialization with System Class Loader
+ * as if they are loaded with application's Class Loader it may leak memory after application is undeployment. Mule
+ * ensures to create an instance of this class with the System Class Loader.
+ *
+ * @since 4.0
  */
-public class DefaultResourceInitializer implements ResourceInitializer {
+public class DefaultResourceInitializer {
 
   private final transient Logger logger = LoggerFactory.getLogger(getClass());
 
   /**
-   * {@inheritDoc}
+   * Attempts to initialize resources that should not be initialized from an application class loader.
+   * system or parent class loader is the {@link Thread#contextClassLoader} of the current
+   * thread when method is invoked.
    */
-  @Override
   public void initialize() {
+    // When plugins have com.sun.xml.bind:jaxb-impl:jar a reference to the MuleArtifactClassLoader (plugin) will be
+    // referenced by com.sun.xml.bind.DatatypeConverterImpl. Loading this class with the system or container class loader
+    // will prevent this class loader leak.
     try {
       Class.forName("javax.xml.bind.DatatypeConverterImpl");
     } catch (ClassNotFoundException e) {
