@@ -6,6 +6,7 @@
  */
 package org.mule.module.cxf.support;
 
+import org.mule.module.xml.stax.DelegateXMLStreamReader;
 import org.mule.module.xml.stax.ReversibleXMLStreamReader;
 
 import java.util.logging.Logger;
@@ -62,7 +63,12 @@ public class ProxySchemaValidationInInterceptor extends AbstractPhaseInterceptor
         if (Boolean.TRUE.equals(en) || "true".equals(en)) {
             StaxValidationManager mgr = bus.getExtension(StaxValidationManager.class);
             if (mgr != null) {
-                mgr.setupValidation(reader, endpoint, service);
+                if (reader instanceof DelegateXMLStreamReader ) {
+                    DelegateXMLStreamReader r = (DelegateXMLStreamReader) reader;
+                    mgr.setupValidation(r.getDelegateReader(), endpoint, service);
+                } else {
+                    mgr.setupValidation(reader, endpoint, service);
+                }
             }
         }
     }
