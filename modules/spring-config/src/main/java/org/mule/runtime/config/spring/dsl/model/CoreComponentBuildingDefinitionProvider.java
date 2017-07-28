@@ -790,6 +790,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withTypeDefinition(fromType(ParseTemplateTransformer.class))
         .withSetterParameterDefinition("content", fromChildConfiguration(String.class).withIdentifier("content").build())
         .withSetterParameterDefinition("target", fromSimpleParameter("target").build())
+        .withSetterParameterDefinition("location", fromSimpleParameter("location").build())
         .withSetterParameterDefinition("encoding", fromSimpleParameter("encoding").build())
         .build());
     transformerComponentBuildingDefinitions

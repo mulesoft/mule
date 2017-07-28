@@ -12,6 +12,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 
 import java.nio.charset.Charset;
@@ -25,6 +26,7 @@ public class ParseTemplateTransformer extends AbstractMessageTransformer {
   private String encoding;
   private Charset encoder;
   private String target;
+  private String location;
 
   public ParseTemplateTransformer() {
     registerSourceType(DataType.OBJECT);
@@ -34,12 +36,29 @@ public class ParseTemplateTransformer extends AbstractMessageTransformer {
   @Override
   public void initialise() throws InitialisationException {
     super.initialise();
+    //Check if both content and location are defined. If so, raise exception due to ambiguity.
+    if(content != null && location != null) throw new InitialisationException(createStaticMessage("Can't define both location and content at the same time"),this);
+    if(location != null) {
+      loadContentFromLocation();
+    }
     if (encoding != null) {
       try {
         encoder = Charset.forName(encoding);
       } catch (Exception e) {
         throw new InitialisationException(createStaticMessage("%s is not a valid charset for encoding", encoding), e, this);
       }
+    }
+  }
+
+  private void loadContentFromLocation() throws InitialisationException {
+    try {
+      if (location == null) {
+        throw new IllegalArgumentException("Location cannot be null");
+      }
+      content = IOUtils.getResourceAsString(location, this.getClass());
+
+    } catch (Exception e) {
+      throw new InitialisationException(e, this);
     }
   }
 
@@ -75,6 +94,10 @@ public class ParseTemplateTransformer extends AbstractMessageTransformer {
 
   public void setEncoding(String encoding) {
     this.encoding = encoding;
+  }
+
+  public void setLocation(String location) {
+    this.location = location;
   }
 
 }

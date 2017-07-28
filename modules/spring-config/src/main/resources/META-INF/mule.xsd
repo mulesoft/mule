@@ -2198,6 +2198,13 @@
                         </xsd:annotation>
                     </xsd:element>
                 </xsd:sequence>
+                <xsd:attribute name="location" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The location of the template. The order in which the transformer will attempt to load the file are: from the file system, from a URL or from the classpath.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
                 <xsd:attribute name="target" type="xsd:string" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
