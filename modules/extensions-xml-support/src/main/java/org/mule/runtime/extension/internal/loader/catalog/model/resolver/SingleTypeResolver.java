@@ -27,7 +27,7 @@ import java.util.Optional;
 
 /**
  * Represents a single type (commonly used in JSON schemas).
- * TODO(fernandezlautaro: MULE-11501 this class must be moved to a separate module
+ * TODO MULE-13214: this class could be removed once MULE-13214 is done
  *
  * @since 4.0
  */
