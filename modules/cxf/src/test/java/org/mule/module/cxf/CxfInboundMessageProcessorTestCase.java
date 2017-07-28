@@ -6,9 +6,13 @@
  */
 package org.mule.module.cxf;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mule.MessageExchangePattern.REQUEST_RESPONSE;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -29,18 +33,25 @@ import org.apache.cxf.interceptor.StaxInInterceptor;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
+import org.hamcrest.Matchers;
 import org.junit.Test;
 
 public class CxfInboundMessageProcessorTestCase extends AbstractMuleContextTestCase
 {
-    String msg = 
+    private String msg =
         "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"><soap:Body>" +
             "<ns1:echo xmlns:ns1=\"http://testmodels.cxf.module.mule.org/\">" +
                 "<text>echo</text>" +
             "</ns1:echo>" +
         "</soap:Body></soap:Envelope>";
+    private String responseMsg =
+        "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"><soap:Body>" +
+            "<ns2:echoResponse xmlns:ns2=\"http://testmodels.cxf.module.mule.org/\">" +
+                "<text>echo</text>" +
+            "</ns2:echoResponse>" +
+        "</soap:Body></soap:Envelope>";
 
-    boolean gotEvent = false;
+    private boolean gotEvent = false;
     Object payload;
     
     @Test
@@ -61,7 +72,7 @@ public class CxfInboundMessageProcessorTestCase extends AbstractMuleContextTestC
         };
         processor.setListener(messageProcessor);
         
-        MuleEvent event = getTestEvent(msg, getTestInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE));
+        MuleEvent event = getTestEvent(msg, getTestInboundEndpoint(REQUEST_RESPONSE));
         
         MuleEvent response = processor.process(event);
         
@@ -125,7 +136,7 @@ public class CxfInboundMessageProcessorTestCase extends AbstractMuleContextTestC
             public MuleEvent process(MuleEvent event) throws MuleException
             {
                 payload = event.getMessage().getPayload();
-                assertEquals("echo", payload);
+                assertThat("echo", equalTo(payload));
                 event.getMessage().setPayload("echo");
                 gotEvent = true;
                 return event;
@@ -133,14 +144,13 @@ public class CxfInboundMessageProcessorTestCase extends AbstractMuleContextTestC
         };
         processor.setListener(messageProcessor);
 
-        MuleEvent event = getTestEvent(msg, getTestInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE));
+        MuleEvent event = getTestEvent(msg, getTestInboundEndpoint(REQUEST_RESPONSE));
 
         MuleEvent response = processor.process(event);
 
         Object payload = response.getMessage().getPayload();
-        assertTrue(payload instanceof OutputHandler);
-        ((OutputHandler) payload).write(response, System.out);
-        assertTrue(gotEvent);
+        assertThat(payload, Matchers.instanceOf(OutputHandler.class));
+        assertThat(response.getMessage().getPayloadAsString(), is(responseMsg));
     }
 
 
