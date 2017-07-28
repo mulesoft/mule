@@ -8,7 +8,6 @@ package org.mule.runtime.core.processor.simple;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.api.message.Error;
@@ -25,9 +24,6 @@ import org.mule.runtime.core.internal.processor.simple.ParseTemplateProcessor;
 import org.mule.tck.size.SmallTest;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CodingErrorAction;
 import java.util.HashMap;
 import java.util.Optional;
 
@@ -92,12 +88,6 @@ public class ParseTemplateProcessorTestCase {
     parseTemplateProcessor.process(mockMuleEvent);
   }
 
-  @Test(expected = InitialisationException.class)
-  public void testNonExistentEncoding() throws InitialisationException {
-    parseTemplateProcessor.setEncoding("NON_EXISTENT_ENCODING");
-    parseTemplateProcessor.initialise();
-  }
-
   @Test
   public void testParseTemplateFromLocation() throws InitialisationException, IOException {
     parseTemplateProcessor.setLocation(LOCATION);
@@ -156,28 +146,4 @@ public class ParseTemplateProcessorTestCase {
     assertEquals(payload, (String) response.getMessage().getPayload().getValue());
     assertEquals("Parsed", (String) ((Message) response.getVariable("some_target_variable").getValue()).getPayload().getValue());
   }
-
-  @Test
-  public void testParseTemplateWithEncoding() throws InitialisationException {
-    String payload = "Payload";
-    String template = "Template";
-    parseTemplateProcessor.setContent(template);
-    parseTemplateProcessor.setEncoding("UTF-8");
-    parseTemplateProcessor.initialise();
-
-    when(mockMuleMessage.getPayload()).thenReturn(TypedValue.of(payload));
-    when(mockMuleMessage.getAttributes()).thenReturn(TypedValue.of(new HashMap<>()));
-    when(mockExpressionManager.parse(template, mockMuleEvent, null)).thenReturn("nón äscíí éncódíng");
-
-    Event response = parseTemplateProcessor.process(mockMuleEvent);
-    ByteBuffer result = (ByteBuffer) response.getMessage().getPayload().getValue();
-    assertNotNull(response);
-    try {
-      Charset.forName("US-ASCII").newDecoder().onMalformedInput(CodingErrorAction.REPORT).decode(result);
-      fail();
-    } catch (Exception e) {
-      Charset.forName("UTF-8").decode(result);
-    }
-  }
-
 }

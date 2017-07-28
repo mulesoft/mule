@@ -24,8 +24,6 @@ import java.nio.charset.Charset;
 public class ParseTemplateProcessor extends SimpleMessageProcessor {
 
   private String content;
-  private String encoding;
-  private Charset encoder;
   private String target;
   private String location;
 
@@ -37,13 +35,6 @@ public class ParseTemplateProcessor extends SimpleMessageProcessor {
     }
     if (location != null) {
       loadContentFromLocation();
-    }
-    if (encoding != null) {
-      try {
-        encoder = Charset.forName(encoding);
-      } catch (Exception e) {
-        throw new InitialisationException(createStaticMessage("%s is not a valid charset for encoding", encoding), e, this);
-      }
     }
   }
 
@@ -65,10 +56,7 @@ public class ParseTemplateProcessor extends SimpleMessageProcessor {
       throw new IllegalArgumentException("Template content cannot be null");
     }
     Object result = muleContext.getExpressionManager().parse(content, event, null);
-    if (encoder != null) {
-      result = encoder.encode((String) result);
-    }
-    Message resultMessage = Message.builder(event.getMessage()).payload(result).build();
+    Message resultMessage = Message.builder(event.getMessage()).payload(result).nullAttributes().build();
     if (target == null) {
       return Event.builder(event).message(resultMessage).build();
     } else {
@@ -84,9 +72,6 @@ public class ParseTemplateProcessor extends SimpleMessageProcessor {
     this.target = target;
   }
 
-  public void setEncoding(String encoding) {
-    this.encoding = encoding;
-  }
 
   public void setLocation(String location) {
     this.location = location;
