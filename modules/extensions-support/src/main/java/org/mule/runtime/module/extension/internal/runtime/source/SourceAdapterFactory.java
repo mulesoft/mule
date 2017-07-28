@@ -6,15 +6,46 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
+import static java.lang.String.format;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.source.SourceModel;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.source.Source;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 
 import java.util.Optional;
 
 /**
  * A factory for {@link SourceAdapter} instances
  */
-@FunctionalInterface
-public interface SourceAdapterFactory {
+public class SourceAdapterFactory {
+
+  private final ExtensionModel extensionModel;
+  private final SourceModel sourceModel;
+  private final ResolverSet sourceParameters;
+  private final ResolverSet successCallbackParameters;
+  private final ResolverSet errorCallbackParameters;
+  private final CursorProviderFactory cursorProviderFactory;
+  private final MuleContext muleContext;
+
+  public SourceAdapterFactory(ExtensionModel extensionModel, SourceModel sourceModel,
+                              ResolverSet sourceParameters,
+                              ResolverSet successCallbackParameters,
+                              ResolverSet errorCallbackParameters,
+                              CursorProviderFactory cursorProviderFactory, MuleContext muleContext) {
+    this.extensionModel = extensionModel;
+    this.sourceModel = sourceModel;
+    this.sourceParameters = sourceParameters;
+    this.successCallbackParameters = successCallbackParameters;
+    this.errorCallbackParameters = errorCallbackParameters;
+    this.cursorProviderFactory = cursorProviderFactory;
+    this.muleContext = muleContext;
+  }
 
   /**
    * Creates a new {@link SourceAdapter}
@@ -23,5 +54,29 @@ public interface SourceAdapterFactory {
    * @param sourceCallbackFactory a {@link SourceCallbackFactory}
    * @return a new {@link SourceAdapter}
    */
-  SourceAdapter createAdapter(Optional<ConfigurationInstance> configurationInstance, SourceCallbackFactory sourceCallbackFactory);
+  public SourceAdapter createAdapter(Optional<ConfigurationInstance> configurationInstance,
+                                     SourceCallbackFactory sourceCallbackFactory) {
+    Source source = MuleExtensionUtils.getSourceFactory(sourceModel).createSource();
+    try {
+      source = new SourceConfigurer(sourceModel, sourceParameters, muleContext).configure(source, configurationInstance);
+
+      return new SourceAdapter(extensionModel,
+                               sourceModel,
+                               source,
+                               configurationInstance,
+                               cursorProviderFactory,
+                               sourceCallbackFactory,
+                               sourceParameters,
+                               successCallbackParameters,
+                               errorCallbackParameters);
+    } catch (Exception e) {
+      throw new MuleRuntimeException(createStaticMessage(format("Could not create generator for source '%s'",
+                                                                sourceModel.getName())),
+                                     e);
+    }
+  }
+
+  public ResolverSet getSourceParameters() {
+    return sourceParameters;
+  }
 }

@@ -7,6 +7,7 @@
 package org.mule.test.module.extension.source;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -22,11 +23,16 @@ import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatu
 import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatus.ERROR_INVOKE;
 import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatus.SUCCESS;
 import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
+import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
+import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.message.Error;
+import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.extension.api.runtime.source.ParameterizedSource;
 import org.mule.test.heisenberg.extension.HeisenbergSource;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
+import java.util.Map;
 import java.util.Optional;
 
 import org.junit.Before;
@@ -180,6 +186,18 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
     Optional<Error> optionalError = HeisenbergSource.error;
     assertThat(optionalError, is(not(empty())));
     assertThat(optionalError.get().getErrorType(), is(errorType(SOURCE_ERROR_RESPONSE_GENERATE)));
+  }
+
+  @Test
+  public void obtainSourceParameters() throws Exception {
+    ConfigurationComponentLocator locator = muleContext.getRegistry().lookupObject(ConfigurationComponentLocator.class);
+    AnnotatedObject element = locator.find(Location.builder().globalName("source").addSourcePart().build()).get();
+    assertThat(element, is(instanceOf(ParameterizedSource.class)));
+
+    ParameterizedSource source = (ParameterizedSource) element;
+    Map<String, Object> parameters = source.getInitialisationParameters();
+    assertThat(parameters.get("initialBatchNumber"), is(0));
+    assertThat(parameters.get("corePoolSize"), is(1));
   }
 
   protected void startFlow(String flowName) throws Exception {

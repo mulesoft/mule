@@ -32,7 +32,7 @@ import java.util.Optional;
  */
 public class LazyExecutionContext<M extends ComponentModel> implements EventedExecutionContext<M> {
 
-  private final Map<String, ValueResolver> valueResolvers;
+  private final Map<String, ValueResolver<?>> valueResolvers;
   private final M componentModel;
   private final ExtensionModel extensionModel;
   private final ValueResolvingContext resolvingContext;

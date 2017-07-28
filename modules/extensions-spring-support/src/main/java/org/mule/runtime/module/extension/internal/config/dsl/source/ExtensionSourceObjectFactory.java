@@ -12,7 +12,6 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.source.SourceCallbackModel;
@@ -20,18 +19,14 @@ import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
-import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
+import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
-import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.source.ExtensionMessageSource;
-import org.mule.runtime.module.extension.internal.runtime.source.SourceAdapter;
 import org.mule.runtime.module.extension.internal.runtime.source.SourceAdapterFactory;
-import org.mule.runtime.module.extension.internal.runtime.source.SourceConfigurer;
-import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 
 import com.google.common.base.Joiner;
 
@@ -111,27 +106,13 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
   private SourceAdapterFactory getSourceFactory(ResolverSet nonCallbackParameters,
                                                 ResolverSet successCallbackParameters,
                                                 ResolverSet errorCallbackParameters) {
-    return (configurationInstance, sourceCallbackFactory) -> {
-      Source source = MuleExtensionUtils.getSourceFactory(sourceModel).createSource();
-      try {
-        source = new SourceConfigurer(sourceModel, nonCallbackParameters, muleContext)
-            .configure(source, configurationInstance);
-
-        return new SourceAdapter(extensionModel,
-                                 sourceModel,
-                                 source,
-                                 configurationInstance,
-                                 cursorProviderFactory,
-                                 sourceCallbackFactory,
-                                 nonCallbackParameters,
-                                 successCallbackParameters,
-                                 errorCallbackParameters);
-      } catch (Exception e) {
-        throw new MuleRuntimeException(createStaticMessage(format("Could not create generator for source '%s'",
-                                                                  sourceModel.getName())),
-                                       e);
-      }
-    };
+    return new SourceAdapterFactory(extensionModel,
+                                    sourceModel,
+                                    nonCallbackParameters,
+                                    successCallbackParameters,
+                                    errorCallbackParameters,
+                                    cursorProviderFactory,
+                                    muleContext);
   }
 
   private RetryPolicyTemplate getRetryPolicyTemplate() throws ConfigurationException {
