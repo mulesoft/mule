@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.transformer.simple;
+package org.mule.runtime.core.internal.processor.simple;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.message.Message;
@@ -13,6 +13,7 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.util.IOUtils;
+import org.mule.runtime.core.privileged.processor.simple.SimpleMessageProcessor;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 
 import java.nio.charset.Charset;
@@ -20,7 +21,7 @@ import java.nio.charset.Charset;
 /**
  * Loads a template and parses its content to resolve expressions.
  */
-public class ParseTemplateTransformer extends AbstractMessageTransformer {
+public class ParseTemplateProcessor extends SimpleMessageProcessor {
 
   private String content;
   private String encoding;
@@ -28,14 +29,8 @@ public class ParseTemplateTransformer extends AbstractMessageTransformer {
   private String target;
   private String location;
 
-  public ParseTemplateTransformer() {
-    registerSourceType(DataType.OBJECT);
-    setReturnDataType(DataType.OBJECT);
-  }
-
   @Override
   public void initialise() throws InitialisationException {
-    super.initialise();
     //Check if both content and location are defined. If so, raise exception due to ambiguity.
     if (content != null && location != null) {
       throw new InitialisationException(createStaticMessage("Can't define both location and content at the same time"), this);
@@ -79,11 +74,6 @@ public class ParseTemplateTransformer extends AbstractMessageTransformer {
     } else {
       return Event.builder(event).addVariable(target, resultMessage).build();
     }
-  }
-
-  @Override
-  public Object transformMessage(Event event, Charset outputEncoding) throws TransformerException {
-    return event;
   }
 
   public void setContent(String content) {

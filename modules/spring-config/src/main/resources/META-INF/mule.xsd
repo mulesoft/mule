@@ -2189,7 +2189,7 @@
     <xsd:complexType name="parseTemplateProcessorType">
         <xsd:complexContent>
             <xsd:extension base="abstractMessageProcessorType">
-                <xsd:sequence>
+                <xsd:sequence minOccurs="0" maxOccurs="1">
                     <xsd:element name="content" type="xsd:string">
                         <xsd:annotation>
                             <xsd:documentation>
@@ -2198,7 +2198,7 @@
                         </xsd:annotation>
                     </xsd:element>
                 </xsd:sequence>
-                <xsd:attribute name="location" type="xsd:string" use="required">
+                <xsd:attribute name="location" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
                             The location of the template. The order in which the transformer will attempt to load the file are: from the file system, from a URL or from the classpath.
