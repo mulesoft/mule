@@ -2224,7 +2224,6 @@
         </xsd:annotation>
     </xsd:element>
 
-
     <xsd:complexType name="setPayloadTransformerType">
         <xsd:complexContent>
             <xsd:extension base="topLevelProcessorType">
@@ -2276,13 +2275,6 @@
                     <xsd:annotation>
                         <xsd:documentation>
                             The name of the encryption strategy to use. This should be configured using the password-encryption-strategy element, inside a security-manager element at the top level.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="target" type="xsd:string" use="optional">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Variable name where the transformed message will be stored
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>

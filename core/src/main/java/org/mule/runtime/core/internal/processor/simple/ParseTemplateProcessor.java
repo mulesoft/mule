@@ -72,7 +72,6 @@ public class ParseTemplateProcessor extends SimpleMessageProcessor {
     this.target = target;
   }
 
-
   public void setLocation(String location) {
     this.location = location;
   }
