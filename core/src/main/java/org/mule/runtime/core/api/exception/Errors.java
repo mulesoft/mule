@@ -169,9 +169,9 @@ public abstract class Errors {
   public static final class ComponentIdentifiers {
 
     public static final ComponentIdentifier ANY =
-        builder().withNamespace(CORE_PREFIX).withName(ANY_IDENTIFIER).build();
+        builder().withNamespace(CORE_NAMESPACE_NAME).withName(ANY_IDENTIFIER).build();
     public static final ComponentIdentifier CRITICAL =
-        builder().withNamespace(CORE_PREFIX).withName(CRITICAL_IDENTIFIER).build();
+        builder().withNamespace(CORE_NAMESPACE_NAME).withName(CRITICAL_IDENTIFIER).build();
     public static final ComponentIdentifier TRANSFORMATION =
         builder().withNamespace(CORE_NAMESPACE_NAME).withName(TRANSFORMATION_ERROR_IDENTIFIER).build();
     public static final ComponentIdentifier EXPRESSION =
