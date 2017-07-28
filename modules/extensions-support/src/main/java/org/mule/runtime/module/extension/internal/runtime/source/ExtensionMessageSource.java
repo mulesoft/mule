@@ -9,13 +9,15 @@ package org.mule.runtime.module.extension.internal.runtime.source;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
+import static org.mule.runtime.core.api.util.collection.Collectors.toImmutableMap;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.exception.MuleException;
@@ -27,6 +29,9 @@ import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.exception.ErrorTypeLocator;
+import org.mule.runtime.core.api.execution.MessageProcessContext;
+import org.mule.runtime.core.api.execution.MessageProcessingManager;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.RetryCallback;
@@ -34,23 +39,25 @@ import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.api.transaction.TransactionConfig;
-import org.mule.runtime.core.api.exception.ErrorTypeLocator;
-import org.mule.runtime.core.internal.execution.ExceptionCallback;
-import org.mule.runtime.core.api.execution.MessageProcessContext;
-import org.mule.runtime.core.api.execution.MessageProcessingManager;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
+import org.mule.runtime.core.api.transaction.TransactionConfig;
+import org.mule.runtime.core.internal.execution.ExceptionCallback;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
+import org.mule.runtime.extension.api.runtime.source.ParameterizedSource;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ObjectBasedParameterValueResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionHandlerManager;
 import org.mule.runtime.module.extension.internal.runtime.operation.IllegalSourceException;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ObjectBasedParameterValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionFactory;
+import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -64,7 +71,8 @@ import org.slf4j.Logger;
  *
  * @since 4.0
  */
-public class ExtensionMessageSource extends ExtensionComponent<SourceModel> implements MessageSource, ExceptionCallback {
+public class ExtensionMessageSource extends ExtensionComponent<SourceModel> implements MessageSource, ExceptionCallback,
+    ParameterizedSource {
 
   private static final Logger LOGGER = getLogger(ExtensionMessageSource.class);
 
@@ -377,5 +385,21 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     } catch (Exception e) {
       throw new InitialisationException(e, this);
     }
+  }
+
+  @Override
+  public Map<String, Object> getInitialisationParameters() {
+    final ValueResolvingContext ctx = from(MuleExtensionUtils.getInitialiserEvent());
+    Map<String, ValueResolver<?>> resolvers = sourceAdapterFactory.getSourceParameters().getResolvers();
+    return resolvers.entrySet().stream()
+        .collect(toImmutableMap(entry -> entry.getKey(), entry -> {
+          try {
+            return entry.getValue().resolve(ctx);
+          } catch (MuleException e) {
+            throw new MuleRuntimeException(createStaticMessage(format(
+                "Could not resolve parameter '%s' for message source at location '%s'",
+                entry.getKey()), getLocation().toString()), e);
+          }
+        }));
   }
 }

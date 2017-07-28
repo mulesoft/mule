@@ -43,7 +43,7 @@ import java.util.function.Function;
  */
 public class ResolverSet implements ValueResolver<ResolverSetResult>, Initialisable {
 
-  private Map<String, ValueResolver> resolvers = new LinkedHashMap<>();
+  private Map<String, ValueResolver<?>> resolvers = new LinkedHashMap<>();
   private boolean dynamic = false;
   private final MuleContext muleContext;
   private Function<Event, Optional<ConfigurationInstance>> configProvider;
@@ -96,7 +96,7 @@ public class ResolverSet implements ValueResolver<ResolverSetResult>, Initialisa
   public ResolverSetResult resolve(ValueResolvingContext context) throws MuleException {
     ResolverSetResult.Builder builder = getResolverSetBuilder();
 
-    for (Map.Entry<String, ValueResolver> entry : resolvers.entrySet()) {
+    for (Map.Entry<String, ValueResolver<?>> entry : resolvers.entrySet()) {
       builder.add(entry.getKey(), resolveValue(entry.getValue(), context));
     }
 
@@ -126,7 +126,7 @@ public class ResolverSet implements ValueResolver<ResolverSetResult>, Initialisa
     return value;
   }
 
-  public Map<String, ValueResolver> getResolvers() {
+  public Map<String, ValueResolver<?>> getResolvers() {
     return ImmutableMap.copyOf(resolvers);
   }
 

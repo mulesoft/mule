@@ -393,7 +393,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
   }
 
   private void setUpValueResolvers() throws MuleException {
-    final Map<String, ValueResolver> valueResolvers = mock(Map.class);
+    final Map<String, ValueResolver<?>> valueResolvers = mock(Map.class);
     when(resolverSet.getResolvers()).thenReturn(valueResolvers);
     final ValueResolver valueResolver = mock(ValueResolver.class);
     when(valueResolvers.get(eq(SOME_PARAM_NAME))).thenReturn(valueResolver);
