@@ -23,10 +23,10 @@ import static org.mule.runtime.api.meta.model.ExecutionType.CPU_LITE;
 import static org.mule.runtime.api.meta.model.error.ErrorModelBuilder.newError;
 import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.core.api.config.MuleManifest.getVendorName;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.TRANSFORMATION;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.module.extension.internal.resources.MuleExtensionModelProvider.MULE_VERSION;
 import static org.mule.runtime.module.extension.internal.resources.MuleExtensionModelProvider.getExtensionModel;
-
 import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.model.MetadataType;
@@ -53,8 +53,8 @@ import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.core.api.processor.LoggerMessageProcessor;
 import org.mule.runtime.core.api.processor.LoggerMessageProcessor.LogLevel;
-import org.mule.runtime.core.api.source.SchedulingStrategy;
 import org.mule.runtime.core.api.routing.AggregationStrategy;
+import org.mule.runtime.core.api.source.SchedulingStrategy;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.Iterator;
@@ -124,11 +124,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(coreExtensionModel.getConnectionProviders(), empty());
 
     assertThat(coreExtensionModel.getErrorModels(),
-               hasItem(newError("TRANSFORMATION", "CORE")
-                   .withParent(newError("TRANSFORMATION", "MULE").withParent(errorMuleAny).build()).build()));
-    assertThat(coreExtensionModel.getErrorModels(),
-               hasItem(newError("CORRELATION_TIMEOUT", "CORE")
-                   .withParent(newError("ANY", "CORE").withParent(errorMuleAny).build()).build()));
+               hasItem(newError(TRANSFORMATION).withParent(errorMuleAny).build()));
 
     assertThat(coreExtensionModel.getSourceModels(), hasSize(1));
 
@@ -223,9 +219,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
   public void collectionAggregator() {
     final OperationModel collectionAggregatorModel = coreExtensionModel.getOperationModel("collectionAggregator").get();
 
-    assertThat(collectionAggregatorModel.getErrorModels(),
-               hasItem(newError("CORRELATION_TIMEOUT", "CORE")
-                   .withParent(newError("ANY", "CORE").withParent(errorMuleAny).build()).build()));
+    assertThat(collectionAggregatorModel.getErrorModels(), is(empty()));
     assertThat(collectionAggregatorModel.getExecutionType(), is(BLOCKING));
 
     assertThat(collectionAggregatorModel.getOutput().getType(), instanceOf(DefaultArrayType.class));
