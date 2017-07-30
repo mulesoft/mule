@@ -18,13 +18,19 @@ import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.mule.metadata.api.model.MetadataFormat.JAVA;
+import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.PRIMITIVE_TYPES;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.model.display.LayoutModel.builder;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.config.spring.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
-import org.mule.metadata.api.ClassTypeLoader;
+import static org.mule.runtime.extension.internal.loader.catalog.loader.common.XmlMatcher.match;
+import com.google.common.collect.ImmutableMap;
+import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.catalog.api.TypeResolver;
+import org.mule.metadata.catalog.api.TypeResolverException;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.Category;
@@ -50,20 +56,17 @@ import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationParser;
 import org.mule.runtime.core.component.config.DefaultConfigurationPropertiesResolver;
 import org.mule.runtime.core.component.config.SystemPropertiesConfigurationProvider;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
-import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.internal.loader.catalog.loader.common.XmlMatcher;
 import org.mule.runtime.extension.internal.loader.catalog.loader.xml.TypesCatalogXmlLoader;
 import org.mule.runtime.extension.internal.loader.catalog.model.TypesCatalog;
-
-import com.google.common.collect.ImmutableMap;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import java.io.IOException;
 import java.net.URL;
-import java.time.LocalTime;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -71,8 +74,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
-import org.w3c.dom.Document;
 
 /**
  * Describes an {@link ExtensionModel} by scanning an XML provided in the constructor
@@ -90,13 +91,6 @@ final class XmlExtensionLoaderDelegate {
   private static final String MODULE_NAMESPACE_NAME = "module";
   protected static final String CONFIG_NAME = "config";
 
-  private static final ClassTypeLoader typeLoader =
-      ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(XmlExtensionLoaderDelegate.class.getClassLoader());
-  private static final Map<String, MetadataType> defaultInputTypes = getCommonTypesBuilder()
-      .build();
-  private static final Map<String, MetadataType> defaultOutputTypes = getCommonTypesBuilder()
-      .put("void", typeLoader.load(Void.class))
-      .build();
   private static final Map<String, ParameterRole> parameterRoleTypes = ImmutableMap.<String, ParameterRole>builder()
       .put("BEHAVIOUR", ParameterRole.BEHAVIOUR)
       .put("CONTENT", ParameterRole.CONTENT)
@@ -120,16 +114,6 @@ final class XmlExtensionLoaderDelegate {
    */
   private enum UseEnum {
     REQUIRED, OPTIONAL, AUTO
-  }
-
-  private static ImmutableMap.Builder<String, MetadataType> getCommonTypesBuilder() {
-    return ImmutableMap.<String, MetadataType>builder()
-        .put("string", typeLoader.load(String.class))
-        .put("boolean", typeLoader.load(Boolean.class))
-        .put("datetime", typeLoader.load(Calendar.class))
-        .put("date", typeLoader.load(Date.class))
-        .put("integer", typeLoader.load(Integer.class))
-        .put("time", typeLoader.load(LocalTime.class));
   }
 
   private static ParameterRole getRole(final String role) {
@@ -160,7 +144,9 @@ final class XmlExtensionLoaderDelegate {
   private static final String TYPES_XML_SUFFIX = "-catalog" + XML_SUFFIX;
 
   private final String modulePath;
+  //TODO MULE-13214: typesCatalog could be removed once MULE-13214 is done
   private Optional<TypesCatalog> typesCatalog;
+  private TypeResolver typeResolver;
 
   /**
    * @param modulePath relative path to a file that will be loaded from the current {@link ClassLoader}. Non null.
@@ -184,7 +170,6 @@ final class XmlExtensionLoaderDelegate {
                                                 getCustomTypeFilename(), modulePath),
                                          e);
     }
-
 
     Document moduleDocument = getModuleDocument(context, resource);
     XmlApplicationParser xmlApplicationParser =
@@ -215,14 +200,28 @@ final class XmlExtensionLoaderDelegate {
    * @throws Exception
    */
   private void loadCustomTypes() throws Exception {
-    TypesCatalog typesCatalog = null;
+    typesCatalog = empty();
+
     final String customTypes = getCustomTypeFilename();
     final URL resourceCustomType = getResource(customTypes);
     if (resourceCustomType != null) {
-      TypesCatalogXmlLoader typesCatalogXmlLoader = new TypesCatalogXmlLoader();
-      typesCatalog = typesCatalogXmlLoader.load(resourceCustomType);
+      final Element typesDocument = TypesCatalogXmlLoader.parseRootElement(resourceCustomType);
+      final Optional<XmlMatcher> match = match(typesDocument, TypesCatalogXmlLoader.ELEM_MULE);
+      if (match.isPresent()) {
+        //TODO MULE-13214: then could be removed once MULE-13214 is done
+        TypesCatalogXmlLoader typesCatalogXmlLoader = new TypesCatalogXmlLoader();
+        typesCatalog = of(typesCatalogXmlLoader.load(resourceCustomType));
+        typeResolver = getEmptyTypeResolver();
+      } else {
+        typeResolver = TypeResolver.createFrom(resourceCustomType, currentThread().getContextClassLoader());
+      }
+    } else {
+      typeResolver = getEmptyTypeResolver();
     }
-    this.typesCatalog = ofNullable(typesCatalog);
+  }
+
+  private TypeResolver getEmptyTypeResolver() {
+    return TypeResolver.create(currentThread().getContextClassLoader());
   }
 
   /**
@@ -261,7 +260,7 @@ final class XmlExtensionLoaderDelegate {
     declarer.named(name)
         .describedAs(getDescription(moduleModel))
         .fromVendor(vendor)
-        .withMinMuleVersion(new MuleVersion(minMuleVersion)) // TODO(fernandezlautaro): MULE-11010 remove minMuleVersion from
+        .withMinMuleVersion(new MuleVersion(minMuleVersion))
         .onVersion(version)
         .withCategory(Category.valueOf(category.toUpperCase()))
         .withXmlDsl(getXmlDslModel(moduleModel, name, version));
@@ -361,7 +360,7 @@ final class XmlExtensionLoaderDelegate {
     String receivedInputType = parameters.get(TYPE_ATTRIBUTE);
     LayoutModel layoutModel = parseBoolean(parameters.get(PASSWORD)) ? builder().asPassword().build()
         : builder().build();
-    MetadataType parameterType = extractType(defaultInputTypes, receivedInputType);
+    MetadataType parameterType = extractType(receivedInputType);
 
     ParameterDeclarer parameterDeclarer = getParameterDeclarer(parameterizedDeclarer, parameters);
     parameterDeclarer.describedAs(getDescription(param))
@@ -409,29 +408,31 @@ final class XmlExtensionLoaderDelegate {
         .orElseThrow(() -> new IllegalArgumentException("Having an operation without <output> is not supported"));
 
     String receivedOutputType = outputComponentModel.getParameters().get(TYPE_ATTRIBUTE);
-    MetadataType metadataType = extractType(defaultOutputTypes, receivedOutputType);
+    MetadataType metadataType = extractType(receivedOutputType);
 
     operationDeclarer.withOutput().describedAs(getDescription(outputComponentModel))
         .ofType(metadataType);
-    operationDeclarer.withOutputAttributes().ofType(typeLoader.load(Void.class));
+    operationDeclarer.withOutputAttributes().ofType(BaseTypeBuilder.create(JAVA).voidType().build());
   }
 
-  private MetadataType extractType(Map<String, MetadataType> types, String receivedType) {
+  private MetadataType extractType(String receivedType) {
     Optional<MetadataType> metadataType = empty();
-    if (types.containsKey(receivedType)) {
-      metadataType = of(types.get(receivedType));
-    } else if (typesCatalog.isPresent()) {
-      metadataType = typesCatalog.get().resolveType(receivedType);
+    try {
+      metadataType = typeResolver.resolveType(receivedType);
+    } catch (TypeResolverException e) {
+      //TODO MULE-13214: could be removed once MULE-13214 is done, as when fails fetching the type, then retries with the old model
+      if (typesCatalog.isPresent()) {
+        metadataType = typesCatalog.get().resolveType(receivedType);
+      }
+      if (!metadataType.isPresent()) {
+        throw new IllegalParameterModelDefinitionException(format("The type obtained [%s] cannot be resolved", receivedType), e);
+      }
     }
     if (!metadataType.isPresent()) {
       String errorMessage = format(
                                    "should not have reach here. Type obtained [%s] when supported default types are [%s].",
                                    receivedType,
-                                   join(", ", types.keySet()));
-      if (typesCatalog.isPresent()) {
-        errorMessage +=
-            format(" Custom types [%s] doesn't have support for the specified [%s] type", getCustomTypeFilename(), receivedType);
-      }
+                                   join(", ", PRIMITIVE_TYPES.keySet()));
       throw new IllegalParameterModelDefinitionException(errorMessage);
     }
     return metadataType.get();

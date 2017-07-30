@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module name="module-xsd-custom-types"
+<module name="module-json-custom-types"
         minMuleVersion="4.0.0"
         xmlns="http://www.mulesoft.org/schema/mule/module"
         xmlns:mule="http://www.mulesoft.org/schema/mule/core"
@@ -10,19 +10,27 @@
 
     <operation name="operation-with-custom-types">
         <parameters>
-            <parameter name="value" type="XsdType1::{http://validationnamespace.raml.org}User"/>
-            <!--extra parameter without targetNamespace in the schema under XsdType3-->
-            <parameter name="value2" type="XsdType3::Root"/>
+            <parameter name="value" type="Type1"/>
         </parameters>
         <body>
             <mule:set-payload value="#[parameters.value]"/>
         </body>
-        <output type="XsdType2::{http://uri}Root0"/>
+        <output type="Type2"/>
     </operation>
 
-    <operation name="is-xsdtype1">
+    <operation name="is-jsontype1">
         <parameters>
-            <parameter name="aParameter" type="XsdType1::{http://validationnamespace.raml.org}User"/>
+            <parameter name="aParameter" type="Type1"/>
+        </parameters>
+        <body>
+            <mule:set-payload value="#[parameters.aParameter as String]"/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="is-jsontype2">
+        <parameters>
+            <parameter name="aParameter" type="Type2"/>
         </parameters>
         <body>
             <mule:set-payload value="#[parameters.aParameter as String]"/>

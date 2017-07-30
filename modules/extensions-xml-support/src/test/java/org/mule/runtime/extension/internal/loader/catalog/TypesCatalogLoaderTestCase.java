@@ -19,11 +19,9 @@ import java.net.URISyntaxException;
 import java.nio.file.Paths;
 
 /**
- * TODO(fernandezlautaro: MULE-11501 this class must be moved to a separate module
+ * TODO MULE-13214: compatibility test, could be removed once MULE-13214 is done
  */
 public class TypesCatalogLoaderTestCase extends AbstractMuleTestCase {
-
-  //TODO(fernandezlautaro: MULE-11501 resources under src/test/resources/catalog must be moved too
 
   @Test
   public void typesJsonCatalogCanBeLoadedFromXmlFile() throws Exception {
@@ -56,7 +54,7 @@ public class TypesCatalogLoaderTestCase extends AbstractMuleTestCase {
   }
 
   private File getResourceFile(String filename) throws URISyntaxException {
-    return new File(getResource(Paths.get("catalog", filename).toString(), getClass()).toURI());
+    return new File(getResource(Paths.get("compatibility", "catalog", filename).toString(), getClass()).toURI());
   }
 
 }

@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<types:mule xmlns="http://www.mulesoft.org/schema/mule/core"
-            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-            xmlns:types="http://www.mulesoft.org/schema/mule/types">
+<catalogs xmlns="http://www.mulesoft.org/schema/mule/types" >
 
-    <types:catalog>
-        <types:type name="Type_same_folder" location="./type1-schema.json"/>
-        <types:type name="Type_sub_folder" location="./inner/folder/type2-schema.json"/>
-        <types:type name="Type_upper_folder" location="../type3-schema.json"/>
-    </types:catalog>
+    <catalog name="Type_same_folder" format="application/json">
+        <schema format="application/json+schema" location="./type1-schema.json" />
+    </catalog>
 
-</types:mule>
+    <catalog name="Type_sub_folder" format="application/json">
+        <schema format="application/json+schema" location="./inner/folder/type2-schema.json" />
+    </catalog>
+
+    <catalog name="Type_upper_folder" format="application/json">
+        <schema format="application/json+schema" location="../type3-schema.json" />
+    </catalog>
+
+</catalogs>

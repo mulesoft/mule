@@ -25,14 +25,14 @@ import java.net.URL;
 
 /**
  * Loads a {@link TypesCatalog} from a {@link URL}.
- * TODO(fernandezlautaro: MULE-11501 this class must be moved to a separate module
+ * TODO MULE-13214: this class could be removed once MULE-13214 is done
  *
  * @since 4.0
  */
 public class TypesCatalogXmlLoader {
 
   private static final String NS_TYPES = "http://www.mulesoft.org/schema/mule/types";
-  private static final QName ELEM_MULE = new QName(NS_TYPES, "mule");
+  public static final QName ELEM_MULE = new QName(NS_TYPES, "mule");
   private static final QName ELEM_CATALOG = new QName(NS_TYPES, "catalog");
   private static final QName ELEM_TYPE = new QName(NS_TYPES, "type");
   private static final String ELEM_TYPE_ATTR_NAME = "name";
@@ -68,7 +68,7 @@ public class TypesCatalogXmlLoader {
     }
   }
 
-  private Element parseRootElement(URL resourceType)
+  public static Element parseRootElement(URL resourceType)
       throws ParserConfigurationException, SAXException, IOException {
     DocumentBuilderFactory documentBuilderFactory = newInstance();
     documentBuilderFactory.setNamespaceAware(true);

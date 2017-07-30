@@ -1,0 +1,17 @@
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="Root">
+        <xs:complexType>
+            <xs:annotation>
+                <xs:documentation xml:lang="en">
+                    A user with all the information
+                </xs:documentation>
+            </xs:annotation>
+            <xs:sequence>
+                <xs:element type="xs:string" name="name"/>
+                <xs:element type="xs:string" name="lastName"/>
+                <xs:element type="xs:boolean" name="male"/>
+                <xs:element type="xs:integer" name="age"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

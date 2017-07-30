@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<types:mule xmlns="http://www.mulesoft.org/schema/mule/core"
-            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-            xmlns:types="http://www.mulesoft.org/schema/mule/types">
+<catalogs xmlns="http://www.mulesoft.org/schema/mule/types" >
 
-    <types:catalog>
-        <types:type name="Person" location="./module-param-custom-types-person-schema.json"/>
-        <types:type name="Cat" location="./module-param-custom-types-cat-schema.json"/>
-    </types:catalog>
+    <catalog name="Person" format="application/json">
+        <schema format="application/json+schema" location="./module-param-custom-types-person-schema.json" />
+    </catalog>
 
-</types:mule>
+    <catalog name="Cat" format="application/json">
+        <schema format="application/json+schema" location="./module-param-custom-types-cat-schema.json" />
+    </catalog>
+</catalogs>

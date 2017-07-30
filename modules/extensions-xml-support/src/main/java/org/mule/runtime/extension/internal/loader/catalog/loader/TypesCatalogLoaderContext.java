@@ -10,7 +10,7 @@ import org.mule.runtime.extension.internal.loader.catalog.builder.TypesCatalogBu
 
 /**
  * Holds the context of the current catalog being discovered.
- * TODO(fernandezlautaro: MULE-11501 this class must be moved to a separate module
+ * TODO MULE-13214: this class could be removed once MULE-13214 is done
  *
  * @since 4.0
  */

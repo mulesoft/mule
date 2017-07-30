@@ -10,19 +10,19 @@
 
     <operation name="operation-with-custom-types">
         <parameters>
-            <parameter name="value" type="XsdType1::{http://validationnamespace.raml.org}User"/>
+            <parameter name="value" type="XsdType1"/>
             <!--extra parameter without targetNamespace in the schema under XsdType3-->
-            <parameter name="value2" type="XsdType3::Root"/>
+            <parameter name="value2" type="XsdType3"/>
         </parameters>
         <body>
             <mule:set-payload value="#[parameters.value]"/>
         </body>
-        <output type="XsdType2::{http://uri}Root0"/>
+        <output type="XsdType2"/>
     </operation>
 
     <operation name="is-xsdtype1">
         <parameters>
-            <parameter name="aParameter" type="XsdType1::{http://validationnamespace.raml.org}User"/>
+            <parameter name="aParameter" type="XsdType1"/>
         </parameters>
         <body>
             <mule:set-payload value="#[parameters.aParameter as String]"/>
