@@ -65,7 +65,6 @@ import org.mule.runtime.extension.internal.loader.catalog.model.TypesCatalog;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashSet;
@@ -145,6 +144,7 @@ final class XmlExtensionLoaderDelegate {
   private static final String TYPES_XML_SUFFIX = "-catalog" + XML_SUFFIX;
 
   private final String modulePath;
+  //TODO MULE-13214: typesCatalog could be removed once MULE-13214 is done
   private Optional<TypesCatalog> typesCatalog;
   private TypeResolver typeResolver;
 
@@ -205,15 +205,15 @@ final class XmlExtensionLoaderDelegate {
     final String customTypes = getCustomTypeFilename();
     final URL resourceCustomType = getResource(customTypes);
     if (resourceCustomType != null) {
-
       final Element typesDocument = TypesCatalogXmlLoader.parseRootElement(resourceCustomType);
       final Optional<XmlMatcher> match = match(typesDocument, TypesCatalogXmlLoader.ELEM_MULE);
       if (match.isPresent()) {
+        //TODO MULE-13214: then could be removed once MULE-13214 is done
         TypesCatalogXmlLoader typesCatalogXmlLoader = new TypesCatalogXmlLoader();
         typesCatalog = of(typesCatalogXmlLoader.load(resourceCustomType));
         typeResolver = getEmptyTypeResolver();
       } else {
-        typeResolver = TypeResolver.createFrom(new File(resourceCustomType.getFile()), currentThread().getContextClassLoader());
+        typeResolver = TypeResolver.createFrom(resourceCustomType, currentThread().getContextClassLoader());
       }
     } else {
       typeResolver = getEmptyTypeResolver();
