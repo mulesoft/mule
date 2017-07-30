@@ -78,7 +78,7 @@ public class HttpResponseBuilderTestCase {
     builder.addHeader(header.toLowerCase(), value.toUpperCase());
     Optional<String> headerValue2 = builder.getHeaderValue(header);
     assertThat(headerValue2.isPresent(), is(true));
-    assertThat(headerValue2.get(), is(value.toUpperCase()));
+    assertThat(headerValue2.get(), is(value));
     Collection<String> headerValues2 = builder.getHeaderValues(header.toLowerCase());
     assertThat(headerValues2, hasItems(value, value.toUpperCase()));
     assertThat(builder.build().getHeaderValues(header), hasItems(value, value.toUpperCase()));
