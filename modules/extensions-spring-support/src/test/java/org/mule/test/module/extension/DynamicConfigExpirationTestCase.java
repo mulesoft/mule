@@ -8,7 +8,8 @@ package org.mule.test.module.extension;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import org.mule.functional.junit4.FlowRunner;
+
+import org.mule.functional.api.flow.FlowRunner;
 import org.mule.runtime.core.api.Event;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;

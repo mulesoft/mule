@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.functional.junit4;
+package org.mule.functional.api.flow;
 
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 

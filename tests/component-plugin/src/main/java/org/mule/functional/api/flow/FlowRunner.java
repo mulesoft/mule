@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.functional.junit4;
+package org.mule.functional.api.flow;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.Assert.fail;
@@ -16,17 +16,16 @@ import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
+import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
 import org.mule.tck.processor.FlowAssert;
-import org.mule.runtime.core.api.exception.MessagingException;
-import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 
 import java.util.concurrent.ExecutionException;
-
-import org.apache.commons.collections.Transformer;
+import java.util.function.Function;
 
 import reactor.core.publisher.MonoProcessor;
 
@@ -41,7 +40,7 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> implements Dispo
 
   private ExecutionTemplate<Event> txExecutionTemplate = callback -> callback.process();
 
-  private Transformer responseEventTransformer = input -> input;
+  private Function<Event, Event> responseEventTransformer = input -> input;
 
   private Scheduler scheduler;
 
@@ -148,7 +147,7 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> implements Dispo
       }
     }
     verify(flowNamesToVerify);
-    return (Event) responseEventTransformer.transform(response);
+    return responseEventTransformer.apply(response);
   }
 
   /**
@@ -208,9 +207,10 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> implements Dispo
 
   /**
    * Verifies asserts on flowNamesToVerify
+   * 
    * @param flowNamesToVerify
    * @throws Exception
-   * */
+   */
   private void verify(String... flowNamesToVerify) throws Exception {
     for (String flowNameToVerify : flowNamesToVerify) {
       FlowAssert.verify(flowNameToVerify);
