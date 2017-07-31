@@ -160,7 +160,7 @@ public class GroovyScriptExecutor implements TestRule {
 
     } catch (IOException e) {
       throw new RuntimeException("Error reading Groovy script: " + scriptPath, e);
-    } catch (CompilationFailedException e){
+    } catch (CompilationFailedException e) {
       throw new RuntimeException("Compilation error were found on: " + scriptPath, e);
     }
   }
