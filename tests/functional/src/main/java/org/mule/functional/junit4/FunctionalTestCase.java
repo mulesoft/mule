@@ -8,7 +8,8 @@ package org.mule.functional.junit4;
 
 import static java.util.Collections.emptyMap;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
-import org.mule.functional.api.component.FlowAssert;
+
+import org.mule.functional.api.flow.FlowRunner;
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
 import org.mule.runtime.core.api.Event;
@@ -19,6 +20,7 @@ import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.processor.FlowAssert;
 
 import org.junit.After;
 

@@ -12,6 +12,7 @@ import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Maps.newLinkedHashMap;
 import static com.google.common.collect.Sets.newHashSet;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.singleton;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.io.FileUtils.toFile;
@@ -25,25 +26,14 @@ import static org.eclipse.aether.util.filter.DependencyFilterUtils.classpathFilt
 import static org.eclipse.aether.util.filter.DependencyFilterUtils.orFilter;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import static org.mule.runtime.core.api.util.PropertiesUtils.loadProperties;
-import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.test.runner.api.ArtifactClassificationType.APPLICATION;
 import static org.mule.test.runner.api.ArtifactClassificationType.MODULE;
 import static org.mule.test.runner.api.ArtifactClassificationType.PLUGIN;
+
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.test.runner.classification.PatternExclusionsDependencyFilter;
 import org.mule.test.runner.classification.PatternInclusionsDependencyFilter;
-
-import org.apache.commons.io.filefilter.WildcardFileFilter;
-import org.eclipse.aether.artifact.Artifact;
-import org.eclipse.aether.artifact.DefaultArtifact;
-import org.eclipse.aether.graph.Dependency;
-import org.eclipse.aether.graph.DependencyFilter;
-import org.eclipse.aether.repository.RemoteRepository;
-import org.eclipse.aether.resolution.ArtifactDescriptorException;
-import org.eclipse.aether.resolution.ArtifactResolutionException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -61,6 +51,18 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
+
+import org.apache.commons.io.filefilter.WildcardFileFilter;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.DefaultArtifact;
+import org.eclipse.aether.graph.Dependency;
+import org.eclipse.aether.graph.DependencyFilter;
+import org.eclipse.aether.graph.Exclusion;
+import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.resolution.ArtifactDescriptorException;
+import org.eclipse.aether.resolution.ArtifactResolutionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Creates the {@link ArtifactUrlClassification} based on the Maven dependencies declared by the rootArtifact using Eclipse
@@ -91,6 +93,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
   private static final String TESTS_JAR = "-tests.jar";
   private static final String SERVICE_PROPERTIES_FILE_NAME = "service.properties";
   private static final String SERVICE_PROVIDER_CLASS_NAME = "service.className";
+  private static final String MULE_PLUGIN_CLASSIFIER = "mule-plugin";
   private static final String MULE_SERVICE_CLASSIFIER = "mule-service";
 
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -169,8 +172,8 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
   }
 
   /**
-   * Finds direct dependencies declared with classifier {@value #MULE_SERVICE_CLASSIFIER}. Creates a
-   * List of {@link ArtifactUrlClassification} for each service including their {@code compile} scope dependencies.
+   * Finds direct dependencies declared with classifier {@value #MULE_SERVICE_CLASSIFIER}. Creates a List of
+   * {@link ArtifactUrlClassification} for each service including their {@code compile} scope dependencies.
    * <p/>
    * {@value #SERVICE_PROVIDER_CLASS_NAME} will be used as {@link ArtifactClassLoader#getArtifactId()}
    * <p/>
@@ -762,6 +765,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    * <p/>
    * If the application artifact has not been classified as plugin its going to be resolved as {@value #JAR_EXTENSION} in order to
    * include this its compiled classes classification.
+   * 
    * @param context {@link ClassPathClassifierContext} with settings for the classification process
    * @param directDependencies {@link List} of {@link Dependency} with direct dependencies for the rootArtifact
    * @param rootArtifactType {@link ArtifactClassificationType} for rootArtifact @return {@link URL}s for application class loader
@@ -799,11 +803,17 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
     directDependencies = directDependencies.stream()
         .map(toTransform -> {
           if (toTransform.getScope().equals(TEST)) {
-            // TODO MULE-11332 Review other manifestations of this bug and add unit tests
-            return toTransform.setScope(COMPILE);
+            if (TESTS_CLASSIFIER.equals(toTransform.getArtifact().getClassifier())) {
+              // Exclude transitive dependencies of test-jar artifacts
+              return toTransform.setScope(COMPILE).setExclusions(singleton(new Exclusion("*", "*", "*", "*")));
+            } else {
+              return toTransform.setScope(COMPILE);
+            }
           }
-          if (PLUGIN.equals(rootArtifactType) && toTransform.getScope().equals(COMPILE)) {
-            // TODO MULE-11332 Review other manifestations of this bug and add unit tests
+          if ((PLUGIN.equals(rootArtifactType)
+              || MULE_PLUGIN_CLASSIFIER.equals(toTransform.getArtifact().getClassifier())
+              || MULE_SERVICE_CLASSIFIER.equals(toTransform.getArtifact().getClassifier()))
+              && toTransform.getScope().equals(COMPILE)) {
             return toTransform.setScope(PROVIDED);
           }
           Artifact artifact = toTransform.getArtifact();

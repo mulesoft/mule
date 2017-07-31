@@ -19,6 +19,7 @@ import static org.mule.runtime.container.internal.ContainerClassLoaderFactory.SY
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_VERBOSE_CLASSLOADING;
 import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.getArtifactPluginId;
 import static org.mule.runtime.module.artifact.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.container.api.MuleModule;
@@ -66,7 +67,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Factory that creates a class loader hierarchy to emulate the one used in a mule standalone container.
@@ -84,9 +84,10 @@ import org.slf4j.LoggerFactory;
  */
 public class IsolatedClassLoaderFactory {
 
+  private static final Logger LOGGER = getLogger(IsolatedClassLoaderFactory.class);
+
   private static final String APP_NAME = "app";
 
-  protected final Logger logger = LoggerFactory.getLogger(this.getClass());
   private ClassLoaderFilterFactory classLoaderFilterFactory = new ArtifactClassLoaderFilterFactory();
   private PluginLookPolicyFactory pluginLookupPolicyGenerator = new PluginLookPolicyFactory();
 
@@ -413,7 +414,7 @@ public class IsolatedClassLoaderFactory {
     }).collect(toSet());
     if (!containerProvidedPackages.isEmpty()) {
       exportedPackages.removeAll(containerProvidedPackages);
-      logger
+      LOGGER
           .warn("Exported packages from plugin '" + pluginUrlClassification.getName() + "' are provided by parent class loader: "
               + containerProvidedPackages);
     }
@@ -422,7 +423,7 @@ public class IsolatedClassLoaderFactory {
         parentExportedPackages.stream().filter(p -> exportedPackages.contains(p)).collect(toSet());
     if (!appProvidedPackages.isEmpty()) {
       exportedPackages.removeAll(appProvidedPackages);
-      logger.warn("Exported packages from plugin '" + pluginUrlClassification.getName() + "' are provided by the artifact owner: "
+      LOGGER.warn("Exported packages from plugin '" + pluginUrlClassification.getName() + "' are provided by the artifact owner: "
           + appProvidedPackages);
     }
     return exportedPackages;
@@ -471,9 +472,9 @@ public class IsolatedClassLoaderFactory {
    */
   private void logClassLoadingTrace(String message) {
     if (isVerboseClassLoading()) {
-      logger.info(message);
+      LOGGER.info(message);
     } else {
-      logger.debug(message);
+      LOGGER.debug(message);
     }
   }
 

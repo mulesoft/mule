@@ -4,10 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.functional.junit4;
+package org.mule.functional.api.flow;
 
 import static org.mockito.Mockito.spy;
 import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR_LOCATION;
+
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
@@ -25,10 +26,10 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Function;
 
 import javax.activation.DataHandler;
 
-import org.apache.commons.collections.Transformer;
 import org.mockito.Mockito;
 import org.reactivestreams.Publisher;
 
@@ -53,7 +54,8 @@ public class TestEventBuilder {
 
   private ReplyToHandler replyToHandler;
 
-  private Transformer spyTransformer = input -> input;
+  private Function<Message, Message> spyMessage = input -> input;
+  private Function<Event, Event> spyEvent = input -> input;
 
   private Publisher<Void> externalCompletionCallback = null;
 
@@ -235,7 +237,8 @@ public class TestEventBuilder {
    * @return this {@link TestEventBuilder}
    */
   public TestEventBuilder spyObjects() {
-    spyTransformer = input -> spy(input);
+    spyMessage = input -> spy(input);
+    spyEvent = input -> spy(input);
 
     return this;
   }
@@ -273,7 +276,7 @@ public class TestEventBuilder {
     }
 
     Event.Builder builder = Event.builder(eventContext)
-        .message((Message) spyTransformer.transform(muleMessage)).groupCorrelation(correlation)
+        .message(spyMessage.apply(muleMessage)).groupCorrelation(correlation)
         .flow(flow).replyToHandler(replyToHandler);
     for (Entry<String, TypedValue> variableEntry : variables.entrySet()) {
       builder.addVariable(variableEntry.getKey(), variableEntry.getValue().getValue(), variableEntry.getValue().getDataType());
@@ -287,7 +290,7 @@ public class TestEventBuilder {
       event.getSession().setProperty(sessionPropertyEntry.getKey(), sessionPropertyEntry.getValue());
     }
 
-    return (Event) spyTransformer.transform(event);
+    return spyEvent.apply(event);
   }
 
   private void setInboundProperties(Message.Builder messageBuilder, Map<String, Serializable> inboundProperties) {

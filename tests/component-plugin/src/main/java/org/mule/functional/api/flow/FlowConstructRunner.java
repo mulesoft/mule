@@ -4,11 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.functional.junit4;
+package org.mule.functional.api.flow;
 
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 import static org.junit.Assert.fail;
+
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;

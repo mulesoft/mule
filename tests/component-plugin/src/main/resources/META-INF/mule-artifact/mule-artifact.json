@@ -7,11 +7,11 @@
       "exportedPackages": [
         "org.mule.functional.api.component",
         "org.mule.functional.api.exception",
-        "org.mule.functional.api.notification",
-        "org.mule.functional.config",
-        "org.mule.functional.client"
+        "org.mule.functional.api.flow",
+        "org.mule.functional.api.notification"
       ],
       "exportedResources": [
+        "META-INF/spring.schemas",
         "META-INF/mule-test.xsd"
       ]
     }
