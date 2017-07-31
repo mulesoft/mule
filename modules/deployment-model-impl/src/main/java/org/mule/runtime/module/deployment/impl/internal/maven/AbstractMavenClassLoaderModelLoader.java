@@ -24,7 +24,8 @@ import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConst
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.PRIVILEGED_ARTIFACTS_IDS;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.PRIVILEGED_EXPORTED_PACKAGES;
 import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.isStandalone;
-import static org.mule.tools.api.ContentGenerator.createClassLoaderModelFromJson;
+import static org.mule.tools.api.packager.ContentGenerator.createClassLoaderModelFromJson;
+import org.apache.maven.model.Model;
 import org.mule.maven.client.api.LocalRepositorySupplierFactory;
 import org.mule.maven.client.api.MavenClient;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
@@ -39,6 +40,8 @@ import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModelLoader;
 import org.mule.runtime.module.artifact.descriptor.InvalidDescriptorLoaderException;
 import org.mule.tools.api.classloader.model.Artifact;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -50,10 +53,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
-
-import org.apache.maven.model.Model;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Abstract implementation of {@link ClassLoaderModelLoader} that resolves the dependencies for all the mule artifacts and create
