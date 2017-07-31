@@ -22,7 +22,7 @@ import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.config.builders.DefaultsConfigurationBuilder;
 import org.mule.runtime.core.internal.config.bootstrap.SimpleRegistryBootstrap;
-import org.mule.runtime.core.transformer.AbstractDiscoverableTransformer;
+import org.mule.runtime.core.internal.transformer.AbstractDiscoverableTransformer;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.nio.charset.Charset;

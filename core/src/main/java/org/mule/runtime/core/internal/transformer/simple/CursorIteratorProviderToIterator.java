@@ -11,7 +11,7 @@ import static org.mule.runtime.api.metadata.DataType.ITERATOR;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.transformer.AbstractTransformer;
+import org.mule.runtime.core.api.transformer.AbstractTransformer;
 
 import java.nio.charset.Charset;
 import java.util.Iterator;

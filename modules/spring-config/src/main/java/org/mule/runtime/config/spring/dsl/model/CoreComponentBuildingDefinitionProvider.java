@@ -94,7 +94,6 @@ import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.context.notification.ListenerSubscriptionPair;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
-import org.mule.runtime.core.api.object.ObjectFactory;
 import org.mule.runtime.core.api.processor.AbstractProcessor;
 import org.mule.runtime.core.api.processor.LoggerMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
@@ -114,6 +113,7 @@ import org.mule.runtime.core.api.streaming.object.CursorIteratorProviderFactory;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionType;
 import org.mule.runtime.core.api.transaction.xa.XaTransactionFactory;
+import org.mule.runtime.core.api.transformer.AbstractTransformer;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.el.ExpressionLanguageComponent;
@@ -123,10 +123,6 @@ import org.mule.runtime.core.el.mvel.configuration.ImportEntry;
 import org.mule.runtime.core.el.mvel.configuration.MVELExpressionLanguageObjectFactory;
 import org.mule.runtime.core.el.mvel.configuration.MVELGlobalFunctionsConfig;
 import org.mule.runtime.core.expression.ExpressionConfig;
-import org.mule.runtime.core.expression.transformers.AbstractExpressionTransformer;
-import org.mule.runtime.core.expression.transformers.BeanBuilderTransformer;
-import org.mule.runtime.core.expression.transformers.ExpressionArgument;
-import org.mule.runtime.core.expression.transformers.ExpressionTransformer;
 import org.mule.runtime.core.internal.enricher.MessageEnricher;
 import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.internal.exception.OnErrorContinueHandler;
@@ -162,6 +158,9 @@ import org.mule.runtime.core.internal.transformer.compression.GZipUncompressTran
 import org.mule.runtime.core.internal.transformer.encryption.AbstractEncryptionTransformer;
 import org.mule.runtime.core.internal.transformer.encryption.DecryptionTransformer;
 import org.mule.runtime.core.internal.transformer.encryption.EncryptionTransformer;
+import org.mule.runtime.core.internal.transformer.expression.AbstractExpressionTransformer;
+import org.mule.runtime.core.internal.transformer.expression.ExpressionArgument;
+import org.mule.runtime.core.internal.transformer.expression.ExpressionTransformer;
 import org.mule.runtime.core.internal.transformer.simple.AutoTransformer;
 import org.mule.runtime.core.internal.transformer.simple.ByteArrayToHexString;
 import org.mule.runtime.core.internal.transformer.simple.HexStringToByteArray;
@@ -177,10 +176,7 @@ import org.mule.runtime.core.security.PasswordBasedEncryptionStrategy;
 import org.mule.runtime.core.security.SecretKeyEncryptionStrategy;
 import org.mule.runtime.core.security.UsernamePasswordAuthenticationFilter;
 import org.mule.runtime.core.security.filters.MuleEncryptionEndpointSecurityFilter;
-import org.mule.runtime.core.transformer.AbstractTransformer;
-import org.mule.runtime.core.transformer.codec.Base64Decoder;
-import org.mule.runtime.core.transformer.codec.Base64Encoder;
-import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
+import org.mule.runtime.core.internal.transformer.simple.StringAppendTransformer;
 import org.mule.runtime.dsl.api.component.AttributeDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
@@ -736,12 +732,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
 
   private List<ComponentBuildingDefinition> getTransformersBuildingDefinitions() {
     List<ComponentBuildingDefinition> transformerComponentBuildingDefinitions = new ArrayList<>();
-    transformerComponentBuildingDefinitions.add(getTransformerBaseBuilder(Base64Encoder.class)
-        .withIdentifier("base64-encoder-transformer")
-        .build());
-    transformerComponentBuildingDefinitions.add(getTransformerBaseBuilder(Base64Decoder.class)
-        .withIdentifier("base64-decoder-transformer")
-        .build());
     transformerComponentBuildingDefinitions.add(getTransformerBaseBuilder(XmlEntityEncoder.class)
         .withIdentifier("xml-entity-encoder-transformer")
         .build());
@@ -817,26 +807,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
                                                                               .build())
                                                                                   .withTypeDefinition(fromConfigurationAttribute("class"))
                                                                                   .withIdentifier("custom-transformer")
-                                                                                  .build());
-    transformerComponentBuildingDefinitions.add(getTransformerBaseBuilder(getBeanBuilderTransformerConfigurationFactory(),
-                                                                          BeanBuilderTransformer.class,
-                                                                          newBuilder()
-                                                                              .withKey("beanClass")
-                                                                              .withAttributeDefinition(fromSimpleParameter("beanClass",
-                                                                                                                           stringToClassConverter())
-                                                                                                                               .build())
-                                                                              .build(),
-                                                                          newBuilder()
-                                                                              .withKey("beanFactory")
-                                                                              .withAttributeDefinition(fromSimpleReferenceParameter("beanFactory-ref")
-                                                                                  .build())
-                                                                              .build(),
-                                                                          newBuilder()
-                                                                              .withKey("arguments")
-                                                                              .withAttributeDefinition(fromChildCollectionConfiguration(ExpressionArgument.class)
-                                                                                  .build())
-                                                                              .build())
-                                                                                  .withIdentifier("bean-builder-transformer")
                                                                                   .build());
 
     transformerComponentBuildingDefinitions.add(getTransformerBaseBuilder(getExpressionTransformerConfigurationFactory(),
@@ -980,14 +950,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     });
   }
 
-  private ConfigurableInstanceFactory getBeanBuilderTransformerConfigurationFactory() {
-    return getAbstractTransformerConfigurationFactory(parameters -> {
-      BeanBuilderTransformer beanBuilderTransformer = new BeanBuilderTransformer();
-      beanBuilderTransformer.setBeanClass((Class<?>) parameters.get("beanClass"));
-      beanBuilderTransformer.setBeanFactory((ObjectFactory) parameters.get("beanFactory"));
-      return beanBuilderTransformer;
-    });
-  }
 
   private ConfigurableInstanceFactory getAbstractTransformerConfigurationFactory(Function<Map<String, Object>, AbstractExpressionTransformer> abstractExpressionTransformerFactory) {
     return parameters -> {

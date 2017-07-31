@@ -35,7 +35,7 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.api.util.TemplateParser;
 import org.mule.runtime.core.api.util.TemplateParser.PatternInfo;
-import org.mule.runtime.core.transformer.TransformerTemplate;
+import org.mule.runtime.core.privileged.transformer.TransformerTemplate;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;

@@ -12,7 +12,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
-import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
+import org.mule.runtime.core.internal.transformer.simple.StringAppendTransformer;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 
 import org.junit.Test;

@@ -28,7 +28,7 @@ import org.mule.runtime.core.api.config.bootstrap.BootstrapObjectFactory;
 import org.mule.runtime.core.internal.config.bootstrap.ObjectBootstrapProperty;
 import org.mule.runtime.core.internal.config.bootstrap.SimpleRegistryBootstrap;
 import org.mule.runtime.core.internal.config.bootstrap.TransformerBootstrapProperty;
-import org.mule.runtime.core.transformer.TransformerUtils;
+import org.mule.runtime.core.privileged.transformer.TransformerUtils;
 
 import java.util.Map.Entry;
 import java.util.function.BiConsumer;

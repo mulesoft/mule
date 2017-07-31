@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.transformer.graph;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.Converter;
-import org.mule.runtime.core.transformer.CompositeConverter;
+import org.mule.runtime.core.privileged.transformer.CompositeConverter;
 
 import java.util.HashSet;
 import java.util.LinkedList;

@@ -25,8 +25,8 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transformer.DataTypeConversionResolver;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.transformer.builder.MockConverterBuilder;
-import org.mule.runtime.core.transformer.builder.MockTransformerBuilder;
+import org.mule.runtime.core.internal.transformer.builder.MockConverterBuilder;
+import org.mule.runtime.core.internal.transformer.builder.MockTransformerBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
