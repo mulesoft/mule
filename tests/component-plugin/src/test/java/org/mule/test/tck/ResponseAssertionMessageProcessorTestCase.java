@@ -14,9 +14,9 @@ import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 
 import org.mule.functional.api.component.ResponseAssertionMessageProcessor;
+import org.mule.functional.api.component.TestNonBlockingProcessor;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.tck.SensingNullMessageProcessor;
-import org.mule.tck.processor.TestNonBlockingProcessor;
 
 import org.junit.Before;
 import org.junit.Test;
