@@ -12,6 +12,7 @@ import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Maps.newLinkedHashMap;
 import static com.google.common.collect.Sets.newHashSet;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.singleton;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.io.FileUtils.toFile;
@@ -56,6 +57,7 @@ import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyFilter;
+import org.eclipse.aether.graph.Exclusion;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.ArtifactDescriptorException;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
@@ -801,14 +803,17 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
     directDependencies = directDependencies.stream()
         .map(toTransform -> {
           if (toTransform.getScope().equals(TEST)) {
-            // TODO MULE-11332 Review other manifestations of this bug and add unit tests
-            return toTransform.setScope(COMPILE);
+            if (TESTS_CLASSIFIER.equals(toTransform.getArtifact().getClassifier())) {
+              // Exclude transitive dependencies of test-jar artifacts
+              return toTransform.setScope(COMPILE).setExclusions(singleton(new Exclusion("*", "*", "*", "*")));
+            } else {
+              return toTransform.setScope(COMPILE);
+            }
           }
           if ((PLUGIN.equals(rootArtifactType)
               || MULE_PLUGIN_CLASSIFIER.equals(toTransform.getArtifact().getClassifier())
               || MULE_SERVICE_CLASSIFIER.equals(toTransform.getArtifact().getClassifier()))
               && toTransform.getScope().equals(COMPILE)) {
-            // TODO MULE-11332 Review other manifestations of this bug and add unit tests
             return toTransform.setScope(PROVIDED);
           }
           Artifact artifact = toTransform.getArtifact();
