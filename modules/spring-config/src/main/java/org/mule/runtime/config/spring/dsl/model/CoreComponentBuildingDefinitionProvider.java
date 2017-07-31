@@ -166,7 +166,7 @@ import org.mule.runtime.core.internal.transformer.simple.ByteArrayToHexString;
 import org.mule.runtime.core.internal.transformer.simple.HexStringToByteArray;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToString;
-import org.mule.runtime.core.internal.transformer.simple.ParseTemplateTransformer;
+import org.mule.runtime.core.internal.processor.simple.ParseTemplateProcessor;
 import org.mule.runtime.core.privileged.processor.IdempotentRedeliveryPolicy;
 import org.mule.runtime.core.privileged.processor.simple.AbstractAddVariablePropertyProcessor;
 import org.mule.runtime.core.privileged.transformer.simple.ByteArrayToObject;
@@ -785,11 +785,15 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     transformerComponentBuildingDefinitions.add(getTransformerBaseBuilder(ObjectToByteArray.class)
         .withIdentifier("string-to-byte-array-transformer")
         .build());
-    transformerComponentBuildingDefinitions.add(getMuleMessageTransformerBaseBuilder()
+    transformerComponentBuildingDefinitions.add(baseDefinition
         .withIdentifier("parse-template")
-        .withTypeDefinition(fromType(ParseTemplateTransformer.class))
+        .withTypeDefinition(fromType(ParseTemplateProcessor.class))
+        .withSetterParameterDefinition("content", fromChildConfiguration(String.class).withIdentifier("content").build())
+        .withSetterParameterDefinition("target", fromSimpleParameter("target").build())
         .withSetterParameterDefinition("location", fromSimpleParameter("location").build())
         .build());
+    transformerComponentBuildingDefinitions
+        .add(getMuleMessageTransformerBaseBuilder().withIdentifier("content").withTypeDefinition(fromType(String.class)).build());
     transformerComponentBuildingDefinitions.add(getTransformerBaseBuilder(AutoTransformer.class)
         .withIdentifier("auto-transformer")
         .build());
