@@ -80,6 +80,7 @@
             <mule:set-payload value="#[parameters.value1 ++ parameters.value2]"/>
         </body>
         <output type="string"/>
+        <output-attributes type="string"/>
     </operation>
 
     <operation name="set-payload-using-undefined-param">

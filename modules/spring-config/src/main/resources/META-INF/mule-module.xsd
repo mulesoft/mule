@@ -55,6 +55,7 @@
                         </xsd:complexType>
                     </xsd:element>
                     <xsd:element ref="output" minOccurs="1" maxOccurs="1"/>
+                    <xsd:element ref="output-attributes" minOccurs="0" maxOccurs="1"/>
                 </xsd:sequence>
                 <xsd:attribute name="name" use="required">
                     <xsd:annotation>
@@ -97,6 +98,22 @@
     </xsd:element>
 
     <xsd:complexType name="outputType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:annotatedType">
+                <xsd:attribute name="type" type="xsd:string"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="output-attributes" type="outputAttributesType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Defines the attribute's output of the operation if exists, void otherwise.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="outputAttributesType">
         <xsd:complexContent>
             <xsd:extension base="mule:annotatedType">
                 <xsd:attribute name="type" type="xsd:string"/>

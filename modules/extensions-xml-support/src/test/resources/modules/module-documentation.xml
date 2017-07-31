@@ -23,5 +23,6 @@
             <mule:set-payload value="hardcoded value"/>
         </body>
         <output type="string" doc:description="Documentation for the output"/>
+        <output-attributes type="string" doc:description="Documentation for the output attributes"/>
     </operation>
 </module>
