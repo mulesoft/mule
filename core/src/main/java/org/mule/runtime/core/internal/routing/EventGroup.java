@@ -16,7 +16,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.api.store.ObjectStoreException;
-import org.mule.runtime.core.api.store.PartitionableObjectStore;
+import org.mule.runtime.api.store.PartitionableObjectStore;
 import org.mule.runtime.core.api.session.DefaultMuleSession;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.api.store.DeserializationPostInitialisable;

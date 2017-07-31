@@ -7,6 +7,7 @@
 package org.mule.runtime.core.api.store;
 
 import org.mule.runtime.api.store.ObjectStoreException;
+import org.mule.runtime.api.store.PartitionableObjectStore;
 
 import java.io.Serializable;
 

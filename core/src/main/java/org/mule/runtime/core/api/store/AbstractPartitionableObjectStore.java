@@ -11,6 +11,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.store.AbstractObjectStoreSupport;
 import org.mule.runtime.api.store.ObjectDoesNotExistException;
 import org.mule.runtime.api.store.ObjectStoreException;
+import org.mule.runtime.api.store.PartitionableObjectStore;
 
 import java.io.Serializable;
 import java.util.List;
