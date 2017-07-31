@@ -2039,25 +2039,6 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-
-    <xsd:element name="base64-encoder-transformer" type="abstractTransformerType"
-                 substitutionGroup="abstract-transformer">
-        <xsd:annotation>
-            <xsd:documentation>
-                A transformer that base64 encodes a string or byte array message.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
-    <xsd:element name="base64-decoder-transformer" type="abstractTransformerType"
-                 substitutionGroup="abstract-transformer">
-        <xsd:annotation>
-            <xsd:documentation>
-                A transformer that base64 decodes a message to give an array of bytes.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
     <xsd:element name="xml-entity-encoder-transformer" type="abstractTransformerType"
                  substitutionGroup="abstract-transformer">
         <xsd:annotation>
@@ -2284,54 +2265,6 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-
-    <xsd:element name="bean-builder-transformer" substitutionGroup="abstract-transformer">
-        <xsd:annotation>
-            <xsd:documentation>
-                A transformer that uses expressions to configure a simple bean object.  The user can specify a bean class or factory to create and one or more expressions that are used to configure properties on the bean.
-            </xsd:documentation>
-        </xsd:annotation>
-        <xsd:complexType>
-            <xsd:complexContent>
-                <xsd:extension base="abstractTransformerType">
-                    <xsd:sequence minOccurs="1" maxOccurs="unbounded">
-                        <xsd:element name="bean-property">
-                            <xsd:complexType>
-                                <xsd:attribute name="property-name" type="xsd:string" use="required">
-                                    <xsd:annotation>
-                                        <xsd:documentation>
-                                            The name of the bean property
-                                        </xsd:documentation>
-                                    </xsd:annotation>
-                                </xsd:attribute>
-                                <xsd:attributeGroup ref="expressionAttributes"/>
-                                <xsd:attribute name="optional" type="substitutableBoolean" use="optional">
-                                    <xsd:annotation>
-                                        <xsd:documentation>If the expression evaluates to null, whether to continue to the next expression without error.
-                                        </xsd:documentation>
-                                    </xsd:annotation>
-                                </xsd:attribute>
-                            </xsd:complexType>
-                        </xsd:element>
-                    </xsd:sequence>
-                    <xsd:attribute name="beanClass" type="xsd:string">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                The bean class to create
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:attribute>
-                    <xsd:attribute name="beanFactory-ref" type="xsd:string">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                A Bean factory to use when creating the bean object.  The factory must implement {{org.mule.runtime.core.api.object.ObjectFactory}}.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:attribute>
-                </xsd:extension>
-            </xsd:complexContent>
-        </xsd:complexType>
-    </xsd:element>
 
     <xsd:element name="expression-transformer" type="expressionTransformerType" substitutionGroup="abstract-transformer">
         <xsd:annotation>

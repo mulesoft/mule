@@ -8,7 +8,7 @@ package org.mule.runtime.core.api.transformer;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessage;
-import org.mule.runtime.core.transformer.TransformerUtils;
+import org.mule.runtime.core.privileged.transformer.TransformerUtils;
 
 import java.util.List;
 

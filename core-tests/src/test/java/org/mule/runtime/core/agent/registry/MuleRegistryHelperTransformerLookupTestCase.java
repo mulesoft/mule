@@ -19,7 +19,7 @@ import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.registry.DefaultRegistryBroker;
 import org.mule.runtime.core.registry.MuleRegistryHelper;
-import org.mule.runtime.core.transformer.builder.MockConverterBuilder;
+import org.mule.runtime.core.internal.transformer.builder.MockConverterBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Orange;

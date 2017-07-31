@@ -8,7 +8,7 @@ package org.mule.tck.testmodels.mule;
 
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
-import org.mule.runtime.core.transformer.AbstractTransformer;
+import org.mule.runtime.core.api.transformer.AbstractTransformer;
 
 import java.nio.charset.Charset;
 

@@ -10,7 +10,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.fromType;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.transformer.AbstractTransformer;
+import org.mule.runtime.core.api.transformer.AbstractTransformer;
 
 import java.nio.charset.Charset;
 import java.time.LocalDate;

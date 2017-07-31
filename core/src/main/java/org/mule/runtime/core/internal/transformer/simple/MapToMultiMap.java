@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.transformer.simple;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.transformer.AbstractDiscoverableTransformer;
+import org.mule.runtime.core.internal.transformer.AbstractDiscoverableTransformer;
 
 import java.nio.charset.Charset;
 import java.util.Map;

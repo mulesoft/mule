@@ -15,7 +15,7 @@ import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.transformer.simple.InputStreamToByteArray;
-import org.mule.runtime.core.transformer.AbstractTransformer;
+import org.mule.runtime.core.api.transformer.AbstractTransformer;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.FilterInputStream;

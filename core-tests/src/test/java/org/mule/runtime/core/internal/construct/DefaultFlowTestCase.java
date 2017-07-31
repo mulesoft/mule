@@ -41,7 +41,7 @@ import org.mule.runtime.core.construct.AbstractFlowConstructTestCase;
 import org.mule.runtime.core.internal.construct.DefaultFlowBuilder.DefaultFlow;
 import org.mule.runtime.core.internal.processor.ResponseMessageProcessorAdapter;
 import org.mule.runtime.core.internal.processor.strategy.BlockingProcessingStrategyFactory;
-import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
+import org.mule.runtime.core.internal.transformer.simple.StringAppendTransformer;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.core.lifecycle.LifecycleTrackerProcessor;
 

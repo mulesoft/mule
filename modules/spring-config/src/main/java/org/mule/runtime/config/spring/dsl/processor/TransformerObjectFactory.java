@@ -13,7 +13,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.transformer.AbstractTransformer;
+import org.mule.runtime.core.api.transformer.AbstractTransformer;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
 import org.mule.runtime.dsl.api.component.ObjectFactory;

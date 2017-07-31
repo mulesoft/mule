@@ -12,7 +12,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.transformer.builder.MockConverterBuilder;
+import org.mule.runtime.core.internal.transformer.builder.MockConverterBuilder;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.BloodOrange;
 import org.mule.tck.testmodels.fruit.Fruit;

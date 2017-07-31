@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.util.compression;
 
-import org.mule.runtime.core.transformer.AbstractTransformer;
+import org.mule.runtime.core.api.transformer.AbstractTransformer;
 
 /**
  * <code>AbstractCompressionTransformer</code> is a base class for all transformers that can compress or uncompress data when they
