@@ -18,16 +18,19 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.DataType.BOOLEAN;
 import static org.mule.runtime.api.metadata.DataType.HTML_STRING;
+import static org.mule.runtime.api.metadata.DataType.JSON_STRING;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.DataType.TEXT_STRING;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
+import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
 import static org.mule.runtime.api.metadata.MediaType.HTML;
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
 import static org.mule.runtime.api.metadata.MediaType.XML;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.message.BaseAttributes;
 import org.mule.runtime.core.internal.metadata.DefaultCollectionDataType;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -44,6 +47,7 @@ import org.junit.Test;
 public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
 
   private static final String NEW_PAYLOAD = "new payload";
+  private static final String EMPTY_JSON = "{}";
   private static final Object BASE_ATTRIBUTES = new BaseAttributes() {};
   private static final DataType BASE_ATTRIBUTES_DATATYPE = DataType.fromObject(BASE_ATTRIBUTES);
   private static final String PROPERTY_KEY = "propertyKey";
@@ -143,8 +147,26 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  public void wholePayload() {
+    Message message = Message.builder().payload(new TypedValue<>(EMPTY_JSON, JSON_STRING)).build();
+
+    assertThat(message.getPayload().getValue(), equalTo(EMPTY_JSON));
+    assertThat(message.getPayload().getDataType().getType(), equalTo(String.class));
+    assertThat(message.getPayload().getDataType().getMediaType(), is(APPLICATION_JSON));
+  }
+
+  @Test
   public void messageAttributes() {
     assertTestMessage(createTestMessage());
+  }
+
+  @Test
+  public void wholeAttributes() {
+    Message message = Message.builder().nullPayload().attributes(new TypedValue<>(EMPTY_JSON, JSON_STRING)).build();
+
+    assertThat(message.getAttributes().getValue(), equalTo(EMPTY_JSON));
+    assertThat(message.getAttributes().getDataType().getType(), equalTo(String.class));
+    assertThat(message.getAttributes().getDataType().getMediaType(), is(APPLICATION_JSON));
   }
 
   @Test
@@ -246,6 +268,16 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
   public void nullPayload() {
     Message message = of(null);
     assertThat(message.getPayload().getDataType().getType(), equalTo(Object.class));
+  }
+
+  @Test
+  public void mutateEntirePayload() {
+    Message message = createTestMessage();
+    Message copy = new DefaultMessageBuilder(message).payload(new TypedValue<>(EMPTY_JSON, JSON_STRING)).build();
+
+    assertThat(copy.getPayload().getValue(), equalTo(EMPTY_JSON));
+    assertThat(copy.getPayload().getDataType().getType(), equalTo(String.class));
+    assertThat(copy.getPayload().getDataType().getMediaType(), is(APPLICATION_JSON));
   }
 
   @Test

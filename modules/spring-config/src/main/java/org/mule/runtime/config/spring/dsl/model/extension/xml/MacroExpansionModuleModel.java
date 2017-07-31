@@ -235,7 +235,7 @@ public class MacroExpansionModuleModel {
 
     ComponentModel.Builder processorChainBuilder = new ComponentModel.Builder();
     processorChainBuilder
-        .setIdentifier(builder().withNamespace(CORE_PREFIX).withName("module-operation-chain").build());
+        .setIdentifier(builder().namespace(CORE_PREFIX).name("module-operation-chain").build());
 
     processorChainBuilder.addParameter("moduleName", extensionModel.getXmlDslModel().getPrefix(), false);
     processorChainBuilder.addParameter("moduleOperation", operationModel.getName(), false);
@@ -304,11 +304,11 @@ public class MacroExpansionModuleModel {
   private ComponentModel getParameterChild(Map<String, String> parameters, String wrapperParameters, String entryParameter) {
     ComponentModel.Builder parametersBuilder = new ComponentModel.Builder();
     parametersBuilder
-        .setIdentifier(builder().withNamespace(CORE_PREFIX).withName(wrapperParameters).build());
+        .setIdentifier(builder().namespace(CORE_PREFIX).name(wrapperParameters).build());
     parameters.forEach((paramName, paramValue) -> {
       ComponentModel.Builder parameterBuilder = new ComponentModel.Builder();
-      parameterBuilder.setIdentifier(builder().withNamespace(CORE_PREFIX)
-          .withName(entryParameter).build());
+      parameterBuilder.setIdentifier(builder().namespace(CORE_PREFIX)
+          .name(entryParameter).build());
 
       parameterBuilder.addParameter(KEY_ATTRIBUTE_NAME, paramName, false);
       parameterBuilder.addParameter(VALUE_ATTRIBUTE_NAME, paramValue, false);

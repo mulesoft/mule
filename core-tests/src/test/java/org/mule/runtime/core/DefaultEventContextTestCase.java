@@ -569,8 +569,8 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
   @Description("Verify that a location produces connector and source data.")
   public void componentData() throws Exception {
     TypedComponentIdentifier typedComponentIdentifier = TypedComponentIdentifier.builder()
-        .withType(SOURCE)
-        .withIdentifier(buildFromStringRepresentation("http:listener"))
+        .type(SOURCE)
+        .identifier(buildFromStringRepresentation("http:listener"))
         .build();
     ComponentLocation location = mock(ComponentLocation.class);
     when(location.getComponentIdentifier()).thenReturn(typedComponentIdentifier);

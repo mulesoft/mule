@@ -59,12 +59,12 @@ public class MavenConfigBuilder {
         }
       }
       MavenConfiguration.MavenConfigurationBuilder mavenConfigurationBuilder =
-          MavenConfiguration.newMavenConfigurationBuilder().withLocalMavenRepositoryLocation(repositoryFolder);
+          MavenConfiguration.newMavenConfigurationBuilder().localMavenRepositoryLocation(repositoryFolder);
       if (globalSettingsFile != null) {
-        mavenConfigurationBuilder.withGlobalSettingsLocation(globalSettingsFile);
+        mavenConfigurationBuilder.globalSettingsLocation(globalSettingsFile);
       }
       if (userSettingsFile != null) {
-        mavenConfigurationBuilder.withUserSettingsLocation(userSettingsFile);
+        mavenConfigurationBuilder.userSettingsLocation(userSettingsFile);
       }
 
       ConfigObject repositories =
@@ -79,18 +79,18 @@ public class MavenConfigBuilder {
           String password = repositoryConfig.get("password");
           try {
             RemoteRepository.RemoteRepositoryBuilder remoteRepositoryBuilder = RemoteRepository.newRemoteRepositoryBuilder()
-                .withId(repositoryId).withUrl(new URL(url));
+                .id(repositoryId).url(new URL(url));
             if (username != null || password != null) {
               Authentication.AuthenticationBuilder authenticationBuilder = Authentication.newAuthenticationBuilder();
               if (username != null) {
-                authenticationBuilder.withUsername(username);
+                authenticationBuilder.username(username);
               }
               if (password != null) {
-                authenticationBuilder.withPassword(password);
+                authenticationBuilder.password(password);
               }
-              remoteRepositoryBuilder.withAuthentication(authenticationBuilder.build());
+              remoteRepositoryBuilder.authentication(authenticationBuilder.build());
             }
-            mavenConfigurationBuilder.withRemoteRepository(remoteRepositoryBuilder.build());
+            mavenConfigurationBuilder.remoteRepository(remoteRepositoryBuilder.build());
           } catch (MalformedURLException e) {
             throw new MuleRuntimeException(e);
           }
@@ -142,7 +142,7 @@ public class MavenConfigBuilder {
    * @return creates a {@link MavenConfiguration} instance when no maven settings are defined.
    */
   public static MavenConfiguration buildNullMavenConfig() {
-    return MavenConfiguration.newMavenConfigurationBuilder().withLocalMavenRepositoryLocation(getRuntimeRepositoryFolder())
+    return MavenConfiguration.newMavenConfigurationBuilder().localMavenRepositoryLocation(getRuntimeRepositoryFolder())
         .build();
   }
 }

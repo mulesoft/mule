@@ -101,7 +101,7 @@ public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCas
     MavenClientProvider mavenClientProvider = MavenClientProvider.discoverProvider(currentThread().getContextClassLoader());
     when(descriptorLoaderRepository.get(MAVEN, POLICY, ClassLoaderModelLoader.class))
         .thenReturn(new DeployableMavenClassLoaderModelLoader(mavenClientProvider.createMavenClient(newMavenConfigurationBuilder()
-            .withLocalMavenRepositoryLocation(mavenClientProvider
+            .localMavenRepositoryLocation(mavenClientProvider
                 .getLocalRepositorySuppliers().environmentMavenRepositorySupplier().get())
             .build()), mavenClientProvider.getLocalRepositorySuppliers()));
 

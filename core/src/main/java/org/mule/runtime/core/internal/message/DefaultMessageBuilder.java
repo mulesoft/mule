@@ -116,7 +116,12 @@ public class DefaultMessageBuilder
 
   @Override
   public InternalMessage.Builder payload(Object payload) {
-    this.payload = payload;
+    if (payload instanceof TypedValue<?>) {
+      this.payload = ((TypedValue) payload).getValue();
+      this.dataType = ((TypedValue) payload).getDataType();
+    } else {
+      this.payload = payload;
+    }
     return this;
   }
 
@@ -167,7 +172,12 @@ public class DefaultMessageBuilder
 
   @Override
   public InternalMessage.Builder attributes(Object attributes) {
-    this.attributes = attributes;
+    if (attributes instanceof TypedValue<?>) {
+      this.attributes = ((TypedValue) attributes).getValue();
+      this.attributesDataType = ((TypedValue) attributes).getDataType();
+    } else {
+      this.attributes = attributes;
+    }
     return this;
   }
 

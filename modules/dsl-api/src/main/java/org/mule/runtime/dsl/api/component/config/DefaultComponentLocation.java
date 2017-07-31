@@ -67,8 +67,8 @@ public class DefaultComponentLocation implements ComponentLocation, Serializable
   public static DefaultComponentLocation fromSingleComponent(String component) {
     DefaultLocationPart part = new DefaultLocationPart(component,
                                                        of(TypedComponentIdentifier.builder()
-                                                           .withType(UNKNOWN)
-                                                           .withIdentifier(ComponentIdentifier
+                                                           .type(UNKNOWN)
+                                                           .identifier(ComponentIdentifier
                                                                .buildFromStringRepresentation(component))
                                                            .build()),
                                                        empty(),

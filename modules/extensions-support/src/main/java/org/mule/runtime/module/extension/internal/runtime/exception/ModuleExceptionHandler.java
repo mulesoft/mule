@@ -74,8 +74,8 @@ public class ModuleExceptionHandler {
     }
 
     ErrorType errorType = typeRepository.lookupErrorType(builder()
-        .withNamespace(extensionNamespace)
-        .withName(errorDefinition.getType())
+        .namespace(extensionNamespace)
+        .name(errorDefinition.getType())
         .build())
         .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("The component '%s' from the connector '%s' attempted to throw '%s', but it was not registered "
             + "in the Error Repository", componentModel.getName(), extensionModel.getName(),

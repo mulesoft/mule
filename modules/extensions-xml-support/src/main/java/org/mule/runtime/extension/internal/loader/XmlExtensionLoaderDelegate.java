@@ -26,7 +26,6 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.config.spring.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
 import static org.mule.runtime.extension.internal.loader.catalog.loader.common.XmlMatcher.match;
-import com.google.common.collect.ImmutableMap;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.catalog.api.TypeResolver;
@@ -63,8 +62,8 @@ import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.internal.loader.catalog.loader.common.XmlMatcher;
 import org.mule.runtime.extension.internal.loader.catalog.loader.xml.TypesCatalogXmlLoader;
 import org.mule.runtime.extension.internal.loader.catalog.model.TypesCatalog;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+
+import com.google.common.collect.ImmutableMap;
 
 import java.io.IOException;
 import java.net.URL;
@@ -75,6 +74,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * Describes an {@link ExtensionModel} by scanning an XML provided in the constructor
@@ -126,21 +128,21 @@ final class XmlExtensionLoaderDelegate {
   }
 
   private static final ComponentIdentifier OPERATION_IDENTIFIER =
-      ComponentIdentifier.builder().withNamespace(MODULE_NAMESPACE_NAME).withName("operation").build();
+      ComponentIdentifier.builder().namespace(MODULE_NAMESPACE_NAME).name("operation").build();
   private static final ComponentIdentifier OPERATION_PROPERTY_IDENTIFIER =
-      ComponentIdentifier.builder().withNamespace(MODULE_NAMESPACE_NAME).withName("property").build();
+      ComponentIdentifier.builder().namespace(MODULE_NAMESPACE_NAME).name("property").build();
   private static final ComponentIdentifier OPERATION_PARAMETERS_IDENTIFIER =
-      ComponentIdentifier.builder().withNamespace(MODULE_NAMESPACE_NAME).withName("parameters").build();
+      ComponentIdentifier.builder().namespace(MODULE_NAMESPACE_NAME).name("parameters").build();
   private static final ComponentIdentifier OPERATION_PARAMETER_IDENTIFIER =
-      ComponentIdentifier.builder().withNamespace(MODULE_NAMESPACE_NAME).withName("parameter").build();
+      ComponentIdentifier.builder().namespace(MODULE_NAMESPACE_NAME).name("parameter").build();
   private static final ComponentIdentifier OPERATION_BODY_IDENTIFIER =
-      ComponentIdentifier.builder().withNamespace(MODULE_NAMESPACE_NAME).withName("body").build();
+      ComponentIdentifier.builder().namespace(MODULE_NAMESPACE_NAME).name("body").build();
   private static final ComponentIdentifier OPERATION_OUTPUT_IDENTIFIER =
-      ComponentIdentifier.builder().withNamespace(MODULE_NAMESPACE_NAME).withName("output").build();
+      ComponentIdentifier.builder().namespace(MODULE_NAMESPACE_NAME).name("output").build();
   private static final ComponentIdentifier OPERATION_OUTPUT_ATTRIBUTES_IDENTIFIER =
-      ComponentIdentifier.builder().withNamespace(MODULE_NAMESPACE_NAME).withName("output-attributes").build();
+      ComponentIdentifier.builder().namespace(MODULE_NAMESPACE_NAME).name("output-attributes").build();
   private static final ComponentIdentifier MODULE_IDENTIFIER =
-      ComponentIdentifier.builder().withNamespace(MODULE_NAMESPACE_NAME).withName(MODULE_NAMESPACE_NAME)
+      ComponentIdentifier.builder().namespace(MODULE_NAMESPACE_NAME).name(MODULE_NAMESPACE_NAME)
           .build();
   public static final String XSD_SUFFIX = ".xsd";
   private static final String XML_SUFFIX = ".xml";

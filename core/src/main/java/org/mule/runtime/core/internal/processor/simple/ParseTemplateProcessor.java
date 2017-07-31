@@ -52,7 +52,7 @@ public class ParseTemplateProcessor extends SimpleMessageProcessor {
       throw new IllegalArgumentException("Template content cannot be null");
     }
     Object result = muleContext.getExpressionManager().parse(content, event, null);
-    Message resultMessage = Message.builder(event.getMessage()).payload(result).nullAttributes().build();
+    Message resultMessage = Message.builder(event.getMessage()).value(result).nullAttributesValue().build();
     if (target == null) {
       return Event.builder(event).message(resultMessage).build();
     } else {

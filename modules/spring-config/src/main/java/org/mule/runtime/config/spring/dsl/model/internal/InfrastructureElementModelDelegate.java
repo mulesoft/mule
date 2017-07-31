@@ -123,8 +123,8 @@ class InfrastructureElementModelDelegate {
 
         ComponentConfiguration.Builder tlsConfig = ComponentConfiguration.builder()
             .withIdentifier(builder()
-                .withNamespace(TLS_PREFIX)
-                .withName(TLS_CONTEXT_ELEMENT_IDENTIFIER)
+                .namespace(TLS_PREFIX)
+                .name(TLS_CONTEXT_ELEMENT_IDENTIFIER)
                 .build());
 
         objectValue.getParameters()
@@ -139,8 +139,8 @@ class InfrastructureElementModelDelegate {
               public void visitObjectValue(ParameterObjectValue objectValue) {
                 ComponentConfiguration.Builder nested = ComponentConfiguration.builder()
                     .withIdentifier(builder()
-                        .withNamespace(TLS_PREFIX)
-                        .withName(name)
+                        .namespace(TLS_PREFIX)
+                        .name(name)
                         .build());
 
                 cloneParameters(objectValue, nested);
@@ -190,8 +190,8 @@ class InfrastructureElementModelDelegate {
 
     ComponentConfiguration.Builder config = ComponentConfiguration.builder()
         .withIdentifier(builder()
-            .withNamespace(isBlank(customNamespace) ? CORE_PREFIX : customNamespace)
-            .withName(elementName)
+            .namespace(isBlank(customNamespace) ? CORE_PREFIX : customNamespace)
+            .name(elementName)
             .build());
 
     cloneParameters(objectValue, config);

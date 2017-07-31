@@ -31,7 +31,7 @@ public final class TcpClientSocketPropertiesBuilder {
    * @param sendBufferSize size of the buffer (in bytes).
    * @return this builder
    */
-  public TcpClientSocketPropertiesBuilder setSendBufferSize(Integer sendBufferSize) {
+  public TcpClientSocketPropertiesBuilder sendBufferSize(Integer sendBufferSize) {
     this.sendBufferSize = sendBufferSize;
     return this;
   }
@@ -43,7 +43,7 @@ public final class TcpClientSocketPropertiesBuilder {
    * @param receiveBufferSize size of the buffer (in bytes).
    * @return this builder
    */
-  public TcpClientSocketPropertiesBuilder setReceiveBufferSize(Integer receiveBufferSize) {
+  public TcpClientSocketPropertiesBuilder receiveBufferSize(Integer receiveBufferSize) {
     this.receiveBufferSize = receiveBufferSize;
     return this;
   }
@@ -55,7 +55,7 @@ public final class TcpClientSocketPropertiesBuilder {
    * @param clientTimeout the timeout (in milliseconds).
    * @return this builder
    */
-  public TcpClientSocketPropertiesBuilder setClientTimeout(Integer clientTimeout) {
+  public TcpClientSocketPropertiesBuilder clientTimeout(Integer clientTimeout) {
     this.clientTimeout = clientTimeout;
     return this;
   }
@@ -67,7 +67,7 @@ public final class TcpClientSocketPropertiesBuilder {
    * @param sendTcpNoDelay whether to send everything or collect data
    * @return this builder
    */
-  public TcpClientSocketPropertiesBuilder setSendTcpNoDelay(Boolean sendTcpNoDelay) {
+  public TcpClientSocketPropertiesBuilder sendTcpNoDelay(Boolean sendTcpNoDelay) {
     this.sendTcpNoDelay = sendTcpNoDelay;
     return this;
   }
@@ -79,7 +79,7 @@ public final class TcpClientSocketPropertiesBuilder {
    * @param linger timeout (in milliseconds)
    * @return this builder
    */
-  public TcpClientSocketPropertiesBuilder setLinger(Integer linger) {
+  public TcpClientSocketPropertiesBuilder linger(Integer linger) {
     this.linger = linger;
     return this;
   }
@@ -91,7 +91,7 @@ public final class TcpClientSocketPropertiesBuilder {
    * @param keepAlive
    * @return
    */
-  public TcpClientSocketPropertiesBuilder setKeepAlive(Boolean keepAlive) {
+  public TcpClientSocketPropertiesBuilder keepAlive(Boolean keepAlive) {
     this.keepAlive = keepAlive;
     return this;
   }
@@ -103,7 +103,7 @@ public final class TcpClientSocketPropertiesBuilder {
    * @param connectionTimeout timeout (in milliseconds)
    * @return this builder
    */
-  public TcpClientSocketPropertiesBuilder setConnectionTimeout(Integer connectionTimeout) {
+  public TcpClientSocketPropertiesBuilder connectionTimeout(Integer connectionTimeout) {
     this.connectionTimeout = connectionTimeout;
     return this;
   }

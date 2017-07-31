@@ -123,8 +123,8 @@ public class NotificationHelperTestCase extends AbstractMuleTestCase {
     final ComponentLocation location = mock(ComponentLocation.class);
     when(location.getParts()).thenReturn(Collections.singletonList(flowPart));
     when(location.getComponentIdentifier()).thenReturn(TypedComponentIdentifier.builder()
-        .withType(SOURCE)
-        .withIdentifier(buildFromStringRepresentation("http:listener"))
+        .type(SOURCE)
+        .identifier(buildFromStringRepresentation("http:listener"))
         .build());
     when(messageSource.getLocation()).thenReturn(location);
     final FlowConstruct flowConstruct = mock(FlowConstruct.class, withSettings().extraInterfaces(AnnotatedObject.class));
