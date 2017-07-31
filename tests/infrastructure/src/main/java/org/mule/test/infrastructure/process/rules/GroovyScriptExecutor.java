@@ -1,29 +1,48 @@
 /*
- * (c) 2003-2017 MuleSoft, Inc. This software is protected under international copyright
- * law. All use of this software is subject to MuleSoft's Master Subscription Agreement
- * (or other master license agreement) separately entered into in writing between you and
- * MuleSoft. If such an agreement is not in place, you may not use the software.
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
  */
 package org.mule.test.infrastructure.process.rules;
 
+import org.codehaus.groovy.control.CompilationFailedException;
 import org.mule.runtime.core.api.util.IOUtils;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import org.junit.rules.ExternalResource;
+import org.junit.rules.TestRule;
+import org.junit.runner.Description;
+import org.junit.runners.model.Statement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import groovy.lang.GroovyShell;
 
 /**
- * Junit rule to run Groovy scripts.
+ * Junit rule to run Groovy scripts for testing. Usage:
+ * <p>
+ *
+ * <pre>
+ * public class MuleApplicationTestCase {
+ *
+ *   &#064;ClassRule
+ *   public static GroovyScriptExecutor executor = builder(&quot;/path/to/script.groovy&quot;).withProperty("property", "value");
+ *
+ *   &#064;Test
+ *   public void useApplication() throws IOException {
+ *     // Groovy scrip is executed
+ *     // This code exercises the application
+ *   }
+ * }
+ * </pre>
  */
-public class GroovyScriptExecutor extends ExternalResource {
+public class GroovyScriptExecutor implements TestRule {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(MuleDeployment.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(GroovyScriptExecutor.class);
 
   private final String scriptPath;
   private Map<String, String> properties = new HashMap<>();
@@ -31,43 +50,101 @@ public class GroovyScriptExecutor extends ExternalResource {
 
   public static class Builder {
 
-    GroovyScriptExecutor executor;
+    private String scriptPath;
+    private Map<String, String> properties = new HashMap<>();
+    private Map<String, Supplier<String>> propertiesUsingLambdas = new HashMap<>();
 
     Builder(String scriptPath) {
-      executor = new GroovyScriptExecutor(scriptPath);
+      this.scriptPath = scriptPath;
     }
 
+    /**
+     * Specifies a property to be passed to the Groovy script.
+     *
+     * @param property
+     * @param value
+     * @return
+     */
     public Builder withProperty(String property, String value) {
-      executor.properties.put(property, value);
+      properties.put(property, value);
       return this;
     }
 
+    /**
+     * Specifies a property to be passed to the Groovy script that needs to be resolved before its execution.
+     *
+     * @param property
+     * @param propertySupplier
+     * @return
+     */
     public Builder withPropertyUsingLambda(String property, Supplier<String> propertySupplier) {
-      executor.propertiesUsingLambdas.put(property, propertySupplier);
+      propertiesUsingLambdas.put(property, propertySupplier);
       return this;
     }
 
+    /**
+     * Specifies a Map of properties to be passed to the Groovy script.
+     *
+     * @param properties
+     * @return
+     */
     public Builder withProperties(Map<String, String> properties) {
-      executor.properties.putAll(properties);
+      properties.putAll(properties);
       return this;
     }
 
+    /**
+     * Creates a new {@link GroovyScriptExecutor} with all the previously defined properties.
+     *
+     * @return a {@link GroovyScriptExecutor} instance
+     */
     public GroovyScriptExecutor build() {
-      return executor;
+      return new GroovyScriptExecutor(scriptPath, properties, propertiesUsingLambdas);
     }
+
   }
 
+  /**
+   * Creates a new {@link Builder} for the construction of a {@link GroovyScriptExecutor} instance.
+   *
+   * @param scriptPath the full path of the groovy script to be executed.
+   * @return a {@link Builder} instance.
+   */
   public static GroovyScriptExecutor.Builder builder(String scriptPath) {
     return new GroovyScriptExecutor.Builder(scriptPath);
+  }
+
+  public GroovyScriptExecutor(String scriptPath, Map<String, String> properties,
+                              Map<String, Supplier<String>> propertiesUsingLambdas) {
+    this(scriptPath);
+    this.properties = properties;
+    this.propertiesUsingLambdas = propertiesUsingLambdas;
   }
 
   protected GroovyScriptExecutor(String scriptPath) {
     this.scriptPath = scriptPath;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  protected void before() throws Throwable {
-    executeGroovyScript();
+  public Statement apply(Statement base, Description description) {
+    return statement(base);
+  }
+
+  private Statement statement(final Statement base) {
+    return new Statement() {
+
+      @Override
+      public void evaluate() throws Throwable {
+        executeGroovyScript();
+        try {
+          base.evaluate();
+        } finally {
+        }
+      }
+    };
   }
 
   private void executeGroovyScript() {
@@ -81,10 +158,10 @@ public class GroovyScriptExecutor extends ExternalResource {
 
       LOGGER.info("Groovy script executed");
 
-    } catch (Exception e) {
-      String errorMessage = "Error executing Groovy script: " + scriptPath;
-      LOGGER.error(errorMessage, e);
-      throw new RuntimeException(errorMessage, e);
+    } catch (IOException e) {
+      throw new RuntimeException("Error reading Groovy script: " + scriptPath, e);
+    } catch (CompilationFailedException e){
+      throw new RuntimeException("Compilation error were found on: " + scriptPath, e);
     }
   }
 

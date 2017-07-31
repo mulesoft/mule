@@ -47,8 +47,7 @@ import org.slf4j.LoggerFactory;
  * public class MuleApplicationTestCase {
  * 
  *   &#064;ClassRule
- *   public static MuleDeployment deployment =
- *       builder().withApplications(&quot;/path/to/application.zip&quot;).withProperty("-M-Dproperty", "value").timeout(120).deploy();
+ *   public static MuleDeployment deployment = builder(&quot;/path/to/script.groovy&quot;).withProperty("property", "value");
  *
  *   &#064;Test
  *   public void useApplication() throws IOException {
