@@ -96,5 +96,10 @@
             <artifactId>allure-junit4</artifactId>
             <version>${allureJunitVersion}</version>
         </dependency>
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+            <version>${groovyVersion}</version>
+        </dependency>
     </dependencies>
 </project>
