@@ -6,6 +6,7 @@
  */
 package org.mule.test.values.extension.source;
 
+import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.values.OfValues;
@@ -19,6 +20,6 @@ public class SourceWithConnection extends AbstractSource {
   String channel;
 
   @Connection
-  ValuesConnection connection;
+  ConnectionProvider<ValuesConnection> connection;
 
 }

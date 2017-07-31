@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.util;
 
 import static java.lang.String.format;
 import static java.lang.reflect.Modifier.isPublic;
+import static java.lang.reflect.Modifier.isStatic;
 import static java.util.Arrays.stream;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -697,7 +698,7 @@ public final class IntrospectionUtils {
 
   public static List<Field> getFieldsOfType(Class<?> introspectedType, Class fieldType) {
     return getFieldsStream(introspectedType)
-        .filter(f -> fieldType.isAssignableFrom(f.getType()))
+        .filter(f -> fieldType.isAssignableFrom(f.getType()) && !isStatic(f.getModifiers()))
         .collect(toList());
   }
 

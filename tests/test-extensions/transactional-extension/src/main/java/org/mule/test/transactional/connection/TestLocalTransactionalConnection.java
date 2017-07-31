@@ -6,6 +6,8 @@
  */
 package org.mule.test.transactional.connection;
 
+import org.mule.runtime.api.tx.TransactionException;
+
 public class TestLocalTransactionalConnection implements TestTransactionalConnection {
 
   private boolean transactionBegun, transactionCommited, transactionRolledback = false;
@@ -17,17 +19,17 @@ public class TestLocalTransactionalConnection implements TestTransactionalConnec
   }
 
   @Override
-  public void begin() throws Exception {
+  public void begin() throws TransactionException {
     transactionBegun = true;
   }
 
   @Override
-  public void commit() throws Exception {
+  public void commit() throws TransactionException {
     transactionCommited = true;
   }
 
   @Override
-  public void rollback() throws Exception {
+  public void rollback() throws TransactionException {
     transactionRolledback = true;
   }
 

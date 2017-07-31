@@ -6,6 +6,7 @@
  */
 package org.mule.test.vegan.extension;
 
+import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.Connection;
@@ -20,12 +21,12 @@ public class HarvestPeachesSource extends Source<String, StringAttributes> {
   public static boolean isConnected;
 
   @Connection
-  Peach connection;
+  private ConnectionProvider<Peach> connection;
 
 
   @Override
   public void onStart(SourceCallback<String, StringAttributes> sourceCallback) throws MuleException {
-    isConnected = connection != null;
+    isConnected = connection.connect() != null;
   }
 
   @Override

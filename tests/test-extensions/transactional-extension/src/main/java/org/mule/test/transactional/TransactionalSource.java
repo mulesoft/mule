@@ -7,6 +7,7 @@
 package org.mule.test.transactional;
 
 import static java.util.concurrent.Executors.newFixedThreadPool;
+import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.annotation.execution.OnError;
 import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
@@ -15,12 +16,13 @@ import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
+import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.test.transactional.connection.TestTransactionalConnection;
 
 public class TransactionalSource extends Source<TestTransactionalConnection, Object> {
 
   @Connection
-  private static TestTransactionalConnection connection;
+  private ConnectionProvider<TestTransactionalConnection> connectionProvider;
 
   public TransactionalSource() {
     isSuccess = null;
@@ -30,8 +32,16 @@ public class TransactionalSource extends Source<TestTransactionalConnection, Obj
 
   @Override
   public void onStart(SourceCallback<TestTransactionalConnection, Object> sourceCallback) throws MuleException {
-    newFixedThreadPool(1).execute(() -> sourceCallback
-        .handle(Result.<TestTransactionalConnection, Object>builder().output(connection).build()));
+    newFixedThreadPool(1).execute(() -> {
+      SourceCallbackContext ctx = sourceCallback.createContext();
+      try {
+        TestTransactionalConnection connection = connectionProvider.connect();
+        ctx.bindConnection(connection);
+        sourceCallback.handle(Result.<TestTransactionalConnection, Object>builder().output(connection).build(), ctx);
+      } catch (Exception e) {
+        sourceCallback.onSourceException(e);
+      }
+    });
   }
 
   @Override

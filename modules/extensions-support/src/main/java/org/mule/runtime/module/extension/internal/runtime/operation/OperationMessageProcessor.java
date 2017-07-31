@@ -220,8 +220,7 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
       throws MuleException {
 
     return new DefaultExecutionContext<>(extensionModel, configuration, resolvedParameters, operationModel, event,
-                                         getCursorProviderFactory(), streamingManager, flowConstruct,
-                                         getLocation(), muleContext);
+                                         getCursorProviderFactory(), streamingManager, getLocation(), muleContext);
   }
 
   @Override

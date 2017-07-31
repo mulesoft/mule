@@ -19,7 +19,6 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -27,6 +26,7 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.ErrorTypeLocator;
@@ -86,12 +86,17 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   private final SourceAdapterFactory sourceAdapterFactory;
   private final RetryPolicyTemplate retryPolicyTemplate;
   private final ExceptionHandlerManager exceptionEnricherManager;
+
+  private SourceConnectionManager sourceConnectionManager;
   private Processor messageProcessor;
+  private LazyValue<TransactionConfig> transactionConfig = new LazyValue<>(this::buildTransactionConfig);
 
   private SourceAdapter sourceAdapter;
   private Scheduler retryScheduler;
   private Scheduler flowTriggerScheduler;
 
+  // TODO - MULE-12066 : Support XA transactions in SDK extensions at source level
+  private final ExtensionTransactionFactory transactionFactory = new ExtensionTransactionFactory();
   private AtomicBoolean started = new AtomicBoolean(false);
 
   public ExtensionMessageSource(ExtensionModel extensionModel,
@@ -111,10 +116,11 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   private synchronized void createSource() throws Exception {
     if (sourceAdapter == null) {
       sourceAdapter =
-          sourceAdapterFactory.createAdapter(getConfiguration(getInitialiserEvent(muleContext)), createSourceCallbackFactory());
+          sourceAdapterFactory.createAdapter(getConfiguration(getInitialiserEvent(muleContext)),
+                                             createSourceCallbackFactory(),
+                                             getLocation(),
+                                             sourceConnectionManager);
       muleContext.getInjector().inject(sourceAdapter);
-      sourceAdapter.setFlowConstruct(flowConstruct);
-      sourceAdapter.setComponentLocation(getLocation());
     }
   }
 
@@ -146,14 +152,12 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     return sourceAdapter.getConfigurationInstance();
   }
 
-  public Optional<ConnectionHandler> getConnectionHandler() {
-    return sourceAdapter.getConnectionHandler();
-  }
-
   private SourceCallbackFactory createSourceCallbackFactory() {
     return completionHandlerFactory -> DefaultSourceCallback.builder()
         .setExceptionCallback(this)
         .setSourceModel(sourceModel)
+        .setConfigurationInstance(getConfigurationInstance().orElse(null))
+        .setTransactionConfig(transactionConfig.get())
         .setSource(this)
         .setFlowConstruct(flowConstruct)
         .setListener(messageProcessor)
@@ -266,11 +270,22 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     sourceAdapter = null;
   }
 
+  private TransactionConfig buildTransactionConfig() {
+    MuleTransactionConfig transactionConfig = new MuleTransactionConfig();
+    transactionConfig.setAction(toActionCode(sourceAdapter.getTransactionalAction()));
+    transactionConfig.setMuleContext(muleContext);
+    transactionConfig.setFactory(transactionFactory);
+
+    return transactionConfig;
+  }
+
+  SourceConnectionManager getSourceConnectionManager() {
+    return sourceConnectionManager;
+  }
+
   private MessageProcessContext createProcessingContext() {
 
     return new MessageProcessContext() {
-
-      private final ExtensionTransactionFactory TRANSACTION_FACTORY = new ExtensionTransactionFactory();
 
       @Override
       public boolean supportsAsynchronousProcessing() {
@@ -294,23 +309,12 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
       @Override
       public Optional<TransactionConfig> getTransactionConfig() {
-        return sourceModel.isTransactional() ? of(buildTransactionConfig()) : empty();
+        return sourceModel.isTransactional() ? of(transactionConfig.get()) : empty();
       }
 
       @Override
       public ClassLoader getExecutionClassLoader() {
         return muleContext.getExecutionClassLoader();
-      }
-
-      private TransactionConfig buildTransactionConfig() {
-        MuleTransactionConfig transactionConfig = new MuleTransactionConfig();
-        transactionConfig.setAction(toActionCode(sourceAdapter.getTransactionalAction()));
-        transactionConfig.setMuleContext(muleContext);
-
-        // TODO - MULE-12066 : Support XA transactions in SDK extensions at source level
-        transactionConfig.setFactory(TRANSACTION_FACTORY);
-
-        return transactionConfig;
       }
 
       @Override
@@ -380,6 +384,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
   @Override
   protected void doInitialise() throws InitialisationException {
+    sourceConnectionManager = new SourceConnectionManager(connectionManager);
     try {
       createSource();
     } catch (Exception e) {
