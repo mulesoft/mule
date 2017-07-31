@@ -8,15 +8,11 @@ package org.mule.runtime.core.internal.processor.simple;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.privileged.processor.simple.SimpleMessageProcessor;
-import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 
-import java.nio.charset.Charset;
 
 /**
  * Loads a template and parses its content to resolve expressions.
