@@ -34,7 +34,7 @@ import groovy.lang.GroovyShell;
  *
  *   &#064;Test
  *   public void useApplication() throws IOException {
- *     // Groovy scrip is executed
+ *     // Groovy script is executed
  *     // This code exercises the application
  *   }
  * }
