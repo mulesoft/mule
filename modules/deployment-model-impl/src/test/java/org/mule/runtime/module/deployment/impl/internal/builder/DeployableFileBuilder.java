@@ -13,16 +13,16 @@ import static org.mule.runtime.deployment.model.api.application.ApplicationDescr
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.deployment.impl.internal.plugin.PluginMavenClassLoaderModelLoader.CLASSLOADER_MODEL_JSON_DESCRIPTOR;
 import static org.mule.runtime.module.deployment.impl.internal.plugin.PluginMavenClassLoaderModelLoader.CLASSLOADER_MODEL_JSON_DESCRIPTOR_LOCATION;
-import static org.mule.tools.api.packager.PackagerFolders.META_INF;
-import static org.mule.tools.api.packager.PackagerFolders.MULE_ARTIFACT;
+import static org.mule.tools.api.packager.structure.PackagerFolders.META_INF;
+import static org.mule.tools.api.packager.structure.PackagerFolders.MULE_ARTIFACT;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.module.artifact.builder.AbstractArtifactFileBuilder;
 import org.mule.runtime.module.artifact.builder.AbstractDependencyFileBuilder;
 import org.mule.tck.ZipUtils;
-import org.mule.tools.api.ContentGenerator;
 import org.mule.tools.api.classloader.model.Artifact;
 import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 import org.mule.tools.api.classloader.model.ClassLoaderModel;
+import org.mule.tools.api.packager.ContentGenerator;
 
 import java.io.File;
 import java.nio.file.Path;
