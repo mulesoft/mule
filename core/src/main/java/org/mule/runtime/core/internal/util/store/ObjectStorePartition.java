@@ -11,7 +11,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.TemplateObjectStore;
-import org.mule.runtime.core.api.store.PartitionableObjectStore;
+import org.mule.runtime.api.store.PartitionableObjectStore;
 
 import java.io.Serializable;
 import java.util.List;

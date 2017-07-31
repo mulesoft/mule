@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.util.store;
 
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.store.AbstractPartitionableObjectStore;
-import org.mule.runtime.core.api.store.PartitionableObjectStore;
+import org.mule.runtime.api.store.PartitionableObjectStore;
 
 import java.io.Serializable;
 import java.util.List;
