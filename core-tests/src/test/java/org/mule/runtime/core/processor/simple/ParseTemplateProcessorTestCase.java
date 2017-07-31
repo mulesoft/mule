@@ -21,6 +21,7 @@ import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.internal.processor.simple.ParseTemplateProcessor;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.io.IOException;
@@ -31,7 +32,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 @SmallTest
-public class ParseTemplateProcessorTestCase {
+public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
 
   private static final String LOCATION = "error.html";
   private static final String INVALID_LOCATION = "wrong_error.html";
