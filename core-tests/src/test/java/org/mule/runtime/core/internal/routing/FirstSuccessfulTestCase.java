@@ -61,10 +61,9 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void testFailureExpression() throws Exception {
-    Processor intSetter = event -> {
-      return Event.builder(event).message(Message.builder(event.getMessage()).payload(Integer.valueOf(1)).build())
-          .build();
-    };
+    Processor intSetter =
+        event -> Event.builder(event).message(Message.builder(event.getMessage()).value(Integer.valueOf(1)).build())
+            .build();
 
     FirstSuccessful fs = createFirstSuccessfulRouter(intSetter, new StringAppendTransformer("abc"));
     fs.setFailureExpression("#[mel:payload is Integer]");
@@ -143,7 +142,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
         } else if (payload.toLowerCase().indexOf(rejectIfMatches) >= 0) {
           Exception exception = new Exception();
           error = createErrorMock(exception);
-          msg = InternalMessage.builder().nullPayload().exceptionPayload(new DefaultExceptionPayload(exception)).build();
+          msg = InternalMessage.builder().nullValue().exceptionPayload(new DefaultExceptionPayload(exception)).build();
         } else {
           msg = of("No " + rejectIfMatches);
         }

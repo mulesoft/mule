@@ -66,7 +66,7 @@ public class IdempotentMessageValidatorMule6079TestCase extends AbstractMuleCont
 
     @Override
     public void run() {
-      Message okMessage = InternalMessage.builder().payload("OK").build();
+      Message okMessage = InternalMessage.builder().value("OK").build();
       EventContext context = mock(EventContext.class);
       when(context.getCorrelationId()).thenReturn("1");
       Event event = Event.builder(context).message(okMessage).build();

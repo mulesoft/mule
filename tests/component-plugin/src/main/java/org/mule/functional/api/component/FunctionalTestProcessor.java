@@ -230,13 +230,13 @@ public class FunctionalTestProcessor extends AbstractAnnotatedObject implements 
     if (returnData != null) {
       if (returnData instanceof String && muleContext.getExpressionManager().isExpression(returnData.toString())) {
         replyBuilder =
-            replyBuilder.payload(muleContext.getExpressionManager().parse(returnData.toString(), event, getLocation()));
+            replyBuilder.value(muleContext.getExpressionManager().parse(returnData.toString(), event, getLocation()));
       } else {
-        replyBuilder = replyBuilder.payload(returnData);
+        replyBuilder = replyBuilder.value(returnData);
       }
     } else {
       if (appendString != null) {
-        replyBuilder = replyBuilder.payload(append(event.getMessageAsString(muleContext), event));
+        replyBuilder = replyBuilder.value(append(event.getMessageAsString(muleContext), event));
       }
     }
     Event replyMessage = Event.builder(event).message(replyBuilder.build()).build();

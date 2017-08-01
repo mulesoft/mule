@@ -257,13 +257,13 @@ public class TestEventBuilder {
   public Event build(FlowConstruct flow) {
     final Message.Builder messageBuilder;
 
-    messageBuilder = Message.builder().payload(payload).mediaType(mediaType);
+    messageBuilder = Message.builder().value(payload).mediaType(mediaType);
 
     setInboundProperties(messageBuilder, inboundProperties);
     setOutboundProperties(messageBuilder, outboundProperties);
 
     if (attributes != null) {
-      messageBuilder.attributes(attributes);
+      messageBuilder.attributesValue(attributes);
     }
     final Message muleMessage = messageBuilder.build();
 
