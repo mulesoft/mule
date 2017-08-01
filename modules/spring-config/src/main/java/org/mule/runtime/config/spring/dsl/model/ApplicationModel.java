@@ -327,6 +327,7 @@ public class ApplicationModel {
    *        this model to their definitions
    * @param runtimeMode true implies the mule application should behave as a runtime app (e.g.: smart connectors will be macro
    *        expanded) false implies the mule is being created from a tooling perspective.
+   * @param externalResourceProvider the provider for configuration properties files and ${file::name.txt} placeholders
    * @throws Exception when the application configuration has semantic errors.
    */
   // TODO: MULE-9638 remove this optional
