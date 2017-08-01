@@ -27,6 +27,7 @@ import static org.mule.runtime.extension.api.util.NameUtils.sanitizeName;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.SubTypesModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -412,21 +413,12 @@ final class ObjectTypeSchemaDelegate {
   }
 
   private Optional<QName> resolveSubstitutionGroupFromString(String userConfiguredSubstitutionGroup) {
-    String namespacePrefix = "";
-    String namespaceUri = builder.getSchema().getTargetNamespace();
-    String substitutionComponent;
     String[] splittedSubstitutionGroup = userConfiguredSubstitutionGroup.split(":");
-    //substitutionGroup is defined from the same namespace.
-    //TODO: Check if this is a valid case
-    if ( splittedSubstitutionGroup.length == 1 ) {
-      substitutionComponent = splittedSubstitutionGroup[0];
-      return Optional.of(new QName(namespaceUri, substitutionComponent, namespacePrefix));
-    }
-    //subsituttionGroup is imported froma  different namespace
-    else if (splittedSubstitutionGroup.length == 2){
-      namespacePrefix = splittedSubstitutionGroup[0];
-      substitutionComponent = splittedSubstitutionGroup[1];
-      namespaceUri = "other";
+    if (splittedSubstitutionGroup.length == 2) {
+      String namespacePrefix = splittedSubstitutionGroup[0];
+      String substitutionComponent = splittedSubstitutionGroup[1];
+      String namespaceUri = "other";
+      Optional<ExtensionModel> extension = builder.getExtension(namespacePrefix);
       return Optional.of(new QName(namespaceUri, substitutionComponent, namespacePrefix));
     }
     return Optional.empty();
@@ -436,9 +428,9 @@ final class ObjectTypeSchemaDelegate {
     QName substitutionGroup;
     //First check if the substitutionGroup was defined by the user
     if (!typeDsl.getSubstitutionGroup().isEmpty()) {
-      substitutionGroup = resolveSubstitutionGroupFromString(typeDsl.getSubstitutionGroup()).orElseThrow(() -> new IllegalArgumentException("Invalid substitution group"));
-    }
-    else if (baseDsl.isPresent()) {
+      substitutionGroup = resolveSubstitutionGroupFromString(typeDsl.getSubstitutionGroup())
+          .orElseThrow(() -> new IllegalArgumentException("Invalid substitution group"));
+    } else if (baseDsl.isPresent()) {
       DslElementSyntax base = baseDsl.get();
       String abstractElementName = typeDsl.supportsTopLevelDeclaration() ? getGlobalAbstractName(base)
           : getAbstractElementName(base);
@@ -487,7 +479,8 @@ final class ObjectTypeSchemaDelegate {
     TopLevelElement objectElement = new TopLevelElement();
     objectElement.setName(typeDsl.getElementName());
 
-    objectElement.setSubstitutionGroup(new QName(typeDsl.getNamespace(), abstractElementName, typeDsl.getPrefix()));
+    objectElement.setSubstitutionGroup(resolveSubstitutionGroupFromString(typeDsl.getSubstitutionGroup())
+        .orElse(new QName(typeDsl.getNamespace(), abstractElementName, typeDsl.getPrefix())));
     objectElement.setAnnotation(builder.createDocAnnotation(description));
 
     objectElement.setComplexType(createTypeExtension(typeQName));

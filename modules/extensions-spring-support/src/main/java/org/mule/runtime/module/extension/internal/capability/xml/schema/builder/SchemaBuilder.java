@@ -136,7 +136,6 @@ public final class SchemaBuilder {
 
   public static SchemaBuilder newSchema(ExtensionModel extensionModel, XmlDslModel xmlDslModel,
                                         DslResolvingContext dslContext) {
-
     SchemaBuilder builder = new SchemaBuilder();
     builder.extensionModel = extensionModel;
     builder.schema = new Schema();
@@ -710,5 +709,9 @@ public final class SchemaBuilder {
 
     complexType.getComplexContent().getExtension().setSequence(groupSequence);
     parentSequence.getParticle().add(objectFactory.createElement(groupElement));
+  }
+
+  Optional<ExtensionModel> getExtension(String prefix) {
+    return dslContext.getExtension(prefix);
   }
 }
