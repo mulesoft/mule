@@ -14,7 +14,6 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.isEmptyString;
 import static org.hamcrest.Matchers.isOneOf;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.core.Is.is;
@@ -57,6 +56,7 @@ import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.internal.metadata.DefaultMetadataCache;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.extension.api.metadata.NullMetadataKey;
+import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.tck.junit4.matcher.MetadataKeyMatcher;
 import org.mule.tck.message.StringAttributes;
 import org.mule.test.metadata.extension.model.animals.Animal;
@@ -402,6 +402,7 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     ComponentMetadataDescriptor metadataDescriptor = getSuccessComponentDynamicMetadata(PERSON_METADATA_KEY);
     MetadataType param = metadataDescriptor.getModel().getOutput().getType();
     assertThat(param, is(instanceOf(ArrayType.class)));
+    assertThat(getId(param), is(PagingProvider.class.getName()));
     assertMessageType(((ArrayType) param).getType(), personType, TYPE_LOADER.load(Animal.class));
   }
 
@@ -412,6 +413,7 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     ComponentMetadataDescriptor metadataDescriptor = getSuccessComponentDynamicMetadata(PERSON_METADATA_KEY);
     MetadataType param = metadataDescriptor.getModel().getOutput().getType();
     assertThat(param, is(instanceOf(ArrayType.class)));
+    assertThat(getId(param), is(PagingProvider.class.getName()));
     assertMessageType(((ArrayType) param).getType(), personType, personType);
   }
 
@@ -571,7 +573,7 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     ComponentMetadataDescriptor descriptor = result.get();
     MetadataType param = descriptor.getModel().getOutput().getType();
     assertThat(param, is(instanceOf(ArrayType.class)));
-    assertThat(getId(param), is(isEmptyString()));
+    assertThat(getId(param), is(List.class.getName()));
     return param;
   }
 

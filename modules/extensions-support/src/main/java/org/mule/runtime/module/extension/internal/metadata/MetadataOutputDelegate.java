@@ -176,19 +176,21 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
 
   private MetadataType adaptToListIfNecessary(MetadataType resolvedType, Object key, MetadataContext metadataContext)
       throws MetadataResolvingException {
-    if (!isCollection(component.getOutput().getType())) {
+
+    MetadataType componentOutputType = component.getOutput().getType();
+    if (!isCollection(componentOutputType)) {
       return resolvedType;
     }
 
-    MetadataType outputType = ((ArrayType) component.getOutput().getType()).getType();
-    String typeId = getId(outputType);
+    MetadataType collectionValueType = ((ArrayType) componentOutputType).getType();
+    String collectionValueTypeId = getId(collectionValueType);
 
-    if (Message.class.getName().equals(typeId)) {
-      MessageMetadataType message = (MessageMetadataType) outputType;
+    if (Message.class.getName().equals(collectionValueTypeId)) {
+      MessageMetadataType message = (MessageMetadataType) collectionValueType;
       resolvedType = wrapInMessageType(resolvedType, key, metadataContext, message.getAttributesType());
     }
 
-    return metadataContext.getTypeBuilder().arrayType().of(resolvedType).build();
+    return metadataContext.getTypeBuilder().arrayType().id(getId(componentOutputType)).of(resolvedType).build();
   }
 
   private MetadataType wrapInMessageType(MetadataType type, Object key, MetadataContext context,
