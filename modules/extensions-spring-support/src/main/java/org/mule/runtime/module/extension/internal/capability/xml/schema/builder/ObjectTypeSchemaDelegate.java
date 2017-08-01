@@ -411,9 +411,34 @@ final class ObjectTypeSchemaDelegate {
     return abstractElement;
   }
 
+  private Optional<QName> resolveSubstitutionGroupFromString(String userConfiguredSubstitutionGroup) {
+    String namespacePrefix = "";
+    String namespaceUri = builder.getSchema().getTargetNamespace();
+    String substitutionComponent;
+    String[] splittedSubstitutionGroup = userConfiguredSubstitutionGroup.split(":");
+    //substitutionGroup is defined from the same namespace.
+    //TODO: Check if this is a valid case
+    if ( splittedSubstitutionGroup.length == 1 ) {
+      substitutionComponent = splittedSubstitutionGroup[0];
+      return Optional.of(new QName(namespaceUri, substitutionComponent, namespacePrefix));
+    }
+    //subsituttionGroup is imported froma  different namespace
+    else if (splittedSubstitutionGroup.length == 2){
+      namespacePrefix = splittedSubstitutionGroup[0];
+      substitutionComponent = splittedSubstitutionGroup[1];
+      namespaceUri = "other";
+      return Optional.of(new QName(namespaceUri, substitutionComponent, namespacePrefix));
+    }
+    return Optional.empty();
+  }
+
   private QName getAbstractElementSubstitutionGroup(DslElementSyntax typeDsl, Optional<DslElementSyntax> baseDsl) {
     QName substitutionGroup;
-    if (baseDsl.isPresent()) {
+    //First check if the substitutionGroup was defined by the user
+    if (!typeDsl.getSubstitutionGroup().isEmpty()) {
+      substitutionGroup = resolveSubstitutionGroupFromString(typeDsl.getSubstitutionGroup()).orElseThrow(() -> new IllegalArgumentException("Invalid substitution group"));
+    }
+    else if (baseDsl.isPresent()) {
       DslElementSyntax base = baseDsl.get();
       String abstractElementName = typeDsl.supportsTopLevelDeclaration() ? getGlobalAbstractName(base)
           : getAbstractElementName(base);
