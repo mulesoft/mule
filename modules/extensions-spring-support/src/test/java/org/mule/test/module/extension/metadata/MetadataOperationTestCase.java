@@ -56,7 +56,6 @@ import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.internal.metadata.DefaultMetadataCache;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.extension.api.metadata.NullMetadataKey;
-import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.tck.junit4.matcher.MetadataKeyMatcher;
 import org.mule.tck.message.StringAttributes;
 import org.mule.test.metadata.extension.model.animals.Animal;
@@ -71,6 +70,7 @@ import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -402,7 +402,7 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     ComponentMetadataDescriptor metadataDescriptor = getSuccessComponentDynamicMetadata(PERSON_METADATA_KEY);
     MetadataType param = metadataDescriptor.getModel().getOutput().getType();
     assertThat(param, is(instanceOf(ArrayType.class)));
-    assertThat(getId(param), is(PagingProvider.class.getName()));
+    assertThat(getId(param), is(Iterator.class.getName()));
     assertMessageType(((ArrayType) param).getType(), personType, TYPE_LOADER.load(Animal.class));
   }
 
@@ -413,7 +413,7 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     ComponentMetadataDescriptor metadataDescriptor = getSuccessComponentDynamicMetadata(PERSON_METADATA_KEY);
     MetadataType param = metadataDescriptor.getModel().getOutput().getType();
     assertThat(param, is(instanceOf(ArrayType.class)));
-    assertThat(getId(param), is(PagingProvider.class.getName()));
+    assertThat(getId(param), is(Iterator.class.getName()));
     assertMessageType(((ArrayType) param).getType(), personType, personType);
   }
 
