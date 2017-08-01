@@ -188,7 +188,7 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
       resolvedType = wrapInMessageType(resolvedType, key, metadataContext, message.getAttributesType());
     }
 
-    return metadataContext.getTypeBuilder().arrayType().id(typeId).of(resolvedType).build();
+    return metadataContext.getTypeBuilder().arrayType().of(resolvedType).build();
   }
 
   private MetadataType wrapInMessageType(MetadataType type, Object key, MetadataContext context,
