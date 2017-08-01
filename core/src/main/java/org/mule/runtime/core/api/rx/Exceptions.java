@@ -224,7 +224,7 @@ public class Exceptions {
 
   /**
    * Register reactor hooks using the provided class. This needs to use reflection because reactor could be
-   * loaded on different class loaders. Only compatibility plugin should need this.
+   * loaded on different class loaders.
    *
    * In reactor 3.1, the error handler will be explicitly defined for each flux instead of globally.
    */
@@ -245,13 +245,14 @@ public class Exceptions {
       Method onOperatorError = clazz.getMethod("onOperatorError", BiFunction.class);
       onOperatorError.invoke(null, onOperationErrorFunction);
 
-      // Log dropped events/errors rather than blow up which causes cryptic timeouts and stack traces.
+      // Log dropped events/errors rather than blow up which causes cryptic timeouts and stack traces
       Method onErrorDropped = clazz.getMethod("onErrorDropped", Consumer.class);
       Consumer<Object> onErrorDroppedFunction = error -> logger.error("ERROR DROPPED UNEXPECTEDLY " + error);
       onErrorDropped.invoke(null, onErrorDroppedFunction);
 
       Method onNextDropped = clazz.getMethod("onNextDropped", Consumer.class);
-      onNextDropped.invoke(null, onErrorDroppedFunction);
+      Consumer<Object> onNextDroppedFunction = event -> logger.error("EVENT DROPPED UNEXPECTEDLY " + event);
+      onNextDropped.invoke(null, onNextDroppedFunction);
     } catch (Exception e) {
       throw new RuntimeException("Failed to configure reactor hooks", e);
     }

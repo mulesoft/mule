@@ -12,6 +12,7 @@ import static java.lang.System.identityHashCode;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
+
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 
@@ -110,17 +111,35 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
   }
 
   protected ResourceReleaser createResourceReleaserInstance() {
+    return (ResourceReleaser) createCustomInstance(resourceReleaserClassLocation);
+  }
+
+  protected Object createCustomInstance(String classLocation) {
     InputStream classStream = null;
     try {
-      classStream = this.getClass().getResourceAsStream(resourceReleaserClassLocation);
+      classStream = this.getClass().getResourceAsStream(classLocation);
       byte[] classBytes = IOUtils.toByteArray(classStream);
       classStream.close();
       Class clazz = this.defineClass(null, classBytes, 0, classBytes.length);
-      return (ResourceReleaser) clazz.newInstance();
+      return clazz.newInstance();
     } catch (Exception e) {
-      throw new RuntimeException("Can not create resource releaser instance from resource: " + resourceReleaserClassLocation, e);
+      throw new RuntimeException("Can not create instance from resource: " + classLocation, e);
     } finally {
       closeQuietly(classStream);
+    }
+  }
+
+  /**
+   * Setup reactor-core error hooks, these are required for plugins that end up executing reactive streams.
+   *
+   * For instance, compatibility plugin which inherits from transformers that call {@code block()}.
+   */
+  public void configureErrorHooks() {
+    try {
+      loadClass("reactor.core.publisher.Hooks");
+      createCustomInstance("/org/mule/module/artifact/classloader/ErrorHooksConfiguration.class");
+    } catch (ClassNotFoundException e) {
+      // ignore, we don't care if the plugin does not include reactor-core
     }
   }
 
