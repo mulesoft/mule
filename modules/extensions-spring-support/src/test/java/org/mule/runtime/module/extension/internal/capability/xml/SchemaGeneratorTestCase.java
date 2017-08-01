@@ -46,6 +46,7 @@ import org.mule.test.oauth.TestOAuthExtension;
 import org.mule.test.petstore.extension.PetStoreConnector;
 import org.mule.test.ram.RickAndMortyExtension;
 import org.mule.test.soap.extension.FootballSoapExtension;
+import org.mule.test.substitutiongroup.extension.SubstitutionGroupExtension;
 import org.mule.test.subtypes.extension.SubTypesMappingConnector;
 import org.mule.test.transactional.TransactionalExtension;
 import org.mule.test.typed.value.extension.extension.TypedValueExtension;
@@ -111,9 +112,10 @@ public class SchemaGeneratorTestCase extends AbstractMuleTestCase {
                                                                    //                            "global-inner-pojo.xsd"),
                                                                    //new SchemaGeneratorTestUnit(javaLoader, VeganExtension.class,
                                                                    //                            "vegan.xsd"),
-                                                                   new SchemaGeneratorTestUnit(javaLoader,
-                                                                                              PetStoreConnector.class,
-                                                                                               "petstore.xsd"));
+                                                                   //new SchemaGeneratorTestUnit(javaLoader,
+                                                                   //                           PetStoreConnector.class,
+                                                                   //                            "heisenberg.xsd"),
+    new SchemaGeneratorTestUnit(javaLoader, SubstitutionGroupExtension.class, "petstore.xsd"));
                                                                    //new SchemaGeneratorTestUnit(javaLoader,
                                                                    //                            MetadataExtension.class,
                                                                    //                            "metadata.xsd"),

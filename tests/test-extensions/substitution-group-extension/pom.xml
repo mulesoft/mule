@@ -11,5 +11,14 @@
 
     <artifactId>mule-substitution-group-extension</artifactId>
 
+    <packaging>jar</packaging>
+
+    <name>Mule Substitution Group Test Extension</name>
+    <description>A Mule extension for testing</description>
+
+    <properties>
+        <testExtensionModelLoaderId>java</testExtensionModelLoaderId>
+        <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
+    </properties>
 
 </project>

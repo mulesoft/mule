@@ -7,9 +7,12 @@
 package org.mule.test.substitutiongroup.extension;
 
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 
-@XmlHints(substitutionGroup = "someprefix:someuri")
-public class SomeExportedPojo
-{
+@XmlHints(substitutionGroup = "someprefix:someuri", allowTopLevelDefinition = true)
+public class SomeExportedPojo {
+
+  @Parameter
+  private boolean attribute;
 
 }
