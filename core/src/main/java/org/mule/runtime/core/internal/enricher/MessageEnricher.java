@@ -89,7 +89,7 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements Sc
       return eventBuilder.build();
     } else {
       return builder(currentEvent).message(Message.builder(currentEvent.getMessage())
-          .payload(typedValue.getValue()).mediaType(typedValue.getDataType().getMediaType()).build()).build();
+          .value(typedValue.getValue()).mediaType(typedValue.getDataType().getMediaType()).build()).build();
     }
   }
 

@@ -41,7 +41,7 @@ public class EventBenchmark extends AbstractBenchmark {
     muleContext.start();
     flow = createFlow(muleContext);
     muleContext.getRegistry().registerFlowConstruct(flow);
-    Message.Builder messageBuilder = Message.builder().payload(PAYLOAD);
+    Message.Builder messageBuilder = Message.builder().value(PAYLOAD);
     Event.Builder eventBuilder =
         Event.builder(DefaultEventContext.create(flow, CONNECTOR_LOCATION)).message(messageBuilder.build());
     event = eventBuilder.build();
@@ -178,7 +178,7 @@ public class EventBenchmark extends AbstractBenchmark {
   }
 
   private Event createMuleEventWithFlowVarsAndProperties(int numProperties) {
-    InternalMessage.Builder builder = InternalMessage.builder().payload(PAYLOAD);
+    InternalMessage.Builder builder = InternalMessage.builder().value(PAYLOAD);
     for (int i = 1; i <= numProperties; i++) {
       builder.addInboundProperty("InBoUnDpRoPeRtYkEy" + i, "val");
     }

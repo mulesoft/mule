@@ -138,7 +138,7 @@ public class DefaultLocalMuleClient implements MuleClient {
   }
 
   protected Message createMessage(Object payload, Map<String, Serializable> messageProperties) {
-    final Builder builder = InternalMessage.builder().payload(payload);
+    final Builder builder = InternalMessage.builder().value(payload);
     if (messageProperties != null) {
       builder.outboundProperties(messageProperties);
     }

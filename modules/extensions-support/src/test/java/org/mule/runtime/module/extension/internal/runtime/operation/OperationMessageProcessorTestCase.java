@@ -168,7 +168,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
         .thenReturn(just(builder().output(payload).mediaType(mediaType).build()));
 
     event =
-        Event.builder(event).message(Message.builder().payload("").attributes(mock(Object.class)).build()).build();
+        Event.builder(event).message(Message.builder().value("").attributesValue(mock(Object.class)).build()).build();
 
     Message message = messageProcessor.process(event).getMessage();
     assertThat(message, is(notNullValue()));
@@ -184,7 +184,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
 
     when(operationExecutor.execute(any(ExecutionContext.class))).thenReturn(just(builder().output(payload).build()));
     event =
-        Event.builder(event).message(Message.builder().payload("").attributes(mock(Object.class)).build()).build();
+        Event.builder(event).message(Message.builder().value("").attributesValue(mock(Object.class)).build()).build();
 
     Message message = messageProcessor.process(event).getMessage();
     assertThat(message, is(notNullValue()));

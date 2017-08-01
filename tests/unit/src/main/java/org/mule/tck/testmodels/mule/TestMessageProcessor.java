@@ -34,7 +34,7 @@ public class TestMessageProcessor extends AbstractAnnotatedObject implements Pro
   public Event process(Event event) throws MuleException {
     if (event != null && event.getMessage() != null) {
       return Event.builder(event)
-          .message(Message.builder(event.getMessage()).payload(event.getMessage().getPayload().getValue() + ":" + label)
+          .message(Message.builder(event.getMessage()).value(event.getMessage().getPayload().getValue() + ":" + label)
               .build())
           .build();
     }

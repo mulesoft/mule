@@ -64,7 +64,7 @@ public class MessageChunkSplitter extends AbstractSplitter {
       buffer = new byte[len];
       System.arraycopy(data, pos, buffer, 0, buffer.length);
       pos += len;
-      final Event childEvent = Event.builder(event).message(Message.builder(message).payload(buffer).build())
+      final Event childEvent = Event.builder(event).message(Message.builder(message).value(buffer).build())
           .groupCorrelation(new GroupCorrelation(parts, count)).build();
 
       messageParts.add(childEvent);

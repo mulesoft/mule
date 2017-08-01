@@ -49,12 +49,12 @@ public class DefaultMultiPartPayloadTestCase extends AbstractMuleContextTestCase
 
   @Test
   public void stringAttachment() throws Exception {
-    final Message attachmentPart = Message.builder().payload("this is the attachment").mediaType(TEXT)
-        .attributes(new PartAttributes("attachment")).build();
+    final Message attachmentPart = Message.builder().value("this is the attachment").mediaType(TEXT)
+        .attributesValue(new PartAttributes("attachment")).build();
 
     Message message = Message.builder()
-        .payload(new DefaultMultiPartPayload(Message.builder().payload(TEST_PAYLOAD).attributes(BODY_ATTRIBUTES).build(),
-                                             attachmentPart))
+        .value(new DefaultMultiPartPayload(Message.builder().value(TEST_PAYLOAD).attributesValue(BODY_ATTRIBUTES).build(),
+                                           attachmentPart))
         .build();
 
     final MultiPartPayload multiPartPayload = (MultiPartPayload) message.getPayload().getValue();
@@ -71,8 +71,8 @@ public class DefaultMultiPartPayloadTestCase extends AbstractMuleContextTestCase
     final Message attachmentPart = toMuleMessagePart("spi-props", getResourceAsUrl("test-spi.properties", getClass()), TEXT);
 
     Message message = Message.builder()
-        .payload(new DefaultMultiPartPayload(Message.builder().payload(TEST_PAYLOAD).attributes(BODY_ATTRIBUTES).build(),
-                                             attachmentPart))
+        .value(new DefaultMultiPartPayload(Message.builder().value(TEST_PAYLOAD).attributesValue(BODY_ATTRIBUTES).build(),
+                                           attachmentPart))
         .build();
 
     final MultiPartPayload multiPartPayload = (MultiPartPayload) message.getPayload().getValue();
@@ -93,8 +93,8 @@ public class DefaultMultiPartPayloadTestCase extends AbstractMuleContextTestCase
     final Message attachmentPart2 = toMuleMessagePart("dummy", getResourceAsUrl("dummy.xml", getClass()), null);
 
     Message message = Message.builder()
-        .payload(new DefaultMultiPartPayload(Message.builder().payload(TEST_PAYLOAD).attributes(BODY_ATTRIBUTES).build(),
-                                             attachmentPart1, attachmentPart2))
+        .value(new DefaultMultiPartPayload(Message.builder().value(TEST_PAYLOAD).attributesValue(BODY_ATTRIBUTES).build(),
+                                           attachmentPart1, attachmentPart2))
         .build();
 
     final MultiPartPayload multiPartPayload = (MultiPartPayload) message.getPayload().getValue();
@@ -109,10 +109,10 @@ public class DefaultMultiPartPayloadTestCase extends AbstractMuleContextTestCase
 
   @Test
   public void withBody() throws Exception {
-    final Message attachmentPart = Message.builder().payload("this is the attachment").mediaType(TEXT)
-        .attributes(new PartAttributes("attachment")).build();
+    final Message attachmentPart = Message.builder().value("this is the attachment").mediaType(TEXT)
+        .attributesValue(new PartAttributes("attachment")).build();
 
-    final Message bodyPart = Message.builder().payload(TEST_PAYLOAD).attributes(BODY_ATTRIBUTES).build();
+    final Message bodyPart = Message.builder().value(TEST_PAYLOAD).attributesValue(BODY_ATTRIBUTES).build();
 
     Message message = of(new DefaultMultiPartPayload(bodyPart, attachmentPart));
 
@@ -127,10 +127,10 @@ public class DefaultMultiPartPayloadTestCase extends AbstractMuleContextTestCase
 
   @Test
   public void withoutBody() throws Exception {
-    final Message attachmentPart1 = Message.builder().payload("this is the attachment1").mediaType(TEXT)
-        .attributes(new PartAttributes("attachment1")).build();
-    final Message attachmentPart2 = Message.builder().payload("this is the attachment2").mediaType(TEXT)
-        .attributes(new PartAttributes("attachment2")).build();
+    final Message attachmentPart1 = Message.builder().value("this is the attachment1").mediaType(TEXT)
+        .attributesValue(new PartAttributes("attachment1")).build();
+    final Message attachmentPart2 = Message.builder().value("this is the attachment2").mediaType(TEXT)
+        .attributesValue(new PartAttributes("attachment2")).build();
 
     Message message = of(new DefaultMultiPartPayload(attachmentPart1, attachmentPart2));
 
@@ -145,12 +145,12 @@ public class DefaultMultiPartPayloadTestCase extends AbstractMuleContextTestCase
 
   @Test
   public void multiPartPayloadSerialization() throws Exception {
-    final Message attachmentPart = Message.builder().payload("this is the attachment").mediaType(TEXT)
-        .attributes(new PartAttributes("attachment")).build();
+    final Message attachmentPart = Message.builder().value("this is the attachment").mediaType(TEXT)
+        .attributesValue(new PartAttributes("attachment")).build();
 
     Message message = Message.builder()
-        .payload(new DefaultMultiPartPayload(Message.builder().payload(TEST_PAYLOAD).attributes(BODY_ATTRIBUTES).build(),
-                                             attachmentPart))
+        .value(new DefaultMultiPartPayload(Message.builder().value(TEST_PAYLOAD).attributesValue(BODY_ATTRIBUTES).build(),
+                                           attachmentPart))
         .build();
 
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -178,8 +178,8 @@ public class DefaultMultiPartPayloadTestCase extends AbstractMuleContextTestCase
     assertThat(attachmentPart.getPayload().getValue(), instanceOf(InputStream.class));
 
     Message message = Message.builder()
-        .payload(new DefaultMultiPartPayload(Message.builder().payload(TEST_PAYLOAD).attributes(BODY_ATTRIBUTES).build(),
-                                             attachmentPart))
+        .value(new DefaultMultiPartPayload(Message.builder().value(TEST_PAYLOAD).attributesValue(BODY_ATTRIBUTES).build(),
+                                           attachmentPart))
         .build();
 
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -203,12 +203,12 @@ public class DefaultMultiPartPayloadTestCase extends AbstractMuleContextTestCase
 
   @Test
   public void getPayloadAsStringFails() throws Exception {
-    final Message attachmentPart = Message.builder().payload("this is the attachment").mediaType(TEXT)
-        .attributes(new PartAttributes("attachment")).build();
+    final Message attachmentPart = Message.builder().value("this is the attachment").mediaType(TEXT)
+        .attributesValue(new PartAttributes("attachment")).build();
 
     Message message = Message.builder()
-        .payload(new DefaultMultiPartPayload(Message.builder().payload(TEST_PAYLOAD).attributes(BODY_ATTRIBUTES).build(),
-                                             attachmentPart))
+        .value(new DefaultMultiPartPayload(Message.builder().value(TEST_PAYLOAD).attributesValue(BODY_ATTRIBUTES).build(),
+                                           attachmentPart))
         .build();
 
     expected.expect(TransformerException.class);
@@ -219,12 +219,12 @@ public class DefaultMultiPartPayloadTestCase extends AbstractMuleContextTestCase
 
   @Test
   public void getPayloadAsBytesFails() throws Exception {
-    final Message attachmentPart = Message.builder().payload("this is the attachment").mediaType(TEXT)
-        .attributes(new PartAttributes("attachment")).build();
+    final Message attachmentPart = Message.builder().value("this is the attachment").mediaType(TEXT)
+        .attributesValue(new PartAttributes("attachment")).build();
 
     Message message = Message.builder()
-        .payload(new DefaultMultiPartPayload(Message.builder().payload(TEST_PAYLOAD).attributes(BODY_ATTRIBUTES).build(),
-                                             attachmentPart))
+        .value(new DefaultMultiPartPayload(Message.builder().value(TEST_PAYLOAD).attributesValue(BODY_ATTRIBUTES).build(),
+                                           attachmentPart))
         .build();
 
     expected.expect(TransformerException.class);
@@ -235,17 +235,17 @@ public class DefaultMultiPartPayloadTestCase extends AbstractMuleContextTestCase
 
   @Test
   public void nestedMultiPartFlattens() throws Exception {
-    final Message attachmentPart1 = Message.builder().payload("this is the attachment1").mediaType(TEXT)
-        .attributes(new PartAttributes("attachment1")).build();
-    final Message attachmentPart2 = Message.builder().payload("this is the attachment2").mediaType(TEXT)
-        .attributes(new PartAttributes("attachment2")).build();
+    final Message attachmentPart1 = Message.builder().value("this is the attachment1").mediaType(TEXT)
+        .attributesValue(new PartAttributes("attachment1")).build();
+    final Message attachmentPart2 = Message.builder().value("this is the attachment2").mediaType(TEXT)
+        .attributesValue(new PartAttributes("attachment2")).build();
 
     Message messageInner = Message.builder()
-        .payload(new DefaultMultiPartPayload(Message.builder().payload(TEST_PAYLOAD).attributes(BODY_ATTRIBUTES).build(),
-                                             attachmentPart1))
-        .attributes(BODY_ATTRIBUTES).build();
+        .value(new DefaultMultiPartPayload(Message.builder().value(TEST_PAYLOAD).attributesValue(BODY_ATTRIBUTES).build(),
+                                           attachmentPart1))
+        .attributesValue(BODY_ATTRIBUTES).build();
 
-    Message message = Message.builder().payload(new DefaultMultiPartPayload(attachmentPart2, messageInner)).build();
+    Message message = Message.builder().value(new DefaultMultiPartPayload(attachmentPart2, messageInner)).build();
 
     final MultiPartPayload multiPartPayload = (MultiPartPayload) message.getPayload().getValue();
     assertThat(multiPartPayload.getParts(), hasSize(3));
@@ -261,8 +261,8 @@ public class DefaultMultiPartPayloadTestCase extends AbstractMuleContextTestCase
 
   @Test
   public void partWithInvalidAttributes() throws Exception {
-    final Message attachmentPart = Message.builder().payload("this is the attachment").mediaType(TEXT)
-        .attributes(new PartAttributes("attachment")).build();
+    final Message attachmentPart = Message.builder().value("this is the attachment").mediaType(TEXT)
+        .attributesValue(new PartAttributes("attachment")).build();
 
     expected.expect(IllegalArgumentException.class);
 

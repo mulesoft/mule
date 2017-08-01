@@ -321,7 +321,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
 
         List<Message> messageList = Arrays.stream(muleEvents).map(event -> event.getMessage()).collect(toList());
 
-        final Message.Builder builder = Message.builder().collectionPayload(messageList, Message.class);
+        final Message.Builder builder = Message.builder().collectionValue(messageList, Message.class);
         Event muleEvent = Event.builder(lastEvent).message(builder.build()).session(getMergedSession(muleEvents)).build();
         return muleEvent;
       } else {

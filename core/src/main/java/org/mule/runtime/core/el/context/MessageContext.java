@@ -91,7 +91,7 @@ public class MessageContext {
   }
 
   public void setPayload(Object payload) {
-    eventBuilder.message(Message.builder(event.getMessage()).payload(payload).build());
+    eventBuilder.message(Message.builder(event.getMessage()).value(payload).build());
     event = eventBuilder.build();
 
   }

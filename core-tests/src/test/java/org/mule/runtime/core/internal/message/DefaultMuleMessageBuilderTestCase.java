@@ -58,7 +58,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
   public void createNewAPIMessageViaMessageInterface() {
     org.mule.runtime.api.message.Message message;
     message = org.mule.runtime.api.message.Message.builder()
-        .payload(TEST_PAYLOAD)
+        .value(TEST_PAYLOAD)
         .mediaType(HTML_STRING_UTF8)
         .build();
 
@@ -72,10 +72,10 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
   @Test
   public void createAPIMessageViaMessageInterfaceFromCopy() {
     org.mule.runtime.api.message.Message message;
-    message = org.mule.runtime.api.message.Message.builder().payload(TEST_PAYLOAD).build();
+    message = org.mule.runtime.api.message.Message.builder().value(TEST_PAYLOAD).build();
 
     org.mule.runtime.api.message.Message messageCopy;
-    messageCopy = org.mule.runtime.api.message.Message.builder(message).payload(true).attributes(BASE_ATTRIBUTES).build();
+    messageCopy = org.mule.runtime.api.message.Message.builder(message).value(true).attributesValue(BASE_ATTRIBUTES).build();
 
     assertThat(messageCopy.getPayload().getValue(), is(true));
     assertThat(messageCopy.getPayload().getDataType(), is(BOOLEAN));
@@ -85,7 +85,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void createNewMessageViaMessageInterface() {
-    Message message = Message.builder().payload(TEST_PAYLOAD).build();
+    Message message = Message.builder().value(TEST_PAYLOAD).build();
 
     assertThat(message.getPayload().getValue(), is(TEST_PAYLOAD));
     assertThat(message.getPayload().getDataType(), is(STRING));
@@ -100,7 +100,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
     htmlStringList.add("HTML3");
 
     Message message =
-        InternalMessage.builder().collectionPayload(htmlStringList, String.class).itemMediaType(HTML)
+        InternalMessage.builder().collectionValue(htmlStringList, String.class).itemMediaType(HTML)
             .build();
 
     assertThat(message.getPayload().getValue(), is(htmlStringList));
@@ -118,7 +118,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
     htmlStringList.add("HTML3");
 
     Message message =
-        InternalMessage.builder().collectionPayload(htmlStringList, String.class).itemMediaType(HTML)
+        InternalMessage.builder().collectionValue(htmlStringList, String.class).itemMediaType(HTML)
             .build();
 
     Message copy = InternalMessage.builder(message).build();
@@ -132,7 +132,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void createMessageViaMessageInterfaceFromCopy() {
-    Message messageCopy = InternalMessage.builder(createTestMessage()).payload(true).attributes(BASE_ATTRIBUTES).build();
+    Message messageCopy = InternalMessage.builder(createTestMessage()).value(true).attributesValue(BASE_ATTRIBUTES).build();
 
     assertThat(messageCopy.getPayload().getValue(), is(true));
     assertThat(messageCopy.getPayload().getDataType(), is(BOOLEAN));
@@ -162,7 +162,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void wholeAttributes() {
-    Message message = Message.builder().nullPayload().attributes(new TypedValue<>(EMPTY_JSON, JSON_STRING)).build();
+    Message message = Message.builder().nullValue().attributes(new TypedValue<>(EMPTY_JSON, JSON_STRING)).build();
 
     assertThat(message.getAttributes().getValue(), equalTo(EMPTY_JSON));
     assertThat(message.getAttributes().getDataType().getType(), equalTo(String.class));
@@ -177,7 +177,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
   @Test
   public void inboundPropertyMap() {
     Map<String, Serializable> inboundProperties = singletonMap(PROPERTY_KEY, PROPERTY_VALUE);
-    InternalMessage message = new DefaultMessageBuilder().payload(TEST_PAYLOAD).inboundProperties(inboundProperties).build();
+    InternalMessage message = new DefaultMessageBuilder().value(TEST_PAYLOAD).inboundProperties(inboundProperties).build();
 
     assertThat(message.getInboundProperty(PROPERTY_KEY), equalTo(PROPERTY_VALUE));
     assertThat(message.getInboundPropertyDataType(PROPERTY_KEY), equalTo(STRING));
@@ -188,7 +188,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
   @Test
   public void inboundPropertyMapCopy() {
     Map<String, Serializable> inboundProperties = singletonMap(PROPERTY_KEY, PROPERTY_VALUE);
-    InternalMessage copy = new DefaultMessageBuilder(new DefaultMessageBuilder().payload(TEST_PAYLOAD)
+    InternalMessage copy = new DefaultMessageBuilder(new DefaultMessageBuilder().value(TEST_PAYLOAD)
         .inboundProperties(inboundProperties).build()).build();
 
     assertThat(copy.getInboundProperty(PROPERTY_KEY), equalTo(PROPERTY_VALUE));
@@ -200,7 +200,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
   @Test
   public void outboundPropertyMap() {
     Map<String, Serializable> outboundProperties = singletonMap(PROPERTY_KEY, PROPERTY_VALUE);
-    InternalMessage message = new DefaultMessageBuilder().payload(TEST_PAYLOAD).outboundProperties(outboundProperties).build();
+    InternalMessage message = new DefaultMessageBuilder().value(TEST_PAYLOAD).outboundProperties(outboundProperties).build();
 
     assertThat(message.getOutboundProperty(PROPERTY_KEY), equalTo(PROPERTY_VALUE));
     assertThat(message.getOutboundPropertyDataType(PROPERTY_KEY), equalTo(STRING));
@@ -211,7 +211,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
   @Test
   public void outboundPropertyMapCopy() {
     Map<String, Serializable> outboundProperties = singletonMap(PROPERTY_KEY, PROPERTY_VALUE);
-    InternalMessage copy = new DefaultMessageBuilder(new DefaultMessageBuilder().payload(TEST_PAYLOAD)
+    InternalMessage copy = new DefaultMessageBuilder(new DefaultMessageBuilder().value(TEST_PAYLOAD)
         .outboundProperties(outboundProperties).build()).build();
 
     assertThat(copy.getOutboundProperty(PROPERTY_KEY), equalTo(PROPERTY_VALUE));
@@ -223,7 +223,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
   @Test
   public void inboundProperty() {
     InternalMessage message =
-        new DefaultMessageBuilder().payload(TEST_PAYLOAD).addInboundProperty(PROPERTY_KEY, PROPERTY_VALUE).build();
+        new DefaultMessageBuilder().value(TEST_PAYLOAD).addInboundProperty(PROPERTY_KEY, PROPERTY_VALUE).build();
 
     assertThat(message.getInboundProperty(PROPERTY_KEY), equalTo(PROPERTY_VALUE));
     assertThat(message.getInboundPropertyDataType(PROPERTY_KEY), equalTo(STRING));
@@ -234,7 +234,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
   @Test
   public void inboundPropertyDataType() {
     InternalMessage message =
-        new DefaultMessageBuilder().payload(TEST_PAYLOAD).addInboundProperty(PROPERTY_KEY, PROPERTY_VALUE, HTML_STRING).build();
+        new DefaultMessageBuilder().value(TEST_PAYLOAD).addInboundProperty(PROPERTY_KEY, PROPERTY_VALUE, HTML_STRING).build();
 
     assertThat(message.getInboundProperty(PROPERTY_KEY), equalTo(PROPERTY_VALUE));
     assertThat(message.getInboundPropertyDataType(PROPERTY_KEY), equalTo(HTML_STRING));
@@ -244,7 +244,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void outboundProperty() {
-    InternalMessage message = new DefaultMessageBuilder().payload(TEST_PAYLOAD).addOutboundProperty(PROPERTY_KEY, PROPERTY_VALUE)
+    InternalMessage message = new DefaultMessageBuilder().value(TEST_PAYLOAD).addOutboundProperty(PROPERTY_KEY, PROPERTY_VALUE)
         .build();
 
     assertThat(message.getOutboundProperty(PROPERTY_KEY), equalTo(PROPERTY_VALUE));
@@ -255,7 +255,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void outboundPropertyDataType() {
-    InternalMessage message = new DefaultMessageBuilder().payload(TEST_PAYLOAD)
+    InternalMessage message = new DefaultMessageBuilder().value(TEST_PAYLOAD)
         .addOutboundProperty(PROPERTY_KEY, PROPERTY_VALUE, HTML_STRING).build();
 
     assertThat(message.getOutboundProperty(PROPERTY_KEY), equalTo(PROPERTY_VALUE));
@@ -283,7 +283,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
   @Test
   public void mutatePayloadSameTypeConserveTypeAndMimeType() {
     Message message = createTestMessage();
-    Message copy = new DefaultMessageBuilder(message).payload(NEW_PAYLOAD).build();
+    Message copy = new DefaultMessageBuilder(message).value(NEW_PAYLOAD).build();
 
     assertThat(copy.getPayload().getValue(), equalTo(NEW_PAYLOAD));
     assertThat(copy.getPayload().getDataType().getType(), equalTo(String.class));
@@ -292,7 +292,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void mutatePayloadDifferentTypeUpdateTypeAndConserveMimeType() {
-    Message copy = new DefaultMessageBuilder(createTestMessage()).payload(1).build();
+    Message copy = new DefaultMessageBuilder(createTestMessage()).value(1).build();
 
     assertThat(copy.getPayload().getValue(), equalTo(1));
     assertThat(copy.getPayload().getDataType().getType(), equalTo(Integer.class));
@@ -303,7 +303,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
   public void mutatePayloadDifferentTypeWithMediaTypeUpdateTypeAndConserveMimeType() {
     Long payload = new Long(1);
     DataHandler dataHandler = new DataHandler(payload, XML.toString());
-    Message copy = new DefaultMessageBuilder(createTestMessage()).payload(dataHandler).build();
+    Message copy = new DefaultMessageBuilder(createTestMessage()).value(dataHandler).build();
 
     assertThat(copy.getPayload().getValue(), is(dataHandler));
     assertThat(copy.getPayload().getDataType().getType(), equalTo(DataHandler.class));
@@ -311,7 +311,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
   }
 
   private Message createTestMessage() {
-    return new DefaultMessageBuilder().payload(TEST_PAYLOAD).mediaType(TEXT).build();
+    return new DefaultMessageBuilder().value(TEST_PAYLOAD).mediaType(TEXT).build();
   }
 
   private void assertTestMessage(Message message) {

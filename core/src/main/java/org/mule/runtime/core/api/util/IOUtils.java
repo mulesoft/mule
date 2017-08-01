@@ -328,16 +328,16 @@ public class IOUtils {
     final Message.Builder builder;
 
     if (object instanceof File) {
-      builder = Message.builder().payload(new FileInputStream((File) object));
+      builder = Message.builder().value(new FileInputStream((File) object));
     } else if (object instanceof URL) {
-      builder = Message.builder().payload(((URL) object).openStream());
+      builder = Message.builder().value(((URL) object).openStream());
     } else if (object instanceof String) {
-      builder = Message.builder().payload(object);
+      builder = Message.builder().value(object);
       if (contentType == null || MediaType.ANY.matches(contentType)) {
         builder.mediaType(MediaType.TEXT);
       }
     } else {
-      builder = Message.builder().payload(object);
+      builder = Message.builder().value(object);
     }
 
     if (contentType != null && !MediaType.ANY.matches(contentType)) {
@@ -347,7 +347,7 @@ public class IOUtils {
       builder.mediaType(MediaType.parse(dataHandler.getContentType()));
     }
 
-    return builder.attributes(new PartAttributes(name)).build();
+    return builder.attributesValue(new PartAttributes(name)).build();
   }
 
   public static void ifInputStream(Object value, CheckedConsumer<InputStream> consumer) throws NotAnInputStreamException {

@@ -86,7 +86,7 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler {
   }
 
   private Event createMessageCollectionWithSingleMessage(Event event) {
-    final Message coll = Message.builder().collectionPayload(singletonList(event.getMessage()), Message.class).build();
+    final Message coll = Message.builder().collectionValue(singletonList(event.getMessage()), Message.class).build();
     event = Event.builder(event).message(coll).build();
     setCurrentEvent(event);
     return event;
@@ -104,7 +104,7 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler {
       }
       list.add(event.getMessage());
     }
-    final Message coll = Message.builder().collectionPayload(list, Message.class).build();
+    final Message coll = Message.builder().collectionValue(list, Message.class).build();
 
     Event resultEvent = resultBuilder.message(coll).build();
     setCurrentEvent(resultEvent);

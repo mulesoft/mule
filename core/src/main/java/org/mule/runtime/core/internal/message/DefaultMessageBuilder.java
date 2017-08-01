@@ -109,19 +109,21 @@ public class DefaultMessageBuilder
   }
 
   @Override
-  public InternalMessage.Builder nullPayload() {
+  public InternalMessage.Builder payload(TypedValue<?> typedValue) {
+    this.payload = typedValue.getValue();
+    this.dataType = typedValue.getDataType();
+    return this;
+  }
+
+  @Override
+  public InternalMessage.Builder nullValue() {
     this.payload = null;
     return this;
   }
 
   @Override
-  public InternalMessage.Builder payload(Object payload) {
-    if (payload instanceof TypedValue<?>) {
-      this.payload = ((TypedValue) payload).getValue();
-      this.dataType = ((TypedValue) payload).getDataType();
-    } else {
-      this.payload = payload;
-    }
+  public InternalMessage.Builder value(Object payload) {
+    this.payload = payload;
     return this;
   }
 
@@ -132,7 +134,7 @@ public class DefaultMessageBuilder
   }
 
   @Override
-  public InternalMessage.CollectionBuilder streamPayload(Iterator payload, Class<?> clazz) {
+  public InternalMessage.CollectionBuilder streamValue(Iterator payload, Class<?> clazz) {
     requireNonNull(payload);
     this.payload = payload;
     this.dataType = DataType.builder().streamType(payload.getClass()).itemType(clazz).build();
@@ -140,7 +142,7 @@ public class DefaultMessageBuilder
   }
 
   @Override
-  public InternalMessage.CollectionBuilder collectionPayload(Collection payload, Class<?> clazz) {
+  public InternalMessage.CollectionBuilder collectionValue(Collection payload, Class<?> clazz) {
     requireNonNull(payload);
     this.payload = payload;
     this.dataType = DataType.builder().collectionType(payload.getClass()).itemType(clazz).build();
@@ -148,9 +150,9 @@ public class DefaultMessageBuilder
   }
 
   @Override
-  public InternalMessage.CollectionBuilder collectionPayload(Object[] payload) {
+  public InternalMessage.CollectionBuilder collectionValue(Object[] payload) {
     requireNonNull(payload);
-    return collectionPayload(asList(payload), payload.getClass().getComponentType());
+    return collectionValue(asList(payload), payload.getClass().getComponentType());
   }
 
   @Override
@@ -165,19 +167,21 @@ public class DefaultMessageBuilder
   }
 
   @Override
-  public InternalMessage.Builder nullAttributes() {
+  public InternalMessage.Builder attributes(TypedValue<?> typedValue) {
+    this.attributes = typedValue.getValue();
+    this.attributesDataType = typedValue.getDataType();
+    return this;
+  }
+
+  @Override
+  public InternalMessage.Builder nullAttributesValue() {
     this.attributes = null;
     return this;
   }
 
   @Override
-  public InternalMessage.Builder attributes(Object attributes) {
-    if (attributes instanceof TypedValue<?>) {
-      this.attributes = ((TypedValue) attributes).getValue();
-      this.attributesDataType = ((TypedValue) attributes).getDataType();
-    } else {
-      this.attributes = attributes;
-    }
+  public InternalMessage.Builder attributesValue(Object attributes) {
+    this.attributes = attributes;
     return this;
   }
 

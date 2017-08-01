@@ -78,7 +78,7 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
         value = toMessageIterator((Iterator<Result>) value, cursorProviderFactory, event);
       }
       return Message.builder()
-          .payload(streamingContent(value, cursorProviderFactory, event))
+          .value(streamingContent(value, cursorProviderFactory, event))
           .mediaType(mediaType)
           .build();
     }

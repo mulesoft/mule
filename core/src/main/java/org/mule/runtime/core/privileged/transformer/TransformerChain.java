@@ -63,7 +63,7 @@ public class TransformerChain extends AbstractMessageTransformer {
       if (temp instanceof Message) {
         result = (Message) temp;
       } else {
-        result = Message.builder(event.getMessage()).payload(temp).build();
+        result = Message.builder(event.getMessage()).value(temp).build();
         event = Event.builder(event).message(result).build();
       }
     }

@@ -181,7 +181,7 @@ public class ModuleOperationMessageProcessorChainBuilder extends ExplicitMessage
 
     private Event createEventWithParameters(Event event) {
       Event.Builder builder = Event.builder(event.getContext());
-      builder.message(builder().nullPayload().build());
+      builder.message(builder().nullValue().build());
       builder.parameters(evaluateParameters(event, parameters));
       builder.properties(evaluateParameters(event, properties));
       return builder.build();

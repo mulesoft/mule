@@ -56,7 +56,7 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleTe
 
   @Before
   public void before() throws MuleException {
-    event = eventBuilder().message(Message.builder().payload("").attributes(attributes).build()).build();
+    event = eventBuilder().message(Message.builder().value("").attributesValue(attributes).build()).build();
     delegate = createReturnDelegate();
     when(operationContext.getEvent()).thenReturn(event);
   }

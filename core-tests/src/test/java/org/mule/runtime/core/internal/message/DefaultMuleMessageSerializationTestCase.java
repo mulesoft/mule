@@ -29,7 +29,7 @@ public class DefaultMuleMessageSerializationTestCase extends AbstractMuleContext
 
   @Test
   public void testSerializablePayload() throws Exception {
-    final Message message = InternalMessage.builder().payload(TEST_MESSAGE).addOutboundProperty("foo", "bar").build();
+    final Message message = InternalMessage.builder().value(TEST_MESSAGE).addOutboundProperty("foo", "bar").build();
     Message deserializedMessage = serializationRoundtrip(message);
 
     assertEquals(TEST_MESSAGE, deserializedMessage.getPayload().getValue());
@@ -42,7 +42,7 @@ public class DefaultMuleMessageSerializationTestCase extends AbstractMuleContext
     // will be used during Serialization
     muleContext.getRegistry().registerTransformer(new NonSerializableToByteArray());
 
-    final Message message = InternalMessage.builder().payload(new NonSerializable()).addOutboundProperty("foo", "bar").build();
+    final Message message = InternalMessage.builder().value(new NonSerializable()).addOutboundProperty("foo", "bar").build();
 
     setCurrentEvent(eventBuilder().message(message).build());
     InternalMessage deserializedMessage = serializationRoundtrip(message);
@@ -54,7 +54,7 @@ public class DefaultMuleMessageSerializationTestCase extends AbstractMuleContext
   @Test
   public void testStreamPayloadSerialization() throws Exception {
     InputStream stream = new ByteArrayInputStream(TEST_MESSAGE.getBytes());
-    final Message message = InternalMessage.builder().payload(stream).addOutboundProperty("foo", "bar").build();
+    final Message message = InternalMessage.builder().value(stream).addOutboundProperty("foo", "bar").build();
     setCurrentEvent(eventBuilder().message(message).build());
     InternalMessage deserializedMessage = serializationRoundtrip(message);
 

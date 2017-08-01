@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.message;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.message.DefaultMultiPartPayload;
 import org.mule.runtime.core.api.message.ExceptionPayload;
 
@@ -54,31 +55,37 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
   interface PayloadBuilder extends Message.PayloadBuilder {
 
     @Override
-    Builder nullPayload();
+    Builder payload(TypedValue<?> typedValue);
 
     @Override
-    Builder payload(Object payload);
+    Builder nullValue();
+
+    @Override
+    Builder value(Object payload);
 
     @Override
     Builder mediaType(MediaType mediaType);
 
     @Override
-    CollectionBuilder streamPayload(Iterator payload, Class<?> itemType);
+    CollectionBuilder streamValue(Iterator payload, Class<?> itemType);
 
     @Override
-    CollectionBuilder collectionPayload(Collection payload, Class<?> itemType);
+    CollectionBuilder collectionValue(Collection payload, Class<?> itemType);
 
     @Override
-    CollectionBuilder collectionPayload(Object[] payload);
+    CollectionBuilder collectionValue(Object[] payload);
   }
 
   interface AttributesBuilder extends Message.AttributesBuilder {
 
     @Override
-    Builder nullAttributes();
+    Builder attributes(TypedValue<?> typedValue);
 
     @Override
-    Builder attributes(Object value);
+    Builder nullAttributesValue();
+
+    @Override
+    Builder attributesValue(Object value);
 
     @Override
     Builder attributesMediaType(MediaType mediaType);

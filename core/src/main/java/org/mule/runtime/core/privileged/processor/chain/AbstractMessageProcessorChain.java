@@ -158,9 +158,9 @@ abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObject imp
         .map(result -> {
           Object payload = result.getMessage().getPayload().getValue();
           if (payload instanceof CursorProvider) {
-            Message message = Message.builder(result.getMessage()).payload(
-                                                                           streamingManager.manage((CursorProvider) payload,
-                                                                                                   result))
+            Message message = Message.builder(result.getMessage()).value(
+                                                                         streamingManager.manage((CursorProvider) payload,
+                                                                                                 result))
                 .build();
             result = Event.builder(result).message(message).build();
           }

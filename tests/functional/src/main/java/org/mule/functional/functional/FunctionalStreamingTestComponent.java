@@ -77,7 +77,7 @@ public abstract class FunctionalStreamingTestComponent implements Processor, Mul
   @Override
   public Event process(Event event) throws MuleException {
     return Event.builder(event)
-        .message(Message.builder(event.getMessage()).payload(ifInputStream(event.getMessage().getPayload().getValue(), in -> {
+        .message(Message.builder(event.getMessage()).value(ifInputStream(event.getMessage().getPayload().getValue(), in -> {
           try {
             logger.debug("arrived at " + toString());
             byte[] startData = new byte[STREAM_SAMPLE_SIZE];

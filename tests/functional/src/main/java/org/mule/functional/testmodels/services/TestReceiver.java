@@ -35,7 +35,7 @@ public class TestReceiver implements Processor, MuleContextAware {
     try {
       final Message message = event.getMessage();
       return Event.builder(event)
-          .message(Message.builder(message).payload(receive(event.getMessageAsString(muleContext))).build())
+          .message(Message.builder(message).value(receive(event.getMessageAsString(muleContext))).build())
           .build();
     } catch (Exception e) {
       throw new DefaultMuleException(e);

@@ -43,7 +43,7 @@ public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCa
   private static final String ADDED_VAR_VALUE = "addedVarValue";
   private static final String PAYLOAD = "payload";
 
-  private static final Message MESSAGE = Message.builder().payload(PAYLOAD).attributes(new StringAttributes()).build();
+  private static final Message MESSAGE = Message.builder().value(PAYLOAD).attributesValue(new StringAttributes()).build();
 
   protected Policy policy = mock(Policy.class, RETURNS_DEEP_STUBS);
   protected Processor flowProcessor = mock(Processor.class);
@@ -147,7 +147,7 @@ public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCa
   private Event createTestEvent() {
     when(mockFlowConstruct.getUniqueIdString()).thenReturn(executionId);
     return Event.builder(DefaultEventContext.create(mockFlowConstruct, fromSingleComponent("http")))
-        .message(Message.builder().nullPayload().build())
+        .message(Message.builder().nullValue().build())
         .build();
   }
 }

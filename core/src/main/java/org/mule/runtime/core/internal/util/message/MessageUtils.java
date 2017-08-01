@@ -83,10 +83,10 @@ public final class MessageUtils {
                                   CursorProviderFactory cursorProviderFactory,
                                   Event event) {
     Message.Builder builder = Message.builder()
-        .payload(streamingContent(result.getOutput(), cursorProviderFactory, event))
+        .value(streamingContent(result.getOutput(), cursorProviderFactory, event))
         .mediaType(mediaType);
 
-    result.getAttributes().ifPresent(builder::attributes);
+    result.getAttributes().ifPresent(builder::attributesValue);
     result.getAttributesMediaType().ifPresent(builder::attributesMediaType);
 
     return builder.build();
