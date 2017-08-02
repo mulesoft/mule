@@ -9,11 +9,14 @@ package org.mule.test.substitutiongroup.extension;
 
 import org.mule.runtime.extension.api.annotation.Export;
 import org.mule.runtime.extension.api.annotation.Extension;
+import org.mule.runtime.extension.api.annotation.Import;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.test.heisenberg.extension.model.Ricin;
 
 @Extension(name = "substitutionGroup")
 @Xml(namespace = "http://www.mulesoft.org/schema/mule/sg", prefix = "sg")
+@Import(type = Ricin.class)
 @Export(classes = {SomeExportedPojo.class})
 public class SubstitutionGroupExtension {
 

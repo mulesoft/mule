@@ -404,7 +404,7 @@ final class ObjectTypeSchemaDelegate {
       abstractElement.setType(typeQName);
     }
 
-    if (baseDsl.isPresent() || typeDsl.supportsTopLevelDeclaration()) {
+    if (baseDsl.isPresent() || typeDsl.supportsTopLevelDeclaration() || !typeDsl.getSubstitutionGroup().isEmpty()) {
       QName substitutionGroup = getAbstractElementSubstitutionGroup(typeDsl, baseDsl);
       abstractElement.setSubstitutionGroup(substitutionGroup);
     }
@@ -420,9 +420,10 @@ final class ObjectTypeSchemaDelegate {
     if (splittedSubstitutionGroup.length == 2) {
       String namespacePrefix = splittedSubstitutionGroup[0];
       String substitutionComponent = splittedSubstitutionGroup[1];
-      String namespaceUri = "other";
-      //Optional<ExtensionModel> extension = builder.getExtension(namespacePrefix);
-      return Optional.of(new QName(namespaceUri, substitutionComponent, namespacePrefix));
+      String namespaceUri = builder.getNamespaceUri(namespacePrefix);
+      if (namespaceUri != null) {
+        return Optional.of(new QName(namespaceUri, substitutionComponent, namespacePrefix));
+      }
     }
     return Optional.empty();
   }
@@ -432,7 +433,8 @@ final class ObjectTypeSchemaDelegate {
     //First check if the substitutionGroup was defined by the user
     if (!typeDsl.getSubstitutionGroup().isEmpty()) {
       substitutionGroup = resolveSubstitutionGroupFromString(typeDsl.getSubstitutionGroup())
-          .orElseThrow(() -> new IllegalArgumentException("Invalid substitution group"));
+          .orElseThrow(() -> new IllegalArgumentException(typeDsl.getSubstitutionGroup()
+              + " is not a valid substitutionGrup. Prefix does not exist."));
     } else if (baseDsl.isPresent()) {
       DslElementSyntax base = baseDsl.get();
       String abstractElementName = typeDsl.supportsTopLevelDeclaration() ? getGlobalAbstractName(base)

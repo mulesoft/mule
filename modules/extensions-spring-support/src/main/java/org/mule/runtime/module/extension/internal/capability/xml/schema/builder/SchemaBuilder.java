@@ -39,6 +39,9 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isM
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
 import static org.mule.runtime.extension.api.util.NameUtils.sanitizeName;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.internal.dsl.DslConstants.EE_NAMESPACE;
+import static org.mule.runtime.internal.dsl.DslConstants.EE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.capability.xml.schema.builder.ObjectTypeSchemaDelegate.getAbstractElementName;
@@ -101,6 +104,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
@@ -711,7 +716,16 @@ public final class SchemaBuilder {
     parentSequence.getParticle().add(objectFactory.createElement(groupElement));
   }
 
-  void checkImportAndGet(String prefix) {
-    dslContext.getExtensions().stream();
+  String getNamespaceUri(String prefix) {
+    if (prefix.equals(CORE_PREFIX))
+      return CORE_NAMESPACE;
+    if (prefix.equals(EE_PREFIX))
+      return EE_NAMESPACE;
+    Optional<ExtensionModel> extensionModelFromPrefix = dslContext.getExtensions().stream()
+        .filter((extensionModel) -> prefix.equals(extensionModel.getXmlDslModel().getPrefix())).findFirst();
+    if (extensionModelFromPrefix.isPresent()) {
+      return extensionModelFromPrefix.get().getXmlDslModel().getNamespace();
+    }
+    return null;
   }
 }
