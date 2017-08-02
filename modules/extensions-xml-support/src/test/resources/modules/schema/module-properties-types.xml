@@ -7,7 +7,7 @@
            http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd">
 
     <!-- shows that the xsd will have a global element called config, for the following properties-->
-    <property name="integerParam" type="integer"/>
+    <property name="integerParam" type="number"/>
     <property name="booleanParam" type="boolean"/>
     <property name="dateParam" type="date"/>
     <property name="datetimeParam" type="datetime"/>

@@ -10,7 +10,7 @@
   <xs:complexType name="org.mule.test.subtypes.extension.ParentShape">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-        <xs:attribute type="mule:expressionInt" use="optional" name="area"></xs:attribute>
+        <xs:attribute type="mule:expressionDecimal" use="optional" name="area"></xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -26,7 +26,7 @@
   <xs:complexType name="org.mule.test.subtypes.extension.Square">
     <xs:complexContent>
       <xs:extension xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" base="subtypes:org.mule.test.subtypes.extension.ParentShape">
-        <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionInt" use="optional" name="side"></xs:attribute>
+        <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionDecimal" use="optional" name="side"></xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -43,7 +43,7 @@
   <xs:complexType name="org.mule.test.subtypes.extension.Triangle">
     <xs:complexContent>
       <xs:extension xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" base="subtypes:org.mule.test.subtypes.extension.ParentShape">
-        <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionInt" use="optional" name="height"></xs:attribute>
+        <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionDecimal" use="optional" name="height"></xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -268,7 +268,7 @@
               <xs:sequence>
                 <xs:element minOccurs="0" maxOccurs="unbounded" name="number">
                   <xs:complexType>
-                    <xs:attribute type="mule:expressionInt" use="required" name="value"></xs:attribute>
+                    <xs:attribute type="mule:expressionDecimal" use="required" name="value"></xs:attribute>
                   </xs:complexType>
                 </xs:element>
               </xs:sequence>

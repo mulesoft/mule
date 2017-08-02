@@ -84,8 +84,8 @@
           <xs:attribute type="mule:expressionString" use="required" name="cashierName"></xs:attribute>
           <xs:attribute type="mule:expressionString" use="optional" name="rothIRA"></xs:attribute>
           <xs:attribute type="mule:expressionString" use="optional" name="pensionPlan"></xs:attribute>
-          <xs:attribute type="mule:expressionInt" use="optional" name="cash"></xs:attribute>
-          <xs:attribute type="mule:expressionInt" use="optional" name="debt"></xs:attribute>
+          <xs:attribute type="mule:expressionDecimal" use="optional" name="cash"></xs:attribute>
+          <xs:attribute type="mule:expressionDecimal" use="optional" name="debt"></xs:attribute>
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>
@@ -100,7 +100,7 @@
                 <xs:element minOccurs="0" maxOccurs="unbounded" name="bird">
                   <xs:complexType>
                     <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
-                    <xs:attribute type="mule:expressionInt" use="required" name="value"></xs:attribute>
+                    <xs:attribute type="mule:expressionDecimal" use="required" name="value"></xs:attribute>
                   </xs:complexType>
                 </xs:element>
               </xs:sequence>
@@ -600,8 +600,8 @@
         <xs:attribute type="mule:expressionString" use="required" name="cashierName"></xs:attribute>
         <xs:attribute type="mule:expressionString" use="optional" name="rothIRA"></xs:attribute>
         <xs:attribute type="mule:expressionString" use="optional" name="pensionPlan"></xs:attribute>
-        <xs:attribute type="mule:expressionInt" use="optional" name="cash"></xs:attribute>
-        <xs:attribute type="mule:expressionInt" use="optional" name="debt"></xs:attribute>
+        <xs:attribute type="mule:expressionDecimal" use="optional" name="cash"></xs:attribute>
+        <xs:attribute type="mule:expressionDecimal" use="optional" name="debt"></xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
           <xs:annotation>
             <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
