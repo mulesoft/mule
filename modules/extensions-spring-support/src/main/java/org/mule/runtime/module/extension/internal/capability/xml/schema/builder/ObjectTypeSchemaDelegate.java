@@ -92,9 +92,8 @@ final class ObjectTypeSchemaDelegate {
       } else {
         if (!paramSyntax.getSubstitutionGroup().isEmpty()) {
           declareRefToType(type, paramSyntax, description, all, required);
-          registerAbstractElement(type,paramSyntax);
-        }
-        else if (paramSyntax.isWrapped()) {
+          registerAbstractElement(type, paramSyntax);
+        } else if (paramSyntax.isWrapped()) {
           declareRefToType(type, paramSyntax, description, all, required);
         } else {
           declareTypeInline(type, paramSyntax, description, all, required);
@@ -116,8 +115,8 @@ final class ObjectTypeSchemaDelegate {
     String typeName = getBaseTypeName(objectType);
     QName localQName = new QName(paramDsl.getNamespace(), typeName, paramDsl.getPrefix());
     addChildElementTypeExtension(localQName, description, paramDsl.getElementName(),
-                                   !paramDsl.supportsAttributeDeclaration() && required,
-                                   all);
+                                 !paramDsl.supportsAttributeDeclaration() && required,
+                                 all);
   }
 
   private void declareRefToType(ObjectType objectType, DslElementSyntax paramDsl, String description,
