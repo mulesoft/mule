@@ -51,11 +51,24 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
    */
   public MuleArtifactClassLoader(String artifactId, ArtifactDescriptor artifactDescriptor, URL[] urls, ClassLoader parent,
                                  ClassLoaderLookupPolicy lookupPolicy) {
+    this(artifactId, artifactDescriptor, urls, parent, lookupPolicy, true);
+  }
+
+  /**
+   * Alternative constructor that allows not registering error hooks, useful for subclasses that need to do it after
+   * their own initialization or not at all.
+   */
+  protected MuleArtifactClassLoader(String artifactId, ArtifactDescriptor artifactDescriptor, URL[] urls, ClassLoader parent,
+                                    ClassLoaderLookupPolicy lookupPolicy, Boolean configureErrorHooks) {
     super(urls, parent, lookupPolicy);
     checkArgument(!isEmpty(artifactId), "artifactId cannot be empty");
     checkArgument(artifactDescriptor != null, "artifactDescriptor cannot be null");
     this.artifactId = artifactId;
     this.artifactDescriptor = artifactDescriptor;
+
+    if (configureErrorHooks) {
+      configureErrorHooks();
+    }
   }
 
   @Override
@@ -114,7 +127,7 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
     return (ResourceReleaser) createCustomInstance(resourceReleaserClassLocation);
   }
 
-  protected Object createCustomInstance(String classLocation) {
+  private Object createCustomInstance(String classLocation) {
     InputStream classStream = null;
     try {
       classStream = this.getClass().getResourceAsStream(classLocation);
@@ -134,12 +147,16 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
    *
    * For instance, compatibility plugin which inherits from transformers that call {@code block()}.
    */
-  public void configureErrorHooks() {
+  protected void configureErrorHooks() {
     try {
-      loadClass("reactor.core.publisher.Hooks");
-      createCustomInstance("/org/mule/module/artifact/classloader/ErrorHooksConfiguration.class");
+      Class reactorHooks = loadClass("reactor.core.publisher.Hooks");
+      if (reactorHooks.getClassLoader().equals(this)) {
+        createCustomInstance("/org/mule/module/artifact/classloader/ErrorHooksConfiguration.class");
+      }
     } catch (ClassNotFoundException e) {
       // ignore, we don't care if the plugin does not include reactor-core
+    } catch (Exception e) {
+      logger.error("Cannot configure error hooks", e);
     }
   }
 

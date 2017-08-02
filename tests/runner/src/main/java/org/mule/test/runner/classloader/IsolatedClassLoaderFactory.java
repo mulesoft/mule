@@ -157,7 +157,6 @@ public class IsolatedClassLoaderFactory {
                                                                                              .getPluginUrlClassifications(),
                                                                                          pluginLookupPolicy,
                                                                                          pluginsArtifactClassLoaders));
-          pluginCL.configureErrorHooks();
           pluginsArtifactClassLoaders.add(pluginCL);
 
           ArtifactClassLoaderFilter filter =

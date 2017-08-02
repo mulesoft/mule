@@ -36,7 +36,13 @@ public class MuleDeployableArtifactClassLoader extends MuleArtifactClassLoader {
                                            ClassLoader parent,
                                            ClassLoaderLookupPolicy lookupPolicy,
                                            List<ArtifactClassLoader> artifactPluginClassLoaders) {
-    super(artifactId, artifactDescriptor, urls, parent, lookupPolicy);
+    this(artifactId, artifactDescriptor, urls, parent, lookupPolicy, artifactPluginClassLoaders, true);
+  }
+
+  protected MuleDeployableArtifactClassLoader(String artifactId, ArtifactDescriptor artifactDescriptor, URL[] urls,
+                                              ClassLoader parent, ClassLoaderLookupPolicy lookupPolicy,
+                                              List<ArtifactClassLoader> artifactPluginClassLoaders, boolean configureErrorHooks) {
+    super(artifactId, artifactDescriptor, urls, parent, lookupPolicy, configureErrorHooks);
     checkArgument(artifactPluginClassLoaders != null, "artifact plugin class loaders cannot be null");
     this.artifactPluginClassLoaders = artifactPluginClassLoaders;
   }

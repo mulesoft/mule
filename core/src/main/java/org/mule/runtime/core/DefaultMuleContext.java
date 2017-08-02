@@ -250,6 +250,8 @@ public class DefaultMuleContext implements MuleContext {
   private ErrorTypeRepository errorTypeRepository;
   private ProcessorInterceptorProvider processorInterceptorManager;
 
+  // If this runs inside a Mule classloader it's automatically loaded, but in unit tests that
+  // are run outside we need to set it up here.
   static {
     setupErrorHooks(Hooks.class);
   }

@@ -10,7 +10,10 @@ import static org.mule.runtime.core.api.rx.Exceptions.setupErrorHooks;
 
 import reactor.core.publisher.Hooks;
 
-public class ErrorHooksconfiguration {
+/**
+ * Registers reactor-core error handling hooks when dynamically loaded into each plugin class loader.
+ */
+public class ErrorHooksConfiguration {
 
   static {
     setupErrorHooks(Hooks.class);

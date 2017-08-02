@@ -38,9 +38,11 @@ public class MuleApplicationClassLoader extends MuleDeployableArtifactClassLoade
   public MuleApplicationClassLoader(String artifactId, ArtifactDescriptor artifactDescriptor, ClassLoader parentCl,
                                     NativeLibraryFinder nativeLibraryFinder, List<URL> urls,
                                     ClassLoaderLookupPolicy lookupPolicy, List<ArtifactClassLoader> artifactPluginClassLoaders) {
-    super(artifactId, artifactDescriptor, urls.toArray(new URL[0]), parentCl, lookupPolicy, artifactPluginClassLoaders);
+    super(artifactId, artifactDescriptor, urls.toArray(new URL[0]), parentCl, lookupPolicy, artifactPluginClassLoaders, false);
 
     this.nativeLibraryFinder = nativeLibraryFinder;
+
+    configureErrorHooks();
   }
 
   @Override
