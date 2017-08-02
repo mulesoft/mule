@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.core.api.registry;
 
+import org.mule.runtime.core.internal.registry.TransientRegistry;
+
 /**
  * Fired after the inject phase but before the initialise lifecycle phase
  *
- * @deprecated as of 3.7.0 since these are only used by {@link org.mule.runtime.core.registry.TransientRegistry} which is also
+ * @deprecated as of 3.7.0 since these are only used by {@link TransientRegistry} which is also
  *             deprecated. Use post processors for currently supported registries instead (i.e:
  *             {@link org.mule.runtime.core.config.spring.SpringRegistry})
  */

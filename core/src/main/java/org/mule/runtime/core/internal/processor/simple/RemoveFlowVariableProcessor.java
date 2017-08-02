@@ -6,13 +6,14 @@
  */
 package org.mule.runtime.core.internal.processor.simple;
 
-import org.mule.runtime.core.PropertyScope;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.privileged.processor.simple.AbstractRemoveVariablePropertyProcessor;
 
 import java.util.Set;
 
 public class RemoveFlowVariableProcessor extends AbstractRemoveVariablePropertyProcessor {
+
+  private static final String FLOW_VAR_NAME = "flow variables";
 
   @Override
   protected Set<String> getPropertyNames(Event event) {
@@ -26,6 +27,6 @@ public class RemoveFlowVariableProcessor extends AbstractRemoveVariablePropertyP
 
   @Override
   protected String getScopeName() {
-    return PropertyScope.FLOW_VAR_NAME;
+    return FLOW_VAR_NAME;
   }
 }

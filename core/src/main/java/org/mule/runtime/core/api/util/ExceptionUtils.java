@@ -15,7 +15,7 @@ import static org.mule.runtime.api.exception.ExceptionHelper.getExceptionsAsList
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.UNKNOWN;
-import static org.mule.runtime.core.component.ComponentAnnotations.ANNOTATION_NAME;
+import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_NAME;
 import static org.mule.runtime.core.internal.exception.ErrorMapping.ANNOTATION_ERROR_MAPPINGS;
 import static reactor.core.publisher.Mono.error;
 
@@ -52,7 +52,6 @@ import java.util.concurrent.Callable;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
-import reactor.core.publisher.Mono;
 
 /**
  * Mule exception utilities.

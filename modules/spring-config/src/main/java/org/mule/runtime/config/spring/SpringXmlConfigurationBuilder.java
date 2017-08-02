@@ -16,8 +16,8 @@ import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
-import org.mule.runtime.api.ioc.ObjectProvider;
 import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.config.spring.internal.SpringRegistry;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigResource;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -46,7 +46,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
   protected boolean useDefaultConfigResource = true;
   protected boolean useMinimalConfigResource = false;
 
-  protected SpringRegistry registry;
+  private SpringRegistry registry;
 
   protected ApplicationContext domainContext;
   protected ApplicationContext parentContext;

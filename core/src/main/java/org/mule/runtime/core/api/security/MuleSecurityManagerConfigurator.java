@@ -9,7 +9,7 @@ package org.mule.runtime.core.api.security;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.security.DefaultMuleSecurityManager;
+import org.mule.runtime.core.internal.security.DefaultMuleSecurityManager;
 import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
 
 import java.util.ArrayList;

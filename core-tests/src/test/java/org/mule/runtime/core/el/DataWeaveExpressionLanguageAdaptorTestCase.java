@@ -60,7 +60,7 @@ import org.mule.runtime.core.api.security.DefaultMuleAuthentication;
 import org.mule.runtime.core.api.security.DefaultMuleCredentials;
 import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.internal.message.InternalMessage;
-import org.mule.runtime.core.security.DefaultSecurityContext;
+import org.mule.runtime.core.internal.security.DefaultSecurityContext;
 
 import com.google.common.collect.Sets;
 

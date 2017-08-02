@@ -7,7 +7,6 @@
 package org.mule.runtime.config.spring.internal;
 
 import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.config.spring.SpringRegistry;
 import org.mule.runtime.core.api.lifecycle.LifecycleObject;
 import org.mule.runtime.core.internal.lifecycle.RegistryLifecycleCallback;
 import org.mule.runtime.core.internal.lifecycle.RegistryLifecycleManager;

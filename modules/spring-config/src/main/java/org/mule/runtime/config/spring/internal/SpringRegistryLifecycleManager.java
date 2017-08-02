@@ -15,7 +15,6 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.store.ObjectStoreManager;
-import org.mule.runtime.config.spring.SpringRegistry;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.component.Component;
 import org.mule.runtime.core.api.config.Config;
@@ -44,7 +43,7 @@ import org.mule.runtime.core.internal.lifecycle.phases.MuleContextStartPhase;
 import org.mule.runtime.core.internal.lifecycle.phases.MuleContextStopPhase;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
-import org.mule.runtime.core.registry.AbstractRegistryBroker;
+import org.mule.runtime.core.internal.registry.AbstractRegistryBroker;
 import org.mule.runtime.core.internal.routing.requestreply.AbstractAsyncRequestReplyRequester;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
@@ -122,7 +121,7 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
   }
 
   /**
-   * A lifecycle phase that will delegate to the {@link org.mule.runtime.config.spring.SpringRegistry#doDispose()} method which in
+   * A lifecycle phase that will delegate to the {@link SpringRegistry#doDispose()} method which in
    * turn will destroy the application context managed by this registry
    */
   class SpringContextDisposePhase extends MuleContextDisposePhase {

@@ -54,8 +54,8 @@ import org.mule.runtime.core.api.exception.ErrorTypeRepository;
 import org.mule.runtime.core.internal.client.DefaultLocalMuleClient;
 import org.mule.runtime.core.internal.lifecycle.MuleContextLifecycleManager;
 import org.mule.runtime.core.internal.processor.interceptor.DefaultProcessorInterceptorManager;
-import org.mule.runtime.core.registry.DefaultRegistryBroker;
-import org.mule.runtime.core.registry.MuleRegistryHelper;
+import org.mule.runtime.core.internal.registry.DefaultRegistryBroker;
+import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
 import org.mule.runtime.core.internal.registry.RegistryDelegatingInjector;
 
 import org.slf4j.Logger;

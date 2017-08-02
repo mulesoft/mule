@@ -24,7 +24,7 @@ import org.mule.runtime.core.internal.lifecycle.phases.MuleContextStartPhase;
 import org.mule.runtime.core.internal.lifecycle.phases.MuleContextStopPhase;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.core.api.lifecycle.AbstractLifecycleManager;
-import org.mule.runtime.core.registry.AbstractRegistryBroker;
+import org.mule.runtime.core.internal.registry.AbstractRegistryBroker;
 
 import java.util.HashMap;
 import java.util.Map;

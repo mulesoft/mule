@@ -41,7 +41,6 @@ import org.mule.runtime.api.metadata.resolving.MetadataComponent;
 import org.mule.runtime.api.metadata.resolving.MetadataFailure;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.metadata.NullMetadataKey;
 import org.mule.runtime.module.extension.internal.metadata.MultilevelMetadataKeyBuilder;
@@ -150,7 +149,7 @@ public abstract class MetadataExtensionFunctionalTestCase<T extends ComponentMod
   @Before
   public void setup() throws Exception {
     event = eventBuilder().message(of("")).build();
-    metadataService = muleContext.getRegistry().lookupObject(MuleMetadataService.class);
+    metadataService = muleContext.getRegistry().lookupObject(MetadataService.class);
     personType = getMetadata(PERSON_METADATA_KEY.getId());
   }
 

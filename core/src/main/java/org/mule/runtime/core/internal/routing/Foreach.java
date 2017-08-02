@@ -27,7 +27,7 @@ import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.Scope;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.expression.ExpressionConfig;
+import org.mule.runtime.core.privileged.expression.ExpressionConfig;
 import org.mule.runtime.core.internal.routing.outbound.AbstractMessageSequenceSplitter;
 
 import java.util.ArrayList;

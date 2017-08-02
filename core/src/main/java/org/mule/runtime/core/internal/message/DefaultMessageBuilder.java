@@ -12,8 +12,6 @@ import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
-import static org.mule.runtime.core.PropertyScope.INBOUND;
-import static org.mule.runtime.core.PropertyScope.OUTBOUND;
 import static org.mule.runtime.core.api.Event.getCurrentEvent;
 import static org.mule.runtime.core.api.util.ObjectUtils.getBoolean;
 import static org.mule.runtime.core.api.util.ObjectUtils.getByte;
@@ -60,6 +58,9 @@ import org.slf4j.LoggerFactory;
 public class DefaultMessageBuilder
     implements InternalMessage.Builder, InternalMessage.PayloadBuilder, InternalMessage.AttributesBuilder,
     InternalMessage.CollectionBuilder {
+
+  private static final String INBOUND_NAME = "INBOUND";
+  private static final String OUTBOUND_NAME = "OUTBOUND";
 
   private Object payload;
   private DataType dataType;
@@ -410,13 +411,13 @@ public class DefaultMessageBuilder
       try {
         if (!m.getInboundPropertyNames().isEmpty()) {
           Set<String> inboundNames = new TreeSet(m.getInboundPropertyNames());
-          buf.append("    ").append(INBOUND.toString().toUpperCase()).append(" scoped properties:").append(lineSeparator());
+          buf.append("    ").append(INBOUND_NAME).append(" scoped properties:").append(lineSeparator());
           appendPropertyValues(m, buf, inboundNames, name -> m.getInboundProperty(name));
         }
 
         if (!m.getOutboundPropertyNames().isEmpty()) {
           Set<String> outboundNames = new TreeSet(m.getOutboundPropertyNames());
-          buf.append("    ").append(OUTBOUND.toString().toUpperCase()).append(" scoped properties:").append(lineSeparator());
+          buf.append("    ").append(OUTBOUND_NAME).append(" scoped properties:").append(lineSeparator());
           appendPropertyValues(m, buf, outboundNames, name -> m.getOutboundProperty(name));
         }
       } catch (IllegalArgumentException e) {
