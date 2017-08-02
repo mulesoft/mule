@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml"
+	xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
+http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd">
+
+	<cxf:configuration name="CXF_Configuration"
+		enableMuleSoapHeaders="true" initializeStaticBusInstance="true"
+		doc:name="CXF Configuration">
+	</cxf:configuration>
+
+	<spring:beans>
+		<spring:bean name="signatureCryptoProperties" class="java.util.Properties">
+			<spring:constructor-arg>
+				<spring:map>
+					<spring:entry key="org.apache.ws.security.crypto.provider"
+						value="org.apache.ws.security.components.crypto.Merlin" />
+					<spring:entry key="org.apache.ws.security.crypto.merlin.keystore.type"
+						value="jks" />
+					<spring:entry
+						key="org.apache.ws.security.crypto.merlin.keystore.password"
+						value="server" />
+					<spring:entry key="org.apache.ws.security.crypto.merlin.file"
+						value="ServerKeyStore.jks" />
+				</spring:map>
+			</spring:constructor-arg>
+		</spring:bean>
+
+		<spring:bean name="decryptCryptoProperties" class="java.util.Properties">
+			<spring:constructor-arg>
+				<spring:map>
+					<spring:entry key="org.apache.ws.security.crypto.provider"
+						value="org.apache.ws.security.components.crypto.Merlin" />
+					<spring:entry key="org.apache.ws.security.crypto.merlin.keystore.type"
+						value="jks" />
+					<spring:entry
+						key="org.apache.ws.security.crypto.merlin.keystore.password"
+						value="server" />
+					<spring:entry key="org.apache.ws.security.crypto.merlin.file"
+						value="ServerKeyStore.jks" />
+				</spring:map>
+			</spring:constructor-arg>
+		</spring:bean>
+
+		<spring:bean name="addEnvelope"
+			class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
+			<spring:constructor-arg>
+				<spring:map>
+					<spring:entry key="action" value="" />
+			</spring:map>
+			</spring:constructor-arg>
+		</spring:bean>
+		<!-- WSS4JOutInterceptor for signing and encrypting outbound SOAP -->
+		<spring:bean name="outboundSecurity"
+			class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
+			<spring:constructor-arg>
+				<spring:map>
+					<spring:entry key="action" value="Timestamp Signature Encrypt" />
+					<spring:entry key="user" value="client" />
+					<spring:entry key="signaturePropFile" value="client-crypto.properties" />
+					<spring:entry key="encryptionPropFile" value="client-crypto.properties" />
+					<spring:entry key="signatureKeyIdentifier" value="DirectReference" />
+					<spring:entry key="encryptionUser" value="server" />
+					<spring:entry key="passwordCallbackClass"
+						value="org.mule.module.cxf.issues.ClientPasswordCallbackClientServer" />
+					<spring:entry key="signatureParts"
+						value="{Element}{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp;{Element}{http://schemas.xmlsoap.org/soap/envelope/}Body" />
+					<spring:entry key="encryptionParts"
+						value="{Element}{http://www.w3.org/2000/09/xmldsig#}Signature;{Content}{http://schemas.xmlsoap.org/soap/envelope/}Body" />
+					<spring:entry key="encryptionSymAlgorithm"
+						value="http://www.w3.org/2001/04/xmlenc#tripledes-cbc" />
+				</spring:map>
+			</spring:constructor-arg>
+		</spring:bean>
+		<!-- WSS4JInInterceptor for decrypting and validating the signature of 
+			inbound SOAP -->
+		<spring:bean id="inboundSecurity"
+			class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
+			<spring:constructor-arg>
+				<spring:map>
+					<spring:entry key="action" value="Timestamp Signature Encrypt" />
+					<spring:entry key="signaturePropRefId" value="signatureCryptoProperties" />
+					<spring:entry key="signatureCryptoProperties"
+						value-ref="signatureCryptoProperties" />
+					<spring:entry key="decryptionPropFile" value="server-crypto.properties" />
+					<spring:entry key="passwordCallbackClass"
+						value="org.mule.module.cxf.issues.ClientPasswordCallbackClientServer" />
+				</spring:map>
+			</spring:constructor-arg>
+		</spring:bean>
+	</spring:beans>
+
+	<http:listener-config name="HTTP_Listener_Configuration"
+		host="0.0.0.0" port="${port}" />
+
+	<flow name="poc-wss4j-clientFlow">
+		<http:listener config-ref="HTTP_Listener_Configuration"
+			path="/client" />
+		<cxf:proxy-client payload="body">
+			<cxf:outInterceptors>
+				<spring:ref bean="outboundSecurity" />
+			</cxf:outInterceptors>
+		</cxf:proxy-client>
+		<http:outbound-endpoint exchange-pattern="request-response"
+			address="http://localhost:${port}/test" />
+	</flow>
+
+	<flow name="test">
+		<http:listener config-ref="HTTP_Listener_Configuration"
+			path="/test" />
+		<cxf:proxy-service service="WebService2"
+			wsdlLocation="localWsdl.wsdl" namespace="http://www.muleumo.org" payload="envelope">
+			<cxf:inInterceptors>
+				<spring:ref bean="inboundSecurity" />
+			</cxf:inInterceptors>
+		</cxf:proxy-service>
+		<object-to-string-transformer />
+	</flow>
+</mule>
