@@ -1,0 +1,365 @@
+{
+  "name": "substitutionGroup",
+  "description": "",
+  "version": "4.0",
+  "vendor": "Mulesoft",
+  "category": "COMMUNITY",
+  "minMuleVersion": "4.0.0",
+  "xmlDsl": {
+    "prefix": "sg",
+    "namespace": "http://www.mulesoft.org/schema/mule/sg",
+    "schemaLocation": "http://www.mulesoft.org/schema/mule/sg/current/mule-sg.xsd",
+    "schemaVersion": "4.0",
+    "xsdFileName": "mule-sg.xsd"
+  },
+  "resources": [],
+  "subTypes": [],
+  "privilegedPackages": [],
+  "privilegedArtifacts": [],
+  "externalLibraries": [],
+  "importedTypes": [
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
+        "typeId": "org.mule.test.heisenberg.extension.model.Ricin",
+        "classInformation": {
+          "hasDefaultConstructor": true,
+          "isInterface": false,
+          "isInstantiable": true,
+          "isAbstract": false,
+          "isFinal": false,
+          "implementedInterfaces": [
+            "org.mule.test.heisenberg.extension.model.Weapon"
+          ],
+          "parent": "",
+          "genericTypes": []
+        },
+        "xmlHints": {
+          "allowInlineDefinition": true,
+          "allowTopLevelDefinition": true,
+          "allowReferences": true,
+          "substitutionGroup": ""
+        },
+        "typeAlias": {
+          "value": "Ricin"
+        }
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "microgramsPerKilo",
+            "required": "true"
+          },
+          "model": {
+            "type": "Number",
+            "annotations": {
+              "typeId": "java.lang.Long"
+            }
+          },
+          "annotations": {
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
+            },
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "destination",
+            "required": "true"
+          },
+          "model": {
+            "type": "Object",
+            "annotations": {
+              "typeId": "org.mule.test.heisenberg.extension.model.KnockeableDoor",
+              "classInformation": {
+                "hasDefaultConstructor": true,
+                "isInterface": false,
+                "isInstantiable": true,
+                "isAbstract": false,
+                "isFinal": false,
+                "implementedInterfaces": [],
+                "parent": "",
+                "genericTypes": []
+              },
+              "xmlHints": {
+                "allowInlineDefinition": true,
+                "allowTopLevelDefinition": true,
+                "allowReferences": true,
+                "substitutionGroup": ""
+              },
+              "typeAlias": {
+                "value": "door"
+              }
+            },
+            "fields": [
+              {
+                "key": {
+                  "name": "victim",
+                  "required": "true"
+                },
+                "model": {
+                  "type": "String",
+                  "annotations": {
+                    "typeId": "java.lang.String"
+                  }
+                },
+                "annotations": {
+                  "parameterPurpose": {
+                    "role": "BEHAVIOUR"
+                  },
+                  "expressionSupport": {
+                    "value": "SUPPORTED"
+                  }
+                }
+              },
+              {
+                "key": {
+                  "name": "address",
+                  "required": "true"
+                },
+                "model": {
+                  "type": "String",
+                  "annotations": {
+                    "typeId": "java.lang.String"
+                  }
+                },
+                "annotations": {
+                  "parameterPurpose": {
+                    "role": "BEHAVIOUR"
+                  },
+                  "expressionSupport": {
+                    "value": "SUPPORTED"
+                  }
+                }
+              },
+              {
+                "key": {
+                  "name": "previous"
+                },
+                "model": "#..",
+                "annotations": {
+                  "parameterPurpose": {
+                    "role": "BEHAVIOUR"
+                  },
+                  "expressionSupport": {
+                    "value": "SUPPORTED"
+                  }
+                }
+              }
+            ]
+          },
+          "annotations": {
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
+            },
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "configurations": [
+    {
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "@ref:org.mule.test.substitutiongroup.extension.SomePojo"
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
+              "elementReferences": [],
+              "name": "somePojo",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "externalLibraryModels": [],
+      "operations": [],
+      "connectionProviders": [],
+      "messageSources": [],
+      "functions": [],
+      "name": "config",
+      "description": "Default configuration",
+      "modelProperties": {}
+    }
+  ],
+  "operations": [],
+  "functions": [],
+  "connectionProviders": [],
+  "messageSources": [],
+  "errors": [
+    {
+      "type": "RETRY_EXHAUSTED",
+      "namespace": "SG",
+      "parent": {
+        "type": "RETRY_EXHAUSTED",
+        "namespace": "MULE",
+        "parent": {
+          "type": "ANY",
+          "namespace": "MULE"
+        }
+      }
+    },
+    {
+      "type": "CONNECTIVITY",
+      "namespace": "MULE",
+      "parent": {
+        "type": "ANY",
+        "namespace": "MULE"
+      }
+    },
+    {
+      "type": "ANY",
+      "namespace": "MULE"
+    },
+    {
+      "type": "RETRY_EXHAUSTED",
+      "namespace": "MULE",
+      "parent": {
+        "type": "ANY",
+        "namespace": "MULE"
+      }
+    },
+    {
+      "type": "CONNECTIVITY",
+      "namespace": "SG",
+      "parent": {
+        "type": "CONNECTIVITY",
+        "namespace": "MULE",
+        "parent": {
+          "type": "ANY",
+          "namespace": "MULE"
+        }
+      }
+    }
+  ],
+  "modelProperties": {},
+  "types": [
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
+        "typeId": "org.mule.test.substitutiongroup.extension.SomeExportedPojo",
+        "classInformation": {
+          "hasDefaultConstructor": true,
+          "isInterface": false,
+          "isInstantiable": true,
+          "isAbstract": false,
+          "isFinal": false,
+          "implementedInterfaces": [],
+          "parent": "",
+          "genericTypes": []
+        },
+        "xmlHints": {
+          "allowInlineDefinition": true,
+          "allowTopLevelDefinition": true,
+          "allowReferences": true,
+          "substitutionGroup": "heisenberg:some-component"
+        },
+        "typeAlias": {
+          "value": "SomeExportedPojo"
+        }
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "attribute"
+          },
+          "model": {
+            "type": "Boolean",
+            "annotations": {
+              "typeId": "boolean"
+            }
+          },
+          "annotations": {
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
+            },
+            "default": "false",
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
+        "typeId": "org.mule.test.substitutiongroup.extension.SomePojo",
+        "classInformation": {
+          "hasDefaultConstructor": true,
+          "isInterface": false,
+          "isInstantiable": true,
+          "isAbstract": false,
+          "isFinal": false,
+          "implementedInterfaces": [],
+          "parent": "",
+          "genericTypes": []
+        },
+        "xmlHints": {
+          "allowInlineDefinition": true,
+          "allowTopLevelDefinition": false,
+          "allowReferences": true,
+          "substitutionGroup": "heisenberg:some-component"
+        },
+        "typeAlias": {
+          "value": "SomePojo"
+        }
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "attribute"
+          },
+          "model": {
+            "type": "Boolean",
+            "annotations": {
+              "typeId": "boolean"
+            }
+          },
+          "annotations": {
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
+            },
+            "default": "false",
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
