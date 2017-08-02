@@ -19,6 +19,7 @@ import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.module.extension.internal.metadata.MultilevelMetadataKeyBuilder.newKey;
 import static org.mule.tck.junit4.matcher.MetadataKeyMatcher.metadataKeyWithId;
 import static org.mule.test.metadata.extension.MetadataConnection.CAR;
@@ -67,6 +68,7 @@ import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -398,6 +400,7 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     ComponentMetadataDescriptor metadataDescriptor = getSuccessComponentDynamicMetadata(PERSON_METADATA_KEY);
     MetadataType param = metadataDescriptor.getModel().getOutput().getType();
     assertThat(param, is(instanceOf(ArrayType.class)));
+    assertThat(getId(param), is(Iterator.class.getName()));
     assertMessageType(((ArrayType) param).getType(), personType, TYPE_LOADER.load(Animal.class));
   }
 
@@ -408,6 +411,7 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     ComponentMetadataDescriptor metadataDescriptor = getSuccessComponentDynamicMetadata(PERSON_METADATA_KEY);
     MetadataType param = metadataDescriptor.getModel().getOutput().getType();
     assertThat(param, is(instanceOf(ArrayType.class)));
+    assertThat(getId(param), is(Iterator.class.getName()));
     assertMessageType(((ArrayType) param).getType(), personType, personType);
   }
 
@@ -573,6 +577,7 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     ComponentMetadataDescriptor descriptor = result.get();
     MetadataType param = descriptor.getModel().getOutput().getType();
     assertThat(param, is(instanceOf(ArrayType.class)));
+    assertThat(getId(param), is(List.class.getName()));
     return param;
   }
 

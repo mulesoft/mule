@@ -32,9 +32,11 @@ import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.api.metadata.resolving.NamedTypeResolver;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.extension.api.metadata.MetadataResolverUtils;
+import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 
 import com.google.common.collect.ImmutableList;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -176,19 +178,21 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
 
   private MetadataType adaptToListIfNecessary(MetadataType resolvedType, Object key, MetadataContext metadataContext)
       throws MetadataResolvingException {
-    if (!isCollection(component.getOutput().getType())) {
+
+    MetadataType componentOutputType = component.getOutput().getType();
+    if (!isCollection(componentOutputType)) {
       return resolvedType;
     }
 
-    MetadataType outputType = ((ArrayType) component.getOutput().getType()).getType();
-    String typeId = getId(outputType);
+    MetadataType collectionValueType = ((ArrayType) componentOutputType).getType();
+    String collectionValueTypeId = getId(collectionValueType);
 
-    if (Message.class.getName().equals(typeId)) {
-      MessageMetadataType message = (MessageMetadataType) outputType;
+    if (Message.class.getName().equals(collectionValueTypeId)) {
+      MessageMetadataType message = (MessageMetadataType) collectionValueType;
       resolvedType = wrapInMessageType(resolvedType, key, metadataContext, message.getAttributesType());
     }
 
-    return metadataContext.getTypeBuilder().arrayType().id(typeId).of(resolvedType).build();
+    return metadataContext.getTypeBuilder().arrayType().id(getCollectionTypeId(componentOutputType)).of(resolvedType).build();
   }
 
   private MetadataType wrapInMessageType(MetadataType type, Object key, MetadataContext context,
@@ -211,5 +215,13 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
     }
 
     return message.build();
+  }
+
+  private String getCollectionTypeId(MetadataType type) {
+    if (PagingProvider.class.getName().equals(getId(type))) {
+      return Iterator.class.getName();
+    }
+
+    return getId(type);
   }
 }
