@@ -33,9 +33,9 @@
                         <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="0" maxOccurs="1" ref="extension:dynamic-config-policy"></xs:element>
                         <xs:element minOccurs="0" maxOccurs="1" name="some-pojo">
                             <xs:complexType>
-                                <xs:complexContent>
-                                    <xs:extension xmlns:sg="http://www.mulesoft.org/schema/mule/sg" base="sg:org.mule.test.substitutiongroup.extension.SomePojo"></xs:extension>
-                                </xs:complexContent>
+                                <xs:sequence minOccurs="1" maxOccurs="1">
+                                    <xs:element xmlns:sg="http://www.mulesoft.org/schema/mule/sg" minOccurs="0" maxOccurs="1" ref="sg:abstract-some-pojo"></xs:element>
+                                </xs:sequence>
                             </xs:complexType>
                         </xs:element>
                     </xs:sequence>
@@ -52,4 +52,5 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
+    <xs:element xmlns:sg="http://www.mulesoft.org/schema/mule/sg" type="sg:org.mule.test.substitutiongroup.extension.SomePojo" abstract="true" name="abstract-some-pojo"></xs:element>
 </xs:schema>
