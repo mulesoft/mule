@@ -113,9 +113,9 @@ final class ObjectTypeSchemaDelegate {
   private void declareTypeInline(ObjectType objectType, DslElementSyntax paramDsl, String description,
                                  List<TopLevelElement> all, boolean required) {
     registerPojoComplexType(objectType, null, description);
-      String typeName = getBaseTypeName(objectType);
-      QName localQName = new QName(paramDsl.getNamespace(), typeName, paramDsl.getPrefix());
-      addChildElementTypeExtension(localQName, description, paramDsl.getElementName(),
+    String typeName = getBaseTypeName(objectType);
+    QName localQName = new QName(paramDsl.getNamespace(), typeName, paramDsl.getPrefix());
+    addChildElementTypeExtension(localQName, description, paramDsl.getElementName(),
                                    !paramDsl.supportsAttributeDeclaration() && required,
                                    all);
   }
