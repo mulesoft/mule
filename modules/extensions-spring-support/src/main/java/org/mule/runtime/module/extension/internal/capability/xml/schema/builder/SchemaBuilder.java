@@ -711,7 +711,7 @@ public final class SchemaBuilder {
     parentSequence.getParticle().add(objectFactory.createElement(groupElement));
   }
 
-  Optional<ExtensionModel> getExtension(String prefix) {
-    return dslContext.getExtension(prefix);
+  void checkImportAndGet(String prefix) {
+    dslContext.getExtensions().stream();
   }
 }

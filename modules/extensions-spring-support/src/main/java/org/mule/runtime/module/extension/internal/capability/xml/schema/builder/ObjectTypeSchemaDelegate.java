@@ -90,7 +90,11 @@ final class ObjectTypeSchemaDelegate {
       if (builder.isImported(type)) {
         addImportedTypeElement(paramSyntax, description, type, all, required);
       } else {
-        if (paramSyntax.isWrapped()) {
+        if (!paramSyntax.getSubstitutionGroup().isEmpty()) {
+          declareRefToType(type, paramSyntax, description, all, required);
+          registerAbstractElement(type,paramSyntax);
+        }
+        else if (paramSyntax.isWrapped()) {
           declareRefToType(type, paramSyntax, description, all, required);
         } else {
           declareTypeInline(type, paramSyntax, description, all, required);
@@ -109,11 +113,11 @@ final class ObjectTypeSchemaDelegate {
   private void declareTypeInline(ObjectType objectType, DslElementSyntax paramDsl, String description,
                                  List<TopLevelElement> all, boolean required) {
     registerPojoComplexType(objectType, null, description);
-    String typeName = getBaseTypeName(objectType);
-    QName localQName = new QName(paramDsl.getNamespace(), typeName, paramDsl.getPrefix());
-    addChildElementTypeExtension(localQName, description, paramDsl.getElementName(),
-                                 !paramDsl.supportsAttributeDeclaration() && required,
-                                 all);
+      String typeName = getBaseTypeName(objectType);
+      QName localQName = new QName(paramDsl.getNamespace(), typeName, paramDsl.getPrefix());
+      addChildElementTypeExtension(localQName, description, paramDsl.getElementName(),
+                                   !paramDsl.supportsAttributeDeclaration() && required,
+                                   all);
   }
 
   private void declareRefToType(ObjectType objectType, DslElementSyntax paramDsl, String description,
@@ -418,7 +422,7 @@ final class ObjectTypeSchemaDelegate {
       String namespacePrefix = splittedSubstitutionGroup[0];
       String substitutionComponent = splittedSubstitutionGroup[1];
       String namespaceUri = "other";
-      Optional<ExtensionModel> extension = builder.getExtension(namespacePrefix);
+      //Optional<ExtensionModel> extension = builder.getExtension(namespacePrefix);
       return Optional.of(new QName(namespaceUri, substitutionComponent, namespacePrefix));
     }
     return Optional.empty();
