@@ -16,6 +16,7 @@ import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
+import java.util.List;
 
 /**
  * Tooling {@link ClassLoader} that will delegate every call to it's delegate (the specific {@link org.eclipse.aether.artifact.Artifact} under
@@ -44,6 +45,10 @@ public class ToolingArtifactClassLoader implements ArtifactClassLoader {
 
     this.regionClassLoader = regionClassLoader;
     this.delegateArtifactClassLoader = delegateArtifactClassLoader;
+  }
+
+  public List<ArtifactClassLoader> getArtifactPluginClassLoaders() {
+    return regionClassLoader.getArtifactPluginClassLoaders();
   }
 
   @Override

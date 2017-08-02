@@ -60,7 +60,7 @@ public class ToolingApplicationClassLoaderBuilder
    * @return a {@code MuleDeployableArtifactClassLoader} created from the provided configuration.
    * @throws IOException exception cause when it was not possible to access the file provided as dependencies
    */
-  public ArtifactClassLoader build() throws IOException {
+  public ToolingArtifactClassLoader build() throws IOException {
     ArtifactClassLoader ownerArtifactClassLoader = super.build();
     ClassLoader parent = ownerArtifactClassLoader.getClassLoader().getParent();
     if (!(parent instanceof RegionClassLoader)) {
