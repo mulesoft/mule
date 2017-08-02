@@ -479,8 +479,7 @@ final class ObjectTypeSchemaDelegate {
     TopLevelElement objectElement = new TopLevelElement();
     objectElement.setName(typeDsl.getElementName());
 
-    objectElement.setSubstitutionGroup(resolveSubstitutionGroupFromString(typeDsl.getSubstitutionGroup())
-        .orElse(new QName(typeDsl.getNamespace(), abstractElementName, typeDsl.getPrefix())));
+    objectElement.setSubstitutionGroup(new QName(typeDsl.getNamespace(), abstractElementName, typeDsl.getPrefix()));
     objectElement.setAnnotation(builder.createDocAnnotation(description));
 
     objectElement.setComplexType(createTypeExtension(typeQName));
