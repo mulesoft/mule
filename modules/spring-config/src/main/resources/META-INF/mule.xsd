@@ -382,6 +382,13 @@
     <xsd:complexType name="topLevelProcessorType">
         <xsd:complexContent>
             <xsd:extension base="abstractMessageProcessorType">
+                <xsd:attribute name="name" type="substitutableName" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Identifies the message processor in the registry.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -393,13 +400,6 @@
                 <xsd:sequence>
                     <xsd:group ref="propertiesGroup"/>
                 </xsd:sequence>
-                <xsd:attribute name="name" type="substitutableName" use="optional">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Identifies the message processor in the registry.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
                 <xsd:attribute name="class" type="substitutableClass" use="required"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -546,13 +546,6 @@
                     <xsd:annotation>
                         <xsd:documentation>
                             Comma-seperated list of mule expression that when evaluated are the arguments for the method invocation
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="name" type="substitutableName" use="optional">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Identifies the message processor in the registry.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -827,13 +820,6 @@
     <xsd:complexType name="abstractTransformerType">
         <xsd:complexContent>
             <xsd:extension base="commonTransformerType">
-                <xsd:attribute name="name" type="substitutableName">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Identifies the transformer so that other elements can reference it. Required if the transformer is defined at the global level.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
                 <xsd:attribute name="returnClass" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
