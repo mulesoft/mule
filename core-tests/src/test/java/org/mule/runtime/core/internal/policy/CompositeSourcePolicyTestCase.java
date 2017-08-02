@@ -199,7 +199,7 @@ public class CompositeSourcePolicyTestCase extends AbstractMuleTestCase {
 
   private Event createTestEvent() {
     return Event.builder(DefaultEventContext.create(mockFlowConstruct, fromSingleComponent("http")))
-        .message(Message.builder().nullPayload().build()).build();
+        .message(Message.builder().nullValue().build()).build();
   }
 
 }

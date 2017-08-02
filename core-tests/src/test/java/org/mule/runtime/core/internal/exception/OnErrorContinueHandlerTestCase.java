@@ -37,7 +37,6 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
-import org.mule.runtime.core.api.util.StreamCloserService;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -180,7 +179,7 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
 
   private Processor createSetStringMessageProcessor(final String appendText) {
     return event -> {
-      return Event.builder(event).message(InternalMessage.builder(event.getMessage()).payload(appendText).build()).build();
+      return Event.builder(event).message(InternalMessage.builder(event.getMessage()).value(appendText).build()).build();
     };
   }
 

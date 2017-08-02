@@ -1410,7 +1410,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
   private static DefaultComponentLocation buildLocation(final String componentIdentifier) {
     final TypedComponentIdentifier part =
-        builder().withIdentifier(buildFromStringRepresentation(componentIdentifier)).withType(PROCESSOR).build();
+        builder().identifier(buildFromStringRepresentation(componentIdentifier)).type(PROCESSOR).build();
     return new DefaultComponentLocation(of("flowName"), singletonList(new DefaultLocationPart("0", of(part), empty(), empty())));
   }
 

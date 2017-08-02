@@ -125,6 +125,6 @@ public final class ErrorTypeHandlerConnectionProviderWrapper<C> extends Connecti
   }
 
   private ComponentIdentifier getIdentifier(ErrorTypeDefinition errorType) {
-    return builder().withName(errorType.getType()).withNamespace(prefix).build();
+    return builder().name(errorType.getType()).namespace(prefix).build();
   }
 }

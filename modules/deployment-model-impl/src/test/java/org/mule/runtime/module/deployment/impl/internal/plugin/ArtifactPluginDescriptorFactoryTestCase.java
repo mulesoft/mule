@@ -78,7 +78,7 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
     when(descriptorLoaderRepository.get(MAVEN, PLUGIN, ClassLoaderModelLoader.class))
         .thenReturn(new PluginMavenClassLoaderModelLoader(mavenClientProvider.createMavenClient(
                                                                                                 newMavenConfigurationBuilder()
-                                                                                                    .withLocalMavenRepositoryLocation(mavenClientProvider
+                                                                                                    .localMavenRepositoryLocation(mavenClientProvider
                                                                                                         .getLocalRepositorySuppliers()
                                                                                                         .environmentMavenRepositorySupplier()
                                                                                                         .get())

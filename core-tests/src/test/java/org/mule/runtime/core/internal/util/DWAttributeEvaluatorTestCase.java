@@ -203,7 +203,7 @@ public class DWAttributeEvaluatorTestCase extends AbstractMuleContextTestCase {
   private Event newEvent(Object payload, MediaType applicationJson) throws MuleException {
     return Event.builder(newEvent())
         .message(Message.builder()
-            .payload(payload)
+            .value(payload)
             .mediaType(applicationJson)
             .build())
         .build();

@@ -9,9 +9,6 @@ package org.mule.runtime.http.api.tcp;
 import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_SERVICE;
 import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.TCP_BUILDER;
 
-import org.mule.runtime.http.api.tcp.TcpClientSocketProperties;
-import org.mule.runtime.http.api.tcp.TcpClientSocketPropertiesBuilder;
-
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
@@ -41,13 +38,13 @@ public class TcpClientSocketPropertiesBuilderTestCase {
   @Test
   public void complexConfiguration() {
     TcpClientSocketProperties properties = builder
-        .setConnectionTimeout(1)
-        .setKeepAlive(true)
-        .setSendTcpNoDelay(false)
-        .setSendBufferSize(2)
-        .setReceiveBufferSize(3)
-        .setLinger(4)
-        .setClientTimeout(5).build();
+        .connectionTimeout(1)
+        .keepAlive(true)
+        .sendTcpNoDelay(false)
+        .sendBufferSize(2)
+        .receiveBufferSize(3)
+        .linger(4)
+        .clientTimeout(5).build();
 
     assertThat(properties.getConnectionTimeout(), is(1));
     assertThat(properties.getKeepAlive(), is(true));

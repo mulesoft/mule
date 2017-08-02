@@ -33,12 +33,12 @@ public class SetPayloadMessageProcessor extends SimpleMessageProcessor {
 
     if (dataType == null) {
       final TypedValue typedValue = resolveTypedValue(event);
-      builder.payload(typedValue.getValue()).mediaType(typedValue.getDataType().getMediaType());
+      builder.value(typedValue.getValue()).mediaType(typedValue.getDataType().getMediaType());
     } else {
       Object value = resolveValue(event);
       final DataTypeParamsBuilder dataTypeBuilder =
           DataType.builder(dataType).type(value == null ? Object.class : value.getClass());
-      builder.payload(value).mediaType(dataTypeBuilder.build().getMediaType());
+      builder.value(value).mediaType(dataTypeBuilder.build().getMediaType());
     }
 
     return eventBuilder.message(builder.build()).build();

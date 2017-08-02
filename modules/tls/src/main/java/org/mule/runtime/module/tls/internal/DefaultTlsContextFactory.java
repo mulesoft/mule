@@ -218,12 +218,12 @@ public class DefaultTlsContextFactory implements TlsContextFactory, Initialisabl
   }
 
   @Override
-  public SSLSocketFactory getSocketFactory() throws KeyManagementException, NoSuchAlgorithmException {
+  public SSLSocketFactory createSocketFactory() throws KeyManagementException, NoSuchAlgorithmException {
     return new RestrictedSSLSocketFactory(createSslContext(), getEnabledCipherSuites(), getEnabledProtocols());
   }
 
   @Override
-  public SSLServerSocketFactory getServerSocketFactory() throws KeyManagementException, NoSuchAlgorithmException {
+  public SSLServerSocketFactory createServerSocketFactory() throws KeyManagementException, NoSuchAlgorithmException {
     return new RestrictedSSLServerSocketFactory(createSslContext(), getEnabledCipherSuites(), getEnabledProtocols());
   }
 

@@ -74,7 +74,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
 
   @Test
   public void usesCustomEncodingWithNoProperty() throws Exception {
-    Message message = Message.builder().payload(TEST_PAYLOAD).mediaType(ANY.withCharset(CUSTOM_ENCODING)).build();
+    Message message = Message.builder().value(TEST_PAYLOAD).mediaType(ANY.withCharset(CUSTOM_ENCODING)).build();
 
     assertThat(message.getPayload().getDataType().getMediaType().getCharset().get(), equalTo(CUSTOM_ENCODING));
     assertCustomEncoding(message);
@@ -82,30 +82,30 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
 
   @Test
   public void setsDataTypeFromPreviousMessageOnCreation() throws Exception {
-    Message message = Message.builder().payload(1).mediaType(APPLICATION_XML_CUSTOM).build();
+    Message message = Message.builder().value(1).mediaType(APPLICATION_XML_CUSTOM).build();
 
     assertDataType(InternalMessage.builder(message).build(), message.getPayload().getDataType());
   }
 
   @Test
   public void overridesDataTypeFromPreviousMessageOnCreation() throws Exception {
-    Message message = Message.builder().payload(1).mediaType(APPLICATION_XML_CUSTOM).build();
+    Message message = Message.builder().value(1).mediaType(APPLICATION_XML_CUSTOM).build();
 
-    assertDataType(InternalMessage.builder(message).payload("TEST").build(), String.class, APPLICATION_XML, CUSTOM_ENCODING);
+    assertDataType(InternalMessage.builder(message).value("TEST").build(), String.class, APPLICATION_XML, CUSTOM_ENCODING);
   }
 
   @Test
   public void updatesDataTypeWhenPayloadIsReplacedWithNullPayload() throws Exception {
     Message muleMessage = of(TEST_PAYLOAD);
 
-    assertDataType(InternalMessage.builder(muleMessage).nullPayload().build(), Object.class, ANY, null);
+    assertDataType(InternalMessage.builder(muleMessage).nullValue().build(), Object.class, ANY, null);
   }
 
   @Test
   public void setsNullPayloadWithDataType() throws Exception {
     Message muleMessage = of(TEST_PAYLOAD);
 
-    assertDataType(InternalMessage.builder(muleMessage).nullPayload().mediaType(APPLICATION_XML_CUSTOM).build(), Object.class,
+    assertDataType(InternalMessage.builder(muleMessage).nullValue().mediaType(APPLICATION_XML_CUSTOM).build(), Object.class,
                    APPLICATION_XML, CUSTOM_ENCODING);
   }
 
@@ -113,13 +113,13 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
   public void setsPayloadWithDataType() throws Exception {
     Message muleMessage = of(TEST_PAYLOAD);
 
-    assertDataType(InternalMessage.builder(muleMessage).payload(1).mediaType(APPLICATION_XML_CUSTOM).build(), Integer.class,
+    assertDataType(InternalMessage.builder(muleMessage).value(1).mediaType(APPLICATION_XML_CUSTOM).build(), Integer.class,
                    APPLICATION_XML, CUSTOM_ENCODING);
   }
 
   @Test
   public void updatesTypeOnTransformation() throws Exception {
-    Message message = Message.builder().payload(1).mediaType(APPLICATION_XML_DEFAULT).build();
+    Message message = Message.builder().value(1).mediaType(APPLICATION_XML_DEFAULT).build();
 
     Transformer transformer = mock(Transformer.class);
     when(transformer.isSourceDataTypeSupported(any())).thenReturn(true);
@@ -136,7 +136,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
 
   @Test
   public void updatesEncodingOnTransformation() throws Exception {
-    Message message = Message.builder().payload(TEST_PAYLOAD).mediaType(APPLICATION_XML_DEFAULT).build();
+    Message message = Message.builder().value(TEST_PAYLOAD).mediaType(APPLICATION_XML_DEFAULT).build();
 
     Transformer transformer = mock(Transformer.class);
     when(transformer.isSourceDataTypeSupported(any())).thenReturn(true);
@@ -153,7 +153,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
 
   @Test
   public void updatesMimeTypeOnTransformation() throws Exception {
-    Message message = Message.builder().payload(TEST_PAYLOAD).mediaType(ANY.withCharset(CUSTOM_ENCODING)).build();
+    Message message = Message.builder().value(TEST_PAYLOAD).mediaType(ANY.withCharset(CUSTOM_ENCODING)).build();
 
     Transformer transformer = mock(Transformer.class);
     when(transformer.isSourceDataTypeSupported(any())).thenReturn(true);
@@ -188,7 +188,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
   @Test
   public void maintainsDataTypeOnGetPayloadTransformation() throws Exception {
     InputStream payload = mock(InputStream.class);
-    Message message = Message.builder().payload(payload).mediaType(APPLICATION_XML_CUSTOM).build();
+    Message message = Message.builder().value(payload).mediaType(APPLICATION_XML_CUSTOM).build();
 
     MuleRegistry muleRegistry = mock(MuleRegistry.class);
     when(muleContext.getRegistry()).thenReturn(muleRegistry);
@@ -204,7 +204,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
   @Test
   public void setsDefaultOutboundPropertyDataType() throws Exception {
     InternalMessage message =
-        (InternalMessage) InternalMessage.builder().payload(TEST_PAYLOAD).addOutboundProperty(TEST_PROPERTY, TEST_PAYLOAD)
+        (InternalMessage) InternalMessage.builder().value(TEST_PAYLOAD).addOutboundProperty(TEST_PROPERTY, TEST_PAYLOAD)
             .build();
 
     assertDefaultOutboundPropertyDataType(message);
@@ -214,7 +214,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
   public void setsCustomOutboundPropertyDataType() throws Exception {
     MediaType mediaType = APPLICATION_XML_CUSTOM;
     InternalMessage message =
-        (InternalMessage) InternalMessage.builder().payload(TEST_PAYLOAD)
+        (InternalMessage) InternalMessage.builder().value(TEST_PAYLOAD)
             .addOutboundProperty(TEST_PROPERTY, TEST_PAYLOAD, mediaType).build();
 
     assertOutboundPropertyDataType(message, DataType.builder().type(String.class).mediaType(mediaType).build());
@@ -223,7 +223,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
   @Test
   public void setsDefaultOutboundScopePropertyDataType() throws Exception {
     InternalMessage message =
-        (InternalMessage) InternalMessage.builder().payload(TEST_PAYLOAD).addOutboundProperty(TEST_PROPERTY, TEST_PAYLOAD)
+        (InternalMessage) InternalMessage.builder().value(TEST_PAYLOAD).addOutboundProperty(TEST_PROPERTY, TEST_PAYLOAD)
             .build();
 
     assertDefaultOutboundPropertyDataType(message);
@@ -232,7 +232,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
   @Test
   public void setsDefaultInboundPropertyDataType() throws Exception {
     InternalMessage message =
-        (InternalMessage) InternalMessage.builder().payload(TEST_PAYLOAD).addInboundProperty(TEST_PROPERTY, TEST_PAYLOAD).build();
+        (InternalMessage) InternalMessage.builder().value(TEST_PAYLOAD).addInboundProperty(TEST_PROPERTY, TEST_PAYLOAD).build();
 
     assertDefaultInboundPropertyDataType(message);
   }
@@ -241,7 +241,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
   public void setsCustomInboundPropertyDataType() throws Exception {
     MediaType mediaType = APPLICATION_XML_CUSTOM;
     InternalMessage message =
-        (InternalMessage) InternalMessage.builder().payload(TEST_PAYLOAD)
+        (InternalMessage) InternalMessage.builder().value(TEST_PAYLOAD)
             .addInboundProperty(TEST_PROPERTY, TEST_PAYLOAD, mediaType).build();
     assertInboundPropertyDataType(message, DataType.builder().type(String.class).mediaType(mediaType).build());
   }
@@ -251,7 +251,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
   @Test
   public void setsDefaultInboundScopePropertyDataType() throws Exception {
     InternalMessage message =
-        (InternalMessage) InternalMessage.builder().payload(TEST_PAYLOAD).addInboundProperty(TEST_PROPERTY, TEST_PAYLOAD).build();
+        (InternalMessage) InternalMessage.builder().value(TEST_PAYLOAD).addInboundProperty(TEST_PROPERTY, TEST_PAYLOAD).build();
 
     assertDefaultInboundPropertyDataType(message);
   }
@@ -292,7 +292,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
   public void setsCustomPropertyDataType() throws Exception {
     MediaType mediaType = APPLICATION_XML_CUSTOM;
     InternalMessage message =
-        (InternalMessage) InternalMessage.builder().payload(TEST_PAYLOAD)
+        (InternalMessage) InternalMessage.builder().value(TEST_PAYLOAD)
             .addOutboundProperty(TEST_PROPERTY, TEST_PAYLOAD, mediaType).build();
 
     assertOutboundPropertyDataType(message, DataType.builder(STRING).mediaType(mediaType).build());

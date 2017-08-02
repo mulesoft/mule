@@ -41,7 +41,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase {
     Apple apple = new Apple(true);
     properties.put("apple", apple);
     InternalMessage message =
-        (InternalMessage) InternalMessage.builder().payload(TEST_MESSAGE).outboundProperties(properties).build();
+        (InternalMessage) InternalMessage.builder().value(TEST_MESSAGE).outboundProperties(properties).build();
     assertTrue(message.getOutboundProperty("boolean", false));
     assertEquals(new Integer(24), message.getOutboundProperty("number", 0));
     assertEquals(new Byte((byte) 24), message.getOutboundProperty("number", (byte) 0));
@@ -93,7 +93,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase {
   }
 
   private Message createMuleMessage() {
-    return InternalMessage.builder().payload(TEST_PAYLOAD)
+    return InternalMessage.builder().value(TEST_PAYLOAD)
         .addOutboundProperty("Message", "Message").build();
   }
 

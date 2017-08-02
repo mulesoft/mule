@@ -517,7 +517,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
     Event event = eventBuilder().message(of(new String[] {"1", "2"})).build();
     assertEquals("1", mvel.evaluateUntyped("payload[0]", event, Event.builder(event),
                                            ((AnnotatedObject) flowConstruct).getLocation(), null));
-    event = Event.builder(event).message(InternalMessage.builder(event.getMessage()).payload(singletonList("1")).build()).build();
+    event = Event.builder(event).message(InternalMessage.builder(event.getMessage()).value(singletonList("1")).build()).build();
     assertEquals("1", mvel.evaluateUntyped("payload[0]", event, Event.builder(event),
                                            ((AnnotatedObject) flowConstruct).getLocation(), null));
   }

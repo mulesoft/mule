@@ -158,7 +158,7 @@ public class MinimalApplicationModelGenerator {
 
   private ComponentModel findRequiredComponentModel(Location location) {
     final Reference<ComponentModel> foundComponentModelReference = new Reference<>();
-    Optional<ComponentModel> globalComponent = applicationModel.findTopLevelNamedComponent(location.getGlobalElementName());
+    Optional<ComponentModel> globalComponent = applicationModel.findTopLevelNamedComponent(location.getGlobalName());
     globalComponent.ifPresent(componentModel -> {
       findComponentWithLocation(componentModel, location).ifPresent(foundComponentModel -> {
         foundComponentModelReference.set(foundComponentModel);

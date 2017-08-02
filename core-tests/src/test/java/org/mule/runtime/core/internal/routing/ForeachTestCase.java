@@ -66,7 +66,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
     List<Processor> lmp = new ArrayList<>();
     lmp.add(event -> {
       String payload = event.getMessage().getPayload().getValue().toString();
-      event = Event.builder(event).message(InternalMessage.builder(event.getMessage()).payload(payload + ":foo").build()).build();
+      event = Event.builder(event).message(InternalMessage.builder(event.getMessage()).value(payload + ":foo").build()).build();
       return event;
     });
     lmp.add(innerProcessor);

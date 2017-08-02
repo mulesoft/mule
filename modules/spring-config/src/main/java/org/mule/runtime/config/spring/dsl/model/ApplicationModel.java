@@ -151,80 +151,80 @@ public class ApplicationModel {
   public static final String OBJECT_ELEMENT = "object";
 
   public static final ComponentIdentifier ERROR_HANDLER_IDENTIFIER =
-      builder().withNamespace(CORE_PREFIX).withName(ERROR_HANDLER).build();
+      builder().namespace(CORE_PREFIX).name(ERROR_HANDLER).build();
   public static final ComponentIdentifier EXCEPTION_STRATEGY_REFERENCE_IDENTIFIER =
-      builder().withNamespace(CORE_PREFIX).withName(EXCEPTION_STRATEGY_REFERENCE_ELEMENT)
+      builder().namespace(CORE_PREFIX).name(EXCEPTION_STRATEGY_REFERENCE_ELEMENT)
           .build();
   public static final ComponentIdentifier ERROR_MAPPING_IDENTIFIER =
-      builder().withNamespace(CORE_PREFIX).withName(ERROR_MAPPING).build();
+      builder().namespace(CORE_PREFIX).name(ERROR_MAPPING).build();
   public static final ComponentIdentifier MULE_IDENTIFIER =
-      builder().withNamespace(CORE_PREFIX).withName(MULE_ROOT_ELEMENT).build();
+      builder().namespace(CORE_PREFIX).name(MULE_ROOT_ELEMENT).build();
   public static final ComponentIdentifier MULE_DOMAIN_IDENTIFIER =
-      builder().withNamespace(DOMAIN_PREFIX).withName(MULE_DOMAIN_ROOT_ELEMENT).build();
+      builder().namespace(DOMAIN_PREFIX).name(MULE_DOMAIN_ROOT_ELEMENT).build();
   public static final ComponentIdentifier MULE_EE_DOMAIN_IDENTIFIER =
-      builder().withNamespace(EE_DOMAIN_PREFIX).withName(MULE_DOMAIN_ROOT_ELEMENT).build();
+      builder().namespace(EE_DOMAIN_PREFIX).name(MULE_DOMAIN_ROOT_ELEMENT).build();
   public static final ComponentIdentifier POLICY_IDENTIFIER =
-      builder().withNamespace(POLICY_ROOT_ELEMENT).withName(POLICY_ROOT_ELEMENT).build();
+      builder().namespace(POLICY_ROOT_ELEMENT).name(POLICY_ROOT_ELEMENT).build();
   public static final ComponentIdentifier MULE_PROPERTY_IDENTIFIER =
-      builder().withNamespace(CORE_PREFIX).withName(PROPERTY_ELEMENT).build();
+      builder().namespace(CORE_PREFIX).name(PROPERTY_ELEMENT).build();
   public static final ComponentIdentifier MULE_PROPERTIES_IDENTIFIER =
-      builder().withNamespace(CORE_PREFIX).withName(PROPERTIES_ELEMENT).build();
+      builder().namespace(CORE_PREFIX).name(PROPERTIES_ELEMENT).build();
   public static final ComponentIdentifier ANNOTATIONS_ELEMENT_IDENTIFIER =
-      builder().withNamespace(CORE_PREFIX).withName(ANNOTATION_ELEMENT).build();
+      builder().namespace(CORE_PREFIX).name(ANNOTATION_ELEMENT).build();
   public static final ComponentIdentifier PROCESSOR_IDENTIFIER =
-      builder().withNamespace(CORE_PREFIX).withName(PROCESSOR_REFERENCE_ELEMENT).build();
+      builder().namespace(CORE_PREFIX).name(PROCESSOR_REFERENCE_ELEMENT).build();
   public static final ComponentIdentifier TRANSFORMER_IDENTIFIER =
-      builder().withNamespace(CORE_PREFIX).withName(TRANSFORMER_REFERENCE_ELEMENT).build();
+      builder().namespace(CORE_PREFIX).name(TRANSFORMER_REFERENCE_ELEMENT).build();
   public static final ComponentIdentifier CONFIGURATION_IDENTIFIER =
-      builder().withNamespace(CORE_PREFIX).withName(CONFIGURATION_ELEMENT).build();
+      builder().namespace(CORE_PREFIX).name(CONFIGURATION_ELEMENT).build();
   public static final ComponentIdentifier CUSTOM_TRANSFORMER_IDENTIFIER =
-      builder().withNamespace(CORE_PREFIX).withName(CUSTOM_TRANSFORMER).build();
+      builder().namespace(CORE_PREFIX).name(CUSTOM_TRANSFORMER).build();
   public static final ComponentIdentifier DOC_DESCRIPTION_IDENTIFIER =
-      builder().withNamespace(DOC_NAMESPACE).withName(DESCRIPTION_ELEMENT).build();
+      builder().namespace(DOC_NAMESPACE).name(DESCRIPTION_ELEMENT).build();
   public static final ComponentIdentifier DESCRIPTION_IDENTIFIER =
-      builder().withNamespace(CORE_PREFIX).withName(DESCRIPTION_ELEMENT).build();
+      builder().namespace(CORE_PREFIX).name(DESCRIPTION_ELEMENT).build();
   public static final ComponentIdentifier ANNOTATIONS_IDENTIFIER =
-      builder().withNamespace(CORE_PREFIX).withName(ANNOTATIONS).build();
+      builder().namespace(CORE_PREFIX).name(ANNOTATIONS).build();
   public static final ComponentIdentifier OBJECT_IDENTIFIER =
-      builder().withNamespace(CORE_PREFIX).withName(OBJECT_ELEMENT).build();
+      builder().namespace(CORE_PREFIX).name(OBJECT_ELEMENT).build();
   public static final ComponentIdentifier FLOW_IDENTIFIER =
-      builder().withNamespace(CORE_PREFIX).withName(FLOW_ELEMENT).build();
+      builder().namespace(CORE_PREFIX).name(FLOW_ELEMENT).build();
   public static final ComponentIdentifier FLOW_REF_IDENTIFIER =
-      builder().withNamespace(CORE_PREFIX).withName(FLOW_REF_ELEMENT).build();
+      builder().namespace(CORE_PREFIX).name(FLOW_REF_ELEMENT).build();
   public static final ComponentIdentifier SUBFLOW_IDENTIFIER =
-      builder().withNamespace(CORE_PREFIX).withName(SUBFLOW_ELEMENT).build();
+      builder().namespace(CORE_PREFIX).name(SUBFLOW_ELEMENT).build();
   public static final ComponentIdentifier REDELIVERY_POLICY_IDENTIFIER =
-      builder().withNamespace(CORE_PREFIX).withName(REDELIVERY_POLICY_ELEMENT).build();
+      builder().namespace(CORE_PREFIX).name(REDELIVERY_POLICY_ELEMENT).build();
   public static final ComponentIdentifier GLOBAL_PROPERTY_IDENTIFIER =
-      builder().withNamespace(CORE_PREFIX).withName(GLOBAL_PROPERTY).build();
+      builder().namespace(CORE_PREFIX).name(GLOBAL_PROPERTY).build();
   public static final ComponentIdentifier SECURITY_MANAGER_IDENTIFIER =
-      builder().withNamespace(CORE_PREFIX).withName(SECURITY_MANAGER).build();
+      builder().namespace(CORE_PREFIX).name(SECURITY_MANAGER).build();
   public static final ComponentIdentifier CONFIGURATION_PROPERTIES =
-      builder().withNamespace(CORE_PREFIX).withName(CONFIGURATION_PROPERTIES_ELEMENT).build();
+      builder().namespace(CORE_PREFIX).name(CONFIGURATION_PROPERTIES_ELEMENT).build();
   public static final ComponentIdentifier MODULE_OPERATION_CHAIN =
-      builder().withNamespace(CORE_PREFIX).withName(MODULE_OPERATION_CHAIN_ELEMENT).build();
+      builder().namespace(CORE_PREFIX).name(MODULE_OPERATION_CHAIN_ELEMENT).build();
 
 
   // TODO MULE-13042 - remove this constants and their usages one this code gets migrated to use extension models.
   public static final String MUNIT_PREFIX = "munit";
   public static final ComponentIdentifier MUNIT_TEST_IDENTIFIER =
-      builder().withNamespace(MUNIT_PREFIX).withName("test").build();
+      builder().namespace(MUNIT_PREFIX).name("test").build();
   public static final ComponentIdentifier MUNIT_BEFORE_TEST_IDENTIFIER =
-      builder().withNamespace(MUNIT_PREFIX).withName("before-test").build();
+      builder().namespace(MUNIT_PREFIX).name("before-test").build();
   public static final ComponentIdentifier MUNIT_BEFORE_SUITE_IDENTIFIER =
-      builder().withNamespace(MUNIT_PREFIX).withName("before-suite").build();
+      builder().namespace(MUNIT_PREFIX).name("before-suite").build();
   public static final ComponentIdentifier MUNIT_AFTER_TEST_IDENTIFIER =
-      builder().withNamespace(MUNIT_PREFIX).withName("after-test").build();
+      builder().namespace(MUNIT_PREFIX).name("after-test").build();
   public static final ComponentIdentifier MUNIT_AFTER_SUITE_IDENTIFIER =
-      builder().withNamespace(MUNIT_PREFIX).withName("after-suite").build();
+      builder().namespace(MUNIT_PREFIX).name("after-suite").build();
 
   public static final String HTTP_POLICY = "http-policy";
   public static final ComponentIdentifier HTTP_PROXY_SOURCE_POLICY_IDENTIFIER =
-      builder().withNamespace(HTTP_POLICY).withName("source").build();
+      builder().namespace(HTTP_POLICY).name("source").build();
   public static final ComponentIdentifier HTTP_PROXY_OPERATION_IDENTIFIER =
-      builder().withNamespace(HTTP_POLICY).withName("operation").build();
+      builder().namespace(HTTP_POLICY).name("operation").build();
   public static final ComponentIdentifier HTTP_PROXY_POLICY_IDENTIFIER =
-      builder().withNamespace(HTTP_POLICY).withName("proxy").build();
+      builder().namespace(HTTP_POLICY).name("proxy").build();
 
 
 
@@ -232,64 +232,64 @@ public class ApplicationModel {
 
   private static ImmutableSet<ComponentIdentifier> ignoredNameValidationComponentList =
       ImmutableSet.<ComponentIdentifier>builder()
-          .add(builder().withNamespace(MULE_ROOT_ELEMENT).withName("flow-ref").build())
-          .add(builder().withNamespace(MULE_ROOT_ELEMENT).withName("alias").build())
-          .add(builder().withNamespace(MULE_ROOT_ELEMENT).withName("password-encryption-strategy")
+          .add(builder().namespace(MULE_ROOT_ELEMENT).name("flow-ref").build())
+          .add(builder().namespace(MULE_ROOT_ELEMENT).name("alias").build())
+          .add(builder().namespace(MULE_ROOT_ELEMENT).name("password-encryption-strategy")
               .build())
-          .add(builder().withNamespace(MULE_ROOT_ELEMENT).withName("custom-security-provider")
+          .add(builder().namespace(MULE_ROOT_ELEMENT).name("custom-security-provider")
               .build())
-          .add(builder().withNamespace(MULE_ROOT_ELEMENT).withName("custom-encryption-strategy")
+          .add(builder().namespace(MULE_ROOT_ELEMENT).name("custom-encryption-strategy")
               .build())
-          .add(builder().withNamespace(MULE_ROOT_ELEMENT)
-              .withName("secret-key-encryption-strategy")
+          .add(builder().namespace(MULE_ROOT_ELEMENT)
+              .name("secret-key-encryption-strategy")
               .build())
-          .add(builder().withNamespace(MULE_ROOT_ELEMENT).withName("import").build())
-          .add(builder().withNamespace(MULE_ROOT_ELEMENT)
-              .withName("string-to-byte-array-transformer")
+          .add(builder().namespace(MULE_ROOT_ELEMENT).name("import").build())
+          .add(builder().namespace(MULE_ROOT_ELEMENT)
+              .name("string-to-byte-array-transformer")
               .build())
-          .add(builder().withNamespace(MULE_ROOT_ELEMENT).withName("append-string-transformer")
+          .add(builder().namespace(MULE_ROOT_ELEMENT).name("append-string-transformer")
               .build())
-          .add(builder().withNamespace(MULE_ROOT_ELEMENT).withName("security-manager").build())
-          .add(builder().withNamespace(TEST_NAMESPACE).withName("queue").build())
-          .add(builder().withNamespace(TEST_NAMESPACE).withName("invocation-counter").build())
-          .add(builder().withNamespace(SPRING_SECURITY_NAMESPACE).withName("user").build())
-          .add(builder().withNamespace(MULE_SECURITY_NAMESPACE)
-              .withName("delegate-security-provider")
+          .add(builder().namespace(MULE_ROOT_ELEMENT).name("security-manager").build())
+          .add(builder().namespace(TEST_NAMESPACE).name("queue").build())
+          .add(builder().namespace(TEST_NAMESPACE).name("invocation-counter").build())
+          .add(builder().namespace(SPRING_SECURITY_NAMESPACE).name("user").build())
+          .add(builder().namespace(MULE_SECURITY_NAMESPACE)
+              .name("delegate-security-provider")
               .build())
-          .add(builder().withNamespace(MULE_SECURITY_NAMESPACE).withName("security-manager")
+          .add(builder().namespace(MULE_SECURITY_NAMESPACE).name("security-manager")
               .build())
-          .add(builder().withNamespace(MULE_XML_NAMESPACE).withName("xslt-transformer").build())
-          .add(builder().withNamespace(MULE_XML_NAMESPACE).withName("alias").build())
-          .add(builder().withNamespace(PGP_NAMESPACE).withName("security-provider").build())
-          .add(builder().withNamespace(PGP_NAMESPACE).withName("keybased-encryption-strategy")
+          .add(builder().namespace(MULE_XML_NAMESPACE).name("xslt-transformer").build())
+          .add(builder().namespace(MULE_XML_NAMESPACE).name("alias").build())
+          .add(builder().namespace(PGP_NAMESPACE).name("security-provider").build())
+          .add(builder().namespace(PGP_NAMESPACE).name("keybased-encryption-strategy")
               .build())
-          .add(builder().withNamespace(XSL_NAMESPACE).withName("param").build())
-          .add(builder().withNamespace(XSL_NAMESPACE).withName("attribute").build())
-          .add(builder().withNamespace(XSL_NAMESPACE).withName("element").build())
-          .add(builder().withNamespace(TRANSPORT_NAMESPACE).withName("inbound-endpoint").build())
-          .add(builder().withNamespace(TRANSPORT_NAMESPACE).withName("outbound-endpoint").build())
-          .add(builder().withNamespace(JMS_NAMESPACE).withName("inbound-endpoint").build())
-          .add(builder().withNamespace(VM_NAMESPACE).withName("inbound-endpoint").build())
-          .add(builder().withNamespace(HTTP_TRANSPORT_NAMESPACE).withName("inbound-endpoint").build())
-          .add(builder().withNamespace(HTTP_TRANSPORT_NAMESPACE).withName("set-cookie").build())
-          .add(builder().withNamespace(HTTP_TRANSPORT_NAMESPACE).withName("header").build())
-          .add(builder().withNamespace(HTTP_TRANSPORT_NAMESPACE)
-              .withName("http-response-to-object-transformer")
+          .add(builder().namespace(XSL_NAMESPACE).name("param").build())
+          .add(builder().namespace(XSL_NAMESPACE).name("attribute").build())
+          .add(builder().namespace(XSL_NAMESPACE).name("element").build())
+          .add(builder().namespace(TRANSPORT_NAMESPACE).name("inbound-endpoint").build())
+          .add(builder().namespace(TRANSPORT_NAMESPACE).name("outbound-endpoint").build())
+          .add(builder().namespace(JMS_NAMESPACE).name("inbound-endpoint").build())
+          .add(builder().namespace(VM_NAMESPACE).name("inbound-endpoint").build())
+          .add(builder().namespace(HTTP_TRANSPORT_NAMESPACE).name("inbound-endpoint").build())
+          .add(builder().namespace(HTTP_TRANSPORT_NAMESPACE).name("set-cookie").build())
+          .add(builder().namespace(HTTP_TRANSPORT_NAMESPACE).name("header").build())
+          .add(builder().namespace(HTTP_TRANSPORT_NAMESPACE)
+              .name("http-response-to-object-transformer")
               .build())
-          .add(builder().withNamespace(HTTP_TRANSPORT_NAMESPACE)
-              .withName("http-response-to-string-transformer")
+          .add(builder().namespace(HTTP_TRANSPORT_NAMESPACE)
+              .name("http-response-to-string-transformer")
               .build())
-          .add(builder().withNamespace(HTTP_TRANSPORT_NAMESPACE)
-              .withName("message-to-http-response-transformer")
+          .add(builder().namespace(HTTP_TRANSPORT_NAMESPACE)
+              .name("message-to-http-response-transformer")
               .build())
-          .add(builder().withNamespace(HTTP_TRANSPORT_NAMESPACE)
-              .withName("object-to-http-request-transformer")
+          .add(builder().namespace(HTTP_TRANSPORT_NAMESPACE)
+              .name("object-to-http-request-transformer")
               .build())
-          .add(builder().withNamespace(BATCH_NAMESPACE).withName("step").build())
-          .add(builder().withNamespace(BATCH_NAMESPACE).withName("execute").build())
-          .add(builder().withNamespace(PARSER_TEST_NAMESPACE).withName("child").build())
-          .add(builder().withNamespace(PARSER_TEST_NAMESPACE).withName("kid").build())
-          .add(builder().withNamespace(DATA_WEAVE).withName("reader-property").build())
+          .add(builder().namespace(BATCH_NAMESPACE).name("step").build())
+          .add(builder().namespace(BATCH_NAMESPACE).name("execute").build())
+          .add(builder().namespace(PARSER_TEST_NAMESPACE).name("child").build())
+          .add(builder().namespace(PARSER_TEST_NAMESPACE).name("kid").build())
+          .add(builder().namespace(DATA_WEAVE).name("reader-property").build())
           .build();
 
   private final Optional<ComponentBuildingDefinitionRegistry> componentBuildingDefinitionRegistry;
@@ -427,8 +427,8 @@ public class ApplicationModel {
                   DefaultComponentLocation.DefaultLocationPart locationPart =
                       new DefaultComponentLocation.DefaultLocationPart(CONFIGURATION_PROPERTIES_ELEMENT,
                                                                        of(TypedComponentIdentifier.builder()
-                                                                           .withType(UNKNOWN)
-                                                                           .withIdentifier(CONFIGURATION_PROPERTIES)
+                                                                           .type(UNKNOWN)
+                                                                           .identifier(CONFIGURATION_PROPERTIES)
                                                                            .build()),
                                                                        of(configFile.getFilename()),
                                                                        of(configLine.getLineNumber()));
@@ -512,8 +512,8 @@ public class ApplicationModel {
 
       ComponentModel rootComponent = new ComponentModel.Builder()
           .setIdentifier(ComponentIdentifier.builder()
-              .withNamespace(CORE_PREFIX)
-              .withName(CORE_PREFIX)
+              .namespace(CORE_PREFIX)
+              .name(CORE_PREFIX)
               .build())
           .build();
 

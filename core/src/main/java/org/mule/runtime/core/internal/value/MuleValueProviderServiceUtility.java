@@ -25,7 +25,7 @@ public class MuleValueProviderServiceUtility {
   public static Location deleteLastPartFromLocation(Location location) {
     Location.Builder builder = Location.builder();
     List<String> parts = location.getParts();
-    builder = builder.globalName(location.getGlobalElementName());
+    builder = builder.globalName(location.getGlobalName());
     for (int i = 0; i < parts.size() - 1; i++) {
       builder = builder.addPart(parts.get(i));
     }

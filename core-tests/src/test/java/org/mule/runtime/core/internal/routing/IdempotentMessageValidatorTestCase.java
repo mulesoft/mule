@@ -56,7 +56,7 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
     final EventContext contextA = mock(EventContext.class);
     when(contextA.getCorrelationId()).thenReturn("1");
 
-    Message okMessage = InternalMessage.builder().payload("OK").build();
+    Message okMessage = InternalMessage.builder().value("OK").build();
     Event event = Event.builder(contextA).message(okMessage).build();
 
     // This one will process the event on the target endpoint

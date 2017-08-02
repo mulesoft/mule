@@ -27,85 +27,85 @@ public class DefaultTlsContextFactoryBuilder implements TlsContextFactoryBuilder
   }
 
   @Override
-  public TlsContextFactoryBuilder setName(String name) {
+  public TlsContextFactoryBuilder name(String name) {
     tlsContextFactory.setName(name);
     return this;
   }
 
   @Override
-  public TlsContextFactoryBuilder setEnabledProtocols(String protocols) {
+  public TlsContextFactoryBuilder enabledProtocols(String protocols) {
     tlsContextFactory.setEnabledProtocols(protocols);
     return this;
   }
 
   @Override
-  public TlsContextFactoryBuilder setEnabledCipherSuites(String cipherSuites) {
+  public TlsContextFactoryBuilder enabledCipherSuites(String cipherSuites) {
     tlsContextFactory.setEnabledCipherSuites(cipherSuites);
     return this;
   }
 
   @Override
-  public TlsContextFactoryBuilder setTrustStorePath(String path) {
+  public TlsContextFactoryBuilder trustStorePath(String path) {
     trustStorePath = path;
     return this;
   }
 
   @Override
-  public TlsContextFactoryBuilder setTrustStorePassword(String password) {
+  public TlsContextFactoryBuilder trustStorePassword(String password) {
     tlsContextFactory.setTrustStorePassword(password);
     return this;
   }
 
   @Override
-  public TlsContextFactoryBuilder setTrustStoreType(String type) {
+  public TlsContextFactoryBuilder trustStoreType(String type) {
     tlsContextFactory.setTrustStoreType(type);
     return this;
   }
 
   @Override
-  public TlsContextFactoryBuilder setInsecureTrustStore(boolean insecure) {
+  public TlsContextFactoryBuilder insecureTrustStore(boolean insecure) {
     tlsContextFactory.setTrustStoreInsecure(insecure);
     return this;
   }
 
   @Override
-  public TlsContextFactoryBuilder setTrustStoreAlgorithm(String algorithm) {
+  public TlsContextFactoryBuilder trustStoreAlgorithm(String algorithm) {
     tlsContextFactory.setTrustManagerAlgorithm(algorithm);
     return this;
   }
 
   @Override
-  public TlsContextFactoryBuilder setKeyStorePath(String path) {
+  public TlsContextFactoryBuilder keyStorePath(String path) {
     keyStorePath = path;
     return this;
   }
 
   @Override
-  public TlsContextFactoryBuilder setKeyStorePassword(String password) {
+  public TlsContextFactoryBuilder keyStorePassword(String password) {
     tlsContextFactory.setKeyStorePassword(password);
     return this;
   }
 
   @Override
-  public TlsContextFactoryBuilder setKeyAlias(String alias) {
+  public TlsContextFactoryBuilder keyAlias(String alias) {
     tlsContextFactory.setKeyAlias(alias);
     return this;
   }
 
   @Override
-  public TlsContextFactoryBuilder setKeyPassword(String password) {
+  public TlsContextFactoryBuilder keyPassword(String password) {
     tlsContextFactory.setKeyPassword(password);
     return this;
   }
 
   @Override
-  public TlsContextFactoryBuilder setKeyStoreType(String type) {
+  public TlsContextFactoryBuilder keyStoreType(String type) {
     tlsContextFactory.setKeyStoreType(type);
     return this;
   }
 
   @Override
-  public TlsContextFactoryBuilder setKeyStoreAlgorithm(String algorithm) {
+  public TlsContextFactoryBuilder keyStoreAlgorithm(String algorithm) {
     tlsContextFactory.setKeyManagerAlgorithm(algorithm);
     return this;
   }

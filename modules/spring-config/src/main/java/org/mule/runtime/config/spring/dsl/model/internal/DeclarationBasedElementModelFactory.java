@@ -836,8 +836,8 @@ class DeclarationBasedElementModelFactory {
                   format("The given component '%s' does not support element-like declaration", fieldDsl.getAttributeName()));
 
     return builder()
-        .withName(fieldDsl.getElementName())
-        .withNamespace(fieldDsl.getPrefix())
+        .name(fieldDsl.getElementName())
+        .namespace(fieldDsl.getPrefix())
         .build();
   }
 

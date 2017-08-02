@@ -50,7 +50,7 @@ public class PayloadExpressionDataTypeResolverTestCase extends AbstractMuleConte
     final CompiledExpression compiledExpression =
         (CompiledExpression) compileExpression(expression, new ParserContext(expressionLanguage.getParserConfiguration()));
 
-    Event event = Event.builder(testEvent()).message(InternalMessage.builder(testEvent().getMessage()).payload(TEST_MESSAGE)
+    Event event = Event.builder(testEvent()).message(InternalMessage.builder(testEvent().getMessage()).value(TEST_MESSAGE)
         .mediaType(expectedDataType.getMediaType()).build()).build();
     assertThat(dataTypeResolver.resolve(event, compiledExpression), like(String.class, JSON, CUSTOM_ENCODING));
   }

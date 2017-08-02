@@ -210,7 +210,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
       byte[] bytes = (byte[]) objectToByteArray.transform(payload);
       if (payload instanceof InputStream) {
         // We've consumed the stream.
-        event = Event.builder(event).message(Message.builder(event.getMessage()).payload(bytes).build()).build();
+        event = Event.builder(event).message(Message.builder(event.getMessage()).value(bytes).build()).build();
       }
       MessageDigest md = MessageDigest.getInstance(messageDigestAlgorithm);
       byte[] digestedBytes = md.digest(bytes);

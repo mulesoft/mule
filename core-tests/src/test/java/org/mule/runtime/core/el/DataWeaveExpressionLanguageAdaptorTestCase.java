@@ -101,7 +101,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
   public void attributesBinding() throws Exception {
     Event event = getEventWithError(empty());
     SomeAttributes attributes = new SomeAttributes();
-    InternalMessage message = (InternalMessage) Message.builder().nullPayload().attributes(attributes).build();
+    InternalMessage message = (InternalMessage) Message.builder().nullValue().attributesValue(attributes).build();
     when(event.getMessage()).thenReturn(message);
 
     TypedValue result = expressionLanguage.evaluate(ATTRIBUTES, event, BindingContext.builder().build());
@@ -111,7 +111,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
 
   @Test
   public void splitByJson() throws Exception {
-    Event jsonMessage = eventBuilder().message(Message.builder().payload("[1,2,3]").mediaType(APPLICATION_JSON).build()).build();
+    Event jsonMessage = eventBuilder().message(Message.builder().value("[1,2,3]").mediaType(APPLICATION_JSON).build()).build();
     Iterator<TypedValue<?>> payload = expressionLanguage.split("payload", jsonMessage, BindingContext.builder().build());
     assertThat(payload.hasNext(), is(true));
     assertThat(payload.next().getValue().toString(), is("1"));
@@ -125,7 +125,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
   @Test
   public void expectedOutputShouldBeUsed() throws Exception {
     Event jsonMessage =
-        eventBuilder().message(Message.builder().payload("{\"student\": false}").mediaType(APPLICATION_JSON).build()).build();
+        eventBuilder().message(Message.builder().value("{\"student\": false}").mediaType(APPLICATION_JSON).build()).build();
     TypedValue result = expressionLanguage.evaluate("payload.student", BOOLEAN, jsonMessage, BindingContext.builder().build());
     assertThat(result.getValue(), is(false));
   }

@@ -10,6 +10,7 @@ package org.mule.functional.junit4;
 import static org.mule.functional.junit4.TestLegacyMessageUtils.LEGACY_MESSAGE_API_ERROR;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.message.ExceptionPayload;
 
 import java.io.Serializable;
@@ -29,7 +30,7 @@ public class TestLegacyMessageBuilder implements Message.Builder {
   private Message.Builder builder;
 
   public TestLegacyMessageBuilder() {
-    builder = Message.builder().nullPayload();
+    builder = Message.builder().nullValue();
   }
 
   /**
@@ -42,36 +43,42 @@ public class TestLegacyMessageBuilder implements Message.Builder {
   }
 
   @Override
-  public TestLegacyMessageBuilder nullPayload() {
-    builder.nullPayload();
+  public Message.Builder payload(TypedValue<?> typedValue) {
+    builder.payload(typedValue);
+    return this;
+  }
+
+  @Override
+  public TestLegacyMessageBuilder nullValue() {
+    builder.nullValue();
 
     return this;
   }
 
   @Override
-  public TestLegacyMessageBuilder payload(Object value) {
-    builder.payload(value);
+  public TestLegacyMessageBuilder value(Object value) {
+    builder.value(value);
 
     return this;
   }
 
   @Override
-  public TestLegacyMessageBuilder streamPayload(Iterator value, Class<?> itemType) {
-    builder.streamPayload(value, itemType);
+  public TestLegacyMessageBuilder streamValue(Iterator value, Class<?> itemType) {
+    builder.streamValue(value, itemType);
 
     return this;
   }
 
   @Override
-  public TestLegacyMessageBuilder collectionPayload(Collection value, Class<?> itemType) {
-    builder.collectionPayload(value, itemType);
+  public TestLegacyMessageBuilder collectionValue(Collection value, Class<?> itemType) {
+    builder.collectionValue(value, itemType);
 
     return this;
   }
 
   @Override
-  public TestLegacyMessageBuilder collectionPayload(Object[] value) {
-    builder.collectionPayload(value);
+  public TestLegacyMessageBuilder collectionValue(Object[] value) {
+    builder.collectionValue(value);
 
     return this;
   }
@@ -84,15 +91,21 @@ public class TestLegacyMessageBuilder implements Message.Builder {
   }
 
   @Override
-  public TestLegacyMessageBuilder nullAttributes() {
-    builder.nullAttributes();
+  public Message.Builder attributes(TypedValue<?> typedValue) {
+    builder.attributes(typedValue);
     return this;
   }
 
   @Override
-  public TestLegacyMessageBuilder attributes(Object value) {
+  public TestLegacyMessageBuilder nullAttributesValue() {
+    builder.nullAttributesValue();
+    return this;
+  }
+
+  @Override
+  public TestLegacyMessageBuilder attributesValue(Object value) {
     checkInternalState();
-    builder.attributes(value);
+    builder.attributesValue(value);
     return this;
   }
 

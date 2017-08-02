@@ -70,7 +70,7 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
     }
     DefaultComponentLocation componentLocation;
     Optional<TypedComponentIdentifier> typedComponentIdentifier =
-        of(builder().withIdentifier(componentModel.getIdentifier()).withType(resolveComponentType(componentModel)).build());
+        of(builder().identifier(componentModel.getIdentifier()).type(resolveComponentType(componentModel)).build());
     if (componentModel.isRoot()) {
       String componentModelNameAttribute = componentModel.getNameAttribute();
       ImmutableList<DefaultLocationPart> parts =
@@ -112,8 +112,8 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
         } else {
           // this is the case of the when element inside the choice
           componentLocation = parentComponentLocation.appendRoutePart()
-              .appendLocationPart(findNonProcessorPath(componentModel), of(TypedComponentIdentifier.builder().withType(UNKNOWN)
-                  .withIdentifier(ROUTE_COMPONENT_IDENTIFIER).build()), empty(), empty());
+              .appendLocationPart(findNonProcessorPath(componentModel), of(TypedComponentIdentifier.builder().type(UNKNOWN)
+                  .identifier(ROUTE_COMPONENT_IDENTIFIER).build()), empty(), empty());
         }
       } else if (isProcessor(componentModel)) {
         if (isModuleOperation(componentModel.getParent())) {
@@ -239,8 +239,8 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
     final String operationName = originalIdentifier.getName();
 
     final ComponentIdentifier operationIdentifier =
-        ComponentIdentifier.builder().withNamespace(namespace).withName(operationName).build();
-    return of(builder().withIdentifier(operationIdentifier).withType(OPERATION).build());
+        ComponentIdentifier.builder().namespace(namespace).name(operationName).build();
+    return of(builder().identifier(operationIdentifier).type(OPERATION).build());
   }
 
   /**

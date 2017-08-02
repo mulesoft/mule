@@ -154,7 +154,7 @@ public class SplitterTestCase extends AbstractMuleContextTestCase {
     }
 
     Message toSplit =
-        InternalMessage.builder().payload(payload).inboundProperties(inboundProps).outboundProperties(outboundProps).build();
+        InternalMessage.builder().value(payload).inboundProperties(inboundProps).outboundProperties(outboundProps).build();
     Splitter splitter = new Splitter();
     Grabber grabber = new Grabber();
     splitter.setMuleContext(muleContext);

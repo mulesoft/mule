@@ -89,30 +89,30 @@ public final class SoapOperationExecutor implements OperationExecutor {
    */
   private SoapRequest getRequest(ExecutionContext<OperationModel> context, Map<String, String> fixedHeaders)
       throws MessageTransformerException, MessagingException, TransformerException {
-    SoapRequestBuilder builder = SoapRequest.builder().withOperation(getOperation(context));
-    builder.withSoapHeaders(fixedHeaders);
+    SoapRequestBuilder builder = SoapRequest.builder().operation(getOperation(context));
+    builder.soapHeaders(fixedHeaders);
 
     Optional<Object> optionalMessageGroup = getParam(context, MESSAGE_GROUP);
     if (optionalMessageGroup.isPresent()) {
       Map<String, Object> message = (Map<String, Object>) optionalMessageGroup.get();
       InputStream body = (InputStream) message.get(BODY_PARAM);
       if (body != null) {
-        builder.withContent(body);
+        builder.content(body);
       }
 
       InputStream headers = (InputStream) message.get(HEADERS_PARAM);
       if (headers != null) {
-        builder.withSoapHeaders((Map<String, String>) evaluateHeaders(headers));
+        builder.soapHeaders((Map<String, String>) evaluateHeaders(headers));
       }
 
       Map<String, TypedValue<?>> attachments = (Map<String, TypedValue<?>>) message.get(ATTACHMENTS_PARAM);
       if (attachments != null) {
-        toSoapAttachments(attachments).forEach(builder::withAttachment);
+        toSoapAttachments(attachments).forEach(builder::attachment);
       }
     }
 
     getParam(context, TRANSPORT_HEADERS_PARAM)
-        .ifPresent(th -> builder.withTransportHeaders((Map<String, String>) th));
+        .ifPresent(th -> builder.transportHeaders((Map<String, String>) th));
     return builder.build();
   }
 

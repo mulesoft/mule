@@ -47,7 +47,7 @@ public class MessagePropertiesTestCase extends AbstractELTestCase {
   @Test
   public void inboundPropertyMap() throws Exception {
     event = Event.builder(context)
-        .message(InternalMessage.builder().payload("").inboundProperties(singletonMap("foo", "bar")).build())
+        .message(InternalMessage.builder().value("").inboundProperties(singletonMap("foo", "bar")).build())
         .build();
     assertTrue(evaluate("message.inboundProperties", event) instanceof Map);
   }
@@ -60,7 +60,7 @@ public class MessagePropertiesTestCase extends AbstractELTestCase {
   @Test
   public void inboundProperty() throws Exception {
     event = Event.builder(context)
-        .message(InternalMessage.builder().payload("").inboundProperties(singletonMap("foo", "bar")).build())
+        .message(InternalMessage.builder().value("").inboundProperties(singletonMap("foo", "bar")).build())
         .build();
     assertEquals("bar", evaluate("message.inboundProperties['foo']", event));
   }
@@ -68,7 +68,7 @@ public class MessagePropertiesTestCase extends AbstractELTestCase {
   @Test
   public void assignValueToInboundProperty() throws Exception {
     event = Event.builder(context)
-        .message(InternalMessage.builder().payload("").inboundProperties(singletonMap("foo", "bar")).build())
+        .message(InternalMessage.builder().value("").inboundProperties(singletonMap("foo", "bar")).build())
         .build();
     assertUnsupportedOperation("message.inboundProperties['foo']='bar'", event);
   }

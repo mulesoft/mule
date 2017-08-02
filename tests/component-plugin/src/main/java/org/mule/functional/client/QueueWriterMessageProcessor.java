@@ -44,7 +44,7 @@ public class QueueWriterMessageProcessor extends AbstractAnnotatedObject impleme
           .build();
     } else {
       Object payloadValue = attributeEvaluator.resolveTypedValue(event).getValue();
-      copy = Event.builder(event).message(Message.builder(event.getMessage()).payload(payloadValue).build())
+      copy = Event.builder(event).message(Message.builder(event.getMessage()).value(payloadValue).build())
           .session(new DefaultMuleSession(event.getSession()))
           // Queue works based on MuleEvent for testing purposes. A real operation
           // would not be aware of the error field and just the plain message would be sent.

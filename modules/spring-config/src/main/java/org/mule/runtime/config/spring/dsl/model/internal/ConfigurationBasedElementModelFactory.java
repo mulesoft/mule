@@ -607,8 +607,8 @@ class ConfigurationBasedElementModelFactory {
   private Optional<ComponentIdentifier> getIdentifier(DslElementSyntax dsl) {
     if (dsl.supportsTopLevelDeclaration() || dsl.supportsChildDeclaration()) {
       return Optional.of(builder()
-          .withName(dsl.getElementName())
-          .withNamespace(dsl.getPrefix())
+          .name(dsl.getElementName())
+          .namespace(dsl.getPrefix())
           .build());
     }
 
@@ -690,7 +690,7 @@ class ConfigurationBasedElementModelFactory {
   }
 
   private ComponentIdentifier newIdentifier(String name, String ns) {
-    return ComponentIdentifier.builder().withName(name).withNamespace(ns).build();
+    return ComponentIdentifier.builder().name(name).namespace(ns).build();
   }
 
   private DslElementModel newElementModel(ParameterModel paramModel, DslElementSyntax paramDsl,

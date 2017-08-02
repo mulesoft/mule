@@ -108,6 +108,6 @@ class ExtensionErrorsRegistrant {
   }
 
   private static ComponentIdentifier createIdentifier(String name, String namespace) {
-    return builder().withName(name).withNamespace(namespace).build();
+    return builder().name(name).namespace(namespace).build();
   }
 }

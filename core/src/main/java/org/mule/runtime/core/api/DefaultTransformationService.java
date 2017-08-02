@@ -150,7 +150,7 @@ public class DefaultTransformationService implements TransformationService {
     checkNotNull(message, "Message cannot be null");
     checkNotNull(outputDataType, "DataType cannot be null");
 
-    return Message.builder(message).payload(getPayload(message, outputDataType, resolveEncoding(message))).build();
+    return Message.builder(message).value(getPayload(message, outputDataType, resolveEncoding(message))).build();
   }
 
   /**
@@ -277,7 +277,7 @@ public class DefaultTransformationService implements TransformationService {
       // a new message instance. This issue goes away once transformers are cleaned up and always return event or
       // message. See MULE-9342
       Message messagePostTransform = (event != null && event.getMessage() != null) ? event.getMessage() : message;
-      return Message.builder(messagePostTransform).payload(result)
+      return Message.builder(messagePostTransform).value(result)
           .mediaType(mergeMediaType(messagePostTransform, transformer.getReturnDataType())).build();
     }
   }

@@ -11,10 +11,6 @@ import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.service.test.FooService;
-import org.mule.runtime.core.internal.client.DefaultLocalMuleClient;
-
-import javax.inject.Inject;
 
 @Extension(
     name = "Privileged",
@@ -27,7 +23,7 @@ public class PrivilegedExtension {
 
   public PrivilegedExtension() {
     // Moved to the constructor as same code in the operation does not show any error in the log
-    InternalMessage.builder().payload("privileged");
+    InternalMessage.builder().value("privileged");
   }
 
   public String getMessage() {

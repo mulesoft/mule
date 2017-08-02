@@ -123,7 +123,7 @@ public final class StreamingUtils {
   private static Event replacePayload(Event event, Object newPayload) {
     return Event.builder(event)
         .message(Message.builder(event.getMessage())
-            .payload(newPayload)
+            .value(newPayload)
             .build())
         .build();
   }

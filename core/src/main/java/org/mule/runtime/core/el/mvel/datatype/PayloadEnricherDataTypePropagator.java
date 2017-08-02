@@ -26,7 +26,7 @@ public class PayloadEnricherDataTypePropagator extends AbstractEnricherDataTypeP
       String assignmentVar = ((Assignment) node).getAssignmentVar();
 
       if (PAYLOAD.equals(assignmentVar) || MESSAGE_PAYLOAD.equals(assignmentVar)) {
-        builder.message(Message.builder(event.getMessage()).payload(typedValue.getValue())
+        builder.message(Message.builder(event.getMessage()).value(typedValue.getValue())
             .mediaType(typedValue.getDataType().getMediaType()).build());
         return true;
       }

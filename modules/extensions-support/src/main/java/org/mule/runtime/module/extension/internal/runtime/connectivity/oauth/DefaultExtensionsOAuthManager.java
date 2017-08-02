@@ -328,14 +328,14 @@ public class DefaultExtensionsOAuthManager implements Initialisable, Startable, 
       Event event = (Event) callbackContext.getParameter(DANCE_CALLBACK_EVENT_KEY)
           .orElseGet(() -> createEvent(state, config, flow));
 
-      event = Event.builder(event).message(Message.builder().payload(state).build()).build();
+      event = Event.builder(event).message(Message.builder().value(state).build()).build();
       runFlow(flow, event, config, "after");
     };
   }
 
   private Event createEvent(Object payload, OAuthConfig config, Flow flow) {
     return Event.builder(create(flow, fromSingleComponent(config.getOwnerConfigName())))
-        .message(Message.builder().payload(payload).build()).build();
+        .message(Message.builder().value(payload).build()).build();
   }
 
   private Event runFlow(Flow flow, Event event, OAuthConfig config, String callbackType) {

@@ -90,8 +90,8 @@ public class ModuleExceptionHandlerTestCase {
     when(operationModel.getErrorModels()).thenReturn(singleton(newError(CONNECTIVITY_ERROR_IDENTIFIER, ERROR_NAMESPACE).build()));
     ModuleExceptionHandler handler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository);
     typeRepository.addErrorType(builder()
-        .withName(CONNECTIVITY_ERROR_IDENTIFIER)
-        .withNamespace(ERROR_NAMESPACE)
+        .name(CONNECTIVITY_ERROR_IDENTIFIER)
+        .namespace(ERROR_NAMESPACE)
         .build(),
                                 typeRepository.getAnyErrorType());
 
