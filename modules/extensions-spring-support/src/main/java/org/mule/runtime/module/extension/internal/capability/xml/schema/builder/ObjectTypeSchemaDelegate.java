@@ -414,26 +414,25 @@ final class ObjectTypeSchemaDelegate {
     return abstractElement;
   }
 
-  private Optional<QName> resolveSubstitutionGroupFromString(String userConfiguredSubstitutionGroup) {
+  private QName resolveSubstitutionGroupFromString(String userConfiguredSubstitutionGroup) {
     String[] splittedSubstitutionGroup = userConfiguredSubstitutionGroup.split(":");
     if (splittedSubstitutionGroup.length == 2) {
       String namespacePrefix = splittedSubstitutionGroup[0];
       String substitutionComponent = splittedSubstitutionGroup[1];
       String namespaceUri = builder.getNamespaceUri(namespacePrefix);
       if (namespaceUri != null) {
-        return Optional.of(new QName(namespaceUri, substitutionComponent, namespacePrefix));
+        return new QName(namespaceUri, substitutionComponent, namespacePrefix);
       }
     }
-    return Optional.empty();
+    throw new IllegalArgumentException(userConfiguredSubstitutionGroup
+                                       + " is not a valid substitutionGrup. Prefix does not exist.");
   }
 
   private QName getAbstractElementSubstitutionGroup(DslElementSyntax typeDsl, Optional<DslElementSyntax> baseDsl) {
     QName substitutionGroup;
     //First check if the substitutionGroup was defined by the user
     if (!typeDsl.getSubstitutionGroup().isEmpty()) {
-      substitutionGroup = resolveSubstitutionGroupFromString(typeDsl.getSubstitutionGroup())
-          .orElseThrow(() -> new IllegalArgumentException(typeDsl.getSubstitutionGroup()
-              + " is not a valid substitutionGrup. Prefix does not exist."));
+      substitutionGroup = resolveSubstitutionGroupFromString(typeDsl.getSubstitutionGroup());
     } else if (baseDsl.isPresent()) {
       DslElementSyntax base = baseDsl.get();
       String abstractElementName = typeDsl.supportsTopLevelDeclaration() ? getGlobalAbstractName(base)
