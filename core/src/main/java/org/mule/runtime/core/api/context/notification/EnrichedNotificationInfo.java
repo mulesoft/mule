@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.core.api.context.notification;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
+
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.AnnotatedObject;
@@ -69,7 +72,7 @@ public class EnrichedNotificationInfo {
           return createInfo(messagingException.getEvent(), e, componentFromException(e));
         }
       } else {
-        notificationInfo = new EnrichedNotificationInfo(null, null, null,
+        notificationInfo = new EnrichedNotificationInfo(null, null, empty(),
                                                         null, null, null, e, new HashMap<>(), null, null);
         notificationInfo.event = event;
         return notificationInfo;
@@ -101,12 +104,13 @@ public class EnrichedNotificationInfo {
     return null;
   }
 
-  public EnrichedNotificationInfo(String uniqueId, String correlationId, GroupCorrelation groupCorrelation, Message message,
+  public EnrichedNotificationInfo(String uniqueId, String correlationId, Optional<GroupCorrelation> groupCorrelation,
+                                  Message message,
                                   Optional<Error> error, Object component, Exception exception,
                                   Map<String, TypedValue> variables, String originatingFlowName, FlowCallStack flowCallStack) {
     this.id = uniqueId;
     this.correlationId = correlationId;
-    this.groupCorrelation = groupCorrelation;
+    this.groupCorrelation = groupCorrelation != null ? groupCorrelation.orElse(null) : null;
     this.message = message;
     this.error = error;
     this.component = component;
@@ -124,8 +128,8 @@ public class EnrichedNotificationInfo {
     return correlationId;
   }
 
-  public GroupCorrelation getGroupCorrelation() {
-    return groupCorrelation;
+  public Optional<GroupCorrelation> getGroupCorrelation() {
+    return ofNullable(groupCorrelation);
   }
 
   public Message getMessage() {

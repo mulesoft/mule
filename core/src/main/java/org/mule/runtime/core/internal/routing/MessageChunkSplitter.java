@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.core.internal.routing;
 
+import static java.util.OptionalInt.of;
+import static org.mule.runtime.core.api.message.GroupCorrelation.of;
+
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
@@ -14,6 +17,7 @@ import org.mule.runtime.core.api.routing.RoutingException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * A router that breaks up the current message onto smaller parts and sends them to the same destination. The Destination service
@@ -65,7 +69,7 @@ public class MessageChunkSplitter extends AbstractSplitter {
       System.arraycopy(data, pos, buffer, 0, buffer.length);
       pos += len;
       final Event childEvent = Event.builder(event).message(Message.builder(message).value(buffer).build())
-          .groupCorrelation(new GroupCorrelation(parts, count)).build();
+          .groupCorrelation(Optional.of(of(count, parts))).build();
 
       messageParts.add(childEvent);
     }

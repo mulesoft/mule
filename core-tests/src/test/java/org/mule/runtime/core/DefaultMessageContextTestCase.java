@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.core;
 
+import static java.util.Optional.empty;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.Message.of;
+
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
@@ -18,6 +20,8 @@ import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+
+import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -72,7 +76,7 @@ public class DefaultMessageContextTestCase extends AbstractMuleTestCase {
   public void overrideCorrelationIdInContext() {
     final Message message = of(TEST_PAYLOAD);
     final Event event = Event.builder(executionContextWithCorrelation).message(message).flow(flow)
-        .groupCorrelation(new GroupCorrelation(null, null)).build();
+        .groupCorrelation(empty()).build();
 
     assertThat(event.getCorrelationId(), is(CUSTOM_CORRELATION_ID));
   }
@@ -82,7 +86,7 @@ public class DefaultMessageContextTestCase extends AbstractMuleTestCase {
     final Message message = of(TEST_PAYLOAD);
     final Event event =
         Event.builder(executionContextWithCorrelation).message(message).correlationId(CUSTOM_CORRELATION_ID).flow(flow)
-            .groupCorrelation(new GroupCorrelation(null, 6)).build();
+            .groupCorrelation(Optional.of(GroupCorrelation.of(6))).build();
 
     assertThat(event.getCorrelationId(), is(CUSTOM_CORRELATION_ID));
   }

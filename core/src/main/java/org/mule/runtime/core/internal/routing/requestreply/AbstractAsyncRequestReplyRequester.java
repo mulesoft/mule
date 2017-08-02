@@ -101,8 +101,8 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
 
   private void addLock(Event event) {
     String correlationId = getAsyncReplyCorrelationId(event);
-    locks.put(correlationId, new RequestReplyLatch(event.getGroupCorrelation().getGroupSize().orElse(-1),
-                                                   event.getGroupCorrelation().getSequence().orElse(-1)));
+    locks.put(correlationId, new RequestReplyLatch(event.getGroupCorrelation().map(gc -> gc.getGroupSize().orElse(-1)).orElse(-1),
+                                                   event.getGroupCorrelation().map(gc -> gc.getSequence()).orElse(-1)));
   }
 
   private Latch getLatch(String correlationId) {

@@ -6,6 +6,7 @@
  */
 package org.mule.functional.api.flow;
 
+import static java.util.Optional.ofNullable;
 import static org.mockito.Mockito.spy;
 import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR_LOCATION;
 
@@ -26,6 +27,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.function.Function;
 
 import javax.activation.DataHandler;
@@ -48,7 +50,7 @@ public class TestEventBuilder {
   private Map<String, Object> sessionProperties = new HashMap<>();
 
   private String sourceCorrelationId = null;
-  private GroupCorrelation correlation = new GroupCorrelation(null, null);
+  private GroupCorrelation groupCorrelation;
 
   private Map<String, TypedValue> variables = new HashMap<>();
 
@@ -185,8 +187,8 @@ public class TestEventBuilder {
    *
    * @return this {@link TestEventBuilder}
    */
-  public TestEventBuilder withCorrelation(GroupCorrelation correlation) {
-    this.correlation = correlation;
+  public TestEventBuilder withCorrelation(GroupCorrelation groupCorrelation) {
+    this.groupCorrelation = groupCorrelation;
 
     return this;
   }
@@ -276,7 +278,7 @@ public class TestEventBuilder {
     }
 
     Event.Builder builder = Event.builder(eventContext)
-        .message(spyMessage.apply(muleMessage)).groupCorrelation(correlation)
+        .message(spyMessage.apply(muleMessage)).groupCorrelation(ofNullable(groupCorrelation))
         .flow(flow).replyToHandler(replyToHandler);
     for (Entry<String, TypedValue> variableEntry : variables.entrySet()) {
       builder.addVariable(variableEntry.getKey(), variableEntry.getValue().getValue(), variableEntry.getValue().getDataType());

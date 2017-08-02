@@ -183,12 +183,11 @@ public class SplitterTestCase extends AbstractMuleContextTestCase {
       Message msg = event.getMessage();
       assertTrue(msg.getPayload().getValue() instanceof String);
       if (counted) {
-        assertThat(event.getGroupCorrelation().getGroupSize().get(), is(count));
+        assertThat(event.getGroupCorrelation().get().getGroupSize().getAsInt(), is(count));
       } else {
-        assertThat(event.getGroupCorrelation().getGroupSize().isPresent(), is(false));
+        assertThat(event.getGroupCorrelation().get().getGroupSize().isPresent(), is(false));
       }
-      actualSequences.add(event.getGroupCorrelation().getSequence().get());
-      // actualSequences.add(msg.getCorrelation().getSequence().get());
+      actualSequences.add(event.getGroupCorrelation().get().getSequence());
       String str = (String) msg.getPayload().getValue();
       assertTrue(TEST_LIST_MULTIPLE.contains(str));
       for (String key : inboundProps.keySet()) {

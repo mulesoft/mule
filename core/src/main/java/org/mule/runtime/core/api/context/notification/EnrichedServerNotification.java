@@ -51,7 +51,7 @@ public abstract class EnrichedServerNotification extends ServerNotification {
     return notificationInfo.getCorrelationId();
   }
 
-  public GroupCorrelation getGroupCorrelation() {
+  public Optional<GroupCorrelation> getGroupCorrelation() {
     return notificationInfo.getGroupCorrelation();
   }
 

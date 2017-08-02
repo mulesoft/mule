@@ -221,7 +221,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
 
   private String getEventKey(Event event) {
     StringBuilder stringBuilder = new StringBuilder();
-    event.getGroupCorrelation().getSequence().ifPresent(v -> stringBuilder.append(v + DASH));
+    event.getGroupCorrelation().ifPresent(v -> stringBuilder.append(v.getSequence() + DASH));
     stringBuilder.append(event.hashCode());
     stringBuilder.append(DASH);
     stringBuilder.append(event.getContext().getId());

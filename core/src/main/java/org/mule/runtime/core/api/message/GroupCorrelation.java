@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.core.api.message;
 
-import static java.util.Optional.ofNullable;
+import static java.util.OptionalInt.empty;
 
 import org.mule.runtime.api.message.Message;
 
 import java.io.Serializable;
-import java.util.Optional;
+import java.util.OptionalInt;
 
 /**
  * Immutable container for correlation properties relative to a {@link Message}.
@@ -21,22 +21,28 @@ import java.util.Optional;
 public class GroupCorrelation implements Serializable {
 
   private static final long serialVersionUID = -5687080761804624442L;
-
   public static final String NOT_SET = "<not set>";
-  public static final GroupCorrelation NO_CORRELATION = new GroupCorrelation(null, null);
 
-  private final Integer groupSize;
-  private final Integer sequence;
+  private final int sequence;
+  private final int groupSize;
+
+  public static GroupCorrelation of(int sequence) {
+    return new GroupCorrelation(sequence, empty());
+  }
+
+  public static GroupCorrelation of(int sequence, int groupSize) {
+    return new GroupCorrelation(sequence, OptionalInt.of(groupSize));
+  }
 
   /**
    * Builds a new {@link GroupCorrelation} with the given parameters.
-   * 
-   * @param groupSize see {@link #getGroupSize()}.
+   *
    * @param sequence see {@link #getSequence()}.
+   * @param groupSize see {@link #getGroupSize()}.
    */
-  public GroupCorrelation(Integer groupSize, Integer sequence) {
-    this.groupSize = groupSize;
+  private GroupCorrelation(int sequence, OptionalInt groupSize) {
     this.sequence = sequence;
+    this.groupSize = groupSize.orElse(-1);
   }
 
   /**
@@ -44,8 +50,8 @@ public class GroupCorrelation implements Serializable {
    *
    * @return the sequence number or null value if the sequence is not important
    */
-  public Optional<Integer> getSequence() {
-    return ofNullable(sequence);
+  public int getSequence() {
+    return sequence;
   }
 
   /**
@@ -53,8 +59,8 @@ public class GroupCorrelation implements Serializable {
    *
    * @return total messages in this group or null value if the size is not known
    */
-  public Optional<Integer> getGroupSize() {
-    return ofNullable(groupSize);
+  public OptionalInt getGroupSize() {
+    return groupSize > 0 ? OptionalInt.of(groupSize) : empty();
   }
 
   @Override
@@ -63,8 +69,8 @@ public class GroupCorrelation implements Serializable {
 
     // format message for multi-line output, single-line is not readable
     buf.append("{");
-    buf.append("; groupSize=").append(getGroupSize().map(v -> v.toString()).orElse(NOT_SET));
-    buf.append("; sequence=").append(getSequence().map(v -> v.toString()).orElse(NOT_SET));
+    buf.append("sequence=").append(getSequence());
+    buf.append("; groupSize=").append(getGroupSize().isPresent() ? getGroupSize().getAsInt() : NOT_SET);
     buf.append('}');
     return buf.toString();
   }

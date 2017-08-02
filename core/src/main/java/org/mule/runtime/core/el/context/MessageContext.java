@@ -49,11 +49,11 @@ public class MessageContext {
   }
 
   public int getCorrelationSequence() {
-    return event.getGroupCorrelation().getSequence().orElse(-1);
+    return event.getGroupCorrelation().map(gc -> gc.getSequence()).orElse(-1);
   }
 
   public int getCorrelationGroupSize() {
-    return event.getGroupCorrelation().getSequence().orElse(-1);
+    return event.getGroupCorrelation().map(gc -> gc.getGroupSize().orElse(-1)).orElse(-1);
   }
 
   public DataType getDataType() {

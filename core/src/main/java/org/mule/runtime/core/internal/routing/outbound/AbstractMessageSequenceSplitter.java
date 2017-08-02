@@ -29,6 +29,7 @@ import org.mule.runtime.core.api.routing.MessageSequence;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -106,7 +107,8 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
         builder.addVariable(counterVariableName, correlationSequence);
       }
 
-      builder.groupCorrelation(new GroupCorrelation(count, correlationSequence));
+      builder.groupCorrelation(Optional
+          .of(count != null ? GroupCorrelation.of(correlationSequence, count) : GroupCorrelation.of(correlationSequence)));
       initEventBuilder(messageSequence.next(), originalEvent, builder, resolvePropagatedFlowVars(lastResult));
 
       try {

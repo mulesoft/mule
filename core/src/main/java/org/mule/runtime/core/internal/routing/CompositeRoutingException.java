@@ -32,7 +32,7 @@ public class CompositeRoutingException extends MuleException {
 
   private static final long serialVersionUID = -4421728527040579607L;
 
-  private final Map<Integer, Throwable> exceptions;
+  private final Map<String, Throwable> exceptions;
 
   /**
    * Constructs a new {@link CompositeRoutingException}
@@ -41,12 +41,12 @@ public class CompositeRoutingException extends MuleException {
    * @param exceptions a {@link Map} in which the key is an {@link Integer} describing the index of the route that generated the
    *        error and the value is the {@link Throwable} itself
    */
-  public CompositeRoutingException(I18nMessage message, Map<Integer, Throwable> exceptions) {
+  public CompositeRoutingException(I18nMessage message, Map<String, Throwable> exceptions) {
     super(message);
     this.exceptions = Collections.unmodifiableMap(exceptions);
   }
 
-  public CompositeRoutingException(Map<Integer, Throwable> exceptions) {
+  public CompositeRoutingException(Map<String, Throwable> exceptions) {
     this(buildExceptionMessage(exceptions), exceptions);
   }
 
@@ -56,15 +56,15 @@ public class CompositeRoutingException extends MuleException {
    * @param index the index of a failing route
    * @return an {@link Exception} or <code>null</code> if no {@link Exception} was found for that index
    */
-  public Throwable getExceptionForRouteIndex(Integer index) {
-    return this.exceptions.get(index);
+  public Throwable getExceptionForRouteIndex(int index) {
+    return this.exceptions.get(Integer.toString(index));
   }
 
   /**
    * @return a {@link Map} in which the key is an {@link Integer} describing the number of the route that generated the error and
    *         the value is the {@link Exception} itself
    */
-  public Map<Integer, Throwable> getExceptions() {
+  public Map<String, Throwable> getExceptions() {
     return this.exceptions;
   }
 
@@ -73,7 +73,7 @@ public class CompositeRoutingException extends MuleException {
     StringBuilder builder = new StringBuilder();
     builder.append(MESSAGE_TITLE).append(lineSeparator());
 
-    for (Entry<Integer, Throwable> entry : getExceptions().entrySet()) {
+    for (Entry<String, Throwable> entry : getExceptions().entrySet()) {
       String routeSubtitle = String.format("Route %d:", entry.getKey());
       MuleException muleException = ExceptionHelper.getRootMuleException(entry.getValue());
       if (muleException != null) {
@@ -85,9 +85,9 @@ public class CompositeRoutingException extends MuleException {
     return builder.toString();
   }
 
-  private static I18nMessage buildExceptionMessage(Map<Integer, Throwable> exceptions) {
+  private static I18nMessage buildExceptionMessage(Map<String, Throwable> exceptions) {
     StringBuilder builder = new StringBuilder();
-    for (Integer route : exceptions.keySet()) {
+    for (String route : exceptions.keySet()) {
       Throwable routeException = exceptions.get(route);
       builder.append(lineSeparator() + "\t").append(route).append(": ")
           .append(routeException.getCause() != null ? routeException.getCause().getMessage() : routeException.getMessage());
