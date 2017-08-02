@@ -6,6 +6,7 @@
  */
 package org.mule.test.infrastructure.process.rules;
 
+import static org.apache.commons.lang3.ArrayUtils.addAll;
 import static org.mule.runtime.module.repository.internal.RepositoryServiceFactory.MULE_REMOTE_REPOSITORIES_PROPERTY;
 import static org.mule.test.infrastructure.process.MuleStatusProbe.isNotRunning;
 import static com.jayway.awaitility.Awaitility.await;
@@ -94,6 +95,7 @@ public class MuleDeployment extends MuleInstallation {
   private MuleProcessController mule;
   private Map<String, String> properties = new HashMap<>();
   private Map<String, Supplier<String>> propertiesUsingLambdas = new HashMap<>();
+  private List<String> parameters = new ArrayList<>();
 
   private final Thread shutdownHookThread = new Thread(this::after);
 
@@ -142,7 +144,7 @@ public class MuleDeployment extends MuleInstallation {
     }
 
     /**
-     * Specifies a system property to be passed in the command line when starting Mule that need to be resolved in the before() of the MuleDeployment rule.
+     * Specifies a system property to be passed in the command line when starting Mule that needs to be resolved in the before() of the MuleDeployment rule.
      *
      * @param property
      * @param propertySupplier
@@ -161,6 +163,18 @@ public class MuleDeployment extends MuleInstallation {
      */
     public Builder withProperties(Map<String, String> properties) {
       deployment.properties.putAll(properties);
+      return this;
+    }
+
+    /**
+     * Specifies parameters to be passed in the command line when starting Mule.
+     * As opposed to a property, a parameter is something that will be passed "as-is" and not in a key-value pair format.
+     *
+     * @param parameters
+     * @return
+     */
+    public Builder withParameters(String... parameters) {
+      Collections.addAll(deployment.parameters, parameters);
       return this;
     }
 
@@ -233,6 +247,10 @@ public class MuleDeployment extends MuleInstallation {
     return values.toArray(new String[0]);
   }
 
+  private String[] toArray(List<String> parameters) {
+    return parameters.toArray(new String[0]);
+  }
+
   @Override
   public Statement apply(final Statement base, final Description description) {
     location = description.getTestClass().getSimpleName() + locationSuffix;
@@ -290,7 +308,7 @@ public class MuleDeployment extends MuleInstallation {
         mule.addConfProperty(format("-D%s=%s", MULE_REMOTE_REPOSITORIES_PROPERTY, REMOTE_REPOSITORIES));
       }
       resolvePropertiesUsingLambdas();
-      mule.start(toArray(properties));
+      mule.start(addAll(toArray(parameters), toArray(properties)));
       domains.forEach((domain) -> checkDomainIsDeployed(getName(domain)));
       applications.forEach((application) -> checkAppIsDeployed(getName(application)));
       logger.info("Deployment successful");
