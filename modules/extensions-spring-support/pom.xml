@@ -208,6 +208,13 @@
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
+            <artifactId>mule-substitution-group-extension</artifactId>
+            <version>4.0.0-SNAPSHOT</version>
+            <classifier>mule-plugin</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.tests</groupId>
             <artifactId>mule-test-oauth-extension</artifactId>
             <version>${project.version}</version>
             <classifier>mule-plugin</classifier>
@@ -365,16 +372,6 @@
             <version>${project.version}</version>
             <classifier>mule-plugin</classifier>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.tests</groupId>
-            <artifactId>mule-substitution-group-extension</artifactId>
-            <version>4.0.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.tests</groupId>
-            <artifactId>mule-substitution-group-extension</artifactId>
-            <version>4.0.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 </project>
