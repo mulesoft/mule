@@ -316,7 +316,7 @@
                     <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="description"></xs:element>
                     <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="brand-name"></xs:element>
                   </xs:sequence>
-                  <xs:attribute type="mule:expressionInt" use="optional" name="weight"></xs:attribute>
+                  <xs:attribute type="mule:expressionDecimal" use="optional" name="weight"></xs:attribute>
                 </xs:extension>
               </xs:complexContent>
             </xs:complexType>

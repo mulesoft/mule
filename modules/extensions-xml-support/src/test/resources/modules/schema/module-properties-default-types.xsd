@@ -13,12 +13,12 @@
             <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="0" maxOccurs="1" ref="extension:dynamic-config-policy"></xs:element>
           </xs:sequence>
           <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
-          <xs:attribute type="mule:expressionInt" use="optional" default="11" name="integerParam"></xs:attribute>
+          <xs:attribute type="mule:expressionDecimal" use="optional" default="11" name="integerParam"></xs:attribute>
           <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="booleanParam"></xs:attribute>
           <xs:attribute type="mule:expressionDateTime" use="optional" default="1959-09-07T00:00:00" name="dateParam"></xs:attribute>
           <xs:attribute type="mule:expressionDateTime" use="optional" default="1959-09-07T00:00:00" name="datetimeParam"></xs:attribute>
           <xs:attribute type="mule:expressionString" use="optional" default="hello world" name="stringParam"></xs:attribute>
-          <xs:attribute type="mule:expressionDateTime" use="optional" default="1959-09-07T00:00:00" name="timeParam"></xs:attribute>
+          <xs:attribute type="xs:string" use="optional" default="1959-09-07T00:00:00" name="timeParam"></xs:attribute>
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>
