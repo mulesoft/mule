@@ -41,7 +41,7 @@ public class ExtensionTransactionalResource<T extends TransactionalConnection> i
    * {@inheritDoc}
    */
   @Override
-  public void begin() throws Exception {
+  public void begin() throws TransactionException {
     connection.begin();
   }
 
@@ -49,7 +49,7 @@ public class ExtensionTransactionalResource<T extends TransactionalConnection> i
    * {@inheritDoc}
    */
   @Override
-  public void commit() throws Exception {
+  public void commit() throws TransactionException {
     try {
       connection.commit();
     } finally {
@@ -61,7 +61,7 @@ public class ExtensionTransactionalResource<T extends TransactionalConnection> i
    * {@inheritDoc}
    */
   @Override
-  public void rollback() throws Exception {
+  public void rollback() throws TransactionException {
     try {
       connection.rollback();
     } finally {

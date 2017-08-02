@@ -7,6 +7,7 @@
 package org.mule.test.petstore.extension;
 
 import org.mule.runtime.api.tls.TlsContextFactory;
+import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 
 import java.time.LocalDateTime;
@@ -24,17 +25,17 @@ public class TransactionalPetStoreClient extends PetStoreClient implements Trans
   }
 
   @Override
-  public void begin() throws Exception {
+  public void begin() throws TransactionException {
     begun = true;
   }
 
   @Override
-  public void commit() throws Exception {
+  public void commit() throws TransactionException {
     commited = true;
   }
 
   @Override
-  public void rollback() throws Exception {
+  public void rollback() throws TransactionException {
     rolledback = true;
   }
 

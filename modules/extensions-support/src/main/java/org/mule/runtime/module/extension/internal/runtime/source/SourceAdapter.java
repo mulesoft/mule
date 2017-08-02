@@ -9,19 +9,20 @@ package org.mule.runtime.module.extension.internal.runtime.source;
 import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
-import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.extension.api.ExtensionConstants.TRANSACTIONAL_ACTION_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.tx.SourceTransactionalAction.NONE;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldsOfType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getSourceName;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.withAnnotation;
+import static org.slf4j.LoggerFactory.getLogger;
+import static reactor.core.publisher.Mono.from;
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.connection.ConnectionHandler;
+import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -30,13 +31,10 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
+import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.connector.ConnectionManager;
-import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
@@ -45,10 +43,8 @@ import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
-import org.mule.runtime.extension.api.runtime.FlowInfo;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
-import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.extension.api.tx.SourceTransactionalAction;
 import org.mule.runtime.extension.internal.property.TransactionalActionModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
@@ -70,6 +66,7 @@ import javax.inject.Inject;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
 
 /**
  * An adapter for {@link Source} which acts as a bridge with {@link ExtensionMessageSource}. It also propagates lifecycle and
@@ -77,26 +74,23 @@ import org.reactivestreams.Publisher;
  *
  * @since 4.0
  */
-public final class SourceAdapter implements Startable, Stoppable, Initialisable, FlowConstructAware {
+public final class SourceAdapter implements Startable, Stoppable, Initialisable {
+
+  private static final Logger LOGGER = getLogger(SourceAdapter.class);
 
   private final ExtensionModel extensionModel;
   private final SourceModel sourceModel;
   private final Source source;
   private final Optional<ConfigurationInstance> configurationInstance;
   private final Optional<FieldSetter<Object, Object>> configurationSetter;
-  private final Optional<FieldSetter<Object, Object>> connectionSetter;
+  private final Optional<FieldSetter<Object, ConnectionProvider>> connectionSetter;
   private final SourceCallbackFactory sourceCallbackFactory;
   private final CursorProviderFactory cursorProviderFactory;
   private final ResolverSet nonCallbackParameters;
   private final ResolverSet successCallbackParameters;
   private final ResolverSet errorCallbackParameters;
-
-  private ConnectionHandler<Object> connectionHandler;
-  private FlowConstruct flowConstruct;
-  private ComponentLocation componentLocation;
-
-  @Inject
-  private ConnectionManager connectionManager;
+  private final ComponentLocation componentLocation;
+  private final SourceConnectionManager connectionManager;
 
   @Inject
   private StreamingManager streamingManager;
@@ -109,6 +103,8 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable,
                        Optional<ConfigurationInstance> configurationInstance,
                        CursorProviderFactory cursorProviderFactory,
                        SourceCallbackFactory sourceCallbackFactory,
+                       ComponentLocation componentLocation,
+                       SourceConnectionManager connectionManager,
                        ResolverSet nonCallbackParameters,
                        ResolverSet successCallbackParameters,
                        ResolverSet errorCallbackParameters) {
@@ -118,11 +114,13 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable,
     this.cursorProviderFactory = cursorProviderFactory;
     this.configurationInstance = configurationInstance;
     this.sourceCallbackFactory = sourceCallbackFactory;
+    this.componentLocation = componentLocation;
+    this.connectionManager = connectionManager;
     this.nonCallbackParameters = nonCallbackParameters;
     this.successCallbackParameters = successCallbackParameters;
     this.errorCallbackParameters = errorCallbackParameters;
-    this.configurationSetter = fetchField(Config.class);
-    this.connectionSetter = fetchField(Connection.class);
+    this.configurationSetter = fetchConfigurationField();
+    this.connectionSetter = fetchConnectionProviderField();
   }
 
   private SourceCallback createSourceCallback() {
@@ -148,7 +146,6 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable,
                                                                                          sourceModel, source, m,
                                                                                          cursorProviderFactory,
                                                                                          streamingManager,
-                                                                                         (Flow) flowConstruct,
                                                                                          componentLocation,
                                                                                          muleContext,
                                                                                          sourceCallbackModel))
@@ -167,13 +164,13 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable,
 
     private final SourceCallbackExecutor onSuccessExecutor;
     private final SourceCallbackExecutor onErrorExecutor;
-    private final SourceCallbackContext context;
+    private final SourceCallbackContextAdapter context;
     private final SourceCallbackExecutor onTerminateExecutor;
 
     public DefaultSourceCompletionHandler(SourceCallbackExecutor onSuccessExecutor,
                                           SourceCallbackExecutor onErrorExecutor,
                                           SourceCallbackExecutor onTerminateExecutor,
-                                          SourceCallbackContext context) {
+                                          SourceCallbackContextAdapter context) {
       this.onSuccessExecutor = onSuccessExecutor;
       this.onErrorExecutor = onErrorExecutor;
       this.onTerminateExecutor = onTerminateExecutor;
@@ -182,18 +179,43 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable,
 
     @Override
     public Publisher<Void> onCompletion(Event event, Map<String, Object> parameters) {
-      return onSuccessExecutor.execute(event, parameters, context);
+      return from(onSuccessExecutor.execute(event, parameters, context)).doOnSuccess(v -> commit());
     }
 
     @Override
     public Publisher<Void> onFailure(MessagingException exception, Map<String, Object> parameters) {
-      return onErrorExecutor.execute(exception.getEvent(), parameters, context);
+      return from(onErrorExecutor.execute(exception.getEvent(), parameters, context))
+          .doAfterTerminate((v, e) -> rollback());
     }
 
     @Override
     public void onTerminate(Either<MessagingException, Event> result) throws Exception {
       Event event = result.isRight() ? result.getRight() : result.getLeft().getEvent();
-      onTerminateExecutor.execute(event, emptyMap(), context);
+      from(onTerminateExecutor.execute(event, emptyMap(), context))
+          .doAfterTerminate((v, e) -> context.releaseConnection())
+          .subscribe();
+    }
+
+    private void commit() {
+      try {
+        context.getTransactionHandle().commit();
+      } catch (TransactionException e) {
+        LOGGER.error(format("Failed to commit transaction for message source at '%s': %s",
+                            componentLocation.toString(),
+                            e.getMessage()),
+                     e);
+      }
+    }
+
+    private void rollback() {
+      try {
+        context.getTransactionHandle().rollback();
+      } catch (TransactionException e) {
+        LOGGER.error(format("Failed to rollback transaction for message source at '%s': %s",
+                            componentLocation.toString(),
+                            e.getMessage()),
+                     e);
+      }
     }
 
     @Override
@@ -219,7 +241,7 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable,
 
   @Override
   public void start() throws MuleException {
-    injectFlowInfo();
+    injectComponentLocation();
 
     try {
       setConfiguration(configurationInstance);
@@ -231,15 +253,14 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable,
     }
   }
 
-  private void injectFlowInfo() {
-    // FlowInfoModelValidator assures that there's at most one field
-    List<Field> fields = getFieldsOfType(source.getClass(), FlowInfo.class);
+  private void injectComponentLocation() {
+    // ComponentLocationModelValidator assures that there's at most one field
+    List<Field> fields = getFieldsOfType(source.getClass(), ComponentLocation.class);
     if (fields.isEmpty()) {
       return;
     }
 
-    new FieldSetter<>(fields.get(0)).set(source, new ImmutableFlowInfo(flowConstruct.getName(),
-                                                                       ((Flow) flowConstruct).getMaxConcurrency()));
+    new FieldSetter<>(fields.get(0)).set(source, componentLocation);
   }
 
   @Override
@@ -248,8 +269,6 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable,
       source.onStop();
     } catch (Exception e) {
       throw new DefaultMuleException(e);
-    } finally {
-      releaseConnection();
     }
   }
 
@@ -259,39 +278,53 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable,
     }
   }
 
-  private void setConnection() {
-    if (connectionSetter.isPresent() && configurationInstance.isPresent()) {
-      try {
-        connectionHandler = connectionManager.getConnection(configurationInstance.get().getValue());
-        connectionSetter.get().set(source, connectionHandler.getConnection());
-      } catch (ConnectionException e) {
-        throw new MuleRuntimeException(createStaticMessage(format(
-                                                                  "Could not obtain connection for message source '%s' on flow '%s'",
-                                                                  getName(), flowConstruct.getName())),
-                                       e);
-      }
+  private void setConnection() throws MuleException {
+    if (!connectionSetter.isPresent()) {
+      return;
     }
+
+    FieldSetter<Object, ConnectionProvider> setter = connectionSetter.get();
+    ConfigurationInstance config = configurationInstance.orElseThrow(() -> new DefaultMuleException(createStaticMessage(
+                                                                                                                        "Message Source on Flow '%s' requires a connection but it doesn't point to any configuration. Please review your "
+                                                                                                                            + "application",
+                                                                                                                        componentLocation
+                                                                                                                            .getRootContainerName())));
+
+    if (!config.getConnectionProvider().isPresent()) {
+      throw new DefaultMuleException(createStaticMessage(format(
+                                                                "Message Source on Flow '%s' requires a connection, but points to config '%s' which doesn't specify any. "
+                                                                    + "Please review your application",
+                                                                componentLocation.getRootContainerName(), config.getName())));
+    }
+
+    ConnectionProvider<Object> connectionProvider = new SourceConnectionProvider(connectionManager, config);
+    setter.set(source, connectionProvider);
   }
 
   Optional<ConfigurationInstance> getConfigurationInstance() {
     return configurationInstance;
   }
 
-  Optional<ConnectionHandler> getConnectionHandler() {
-    return ofNullable(connectionHandler);
+  private <T> Optional<FieldSetter<Object, T>> fetchConfigurationField() {
+    return fetchField(Config.class).map(FieldSetter::new);
   }
 
-  private void releaseConnection() {
-    if (connectionHandler != null) {
-      try {
-        connectionHandler.release();
-      } finally {
-        connectionHandler = null;
+  private <T> Optional<FieldSetter<Object, T>> fetchConnectionProviderField() {
+    return fetchField(Connection.class).map(field -> {
+      if (!ConnectionProvider.class.equals(field.getType())) {
+        throw new IllegalModelDefinitionException(format(
+                                                         "Message Source defined on class '%s' has field '%s' of type '%s' annotated with @%s. That annotation can only be "
+                                                             + "used on fields of type '%s'",
+                                                         source.getClass().getName(), field.getName(), field.getType().getName(),
+                                                         Connection.class.getName(),
+                                                         ConnectionProvider.class.getName()));
       }
-    }
+
+      return new FieldSetter<>(field);
+    });
   }
 
-  private <T> Optional<FieldSetter<Object, T>> fetchField(Class<? extends Annotation> annotation) {
+  private Optional<Field> fetchField(Class<? extends Annotation> annotation) {
     Set<Field> fields = getAllFields(source.getClass(), withAnnotation(annotation));
     if (CollectionUtils.isEmpty(fields)) {
       return empty();
@@ -306,7 +339,7 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable,
                                                        annotation.getSimpleName()));
     }
 
-    return Optional.of(new FieldSetter<>(fields.iterator().next()));
+    return Optional.of(fields.iterator().next());
   }
 
   public String getName() {
@@ -319,6 +352,10 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable,
 
   public SourceTransactionalAction getTransactionalAction() {
     ValueResolver valueResolver = nonCallbackParameters.getResolvers().get(getTransactionalActionFieldName());
+    if (valueResolver == null) {
+      return NONE;
+    }
+
     Object transactionalAction;
 
     try {
@@ -341,14 +378,5 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable,
         .map(param -> param.getModelProperty(DeclaringMemberModelProperty.class).get())
         .findAny()
         .map(modelProperty -> modelProperty.getDeclaringField().getName()).orElse(TRANSACTIONAL_ACTION_PARAMETER_NAME);
-  }
-
-  @Override
-  public void setFlowConstruct(FlowConstruct flowConstruct) {
-    this.flowConstruct = flowConstruct;
-  }
-
-  public void setComponentLocation(ComponentLocation componentLocation) {
-    this.componentLocation = componentLocation;
   }
 }

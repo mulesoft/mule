@@ -9,18 +9,15 @@ package org.mule.runtime.module.extension.internal.runtime.source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 
 /**
- * A factory to create a {@link SourceCompletionHandler} associated to a {@link SourceCallbackContext}
+ * Augments the {@link SourceCallbackContext} contract with internal behavior we don't want exposed
+ * on the public API
  *
  * @since 4.0
  */
-@FunctionalInterface
-public interface SourceCompletionHandlerFactory {
+public interface SourceCallbackContextAdapter extends SourceCallbackContext {
 
   /**
-   * Creates a new {@link SourceCompletionHandler}
-   *
-   * @param context a {@link SourceCallbackContext}
-   * @return a new {@link SourceCompletionHandler}
+   * Releases the bound connection
    */
-  SourceCompletionHandler createCompletionHandler(SourceCallbackContextAdapter context);
+  void releaseConnection();
 }

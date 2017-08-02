@@ -18,6 +18,7 @@ import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatu
 import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatus.ERROR_INVOKE;
 import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatus.NONE;
 import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatus.SUCCESS;
+import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -52,24 +53,6 @@ public class HeisenbergSource extends Source<String, Object> {
   public static final String CORE_POOL_SIZE_ERROR_MESSAGE = "corePoolSize cannot be a negative value";
   public static final String INITIAL_BATCH_NUMBER_ERROR_MESSAGE = "initialBatchNumber cannot be a negative value";
 
-  @Inject
-  private SchedulerService schedulerService;
-
-  private Scheduler executor;
-  private ScheduledFuture<?> scheduledFuture;
-
-  @Config
-  private HeisenbergExtension heisenberg;
-
-  @Connection
-  private HeisenbergConnection connection;
-
-  @Parameter
-  private volatile int initialBatchNumber;
-
-  @Parameter
-  @Optional(defaultValue = "1")
-  private int corePoolSize;
   public static boolean receivedGroupOnSource;
   public static boolean receivedInlineOnSuccess;
   public static boolean receivedInlineOnError;
@@ -81,6 +64,27 @@ public class HeisenbergSource extends Source<String, Object> {
   public static boolean executedOnError;
   public static boolean executedOnTerminate;
   public static long gatheredMoney;
+
+  @Inject
+  private SchedulerService schedulerService;
+
+  private Scheduler executor;
+  private ScheduledFuture<?> scheduledFuture;
+
+  @Config
+  private HeisenbergExtension heisenberg;
+
+  @Connection
+  private ConnectionProvider<HeisenbergConnection> connectionProvider;
+
+  @Parameter
+  private volatile int initialBatchNumber;
+
+  @Parameter
+  @Optional(defaultValue = "1")
+  private int corePoolSize;
+
+  private HeisenbergConnection connection;
 
   public HeisenbergSource() {
     receivedGroupOnSource = false;
@@ -105,6 +109,7 @@ public class HeisenbergSource extends Source<String, Object> {
     }
 
     executor = schedulerService.cpuLightScheduler();
+    connection = connectionProvider.connect();
     scheduledFuture = executor.scheduleAtFixedRate(() -> sourceCallback.handle(makeResult(sourceCallback)), 0, 300, MILLISECONDS);
   }
 
@@ -163,6 +168,11 @@ public class HeisenbergSource extends Source<String, Object> {
       scheduledFuture.cancel(true);
       executor.stop();
     }
+
+    if (connection != null) {
+      connectionProvider.disconnect(connection);
+    }
+
     receivedGroupOnSource = false;
     gatheredMoney = 0;
   }
@@ -177,7 +187,7 @@ public class HeisenbergSource extends Source<String, Object> {
         .build();
   }
 
-  public static enum TerminateStatus {
+  public enum TerminateStatus {
     SUCCESS, ERROR_INVOKE, ERROR_BODY, NONE
   }
 }

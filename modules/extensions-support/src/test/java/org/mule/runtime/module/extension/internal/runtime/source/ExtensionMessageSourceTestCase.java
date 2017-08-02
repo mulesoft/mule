@@ -46,6 +46,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.m
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.setRequires;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.java.api.JavaTypeLoader;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -138,10 +139,10 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
   private TransactionConfig transactionConfig;
 
   @Mock
-  Scheduler ioScheduler;
+  private Scheduler ioScheduler;
 
   @Mock
-  Scheduler cpuLightScheduler;
+  private Scheduler cpuLightScheduler;
 
   @Mock(answer = RETURNS_DEEP_STUBS)
   private Processor messageProcessor;
@@ -205,7 +206,7 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
 
     sourceAdapter = createSourceAdapter();
 
-    when(sourceAdapterFactory.createAdapter(any(), any())).thenReturn(sourceAdapter);
+    when(sourceAdapterFactory.createAdapter(any(), any(), any(), any())).thenReturn(sourceAdapter);
 
     mockExceptionEnricher(sourceModel, null);
     when(sourceModel.getName()).thenReturn(SOURCE_NAME);
@@ -311,7 +312,7 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
   public void sourceIsInstantiatedOnce() throws Exception {
     initialise();
     start();
-    verify(sourceAdapterFactory, times(1)).createAdapter(any(), any());
+    verify(sourceAdapterFactory, times(1)).createAdapter(any(), any(), any(), any());
   }
 
   @Test
@@ -514,6 +515,8 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
                              of(configurationInstance),
                              new NullCursorStreamProviderFactory(new SimpleByteBufferManager(), streamingManager),
                              sourceCallbackFactory,
+                             mock(ComponentLocation.class),
+                             mock(SourceConnectionManager.class),
                              null, callbackParameters, null);
   }
 
@@ -538,7 +541,7 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
     final String person = "person";
     source = new DummySource(person);
     sourceAdapter = createSourceAdapter();
-    when(sourceAdapterFactory.createAdapter(any(), any())).thenReturn(sourceAdapter);
+    when(sourceAdapterFactory.createAdapter(any(), any(), any(), any())).thenReturn(sourceAdapter);
     messageSource = getNewExtensionMessageSourceInstance();
     messageSource.initialise();
     messageSource.start();

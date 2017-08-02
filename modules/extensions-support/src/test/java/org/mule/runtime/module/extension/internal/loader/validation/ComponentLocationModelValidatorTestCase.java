@@ -16,11 +16,11 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.when;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
-import org.mule.runtime.extension.api.runtime.FlowInfo;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
@@ -35,7 +35,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class FlowInfoModelValidatorTestCase extends AbstractMuleTestCase {
+public class ComponentLocationModelValidatorTestCase extends AbstractMuleTestCase {
 
   @Mock
   private ExtensionModel extensionModel;
@@ -43,7 +43,7 @@ public class FlowInfoModelValidatorTestCase extends AbstractMuleTestCase {
   @Mock(answer = RETURNS_DEEP_STUBS)
   private SourceModel sourceModel;
 
-  private FlowInfoModelValidator validator = new FlowInfoModelValidator();
+  private ComponentLocationModelValidator validator = new ComponentLocationModelValidator();
   private ProblemsReporter reporter = new ProblemsReporter(extensionModel);
 
   @Before
@@ -61,24 +61,24 @@ public class FlowInfoModelValidatorTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void noFlowInfoField() {
-    mockSourceType(NoFlowInfoSource.class);
+  public void noLocationField() {
+    mockSourceType(NoLocation.class);
     assertValid();
   }
 
   @Test
-  public void oneFlowInfoField() {
-    mockSourceType(OneFlowInfoSource.class);
+  public void oneLocationField() {
+    mockSourceType(OneLocation.class);
     assertValid();
   }
 
   @Test
-  public void twoFlowInfoField() {
-    mockSourceType(TwoFlowInfoSource.class);
+  public void twoLocationFields() {
+    mockSourceType(TwoLocation.class);
     validator.validate(extensionModel, reporter);
     assertThat(reporter.getErrors(), hasSize(1));
     assertThat(reporter.getErrors().get(0).getMessage(), allOf(
-                                                               containsString(FlowInfo.class.getSimpleName()),
+                                                               containsString(ComponentLocation.class.getSimpleName()),
                                                                containsString("2")));
   }
 
@@ -105,18 +105,18 @@ public class FlowInfoModelValidatorTestCase extends AbstractMuleTestCase {
     }
   }
 
-  private static class NoFlowInfoSource extends TestSource {
+  private static class NoLocation extends TestSource {
 
   }
 
-  private static class OneFlowInfoSource extends TestSource {
+  private static class OneLocation extends TestSource {
 
-    private FlowInfo flowInfo;
+    private ComponentLocation location;
 
   }
 
-  private static class TwoFlowInfoSource extends OneFlowInfoSource {
+  private static class TwoLocation extends OneLocation {
 
-    private FlowInfo secondFlowInfo;
+    private ComponentLocation secondLocation;
   }
 }

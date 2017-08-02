@@ -10757,21 +10757,19 @@
           "format": "java",
           "type": "Object",
           "annotations": {
-            "typeId": "org.mule.runtime.extension.api.runtime.FlowInfo",
+            "typeId": "org.mule.runtime.api.component.location.ComponentLocation",
             "classInformation": {
               "hasDefaultConstructor": false,
               "isInterface": true,
               "isInstantiable": false,
               "isAbstract": true,
               "isFinal": false,
-              "implementedInterfaces": [
-                "org.mule.runtime.api.meta.NamedObject"
-              ],
+              "implementedInterfaces": [],
               "parent": "",
               "genericTypes": []
             },
             "typeAlias": {
-              "value": "FlowInfo"
+              "value": "ComponentLocation"
             }
           },
           "fields": []

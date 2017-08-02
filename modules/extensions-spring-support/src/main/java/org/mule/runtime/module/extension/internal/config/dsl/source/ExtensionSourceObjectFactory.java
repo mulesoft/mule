@@ -81,9 +81,9 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
 
       return new ExtensionMessageSource(extensionModel,
                                         sourceModel,
-                                        getSourceFactory(nonCallbackParameters,
-                                                         responseCallbackParameters,
-                                                         errorCallbackParameters),
+                                        getSourceAdapterFactory(nonCallbackParameters,
+                                                                responseCallbackParameters,
+                                                                errorCallbackParameters),
                                         configurationProvider,
                                         getRetryPolicyTemplate(),
                                         cursorProviderFactory,
@@ -103,9 +103,9 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
     return new ResolverSet(muleContext);
   }
 
-  private SourceAdapterFactory getSourceFactory(ResolverSet nonCallbackParameters,
-                                                ResolverSet successCallbackParameters,
-                                                ResolverSet errorCallbackParameters) {
+  private SourceAdapterFactory getSourceAdapterFactory(ResolverSet nonCallbackParameters,
+                                                       ResolverSet successCallbackParameters,
+                                                       ResolverSet errorCallbackParameters) {
     return new SourceAdapterFactory(extensionModel,
                                     sourceModel,
                                     nonCallbackParameters,

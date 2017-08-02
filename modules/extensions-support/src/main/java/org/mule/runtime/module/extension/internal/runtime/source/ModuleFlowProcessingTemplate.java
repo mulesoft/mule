@@ -7,22 +7,18 @@
 package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static org.mule.runtime.core.api.functional.Either.left;
-import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.func.CheckedConsumer;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
-import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.internal.execution.ModuleFlowProcessingPhaseTemplate;
-import org.mule.runtime.core.internal.execution.ResponseCompletionCallback;
 
 import java.util.Map;
-import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
 
@@ -42,12 +38,12 @@ final class ModuleFlowProcessingTemplate implements ModuleFlowProcessingPhaseTem
 
   @Override
   public CheckedFunction<Event, Map<String, Object>> getSuccessfulExecutionResponseParametersFunction() {
-    return event -> completionHandler.createResponseParameters(event);
+    return completionHandler::createResponseParameters;
   }
 
   @Override
   public CheckedFunction<Event, Map<String, Object>> getFailedExecutionResponseParametersFunction() {
-    return event -> completionHandler.createFailureResponseParameters(event);
+    return completionHandler::createFailureResponseParameters;
   }
 
   @Override
@@ -67,13 +63,13 @@ final class ModuleFlowProcessingTemplate implements ModuleFlowProcessingPhaseTem
 
   @Override
   public Publisher<Void> sendResponseToClient(Event response, Map<String, Object> parameters) {
-    return from(completionHandler.onCompletion(response, parameters));
+    return completionHandler.onCompletion(response, parameters);
   }
 
   @Override
   public Publisher<Void> sendFailureResponseToClient(MessagingException messagingException,
                                                      Map<String, Object> parameters) {
-    return from(completionHandler.onFailure(messagingException, parameters));
+    return completionHandler.onFailure(messagingException, parameters);
   }
 
   @Override
