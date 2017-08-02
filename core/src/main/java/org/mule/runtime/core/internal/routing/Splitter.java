@@ -15,7 +15,7 @@ import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
 import org.mule.runtime.core.api.routing.MessageSequence;
 import org.mule.runtime.core.api.processor.Router;
 import org.mule.runtime.core.api.util.collection.SplittingStrategy;
-import org.mule.runtime.core.expression.ExpressionConfig;
+import org.mule.runtime.core.privileged.expression.ExpressionConfig;
 import org.mule.runtime.core.internal.routing.outbound.AbstractMessageSequenceSplitter;
 
 /**

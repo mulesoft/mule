@@ -63,7 +63,7 @@ import org.mule.runtime.config.spring.processors.ContextExclusiveInjectorProcess
 import org.mule.runtime.config.spring.processors.DiscardedOptionalBeanPostProcessor;
 import org.mule.runtime.config.spring.processors.LifecycleStatePostProcessor;
 import org.mule.runtime.config.spring.processors.MuleInjectorProcessor;
-import org.mule.runtime.config.spring.processors.PostRegistrationActionsPostProcessor;
+import org.mule.runtime.config.spring.internal.processor.PostRegistrationActionsPostProcessor;
 import org.mule.runtime.config.spring.util.LaxInstantiationStrategyWrapper;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigResource;
@@ -77,15 +77,26 @@ import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.api.util.Pair;
 import org.mule.runtime.core.api.util.UUID;
-import org.mule.runtime.core.component.config.ClassLoaderResourceProvider;
-import org.mule.runtime.core.component.config.DefaultConfigurationPropertiesResolver;
-import org.mule.runtime.core.component.config.ResourceProvider;
-import org.mule.runtime.core.component.config.SystemPropertiesConfigurationProvider;
+import org.mule.runtime.config.spring.dsl.model.ClassLoaderResourceProvider;
+import org.mule.runtime.config.spring.dsl.model.ResourceProvider;
+import org.mule.runtime.config.spring.dsl.model.internal.config.DefaultConfigurationPropertiesResolver;
+import org.mule.runtime.config.spring.dsl.model.internal.config.SystemPropertiesConfigurationProvider;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
-import org.mule.runtime.core.registry.MuleRegistryHelper;
-import org.mule.runtime.core.registry.SpiServiceRegistry;
+import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
+import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.module.extension.internal.config.ExtensionBuildingDefinitionProvider;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -106,17 +117,6 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.w3c.dom.Document;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 
 /**
  * <code>MuleArtifactContext</code> is a simple extension application context that allows resources to be loaded from the
@@ -154,7 +154,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
    * @param muleContext the {@link MuleContext} that own this context
    * @param artifactDeclaration the mule configuration defined programmatically
    * @param optionalObjectsController the {@link OptionalObjectsController} to use. Cannot be {@code null} @see
-   *        org.mule.runtime.config.spring.SpringRegistry
+   *        org.mule.runtime.config.spring.internal.SpringRegistry
    * @param pluginsClassLoaders the classloades of the plugins included in the artifact, on hwich contexts the parsers will
    *        process.
    * @param parentConfigurationProperties

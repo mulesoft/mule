@@ -8,7 +8,6 @@ package org.mule.test.module.extension.metadata;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
@@ -52,8 +51,6 @@ import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
-import org.mule.runtime.core.internal.metadata.DefaultMetadataCache;
-import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.extension.api.metadata.NullMetadataKey;
 import org.mule.tck.junit4.matcher.MetadataKeyMatcher;
 import org.mule.tck.message.StringAttributes;
@@ -68,6 +65,7 @@ import org.mule.test.metadata.extension.resolver.TestThreadContextClassLoaderRes
 import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -364,8 +362,8 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
 
   @Test
   public void multipleCaches() throws Exception {
-    MuleMetadataService metadataManager = (MuleMetadataService) muleContext.getRegistry().lookupObject(MetadataService.class);
-    Map<String, ? extends MetadataCache> caches = metadataManager.getMetadataCaches();
+    MetadataService metadataManager = muleContext.getRegistry().lookupObject(MetadataService.class);
+    Map<String, ? extends MetadataCache> caches = getMetadataCaches(metadataManager);
     caches.keySet().forEach(metadataManager::disposeCache);
 
     // using config
@@ -380,7 +378,7 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
         .addIndexPart(0).build();
     getSuccessComponentDynamicMetadata(PERSON_METADATA_KEY);
 
-    caches = metadataManager.getMetadataCaches();
+    caches = getMetadataCaches(metadataManager);
 
     assertThat(caches.keySet(), hasSize(2));
     assertThat(caches.keySet(), hasItems(CONFIG, ALTERNATIVE_CONFIG));
@@ -425,18 +423,24 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
         .addIndexPart(0).build();
     getSuccessComponentDynamicMetadata();
 
-    MuleMetadataService metadataManager = (MuleMetadataService) muleContext.getRegistry().lookupObject(MetadataService.class);
-    DefaultMetadataCache configCache = (DefaultMetadataCache) metadataManager.getMetadataCaches().get(CONFIG);
+    MetadataService metadataManager = muleContext.getRegistry().lookupObject(MetadataService.class);
+    MetadataCache configCache = getMetadataCaches(metadataManager).get(CONFIG);
 
-    assertThat(configCache.asMap().keySet(), containsInAnyOrder(AGE, NAME, BRAND));
     assertThat(configCache.get(AGE).get(), is(AGE_VALUE));
     assertThat(configCache.get(NAME).get(), is(NAME_VALUE));
     assertThat(configCache.get(BRAND).get(), is(BRAND_VALUE));
 
-    DefaultMetadataCache alternativeConfigCache =
-        (DefaultMetadataCache) metadataManager.getMetadataCaches().get(ALTERNATIVE_CONFIG);
-    assertThat(alternativeConfigCache.asMap().keySet(), hasItems(BRAND));
+    MetadataCache alternativeConfigCache = getMetadataCaches(metadataManager).get(ALTERNATIVE_CONFIG);
     assertThat(alternativeConfigCache.get(BRAND).get(), is(BRAND_VALUE));
+  }
+
+  private Map<String, ? extends MetadataCache> getMetadataCaches(MetadataService metadataManager) {
+    try {
+      Method getMetadataCachesMethod = metadataManager.getClass().getMethod("getMetadataCaches");
+      return (Map<String, ? extends MetadataCache>) getMetadataCachesMethod.invoke(metadataManager);
+    } catch (Exception e) {
+      throw new IllegalStateException("Cannot obtain metadata caches", e);
+    }
   }
 
   @Test

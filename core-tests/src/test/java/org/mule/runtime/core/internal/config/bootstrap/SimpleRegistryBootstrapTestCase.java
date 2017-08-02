@@ -17,9 +17,6 @@ import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.config.bootstrap.BootstrapServiceDiscoverer;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
-import org.mule.runtime.core.config.bootstrap.FakeTransactionFactory;
-import org.mule.runtime.core.config.bootstrap.FakeTransactionResource;
-import org.mule.runtime.core.config.bootstrap.TestBootstrapServiceDiscoverer;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.ArrayList;

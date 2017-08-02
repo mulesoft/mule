@@ -15,7 +15,6 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
 import org.mule.runtime.config.spring.OptionalObjectsController;
-import org.mule.runtime.config.spring.SpringRegistry;
 import org.mule.runtime.config.spring.factories.BootstrapObjectFactoryBean;
 import org.mule.runtime.config.spring.factories.ConstantFactoryBean;
 import org.mule.runtime.core.api.MuleContext;

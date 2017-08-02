@@ -63,7 +63,7 @@ import org.mule.runtime.core.internal.util.DefaultStreamCloserService;
 import org.mule.runtime.core.internal.util.queue.TransactionalQueueManager;
 import org.mule.runtime.core.internal.util.store.MuleObjectStoreManager;
 import org.mule.runtime.core.internal.value.MuleValueProviderService;
-import org.mule.runtime.core.security.DefaultMuleSecurityManager;
+import org.mule.runtime.core.internal.security.DefaultMuleSecurityManager;
 
 /**
  * Configures defaults required by Mule. This configuration builder is used to configure mule with these defaults when no other

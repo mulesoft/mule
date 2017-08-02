@@ -6,11 +6,12 @@
  */
 package org.mule.runtime.core.api.util;
 
+import org.mule.runtime.api.meta.NameableObject;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -117,33 +118,22 @@ public class BeanUtils {
   }
 
   /**
-   * Similar to {@link #describe(Object)} except that it will only populate bean properties where there is a valid getter and
-   * setter method. Basically this method will describe a bean and honour its encapsulation.
+   * Returns the name for the object passed in. If the object implements {@link NameableObject}, then
+   * {@link NameableObject#getName()} will be returned, otherwise a name is generated using the class name and a generated UUID.
    *
-   * @param object the object to describe
-   * @return a map of published properties
+   * @param obj the object to inspect
+   * @return the name for this object
    */
-  public static Map<String, Object> describeBean(Object object) {
-    Map<String, Object> props = new HashMap<String, Object>();
-    for (int i = 0; i < object.getClass().getMethods().length; i++) {
-      Method method = object.getClass().getMethods()[i];
-      if (method.getName().startsWith("get") || method.getName().startsWith("is")) {
-        String field = (method.getName().startsWith("is") ? method.getName().substring(2) : method.getName().substring(3));
-        String setter = "set" + field;
-        try {
-          object.getClass().getMethod(setter, method.getReturnType());
-        } catch (NoSuchMethodException e) {
-          logger.debug("Ignoring bean property: " + e.getMessage());
-          continue;
-        }
-        field = field.substring(0, 1).toLowerCase() + field.substring(1);
-        try {
-          props.put(field, method.invoke(object));
-        } catch (Exception e) {
-          logger.debug("unable to call bean method: " + method);
-        }
-      }
+  public static String getName(Object obj) {
+    String name = null;
+    if (obj instanceof NameableObject) {
+      name = ((NameableObject) obj).getName();
+    } else if (obj instanceof FlowConstruct) {
+      name = ((FlowConstruct) obj).getName();
     }
-    return props;
+    if (StringUtils.isBlank(name)) {
+      name = obj.getClass().getName() + ":" + UUID.getUUID();
+    }
+    return name;
   }
 }

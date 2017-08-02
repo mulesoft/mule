@@ -100,6 +100,7 @@ import org.mule.runtime.core.api.management.stats.ProcessingTimeWatcher;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.registry.Registry;
+import org.mule.runtime.core.api.registry.RegistryBroker;
 import org.mule.runtime.core.api.scheduler.SchedulerConfig;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.security.SecurityManager;
@@ -123,8 +124,6 @@ import org.mule.runtime.core.internal.util.splash.ApplicationStartupSplashScreen
 import org.mule.runtime.core.internal.util.splash.ServerShutdownSplashScreen;
 import org.mule.runtime.core.internal.util.splash.ServerStartupSplashScreen;
 import org.mule.runtime.core.internal.util.splash.SplashScreen;
-import org.mule.runtime.core.registry.DefaultRegistryBroker;
-import org.mule.runtime.core.registry.MuleRegistryHelper;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -159,7 +158,7 @@ public class DefaultMuleContext implements MuleContext {
   /**
    * Internal registry facade which delegates to other registries.
    */
-  private DefaultRegistryBroker registryBroker;
+  private RegistryBroker registryBroker;
 
   /**
    * Simplified Mule configuration interface
@@ -955,7 +954,7 @@ public class DefaultMuleContext implements MuleContext {
     this.lifecycleManager = (MuleContextLifecycleManager) lifecycleManager;
   }
 
-  public void setRegistryBroker(DefaultRegistryBroker registryBroker) {
+  public void setRegistryBroker(RegistryBroker registryBroker) {
     this.registryBroker = registryBroker;
   }
 
@@ -963,7 +962,7 @@ public class DefaultMuleContext implements MuleContext {
     this.injector = injector;
   }
 
-  public void setMuleRegistry(MuleRegistryHelper muleRegistry) {
+  public void setMuleRegistry(MuleRegistry muleRegistry) {
     this.muleRegistryHelper = muleRegistry;
   }
 

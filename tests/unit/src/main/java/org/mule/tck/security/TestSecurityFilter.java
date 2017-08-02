@@ -15,7 +15,7 @@ import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.api.security.SecurityProviderNotFoundException;
 import org.mule.runtime.core.api.security.UnauthorisedException;
 import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
-import org.mule.runtime.core.security.AbstractAuthenticationFilter;
+import org.mule.runtime.core.api.security.AbstractAuthenticationFilter;
 
 public class TestSecurityFilter extends AbstractAuthenticationFilter {
 

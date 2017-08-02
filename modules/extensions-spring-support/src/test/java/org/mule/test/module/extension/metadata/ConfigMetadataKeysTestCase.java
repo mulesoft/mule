@@ -11,8 +11,8 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.component.location.Location.builder;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
+import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
-import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
 import java.util.Map;
@@ -23,7 +23,7 @@ import org.junit.Test;
 
 public class ConfigMetadataKeysTestCase extends AbstractExtensionFunctionalTestCase {
 
-  private MuleMetadataService metadataManager;
+  private MetadataService metadataManager;
 
   @Override
   protected String getConfigFile() {
@@ -33,7 +33,7 @@ public class ConfigMetadataKeysTestCase extends AbstractExtensionFunctionalTestC
   @Override
   protected void doSetUp() throws Exception {
     super.doSetUp();
-    metadataManager = muleContext.getRegistry().lookupObject(MuleMetadataService.class);
+    metadataManager = muleContext.getRegistry().lookupObject(MetadataService.class);
   }
 
   @Test

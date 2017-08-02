@@ -60,7 +60,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
    * @param muleContext the {@link MuleContext} that own this context
    * @param artifactDeclaration the mule configuration defined programmatically
    * @param optionalObjectsController the {@link OptionalObjectsController} to use. Cannot be {@code null} @see
-   *        org.mule.runtime.config.spring.SpringRegistry
+   *        org.mule.runtime.config.spring.internal.SpringRegistry
    * @param parentConfigurationProperties
    * @since 4.0
    */

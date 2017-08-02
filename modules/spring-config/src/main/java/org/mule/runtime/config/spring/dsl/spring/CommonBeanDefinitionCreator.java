@@ -34,7 +34,7 @@ import org.mule.runtime.core.api.execution.LocationExecutionContextProvider;
 import org.mule.runtime.core.api.security.SecurityFilter;
 import org.mule.runtime.core.api.util.Pair;
 import org.mule.runtime.core.privileged.processor.SecurityFilterMessageProcessor;
-import org.mule.runtime.core.registry.SpiServiceRegistry;
+import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 
 import com.google.common.collect.ImmutableSet;

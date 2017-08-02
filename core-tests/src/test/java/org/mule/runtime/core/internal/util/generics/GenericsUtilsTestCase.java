@@ -7,7 +7,6 @@
 package org.mule.runtime.core.internal.util.generics;
 
 import static org.junit.Assert.assertEquals;
-import org.mule.runtime.core.util.generics.GenericBean;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
