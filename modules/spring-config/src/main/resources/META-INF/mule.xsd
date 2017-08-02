@@ -351,18 +351,13 @@
         </xsd:choice>
     </xsd:group>
 
-    <xsd:group name="routeOrProcessorChain">
-        <xsd:choice>
-            <xsd:element name="route" type="messageProcessorChainType">
-                <xsd:annotation>
-                    <xsd:documentation>
-                        One of n routes in a router such as scatter-gather, first-successful or round-robin.
-                    </xsd:documentation>
-                </xsd:annotation>
-            </xsd:element>
-            <xsd:element ref="processor-chain"/>
-        </xsd:choice>
-    </xsd:group>
+    <xsd:element name="route" type="messageProcessorChainType">
+        <xsd:annotation>
+            <xsd:documentation>
+                One of n routes in a router such as scatter-gather, first-successful or round-robin.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
 
     <xsd:element name="processor" type="refMessageProcessorType" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
@@ -3039,7 +3034,7 @@
         <xsd:complexContent>
             <xsd:extension base="abstractRoutingMessageProcessorType">
                 <xsd:sequence>
-                    <xsd:group ref="routeOrProcessorChain" minOccurs="1" maxOccurs="unbounded"/>
+                    <xsd:element ref="route" minOccurs="1" maxOccurs="unbounded"/>
                 </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>
@@ -3127,7 +3122,7 @@
             <xsd:complexContent>
                 <xsd:extension base="abstractRoutingMessageProcessorType">
                     <xsd:sequence>
-                        <xsd:group ref="routeOrProcessorChain" minOccurs="2" maxOccurs="unbounded"/>
+                        <xsd:element ref="route" minOccurs="2" maxOccurs="unbounded"/>
                     </xsd:sequence>
                     <xsd:attribute name="timeout" type="substitutableLong" use="optional" default="0">
                         <xsd:annotation>
