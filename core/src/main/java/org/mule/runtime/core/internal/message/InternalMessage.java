@@ -245,5 +245,74 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
     @Override
     CollectionBuilder itemMediaType(MediaType mediaType);
 
+    @Override
+    CollectionBuilder mediaType(MediaType mediaType);
+
+    @Override
+    CollectionBuilder attributes(TypedValue<?> typedValue);
+
+    @Override
+    CollectionBuilder nullAttributesValue();
+
+    @Override
+    CollectionBuilder attributesValue(Object o);
+
+    @Override
+    CollectionBuilder attributesMediaType(MediaType mediaType);
+
+    @Override
+    CollectionBuilder exceptionPayload(ExceptionPayload exceptionPayload);
+
+    @Override
+    CollectionBuilder addInboundProperty(String key, Serializable value);
+
+    @Override
+    CollectionBuilder addInboundProperty(String key, Serializable value, MediaType mediaType);
+
+    @Override
+    CollectionBuilder addInboundProperty(String key, Serializable value, DataType dataType);
+
+    @Override
+    CollectionBuilder addOutboundProperty(String key, Serializable value);
+
+    @Override
+    CollectionBuilder addOutboundProperty(String key, Serializable value, MediaType mediaType);
+
+    @Override
+    CollectionBuilder addOutboundProperty(String key, Serializable value, DataType dataType);
+
+    @Override
+    CollectionBuilder removeInboundProperty(String key);
+
+    @Override
+    CollectionBuilder removeOutboundProperty(String key);
+
+    @Override
+    CollectionBuilder addInboundAttachment(String key, DataHandler value);
+
+    @Override
+    CollectionBuilder addOutboundAttachment(String key, DataHandler value);
+
+    @Override
+    CollectionBuilder removeInboundAttachment(String key);
+
+    @Override
+    CollectionBuilder removeOutboundAttachment(String key);
+
+    @Override
+    CollectionBuilder inboundProperties(Map<String, Serializable> inboundProperties);
+
+    @Override
+    CollectionBuilder outboundProperties(Map<String, Serializable> outboundProperties);
+
+    @Override
+    CollectionBuilder inboundAttachments(Map<String, DataHandler> inboundAttachments);
+
+    @Override
+    CollectionBuilder outboundAttachments(Map<String, DataHandler> outbundAttachments);
+
+    @Override
+    InternalMessage build();
+
   }
 }

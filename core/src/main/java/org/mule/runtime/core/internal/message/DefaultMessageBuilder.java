@@ -127,7 +127,7 @@ public class DefaultMessageBuilder
   }
 
   @Override
-  public InternalMessage.Builder mediaType(MediaType mediaType) {
+  public InternalMessage.CollectionBuilder mediaType(MediaType mediaType) {
     this.payload =
         new TypedValue(payload.getValue(), builder(payload.getDataType()).mediaType(mediaType).build(), payload.getLength());
     return this;
@@ -166,111 +166,111 @@ public class DefaultMessageBuilder
   }
 
   @Override
-  public InternalMessage.Builder attributes(TypedValue<?> attributes) {
+  public InternalMessage.CollectionBuilder attributes(TypedValue<?> attributes) {
     this.attributes = attributes;
     return this;
   }
 
   @Override
-  public InternalMessage.Builder nullAttributesValue() {
+  public InternalMessage.CollectionBuilder nullAttributesValue() {
     this.attributes = new TypedValue(null, resolveAttributesDataType(null));
     return this;
   }
 
   @Override
-  public InternalMessage.Builder attributesValue(Object value) {
+  public InternalMessage.CollectionBuilder attributesValue(Object value) {
     this.attributes = new TypedValue(value, resolveAttributesDataType(value));
     return this;
   }
 
   @Override
-  public InternalMessage.Builder attributesMediaType(MediaType mediaType) {
+  public InternalMessage.CollectionBuilder attributesMediaType(MediaType mediaType) {
     this.attributes = new TypedValue(attributes.getValue(), builder(attributes.getDataType()).mediaType(mediaType).build(),
                                      attributes.getLength());
     return this;
   }
 
   @Override
-  public InternalMessage.Builder exceptionPayload(ExceptionPayload exceptionPayload) {
+  public InternalMessage.CollectionBuilder exceptionPayload(ExceptionPayload exceptionPayload) {
     this.exceptionPayload = exceptionPayload;
     return this;
   }
 
   @Override
-  public InternalMessage.Builder addInboundProperty(String key, Serializable value) {
+  public InternalMessage.CollectionBuilder addInboundProperty(String key, Serializable value) {
     inboundProperties.put(key, new TypedValue(value, value != null ? fromObject(value) : OBJECT));
     return this;
   }
 
   @Override
-  public InternalMessage.Builder addInboundProperty(String key, Serializable value, MediaType mediaType) {
+  public InternalMessage.CollectionBuilder addInboundProperty(String key, Serializable value, MediaType mediaType) {
     inboundProperties.put(key,
                           new TypedValue(value, builder().type(value.getClass()).mediaType(mediaType).build()));
     return this;
   }
 
   @Override
-  public InternalMessage.Builder addInboundProperty(String key, Serializable value, DataType dataType) {
+  public InternalMessage.CollectionBuilder addInboundProperty(String key, Serializable value, DataType dataType) {
     inboundProperties.put(key, new TypedValue(value, dataType));
     return this;
   }
 
   @Override
-  public InternalMessage.Builder addOutboundProperty(String key, Serializable value) {
+  public InternalMessage.CollectionBuilder addOutboundProperty(String key, Serializable value) {
     outboundProperties.put(key, new TypedValue(value, value != null ? fromObject(value) : OBJECT));
     return this;
   }
 
   @Override
-  public InternalMessage.Builder addOutboundProperty(String key, Serializable value, MediaType mediaType) {
+  public InternalMessage.CollectionBuilder addOutboundProperty(String key, Serializable value, MediaType mediaType) {
     outboundProperties.put(key, new TypedValue(value, builder().type(value.getClass()).mediaType(mediaType).build()));
     return this;
   }
 
   @Override
-  public InternalMessage.Builder addOutboundProperty(String key, Serializable value, DataType dataType) {
+  public InternalMessage.CollectionBuilder addOutboundProperty(String key, Serializable value, DataType dataType) {
     outboundProperties.put(key, new TypedValue(value, dataType));
     return this;
   }
 
   @Override
-  public InternalMessage.Builder removeInboundProperty(String key) {
+  public InternalMessage.CollectionBuilder removeInboundProperty(String key) {
     inboundProperties.remove(key);
     return this;
   }
 
   @Override
-  public InternalMessage.Builder removeOutboundProperty(String key) {
+  public InternalMessage.CollectionBuilder removeOutboundProperty(String key) {
     outboundProperties.remove(key);
     return this;
   }
 
   @Override
-  public InternalMessage.Builder addInboundAttachment(String key, DataHandler value) {
+  public InternalMessage.CollectionBuilder addInboundAttachment(String key, DataHandler value) {
     inboundAttachments.put(key, value);
     return this;
   }
 
   @Override
-  public InternalMessage.Builder addOutboundAttachment(String key, DataHandler value) {
+  public InternalMessage.CollectionBuilder addOutboundAttachment(String key, DataHandler value) {
     outboundAttachments.put(key, value);
     return this;
   }
 
   @Override
-  public InternalMessage.Builder removeInboundAttachment(String key) {
+  public InternalMessage.CollectionBuilder removeInboundAttachment(String key) {
     inboundAttachments.remove(key);
     return this;
   }
 
   @Override
-  public InternalMessage.Builder removeOutboundAttachment(String key) {
+  public InternalMessage.CollectionBuilder removeOutboundAttachment(String key) {
     outboundAttachments.remove(key);
     return this;
   }
 
   @Override
-  public InternalMessage.Builder inboundProperties(Map<String, Serializable> inboundProperties) {
+  public InternalMessage.CollectionBuilder inboundProperties(Map<String, Serializable> inboundProperties) {
     requireNonNull(inboundProperties);
     this.inboundProperties.clear();
     inboundProperties.forEach((s, serializable) -> addInboundProperty(s, serializable));
@@ -278,7 +278,7 @@ public class DefaultMessageBuilder
   }
 
   @Override
-  public InternalMessage.Builder outboundProperties(Map<String, Serializable> outboundProperties) {
+  public InternalMessage.CollectionBuilder outboundProperties(Map<String, Serializable> outboundProperties) {
     requireNonNull(outboundProperties);
     this.outboundProperties.clear();
     outboundProperties.forEach((s, serializable) -> addOutboundProperty(s, serializable));
@@ -286,14 +286,14 @@ public class DefaultMessageBuilder
   }
 
   @Override
-  public InternalMessage.Builder inboundAttachments(Map<String, DataHandler> inboundAttachments) {
+  public InternalMessage.CollectionBuilder inboundAttachments(Map<String, DataHandler> inboundAttachments) {
     requireNonNull(inboundAttachments);
     this.inboundAttachments = new HashMap<>(inboundAttachments);
     return this;
   }
 
   @Override
-  public InternalMessage.Builder outboundAttachments(Map<String, DataHandler> outbundAttachments) {
+  public InternalMessage.CollectionBuilder outboundAttachments(Map<String, DataHandler> outbundAttachments) {
     requireNonNull(outbundAttachments);
     this.outboundAttachments = new HashMap<>(outbundAttachments);
     return this;
