@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.core.api.routing;
+package org.mule.runtime.core.internal.routing;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;

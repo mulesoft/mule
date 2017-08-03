@@ -53,7 +53,6 @@ import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.core.api.processor.LoggerMessageProcessor;
 import org.mule.runtime.core.api.processor.LoggerMessageProcessor.LogLevel;
-import org.mule.runtime.core.api.routing.AggregationStrategy;
 import org.mule.runtime.core.api.source.SchedulingStrategy;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -387,24 +386,12 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
 
     assertComponentDeterminesOutput(scatterGatherModel);
 
-    assertThat(scatterGatherModel.getAllParameterModels(), hasSize(3));
+    assertThat(scatterGatherModel.getAllParameterModels(), hasSize(1));
 
-    assertThat(scatterGatherModel.getAllParameterModels().get(0).getName(), is("parallel"));
+    assertThat(scatterGatherModel.getAllParameterModels().get(0).getName(), is("timeout"));
     assertThat(scatterGatherModel.getAllParameterModels().get(0).getExpressionSupport(), is(NOT_SUPPORTED));
-    assertThat(scatterGatherModel.getAllParameterModels().get(0).getType(), instanceOf(DefaultBooleanType.class));
+    assertThat(scatterGatherModel.getAllParameterModels().get(0).getType(), instanceOf(DefaultNumberType.class));
     assertThat(scatterGatherModel.getAllParameterModels().get(0).isRequired(), is(false));
-
-    assertThat(scatterGatherModel.getAllParameterModels().get(1).getName(), is("timeout"));
-    assertThat(scatterGatherModel.getAllParameterModels().get(1).getExpressionSupport(), is(NOT_SUPPORTED));
-    assertThat(scatterGatherModel.getAllParameterModels().get(1).getType(), instanceOf(DefaultNumberType.class));
-    assertThat(scatterGatherModel.getAllParameterModels().get(1).isRequired(), is(false));
-
-    assertThat(scatterGatherModel.getAllParameterModels().get(2).getName(), is("custom-aggregation-strategy"));
-    assertThat(scatterGatherModel.getAllParameterModels().get(2).getExpressionSupport(), is(NOT_SUPPORTED));
-    assertThat(scatterGatherModel.getAllParameterModels().get(2).getType(), instanceOf(DefaultObjectType.class));
-    assertThat(scatterGatherModel.getAllParameterModels().get(2).getType().getAnnotation(TypeIdAnnotation.class).get().getValue(),
-               is(AggregationStrategy.class.getName()));
-    assertThat(scatterGatherModel.getAllParameterModels().get(2).isRequired(), is(false));
 
     assertThat(scatterGatherModel.getRouteModels(), hasSize(1));
 

@@ -1603,36 +1603,6 @@
             {
               "type": {
                 "format": "java",
-                "type": "Boolean",
-                "annotations": {
-                  "typeId": "java.lang.Boolean",
-                  "default": "true"
-                }
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "NOT_SUPPORTED",
-              "defaultValue": "true",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 1
-              },
-              "name": "parallel",
-              "description": "Whether the configured routes will run in parallel (default is true).",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
                 "type": "Number",
                 "annotations": {
                   "int": {},
@@ -1658,48 +1628,6 @@
               },
               "name": "timeout",
               "description": "Sets a timeout in milliseconds for each route. Values lower or equals than zero means no timeout.",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "Object",
-                "annotations": {
-                  "typeId": "org.mule.runtime.core.api.routing.AggregationStrategy",
-                  "classInformation": {
-                    "hasDefaultConstructor": false,
-                    "isInterface": true,
-                    "isInstantiable": false,
-                    "isAbstract": true,
-                    "isFinal": false,
-                    "implementedInterfaces": [],
-                    "parent": "",
-                    "genericTypes": []
-                  },
-                  "typeAlias": {
-                    "value": "AggregationStrategy"
-                  }
-                },
-                "fields": []
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "NOT_SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 3
-              },
-              "name": "custom-aggregation-strategy",
-              "description": "Allows customizing the logic used for aggregation the events back together.",
               "modelProperties": {}
             }
           ],
