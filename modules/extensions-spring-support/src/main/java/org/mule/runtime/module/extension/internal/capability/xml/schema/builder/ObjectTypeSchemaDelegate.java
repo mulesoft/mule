@@ -31,6 +31,8 @@ import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.SubTypesModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.tls.TlsContextFactory;
+import org.mule.runtime.extension.api.declaration.type.TypeUtils;
+import org.mule.runtime.extension.api.declaration.type.annotation.SubstitutionGroup;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.model.parameter.ImmutableParameterModel;
@@ -89,7 +91,7 @@ final class ObjectTypeSchemaDelegate {
       if (builder.isImported(type)) {
         addImportedTypeElement(paramSyntax, description, type, all, required);
       } else {
-        if (!paramSyntax.getSubstitutionGroup().isEmpty()) {
+        if (TypeUtils.getSubstitutionGroup(type).isPresent()) {
           declareRefToType(type, paramSyntax, description, all, required);
           registerAbstractElement(type, paramSyntax);
         } else if (paramSyntax.isWrapped()) {
@@ -382,7 +384,10 @@ final class ObjectTypeSchemaDelegate {
   }
 
   TopLevelElement registerAbstractElement(MetadataType type, DslElementSyntax typeDsl) {
-    return registerAbstractElement(getTypeQName(typeDsl, type), typeDsl, null);
+    QName typeQName = getTypeQName(typeDsl, type);
+    TopLevelElement abstractElement = registerAbstractElement(typeQName, typeDsl, null);
+    TypeUtils.getSubstitutionGroup(type).ifPresent((substitutionGroup)->abstractElement.setSubstitutionGroup(resolveSubstitutionGroup(substitutionGroup)));
+    return abstractElement;
   }
 
   private TopLevelElement registerAbstractElement(QName typeQName, DslElementSyntax typeDsl, ObjectType baseType) {
@@ -403,7 +408,7 @@ final class ObjectTypeSchemaDelegate {
       abstractElement.setType(typeQName);
     }
 
-    if (baseDsl.isPresent() || typeDsl.supportsTopLevelDeclaration() || !typeDsl.getSubstitutionGroup().isEmpty()) {
+    if (baseDsl.isPresent() || typeDsl.supportsTopLevelDeclaration()) {
       QName substitutionGroup = getAbstractElementSubstitutionGroup(typeDsl, baseDsl);
       abstractElement.setSubstitutionGroup(substitutionGroup);
     }
@@ -414,26 +419,17 @@ final class ObjectTypeSchemaDelegate {
     return abstractElement;
   }
 
-  private QName resolveSubstitutionGroupFromString(String userConfiguredSubstitutionGroup) {
-    String[] splittedSubstitutionGroup = userConfiguredSubstitutionGroup.split(":");
-    if (splittedSubstitutionGroup.length == 2) {
-      String namespacePrefix = splittedSubstitutionGroup[0];
-      String substitutionComponent = splittedSubstitutionGroup[1];
-      String namespaceUri = builder.getNamespaceUri(namespacePrefix);
-      if (namespaceUri != null) {
-        return new QName(namespaceUri, substitutionComponent, namespacePrefix);
-      }
+  private QName resolveSubstitutionGroup(SubstitutionGroup userConfiguredSubstitutionGroup) {
+    String namespaceUri = builder.getNamespaceUri(userConfiguredSubstitutionGroup.getPrefix());
+    if (namespaceUri != null) {
+      return new QName(namespaceUri, userConfiguredSubstitutionGroup.getElement(), userConfiguredSubstitutionGroup.getPrefix());
     }
-    throw new IllegalArgumentException(userConfiguredSubstitutionGroup
-        + " is not a valid substitutionGrup. Prefix does not exist.");
+    throw new IllegalArgumentException(String.format("prefix: %s, element: %s is not a valid substitutionGroup. Prefix does not exist.",userConfiguredSubstitutionGroup.getPrefix(), userConfiguredSubstitutionGroup.getElement()));
   }
 
   private QName getAbstractElementSubstitutionGroup(DslElementSyntax typeDsl, Optional<DslElementSyntax> baseDsl) {
     QName substitutionGroup;
-    //First check if the substitutionGroup was defined by the user
-    if (!typeDsl.getSubstitutionGroup().isEmpty()) {
-      substitutionGroup = resolveSubstitutionGroupFromString(typeDsl.getSubstitutionGroup());
-    } else if (baseDsl.isPresent()) {
+    if (baseDsl.isPresent()) {
       DslElementSyntax base = baseDsl.get();
       String abstractElementName = typeDsl.supportsTopLevelDeclaration() ? getGlobalAbstractName(base)
           : getAbstractElementName(base);
