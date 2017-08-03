@@ -119,7 +119,7 @@
               </xs:complexType>
             </xs:element>
           </xs:sequence>
-          <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionDecimal" use="optional" default="34.0" name="apiVersion"></xs:attribute>
+          <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionDouble" use="optional" default="34.0" name="apiVersion"></xs:attribute>
           <xs:attribute type="xs:string" use="required" name="display"></xs:attribute>
           <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:substitutableBoolean" use="optional" default="false" name="immediate"></xs:attribute>
           <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:substitutableBoolean" use="optional" default="true" name="prompt"></xs:attribute>
@@ -226,7 +226,7 @@
               </xs:complexType>
             </xs:element>
           </xs:sequence>
-          <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionDecimal" use="optional" default="34.0" name="apiVersion"></xs:attribute>
+          <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionDouble" use="optional" default="34.0" name="apiVersion"></xs:attribute>
           <xs:attribute type="xs:string" use="required" name="display"></xs:attribute>
           <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:substitutableBoolean" use="optional" default="false" name="immediate"></xs:attribute>
           <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:substitutableBoolean" use="optional" default="true" name="prompt"></xs:attribute>
