@@ -25,7 +25,7 @@ public class MessageProcessorTextDebugger implements MessageProcessorNotificatio
     @Override
     public void onNotification(MessageProcessorNotification notification)
     {
-        if (notification.getAction() == MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE)
+        if (notification.getAction() == MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE_ORIGINAL_EVENT)
         {
             messageProcessingFlowTraceManager.onMessageProcessorNotificationPreInvoke(notification);
         }

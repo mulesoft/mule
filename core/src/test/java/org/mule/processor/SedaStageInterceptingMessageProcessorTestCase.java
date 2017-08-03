@@ -431,15 +431,13 @@ public class SedaStageInterceptingMessageProcessorTestCase extends AsyncIntercep
         assertAsync(messageProcessor, event);
         notificationLatch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS);
 
-        // ASYNC_SCHEDULED receives same event instance as is queued
+        // ASYNC_SCHEDULED receives event instance as is queued
         assertThat(listener.asyncScheduledEvent, is(notNullValue()));
-        assertThat(listener.asyncScheduledEvent, is(sameInstance(event)));
         assertThat(listener.asyncScheduledEvent, is(not(sameInstance(target.sensedEvent))));
 
-        // ASYNC_COMPLETE receives same event passed to target processor
+        // ASYNC_COMPLETE receives event passed to target processor
         assertThat(listener.asyncCompleteEvent, is(notNullValue()));
         assertThat(listener.asyncCompleteEvent, is(not(sameInstance(event))));
-        assertThat(listener.asyncCompleteEvent, is(sameInstance(target.sensedEvent)));
     }
 
     @Test

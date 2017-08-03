@@ -56,7 +56,7 @@ public abstract class BaseConnectorMessageNotification extends ServerNotificatio
                                             FlowConstruct flowConstruct,
                                             int action)
     {
-        super(cloneMessage(resource), action, flowConstruct != null ? flowConstruct.getName() : null);
+        super(resource, action, flowConstruct != null ? flowConstruct.getName() : null);
         this.endpoint = endpoint;
         this.flowConstruct = flowConstruct;
     }

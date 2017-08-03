@@ -27,13 +27,21 @@ public class MessageProcessorNotification extends ServerNotification implements 
     private static final long serialVersionUID = 1L;
 
     public static final int MESSAGE_PROCESSOR_PRE_INVOKE = MESSAGE_PROCESSOR_EVENT_ACTION_START_RANGE + 1;
-    public static final int MESSAGE_PROCESSOR_POST_INVOKE = MESSAGE_PROCESSOR_EVENT_ACTION_START_RANGE + 2;
+
+    /**
+     * This action should be only used when you need to get the original event and not a copy of it.
+     * In this case, the <code>MuleEvent<code/> must be used in read-only mode to avoid thread access errors.
+     */
+    public static final int MESSAGE_PROCESSOR_PRE_INVOKE_ORIGINAL_EVENT = MESSAGE_PROCESSOR_EVENT_ACTION_START_RANGE + 2;
+    public static final int MESSAGE_PROCESSOR_POST_INVOKE = MESSAGE_PROCESSOR_EVENT_ACTION_START_RANGE + 3;
+
 
     private final transient MessageProcessor processor;
 
     static
     {
         registerAction("message processor pre invoke", MESSAGE_PROCESSOR_PRE_INVOKE);
+        registerAction("message processor pre invoke that provides original event", MESSAGE_PROCESSOR_PRE_INVOKE_ORIGINAL_EVENT);
         registerAction("message processor post invoke", MESSAGE_PROCESSOR_POST_INVOKE);
     }
 
@@ -45,7 +53,7 @@ public class MessageProcessorNotification extends ServerNotification implements 
                                         MessageProcessor processor,
                                         MessagingException exceptionThrown, int action)
     {
-        super(produceEvent(event, flowConstruct), action, flowConstruct != null ? flowConstruct.getName() : null);
+        super(produceEvent(event, flowConstruct), action, flowConstruct != null ? flowConstruct.getName() : null, action == MESSAGE_PROCESSOR_PRE_INVOKE_ORIGINAL_EVENT);
         this.exceptionThrown = exceptionThrown;
         this.processor = processor;
     }

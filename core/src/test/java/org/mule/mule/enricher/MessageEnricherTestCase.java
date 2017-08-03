@@ -15,6 +15,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.transformer.types.MimeTypes.JSON;
@@ -29,6 +30,8 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.ThreadSafeAccess;
+import org.mule.api.context.notification.MessageProcessorNotificationListener;
+import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transport.PropertyScope;
@@ -36,6 +39,7 @@ import org.mule.api.transport.ReplyToHandler;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.construct.Flow;
+import org.mule.context.notification.MessageProcessorNotification;
 import org.mule.enricher.MessageEnricher;
 import org.mule.enricher.MessageEnricher.EnrichExpressionPair;
 import org.mule.processor.chain.DefaultMessageProcessorChain;
@@ -479,7 +483,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
     public void enricherConservesSameEventInstanceNonBlockingTargetNonBlocking() throws Exception
     {
         SensingNullMessageProcessor sensingNullMessageProcessor = new SensingNullMessageProcessor();
-        MessageEnricher enricher = createNonBlockingEnricher(sensingNullMessageProcessor);
+        MessageEnricher enricher = createEnricher(sensingNullMessageProcessor);
         SensingNullReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
         final MuleEvent in = createNonBlockingEvent(nullReplyToHandler);
 
@@ -503,7 +507,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
                 return false;
             }
         };
-        MessageEnricher enricher = createNonBlockingEnricher(sensingNullMessageProcessor);
+        MessageEnricher enricher = createEnricher(sensingNullMessageProcessor);
 
         SensingNullReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
         final MuleEvent in = createNonBlockingEvent(nullReplyToHandler);
@@ -544,9 +548,48 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
         assertThat(RequestContext.getEvent().getReplyToHandler(), instanceOf(ReplyToHandler.class));
     }
 
+    @Test
+    public void testRaceConditionBetweenEnricherAndNotificationListener() throws Exception
+    {
+        muleContext.getNotificationManager().addInterfaceToType(MessageProcessorNotificationListener.class, MessageProcessorNotification.class);
+        muleContext.getNotificationManager().addListener(new MessageProcessorNotificationListener()
+        {
+            @Override
+            public void onNotification(ServerNotification notification)
+            {
+                if(MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE == notification.getAction())
+                {
+                    final ThreadSafeAccess event = (ThreadSafeAccess) notification.getSource();
+                    new Thread(new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            while(true)
+                            {
+                                event.resetAccessControl();
+                            }
+                        }
+                    }).start();
+                }
+            }
+        });
+        MessageEnricher enricher = createEnricher(new SensingNullMessageProcessor());
+        final MuleEvent in  = createBlockingEvent();
+        try
+        {
+            processEnricherInChain(enricher, in);
+        }
+        catch(Exception e)
+        {
+            fail("Enricher has lost the ownership of the thread");
+        }
+    }
+
     private MuleEvent createNonBlockingEvent(SensingNullReplyToHandler nullReplyToHandler)
     {
         Flow flow = mock(Flow.class);
+        when(flow.getProcessorPath(any(MessageProcessor.class))).thenReturn("testPath" + "");
         when(flow.getProcessingStrategy()).thenReturn(new NonBlockingProcessingStrategy());
 
         return new DefaultMuleEvent(new DefaultMuleMessage(TEST_MESSAGE, muleContext),
@@ -554,7 +597,12 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
                                                   flow);
     }
 
-    private MessageEnricher createNonBlockingEnricher(SensingNullMessageProcessor sensingNullMessageProcessor)
+    private MuleEvent createBlockingEvent()
+    {
+        return createNonBlockingEvent(null);
+    }
+
+    private MessageEnricher createEnricher(SensingNullMessageProcessor sensingNullMessageProcessor)
     {
         MessageEnricher enricher = new MessageEnricher();
         enricher.setMuleContext(muleContext);

@@ -385,7 +385,7 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase
                 verify(notificationManager, times(1)).fireNotification(
                         argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_START, false, event)));
                 verify(notificationManager, times(1)).fireNotification(
-                        argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_ASYNC_SCHEDULED, false, event)));
+                        argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_ASYNC_SCHEDULED, false, null)));
                 verify(notificationManager, times(1)).fireNotification(
                         argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_COMPLETE, false, null)));
                 // Event is not same, because it's copied
