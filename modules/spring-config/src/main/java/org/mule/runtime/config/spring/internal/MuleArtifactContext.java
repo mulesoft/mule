@@ -189,17 +189,28 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
     this.xmlConfigurationDocumentLoader = newXmlConfigurationDocumentLoader();
     this.serviceDiscoverer = new DefaultRegistry(muleContext);
 
-    registerComponentBuildingDefinitions(serviceRegistry, MuleArtifactContext.class.getClassLoader(), componentBuildingDefinitionRegistry, ofNullable(muleContext.getExtensionManager() == null? null : muleContext.getExtensionManager().getExtensions()));
+    registerComponentBuildingDefinitions(serviceRegistry, MuleArtifactContext.class.getClassLoader(),
+                                         componentBuildingDefinitionRegistry,
+                                         ofNullable(muleContext.getExtensionManager() == null ? null
+                                             : muleContext.getExtensionManager().getExtensions()),
+                                         (componentBuildingDefinitionProvider -> componentBuildingDefinitionProvider
+                                             .getComponentBuildingDefinitions()));
 
     for (ClassLoader pluginArtifactClassLoader : pluginsClassLoaders) {
-      serviceRegistry.lookupProviders(ComponentBuildingDefinitionProvider.class, pluginArtifactClassLoader)
+      registerComponentBuildingDefinitions(serviceRegistry, pluginArtifactClassLoader, componentBuildingDefinitionRegistry,
+                                           ofNullable(muleContext.getExtensionManager() == null ? null
+                                               : muleContext.getExtensionManager().getExtensions()),
+                                           (componentBuildingDefinitionProvider -> componentBuildingDefinitionProvider
+                                               .getComponentBuildingDefinitions()));
+
+      /*serviceRegistry.lookupProviders(ComponentBuildingDefinitionProvider.class, pluginArtifactClassLoader)
           .forEach(componentBuildingDefinitionProvider -> {
             if (!(componentBuildingDefinitionProvider instanceof ExtensionBuildingDefinitionProvider)) {
               componentBuildingDefinitionProvider.init();
               componentBuildingDefinitionProvider.getComponentBuildingDefinitions()
                   .forEach(componentBuildingDefinitionRegistry::register);
             }
-          });
+          });*/
     }
 
     xmlApplicationParser = createApplicationParser(pluginsClassLoaders);
