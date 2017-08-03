@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.config.spring.internal.dsl.spring;
 
-import static net.sf.cglib.proxy.Enhancer.registerStaticCallbacks;
+import static org.springframework.cglib.proxy.Enhancer.registerStaticCallbacks;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
@@ -24,9 +24,9 @@ import java.util.function.Supplier;
 
 import org.springframework.beans.factory.SmartFactoryBean;
 
-import net.sf.cglib.proxy.Callback;
-import net.sf.cglib.proxy.Enhancer;
-import net.sf.cglib.proxy.MethodInterceptor;
+import org.springframework.cglib.proxy.Callback;
+import org.springframework.cglib.proxy.Enhancer;
+import org.springframework.cglib.proxy.MethodInterceptor;
 
 /**
  * Repository for storing the dynamic class generated to mimic {@link org.springframework.beans.factory.FactoryBean} from an
