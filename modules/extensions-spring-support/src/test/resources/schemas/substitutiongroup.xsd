@@ -39,9 +39,25 @@
                                 </xs:sequence>
                             </xs:complexType>
                         </xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" name="eesg-pojo">
+                            <xs:complexType>
+                                <xs:sequence minOccurs="1" maxOccurs="1">
+                                    <xs:element xmlns:sg="http://www.mulesoft.org/schema/mule/sg" minOccurs="0" maxOccurs="1" ref="sg:abstract-e-e-s-g-pojo"></xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" name="mule-s-g-pojo">
+                            <xs:complexType>
+                                <xs:sequence minOccurs="1" maxOccurs="1">
+                                    <xs:element xmlns:sg="http://www.mulesoft.org/schema/mule/sg" minOccurs="0" maxOccurs="1" ref="sg:abstract-mule-s-g-pojo"></xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
                     </xs:sequence>
                     <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
                     <xs:attribute type="xs:string" use="optional" name="somePojo"></xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" name="eesgPojo"></xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" name="muleSGPojo"></xs:attribute>
                 </xs:extension>
             </xs:complexContent>
         </xs:complexType>
@@ -54,4 +70,20 @@
         </xs:complexContent>
     </xs:complexType>
     <xs:element xmlns:sg="http://www.mulesoft.org/schema/mule/sg" xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" type="sg:org.mule.test.substitutiongroup.extension.SomePojo" substitutionGroup="heisenberg:some-component" abstract="true" name="abstract-some-pojo"></xs:element>
+    <xs:complexType name="org.mule.test.substitutiongroup.extension.EESGPojo">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+                <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="innerParameter"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:sg="http://www.mulesoft.org/schema/mule/sg" type="sg:org.mule.test.substitutiongroup.extension.EESGPojo" substitutionGroup="ee:some-ee-component" abstract="true" name="abstract-eesg-pojo"></xs:element>
+    <xs:complexType name="org.mule.test.substitutiongroup.extension.MuleSGPojo">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+                <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="innerParameter"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:sg="http://www.mulesoft.org/schema/mule/sg" type="sg:org.mule.test.substitutiongroup.extension.MuleSGPojo" substitutionGroup="mule:some-core-component" abstract="true" name="abstract-mule-s-g-pojo"></xs:element>
 </xs:schema>
