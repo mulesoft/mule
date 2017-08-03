@@ -19,7 +19,7 @@ import java.util.function.Supplier;
 
 import static java.util.Collections.emptySet;
 
-public class SpiUtils {
+public class ComponentBuildingDefinitionUtils {
 
   public static void registerComponentBuildingDefinitions(ServiceRegistry serviceRegistry, ClassLoader classLoader,
                                                           ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry,
@@ -28,17 +28,17 @@ public class SpiUtils {
 
     serviceRegistry.lookupProviders(ComponentBuildingDefinitionProvider.class, classLoader)
         .forEach(componentBuildingDefinitionProvider -> {
-          componentBuildingDefinitionProvider.init();
-
-          List<ComponentBuildingDefinition> componentBuildingDefinitions;
-
-          if (componentBuildingDefinitionProvider instanceof ExtensionBuildingDefinitionProvider) {
+          boolean isExtensionBuildingDefinitionProvider =
+              componentBuildingDefinitionProvider instanceof ExtensionBuildingDefinitionProvider;
+          if (isExtensionBuildingDefinitionProvider) {
             ((ExtensionBuildingDefinitionProvider) componentBuildingDefinitionProvider)
                 .setExtensionModels(extensionModels.orElse(emptySet()));
-            componentBuildingDefinitions = providerListFunction.apply(componentBuildingDefinitionProvider);
-          } else {
-            componentBuildingDefinitions = componentBuildingDefinitionProvider.getComponentBuildingDefinitions();
           }
+          componentBuildingDefinitionProvider.init();
+
+          List<ComponentBuildingDefinition> componentBuildingDefinitions =
+              isExtensionBuildingDefinitionProvider ? providerListFunction.apply(componentBuildingDefinitionProvider)
+                  : componentBuildingDefinitionProvider.getComponentBuildingDefinitions();
 
           componentBuildingDefinitions.forEach(componentBuildingDefinitionRegistry::register);
         });

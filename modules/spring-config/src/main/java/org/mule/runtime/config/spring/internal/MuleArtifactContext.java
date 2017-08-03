@@ -16,12 +16,22 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.ArrayUtils.addAll;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+<<<<<<< HEAD:modules/spring-config/src/main/java/org/mule/runtime/config/spring/internal/MuleArtifactContext.java
 import static org.mule.runtime.config.spring.api.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
 import static org.mule.runtime.config.spring.api.dsl.model.ApplicationModel.CONFIGURATION_IDENTIFIER;
 import static org.mule.runtime.config.spring.api.dsl.model.ApplicationModel.IMPORT_ELEMENT;
 import static org.mule.runtime.config.spring.api.dsl.model.ApplicationModel.MULE_IDENTIFIER;
 import static org.mule.runtime.config.spring.internal.dsl.spring.BeanDefinitionFactory.SPRING_SINGLETON_OBJECT;
 import static org.mule.runtime.config.spring.internal.parsers.generic.AutoIdUtils.uniqueValue;
+=======
+import static org.mule.runtime.config.spring.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.CONFIGURATION_IDENTIFIER;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.IMPORT_ELEMENT;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_IDENTIFIER;
+import static org.mule.runtime.config.spring.dsl.spring.BeanDefinitionFactory.SPRING_SINGLETON_OBJECT;
+import static org.mule.runtime.config.spring.parsers.generic.AutoIdUtils.uniqueValue;
+import static org.mule.runtime.config.spring.util.ComponentBuildingDefinitionUtils.registerComponentBuildingDefinitions;
+>>>>>>> Refactors:modules/spring-config/src/main/java/org/mule/runtime/config/spring/MuleArtifactContext.java
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTIVITY_TESTING_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_METADATA_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
@@ -86,8 +96,12 @@ import org.mule.runtime.core.api.util.Pair;
 import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
+<<<<<<< HEAD:modules/spring-config/src/main/java/org/mule/runtime/config/spring/internal/MuleArtifactContext.java
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.module.extension.internal.config.ExtensionBuildingDefinitionProvider;
+=======
+import org.mule.runtime.core.api.registry.SpiServiceRegistry;
+>>>>>>> Refactors:modules/spring-config/src/main/java/org/mule/runtime/config/spring/MuleArtifactContext.java
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -191,26 +205,15 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
 
     registerComponentBuildingDefinitions(serviceRegistry, MuleArtifactContext.class.getClassLoader(),
                                          componentBuildingDefinitionRegistry,
-                                         ofNullable(muleContext.getExtensionManager() == null ? null
-                                             : muleContext.getExtensionManager().getExtensions()),
+                                         getExtensionModels(muleContext.getExtensionManager()),
                                          (componentBuildingDefinitionProvider -> componentBuildingDefinitionProvider
                                              .getComponentBuildingDefinitions()));
 
     for (ClassLoader pluginArtifactClassLoader : pluginsClassLoaders) {
       registerComponentBuildingDefinitions(serviceRegistry, pluginArtifactClassLoader, componentBuildingDefinitionRegistry,
-                                           ofNullable(muleContext.getExtensionManager() == null ? null
-                                               : muleContext.getExtensionManager().getExtensions()),
+                                           getExtensionModels(muleContext.getExtensionManager()),
                                            (componentBuildingDefinitionProvider -> componentBuildingDefinitionProvider
                                                .getComponentBuildingDefinitions()));
-
-      /*serviceRegistry.lookupProviders(ComponentBuildingDefinitionProvider.class, pluginArtifactClassLoader)
-          .forEach(componentBuildingDefinitionProvider -> {
-            if (!(componentBuildingDefinitionProvider instanceof ExtensionBuildingDefinitionProvider)) {
-              componentBuildingDefinitionProvider.init();
-              componentBuildingDefinitionProvider.getComponentBuildingDefinitions()
-                  .forEach(componentBuildingDefinitionRegistry::register);
-            }
-          });*/
     }
 
     xmlApplicationParser = createApplicationParser(pluginsClassLoaders);
@@ -219,6 +222,11 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
 
     createApplicationModel();
     determineIfOnlyNewParsingMechanismCanBeUsed();
+  }
+
+  private static Optional<Set<ExtensionModel>> getExtensionModels(ExtensionManager extensionManager) {
+    return ofNullable(extensionManager == null ? null
+        : extensionManager.getExtensions());
   }
 
   protected XmlConfigurationDocumentLoader newXmlConfigurationDocumentLoader() {
