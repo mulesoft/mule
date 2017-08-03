@@ -6,14 +6,15 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
-import static org.mule.runtime.api.meta.TargetType.PAYLOAD;
+import static org.mule.runtime.api.meta.TargetType.MESSAGE;
+import static org.mule.runtime.core.internal.util.message.MessageUtils.unwrapResultIfNecessary;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.TargetType;
 import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
-import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 
 /**
@@ -48,21 +49,15 @@ final class TargetReturnDelegate extends AbstractReturnDelegate {
 
   @Override
   public Event asReturnValue(Object value, ExecutionContextAdapter operationContext) {
-    return Event.builder(operationContext.getEvent())
-        .addVariable(target, getTargetValue(value, operationContext))
-        .build();
-  }
-
-  private Object getTargetValue(Object value, ExecutionContextAdapter operationContext) {
-    return targetType == PAYLOAD ? unwrapResultIfNecessary(value) : toMessage(value, operationContext);
-  }
-
-  private Object unwrapResultIfNecessary(Object value) {
-    if (value instanceof Result) {
-      Result result = (Result) value;
-      value = result.getOutput();
+    Event.Builder builder = Event.builder(operationContext.getEvent());
+    if (targetType == MESSAGE) {
+      builder.addVariable(target, toMessage(value, operationContext));
+    } else {
+      Object targetValue = unwrapResultIfNecessary(value);
+      builder.addVariable(target, targetValue,
+                          DataType.builder().fromObject(targetValue).mediaType(resolveMediaType(value, operationContext))
+                              .build());
     }
-
-    return value;
+    return builder.build();
   }
 }

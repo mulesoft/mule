@@ -19,11 +19,15 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.TargetType;
 import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+
+import java.nio.charset.Charset;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -70,9 +74,7 @@ public class TargetOutputMessageReturnDelegateTestCase extends AbstractMuleTestC
     delegate = createDelegate(MESSAGE);
 
     Event result = delegate.asReturnValue(payload, operationContext);
-    assertThat(result.getMessage().getPayload().getValue(), is(""));
-    assertThat(result.getMessage().getAttributes().getValue(), is(attributes));
-    assertThat(result.getMessage().getPayload().getDataType().getType().equals(String.class), is(true));
+    assertMessage(result.getMessage());
     assertThat(result.getVariable(TARGET).getValue(), is(instanceOf(Message.class)));
     Message message = (Message) result.getVariable(TARGET).getValue();
     assertThat(message.getPayload().getValue(), is(payload));
@@ -81,11 +83,24 @@ public class TargetOutputMessageReturnDelegateTestCase extends AbstractMuleTestC
   @Test
   public void operationTargetPayload() {
     delegate = createDelegate(PAYLOAD);
-
     Event result = delegate.asReturnValue(payload, operationContext);
-    assertThat(result.getMessage().getPayload().getValue(), is(""));
-    assertThat(result.getMessage().getAttributes().getValue(), is(attributes));
-    assertThat(result.getMessage().getPayload().getDataType().getType().equals(String.class), is(true));
+    assertMessage(result.getMessage());
     assertThat(result.getVariable(TARGET).getValue(), is(payload));
+  }
+
+  @Test
+  public void operationTargetPayloadWithResult() {
+    delegate = createDelegate(PAYLOAD);
+    MediaType mediaType = MediaType.APPLICATION_JSON.withCharset(Charset.defaultCharset());
+    Event result = delegate.asReturnValue(Result.builder().output(payload).mediaType(mediaType).build(), operationContext);
+    assertMessage(result.getMessage());
+    assertThat(result.getVariable(TARGET).getValue(), is(payload));
+    assertThat(result.getVariable(TARGET).getDataType().getMediaType(), is(mediaType));
+  }
+
+  private void assertMessage(Message message) {
+    assertThat(message.getPayload().getValue(), is(""));
+    assertThat(message.getAttributes().getValue(), is(attributes));
+    assertThat(message.getPayload().getDataType().getType().equals(String.class), is(true));
   }
 }

@@ -92,7 +92,7 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
    * @param operationContext
    * @return
    */
-  private MediaType resolveMediaType(Object value, ExecutionContextAdapter<ComponentModel> operationContext) {
+  protected MediaType resolveMediaType(Object value, ExecutionContextAdapter<ComponentModel> operationContext) {
     Charset existingEncoding = getDefaultEncoding(muleContext);
     MediaType mediaType = null;
     if (value instanceof Result) {
