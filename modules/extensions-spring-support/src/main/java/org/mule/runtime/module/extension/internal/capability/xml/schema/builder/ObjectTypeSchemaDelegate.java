@@ -425,7 +425,7 @@ final class ObjectTypeSchemaDelegate {
       }
     }
     throw new IllegalArgumentException(userConfiguredSubstitutionGroup
-                                       + " is not a valid substitutionGrup. Prefix does not exist.");
+        + " is not a valid substitutionGrup. Prefix does not exist.");
   }
 
   private QName getAbstractElementSubstitutionGroup(DslElementSyntax typeDsl, Optional<DslElementSyntax> baseDsl) {
