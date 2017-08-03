@@ -194,6 +194,58 @@
               "name": "somePojo",
               "description": "",
               "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "@ref:org.mule.test.substitutiongroup.extension.EESGPojo"
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
+              "elementReferences": [],
+              "name": "eesgPojo",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "@ref:org.mule.test.substitutiongroup.extension.MuleSGPojo"
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 3
+              },
+              "elementReferences": [],
+              "name": "muleSGPojo",
+              "description": "",
+              "modelProperties": {}
             }
           ],
           "exclusiveParametersModels": [],
@@ -265,6 +317,102 @@
   ],
   "modelProperties": {},
   "types": [
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
+        "typeId": "org.mule.test.substitutiongroup.extension.EESGPojo",
+        "classInformation": {
+          "hasDefaultConstructor": true,
+          "isInterface": false,
+          "isInstantiable": true,
+          "isAbstract": false,
+          "isFinal": false,
+          "implementedInterfaces": [],
+          "parent": "",
+          "genericTypes": []
+        },
+        "xmlHints": {
+          "allowInlineDefinition": true,
+          "allowTopLevelDefinition": false,
+          "allowReferences": true,
+          "substitutionGroup": "ee:some-ee-component"
+        },
+        "typeAlias": {
+          "value": "EESGPojo"
+        }
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "innerParameter"
+          },
+          "model": {
+            "type": "Boolean",
+            "annotations": {
+              "typeId": "boolean"
+            }
+          },
+          "annotations": {
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
+            },
+            "default": "false",
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
+        "typeId": "org.mule.test.substitutiongroup.extension.MuleSGPojo",
+        "classInformation": {
+          "hasDefaultConstructor": true,
+          "isInterface": false,
+          "isInstantiable": true,
+          "isAbstract": false,
+          "isFinal": false,
+          "implementedInterfaces": [],
+          "parent": "",
+          "genericTypes": []
+        },
+        "xmlHints": {
+          "allowInlineDefinition": true,
+          "allowTopLevelDefinition": false,
+          "allowReferences": true,
+          "substitutionGroup": "mule:some-core-component"
+        },
+        "typeAlias": {
+          "value": "MuleSGPojo"
+        }
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "innerParameter"
+          },
+          "model": {
+            "type": "Boolean",
+            "annotations": {
+              "typeId": "boolean"
+            }
+          },
+          "annotations": {
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
+            },
+            "default": "false",
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        }
+      ]
+    },
     {
       "format": "java",
       "type": "Object",
