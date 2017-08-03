@@ -8540,7 +8540,10 @@
                 "allowInlineDefinition": true,
                 "allowTopLevelDefinition": true,
                 "allowReferences": true,
-                "substitutionGroup": ""
+                "substitutionGroup": {
+                  "prefix": "",
+                  "element": ""
+                }
               },
               "typeAlias": {
                 "value": "HealthyFood"
@@ -8681,7 +8684,10 @@
                 "allowInlineDefinition": true,
                 "allowTopLevelDefinition": true,
                 "allowReferences": true,
-                "substitutionGroup": ""
+                "substitutionGroup": {
+                  "prefix": "",
+                  "element": ""
+                }
               },
               "typeAlias": {
                 "value": "HealthyFood"
@@ -8814,7 +8820,10 @@
           "allowInlineDefinition": true,
           "allowTopLevelDefinition": true,
           "allowReferences": true,
-          "substitutionGroup": ""
+          "substitutionGroup": {
+            "prefix": "",
+            "element": ""
+          }
         },
         "typeAlias": {
           "value": "GroupedFood"
@@ -8966,7 +8975,10 @@
           "allowInlineDefinition": true,
           "allowTopLevelDefinition": true,
           "allowReferences": true,
-          "substitutionGroup": ""
+          "substitutionGroup": {
+            "prefix": "",
+            "element": ""
+          }
         },
         "typeAlias": {
           "value": "HealthyFood"

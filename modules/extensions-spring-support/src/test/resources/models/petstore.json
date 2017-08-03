@@ -13444,7 +13444,10 @@
           "allowInlineDefinition": true,
           "allowTopLevelDefinition": true,
           "allowReferences": true,
-          "substitutionGroup": ""
+          "substitutionGroup": {
+            "prefix": "",
+            "element": ""
+          }
         },
         "typeAlias": {
           "value": "PhoneNumber"

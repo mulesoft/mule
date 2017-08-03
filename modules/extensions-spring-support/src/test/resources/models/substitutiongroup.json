@@ -39,7 +39,10 @@
           "allowInlineDefinition": true,
           "allowTopLevelDefinition": true,
           "allowReferences": true,
-          "substitutionGroup": ""
+          "substitutionGroup": {
+            "prefix": "",
+            "element": ""
+          }
         },
         "typeAlias": {
           "value": "Ricin"
@@ -89,7 +92,10 @@
                 "allowInlineDefinition": true,
                 "allowTopLevelDefinition": true,
                 "allowReferences": true,
-                "substitutionGroup": ""
+                "substitutionGroup": {
+                  "prefix": "",
+                  "element": ""
+                }
               },
               "typeAlias": {
                 "value": "door"
@@ -336,7 +342,10 @@
           "allowInlineDefinition": true,
           "allowTopLevelDefinition": false,
           "allowReferences": true,
-          "substitutionGroup": "ee:some-ee-component"
+          "substitutionGroup": {
+            "prefix": "ee",
+            "element": "some-ee-component"
+          }
         },
         "typeAlias": {
           "value": "EESGPojo"
@@ -384,7 +393,10 @@
           "allowInlineDefinition": true,
           "allowTopLevelDefinition": false,
           "allowReferences": true,
-          "substitutionGroup": "mule:some-core-component"
+          "substitutionGroup": {
+            "prefix": "mule",
+            "element": "some-core-component"
+          }
         },
         "typeAlias": {
           "value": "MuleSGPojo"
@@ -432,7 +444,10 @@
           "allowInlineDefinition": true,
           "allowTopLevelDefinition": true,
           "allowReferences": true,
-          "substitutionGroup": "heisenberg:some-component"
+          "substitutionGroup": {
+            "prefix": "heisenberg",
+            "element": "some-component"
+          }
         },
         "typeAlias": {
           "value": "SomeExportedPojo"
@@ -480,7 +495,10 @@
           "allowInlineDefinition": true,
           "allowTopLevelDefinition": false,
           "allowReferences": true,
-          "substitutionGroup": "heisenberg:some-component"
+          "substitutionGroup": {
+            "prefix": "heisenberg",
+            "element": "some-component"
+          }
         },
         "typeAlias": {
           "value": "SomePojo"
