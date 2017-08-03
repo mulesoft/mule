@@ -77,7 +77,7 @@ import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
-import org.mule.runtime.extension.internal.dsl.syntax.DslElementSyntaxBuilder;
+import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntaxBuilder;
 
 import java.util.List;
 import java.util.Map;
