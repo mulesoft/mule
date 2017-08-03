@@ -70,6 +70,7 @@ import org.mule.runtime.config.spring.internal.processor.LifecycleStatePostProce
 import org.mule.runtime.config.spring.internal.processor.MuleInjectorProcessor;
 import org.mule.runtime.config.spring.internal.processor.PostRegistrationActionsPostProcessor;
 import org.mule.runtime.config.spring.internal.util.LaxInstantiationStrategyWrapper;
+import org.mule.runtime.config.spring.util.SpiUtils;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigResource;
 import org.mule.runtime.core.api.config.RuntimeConfigurationException;
@@ -188,17 +189,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
     this.xmlConfigurationDocumentLoader = newXmlConfigurationDocumentLoader();
     this.serviceDiscoverer = new DefaultRegistry(muleContext);
 
-    serviceRegistry.lookupProviders(ComponentBuildingDefinitionProvider.class, MuleArtifactContext.class.getClassLoader())
-        .forEach(componentBuildingDefinitionProvider -> {
-          if (componentBuildingDefinitionProvider instanceof ExtensionBuildingDefinitionProvider) {
-            ((ExtensionBuildingDefinitionProvider) componentBuildingDefinitionProvider)
-                .setExtensionModels(muleContext.getExtensionManager() != null ? muleContext.getExtensionManager().getExtensions()
-                    : emptySet());
-          }
-          componentBuildingDefinitionProvider.init();
-          componentBuildingDefinitionProvider.getComponentBuildingDefinitions()
-              .forEach(componentBuildingDefinitionRegistry::register);
-        });
+    registerComponentBuildingDefinitions(serviceRegistry, MuleArtifactContext.class.getClassLoader(), componentBuildingDefinitionRegistry, ofNullable(muleContext.getExtensionManager() == null? null : muleContext.getExtensionManager().getExtensions()));
 
     for (ClassLoader pluginArtifactClassLoader : pluginsClassLoaders) {
       serviceRegistry.lookupProviders(ComponentBuildingDefinitionProvider.class, pluginArtifactClassLoader)
