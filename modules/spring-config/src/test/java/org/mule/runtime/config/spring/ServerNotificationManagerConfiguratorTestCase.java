@@ -15,8 +15,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.config.spring.NotificationConfig.DisabledNotificationConfig;
-import org.mule.runtime.config.spring.NotificationConfig.EnabledNotificationConfig;
+import org.mule.runtime.config.spring.internal.ServerNotificationManagerConfigurator;
+import org.mule.runtime.config.spring.internal.NotificationConfig.DisabledNotificationConfig;
+import org.mule.runtime.config.spring.internal.NotificationConfig.EnabledNotificationConfig;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.NotificationsProvider;
 import org.mule.runtime.core.api.context.notification.ServerNotification;

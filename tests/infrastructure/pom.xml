@@ -94,7 +94,6 @@
         <dependency>
             <groupId>io.qameta.allure</groupId>
             <artifactId>allure-junit4</artifactId>
-            <version>${allureJunitVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.groovy</groupId>

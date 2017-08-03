@@ -116,7 +116,7 @@
         <dependency>
             <groupId>com.github.stephenc.eaio-uuid</groupId>
             <artifactId>uuid</artifactId>
-            <version>3.4.0</version>
+            <version>${eaioUuidVersion}</version>
         </dependency>
         <dependency>
             <groupId>commons-cli</groupId>
@@ -150,14 +150,6 @@
         <dependency>
             <groupId>javax.inject</groupId>
             <artifactId>javax.inject</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>asm</groupId>
-            <artifactId>asm</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>asm</groupId>
-            <artifactId>asm-commons</artifactId>
         </dependency>
         <dependency>
             <groupId>org.mule.mvel</groupId>

@@ -15,9 +15,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.internal.config.bootstrap.ClassLoaderRegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.runtime.core.internal.util.EnumerationAdapter;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.classloader.EnumerationAdapter;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.IOException;

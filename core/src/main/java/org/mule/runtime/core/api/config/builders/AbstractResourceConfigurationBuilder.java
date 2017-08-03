@@ -7,24 +7,29 @@
 package org.mule.runtime.core.api.config.builders;
 
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.configurationBuilderSuccess;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ConfigResource;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.core.api.config.ConfigResource;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.util.StringUtils;
 
 import java.io.IOException;
 import java.util.Map;
 
+import org.slf4j.Logger;
+
 /**
  * Abstract {@link ConfigurationBuilder} implementation used for ConfigurationBuider's that use one of more configuration
  * resources of the same type that are defined using strings or {@link ConfigResource} objects. It is recommended that
- * {@link ConfigResource} objects are used over strings since they can be more descriptive, but
- * Strings will be supported for quite some time.
+ * {@link ConfigResource} objects are used over strings since they can be more descriptive, but Strings will be supported for
+ * quite some time.
  */
 public abstract class AbstractResourceConfigurationBuilder extends AbstractConfigurationBuilder {
+
+  private static final Logger LOGGER = getLogger(AbstractResourceConfigurationBuilder.class);
 
   private final Map<String, String> artifactProperties;
   protected ConfigResource[] artifactConfigResources;
@@ -71,12 +76,12 @@ public abstract class AbstractResourceConfigurationBuilder extends AbstractConfi
   @Override
   public void configure(MuleContext muleContext) throws ConfigurationException {
     if (artifactConfigResources == null) {
-      throw new ConfigurationException(CoreMessages.objectIsNull("Configuration Resources"));
+      throw new ConfigurationException(objectIsNull("Configuration Resources"));
     }
 
     super.configure(muleContext);
 
-    logger.debug(configurationBuilderSuccess(this, createConfigResourcesString()).toString());
+    LOGGER.debug(configurationBuilderSuccess(this, createConfigResourcesString()).toString());
   }
 
   protected ConfigResource[] loadConfigResources(String[] configs) throws ConfigurationException {

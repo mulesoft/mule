@@ -13,10 +13,11 @@ import static org.mule.runtime.internal.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MAX_ONE;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.UNBOUNDED;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.MAX_ONE;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.UNBOUNDED;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;

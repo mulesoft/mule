@@ -131,10 +131,12 @@
         <dependency>
             <groupId>dom4j</groupId>
             <artifactId>dom4j</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>jaxen</groupId>
             <artifactId>jaxen</artifactId>
+            <scope>test</scope>
             <!-- see http://jira.codehaus.org/browse/MNG-3007
                  depending on whether jaxen is resolved via dist.codehaus.org
                  or the central repo we get transitive dependencies that we

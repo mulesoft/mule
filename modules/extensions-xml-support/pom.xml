@@ -43,7 +43,7 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <!-- TODO(fernandezlautaro): MULE-9646 + MULE-9637 needed dependency as we heavily rely on org.mule.runtime.config.spring.dsl.model.ComponentModel and org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationParser to make templating work -->
+            <!-- TODO(fernandezlautaro): MULE-9646 + MULE-9637 needed dependency as we heavily rely on org.mule.runtime.config.spring.api.dsl.model.ComponentModel and org.mule.runtime.config.spring.api.dsl.processor.xml.XmlApplicationParser to make templating work -->
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-spring-config</artifactId>
             <version>${project.version}</version>
@@ -57,7 +57,7 @@
 
         <!--Test Dependencies-->
         <dependency>
-        <!-- TODO(fernandezlautaro): needed dependency as we heavily rely on org.mule.runtime.config.spring.dsl.model.ComponentModel and org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationParser to make templating work -->
+        <!-- TODO(fernandezlautaro): needed dependency as we heavily rely on org.mule.runtime.config.spring.api.dsl.model.ComponentModel and org.mule.runtime.config.spring.api.dsl.processor.xml.XmlApplicationParser to make templating work -->
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-extensions-spring-support</artifactId>
             <version>${project.version}</version>

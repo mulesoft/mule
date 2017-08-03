@@ -6,13 +6,16 @@
  */
 package org.mule.runtime.core.api.config.builders;
 
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
+import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A support class for {@link org.mule.runtime.core.api.config.ConfigurationBuilder} implementations that handles the logic of
@@ -22,9 +25,19 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractConfigurationBuilder implements ConfigurationBuilder {
 
-  protected transient final Logger logger = LoggerFactory.getLogger(getClass());
-
+  protected final List<ServiceConfigurator> serviceConfigurators = new ArrayList<>();
   protected boolean configured = false;
+
+  /**
+   * Adds a service configurator to be used on the context being built.
+   *
+   * @param serviceConfigurator service to add. Non null.
+   */
+  @Override
+  public void addServiceConfigurator(ServiceConfigurator serviceConfigurator) {
+    checkArgument(serviceConfigurator != null, "serviceConfigurator cannot be null");
+    serviceConfigurators.add(serviceConfigurator);
+  }
 
   /**
    * Will configure a MuleContext object based on the builders configuration settings. This method will delegate the actual

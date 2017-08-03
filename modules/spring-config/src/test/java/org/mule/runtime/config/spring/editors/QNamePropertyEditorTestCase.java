@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.spring.editors;
 
+import org.mule.runtime.config.spring.internal.editors.QNamePropertyEditor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import javax.xml.namespace.QName;

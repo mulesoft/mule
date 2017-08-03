@@ -12,6 +12,9 @@
     <description>Mule Core Unit Tests</description>
 
     <properties>
+        <asmVersion>3.3.1</asmVersion>
+        <asmCommonsVersion>3.1</asmCommonsVersion>
+    
         <formatterConfigPath>../formatter.xml</formatterConfigPath>
     </properties>
     
@@ -46,6 +49,16 @@
             <groupId>org.mule.services</groupId>
             <artifactId>mule-service-weave</artifactId>
             <classifier>mule-service</classifier>
+        </dependency>
+        <dependency>
+            <groupId>asm</groupId>
+            <artifactId>asm</artifactId>
+            <version>${asmVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>asm</groupId>
+            <artifactId>asm-commons</artifactId>
+            <version>${asmCommonsVersion}</version>
         </dependency>
 
         <dependency>

@@ -7,10 +7,10 @@
 package org.mule.functional.junit4;
 
 import static java.util.Collections.emptyMap;
+import static org.mule.runtime.config.spring.api.SpringXmlConfigurationBuilderFactory.createConfigurationBuilder;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 
 import org.mule.functional.api.flow.FlowRunner;
-import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
@@ -22,12 +22,12 @@ import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.processor.FlowAssert;
 
-import org.junit.After;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
+
+import org.junit.After;
 
 /**
  * A base test case for tests that initialize Mule using a configuration file. The default configuration builder used is
@@ -65,17 +65,16 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
   protected ConfigurationBuilder getBuilder() throws Exception {
     String configResources = getConfigResources();
     if (configResources != null) {
-      return new SpringXmlConfigurationBuilder(configResources, emptyMap(), APP);
+      return createConfigurationBuilder(configResources, emptyMap(), APP);
     }
     configResources = getConfigFile();
     if (configResources != null) {
       if (configResources.contains(",")) {
         throw new RuntimeException("Do not use this method when the config is composed of several files. Use getConfigFiles method instead.");
       }
-      return new SpringXmlConfigurationBuilder(configResources, emptyMap(), APP);
+      return createConfigurationBuilder(configResources, emptyMap(), APP);
     }
-    String[] multipleConfigResources = getConfigFiles();
-    return new SpringXmlConfigurationBuilder(multipleConfigResources, emptyMap(), APP);
+    return createConfigurationBuilder(getConfigFiles(), emptyMap(), APP);
   }
 
   /**

@@ -20,13 +20,12 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldMetadataType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldsWithGetters;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.toDataType;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.unwrapGenericFromClass;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_LOADER;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.arrayOf;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.assertMessageType;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.dictionaryOf;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.objectTypeBuilder;
-import static org.springframework.core.ResolvableType.forType;
+
 import org.mule.metadata.api.builder.ArrayTypeBuilder;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.builder.ObjectTypeBuilder;
@@ -63,7 +62,6 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.junit.Test;
-import org.springframework.core.ResolvableType;
 
 @SmallTest
 public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
@@ -166,12 +164,6 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
                 exposedFields);
     assertField("fruitLikeMap", dictionaryOf(Map.class, objectTypeBuilder(Fruit.class)),
                 exposedFields);
-  }
-
-  @Test
-  public void unwrapPagingProviderGenericFromParentClass() {
-    ResolvableType type = unwrapGenericFromClass(PagingProvider.class, forType(TestPagingProvider.class), 1);
-    assertThat(type.getRawClass(), equalTo(Banana.class));
   }
 
   @Test

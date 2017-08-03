@@ -18,6 +18,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLICY_PROV
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.UUID.getUUID;
+
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
@@ -387,6 +388,11 @@ public class ArtifactContextBuilder {
           @Override
           public boolean isConfigured() {
             return isConfigured;
+          }
+
+          @Override
+          public void addServiceConfigurator(ServiceConfigurator serviceConfigurator) {
+            // Nothing to do
           }
         });
         DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();

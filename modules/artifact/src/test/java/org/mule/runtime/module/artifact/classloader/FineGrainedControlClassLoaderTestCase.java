@@ -20,8 +20,9 @@ import static org.mule.runtime.module.artifact.classloader.ParentFirstLookupStra
 import static org.mule.runtime.module.artifact.classloader.ParentOnlyLookupStrategy.PARENT_ONLY;
 import static org.mule.tck.junit4.matcher.FunctionExpressionMatcher.expressionMatches;
 import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.runtime.module.artifact.classloader.TestClassLoader.TestClassNotFoundException;
 import org.mule.runtime.module.artifact.classloader.exception.CompositeClassNotFoundException;
+import org.mule.tck.classlaoder.TestClassLoader;
+import org.mule.tck.classlaoder.TestClassLoader.TestClassNotFoundException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

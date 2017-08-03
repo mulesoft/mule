@@ -23,9 +23,10 @@ import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.PRIMITIVE_T
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.model.display.LayoutModel.builder;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
-import static org.mule.runtime.config.spring.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
+import static org.mule.runtime.config.spring.api.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
 import static org.mule.runtime.extension.internal.loader.catalog.loader.common.XmlMatcher.match;
+
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.catalog.api.TypeResolver;
@@ -45,16 +46,16 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclarer;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
-import org.mule.runtime.config.spring.XmlConfigurationDocumentLoader;
-import org.mule.runtime.config.spring.dsl.model.ComponentModel;
-import org.mule.runtime.config.spring.dsl.model.internal.ComponentModelReader;
-import org.mule.runtime.config.spring.dsl.model.extension.xml.GlobalElementComponentModelModelProperty;
-import org.mule.runtime.config.spring.dsl.model.extension.xml.OperationComponentModelModelProperty;
-import org.mule.runtime.config.spring.dsl.model.extension.xml.XmlExtensionModelProperty;
-import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
-import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationParser;
-import org.mule.runtime.config.spring.dsl.model.internal.config.DefaultConfigurationPropertiesResolver;
-import org.mule.runtime.config.spring.dsl.model.internal.config.SystemPropertiesConfigurationProvider;
+import org.mule.runtime.config.spring.api.XmlConfigurationDocumentLoader;
+import org.mule.runtime.config.spring.api.dsl.model.ComponentModel;
+import org.mule.runtime.config.spring.api.dsl.processor.ConfigLine;
+import org.mule.runtime.config.spring.api.dsl.processor.xml.XmlApplicationParser;
+import org.mule.runtime.config.spring.internal.dsl.model.ComponentModelReader;
+import org.mule.runtime.config.spring.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
+import org.mule.runtime.config.spring.internal.dsl.model.config.SystemPropertiesConfigurationProvider;
+import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.GlobalElementComponentModelModelProperty;
+import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.OperationComponentModelModelProperty;
+import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.XmlExtensionModelProperty;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
@@ -149,7 +150,7 @@ final class XmlExtensionLoaderDelegate {
   private static final String TYPES_XML_SUFFIX = "-catalog" + XML_SUFFIX;
 
   private final String modulePath;
-  //TODO MULE-13214: typesCatalog could be removed once MULE-13214 is done
+  // TODO MULE-13214: typesCatalog could be removed once MULE-13214 is done
   private Optional<TypesCatalog> typesCatalog;
   private TypeResolver typeResolver;
 
@@ -213,7 +214,7 @@ final class XmlExtensionLoaderDelegate {
       final Element typesDocument = TypesCatalogXmlLoader.parseRootElement(resourceCustomType);
       final Optional<XmlMatcher> match = match(typesDocument, TypesCatalogXmlLoader.ELEM_MULE);
       if (match.isPresent()) {
-        //TODO MULE-13214: then could be removed once MULE-13214 is done
+        // TODO MULE-13214: then could be removed once MULE-13214 is done
         TypesCatalogXmlLoader typesCatalogXmlLoader = new TypesCatalogXmlLoader();
         typesCatalog = of(typesCatalogXmlLoader.load(resourceCustomType));
         typeResolver = getEmptyTypeResolver();
@@ -407,7 +408,7 @@ final class XmlExtensionLoaderDelegate {
   }
 
   private void extractOutputType(OperationDeclarer operationDeclarer, ComponentModel componentModel) {
-    //output processing
+    // output processing
     ComponentModel outputComponentModel = componentModel.getInnerComponents()
         .stream()
         .filter(child -> child.getIdentifier().equals(OPERATION_OUTPUT_IDENTIFIER)).findFirst()
@@ -418,7 +419,7 @@ final class XmlExtensionLoaderDelegate {
     operationDeclarer.withOutput().describedAs(getDescription(outputComponentModel))
         .ofType(outputType);
 
-    //output attribute processing
+    // output attribute processing
     Optional<ComponentModel> outputAttributesComponentModel = componentModel.getInnerComponents()
         .stream()
         .filter(child -> child.getIdentifier().equals(OPERATION_OUTPUT_ATTRIBUTES_IDENTIFIER)).findFirst();
@@ -439,7 +440,8 @@ final class XmlExtensionLoaderDelegate {
     try {
       metadataType = typeResolver.resolveType(receivedType);
     } catch (TypeResolverException e) {
-      //TODO MULE-13214: could be removed once MULE-13214 is done, as when fails fetching the type, then retries with the old model
+      // TODO MULE-13214: could be removed once MULE-13214 is done, as when fails fetching the type, then retries with the old
+      // model
       if (typesCatalog.isPresent()) {
         metadataType = typesCatalog.get().resolveType(receivedType);
       }

@@ -12,7 +12,9 @@ import static org.mule.runtime.dsl.api.component.TypeDefinition.fromConfiguratio
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.config.spring.dsl.model.ComponentModel;
+import org.mule.runtime.config.spring.api.dsl.model.ComponentModel;
+import org.mule.runtime.config.spring.internal.dsl.model.SpringComponentModel;
+import org.mule.runtime.config.spring.internal.dsl.processor.ObjectTypeVisitor;
 import org.mule.runtime.core.internal.processor.ReferenceProcessor;
 import org.mule.runtime.dsl.api.component.TypeDefinition;
 
@@ -35,7 +37,7 @@ public class ObjectTypeVisitorTestCase {
   @Test
   public void typeIsInstanceOfGivenClass() {
 
-    ObjectTypeVisitor visitor = new ObjectTypeVisitor(new ComponentModel());
+    ObjectTypeVisitor visitor = new ObjectTypeVisitor(new SpringComponentModel());
     TypeDefinition typeDefinition = fromType(String.class);
     typeDefinition.visit(visitor);
     assertTrue(String.class.isAssignableFrom(visitor.getType()));
@@ -44,7 +46,7 @@ public class ObjectTypeVisitorTestCase {
 
   @Test
   public void typeIsInstanceOfGivenClassFromAttribute() throws ClassNotFoundException {
-    ComponentModel componentModel = new ComponentModel();
+    ComponentModel componentModel = new SpringComponentModel();
     componentModel.setParameter("type", "org.mule.runtime.core.internal.processor.ReferenceProcessor");
     ObjectTypeVisitor visitor = new ObjectTypeVisitor(componentModel);
     TypeDefinition typeDefinition = fromConfigurationAttribute("type");
@@ -54,7 +56,7 @@ public class ObjectTypeVisitorTestCase {
 
   @Test
   public void typeIsInstanceOfCheckedClassFromAttribute() throws ClassNotFoundException {
-    ComponentModel componentModel = new ComponentModel();
+    ComponentModel componentModel = new SpringComponentModel();
     componentModel.setParameter("type", "org.mule.runtime.core.internal.processor.ReferenceProcessor");
     ObjectTypeVisitor visitor = new ObjectTypeVisitor(componentModel);
     TypeDefinition typeDefinition = fromConfigurationAttribute("type")
@@ -65,10 +67,10 @@ public class ObjectTypeVisitorTestCase {
 
   @Test
   public void typeIsInstanceOfClassInheritedFromCheckedClassFromAttribute() throws ClassNotFoundException {
-    ComponentModel componentModel = new ComponentModel();
+    ComponentModel componentModel = new SpringComponentModel();
     componentModel.setParameter("type", "org.mule.runtime.core.internal.processor.ReferenceProcessor");
     ObjectTypeVisitor visitor = new ObjectTypeVisitor(componentModel);
-    //Check that ReferenceProcessor inherits from AbstractProcessor
+    // Check that ReferenceProcessor inherits from AbstractProcessor
     TypeDefinition typeDefinition = fromConfigurationAttribute("type")
         .checkingThatIsClassOrInheritsFrom(org.mule.runtime.core.api.processor.AbstractProcessor.class);
     typeDefinition.visit(visitor);
@@ -79,7 +81,7 @@ public class ObjectTypeVisitorTestCase {
   public void testFailsIfTypeIsNotOfCheckedClass() throws ClassNotFoundException {
     exception.expect(MuleRuntimeException.class);
     exception.expectMessage("is not the same nor inherits from");
-    ComponentModel componentModel = new ComponentModel();
+    ComponentModel componentModel = new SpringComponentModel();
     componentModel.setParameter("type", this.getClass().getName());
     ObjectTypeVisitor visitor = new ObjectTypeVisitor(componentModel);
     TypeDefinition typeDefinition = fromConfigurationAttribute("type")

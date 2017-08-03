@@ -7,9 +7,10 @@
 package org.mule.runtime.module.extension.internal.capability.xml.schema.builder;
 
 import static org.apache.commons.lang3.StringUtils.capitalize;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.MULE_ABSTRACT_OPERATOR;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.MULE_ABSTRACT_OPERATOR_TYPE;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.TYPE_SUFFIX;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_ABSTRACT_OPERATOR;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_ABSTRACT_OPERATOR_TYPE;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.TYPE_SUFFIX;
+
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;

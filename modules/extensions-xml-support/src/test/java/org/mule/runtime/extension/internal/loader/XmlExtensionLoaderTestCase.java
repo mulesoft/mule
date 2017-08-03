@@ -24,8 +24,8 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
-import org.mule.runtime.config.spring.dsl.model.extension.xml.GlobalElementComponentModelModelProperty;
-import org.mule.runtime.config.spring.dsl.model.extension.xml.OperationComponentModelModelProperty;
+import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.GlobalElementComponentModelModelProperty;
+import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.OperationComponentModelModelProperty;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.IOException;

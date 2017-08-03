@@ -8,6 +8,7 @@
 package org.mule.runtime.module.artifact.classloader;
 
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
+import org.mule.tck.classlaoder.TestClassLoader;
 
 import java.io.IOException;
 import java.net.URL;

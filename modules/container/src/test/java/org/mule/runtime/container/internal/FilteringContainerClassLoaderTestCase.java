@@ -12,11 +12,11 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 
-import org.mule.runtime.module.artifact.classloader.EnumerationMatcher;
 import org.mule.runtime.module.artifact.classloader.ExportedService;
 import org.mule.runtime.module.artifact.classloader.FilteringArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.FilteringArtifactClassLoaderTestCase;
-import org.mule.runtime.module.artifact.classloader.TestClassLoader;
+import org.mule.tck.classlaoder.TestClassLoader;
+import org.mule.tck.util.EnumerationMatcher;
 
 import java.net.MalformedURLException;
 import java.net.URL;
