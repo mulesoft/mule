@@ -8,15 +8,18 @@
 package org.mule.runtime.core.internal.routing;
 
 import static java.lang.System.lineSeparator;
-
+import static java.util.stream.Collectors.toList;
+import org.mule.runtime.api.exception.ComposedErrorException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
+import org.mule.runtime.api.message.Error;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Router;
 import org.mule.runtime.core.internal.config.ExceptionHelper;
-import org.mule.runtime.core.api.exception.MessagingException;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -26,7 +29,7 @@ import java.util.Map.Entry;
  * 
  * @since 3.5.0
  */
-public class CompositeRoutingException extends MuleException {
+public class CompositeRoutingException extends MuleException implements ComposedErrorException {
 
   private static final String MESSAGE_TITLE = "Exception(s) were found for route(s): ";
 
@@ -95,6 +98,14 @@ public class CompositeRoutingException extends MuleException {
 
     builder.insert(0, MESSAGE_TITLE);
     return I18nMessageFactory.createStaticMessage(builder.toString());
+  }
+
+  @Override
+  public List<Error> getErrors() {
+    return exceptions.values().stream()
+        .filter(t -> t instanceof MessagingException && ((MessagingException) t).getEvent().getError().isPresent())
+        .map(me -> ((MessagingException) me).getEvent().getError().get())
+        .collect(toList());
   }
 
 }
