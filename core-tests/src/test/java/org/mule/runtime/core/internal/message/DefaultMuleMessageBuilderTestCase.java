@@ -317,7 +317,8 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
   public void copyPreservesDataType() {
     Apple apple = new Apple();
     long appleSize = 111;
-    Message message = new DefaultMessageBuilder().payload(new TypedValue(apple, fromObject(apple), Optional.of(appleSize))).build();
+    Message message =
+        new DefaultMessageBuilder().payload(new TypedValue(apple, fromObject(apple), Optional.of(appleSize))).build();
     Message copy = new DefaultMessageBuilder(message).build();
 
     assertThat(copy.getPayload(), is(message.getPayload()));
