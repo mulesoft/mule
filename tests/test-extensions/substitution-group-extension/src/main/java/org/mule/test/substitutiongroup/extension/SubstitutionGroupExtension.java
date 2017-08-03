@@ -23,4 +23,10 @@ public class SubstitutionGroupExtension {
   @Parameter
   private SomePojo somePojo;
 
+  @Parameter
+  private EESGPojo eesgPojo;
+
+  @Parameter
+  private MuleSGPojo muleSGPojo;
+
 }
