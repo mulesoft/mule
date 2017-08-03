@@ -46,7 +46,7 @@
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
-                <xs:attribute type="mule:substitutableInt" use="required" name="castFrequencyInMillis"></xs:attribute>
+                <xs:attribute type="mule:substitutableLong" use="required" name="castFrequencyInMillis"></xs:attribute>
                 <xs:attribute type="xs:string" use="required" name="spell"></xs:attribute>
                 <xs:attribute type="mule:substitutableInt" use="optional" default="1" name="spellSize"></xs:attribute>
                 <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
