@@ -29,8 +29,11 @@ import static org.mule.runtime.module.artifact.classloader.RegionClassLoader.cre
 import static org.mule.runtime.module.artifact.classloader.RegionClassLoader.createClassLoaderAlreadyInRegionError;
 import static org.mule.runtime.module.artifact.classloader.RegionClassLoader.duplicatePackageMappingError;
 import static org.mule.runtime.module.artifact.classloader.RegionClassLoader.illegalPackageMappingError;
+
+import org.mule.runtime.core.internal.util.EnumerationAdapter;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.util.EnumerationMatcher;
 
 import java.net.MalformedURLException;
 import java.net.URL;

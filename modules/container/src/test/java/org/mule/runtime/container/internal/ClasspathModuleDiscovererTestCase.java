@@ -18,7 +18,7 @@ import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.container.api.MuleModule;
-import org.mule.runtime.module.artifact.classloader.EnumerationAdapter;
+import org.mule.runtime.core.internal.util.EnumerationAdapter;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

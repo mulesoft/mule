@@ -44,7 +44,7 @@ import java.util.function.Consumer;
  *
  * @since 4.0
  */
-public class ComponentModel {
+public abstract class ComponentModel {
 
   private boolean root = false;
   private ComponentIdentifier identifier;

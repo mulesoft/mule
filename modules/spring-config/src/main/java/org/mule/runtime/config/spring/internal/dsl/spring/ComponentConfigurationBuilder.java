@@ -78,17 +78,17 @@ class ComponentConfigurationBuilder<T> {
      * TODO: MULE-9638 This ugly code is required since we need to get the object type from the bean definition. This code will go
      * away one we remove the old parsing method.
      */
-    return componentModel.getInnerComponents().stream().filter(child -> child.isEnabled()).map(cdm -> {
+    return componentModel.getInnerComponents().stream().filter(child -> child.isEnabled()).map(model -> {
       // When it comes from old model it does not have the type set
-      Class<?> beanDefinitionType = cdm.getType();
-      final SpringComponentModel csdm = (SpringComponentModel) cdm;
+      Class<?> beanDefinitionType = model.getType();
+      final SpringComponentModel springModel = (SpringComponentModel) model;
       if (beanDefinitionType == null) {
-        if (csdm.getBeanDefinition() == null) {
+        if (springModel.getBeanDefinition() == null) {
           // Some component do not have a bean definition since the element parsing is ignored. i.e: annotations
           return null;
         } else {
           try {
-            String beanClassName = csdm.getBeanDefinition().getBeanClassName();
+            String beanClassName = springModel.getBeanDefinition().getBeanClassName();
             if (beanClassName != null) {
               beanDefinitionType = org.apache.commons.lang3.ClassUtils.getClass(beanClassName);
             } else {
@@ -101,8 +101,8 @@ class ComponentConfigurationBuilder<T> {
           }
         }
       }
-      Object bean = csdm.getBeanDefinition() != null ? csdm.getBeanDefinition() : csdm.getBeanReference();
-      return new ComponentValue(cdm, beanDefinitionType, bean);
+      Object bean = springModel.getBeanDefinition() != null ? springModel.getBeanDefinition() : springModel.getBeanReference();
+      return new ComponentValue(model, beanDefinitionType, bean);
     }).filter(beanDefinitionTypePair -> beanDefinitionTypePair != null).collect(toList());
   }
 

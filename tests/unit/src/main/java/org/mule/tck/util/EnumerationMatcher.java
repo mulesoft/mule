@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.artifact.classloader;
+package org.mule.tck.util;
 
 import java.util.Collection;
 import java.util.Enumeration;
@@ -29,6 +29,7 @@ public class EnumerationMatcher<T> extends TypeSafeMatcher<Enumeration<T>> {
     int enumerationSize = 0;
     while (item.hasMoreElements()) {
       T currentItem = item.nextElement();
+
       enumerationSize++;
 
       if (!items.contains(currentItem)) {

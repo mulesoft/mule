@@ -12,6 +12,8 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanReference;
 
 /**
+ * Specialization of {@link SpringComponentModel} that keeps references to a Spring bean specification.
+ * 
  * @since 4.0
  */
 public class SpringComponentModel extends ComponentModel {

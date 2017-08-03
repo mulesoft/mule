@@ -156,6 +156,7 @@
         <commonsPoolVersion>1.6</commonsPoolVersion>
         <derbyVersion>10.11.1.1</derbyVersion>
         <dom4jVersion>1.6.1</dom4jVersion>
+        <eaioUuidVersion>3.4.0</eaioUuidVersion>
         <everitJsonSchemaVersion>1.5.1</everitJsonSchemaVersion>
         <geronimoSpecsJ2eeVersion>2.0.0</geronimoSpecsJ2eeVersion>
         <geronimoSpecsJmsVersion>1.1.1</geronimoSpecsJmsVersion>
