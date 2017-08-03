@@ -115,7 +115,6 @@ public class SchemaGeneratorTestCase extends AbstractMuleTestCase {
                                                                    new SchemaGeneratorTestUnit(javaLoader,
                                                                                                PetStoreConnector.class,
                                                                                                "petstore.xsd"),
-
                                                                    new SchemaGeneratorTestUnit(javaLoader,
                                                                                                MetadataExtension.class,
                                                                                                "metadata.xsd"),
