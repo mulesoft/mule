@@ -7,7 +7,6 @@
 package org.mule.runtime.config.spring.factories;
 
 import static java.lang.String.format;
-import static java.util.Collections.emptyList;
 import static java.util.ServiceLoader.load;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -20,7 +19,6 @@ import org.mule.runtime.core.internal.processor.TryScope;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionType;
 
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -57,7 +55,7 @@ public class TryProcessorFactoryBean extends AbstractAnnotatedObject implements 
     txProcessor.setAnnotations(getAnnotations());
     txProcessor.setExceptionListener(this.exceptionListener);
     txProcessor.setTransactionConfig(createTransactionConfig(this.transactionalAction, this.transactionType));
-    txProcessor.setMessageProcessors(messageProcessors == null ? emptyList() : messageProcessors);
+    txProcessor.setMessageProcessors(messageProcessors);
     return txProcessor;
   }
 
