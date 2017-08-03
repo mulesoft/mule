@@ -6,21 +6,19 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
-import static org.mule.runtime.core.api.rx.Exceptions.wrapFatal;
-import static reactor.core.publisher.Mono.error;
-import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.TargetType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.core.api.rx.Exceptions;
+import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.iterator.Consumer;
 import org.mule.runtime.core.api.streaming.iterator.ConsumerStreamingIterator;
 import org.mule.runtime.core.api.streaming.iterator.ListConsumer;
 import org.mule.runtime.core.api.streaming.iterator.Producer;
 import org.mule.runtime.core.internal.policy.PolicyManager;
-import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
@@ -57,11 +55,9 @@ public class PagedOperationMessageProcessor extends OperationMessageProcessor {
 
   @Override
   protected Mono<Event> doProcess(Event event, ExecutionContextAdapter<OperationModel> operationContext) {
-    try {
-      Event resultEvent = super.doProcess(event, operationContext).block();
+    return super.doProcess(event, operationContext).map(resultEvent -> {
       PagingProvider<?, ?> pagingProvider = getTarget()
-          .map(target -> getPagingProvider(
-                                           resultEvent.getVariable(target).getValue()))
+          .map(target -> getPagingProvider(resultEvent.getVariable(target).getValue()))
           .orElseGet(() -> getPagingProvider(resultEvent.getMessage()));
 
       if (pagingProvider == null) {
@@ -73,12 +69,8 @@ public class PagedOperationMessageProcessor extends OperationMessageProcessor {
                                      operationContext, connectionSupplier);
       Consumer<?> consumer = new ListConsumer(producer);
 
-      return just(returnDelegate.asReturnValue(new ConsumerStreamingIterator<>(consumer), operationContext));
-    } catch (Exception e) {
-      return error(e);
-    } catch (Throwable t) {
-      return error(wrapFatal(t));
-    }
+      return returnDelegate.asReturnValue(new ConsumerStreamingIterator<>(consumer), operationContext);
+    }).onErrorMap(Exceptions::wrapFatal);
   }
 
   private PagingProvider getPagingProvider(Object target) {

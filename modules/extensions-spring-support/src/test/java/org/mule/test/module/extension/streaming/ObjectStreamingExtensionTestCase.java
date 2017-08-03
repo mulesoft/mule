@@ -6,26 +6,31 @@
  */
 package org.mule.test.module.extension.streaming;
 
-import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
-import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingStory.OBJECT_STREAMING;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
+import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingStory.OBJECT_STREAMING;
 import org.mule.runtime.core.api.Event;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
-import org.junit.Test;
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.apache.commons.collections.IteratorUtils;
+import org.junit.Test;
 
 @Feature(STREAMING)
 @Story(OBJECT_STREAMING)
 public class ObjectStreamingExtensionTestCase extends AbstractStreamingExtensionTestCase {
 
   private static final int DATA_SIZE = 100;
+  private static final String MY_STREAM_VAR = "myStreamVar";
   private List<String> data;
 
   @Override
@@ -46,6 +51,16 @@ public class ObjectStreamingExtensionTestCase extends AbstractStreamingExtension
   @Description("Consume an object stream")
   public void getObjectStream() throws Exception {
     assertStreamMatchesData("getStream");
+  }
+
+  @Test
+  @Description("Stores an object stream in a variable leaving without modifying the original payload")
+  public void getObjectStreamWithTargetVariable() throws Exception {
+    Event event = flowRunner("getStreamWithTarget").withPayload(data).run();
+    assertThat(event.getVariable(MY_STREAM_VAR).getValue(), is(instanceOf(Iterator.class)));
+    assertThat(IteratorUtils.toList((Iterator) event.getVariable(MY_STREAM_VAR).getValue()), equalTo(data));
+    assertThat(event.getMessage().getPayload().getValue(), is(instanceOf(List.class)));
+    assertThat(event.getMessage().getPayload().getValue(), equalTo(data));
   }
 
   @Test

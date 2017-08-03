@@ -17,6 +17,10 @@
         <marvel:read-object-stream/>
     </flow>
 
+    <flow name="getStreamWithTarget">
+        <marvel:say-magic-words fetchSize="20" config-ref="drStrange" target="myStreamVar"/>
+    </flow>
+
     <flow name="getStreamWithoutStreaming">
         <marvel:say-magic-words fetchSize="20" config-ref="drStrange">
             <non-repeatable-iterable/>
