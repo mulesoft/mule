@@ -46,7 +46,7 @@ import org.reactivestreams.Publisher;
  * perform parallel invocation of {@link org.mule.runtime.core.api.routing.ForkJoinStrategy.RoutingPair}'s that wish to use the
  * following common behaviour:
  * <ul>
- * <li>Emit result even only once all routes are complete.
+ * <li>Emit a single result event once all routes complete.
  * <li>Merge variables using a last-wins strategy.
  * <li>Use of an optional timeout.
  * <li>Delay error behavior, where all errors are collated and thrown as a composite exception.
@@ -56,7 +56,6 @@ public abstract class AbstractForkJoinStrategy implements ForkJoinStrategy {
 
   private static final long DEFAULT_TIMEOUT = MAX_VALUE;
   private final long timeout;
-
 
   public AbstractForkJoinStrategy() {
     this(DEFAULT_TIMEOUT);

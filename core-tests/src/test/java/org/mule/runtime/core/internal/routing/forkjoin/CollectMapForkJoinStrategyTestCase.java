@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.routing.forkjoin;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.message.Message.of;
@@ -54,8 +54,9 @@ public class CollectMapForkJoinStrategyTestCase extends AbstractForkJoinStrategy
     assertThat(result.getMessage().getPayload().getValue(), instanceOf(Map.class));
     Map<String, Message> resultMap = (Map<String, Message>) result.getMessage().getPayload().getValue();
     assertThat(resultMap.entrySet(), hasSize(3));
-    assertThat(resultMap.keySet(), hasItems("0", "1", "2"));
-    assertThat(resultMap.values(), hasItems(route1Result, route2Result, route3Result));
+    assertThat(resultMap.get("0"), is(route1Result));
+    assertThat(resultMap.get("1"), is(route2Result));
+    assertThat(resultMap.get("2"), is(route3Result));
   }
 
 }
