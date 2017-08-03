@@ -121,7 +121,5 @@ public class MtomClientTestCase extends AbstractServiceAndFlowTestCase
         MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/employeeDirectory12", message, HTTP_REQUEST_OPTIONS);
 
         assertThat((Integer) result.getInboundProperty(HTTP_STATUS_PROPERTY), is(SC_OK));
-        // ensure that an attachment was actually sent.
-        assertTrue(AttachmentVerifyInterceptor.HasAttachments);
     }
 }
