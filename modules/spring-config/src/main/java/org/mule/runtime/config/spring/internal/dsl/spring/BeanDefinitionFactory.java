@@ -203,8 +203,8 @@ public class BeanDefinitionFactory {
                                                                                     source)));
 
                 ErrorTypeMatcher errorTypeMatcher = new SingleErrorTypeMatcher(errorType);
-                ErrorType targetType = resolveErrorType(target);
-                return new ErrorMapping(errorTypeMatcher, targetType);
+                ErrorType targetValue = resolveErrorType(target);
+                return new ErrorMapping(errorTypeMatcher, targetValue);
               }).collect(toList()), componentModel);
             }
           }

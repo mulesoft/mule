@@ -46,10 +46,15 @@
     </flow>
 
     <flow name="testSetPayloadHardcodedFlowWithTarget">
-        <simple-prefix:set-payload-hardcoded-value target="target-variable" />
+        <simple-prefix:set-payload-hardcoded-value target="target-variable" targetValue="#[message]" />
     </flow>
 
     <flow name="testSetPayloadHardcodedFlowWithTargetOverridingAnExistingVariable">
+        <set-variable variableName="existing-variable" value="fixed value that should not be read after the following MP"/>
+        <simple-prefix:set-payload-hardcoded-value target="existing-variable" targetValue="#[message]" />
+    </flow>
+
+    <flow name="testSetPayloadHardcodedFlowWithTargetAndTargetValuePayload">
         <set-variable variableName="existing-variable" value="fixed value that should not be read after the following MP"/>
         <simple-prefix:set-payload-hardcoded-value target="existing-variable" />
     </flow>

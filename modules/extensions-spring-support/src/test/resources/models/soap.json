@@ -619,6 +619,39 @@
                   },
                   "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "REQUIRED",
+                  "defaultValue": "#[payload]",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "tabName": "Advanced"
+                  },
+                  "elementReferences": [],
+                  "name": "targetValue",
+                  "displayModel": {
+                    "displayName": "Target Value"
+                  },
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+                  "modelProperties": {}
                 }
               ],
               "exclusiveParametersModels": [],

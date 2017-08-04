@@ -6,12 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
-import static org.mule.runtime.api.meta.TargetType.MESSAGE;
-import static org.mule.runtime.core.internal.util.message.MessageUtils.unwrapResultIfNecessary;
+import static org.mule.runtime.api.el.BindingContextUtils.getTargetBindingContext;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.meta.TargetType;
 import org.mule.runtime.api.meta.model.ComponentModel;
-import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
@@ -30,7 +28,7 @@ import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapte
 final class TargetReturnDelegate extends AbstractReturnDelegate {
 
   private final String target;
-  private final TargetType targetType;
+  private final String targetValue;
 
   /**
    * {@inheritDoc}
@@ -38,26 +36,21 @@ final class TargetReturnDelegate extends AbstractReturnDelegate {
    * @param target the name of the variable in which the output message will be set
    */
   TargetReturnDelegate(String target,
-                       TargetType targetType,
+                       String targetValue,
                        ComponentModel componentModel,
                        CursorProviderFactory cursorProviderFactory,
                        MuleContext muleContext) {
     super(componentModel, cursorProviderFactory, muleContext);
     this.target = target;
-    this.targetType = targetType;
+    this.targetValue = targetValue;
   }
 
   @Override
   public InternalEvent asReturnValue(Object value, ExecutionContextAdapter operationContext) {
-    InternalEvent.Builder builder = InternalEvent.builder(operationContext.getEvent());
-    if (targetType == MESSAGE) {
-      builder.addVariable(target, toMessage(value, operationContext));
-    } else {
-      Object targetValue = unwrapResultIfNecessary(value);
-      builder.addVariable(target, targetValue,
-                          DataType.builder().fromObject(targetValue).mediaType(resolveMediaType(value, operationContext))
-                              .build());
-    }
-    return builder.build();
+    TypedValue result =
+        operationContext.getMuleContext().getExpressionManager()
+            .evaluate(targetValue, getTargetBindingContext(toMessage(value, operationContext)));
+    return InternalEvent.builder(operationContext.getEvent()).addVariable(this.target, result.getValue(), result.getDataType())
+        .build();
   }
 }

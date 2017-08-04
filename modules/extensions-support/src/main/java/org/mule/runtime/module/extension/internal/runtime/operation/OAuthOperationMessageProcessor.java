@@ -14,7 +14,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.error;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.meta.TargetType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.InternalEvent;
@@ -54,13 +53,13 @@ public class OAuthOperationMessageProcessor extends OperationMessageProcessor {
                                         OperationModel operationModel,
                                         ConfigurationProvider configurationProvider,
                                         String target,
-                                        TargetType targetType,
+                                        String targetValue,
                                         ResolverSet resolverSet,
                                         CursorProviderFactory cursorProviderFactory,
                                         ExtensionManager extensionManager,
                                         PolicyManager policyManager,
                                         ExtensionsOAuthManager oauthManager) {
-    super(extensionModel, operationModel, configurationProvider, target, targetType, resolverSet, cursorProviderFactory,
+    super(extensionModel, operationModel, configurationProvider, target, targetValue, resolverSet, cursorProviderFactory,
           extensionManager,
           policyManager);
     this.oauthManager = oauthManager;

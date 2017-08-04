@@ -30,14 +30,13 @@ import static org.mule.runtime.api.meta.model.tck.TestHttpConnectorDeclarer.VERS
 import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.STREAMING_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
-import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_TYPE_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.assertType;
 import org.mule.metadata.api.model.BinaryType;
 import org.mule.metadata.api.model.NumberType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.model.UnionType;
-import org.mule.runtime.api.meta.TargetType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
@@ -153,12 +152,12 @@ public class ComplexExtensionDeclarationTestCase extends AbstractJavaExtensionDe
     assertTargetParameter(parameterModels.get(2), parameterModels.get(3));
   }
 
-  private void assertTargetParameter(ParameterModel target, ParameterModel targetType) {
+  private void assertTargetParameter(ParameterModel target, ParameterModel targetValue) {
     assertThat(target.getName(), is(TARGET_PARAMETER_NAME));
     assertType(target.getType(), String.class, StringType.class);
 
-    assertThat(targetType.getName(), is(TARGET_TYPE_PARAMETER_NAME));
-    assertType(targetType.getType(), TargetType.class, StringType.class);
+    assertThat(targetValue.getName(), is(TARGET_VALUE_PARAMETER_NAME));
+    assertType(targetValue.getType(), String.class, StringType.class);
   }
 
   private void assertStreamingStrategyParameter(ParameterModel parameter) {

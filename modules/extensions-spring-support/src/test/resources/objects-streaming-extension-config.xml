@@ -21,6 +21,10 @@
         <marvel:say-magic-words fetchSize="20" config-ref="drStrange" target="myStreamVar"/>
     </flow>
 
+    <flow name="getStreamWithTargetValue">
+        <marvel:say-magic-words fetchSize="20" config-ref="drStrange" target="myStreamVar" targetValue="#[payload[0]]"/>
+    </flow>
+
     <flow name="getStreamWithoutStreaming">
         <marvel:say-magic-words fetchSize="20" config-ref="drStrange">
             <non-repeatable-iterable/>

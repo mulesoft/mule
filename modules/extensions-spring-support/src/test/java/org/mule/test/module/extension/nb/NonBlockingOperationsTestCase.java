@@ -15,7 +15,6 @@ import static org.mule.test.marvel.ironman.IronManOperations.FLIGHT_PLAN;
 import static org.mule.test.marvel.model.MissileProofVillain.MISSILE_PROOF;
 import static org.mule.test.marvel.model.Villain.KABOOM;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getConfigurationInstanceFromRegistry;
-
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.exception.MessagingException;

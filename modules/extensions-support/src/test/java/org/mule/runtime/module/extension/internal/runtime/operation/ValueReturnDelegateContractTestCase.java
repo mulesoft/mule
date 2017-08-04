@@ -16,16 +16,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
-import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.InternalEvent;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
-import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
 import org.junit.Before;
@@ -36,10 +34,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleTestCase {
-
-  @Mock(answer = RETURNS_DEEP_STUBS)
-  protected MuleContext muleContext;
+public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleContextTestCase {
 
   @Mock
   protected ExecutionContextAdapter operationContext;
@@ -59,6 +54,7 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleTe
     event = eventBuilder().message(Message.builder().value("").attributesValue(attributes).build()).build();
     delegate = createReturnDelegate();
     when(operationContext.getEvent()).thenReturn(event);
+    when(operationContext.getMuleContext()).thenReturn(muleContext);
   }
 
   @Test

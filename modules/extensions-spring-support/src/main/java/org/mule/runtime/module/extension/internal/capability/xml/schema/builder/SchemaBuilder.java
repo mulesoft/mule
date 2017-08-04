@@ -14,7 +14,6 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
-import static org.mule.runtime.api.meta.TargetType.PAYLOAD;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.EE_SCHEMA_LOCATION;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.ENUM_TYPE_SUFFIX;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MAX_ONE;
@@ -28,7 +27,6 @@ import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_T
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.SPRING_FRAMEWORK_NAMESPACE;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.SPRING_FRAMEWORK_SCHEMA_LOCATION;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.STRING;
-import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.TARGET_OUTPUT_ENUM;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.TLS_CONTEXT_TYPE;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.USE_OPTIONAL;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.USE_REQUIRED;
@@ -56,7 +54,6 @@ import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.ExpressionSupport;
-import org.mule.runtime.api.meta.TargetType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ImportedTypeModel;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
@@ -404,9 +401,6 @@ public final class SchemaBuilder {
         String typeName = getId(enumType);
         if (OperationTransactionalAction.class.getName().equals(typeName)) {
           attribute.setType(MULE_EXTENSION_OPERATION_TRANSACTIONAL_ACTION_TYPE);
-        } else if (TargetType.class.getName().equals(typeName)) {
-          attribute.setType(TARGET_OUTPUT_ENUM);
-          attribute.setDefault(PAYLOAD.name());
         } else {
           attribute.setType(new QName(schema.getTargetNamespace(), sanitizeName(typeName) + ENUM_TYPE_SUFFIX));
           registeredEnums.add(enumType);

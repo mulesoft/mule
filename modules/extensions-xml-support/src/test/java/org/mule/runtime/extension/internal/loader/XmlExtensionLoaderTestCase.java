@@ -11,13 +11,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
-import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_OUTPUT_PARAMETER_DESCRIPTION;
-import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_TYPE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_DESCRIPTION;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_DESCRIPTION;
+import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static org.mule.runtime.extension.internal.loader.XmlExtensionLoaderDelegate.CONFIG_NAME;
 import static org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader.RESOURCE_XML;
-import org.junit.Test;
 import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
@@ -37,6 +36,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import org.junit.Test;
 
 public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
 
@@ -60,7 +61,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     assertThat(operationModel.getAllParameterModels().get(0).getName(), is("value1"));
     assertThat(operationModel.getAllParameterModels().get(1).getName(), is("value2"));
     assertThat(operationModel.getAllParameterModels().get(2).getName(), is(TARGET_PARAMETER_NAME));
-    assertThat(operationModel.getAllParameterModels().get(3).getName(), is(TARGET_TYPE_PARAMETER_NAME));
+    assertThat(operationModel.getAllParameterModels().get(3).getName(), is(TARGET_VALUE_PARAMETER_NAME));
 
     Optional<OperationComponentModelModelProperty> modelProperty =
         operationModel.getModelProperty(OperationComponentModelModelProperty.class);
@@ -99,7 +100,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     assertThat(operationModel.get().getAllParameterModels().size(), is(3));
     assertThat(operationModel.get().getAllParameterModels().get(0).getName(), is("value1"));
     assertThat(operationModel.get().getAllParameterModels().get(1).getName(), is(TARGET_PARAMETER_NAME));
-    assertThat(operationModel.get().getAllParameterModels().get(2).getName(), is(TARGET_TYPE_PARAMETER_NAME));
+    assertThat(operationModel.get().getAllParameterModels().get(2).getName(), is(TARGET_VALUE_PARAMETER_NAME));
 
 
     Optional<OperationComponentModelModelProperty> modelProperty =
@@ -137,7 +138,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     assertThat(operationModel.get().getAllParameterModels().get(0).getName(), is("someUser"));
     assertThat(operationModel.get().getAllParameterModels().get(1).getName(), is("somePass"));
     assertThat(operationModel.get().getAllParameterModels().get(2).getName(), is(TARGET_PARAMETER_NAME));
-    assertThat(operationModel.get().getAllParameterModels().get(3).getName(), is(TARGET_TYPE_PARAMETER_NAME));
+    assertThat(operationModel.get().getAllParameterModels().get(3).getName(), is(TARGET_VALUE_PARAMETER_NAME));
 
 
     Optional<OperationComponentModelModelProperty> modelProperty =
@@ -164,7 +165,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     final ParameterModel parameterValueModel = operation.getAllParameterModels().get(0);
     assertThat(parameterValueModel.getName(), is("value"));
     assertThat(operation.getAllParameterModels().get(1).getName(), is(TARGET_PARAMETER_NAME));
-    assertThat(operation.getAllParameterModels().get(2).getName(), is(TARGET_TYPE_PARAMETER_NAME));
+    assertThat(operation.getAllParameterModels().get(2).getName(), is(TARGET_VALUE_PARAMETER_NAME));
 
     assertThat(parameterValueModel.getType().getMetadataFormat(), is(MetadataFormat.JSON));
     assertThat(parameterValueModel.getType(), instanceOf(ObjectType.class));
@@ -196,7 +197,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     final OperationModel operation = operationModel.get();
     assertThat(operation.getAllParameterModels().size(), is(4));
     assertThat(operation.getAllParameterModels().get(2).getName(), is(TARGET_PARAMETER_NAME));
-    assertThat(operation.getAllParameterModels().get(3).getName(), is(TARGET_TYPE_PARAMETER_NAME));
+    assertThat(operation.getAllParameterModels().get(3).getName(), is(TARGET_VALUE_PARAMETER_NAME));
 
     final ParameterModel firstParameterValueModel = operation.getAllParameterModels().get(0);
     assertThat(firstParameterValueModel.getName(), is("value"));
@@ -302,8 +303,8 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     assertThat(allParameterModels.get(4).getName(), is(TARGET_PARAMETER_NAME));
     assertThat(allParameterModels.get(4).getDescription(), is(TARGET_PARAMETER_DESCRIPTION));
 
-    assertThat(allParameterModels.get(5).getName(), is(TARGET_TYPE_PARAMETER_NAME));
-    assertThat(allParameterModels.get(5).getDescription(), is(TARGET_OUTPUT_PARAMETER_DESCRIPTION));
+    assertThat(allParameterModels.get(5).getName(), is(TARGET_VALUE_PARAMETER_NAME));
+    assertThat(allParameterModels.get(5).getDescription(), is(TARGET_VALUE_PARAMETER_DESCRIPTION));
 
     assertThat(operationModel.getOutput().getDescription(), is("Documentation for the output"));
     assertThat(operationModel.getOutputAttributes().getDescription(), is("Documentation for the output attributes"));
