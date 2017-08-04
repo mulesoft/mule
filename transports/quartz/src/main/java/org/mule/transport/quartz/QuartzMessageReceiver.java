@@ -83,10 +83,8 @@ public class QuartzMessageReceiver extends AbstractMessageReceiver
         try
         {
 
-            if (connector.getQuartzScheduler().isShutdown())
+            if (connector.getQuartzScheduler().isInStandbyMode())
             {
-                // A shutdown scheduler must be reinitialized
-                connector.initializeScheduler();
                 connector.getQuartzScheduler().start();
             }
 

@@ -32,12 +32,12 @@ public class QuartzConnectorHotStopRestartTestCase extends FunctionalTestCase
         QuartzMessageReceiver receiver = (QuartzMessageReceiver) connector.getReceivers().get("quartz://QuartzJob");
 
         // Initially the scheduler must be started
-        assertThat(FALSE, equalTo(connector.getQuartzScheduler().isShutdown()));
+        assertThat(FALSE, equalTo(connector.getQuartzScheduler().isInStandbyMode()));
         receiver.doStop();
-        // When a stop request is sent, the scheduler should be shutdown
-        assertThat(TRUE, equalTo(connector.getQuartzScheduler().isShutdown()));
+        // When a stop request is sent, the scheduler should be put in standby mode.
+        assertThat(TRUE, equalTo(connector.getQuartzScheduler().isInStandbyMode()));
         receiver.doStart();
-        // When a start request is performed, the scheduler should be shutdown
-        assertThat(FALSE, equalTo(connector.getQuartzScheduler().isShutdown()));
+        // When a start request is performed, the scheduler should be restarted.
+        assertThat(FALSE, equalTo(connector.getQuartzScheduler().isInStandbyMode()));
     }
 }

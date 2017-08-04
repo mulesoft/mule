@@ -6,7 +6,6 @@
  */
 package org.mule.transport.quartz;
 
-
 import static java.util.TimeZone.getDefault;
 import static java.util.TimeZone.getTimeZone;
 import static org.mule.api.config.MuleProperties.MULE_CONTEXT_PROPERTY;
@@ -21,6 +20,7 @@ import org.mule.transport.AbstractConnector;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TimeZone;
 
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
@@ -39,6 +39,7 @@ public class QuartzConnector extends AbstractConnector
     public static final String QUARTZ_SCHEDULER_PREFIX = "scheduler-";
 
     public static final String PROPERTY_CRON_EXPRESSION = "cronExpression";
+    public static final String PROPERTY_CRON_TIME_ZONE = "cronTimeZone";
     public static final String PROPERTY_REPEAT_INTERVAL = "repeatInterval";
     public static final String PROPERTY_REPEAT_COUNT = "repeatCount";
     public static final String PROPERTY_START_DELAY = "startDelay";
@@ -53,6 +54,8 @@ public class QuartzConnector extends AbstractConnector
 
     public static final String DEFAULT_GROUP_NAME = "mule";
     public static final String QUARTZ_INSTANCE_NAME_PROPERTY = "org.quartz.scheduler.instanceName";
+
+    private static final String TZ_GMT_ID = "GMT";
 
     private static final Object instanceNamesLock = new Object();
     private static final Map<String, QuartzConnector> instanceNames = new HashMap<String, QuartzConnector>();
@@ -94,7 +97,7 @@ public class QuartzConnector extends AbstractConnector
      */
     protected void initializeScheduler() throws SchedulerException
     {
-        SchedulerFactory factory = new StdSchedulerFactory(factoryProperties);
+        SchedulerFactory factory = createSchedulerFactory();
         quartzScheduler = factory.getScheduler();
         quartzScheduler.getContext().put(MULE_CONTEXT_PROPERTY, muleContext); 
     }
@@ -221,7 +224,7 @@ public class QuartzConnector extends AbstractConnector
         {
             if (quartzScheduler != null)
             {
-                quartzScheduler.shutdown();
+                quartzScheduler.standby();
             }
         }
         catch (Exception e)
@@ -230,6 +233,28 @@ public class QuartzConnector extends AbstractConnector
         }
     }
 
+    TimeZone resolveTimeZone(String timeZone, String name)
+    {
+        TimeZone resolvedTimeZone = timeZone == null ? getDefault() : getTimeZone(timeZone);
+        if (!TZ_GMT_ID.equals(timeZone) && resolvedTimeZone.equals(getTimeZone(TZ_GMT_ID)))
+        {
+            logger.warn(String.format("Configured timezone '%s' is invalid in scheduler '%s'. Defaulting to %s", timeZone, name, TZ_GMT_ID));
+        }
+        return resolvedTimeZone;
+    }
+
+    /**
+     * Creates a {@link SchedulerFactory} used to create Quartz scheduler instances
+     *
+     * @return a SchedulerFactory.
+     * @throws SchedulerException
+     */
+    protected SchedulerFactory createSchedulerFactory() throws SchedulerException
+    {
+        return new StdSchedulerFactory(factoryProperties);
+    }
+
+    @Override
     public String getProtocol()
     {
         return QUARTZ;
