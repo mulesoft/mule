@@ -11,6 +11,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.Boolean.valueOf;
 import static java.lang.System.getProperty;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toSet;
@@ -372,13 +373,19 @@ public class IsolatedClassLoaderFactory {
     ClassLoader launcherClassLoader = IsolatedClassLoaderFactory.class.getClassLoader();
 
     return new MuleArtifactClassLoader("launcher", new ArtifactDescriptor("launcher"), new URL[0], launcherClassLoader,
-                                       new MuleClassLoaderLookupPolicy(Collections.emptyMap(), Collections.emptySet())) {
+                                       new MuleClassLoaderLookupPolicy(emptyMap(), emptySet())) {
 
       @Override
       public URL findResource(String name) {
         URL url = super.findResource(name);
         if (url == null && getParent() != null) {
           url = getParent().getResource(name);
+          // Filter if it is not a resource from the jre
+          if (url.getFile().matches(".*?\\/jre\\/lib\\/\\w+\\.jar\\!.*")) {
+            return url;
+          } else {
+            return null;
+          }
         }
         return url;
       }
