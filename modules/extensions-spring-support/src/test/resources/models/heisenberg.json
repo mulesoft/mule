@@ -16118,11 +16118,7 @@
                       "xmlHints": {
                         "allowInlineDefinition": true,
                         "allowTopLevelDefinition": true,
-                        "allowReferences": true,
-                        "substitutionGroup": {
-                          "prefix": "",
-                          "element": ""
-                        }
+                        "allowReferences": true
                       },
                       "typeAlias": {
                         "value": "Ricin"
@@ -16171,11 +16167,7 @@
                             "xmlHints": {
                               "allowInlineDefinition": true,
                               "allowTopLevelDefinition": true,
-                              "allowReferences": true,
-                              "substitutionGroup": {
-                                "prefix": "",
-                                "element": ""
-                              }
+                              "allowReferences": true
                             },
                             "typeAlias": {
                               "value": "door"
@@ -16290,11 +16282,7 @@
                     "xmlHints": {
                       "allowInlineDefinition": true,
                       "allowTopLevelDefinition": true,
-                      "allowReferences": true,
-                      "substitutionGroup": {
-                        "prefix": "",
-                        "element": ""
-                      }
+                      "allowReferences": true
                     },
                     "typeAlias": {
                       "value": "door"
@@ -16394,11 +16382,7 @@
                       "xmlHints": {
                         "allowInlineDefinition": true,
                         "allowTopLevelDefinition": true,
-                        "allowReferences": true,
-                        "substitutionGroup": {
-                          "prefix": "",
-                          "element": ""
-                        }
+                        "allowReferences": true
                       },
                       "typeAlias": {
                         "value": "Ricin"
@@ -16447,11 +16431,7 @@
                             "xmlHints": {
                               "allowInlineDefinition": true,
                               "allowTopLevelDefinition": true,
-                              "allowReferences": true,
-                              "substitutionGroup": {
-                                "prefix": "",
-                                "element": ""
-                              }
+                              "allowReferences": true
                             },
                             "typeAlias": {
                               "value": "door"
@@ -17038,11 +17018,7 @@
                 "xmlHints": {
                   "allowInlineDefinition": true,
                   "allowTopLevelDefinition": true,
-                  "allowReferences": true,
-                  "substitutionGroup": {
-                    "prefix": "",
-                    "element": ""
-                  }
+                  "allowReferences": true
                 },
                 "typeAlias": {
                   "value": "door"
@@ -18633,11 +18609,7 @@
         "xmlHints": {
           "allowInlineDefinition": true,
           "allowTopLevelDefinition": true,
-          "allowReferences": true,
-          "substitutionGroup": {
-            "prefix": "",
-            "element": ""
-          }
+          "allowReferences": true
         },
         "typeAlias": {
           "value": "CarWash"
@@ -19407,11 +19379,7 @@
         "xmlHints": {
           "allowInlineDefinition": true,
           "allowTopLevelDefinition": true,
-          "allowReferences": true,
-          "substitutionGroup": {
-            "prefix": "",
-            "element": ""
-          }
+          "allowReferences": true
         },
         "typeAlias": {
           "value": "door"
@@ -19786,11 +19754,7 @@
         "xmlHints": {
           "allowInlineDefinition": true,
           "allowTopLevelDefinition": true,
-          "allowReferences": true,
-          "substitutionGroup": {
-            "prefix": "",
-            "element": ""
-          }
+          "allowReferences": true
         },
         "typeAlias": {
           "value": "RecursiveChainA"
@@ -19839,11 +19803,7 @@
               "xmlHints": {
                 "allowInlineDefinition": true,
                 "allowTopLevelDefinition": true,
-                "allowReferences": true,
-                "substitutionGroup": {
-                  "prefix": "",
-                  "element": ""
-                }
+                "allowReferences": true
               },
               "typeAlias": {
                 "value": "RecursiveChainB"
@@ -19944,11 +19904,7 @@
                 "xmlHints": {
                   "allowInlineDefinition": true,
                   "allowTopLevelDefinition": true,
-                  "allowReferences": true,
-                  "substitutionGroup": {
-                    "prefix": "",
-                    "element": ""
-                  }
+                  "allowReferences": true
                 },
                 "typeAlias": {
                   "value": "RecursiveChainB"
@@ -20043,11 +19999,7 @@
         "xmlHints": {
           "allowInlineDefinition": true,
           "allowTopLevelDefinition": true,
-          "allowReferences": true,
-          "substitutionGroup": {
-            "prefix": "",
-            "element": ""
-          }
+          "allowReferences": true
         },
         "typeAlias": {
           "value": "RecursiveChainB"
@@ -20096,11 +20048,7 @@
               "xmlHints": {
                 "allowInlineDefinition": true,
                 "allowTopLevelDefinition": true,
-                "allowReferences": true,
-                "substitutionGroup": {
-                  "prefix": "",
-                  "element": ""
-                }
+                "allowReferences": true
               },
               "typeAlias": {
                 "value": "RecursiveChainA"
@@ -20201,11 +20149,7 @@
                 "xmlHints": {
                   "allowInlineDefinition": true,
                   "allowTopLevelDefinition": true,
-                  "allowReferences": true,
-                  "substitutionGroup": {
-                    "prefix": "",
-                    "element": ""
-                  }
+                  "allowReferences": true
                 },
                 "typeAlias": {
                   "value": "RecursiveChainA"
@@ -20300,11 +20244,7 @@
         "xmlHints": {
           "allowInlineDefinition": true,
           "allowTopLevelDefinition": true,
-          "allowReferences": true,
-          "substitutionGroup": {
-            "prefix": "",
-            "element": ""
-          }
+          "allowReferences": true
         },
         "typeAlias": {
           "value": "RecursivePojo"
@@ -20401,11 +20341,7 @@
         "xmlHints": {
           "allowInlineDefinition": true,
           "allowTopLevelDefinition": true,
-          "allowReferences": true,
-          "substitutionGroup": {
-            "prefix": "",
-            "element": ""
-          }
+          "allowReferences": true
         },
         "typeAlias": {
           "value": "Ricin"
@@ -20454,11 +20390,7 @@
               "xmlHints": {
                 "allowInlineDefinition": true,
                 "allowTopLevelDefinition": true,
-                "allowReferences": true,
-                "substitutionGroup": {
-                  "prefix": "",
-                  "element": ""
-                }
+                "allowReferences": true
               },
               "typeAlias": {
                 "value": "door"

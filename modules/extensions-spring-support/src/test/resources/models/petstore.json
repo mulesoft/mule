@@ -13443,11 +13443,7 @@
         "xmlHints": {
           "allowInlineDefinition": true,
           "allowTopLevelDefinition": true,
-          "allowReferences": true,
-          "substitutionGroup": {
-            "prefix": "",
-            "element": ""
-          }
+          "allowReferences": true
         },
         "typeAlias": {
           "value": "PhoneNumber"

@@ -83,11 +83,7 @@
         "xmlHints": {
           "allowInlineDefinition": true,
           "allowTopLevelDefinition": true,
-          "allowReferences": true,
-          "substitutionGroup": {
-            "prefix": "",
-            "element": ""
-          }
+          "allowReferences": true
         },
         "typeAlias": {
           "value": "Ricin"
@@ -136,11 +132,7 @@
               "xmlHints": {
                 "allowInlineDefinition": true,
                 "allowTopLevelDefinition": true,
-                "allowReferences": true,
-                "substitutionGroup": {
-                  "prefix": "",
-                  "element": ""
-                }
+                "allowReferences": true
               },
               "typeAlias": {
                 "value": "door"
@@ -3026,11 +3018,7 @@
         "xmlHints": {
           "allowInlineDefinition": true,
           "allowTopLevelDefinition": true,
-          "allowReferences": true,
-          "substitutionGroup": {
-            "prefix": "",
-            "element": ""
-          }
+          "allowReferences": true
         },
         "typeAlias": {
           "value": "CarDoor"
@@ -3222,11 +3210,7 @@
         "xmlHints": {
           "allowInlineDefinition": true,
           "allowTopLevelDefinition": true,
-          "allowReferences": true,
-          "substitutionGroup": {
-            "prefix": "",
-            "element": ""
-          }
+          "allowReferences": true
         },
         "typeAlias": {
           "value": "HouseDoor"
@@ -3508,11 +3492,7 @@
         "xmlHints": {
           "allowInlineDefinition": true,
           "allowTopLevelDefinition": true,
-          "allowReferences": true,
-          "substitutionGroup": {
-            "prefix": "",
-            "element": ""
-          }
+          "allowReferences": true
         },
         "typeAlias": {
           "value": "Revolver"
@@ -3560,11 +3540,7 @@
         "xmlHints": {
           "allowInlineDefinition": true,
           "allowTopLevelDefinition": true,
-          "allowReferences": true,
-          "substitutionGroup": {
-            "prefix": "",
-            "element": ""
-          }
+          "allowReferences": true
         },
         "typeAlias": {
           "value": "Square"
@@ -3807,11 +3783,7 @@
               "xmlHints": {
                 "allowInlineDefinition": true,
                 "allowTopLevelDefinition": true,
-                "allowReferences": true,
-                "substitutionGroup": {
-                  "prefix": "",
-                  "element": ""
-                }
+                "allowReferences": true
               },
               "typeAlias": {
                 "value": "Square"
@@ -3921,11 +3893,7 @@
               "xmlHints": {
                 "allowInlineDefinition": true,
                 "allowTopLevelDefinition": true,
-                "allowReferences": true,
-                "substitutionGroup": {
-                  "prefix": "",
-                  "element": ""
-                }
+                "allowReferences": true
               },
               "typeAlias": {
                 "value": "Ricin"
@@ -3974,11 +3942,7 @@
                     "xmlHints": {
                       "allowInlineDefinition": true,
                       "allowTopLevelDefinition": true,
-                      "allowReferences": true,
-                      "substitutionGroup": {
-                        "prefix": "",
-                        "element": ""
-                      }
+                      "allowReferences": true
                     },
                     "typeAlias": {
                       "value": "door"
@@ -4446,11 +4410,7 @@
         "xmlHints": {
           "allowInlineDefinition": true,
           "allowTopLevelDefinition": true,
-          "allowReferences": true,
-          "substitutionGroup": {
-            "prefix": "",
-            "element": ""
-          }
+          "allowReferences": true
         },
         "typeAlias": {
           "value": "triangleAlias"

@@ -38,11 +38,7 @@
         "xmlHints": {
           "allowInlineDefinition": true,
           "allowTopLevelDefinition": true,
-          "allowReferences": true,
-          "substitutionGroup": {
-            "prefix": "",
-            "element": ""
-          }
+          "allowReferences": true
         },
         "typeAlias": {
           "value": "Ricin"
@@ -91,11 +87,7 @@
               "xmlHints": {
                 "allowInlineDefinition": true,
                 "allowTopLevelDefinition": true,
-                "allowReferences": true,
-                "substitutionGroup": {
-                  "prefix": "",
-                  "element": ""
-                }
+                "allowReferences": true
               },
               "typeAlias": {
                 "value": "door"
