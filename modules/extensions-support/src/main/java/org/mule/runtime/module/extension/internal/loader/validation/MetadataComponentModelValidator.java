@@ -236,8 +236,8 @@ public class MetadataComponentModelValidator implements ExtensionModelValidator 
     if (Object.class.equals(type)) {
       problemsReporter
           .addError(new Problem(extensionModel,
-                                format("Extension '%s' specifies a/an %s named '%s' with type '%s' as return type. Operations and Sources with "
-                                    + "return type such as Object or Map (or a collection of any of those) must have defined a not null OutputTypeResolver",
+                                format("Extension '%s' specifies a/an %s named '%s' with type '%s' as return type. Components that return a type "
+                                    + "such as Object or Map (or a collection of any of those) must have defined an OutputResolver",
                                        extensionModel.getName(), componentTypeName, componentModel.getName(),
                                        getId(metadataType))));
     }
@@ -249,8 +249,8 @@ public class MetadataComponentModelValidator implements ExtensionModelValidator 
     if (isInvalidInterface(metadataType, type)) {
       problemsReporter
           .addError(new Problem(extensionModel,
-                                format("Extension '%s' specifies a/an %s named '%s' with type '%s' as return type. Operations and Sources that return an interface"
-                                    + "(or a collection of interfaces) must have defined a not null OutputTypeResolver",
+                                format("Extension '%s' specifies a/an %s named '%s' with type '%s' as return type. Components that return an interface "
+                                    + "(or a collection of interfaces) must have defined an OutputResolver",
                                        extensionModel.getName(), componentTypeName, componentModel.getName(),
                                        getId(metadataType))));
     }
