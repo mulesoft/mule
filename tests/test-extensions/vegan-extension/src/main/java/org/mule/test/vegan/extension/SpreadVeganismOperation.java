@@ -6,6 +6,7 @@
  */
 package org.mule.test.vegan.extension;
 
+import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.ExclusiveOptionals;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -29,10 +30,12 @@ public class SpreadVeganismOperation {
     return policy;
   }
 
+  @OutputResolver(output = FruitMetadataResolver.class)
   public FarmedFood getProduction(@Optional @NullSafe(defaultImplementingType = HealthyFood.class) FarmedFood food) {
     return food;
   }
 
+  @OutputResolver(output = FruitMetadataResolver.class)
   public FarmedFood getHealthyFood(HealthyFood food) {
     return food;
   }

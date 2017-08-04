@@ -8,7 +8,7 @@ package org.mule.test.metadata.extension.model.animals;
 
 import static org.mule.test.metadata.extension.model.animals.AnimalClade.FISH;
 
-public class SwordFish implements Animal {
+public class SwordFish extends Animal {
 
   @Override
   public AnimalClade clade() {

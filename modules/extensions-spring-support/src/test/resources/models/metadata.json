@@ -10312,8 +10312,8 @@
       "annotations": {
         "typeId": "org.mule.test.metadata.extension.model.animals.Animal",
         "classInformation": {
-          "hasDefaultConstructor": false,
-          "isInterface": true,
+          "hasDefaultConstructor": true,
+          "isInterface": false,
           "isInstantiable": false,
           "isAbstract": true,
           "isFinal": false,
@@ -10338,10 +10338,8 @@
           "isInstantiable": true,
           "isAbstract": false,
           "isFinal": false,
-          "implementedInterfaces": [
-            "org.mule.test.metadata.extension.model.animals.Animal"
-          ],
-          "parent": "",
+          "implementedInterfaces": [],
+          "parent": "org.mule.test.metadata.extension.model.animals.Animal",
           "genericTypes": []
         },
         "xmlHints": {

@@ -57,7 +57,7 @@
               "format": "java",
               "type": "@ref:org.mule.test.transactional.connection.TestTransactionalConnection"
             },
-            "hasDynamicType": false,
+            "hasDynamicType": true,
             "description": "",
             "modelProperties": {}
           },
@@ -1670,7 +1670,7 @@
               "format": "java",
               "type": "@ref:org.mule.test.transactional.connection.TestTransactionalConnection"
             },
-            "hasDynamicType": false,
+            "hasDynamicType": true,
             "description": "",
             "modelProperties": {}
           },

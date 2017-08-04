@@ -1408,7 +1408,7 @@
               "format": "java",
               "type": "@ref:org.mule.tck.testmodels.fruit.Fruit"
             },
-            "hasDynamicType": false,
+            "hasDynamicType": true,
             "description": "",
             "modelProperties": {}
           },
@@ -3108,7 +3108,7 @@
               "format": "java",
               "type": "@ref:org.mule.tck.testmodels.fruit.Fruit"
             },
-            "hasDynamicType": false,
+            "hasDynamicType": true,
             "description": "",
             "modelProperties": {}
           },
@@ -4112,7 +4112,7 @@
               "format": "java",
               "type": "@ref:org.mule.tck.testmodels.fruit.Fruit"
             },
-            "hasDynamicType": false,
+            "hasDynamicType": true,
             "description": "",
             "modelProperties": {}
           },
@@ -5973,7 +5973,7 @@
             "type": "@ref:org.mule.test.vegan.extension.FarmedFood"
           }
         },
-        "hasDynamicType": false,
+        "hasDynamicType": true,
         "description": "",
         "modelProperties": {}
       },
@@ -6685,7 +6685,7 @@
           "format": "java",
           "type": "@ref:org.mule.test.vegan.extension.FarmedFood"
         },
-        "hasDynamicType": false,
+        "hasDynamicType": true,
         "description": "",
         "modelProperties": {}
       },
@@ -6834,7 +6834,7 @@
           "format": "java",
           "type": "@ref:org.mule.test.vegan.extension.FarmedFood"
         },
-        "hasDynamicType": false,
+        "hasDynamicType": true,
         "description": "",
         "modelProperties": {}
       },

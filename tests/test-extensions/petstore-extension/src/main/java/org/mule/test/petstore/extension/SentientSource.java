@@ -8,9 +8,11 @@ package org.mule.test.petstore.extension;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 
+@MetadataScope(outputResolver = PetstoreMetadataResolver.class)
 public class SentientSource extends Source<ComponentLocation, Void> {
 
   public static ComponentLocation capturedLocation;
