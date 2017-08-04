@@ -25,7 +25,7 @@ import java.util.Map;
  * @deprecated tests should not access properties, attachments or exception payload using the old API.
  */
 @Deprecated
-public class TestLegacyMessageBuilder implements Message.Builder {
+public class TestLegacyMessageBuilder implements Message.CollectionBuilder {
 
   private Message.Builder builder;
 
@@ -43,7 +43,7 @@ public class TestLegacyMessageBuilder implements Message.Builder {
   }
 
   @Override
-  public Message.Builder payload(TypedValue<?> typedValue) {
+  public TestLegacyMessageBuilder payload(TypedValue<?> typedValue) {
     builder.payload(typedValue);
     return this;
   }
@@ -84,6 +84,11 @@ public class TestLegacyMessageBuilder implements Message.Builder {
   }
 
   @Override
+  public TestLegacyMessageBuilder itemMediaType(MediaType mediaType) {
+    throw new UnsupportedOperationException("This method is not supported in TestLegacyMessageBuilder. Use org.mule.runtime.api.message.Message.builder()");
+  }
+
+  @Override
   public TestLegacyMessageBuilder mediaType(MediaType mediaType) {
     checkInternalState();
     builder.mediaType(mediaType);
@@ -91,7 +96,7 @@ public class TestLegacyMessageBuilder implements Message.Builder {
   }
 
   @Override
-  public Message.Builder attributes(TypedValue<?> typedValue) {
+  public TestLegacyMessageBuilder attributes(TypedValue<?> typedValue) {
     builder.attributes(typedValue);
     return this;
   }
