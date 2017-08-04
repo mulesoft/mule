@@ -31,7 +31,6 @@ import java.util.Optional;
 final class ConfigModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
   private static final String CONFIGURATION = "Configuration";
-  private static final String CUSTOM_CONFIG_SUFFIX = "-config";
 
   ConfigModelLoaderDelegate(DefaultJavaModelLoaderDelegate delegate) {
     super(delegate);
