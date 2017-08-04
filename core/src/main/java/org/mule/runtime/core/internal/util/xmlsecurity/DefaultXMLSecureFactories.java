@@ -37,11 +37,13 @@ public class DefaultXMLSecureFactories {
   public static final String SAX_PARSER_FACTORY = "com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl";
   public static final String XML_INPUT_FACTORY = "com.sun.xml.internal.stream.XMLInputFactoryImpl";
   public static final String TRANSFORMER_FACTORY = "com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl";
+  public static final String SCHEMA_FACTORY = "com.sun.org.apache.xerces.internal.jaxp.validation.XMLSchemaFactory";
 
   public static final String DOCUMENT_BUILDER_PROPERTY = "javax.xml.parsers.DocumentBuilderFactory";
   public static final String SAX_PARSER_PROPERTY = "javax.xml.parsers.SAXParserFactory";
   public static final String XML_INPUT_PROPERTY = "javax.xml.stream.XMLInputFactory";
   public static final String TRANSFORMER_PROPERTY = "javax.xml.transform.TransformerFactory";
+  public static final String SCHEMA_PROPERTY = "javax.xml.validation.SchemaFactory";
 
   private Boolean externalEntities;
   private Boolean expandEntities;
@@ -155,7 +157,19 @@ public class DefaultXMLSecureFactories {
   }
 
   public SchemaFactory createSchemaFactory(String schemaLanguage) {
-    SchemaFactory factory = SchemaFactory.newInstance(schemaLanguage);
+    String schemaProperty = SCHEMA_PROPERTY + ":" + schemaLanguage;
+    SchemaFactory factory;
+
+    if (System.getProperty(schemaProperty) == null) {
+      try {
+        factory = SchemaFactory.newInstance(schemaLanguage, SCHEMA_FACTORY, DefaultXMLSecureFactories.class.getClassLoader());
+      } catch (IllegalArgumentException e) {
+        logCreationWarning("SchemaFactory", SCHEMA_FACTORY, e);
+        factory = SchemaFactory.newInstance(schemaLanguage);
+      }
+    } else {
+      factory = SchemaFactory.newInstance(schemaLanguage);
+    }
 
     configureSchemaFactory(factory);
 
