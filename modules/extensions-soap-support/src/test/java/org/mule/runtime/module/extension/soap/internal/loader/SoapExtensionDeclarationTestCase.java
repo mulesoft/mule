@@ -31,7 +31,6 @@ import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeO
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.TRANSPORT_HEADERS_PARAM;
 import static org.mule.test.soap.extension.CalcioServiceProvider.CALCIO_DESC;
 import static org.mule.test.soap.extension.CalcioServiceProvider.CALCIO_ID;
-
 import org.mule.metadata.api.model.BinaryType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
@@ -44,12 +43,15 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.module.extension.internal.loader.enricher.ModuleErrors;
 import org.mule.runtime.soap.api.exception.error.SoapErrors;
 import org.mule.test.soap.extension.FootballSoapExtension;
+
 import com.google.common.collect.ImmutableList;
-import org.junit.Test;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.junit.Test;
 
 public class SoapExtensionDeclarationTestCase extends AbstractSoapExtensionDeclarationTestCase {
 
@@ -108,8 +110,8 @@ public class SoapExtensionDeclarationTestCase extends AbstractSoapExtensionDecla
         new ParameterProber(TRANSPORT_HEADERS_PARAM, null, ObjectType.class, false),
         new ParameterProber(ATTACHMENTS_PARAM, null, ObjectType.class, false),
     };
-    // the `1` is added because the sdk adds the target parameter automatically
-    assertThat(operation.getAllParameterModels(), hasSize(probers.length + 1));
+    // the `2` is added because the sdk adds the target parameter and the targetType automatically
+    assertThat(operation.getAllParameterModels(), hasSize(probers.length + 2));
     assertParameters(operation.getAllParameterModels(), probers);
   }
 }

@@ -384,7 +384,7 @@ public class MacroExpansionModuleModel {
       }
 
       if (value == null && (parameterExtension.getDefaultValue() != null)) {
-        value = (String) parameterExtension.getDefaultValue();
+        value = String.valueOf(parameterExtension.getDefaultValue());
       }
       if (value != null) {
         valuesMap.put(paramName, value);

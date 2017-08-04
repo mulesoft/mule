@@ -6,8 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
+import static org.mule.runtime.api.meta.TargetType.MESSAGE;
+import static org.mule.runtime.core.internal.util.message.MessageUtils.unwrapResultIfNecessary;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.meta.TargetType;
 import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
@@ -26,6 +30,7 @@ import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapte
 final class TargetReturnDelegate extends AbstractReturnDelegate {
 
   private final String target;
+  private final TargetType targetType;
 
   /**
    * {@inheritDoc}
@@ -33,17 +38,26 @@ final class TargetReturnDelegate extends AbstractReturnDelegate {
    * @param target the name of the variable in which the output message will be set
    */
   TargetReturnDelegate(String target,
+                       TargetType targetType,
                        ComponentModel componentModel,
                        CursorProviderFactory cursorProviderFactory,
                        MuleContext muleContext) {
     super(componentModel, cursorProviderFactory, muleContext);
     this.target = target;
+    this.targetType = targetType;
   }
 
   @Override
   public Event asReturnValue(Object value, ExecutionContextAdapter operationContext) {
-    return Event.builder(operationContext.getEvent())
-        .addVariable(target, toMessage(value, operationContext))
-        .build();
+    Event.Builder builder = Event.builder(operationContext.getEvent());
+    if (targetType == MESSAGE) {
+      builder.addVariable(target, toMessage(value, operationContext));
+    } else {
+      Object targetValue = unwrapResultIfNecessary(value);
+      builder.addVariable(target, targetValue,
+                          DataType.builder().fromObject(targetValue).mediaType(resolveMediaType(value, operationContext))
+                              .build());
+    }
+    return builder.build();
   }
 }

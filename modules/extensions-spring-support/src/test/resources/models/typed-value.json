@@ -148,6 +148,46 @@
                   },
                   "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "org.mule.runtime.api.meta.TargetType",
+                      "enum": {
+                        "type": "[Ljava.lang.String;",
+                        "values": [
+                          "PAYLOAD",
+                          "MESSAGE"
+                        ]
+                      }
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "PAYLOAD",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "tabName": "Advanced"
+                  },
+                  "elementReferences": [],
+                  "name": "targetType",
+                  "displayModel": {
+                    "displayName": "Target Output"
+                  },
+                  "description": "The type of the operation\u0027s output that will be stored in the target variable",
+                  "modelProperties": {}
                 }
               ],
               "exclusiveParametersModels": [],
@@ -293,6 +333,46 @@
                     "displayName": "Target Variable"
                   },
                   "description": "The name of a variable on which the operation\u0027s output will be placed",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "org.mule.runtime.api.meta.TargetType",
+                      "enum": {
+                        "type": "[Ljava.lang.String;",
+                        "values": [
+                          "PAYLOAD",
+                          "MESSAGE"
+                        ]
+                      }
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "PAYLOAD",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "tabName": "Advanced"
+                  },
+                  "elementReferences": [],
+                  "name": "targetType",
+                  "displayModel": {
+                    "displayName": "Target Output"
+                  },
+                  "description": "The type of the operation\u0027s output that will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -718,6 +798,46 @@
               },
               "description": "The name of a variable on which the operation\u0027s output will be placed",
               "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "org.mule.runtime.api.meta.TargetType",
+                  "enum": {
+                    "type": "[Ljava.lang.String;",
+                    "values": [
+                      "PAYLOAD",
+                      "MESSAGE"
+                    ]
+                  }
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": "PAYLOAD",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "elementReferences": [],
+              "name": "targetType",
+              "displayModel": {
+                "displayName": "Target Output"
+              },
+              "description": "The type of the operation\u0027s output that will be stored in the target variable",
+              "modelProperties": {}
             }
           ],
           "exclusiveParametersModels": [],
@@ -1098,6 +1218,46 @@
               },
               "description": "The name of a variable on which the operation\u0027s output will be placed",
               "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "org.mule.runtime.api.meta.TargetType",
+                  "enum": {
+                    "type": "[Ljava.lang.String;",
+                    "values": [
+                      "PAYLOAD",
+                      "MESSAGE"
+                    ]
+                  }
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": "PAYLOAD",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "elementReferences": [],
+              "name": "targetType",
+              "displayModel": {
+                "displayName": "Target Output"
+              },
+              "description": "The type of the operation\u0027s output that will be stored in the target variable",
+              "modelProperties": {}
             }
           ],
           "exclusiveParametersModels": [],
@@ -1242,6 +1402,46 @@
               },
               "description": "The name of a variable on which the operation\u0027s output will be placed",
               "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "org.mule.runtime.api.meta.TargetType",
+                  "enum": {
+                    "type": "[Ljava.lang.String;",
+                    "values": [
+                      "PAYLOAD",
+                      "MESSAGE"
+                    ]
+                  }
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": "PAYLOAD",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "elementReferences": [],
+              "name": "targetType",
+              "displayModel": {
+                "displayName": "Target Output"
+              },
+              "description": "The type of the operation\u0027s output that will be stored in the target variable",
+              "modelProperties": {}
             }
           ],
           "exclusiveParametersModels": [],
@@ -1350,6 +1550,46 @@
                 "displayName": "Target Variable"
               },
               "description": "The name of a variable on which the operation\u0027s output will be placed",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "org.mule.runtime.api.meta.TargetType",
+                  "enum": {
+                    "type": "[Ljava.lang.String;",
+                    "values": [
+                      "PAYLOAD",
+                      "MESSAGE"
+                    ]
+                  }
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": "PAYLOAD",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "elementReferences": [],
+              "name": "targetType",
+              "displayModel": {
+                "displayName": "Target Output"
+              },
+              "description": "The type of the operation\u0027s output that will be stored in the target variable",
               "modelProperties": {}
             }
           ],
@@ -1471,6 +1711,46 @@
                 "displayName": "Target Variable"
               },
               "description": "The name of a variable on which the operation\u0027s output will be placed",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "org.mule.runtime.api.meta.TargetType",
+                  "enum": {
+                    "type": "[Ljava.lang.String;",
+                    "values": [
+                      "PAYLOAD",
+                      "MESSAGE"
+                    ]
+                  }
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": "PAYLOAD",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "elementReferences": [],
+              "name": "targetType",
+              "displayModel": {
+                "displayName": "Target Output"
+              },
+              "description": "The type of the operation\u0027s output that will be stored in the target variable",
               "modelProperties": {}
             }
           ],
@@ -1621,6 +1901,46 @@
               },
               "description": "The name of a variable on which the operation\u0027s output will be placed",
               "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "org.mule.runtime.api.meta.TargetType",
+                  "enum": {
+                    "type": "[Ljava.lang.String;",
+                    "values": [
+                      "PAYLOAD",
+                      "MESSAGE"
+                    ]
+                  }
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": "PAYLOAD",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "elementReferences": [],
+              "name": "targetType",
+              "displayModel": {
+                "displayName": "Target Output"
+              },
+              "description": "The type of the operation\u0027s output that will be stored in the target variable",
+              "modelProperties": {}
             }
           ],
           "exclusiveParametersModels": [],
@@ -1729,6 +2049,46 @@
                 "displayName": "Target Variable"
               },
               "description": "The name of a variable on which the operation\u0027s output will be placed",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "org.mule.runtime.api.meta.TargetType",
+                  "enum": {
+                    "type": "[Ljava.lang.String;",
+                    "values": [
+                      "PAYLOAD",
+                      "MESSAGE"
+                    ]
+                  }
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": "PAYLOAD",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "elementReferences": [],
+              "name": "targetType",
+              "displayModel": {
+                "displayName": "Target Output"
+              },
+              "description": "The type of the operation\u0027s output that will be stored in the target variable",
               "modelProperties": {}
             }
           ],
@@ -1906,6 +2266,46 @@
               },
               "description": "The name of a variable on which the operation\u0027s output will be placed",
               "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "org.mule.runtime.api.meta.TargetType",
+                  "enum": {
+                    "type": "[Ljava.lang.String;",
+                    "values": [
+                      "PAYLOAD",
+                      "MESSAGE"
+                    ]
+                  }
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": "PAYLOAD",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "elementReferences": [],
+              "name": "targetType",
+              "displayModel": {
+                "displayName": "Target Output"
+              },
+              "description": "The type of the operation\u0027s output that will be stored in the target variable",
+              "modelProperties": {}
             }
           ],
           "exclusiveParametersModels": [],
@@ -2032,6 +2432,46 @@
                 "displayName": "Target Variable"
               },
               "description": "The name of a variable on which the operation\u0027s output will be placed",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "org.mule.runtime.api.meta.TargetType",
+                  "enum": {
+                    "type": "[Ljava.lang.String;",
+                    "values": [
+                      "PAYLOAD",
+                      "MESSAGE"
+                    ]
+                  }
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": "PAYLOAD",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "elementReferences": [],
+              "name": "targetType",
+              "displayModel": {
+                "displayName": "Target Output"
+              },
+              "description": "The type of the operation\u0027s output that will be stored in the target variable",
               "modelProperties": {}
             }
           ],
@@ -2200,6 +2640,46 @@
               },
               "description": "The name of a variable on which the operation\u0027s output will be placed",
               "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "org.mule.runtime.api.meta.TargetType",
+                  "enum": {
+                    "type": "[Ljava.lang.String;",
+                    "values": [
+                      "PAYLOAD",
+                      "MESSAGE"
+                    ]
+                  }
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": "PAYLOAD",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "elementReferences": [],
+              "name": "targetType",
+              "displayModel": {
+                "displayName": "Target Output"
+              },
+              "description": "The type of the operation\u0027s output that will be stored in the target variable",
+              "modelProperties": {}
             }
           ],
           "exclusiveParametersModels": [],
@@ -2355,6 +2835,46 @@
               },
               "description": "The name of a variable on which the operation\u0027s output will be placed",
               "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "org.mule.runtime.api.meta.TargetType",
+                  "enum": {
+                    "type": "[Ljava.lang.String;",
+                    "values": [
+                      "PAYLOAD",
+                      "MESSAGE"
+                    ]
+                  }
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": "PAYLOAD",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "elementReferences": [],
+              "name": "targetType",
+              "displayModel": {
+                "displayName": "Target Output"
+              },
+              "description": "The type of the operation\u0027s output that will be stored in the target variable",
+              "modelProperties": {}
             }
           ],
           "exclusiveParametersModels": [],
@@ -2500,6 +3020,46 @@
                 "displayName": "Target Variable"
               },
               "description": "The name of a variable on which the operation\u0027s output will be placed",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "org.mule.runtime.api.meta.TargetType",
+                  "enum": {
+                    "type": "[Ljava.lang.String;",
+                    "values": [
+                      "PAYLOAD",
+                      "MESSAGE"
+                    ]
+                  }
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": "PAYLOAD",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "elementReferences": [],
+              "name": "targetType",
+              "displayModel": {
+                "displayName": "Target Output"
+              },
+              "description": "The type of the operation\u0027s output that will be stored in the target variable",
               "modelProperties": {}
             }
           ],

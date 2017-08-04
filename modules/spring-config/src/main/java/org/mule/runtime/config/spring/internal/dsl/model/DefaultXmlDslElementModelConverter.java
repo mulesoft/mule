@@ -248,10 +248,14 @@ public class DefaultXmlDslElementModelConverter implements XmlDslElementModelCon
 
   private Element populateEETransform(DslElementModel<?> elementModel) {
     Element transform = createElement(elementModel.getDsl());
-    elementModel.getConfiguration().ifPresent(c -> c.getParameters().forEach(transform::setAttribute));
+    elementModel.getConfiguration()
+        .ifPresent(c -> c.getParameters()
+            .forEach((name, value) -> elementModel.findElement(name).filter(DslElementModel::isExplicitInDsl)
+                .ifPresent(e -> transform.setAttribute(name, value))));
 
     // write set-payload and set-attributes
     elementModel.findElement(buildFromStringRepresentation("ee:set-payload"))
+        .filter(DslElementModel::isExplicitInDsl)
         .ifPresent(message -> {
           Element messageElement = createElement(elementModel.getDsl(), "message");
           transform.appendChild(messageElement);

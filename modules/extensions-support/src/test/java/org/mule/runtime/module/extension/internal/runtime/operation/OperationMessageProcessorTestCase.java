@@ -97,7 +97,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
 
   @Override
   protected OperationMessageProcessor createOperationMessageProcessor() {
-    return new OperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, resolverSet,
+    return new OperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetType, resolverSet,
                                          cursorStreamProviderFactory, extensionManager, mockPolicyManager);
   }
 

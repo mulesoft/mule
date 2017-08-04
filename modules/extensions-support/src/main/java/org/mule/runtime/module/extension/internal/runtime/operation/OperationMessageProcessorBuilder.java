@@ -12,6 +12,7 @@ import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.supportsOAuth;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.meta.TargetType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
@@ -41,6 +42,7 @@ public final class OperationMessageProcessorBuilder {
   private ConfigurationProvider configurationProvider;
   private Map<String, ?> parameters;
   private String target;
+  private TargetType targetType;
   private CursorProviderFactory cursorProviderFactory;
 
   public OperationMessageProcessorBuilder(ExtensionModel extensionModel,
@@ -84,6 +86,11 @@ public final class OperationMessageProcessorBuilder {
     return this;
   }
 
+  public OperationMessageProcessorBuilder setTargetType(TargetType targetType) {
+    this.targetType = targetType;
+    return this;
+  }
+
   public OperationMessageProcessorBuilder setCursorProviderFactory(CursorProviderFactory cursorProviderFactory) {
     this.cursorProviderFactory = cursorProviderFactory;
     return this;
@@ -100,16 +107,19 @@ public final class OperationMessageProcessorBuilder {
         OperationMessageProcessor processor;
         if (operationModel.getModelProperty(PagedOperationModelProperty.class).isPresent()) {
           processor =
-              new PagedOperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, resolverSet,
+              new PagedOperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetType,
+                                                 resolverSet,
                                                  cursorProviderFactory, extensionManager, policyManager,
                                                  extensionConnectionSupplier);
         } else if (supportsOAuth(extensionModel)) {
           processor =
-              new OAuthOperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, resolverSet,
+              new OAuthOperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetType,
+                                                 resolverSet,
                                                  cursorProviderFactory, extensionManager, policyManager,
                                                  oauthManager);
         } else {
-          processor = new OperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, resolverSet,
+          processor = new OperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetType,
+                                                    resolverSet,
                                                     cursorProviderFactory, extensionManager, policyManager);
         }
         // TODO: MULE-5002 this should not be necessary but lifecycle issues when injecting message processors automatically
