@@ -11334,7 +11334,7 @@
           },
           "fields": []
         },
-        "hasDynamicType": false,
+        "hasDynamicType": true,
         "description": "",
         "modelProperties": {}
       },

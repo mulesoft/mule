@@ -7,6 +7,7 @@
 package org.mule.test.vegan.extension;
 
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
+import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -35,6 +36,7 @@ public class VeganFidelityOperation {
     throw new IllegalArgumentException("I CAN'T EAT THAT TYPE, IS IMPOSSIBLE!");
   }
 
+  @OutputResolver(output = FruitMetadataResolver.class)
   public List<FarmedFood> consumingGroupedFood(@ParameterGroup(name = "As Group") GroupedFood groupedFood,
                                                @Optional @NullSafe GroupedFood pojoGroupedFood) {
     return Arrays.asList(groupedFood.getFood(), pojoGroupedFood.getFood());
