@@ -14,7 +14,6 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.api.processor.Processor;
@@ -39,9 +38,6 @@ public class EnrichedNotificationInfo {
   private String originatingFlowName;
   private FlowCallStack flowCallStack;
 
-  // TODO: MULE-12626: remove when Studio uses interception API
-  Event event;
-
   /**
    * Extract information from the event and exception to provide notification data.
    *
@@ -58,13 +54,10 @@ public class EnrichedNotificationInfo {
         component = componentFromException(e);
       }
 
-      notificationInfo =
-          new EnrichedNotificationInfo(event.getContext().getId(), event.getCorrelationId(), event.getGroupCorrelation(),
-                                       event.getMessage(), event.getError(), component, e, createVariablesMap(event),
-                                       event.getContext().getOriginatingLocation().getRootContainerName(),
-                                       event.getFlowCallStack());
-      notificationInfo.event = event;
-      return notificationInfo;
+      return new EnrichedNotificationInfo(event.getContext().getId(), event.getCorrelationId(), event.getGroupCorrelation(),
+                                          event.getMessage(), event.getError(), component, e, createVariablesMap(event),
+                                          event.getContext().getOriginatingLocation().getRootContainerName(),
+                                          event.getFlowCallStack());
     } else if (e != null) {
       if (e instanceof MessagingException) {
         MessagingException messagingException = (MessagingException) e;
@@ -72,10 +65,8 @@ public class EnrichedNotificationInfo {
           return createInfo(messagingException.getEvent(), e, componentFromException(e));
         }
       } else {
-        notificationInfo = new EnrichedNotificationInfo(null, null, empty(),
-                                                        null, null, null, e, new HashMap<>(), null, null);
-        notificationInfo.event = event;
-        return notificationInfo;
+        return new EnrichedNotificationInfo(null, null, empty(),
+                                            null, null, null, e, new HashMap<>(), null, null);
       }
     }
 
@@ -162,10 +153,5 @@ public class EnrichedNotificationInfo {
 
   public FlowCallStack getFlowCallStack() {
     return flowCallStack;
-  }
-
-  // TODO: MULE-12626: remove when Studio uses interception API
-  public TypedValue evaluateExpression(ExpressionManager expressionManager, String script) {
-    return expressionManager.evaluate(script, event);
   }
 }

@@ -7,11 +7,10 @@
 package org.mule.runtime.core.api.context.notification;
 
 import static org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo.createInfo;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
-import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
 
@@ -60,10 +59,5 @@ public class MessageProcessorNotification extends EnrichedServerNotification imp
     return EVENT_NAME + "{" + "action=" + getActionName(action) + ", processor=" + getComponent().getLocation().getLocation()
         + ", resourceId="
         + resourceIdentifier + ", serverId=" + serverId + ", timestamp=" + timestamp + "}";
-  }
-
-  // TODO: MULE-12626: remove when Studio uses interception API
-  public TypedValue evaluateExpression(ExpressionManager expressionManager, String script) {
-    return getInfo().evaluateExpression(expressionManager, script);
   }
 }
