@@ -330,8 +330,8 @@ public class IOUtils {
     final Message.Builder builder;
 
     if (object instanceof File) {
-      builder = Message.builder()
-          .payload(new TypedValue(new FileInputStream((File) object), fromObject(object), of(((File) object).length())));
+      File file = (File) object;
+      builder = Message.builder().payload(new TypedValue(new FileInputStream(file), fromObject(file), of(file.length())));
     } else if (object instanceof URL) {
       builder = Message.builder().value(((URL) object).openStream());
     } else if (object instanceof String) {
