@@ -97,7 +97,7 @@ public class QuartzConnector extends AbstractConnector
      */
     protected void initializeScheduler() throws SchedulerException
     {
-        SchedulerFactory factory = new StdSchedulerFactory(factoryProperties);
+        SchedulerFactory factory = createSchedulerFactory();
         quartzScheduler = factory.getScheduler();
         quartzScheduler.getContext().put(MULE_CONTEXT_PROPERTY, muleContext); 
     }
@@ -224,7 +224,7 @@ public class QuartzConnector extends AbstractConnector
         {
             if (quartzScheduler != null)
             {
-                quartzScheduler.shutdown();
+                quartzScheduler.standby();
             }
         }
         catch (Exception e)
@@ -241,6 +241,17 @@ public class QuartzConnector extends AbstractConnector
             logger.warn(String.format("Configured timezone '%s' is invalid in scheduler '%s'. Defaulting to %s", timeZone, name, TZ_GMT_ID));
         }
         return resolvedTimeZone;
+    }
+
+    /**
+     * Creates a {@link SchedulerFactory} used to create Quartz scheduler instances
+     *
+     * @return a SchedulerFactory.
+     * @throws SchedulerException
+     */
+    protected SchedulerFactory createSchedulerFactory() throws SchedulerException
+    {
+        return new StdSchedulerFactory(factoryProperties);
     }
 
     @Override
