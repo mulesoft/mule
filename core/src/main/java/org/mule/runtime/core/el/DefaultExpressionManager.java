@@ -132,7 +132,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   private TypedValue evaluate(String expression, Event event, Event.Builder eventBuilder, ComponentLocation componentLocation,
                               BindingContext context) {
     return updateTypedValueForStreaming(expressionLanguage.evaluate(expression, event, eventBuilder, componentLocation, context),
-                                     event, streamingManager);
+                                        event, streamingManager);
   }
 
   @Override
@@ -155,8 +155,8 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
                              ComponentLocation componentLocation, boolean failOnNull)
       throws ExpressionRuntimeException {
     return updateTypedValueForStreaming(expressionLanguage.evaluate(expression, outputType, event, componentLocation, context,
-                                                                 failOnNull),
-                                     event, streamingManager);
+                                                                    failOnNull),
+                                        event, streamingManager);
   }
 
   private TypedValue transform(TypedValue target, DataType sourceType, DataType outputType) throws TransformerException {
