@@ -16,22 +16,13 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.ArrayUtils.addAll;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-<<<<<<< HEAD:modules/spring-config/src/main/java/org/mule/runtime/config/spring/internal/MuleArtifactContext.java
 import static org.mule.runtime.config.spring.api.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
 import static org.mule.runtime.config.spring.api.dsl.model.ApplicationModel.CONFIGURATION_IDENTIFIER;
 import static org.mule.runtime.config.spring.api.dsl.model.ApplicationModel.IMPORT_ELEMENT;
 import static org.mule.runtime.config.spring.api.dsl.model.ApplicationModel.MULE_IDENTIFIER;
 import static org.mule.runtime.config.spring.internal.dsl.spring.BeanDefinitionFactory.SPRING_SINGLETON_OBJECT;
 import static org.mule.runtime.config.spring.internal.parsers.generic.AutoIdUtils.uniqueValue;
-=======
-import static org.mule.runtime.config.spring.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.CONFIGURATION_IDENTIFIER;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.IMPORT_ELEMENT;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_IDENTIFIER;
-import static org.mule.runtime.config.spring.dsl.spring.BeanDefinitionFactory.SPRING_SINGLETON_OBJECT;
-import static org.mule.runtime.config.spring.parsers.generic.AutoIdUtils.uniqueValue;
 import static org.mule.runtime.config.spring.util.ComponentBuildingDefinitionUtils.registerComponentBuildingDefinitions;
->>>>>>> Refactors:modules/spring-config/src/main/java/org/mule/runtime/config/spring/MuleArtifactContext.java
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTIVITY_TESTING_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_METADATA_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
@@ -80,7 +71,6 @@ import org.mule.runtime.config.spring.internal.processor.LifecycleStatePostProce
 import org.mule.runtime.config.spring.internal.processor.MuleInjectorProcessor;
 import org.mule.runtime.config.spring.internal.processor.PostRegistrationActionsPostProcessor;
 import org.mule.runtime.config.spring.internal.util.LaxInstantiationStrategyWrapper;
-import org.mule.runtime.config.spring.util.SpiUtils;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigResource;
 import org.mule.runtime.core.api.config.RuntimeConfigurationException;
@@ -96,12 +86,6 @@ import org.mule.runtime.core.api.util.Pair;
 import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
-<<<<<<< HEAD:modules/spring-config/src/main/java/org/mule/runtime/config/spring/internal/MuleArtifactContext.java
-import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
-import org.mule.runtime.module.extension.internal.config.ExtensionBuildingDefinitionProvider;
-=======
-import org.mule.runtime.core.api.registry.SpiServiceRegistry;
->>>>>>> Refactors:modules/spring-config/src/main/java/org/mule/runtime/config/spring/MuleArtifactContext.java
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;

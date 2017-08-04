@@ -7,15 +7,16 @@
 package org.mule.runtime.config.spring.util;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.config.spring.dsl.model.ComponentBuildingDefinitionRegistry;
+import org.mule.runtime.config.spring.api.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.module.extension.internal.config.ExtensionBuildingDefinitionProvider;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 import static java.util.Collections.emptySet;
 
