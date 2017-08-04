@@ -84,14 +84,14 @@
 		<!-- Test jars -->
 		<!-- some tests reference cxf test classes -->
 		<dependency>
-			<groupId>org.mule.apache.cxf</groupId>
+			<groupId>org.mule.modules</groupId>
 			<artifactId>mule-module-cxf</artifactId>
 			<version>${project.version}</version>
 			<classifier>tests</classifier>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.cxf</groupId>
+			<groupId>org.mule.apache.cxf</groupId>
 			<artifactId>cxf-testutils</artifactId>
 			<version>${cxfVersion}</version>
 			<scope>test</scope>
