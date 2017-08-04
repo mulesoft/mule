@@ -41,9 +41,6 @@ public class DefaultTlsContextFactoryTestCase extends AbstractMuleTestCase {
   @BeforeClass
   public static void createTlsPropertiesFile() throws Exception {
 
-    // TODO MULE-10805: It's ignored when Allure is used because it fails with the Allure Surefire listener
-    assumeThat(System.getProperty("allure.profile.is.activated", "false"), Is.is(equalTo("false")));
-
     PrintWriter writer = new PrintWriter(getTlsPropertiesFile(), "UTF-8");
     writer.println("enabledCipherSuites=" + getFileEnabledCipherSuites());
     writer.println("enabledProtocols=" + getFileEnabledProtocols());

@@ -1616,7 +1616,6 @@
                             <!-- Just propagate this variable due to surefire will not do this when forked vm for tests -->
                             <maven.multiModuleProjectDirectory>${maven.multiModuleProjectDirectory}</maven.multiModuleProjectDirectory>
                             <maven.projectVersion>${project.version}</maven.projectVersion>
-                            <allure.profile.is.activated>true</allure.profile.is.activated>
                         </systemPropertyVariables>
                         <systemProperties>
                             <property>
