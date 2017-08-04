@@ -147,14 +147,14 @@ public final class StreamingUtils {
    * @param streamingManager the streaming manager
    * @return updated {@link TypedValue instance}
    */
-  public static TypedValue updateTypedValueForStreaming(TypedValue value, Event event, StreamingManager streamingManager) {
+  public static TypedValue updateTypedValueForStreaming(final TypedValue value, final Event event,
+                                                        final StreamingManager streamingManager) {
     if (event == null) {
       return value;
     } else {
       Object payload = value.getValue();
       if (payload instanceof CursorProvider) {
-        value =
-            new TypedValue<>(streamingManager.manage((CursorProvider) payload, event), value.getDataType(), value.getLength());
+        return new TypedValue<>(streamingManager.manage((CursorProvider) payload, event), value.getDataType(), value.getLength());
       }
       return value;
     }
@@ -166,16 +166,15 @@ public final class StreamingUtils {
    * @param streamingManager the streaming manager
    * @return function that maps the an {@link Event}
    */
-  public static Function<Event, Event> updateEventForStreaming(StreamingManager streamingManager) {
+  public static Function<Event, Event> updateEventForStreaming(final StreamingManager streamingManager) {
     return event -> {
       TypedValue payload = event.getMessage().getPayload();
       if (payload.getValue() instanceof CursorProvider) {
         Message message = Message.builder(event.getMessage())
             .payload(updateTypedValueForStreaming(payload, event, streamingManager))
             .build();
-        event = Event.builder(event).message(message).build();
+        return Event.builder(event).message(message).build();
       }
-
       return event;
     };
   }
