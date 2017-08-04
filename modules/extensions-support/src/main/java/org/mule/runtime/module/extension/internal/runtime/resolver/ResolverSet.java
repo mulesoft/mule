@@ -119,7 +119,7 @@ public class ResolverSet implements ValueResolver<ResolverSetResult>, Initialisa
         return new TypedValue<>(cursor, DataType.builder()
             .type(cursor.getClass())
             .mediaType(typedValue.getDataType().getMediaType())
-            .build());
+            .build(), typedValue.getLength());
       }
     }
 

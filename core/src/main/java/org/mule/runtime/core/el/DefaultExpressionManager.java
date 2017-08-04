@@ -13,6 +13,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 import static org.mule.runtime.core.api.util.ClassUtils.isInstance;
+import static org.mule.runtime.core.api.util.StreamingUtils.updateTypedValueForStreaming;
 import static org.mule.runtime.core.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -25,7 +26,6 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.MuleContext;
@@ -131,7 +131,8 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
 
   private TypedValue evaluate(String expression, Event event, Event.Builder eventBuilder, ComponentLocation componentLocation,
                               BindingContext context) {
-    return handleStreaming(expressionLanguage.evaluate(expression, event, eventBuilder, componentLocation, context), event);
+    return updateTypedValueForStreaming(expressionLanguage.evaluate(expression, event, eventBuilder, componentLocation, context),
+                                     event, streamingManager);
   }
 
   @Override
@@ -153,22 +154,9 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   public TypedValue evaluate(String expression, DataType outputType, BindingContext context, Event event,
                              ComponentLocation componentLocation, boolean failOnNull)
       throws ExpressionRuntimeException {
-    return handleStreaming(expressionLanguage.evaluate(expression, outputType, event, componentLocation, context, failOnNull),
-                           event);
-  }
-
-  private TypedValue handleStreaming(TypedValue value, Event event) {
-    // TODO required a better fix for MULE-12486
-    if (event == null) {
-      return value;
-    }
-
-    Object payload = value.getValue();
-    if (payload instanceof CursorProvider) {
-      value = new TypedValue<>(streamingManager.manage((CursorProvider) payload, event), value.getDataType());
-    }
-
-    return value;
+    return updateTypedValueForStreaming(expressionLanguage.evaluate(expression, outputType, event, componentLocation, context,
+                                                                 failOnNull),
+                                     event, streamingManager);
   }
 
   private TypedValue transform(TypedValue target, DataType sourceType, DataType outputType) throws TransformerException {

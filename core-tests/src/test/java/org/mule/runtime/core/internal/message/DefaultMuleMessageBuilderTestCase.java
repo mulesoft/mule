@@ -22,6 +22,7 @@ import static org.mule.runtime.api.metadata.DataType.JSON_STRING;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.DataType.TEXT_STRING;
+import static org.mule.runtime.api.metadata.DataType.fromObject;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
 import static org.mule.runtime.api.metadata.MediaType.HTML;
@@ -34,11 +35,13 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.message.BaseAttributes;
 import org.mule.runtime.core.internal.metadata.DefaultCollectionDataType;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.testmodels.fruit.Apple;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.activation.DataHandler;
 
@@ -49,7 +52,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
   private static final String NEW_PAYLOAD = "new payload";
   private static final String EMPTY_JSON = "{}";
   private static final Object BASE_ATTRIBUTES = new BaseAttributes() {};
-  private static final DataType BASE_ATTRIBUTES_DATATYPE = DataType.fromObject(BASE_ATTRIBUTES);
+  private static final DataType BASE_ATTRIBUTES_DATATYPE = fromObject(BASE_ATTRIBUTES);
   private static final String PROPERTY_KEY = "propertyKey";
   private static final Serializable PROPERTY_VALUE = "propertyValue";
   private static final MediaType HTML_STRING_UTF8 = HTML.withCharset(UTF_8);
@@ -308,6 +311,20 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
     assertThat(copy.getPayload().getValue(), is(dataHandler));
     assertThat(copy.getPayload().getDataType().getType(), equalTo(DataHandler.class));
     assertThat(copy.getPayload().getDataType().getMediaType(), is(XML));
+  }
+
+  @Test
+  public void copyPreservesDataType() {
+    Apple apple = new Apple();
+    long appleSize = 111;
+    Message message =
+        new DefaultMessageBuilder().payload(new TypedValue(apple, fromObject(apple), Optional.of(appleSize))).build();
+    Message copy = new DefaultMessageBuilder(message).build();
+
+    assertThat(copy.getPayload(), is(message.getPayload()));
+    assertThat(copy.getAttributes(), is(message.getAttributes()));
+    assertThat(message.getPayload().getLength().get(), is(appleSize));
+    assertThat(copy.getPayload().getLength().get(), is(appleSize));
   }
 
   private Message createTestMessage() {

@@ -19,6 +19,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextI
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.api.util.ExceptionUtils.updateMessagingExceptionWithError;
+import static org.mule.runtime.core.api.util.StreamingUtils.updateEventForStreaming;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
@@ -27,10 +28,8 @@ import static reactor.core.publisher.Flux.just;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
-import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.api.meta.AnnotatedObject;
-import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -155,18 +154,7 @@ abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObject imp
     // #6 If the processor returns a CursorProvider, then have the StreamingManager manage it
     interceptors.add((processor, next) -> stream -> from(stream)
         .transform(next)
-        .map(result -> {
-          Object payload = result.getMessage().getPayload().getValue();
-          if (payload instanceof CursorProvider) {
-            Message message = Message.builder(result.getMessage()).value(
-                                                                         streamingManager.manage((CursorProvider) payload,
-                                                                                                 result))
-                .build();
-            result = Event.builder(result).message(message).build();
-          }
-
-          return result;
-        }));
+        .map(updateEventForStreaming(streamingManager)));
 
     // #7 Apply processor interceptors.
     muleContext.getProcessorInterceptorManager().getInterceptorFactories().stream()
