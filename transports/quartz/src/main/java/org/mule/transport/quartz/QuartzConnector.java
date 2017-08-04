@@ -244,7 +244,8 @@ public class QuartzConnector extends AbstractConnector
     }
 
     /**
-     * creates a SchedulerFactory used to create quartz scheduler instances.
+     * Creates a {@link SchedulerFactory} used to create Quartz scheduler instances
+     *
      * @return a SchedulerFactory.
      * @throws SchedulerException
      */
