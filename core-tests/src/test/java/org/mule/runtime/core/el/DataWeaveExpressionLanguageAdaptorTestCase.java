@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.el;
 
+import static java.lang.String.format;
+import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 import static org.apache.commons.lang3.SystemUtils.FILE_SEPARATOR;
 import static org.hamcrest.Matchers.containsString;
@@ -47,15 +49,18 @@ import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
+import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.security.Authentication;
+import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleManifest;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.message.BaseAttributes;
+import org.mule.runtime.core.api.message.ErrorBuilder;
 import org.mule.runtime.core.api.security.DefaultMuleAuthentication;
 import org.mule.runtime.core.api.security.DefaultMuleCredentials;
 import org.mule.runtime.core.api.security.SecurityContext;
@@ -64,6 +69,7 @@ import org.mule.runtime.core.internal.security.DefaultSecurityContext;
 
 import com.google.common.collect.Sets;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -139,6 +145,69 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
 
     TypedValue result = expressionLanguage.evaluate(ERROR, event, BindingContext.builder().build());
     assertThat(result.getValue(), is(sameInstance(error)));
+  }
+
+  @Test
+  public void fullErrorBinding() throws Exception {
+    String description = "An error occurred";
+    String detailedDescription = "A division by zero has collapsed our systems.";
+    String exceptionMessage = "dividend cannot be zero";
+    String errorId = "WEAVE_TEST";
+
+    ErrorType errorType = mock(ErrorType.class);
+    when(errorType.getIdentifier()).thenReturn(errorId);
+
+    Error error = ErrorBuilder.builder()
+        .description(description)
+        .detailedDescription(detailedDescription)
+        .exception(new IllegalArgumentException(exceptionMessage))
+        .errorType(errorType)
+        .build();
+    Optional opt = Optional.of(error);
+    Event event = getEventWithError(opt);
+    doReturn(testEvent().getMessage()).when(event).getMessage();
+
+    String expression =
+        "'$(error.description) $(error.detailedDescription) $(error.cause.message) $(error.errorType.identifier)'";
+    TypedValue result = expressionLanguage.evaluate(expression, event, BindingContext.builder().build());
+    assertThat(result.getValue(), is(format("%s %s %s %s", description, detailedDescription, exceptionMessage, errorId)));
+  }
+
+  @Test
+  public void childErrorsErrorBinding() throws Exception {
+    String childErrorMessage = "error";
+    String otherChildErrorMessage = "oops";
+
+    ErrorType errorType = mock(ErrorType.class);
+
+    Error error = mock(Error.class);
+    when(error.getChildErrors()).thenReturn(asList(
+                                                   ErrorBuilder.builder(new IOException(childErrorMessage)).errorType(errorType)
+                                                       .build(),
+                                                   ErrorBuilder.builder(new DefaultMuleException(otherChildErrorMessage))
+                                                       .errorType(errorType).build()));
+
+    Optional opt = Optional.of(error);
+    Event event = getEventWithError(opt);
+    doReturn(testEvent().getMessage()).when(event).getMessage();
+
+    String expression = "error.childErrors reduce ((child, acc = '') -> acc ++ child.cause.message)";
+    TypedValue result = expressionLanguage.evaluate(expression, event, BindingContext.builder().build());
+    assertThat(result.getValue(), is(format("%s%s", childErrorMessage, otherChildErrorMessage)));
+  }
+
+  @Test
+  public void messageErrorBinding() throws Exception {
+    Error error = mock(Error.class);
+    when(error.getErrorMessage()).thenReturn(Message.of(new Integer[] {1, 3, 6}));
+
+    Optional opt = Optional.of(error);
+    Event event = getEventWithError(opt);
+    doReturn(testEvent().getMessage()).when(event).getMessage();
+
+    String expression = "error.errorMessage.payload reduce ($$ + $)";
+    TypedValue result = expressionLanguage.evaluate(expression, event, BindingContext.builder().build());
+    assertThat(result.getValue(), is(10));
   }
 
   @Test

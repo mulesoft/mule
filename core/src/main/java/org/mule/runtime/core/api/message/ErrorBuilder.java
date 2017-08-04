@@ -6,13 +6,18 @@
  */
 package org.mule.runtime.core.api.message;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.unmodifiableList;
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootMuleException;
 import static org.mule.runtime.api.util.Preconditions.checkState;
+import org.mule.runtime.api.exception.ComposedErrorException;
+import org.mule.runtime.api.exception.ErrorMessageAwareException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.ErrorMessageAwareException;
+
+import java.util.List;
 
 /**
  * Builder for {@link Error} instances.
@@ -26,6 +31,7 @@ public final class ErrorBuilder {
   private String detailedDescription;
   private ErrorType errorType;
   private Message errorMessage;
+  private List<Error> errors = emptyList();
 
   public static ErrorBuilder builder() {
     return new ErrorBuilder();
@@ -51,6 +57,9 @@ public final class ErrorBuilder {
     if (e instanceof ErrorMessageAwareException) {
       exception = ((ErrorMessageAwareException) e).getRootCause();
       this.errorMessage = ((ErrorMessageAwareException) e).getErrorMessage();
+    }
+    if (e instanceof ComposedErrorException) {
+      this.errors = ((ComposedErrorException) e).getErrors();
     }
     this.exception = exception;
     String exceptionDescription = exception.getMessage() != null ? exception.getMessage() : "unknown description";
@@ -119,10 +128,24 @@ public final class ErrorBuilder {
    * is available during the error handler execution.
    *
    * @param errorMessage
-   * @return
+   * @return {@code this} builder
    */
   public ErrorBuilder errorMessage(Message errorMessage) {
     this.errorMessage = errorMessage;
+    return this;
+  }
+
+  /**
+   * Sets the child errors, if any.
+   *
+   * This errors represent the failures that caused the error being created. For instance, a scatter gather may aggregate all routes
+   * and fail when any do, making the route errors available in this list.
+   *
+   * @param errors a list of errors that caused this one
+   * @return {@code this} builder
+   */
+  public ErrorBuilder errors(List<Error> errors) {
+    this.errors = errors;
     return this;
   }
 
@@ -138,7 +161,7 @@ public final class ErrorBuilder {
     checkState(description != null, "description exception cannot be null");
     checkState(detailedDescription != null, "detailed description exception cannot be null");
     checkState(errorType != null, "errorType exception cannot be null");
-    return new ErrorImplementation(exception, description, detailedDescription, errorType, errorMessage);
+    return new ErrorImplementation(exception, description, detailedDescription, errorType, errorMessage, errors);
   }
 
   /**
@@ -151,14 +174,16 @@ public final class ErrorBuilder {
     private String detailedDescription;
     private ErrorType errorType;
     private Message muleMessage;
+    private List<Error> errors;
 
     private ErrorImplementation(Throwable exception, String description, String detailedDescription, ErrorType errorType,
-                                Message errorMessage) {
+                                Message errorMessage, List<Error> errors) {
       this.exception = exception;
       this.description = description;
       this.detailedDescription = detailedDescription;
       this.errorType = errorType;
       this.muleMessage = errorMessage;
+      this.errors = unmodifiableList(errors);
     }
 
     /**
@@ -199,6 +224,11 @@ public final class ErrorBuilder {
     @Override
     public Message getErrorMessage() {
       return muleMessage;
+    }
+
+    @Override
+    public List<Error> getChildErrors() {
+      return errors;
     }
   }
 
