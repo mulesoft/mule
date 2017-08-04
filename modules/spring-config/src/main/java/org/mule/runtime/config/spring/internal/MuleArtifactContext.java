@@ -22,6 +22,7 @@ import static org.mule.runtime.config.spring.api.dsl.model.ApplicationModel.IMPO
 import static org.mule.runtime.config.spring.api.dsl.model.ApplicationModel.MULE_IDENTIFIER;
 import static org.mule.runtime.config.spring.internal.dsl.spring.BeanDefinitionFactory.SPRING_SINGLETON_OBJECT;
 import static org.mule.runtime.config.spring.internal.parsers.generic.AutoIdUtils.uniqueValue;
+import static org.mule.runtime.config.spring.util.ComponentBuildingDefinitionUtils.registerComponentBuildingDefinitions;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTIVITY_TESTING_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_METADATA_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
@@ -85,8 +86,6 @@ import org.mule.runtime.core.api.util.Pair;
 import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
-import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
-import org.mule.runtime.module.extension.internal.config.ExtensionBuildingDefinitionProvider;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -188,27 +187,17 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
     this.xmlConfigurationDocumentLoader = newXmlConfigurationDocumentLoader();
     this.serviceDiscoverer = new DefaultRegistry(muleContext);
 
-    serviceRegistry.lookupProviders(ComponentBuildingDefinitionProvider.class, MuleArtifactContext.class.getClassLoader())
-        .forEach(componentBuildingDefinitionProvider -> {
-          if (componentBuildingDefinitionProvider instanceof ExtensionBuildingDefinitionProvider) {
-            ((ExtensionBuildingDefinitionProvider) componentBuildingDefinitionProvider)
-                .setExtensionModels(muleContext.getExtensionManager() != null ? muleContext.getExtensionManager().getExtensions()
-                    : emptySet());
-          }
-          componentBuildingDefinitionProvider.init();
-          componentBuildingDefinitionProvider.getComponentBuildingDefinitions()
-              .forEach(componentBuildingDefinitionRegistry::register);
-        });
+    registerComponentBuildingDefinitions(serviceRegistry, MuleArtifactContext.class.getClassLoader(),
+                                         componentBuildingDefinitionRegistry,
+                                         getExtensionModels(muleContext.getExtensionManager()),
+                                         (componentBuildingDefinitionProvider -> componentBuildingDefinitionProvider
+                                             .getComponentBuildingDefinitions()));
 
     for (ClassLoader pluginArtifactClassLoader : pluginsClassLoaders) {
-      serviceRegistry.lookupProviders(ComponentBuildingDefinitionProvider.class, pluginArtifactClassLoader)
-          .forEach(componentBuildingDefinitionProvider -> {
-            if (!(componentBuildingDefinitionProvider instanceof ExtensionBuildingDefinitionProvider)) {
-              componentBuildingDefinitionProvider.init();
-              componentBuildingDefinitionProvider.getComponentBuildingDefinitions()
-                  .forEach(componentBuildingDefinitionRegistry::register);
-            }
-          });
+      registerComponentBuildingDefinitions(serviceRegistry, pluginArtifactClassLoader, componentBuildingDefinitionRegistry,
+                                           getExtensionModels(muleContext.getExtensionManager()),
+                                           (componentBuildingDefinitionProvider -> componentBuildingDefinitionProvider
+                                               .getComponentBuildingDefinitions()));
     }
 
     xmlApplicationParser = createApplicationParser(pluginsClassLoaders);
@@ -217,6 +206,11 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
 
     createApplicationModel();
     determineIfOnlyNewParsingMechanismCanBeUsed();
+  }
+
+  private static Optional<Set<ExtensionModel>> getExtensionModels(ExtensionManager extensionManager) {
+    return ofNullable(extensionManager == null ? null
+        : extensionManager.getExtensions());
   }
 
   protected XmlConfigurationDocumentLoader newXmlConfigurationDocumentLoader() {
