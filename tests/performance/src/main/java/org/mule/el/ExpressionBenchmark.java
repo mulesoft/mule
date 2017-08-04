@@ -58,7 +58,7 @@ public class ExpressionBenchmark extends AbstractBenchmark {
 
   @Benchmark
   public Object dwFlowVars() {
-    return muleContext.getExpressionManager().evaluate("variables.foo == 'bar'", event).getValue();
+    return muleContext.getExpressionManager().evaluate("vars.foo == 'bar'", event).getValue();
   }
 
   @Benchmark
