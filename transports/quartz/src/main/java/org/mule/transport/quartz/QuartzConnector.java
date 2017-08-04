@@ -243,6 +243,11 @@ public class QuartzConnector extends AbstractConnector
         return resolvedTimeZone;
     }
 
+    /**
+     * creates a SchedulerFactory used to create quartz scheduler instances.
+     * @return a SchedulerFactory.
+     * @throws SchedulerException
+     */
     protected SchedulerFactory createSchedulerFactory() throws SchedulerException
     {
         return new StdSchedulerFactory(factoryProperties);
