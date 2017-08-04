@@ -71,7 +71,7 @@ import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
 import org.mule.runtime.extension.api.util.ExtensionModelUtils;
 import org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty;
 import org.mule.runtime.extension.internal.property.QNameModelProperty;
-import org.mule.runtime.extension.internal.util.ParameterModelComparator;
+import org.mule.runtime.extension.api.util.ParameterModelComparator;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Annotation;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Attribute;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Documentation;
