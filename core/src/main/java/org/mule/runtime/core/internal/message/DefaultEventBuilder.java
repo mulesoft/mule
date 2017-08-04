@@ -11,9 +11,10 @@ import static java.util.Collections.unmodifiableMap;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
+import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
+import static org.mule.runtime.api.el.BindingContextUtils.addEventBindings;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
-import static org.mule.runtime.internal.el.BindingContextUtils.NULL_BINDING_CONTEXT;
-import static org.mule.runtime.internal.el.BindingContextUtils.addEventBindings;
+
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
