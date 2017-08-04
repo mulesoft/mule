@@ -7,8 +7,6 @@
 package org.mule.runtime.config.spring.internal;
 
 import static java.lang.String.format;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootException;
 import static org.mule.runtime.api.value.ResolvingFailure.Builder.newFailure;
 import static org.mule.runtime.api.value.ValueResult.resultFrom;
@@ -23,7 +21,6 @@ import org.mule.runtime.api.value.ValueProviderService;
 import org.mule.runtime.api.value.ValueResult;
 import org.mule.runtime.config.spring.internal.dsl.model.NoSuchComponentModelException;
 
-import java.util.Optional;
 import java.util.function.Supplier;
 
 import javax.inject.Inject;
@@ -44,14 +41,15 @@ public class LazyValueProviderService implements ValueProviderService, Initialis
   public static final String NON_LAZY_VALUE_PROVIDER_SERVICE = "_muleNonLazyValueProviderService";
   private final Supplier<ValueProviderService> valueProviderServiceSupplier;
 
-  private LazyMuleArtifactContext lazyMuleArtifactContext;
+  private LazyComponentTaskExecutor lazyComponentTaskExecutor;
 
   @Inject
   @Named(NON_LAZY_VALUE_PROVIDER_SERVICE)
   private ValueProviderService providerService;
 
-  LazyValueProviderService(LazyMuleArtifactContext artifactContext, Supplier<ValueProviderService> valueProviderServiceSupplier) {
-    this.lazyMuleArtifactContext = artifactContext;
+  LazyValueProviderService(LazyComponentTaskExecutor lazyComponentTaskExecutor,
+                           Supplier<ValueProviderService> valueProviderServiceSupplier) {
+    this.lazyComponentTaskExecutor = lazyComponentTaskExecutor;
     this.valueProviderServiceSupplier = valueProviderServiceSupplier;
   }
 
@@ -60,29 +58,25 @@ public class LazyValueProviderService implements ValueProviderService, Initialis
    */
   @Override
   public ValueResult getValues(Location location, String providerName) {
-    return initializeComponent(locationWithOutConnection(location))
-        .orElseGet(() -> providerService.getValues(location, providerName));
-  }
-
-  private Optional<ValueResult> initializeComponent(Location location) {
     try {
-      lazyMuleArtifactContext.initializeComponent(location);
+      return lazyComponentTaskExecutor.withContext(locationWithOutConnection(location),
+                                                   () -> providerService.getValues(location, providerName));
     } catch (Exception e) {
       Throwable rootException = getRootException(e);
       if (rootException instanceof NoSuchComponentModelException) {
-        return of(resultFrom(newFailure(e)
+        return resultFrom(newFailure(e)
             .withFailureCode(INVALID_LOCATION)
             .withMessage(format("Unable to resolve values. No component was found in the given location [%s]", location))
-            .build()));
+            .build());
       }
 
-      return of(resultFrom(newFailure(e)
+      return resultFrom(newFailure(e)
           .withMessage("Unknown error occurred trying to resolve values. " + e.getMessage())
           .withFailureCode(UNKNOWN)
-          .build()));
+          .build());
     }
-    return empty();
   }
+
 
   private Location locationWithOutConnection(Location location) {
     return isConnection(location) ? deleteLastPartFromLocation(location) : location;

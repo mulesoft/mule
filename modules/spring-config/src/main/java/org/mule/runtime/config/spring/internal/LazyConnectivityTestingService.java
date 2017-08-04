@@ -12,7 +12,7 @@ import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
-import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.connectivity.UnsupportedConnectivityTestingObjectException;
 import org.mule.runtime.api.exception.ObjectNotFoundException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -31,37 +31,37 @@ public class LazyConnectivityTestingService implements ConnectivityTestingServic
 
   public static final String NON_LAZY_CONNECTIVITY_TESTING_SERVICE = "_muleNonLazyConnectivityTestingService";
 
-  private final LazyComponentInitializer lazyComponentInitializer;
+  private final LazyComponentTaskExecutor lazyComponentTaskExecutor;
   private final Supplier<ConnectivityTestingService> connectivityTestingServiceSupplier;
 
   private ConnectivityTestingService connectivityTestingService;
 
-  public LazyConnectivityTestingService(LazyComponentInitializer lazyComponentInitializer,
+  public LazyConnectivityTestingService(LazyComponentTaskExecutor lazyComponentTaskExecutor,
                                         Supplier<ConnectivityTestingService> connectivityTestingServiceSupplier) {
-    this.lazyComponentInitializer = lazyComponentInitializer;
+    this.lazyComponentTaskExecutor = lazyComponentTaskExecutor;
     this.connectivityTestingServiceSupplier = connectivityTestingServiceSupplier;
   }
 
   @Override
   public ConnectionValidationResult testConnection(Location location) {
     try {
-      lazyComponentInitializer.initializeComponent(location);
-    } catch (MuleRuntimeException e) {
-      if (e.getCause() instanceof NoSuchComponentModelException) {
-        throw new ObjectNotFoundException(location.toString());
-      }
+      return lazyComponentTaskExecutor
+          .withContext(location, () -> connectivityTestingService.testConnection(location));
+    } catch (UnsupportedConnectivityTestingObjectException e) {
+      throw e;
+    } catch (NoSuchComponentModelException e) {
+      throw new ObjectNotFoundException(location.toString());
+    } catch (Exception e) {
       List<Throwable> causalChain = getCausalChain(e);
       return causalChain.stream()
           .filter(exception -> exception.getClass().equals(ConnectionException.class)
               && ((ConnectionException) exception).getErrorType().isPresent())
-          .map(exception -> failure(exception.getMessage(), ((ConnectionException) exception).getErrorType().get(),
+          .map(exception -> failure(exception.getMessage(),
+                                    ((ConnectionException) exception).getErrorType().get(),
                                     (Exception) exception))
           .findFirst()
           .orElse(unknownFailureResponse(lastMessage(causalChain), e));
-    } catch (Exception e) {
-      return unknownFailureResponse(e.getMessage(), e);
     }
-    return connectivityTestingService.testConnection(location);
   }
 
   private ConnectionValidationResult unknownFailureResponse(String message, Exception e) {
