@@ -21,8 +21,9 @@ import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.api.session.DefaultMuleSession;
-import org.mule.runtime.core.internal.routing.MessageChunkAggregator;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import java.util.Optional;
 
 import org.junit.Test;
 
@@ -50,7 +51,7 @@ public class MessageChunkAggregatorTestCase extends AbstractMuleContextTestCase 
 
     EventContext context = DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION, "foo");
 
-    Event event1 = Event.builder(context).message(message1).groupCorrelation(new GroupCorrelation(3, null)).flow(flow)
+    Event event1 = Event.builder(context).message(message1).groupCorrelation(Optional.of(GroupCorrelation.of(0, 3))).flow(flow)
         .session(session).build();
     Event event2 = Event.builder(context).message(message2).flow(flow).session(session).build();
     Event event3 = Event.builder(context).message(message3).flow(flow).session(session).build();

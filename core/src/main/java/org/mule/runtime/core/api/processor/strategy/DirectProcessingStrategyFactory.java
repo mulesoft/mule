@@ -24,7 +24,7 @@ import org.mule.runtime.core.internal.processor.strategy.StreamPerEventSink;
  */
 public class DirectProcessingStrategyFactory implements ProcessingStrategyFactory {
 
-  private static final ProcessingStrategy DIRECT_PROCESSING_STRATEGY_INSTANCE =
+  public static final ProcessingStrategy DIRECT_PROCESSING_STRATEGY_INSTANCE =
       new AbstractProcessingStrategy() {
 
         @Override

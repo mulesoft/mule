@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.routing.correlation;
 
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
@@ -17,6 +18,7 @@ import org.mule.runtime.core.internal.routing.EventGroup;
 import org.mule.runtime.core.api.session.DefaultMuleSession;
 
 import java.text.MessageFormat;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,8 +47,8 @@ public class CollectionCorrelatorCallback implements EventCorrelatorCallback {
    * 
    * @param events the event group for this request
    * @return an aggregated message
-   * @throws AggregationException if the aggregation fails. in this scenario the whole event group
-   *         is removed and passed to the exception handler for this component
+   * @throws AggregationException if the aggregation fails. in this scenario the whole event group is removed and passed to the
+   *         exception handler for this component
    */
   @Override
   public Event aggregateEvents(EventGroup events) throws AggregationException {
@@ -69,7 +71,9 @@ public class CollectionCorrelatorCallback implements EventCorrelatorCallback {
   @Override
   public EventGroup createEventGroup(Event event, Object groupId) {
     return new EventGroup(groupId, muleContext,
-                          event.getGroupCorrelation() != null ? event.getGroupCorrelation().getGroupSize() : empty(),
+                          event.getGroupCorrelation().isPresent() ? event.getGroupCorrelation().get().getGroupSize().isPresent()
+                              ? Optional.of(event.getGroupCorrelation().get().getGroupSize().getAsInt())
+                              : empty() : Optional.empty(),
                           storePrefix);
   }
 

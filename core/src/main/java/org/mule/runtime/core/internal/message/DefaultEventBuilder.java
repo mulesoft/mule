@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.message;
 
 
 import static java.util.Objects.requireNonNull;
+import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import org.mule.runtime.api.exception.MuleException;
@@ -59,7 +60,7 @@ public class DefaultEventBuilder implements Event.Builder {
   private Map<String, TypedValue<Object>> moduleParameters = new HashMap<>();
   private Error error;
   private FlowConstruct flow;
-  private GroupCorrelation groupCorrelation = new GroupCorrelation(null, null);
+  private Optional<GroupCorrelation> groupCorrelation = empty();
   private String legacyCorrelationId;
   private FlowCallStack flowCallStack = new DefaultFlowCallStack();
   private ReplyToHandler replyToHandler;
@@ -78,7 +79,7 @@ public class DefaultEventBuilder implements Event.Builder {
     this.originalEvent = event;
     this.message = event.getMessage();
     this.flow = event.getFlowConstruct();
-    this.groupCorrelation = event.getGroupCorrelation();
+    this.groupCorrelation = event.getGroupCorrelation() != null ? event.getGroupCorrelation() : empty();
     this.legacyCorrelationId = event.getLegacyCorrelationId();
     this.flowCallStack = event.getFlowCallStack().clone();
     this.replyToHandler = event.getReplyToHandler();
@@ -159,7 +160,7 @@ public class DefaultEventBuilder implements Event.Builder {
   }
 
   @Override
-  public Event.Builder groupCorrelation(GroupCorrelation correlation) {
+  public Event.Builder groupCorrelation(Optional<GroupCorrelation> correlation) {
     this.groupCorrelation = correlation;
     this.modified = true;
     return this;
@@ -271,7 +272,7 @@ public class DefaultEventBuilder implements Event.Builder {
                                 Map<String, TypedValue<Object>> properties, Map<String, TypedValue<Object>> parameters,
                                 FlowConstruct flowConstruct, MuleSession session,
                                 Object replyToDestination, ReplyToHandler replyToHandler,
-                                FlowCallStack flowCallStack, GroupCorrelation groupCorrelation, Error error,
+                                FlowCallStack flowCallStack, Optional<GroupCorrelation> groupCorrelation, Error error,
                                 String legacyCorrelationId, boolean notificationsEnabled) {
       this.context = context;
       this.flowConstruct = flowConstruct;
@@ -289,7 +290,7 @@ public class DefaultEventBuilder implements Event.Builder {
 
       this.flowCallStack = flowCallStack;
 
-      this.groupCorrelation = groupCorrelation;
+      this.groupCorrelation = groupCorrelation.orElse(null);
       this.error = error;
       this.legacyCorrelationId = legacyCorrelationId;
 
@@ -406,6 +407,7 @@ public class DefaultEventBuilder implements Event.Builder {
     /**
      * Invoked after deserialization. This is called when the marker interface {@link DeserializationPostInitialisable} is used.
      * This will get invoked after the object has been deserialized passing in the current MuleContext.
+     * 
      * @param muleContext the current muleContext instance
      * @throws MuleException if there is an error initializing
      */
@@ -522,8 +524,8 @@ public class DefaultEventBuilder implements Event.Builder {
     private GroupCorrelation groupCorrelation;
 
     @Override
-    public GroupCorrelation getGroupCorrelation() {
-      return groupCorrelation;
+    public Optional<GroupCorrelation> getGroupCorrelation() {
+      return ofNullable(groupCorrelation);
     }
 
     @Override

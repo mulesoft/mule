@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.routing;
 
 import static java.util.Collections.singletonMap;
+import static java.util.OptionalInt.of;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
@@ -29,8 +30,11 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.OptionalInt;
 
 import org.junit.Test;
+import spire.util.Opt;
 
 public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestCase {
 
@@ -59,7 +63,8 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
     Message message3 = Message.of("test event C");
 
     Event event1 =
-        Event.builder(executionContext).message(message1).groupCorrelation(new GroupCorrelation(3, null)).flow(flow).build();
+        Event.builder(executionContext).message(message1).groupCorrelation(Optional.of(GroupCorrelation.of(0, 3))).flow(flow)
+            .build();
     Event event2 = Event.builder(executionContext).message(message2).flow(flow).build();
     Event event3 = Event.builder(executionContext).message(message3).flow(flow).build();
 
@@ -102,7 +107,8 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
     Message message1 = of("test event A");
 
     Event event1 =
-        Event.builder(executionContext).message(message1).groupCorrelation(new GroupCorrelation(1, null)).flow(flow).build();
+        Event.builder(executionContext).message(message1).groupCorrelation(Optional.of(GroupCorrelation.of(0, 1))).flow(flow)
+            .build();
 
     Event resultEvent = router.process(event1);
 
@@ -144,10 +150,12 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
     Message messageCollection2 = Message.of(list2);
 
     Event event1 =
-        Event.builder(executionContext).message(messageCollection1).groupCorrelation(new GroupCorrelation(2, null)).flow(flow)
+        Event.builder(executionContext).message(messageCollection1).groupCorrelation(Optional.of(GroupCorrelation.of(0, 2)))
+            .flow(flow)
             .build();
     Event event2 =
-        Event.builder(executionContext).message(messageCollection2).groupCorrelation(new GroupCorrelation(2, null)).flow(flow)
+        Event.builder(executionContext).message(messageCollection2).groupCorrelation(Optional.of(GroupCorrelation.of(0, 2)))
+            .flow(flow)
             .build();
 
     assertNull(router.process(event1));

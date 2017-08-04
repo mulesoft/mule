@@ -6,9 +6,12 @@
  */
 package org.mule.runtime.core.api.context.notification;
 
+import static java.util.Optional.empty;
+
 import org.mule.runtime.core.api.transaction.Transaction;
 
 import java.util.HashMap;
+import java.util.Optional;
 
 // TODO: Shouldn't really be an EnrichedServerNotification as it doesn't know event data,
 // but inherits to be compatible with how mule-agent tracking currently handles them
@@ -64,6 +67,6 @@ public class TransactionNotification extends EnrichedServerNotification implemen
   }
 
   private static EnrichedNotificationInfo emptyInfo() {
-    return new EnrichedNotificationInfo(null, null, null, null, null, null, null, new HashMap<>(), null, null);
+    return new EnrichedNotificationInfo(null, null, empty(), null, null, null, null, new HashMap<>(), null, null);
   }
 }

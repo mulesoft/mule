@@ -34,11 +34,6 @@ public interface Pipeline extends FlowConstruct, ProcessingDescriptor {
   List<Processor> getProcessors();
 
   /**
-   * @return the {@link ProcessingStrategy} used on the pipeline.
-   */
-  ProcessingStrategy getProcessingStrategy();
-
-  /**
    * @return the maximum concurrency to be used by the {@link Pipeline}.
    */
   int getMaxConcurrency();

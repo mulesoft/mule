@@ -6,12 +6,15 @@
  */
 package org.mule.runtime.core.api.construct;
 
+import static org.mule.runtime.core.api.processor.strategy.DirectProcessingStrategyFactory.DIRECT_PROCESSING_STRATEGY_INSTANCE;
+
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.LifecycleStateEnabled;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.source.MessageSource;
 
 /**
@@ -45,4 +48,11 @@ public interface FlowConstruct extends NamedObject, LifecycleStateEnabled {
    * @return the id of the running mule server
    */
   String getServerId();
+
+  /**
+   * @return the {@link ProcessingStrategy} used.
+   */
+  default ProcessingStrategy getProcessingStrategy() {
+    return DIRECT_PROCESSING_STRATEGY_INSTANCE;
+  }
 }

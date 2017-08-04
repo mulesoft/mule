@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.routing.requestreply;
 
 import static java.util.Collections.singletonMap;
+import static java.util.OptionalInt.of;
 import static junit.framework.Assert.assertNull;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
@@ -47,6 +48,8 @@ import org.mule.tck.probe.PollingProber;
 
 import java.beans.ExceptionListener;
 import java.util.Map;
+import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -230,7 +233,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
 
     try {
       Event event =
-          eventBuilder().message(of("message1")).groupCorrelation(new GroupCorrelation(1, null)).build();
+          eventBuilder().message(of("message1")).groupCorrelation(Optional.of(GroupCorrelation.of(0, 3))).build();
 
       SensingNullMessageProcessor listener = getSensingNullMessageProcessor();
       mp.setListener(listener);

@@ -55,7 +55,7 @@ public interface Event extends Serializable {
    * 
    * @return the correlation metadata of this message.
    */
-  GroupCorrelation getGroupCorrelation();
+  Optional<GroupCorrelation> getGroupCorrelation();
 
   /**
    * The returned value will depend on the {@link MessageSource} that created this event, and the flow that is executing the
@@ -406,7 +406,7 @@ public interface Event extends Serializable {
      * @param groupCorrelation the object containing the group correlation information to set on the produced event
      * @return the builder instance
      */
-    Builder groupCorrelation(GroupCorrelation groupCorrelation);
+    Builder groupCorrelation(Optional<GroupCorrelation> groupCorrelation);
 
     /**
      * Sets an error related to the produced event.

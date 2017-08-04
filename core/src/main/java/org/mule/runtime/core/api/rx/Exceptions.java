@@ -6,13 +6,14 @@
  */
 package org.mule.runtime.core.api.rx;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static reactor.core.Exceptions.isBubbling;
 import static reactor.core.Exceptions.propagate;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MuleFatalException;
 import org.mule.runtime.core.api.util.func.CheckedBiConsumer;
 import org.mule.runtime.core.api.util.func.CheckedBiFunction;
@@ -21,6 +22,8 @@ import org.mule.runtime.core.api.util.func.CheckedConsumer;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.core.api.util.func.CheckedPredicate;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
@@ -167,6 +170,20 @@ public class Exceptions {
       throwable = throwable.getCause();
     }
     return throwable;
+  }
+
+  public static List<Throwable> unwrapCompositeException(Throwable throwable) {
+    // TODO https://github.com/reactor/reactor-core/issues/771
+    // TODO https://github.com/reactor/reactor-core/issues/772
+    if (throwable.getClass().equals(Throwable.class) && throwable.getMessage().equals("Multiple exceptions")) {
+      List<Throwable> list = new ArrayList<>();
+      for (Throwable suppressed : throwable.getSuppressed()) {
+        list.addAll(unwrapCompositeException(suppressed));
+      }
+      return list;
+    } else {
+      return singletonList(unwrap(throwable));
+    }
   }
 
   /**

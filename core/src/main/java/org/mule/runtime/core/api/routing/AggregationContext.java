@@ -84,12 +84,12 @@ public final class AggregationContext {
    * 
    * @return a @{link {@link NavigableMap}. It could be empty but it will never be <code>null</code>
    */
-  public NavigableMap<Integer, Throwable> collectRouteExceptions() {
-    NavigableMap<Integer, Throwable> routes = new TreeMap<Integer, Throwable>();
+  public NavigableMap<String, Throwable> collectRouteExceptions() {
+    NavigableMap<String, Throwable> routes = new TreeMap<>();
     for (int i = 0; i < this.events.size(); i++) {
       Event event = this.events.get(i);
       if (failedEventsPredicate.evaluate(event)) {
-        routes.put(i, event.getError().get().getCause());
+        routes.put(Integer.toString(i), event.getError().get().getCause());
       }
     }
 

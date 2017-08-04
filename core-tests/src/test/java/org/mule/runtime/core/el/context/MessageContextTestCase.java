@@ -31,6 +31,9 @@ import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.message.InternalMessage;
 
+import java.util.Optional;
+import java.util.OptionalInt;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -49,7 +52,7 @@ public class MessageContextTestCase extends AbstractELTestCase {
     when(event.getFlowCallStack()).thenReturn(new DefaultFlowCallStack());
     when(event.getError()).thenReturn(empty());
     message = spy(Message.of(null));
-    when(event.getGroupCorrelation()).thenReturn(mock(GroupCorrelation.class));
+    when(event.getGroupCorrelation()).thenReturn(empty());
     when(event.getMessage()).thenAnswer(invocation -> message);
   }
 
@@ -75,15 +78,15 @@ public class MessageContextTestCase extends AbstractELTestCase {
 
   @Test
   public void correlationSequence() throws Exception {
-    when(event.getGroupCorrelation().getSequence()).thenReturn(of(4));
+    when(event.getGroupCorrelation()).thenReturn(Optional.of(GroupCorrelation.of(4)));
     assertEquals(4, evaluate("message.correlationSequence", event));
     assertFinalProperty("message.correlationSequence=2", event);
   }
 
   @Test
   public void correlationGroupSize() throws Exception {
-    when(event.getGroupCorrelation()).thenReturn(new GroupCorrelation(null, 4));
-    assertEquals(4, evaluate("message.correlationGroupSize", event));
+    when(event.getGroupCorrelation()).thenReturn(Optional.of(GroupCorrelation.of(0, 2)));
+    assertEquals(2, evaluate("message.correlationGroupSize", event));
     assertFinalProperty("message.correlationGroupSize=2", event);
   }
 
