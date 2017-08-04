@@ -32,12 +32,15 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
 
   private static final String DEFAULT_RESOURCE_RELEASER_CLASS_LOCATION =
       "/org/mule/module/artifact/classloader/DefaultResourceReleaser.class";
+  private static final String DEFAULT_ERROR_HOOKS_CLASS_LOCATION =
+      "/org/mule/module/artifact/classloader/ErrorHooksConfiguration.class";
 
   protected List<ShutdownListener> shutdownListeners = new ArrayList<>();
 
   private final String artifactId;
   private LocalResourceLocator localResourceLocator;
   private String resourceReleaserClassLocation = DEFAULT_RESOURCE_RELEASER_CLASS_LOCATION;
+  private String errorHooksClassLocation = DEFAULT_ERROR_HOOKS_CLASS_LOCATION;
   private ArtifactDescriptor artifactDescriptor;
 
   /**
@@ -59,14 +62,14 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
    * their own initialization or not at all.
    */
   protected MuleArtifactClassLoader(String artifactId, ArtifactDescriptor artifactDescriptor, URL[] urls, ClassLoader parent,
-                                    ClassLoaderLookupPolicy lookupPolicy, Boolean configureErrorHooks) {
+                                    ClassLoaderLookupPolicy lookupPolicy, Boolean initialise) {
     super(urls, parent, lookupPolicy);
     checkArgument(!isEmpty(artifactId), "artifactId cannot be empty");
     checkArgument(artifactDescriptor != null, "artifactDescriptor cannot be null");
     this.artifactId = artifactId;
     this.artifactDescriptor = artifactDescriptor;
 
-    if (configureErrorHooks) {
+    if (initialise) {
       configureErrorHooks();
     }
   }
@@ -123,11 +126,11 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
     this.resourceReleaserClassLocation = resourceReleaserClassLocation;
   }
 
-  protected ResourceReleaser createResourceReleaserInstance() {
-    return (ResourceReleaser) createCustomInstance(resourceReleaserClassLocation);
+  public void setErrorHooksClassLocation(String errorHooksClassLocation) {
+    this.errorHooksClassLocation = errorHooksClassLocation;
   }
 
-  private Object createCustomInstance(String classLocation) {
+  protected Object createCustomInstance(String classLocation) {
     InputStream classStream = null;
     try {
       classStream = this.getClass().getResourceAsStream(classLocation);
@@ -142,22 +145,36 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
     }
   }
 
+  protected ResourceReleaser createResourceReleaserInstance() {
+    return (ResourceReleaser) createCustomInstance(resourceReleaserClassLocation);
+  }
+
   /**
    * Setup reactor-core error hooks, these are required for plugins that end up executing reactive streams.
    *
    * For instance, compatibility plugin which inherits from transformers that call {@code block()}.
    */
   protected void configureErrorHooks() {
+    if (getURLs().length == 0 || !isReactorLoaded()) {
+      return;
+    }
+
     try {
-      Class reactorHooks = loadClass("reactor.core.publisher.Hooks");
-      if (reactorHooks.getClassLoader().equals(this)) {
-        createCustomInstance("/org/mule/module/artifact/classloader/ErrorHooksConfiguration.class");
-      }
-    } catch (ClassNotFoundException e) {
-      // ignore, we don't care if the plugin does not include reactor-core
+      createCustomInstance(errorHooksClassLocation);
     } catch (Exception e) {
       logger.error("Cannot configure error hooks", e);
     }
+  }
+
+  protected Boolean isReactorLoaded() {
+    try {
+      Class reactorHooks = loadClass("reactor.core.publisher.Hooks");
+      return reactorHooks.getClassLoader().equals(this);
+    } catch (ClassNotFoundException e) {
+      // ignore, we don't care if the plugin does not include reactor-core
+    }
+
+    return false;
   }
 
   @Override
