@@ -7,7 +7,10 @@
 package org.mule.runtime.module.extension.internal.loader.java.property;
 
 import org.mule.runtime.api.meta.model.ModelProperty;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
+
+import java.util.function.Supplier;
 
 /**
  * A model property which allows the enriched component to specify its
@@ -17,22 +20,22 @@ import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
  */
 public final class MetadataResolverFactoryModelProperty implements ModelProperty {
 
-  private final MetadataResolverFactory metadataResolverFactory;
+  private final LazyValue<MetadataResolverFactory> metadataResolverFactory;
 
   /**
    * Creates a new instance
    *
    * @param metadataResolverFactory a {@link MetadataResolverFactory}
    */
-  public MetadataResolverFactoryModelProperty(MetadataResolverFactory metadataResolverFactory) {
-    this.metadataResolverFactory = metadataResolverFactory;
+  public MetadataResolverFactoryModelProperty(Supplier<MetadataResolverFactory> metadataResolverFactory) {
+    this.metadataResolverFactory = new LazyValue<>(metadataResolverFactory);
   }
 
   /**
    * @return a {@link MetadataResolverFactory}
    */
   public MetadataResolverFactory getMetadataResolverFactory() {
-    return metadataResolverFactory;
+    return metadataResolverFactory.get();
   }
 
   /**

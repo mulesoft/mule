@@ -8,7 +8,7 @@ package org.mule.test.marvel.ironman;
 
 import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.mule.runtime.api.meta.model.ExecutionType.CPU_INTENSIVE;
+import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_INTENSIVE;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;

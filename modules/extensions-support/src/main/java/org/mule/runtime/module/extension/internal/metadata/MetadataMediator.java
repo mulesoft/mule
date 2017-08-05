@@ -14,14 +14,13 @@ import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.OutputModel;
+import org.mule.runtime.api.meta.model.construct.ConstructModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.api.meta.model.operation.RouterModel;
-import org.mule.runtime.api.meta.model.operation.ScopeModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceCallbackModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
-import org.mule.runtime.api.meta.model.util.ComponentModelVisitor;
+import org.mule.runtime.api.meta.model.ComponentModelVisitor;
 import org.mule.runtime.api.metadata.MetadataAttributes;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
@@ -43,9 +42,8 @@ import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.metadata.NullMetadataKey;
 import org.mule.runtime.extension.api.model.ImmutableOutputModel;
+import org.mule.runtime.extension.api.model.construct.ImmutableConstructModel;
 import org.mule.runtime.extension.api.model.operation.ImmutableOperationModel;
-import org.mule.runtime.extension.api.model.operation.ImmutableRouterModel;
-import org.mule.runtime.extension.api.model.operation.ImmutableScopeModel;
 import org.mule.runtime.extension.api.model.parameter.ImmutableParameterGroupModel;
 import org.mule.runtime.extension.api.model.parameter.ImmutableParameterModel;
 import org.mule.runtime.extension.api.model.source.ImmutableSourceCallbackModel;
@@ -202,15 +200,30 @@ public final class MetadataMediator<T extends ComponentModel> {
    */
   private T getTypedModel(InputMetadataDescriptor inputMetadataDescriptor,
                           OutputMetadataDescriptor outputMetadataDescriptor) {
-    OutputModel typedOutputModel = resolveOutputModelType(component.getOutput(), outputMetadataDescriptor.getPayloadMetadata());
-    OutputModel typedAttributesModel =
-        resolveOutputModelType(component.getOutputAttributes(), outputMetadataDescriptor.getAttributesMetadata());
 
     Reference<T> typedModel = new Reference<>();
     component.accept(new ComponentModelVisitor() {
 
       @Override
+      public void visit(ConstructModel constructModel) {
+        typedModel.set((T) new ImmutableConstructModel(constructModel.getName(),
+                                                       constructModel.getDescription(),
+                                                       resolveParameterGroupModelType(
+                                                                                      constructModel.getParameterGroupModels(),
+                                                                                      inputMetadataDescriptor.getAllParameters()),
+                                                       constructModel.getDisplayModel().orElse(null),
+                                                       constructModel.getStereotypes(),
+                                                       constructModel.getModelProperties(),
+                                                       constructModel.getNestedComponents(),
+                                                       constructModel.allowsTopLevelDeclaration()));
+      }
+
+      @Override
       public void visit(OperationModel operationModel) {
+        OutputModel typedOutputModel =
+            resolveOutputModelType(operationModel.getOutput(), outputMetadataDescriptor.getPayloadMetadata());
+        OutputModel typedAttributesModel =
+            resolveOutputModelType(operationModel.getOutputAttributes(), outputMetadataDescriptor.getAttributesMetadata());
         typedModel.set((T) new ImmutableOperationModel(operationModel.getName(),
                                                        operationModel.getDescription(),
                                                        resolveParameterGroupModelType(
@@ -223,46 +236,16 @@ public final class MetadataMediator<T extends ComponentModel> {
                                                        operationModel.getDisplayModel().orElse(null),
                                                        operationModel.getErrorModels(),
                                                        operationModel.getStereotypes(),
-                                                       operationModel.getModelProperties()));
-      }
-
-      @Override
-      public void visit(ScopeModel scopeModel) {
-        typedModel.set((T) new ImmutableScopeModel(scopeModel.getName(),
-                                                   scopeModel.getDescription(),
-                                                   resolveParameterGroupModelType(
-                                                                                  scopeModel.getParameterGroupModels(),
-                                                                                  inputMetadataDescriptor.getAllParameters()),
-                                                   typedOutputModel, typedAttributesModel, scopeModel.isBlocking(),
-                                                   scopeModel.getExecutionType(), scopeModel.requiresConnection(),
-                                                   scopeModel.isTransactional(),
-                                                   scopeModel.supportsStreaming(),
-                                                   scopeModel.getDisplayModel().orElse(null),
-                                                   scopeModel.getErrorModels(),
-                                                   scopeModel.getStereotypes(),
-                                                   scopeModel.getModelProperties()));
-      }
-
-      @Override
-      public void visit(RouterModel routerModel) {
-        typedModel.set((T) new ImmutableRouterModel(routerModel.getName(),
-                                                    routerModel.getDescription(),
-                                                    routerModel.getRouteModels(),
-                                                    resolveParameterGroupModelType(
-                                                                                   routerModel.getParameterGroupModels(),
-                                                                                   inputMetadataDescriptor.getAllParameters()),
-                                                    typedOutputModel, typedAttributesModel, routerModel.isBlocking(),
-                                                    routerModel.getExecutionType(), routerModel.requiresConnection(),
-                                                    routerModel.isTransactional(),
-                                                    routerModel.supportsStreaming(),
-                                                    routerModel.getDisplayModel().orElse(null),
-                                                    routerModel.getErrorModels(),
-                                                    routerModel.getStereotypes(),
-                                                    routerModel.getModelProperties()));
+                                                       operationModel.getModelProperties(),
+                                                       operationModel.getNestedComponents()));
       }
 
       @Override
       public void visit(SourceModel sourceModel) {
+        OutputModel typedOutputModel =
+            resolveOutputModelType(sourceModel.getOutput(), outputMetadataDescriptor.getPayloadMetadata());
+        OutputModel typedAttributesModel =
+            resolveOutputModelType(sourceModel.getOutputAttributes(), outputMetadataDescriptor.getAttributesMetadata());
         typedModel.set((T) new ImmutableSourceModel(sourceModel.getName(),
                                                     sourceModel.getDescription(),
                                                     sourceModel.hasResponse(),
@@ -281,7 +264,8 @@ public final class MetadataMediator<T extends ComponentModel> {
                                                     sourceModel.getDisplayModel().orElse(null),
                                                     sourceModel.getStereotypes(),
                                                     sourceModel.getErrorModels(),
-                                                    sourceModel.getModelProperties()));
+                                                    sourceModel.getModelProperties(),
+                                                    sourceModel.getNestedComponents()));
       }
     });
 

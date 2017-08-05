@@ -8,7 +8,7 @@ package org.mule.test.heisenberg.extension;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.api.meta.model.ExecutionType.CPU_INTENSIVE;
+import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_INTENSIVE;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.metadata.DataType;

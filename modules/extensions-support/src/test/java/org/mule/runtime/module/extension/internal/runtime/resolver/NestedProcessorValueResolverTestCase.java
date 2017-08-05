@@ -43,7 +43,7 @@ public class NestedProcessorValueResolverTestCase extends AbstractMuleContextTes
     resolver.setMuleContext(muleContext);
     NestedProcessor nestedProcessor = resolver.resolve(ValueResolvingContext.from(testEvent()));
     Object response = nestedProcessor.process();
-    assertThat((String) response, is(TEST_PAYLOAD));
+    assertThat(response, is(TEST_PAYLOAD));
 
     ArgumentCaptor<Event> captor = ArgumentCaptor.forClass(Event.class);
     verify(messageProcessor).process(captor.capture());

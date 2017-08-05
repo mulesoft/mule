@@ -74,4 +74,5 @@ public class NestedProcessorChain implements NestedProcessor {
     Event muleEvent = Event.builder(event).message(of(payload)).variables(properties).build();
     return chain.process(muleEvent).getMessage().getPayload().getValue();
   }
+
 }

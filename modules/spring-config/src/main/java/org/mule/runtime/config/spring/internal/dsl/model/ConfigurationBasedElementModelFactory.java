@@ -12,6 +12,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Stream.concat;
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getLocalPart;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.extension.api.ExtensionConstants.DISABLE_CONNECTION_VALIDATION_PARAMETER_NAME;
@@ -40,15 +41,19 @@ import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_ELEMENT_IDENT
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
-
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.meta.model.ComposableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.construct.ConstructModel;
+import org.mule.runtime.api.meta.model.construct.HasConstructModels;
+import org.mule.runtime.api.meta.model.nested.NestableElementModel;
+import org.mule.runtime.api.meta.model.nested.NestedRouteModel;
 import org.mule.runtime.api.meta.model.operation.HasOperationModels;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
@@ -125,7 +130,17 @@ class ConfigurationBasedElementModelFactory {
             stop();
           }
         });
+      }
 
+      @Override
+      protected void onConstruct(HasConstructModels owner, ConstructModel model) {
+        final DslElementSyntax elementDsl = dsl.resolve(model);
+        getIdentifier(elementDsl).ifPresent(elementId -> {
+          if (elementId.equals(identifier)) {
+            elementModel.set(createElementModel(model, elementDsl, configuration).build());
+            stop();
+          }
+        });
       }
 
       @Override
@@ -410,6 +425,9 @@ class ConfigurationBasedElementModelFactory {
         .withConfig(configuration);
 
     populateParameterizedElements(model, elementDsl, builder, configuration);
+    if (model instanceof ComposableModel) {
+      populateComposableElements((ComposableModel) model, elementDsl, builder, configuration);
+    }
 
     if (model instanceof SourceModel) {
       ((SourceModel) model).getSuccessCallback()
@@ -437,6 +455,42 @@ class ConfigurationBasedElementModelFactory {
     model.getAllParameterModels().stream()
         .filter(p -> !inlineGroupedParameters.contains(p))
         .forEach(p -> addElementParameter(innerComponents, parameters, elementDsl, builder, p));
+  }
+
+  private void populateComposableElements(ComposableModel model, DslElementSyntax elementDsl,
+                                          DslElementModel.Builder builder, ComponentConfiguration configuration) {
+
+    configuration.getNestedComponents()
+        .forEach(nestedComponentConfig -> {
+          DslElementModel nestedElement = createIdentifiedElement(nestedComponentConfig);
+          if (nestedElement != null) {
+            builder.containing(nestedElement);
+          } else {
+            model.getNestedComponents()
+                .stream()
+                .filter(nestedModel -> nestedModel instanceof NestedRouteModel)
+                .filter(nestedModel -> elementDsl.getContainedElement(nestedModel.getName())
+                    .map(nestedDsl -> getIdentifier(nestedDsl).map(id -> nestedComponentConfig.getIdentifier().equals(id))
+                        .orElse(false))
+                    .orElse(false))
+                .findFirst()
+                .ifPresent(nestedModel -> {
+                  DslElementSyntax routeDsl = elementDsl.getContainedElement(nestedModel.getName()).get();
+                  DslElementModel.Builder<? extends NestableElementModel> routeBuilder =
+                      DslElementModel.<NestableElementModel>builder()
+                          .withModel(nestedModel)
+                          .withDsl(routeDsl)
+                          .withConfig(nestedComponentConfig)
+                          .isExplicitInDsl(true);
+
+                  populateParameterizedElements((ParameterizedModel) nestedModel, routeDsl, routeBuilder, nestedComponentConfig);
+                  nestedComponentConfig.getNestedComponents()
+                      .forEach(routeElement -> routeBuilder.containing(createIdentifiedElement(routeElement)));
+
+                  builder.containing(routeBuilder.build());
+                });
+          }
+        });
   }
 
   private void addInlineGroup(DslElementSyntax elementDsl,
@@ -606,7 +660,7 @@ class ConfigurationBasedElementModelFactory {
   }
 
   private Optional<ComponentIdentifier> getIdentifier(DslElementSyntax dsl) {
-    if (dsl.supportsTopLevelDeclaration() || dsl.supportsChildDeclaration()) {
+    if (isNotBlank(dsl.getElementName()) && isNotBlank(dsl.getPrefix())) {
       return Optional.of(builder()
           .name(dsl.getElementName())
           .namespace(dsl.getPrefix())

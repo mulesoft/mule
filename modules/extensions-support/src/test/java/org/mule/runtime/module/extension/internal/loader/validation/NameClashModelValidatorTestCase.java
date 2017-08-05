@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.validation;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
@@ -348,7 +349,7 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
 
     SourceModel sourceModel = new ImmutableSourceModel(SOURCE_NAME, "", false, asList(group), null, null,
                                                        of(sourceCallbackModel), empty(), empty(), false, false, false, null,
-                                                       emptySet(), emptySet(), emptySet());
+                                                       emptySet(), emptySet(), emptySet(), emptyList());
     when(extensionModel.getSourceModels()).thenReturn(asList(sourceModel));
     validate();
   }

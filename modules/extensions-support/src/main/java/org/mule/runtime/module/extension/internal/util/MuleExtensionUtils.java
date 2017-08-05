@@ -9,8 +9,10 @@ package org.mule.runtime.module.extension.internal.util;
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
+import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_ALWAYS_BEGIN;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_ALWAYS_JOIN;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_JOIN_IF_POSSIBLE;
@@ -18,13 +20,17 @@ import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_NON
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_NOT_SUPPORTED;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.collection.Collectors.toImmutableList;
+import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
+import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedFields;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.HasOutputModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -56,6 +62,7 @@ import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory
 import org.mule.runtime.extension.api.runtime.source.SourceFactory;
 import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
 import org.mule.runtime.extension.api.tx.SourceTransactionalAction;
+import org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConfigurationFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectionProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectionTypeModelProperty;
@@ -74,7 +81,9 @@ import com.google.common.collect.ImmutableList;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.function.Function;
@@ -91,10 +100,10 @@ public class MuleExtensionUtils {
    * @param componentModel a {@link ComponentModel}
    * @return Whether the {@code componentModel} returns a list of messages
    */
-  public static boolean returnsListOfMessages(ComponentModel componentModel) {
+  public static boolean returnsListOfMessages(HasOutputModel componentModel) {
     MetadataType outputType = componentModel.getOutput().getType();
     return outputType instanceof ArrayType &&
-        Message.class.getName().equals(getTypeId(((ArrayType) outputType).getType()).orElse(null));
+      Message.class.getName().equals(getTypeId(((ArrayType) outputType).getType()).orElse(null));
   }
 
   /**
@@ -134,7 +143,7 @@ public class MuleExtensionUtils {
   public static List<ConnectionProviderModel> getAllConnectionProviders(ExtensionModel extensionModel,
                                                                         ConfigurationModel configurationModel) {
     return ImmutableList.<ConnectionProviderModel>builder().addAll(configurationModel.getConnectionProviders())
-        .addAll(extensionModel.getConnectionProviders()).build();
+      .addAll(extensionModel.getConnectionProviders()).build();
   }
 
   /**
@@ -169,8 +178,8 @@ public class MuleExtensionUtils {
    */
   public static List<Interceptor> createInterceptors(EnrichableModel model) {
     return model.getModelProperty(InterceptorsModelProperty.class)
-        .map(p -> createInterceptors(p.getInterceptorFactories()))
-        .orElse(ImmutableList.of());
+      .map(p -> createInterceptors(p.getInterceptorFactories()))
+      .orElse(ImmutableList.of());
   }
 
   /**
@@ -196,7 +205,7 @@ public class MuleExtensionUtils {
 
   private static InterceptorsModelProperty getOrCreateInterceptorModelProperty(BaseDeclaration declaration) {
     InterceptorsModelProperty property =
-        (InterceptorsModelProperty) declaration.getModelProperty(InterceptorsModelProperty.class).orElse(null);
+      (InterceptorsModelProperty) declaration.getModelProperty(InterceptorsModelProperty.class).orElse(null);
     if (property == null) {
       property = new InterceptorsModelProperty(emptyList());
       declaration.addModelProperty(property);
@@ -226,7 +235,7 @@ public class MuleExtensionUtils {
    */
   public static java.util.Optional<Method> getImplementingMethod(OperationDeclaration operationDeclaration) {
     return operationDeclaration.getModelProperty(ImplementingMethodModelProperty.class)
-        .map(ImplementingMethodModelProperty::getMethod);
+      .map(ImplementingMethodModelProperty::getMethod);
   }
 
   /**
@@ -248,7 +257,7 @@ public class MuleExtensionUtils {
    */
   public static ClassLoader getClassLoader(ExtensionModel extensionModel) {
     return extensionModel.getModelProperty(ClassLoaderModelProperty.class).map(ClassLoaderModelProperty::getClassLoader)
-        .orElse(currentThread().getContextClassLoader());
+      .orElse(currentThread().getContextClassLoader());
   }
 
   /**
@@ -270,10 +279,10 @@ public class MuleExtensionUtils {
 
       if (!configNameField.getDeclaringClass().isInstance(target)) {
         throw new IllegalConfigurationModelDefinitionException(
-                                                               format("field '%s' is annotated with @%s but not defined on an instance of type '%s'",
-                                                                      configNameField.toString(),
-                                                                      RefName.class.getSimpleName(),
-                                                                      target.getClass().getName()));
+          format("field '%s' is annotated with @%s but not defined on an instance of type '%s'",
+                 configNameField.toString(),
+                 RefName.class.getSimpleName(),
+                 target.getClass().getName()));
       }
       new FieldSetter<>(configNameField).set(target, configName);
     });
@@ -286,8 +295,8 @@ public class MuleExtensionUtils {
       return;
     } else if (fields.size() > 1) {
       throw new IllegalModelDefinitionException(format(
-                                                       "Class '%s' has %d fields annotated with @%s. Only one field may carry that annotation",
-                                                       type.getName(), fields.size(), RefName.class));
+        "Class '%s' has %d fields annotated with @%s. Only one field may carry that annotation",
+        type.getName(), fields.size(), RefName.class));
     }
 
     new FieldSetter<>(fields.get(0)).set(target, refName);
@@ -342,10 +351,10 @@ public class MuleExtensionUtils {
                              ConfigurationFactoryModelProperty.class,
                              ConfigurationFactoryModelProperty::getConfigurationFactory,
                              () -> new IllegalConfigurationModelDefinitionException(
-                                                                                    format("Configuration '%s' does not provide a %s",
-                                                                                           configurationModel.getName(),
-                                                                                           ConfigurationFactory.class
-                                                                                               .getName())));
+                               format("Configuration '%s' does not provide a %s",
+                                      configurationModel.getName(),
+                                      ConfigurationFactory.class
+                                        .getName())));
   }
 
   /**
@@ -358,8 +367,8 @@ public class MuleExtensionUtils {
    */
   public static MetadataResolverFactory getMetadataResolverFactory(EnrichableModel model) {
     return model.getModelProperty(MetadataResolverFactoryModelProperty.class)
-        .map(MetadataResolverFactoryModelProperty::getMetadataResolverFactory)
-        .orElse(new NullMetadataResolverFactory());
+      .map(MetadataResolverFactoryModelProperty::getMetadataResolverFactory)
+      .orElse(new NullMetadataResolverFactory());
   }
 
   /**
@@ -373,13 +382,13 @@ public class MuleExtensionUtils {
    */
   public static OperationExecutorFactory getOperationExecutorFactory(OperationModel operationModel) {
     OperationExecutorFactory executorFactory =
-        fromModelProperty(operationModel,
-                          OperationExecutorModelProperty.class,
-                          OperationExecutorModelProperty::getExecutorFactory,
-                          () -> new IllegalOperationModelDefinitionException(format("Operation '%s' does not provide a %s",
-                                                                                    operationModel.getName(),
-                                                                                    OperationExecutorFactory.class
-                                                                                        .getSimpleName())));
+      fromModelProperty(operationModel,
+                        OperationExecutorModelProperty.class,
+                        OperationExecutorModelProperty::getExecutorFactory,
+                        () -> new IllegalOperationModelDefinitionException(format("Operation '%s' does not provide a %s",
+                                                                                  operationModel.getName(),
+                                                                                  OperationExecutorFactory.class
+                                                                                    .getSimpleName())));
 
     return new OperationExecutorFactoryWrapper(executorFactory, createInterceptors(operationModel));
   }
@@ -398,9 +407,9 @@ public class MuleExtensionUtils {
                              SourceFactoryModelProperty.class,
                              SourceFactoryModelProperty::getSourceFactory,
                              () -> new IllegalSourceModelDefinitionException(
-                                                                             format("Source '%s' does not provide a %s",
-                                                                                    sourceModel.getName(),
-                                                                                    SourceFactory.class.getSimpleName())));
+                               format("Source '%s' does not provide a %s",
+                                      sourceModel.getName(),
+                                      SourceFactory.class.getSimpleName())));
   }
 
   /**
@@ -417,10 +426,10 @@ public class MuleExtensionUtils {
                              ConnectionProviderFactoryModelProperty.class,
                              ConnectionProviderFactoryModelProperty::getConnectionProviderFactory,
                              () -> new IllegalConnectionProviderModelDefinitionException(
-                                                                                         format("Connection Provider '%s' does not provide a %s",
-                                                                                                connectionProviderModel.getName(),
-                                                                                                ConnectionProviderFactory.class
-                                                                                                    .getSimpleName())));
+                               format("Connection Provider '%s' does not provide a %s",
+                                      connectionProviderModel.getName(),
+                                      ConnectionProviderFactory.class
+                                        .getSimpleName())));
   }
 
   /**
@@ -437,9 +446,9 @@ public class MuleExtensionUtils {
                              ConnectionTypeModelProperty.class,
                              ConnectionTypeModelProperty::getConnectionType,
                              () -> new IllegalConnectionProviderModelDefinitionException(
-                                                                                         format("Connection Provider '%s' does not specify a connection type",
-                                                                                                connectionProviderModel
-                                                                                                    .getName())));
+                               format("Connection Provider '%s' does not specify a connection type",
+                                      connectionProviderModel
+                                        .getName())));
   }
 
   private static <T, P extends ModelProperty> T fromModelProperty(EnrichableModel model,
@@ -465,6 +474,18 @@ public class MuleExtensionUtils {
 
   private static String getExtensionsErrorNamespace(XmlDslModel dslModel) {
     return dslModel.getPrefix().toUpperCase();
+  }
+
+  public static ExtensionModel loadExtension(Class<?> clazz) {
+    return loadExtension(clazz, new HashMap<>());
+  }
+
+  public static ExtensionModel loadExtension(Class<?> clazz, Map<String, Object> params) {
+    params.put(TYPE_PROPERTY_NAME, clazz.getName());
+    params.put(VERSION, "4.0.0-SNAPSHOT");
+    //TODO MULE-11797: as this utils is consumed from org.mule.runtime.module.extension.internal.capability.xml.schema.AbstractXmlResourceFactory.generateResource(org.mule.runtime.api.meta.model.ExtensionModel), this util should get dropped once the ticket gets implemented.
+    final DslResolvingContext dslResolvingContext = getDefault(emptySet());
+    return new DefaultJavaExtensionModelLoader().loadExtensionModel(clazz.getClassLoader(), dslResolvingContext, params);
   }
 
   public static String getImplicitConfigurationProviderName(ExtensionModel extensionModel,

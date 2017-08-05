@@ -31,6 +31,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.meta.Typed;
 import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.meta.model.ExecutableComponentModel;
 import org.mule.runtime.api.meta.model.OutputModel;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
@@ -217,16 +218,16 @@ public abstract class MetadataExtensionFunctionalTestCase<T extends ComponentMod
     }
   }
 
-  void assertExpectedOutput(ComponentModel model, Type payloadType, Type attributesType) {
+  void assertExpectedOutput(ExecutableComponentModel model, Type payloadType, Type attributesType) {
     assertExpectedOutput(model.getOutput(), model.getOutputAttributes(), TYPE_LOADER.load(payloadType),
                          TYPE_LOADER.load(attributesType));
   }
 
-  void assertExpectedOutput(ComponentModel model, MetadataType payloadType, Type attributesType) {
+  void assertExpectedOutput(ExecutableComponentModel model, MetadataType payloadType, Type attributesType) {
     assertExpectedOutput(model.getOutput(), model.getOutputAttributes(), payloadType, TYPE_LOADER.load(attributesType));
   }
 
-  void assertExpectedOutput(ComponentModel model, MetadataType payloadType, MetadataType attributesType) {
+  void assertExpectedOutput(ExecutableComponentModel model, MetadataType payloadType, MetadataType attributesType) {
     assertExpectedOutput(model.getOutput(), model.getOutputAttributes(), payloadType, attributesType);
   }
 

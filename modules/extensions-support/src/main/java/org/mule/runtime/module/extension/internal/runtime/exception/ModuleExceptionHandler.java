@@ -12,6 +12,7 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.meta.model.ExecutableComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.core.api.exception.ErrorTypeRepository;
@@ -35,7 +36,7 @@ public class ModuleExceptionHandler {
   private final Set<ErrorModel> allowedErrorTypes;
   private final String extensionNamespace;
 
-  public ModuleExceptionHandler(ComponentModel componentModel, ExtensionModel extensionModel,
+  public ModuleExceptionHandler(ExecutableComponentModel componentModel, ExtensionModel extensionModel,
                                 ErrorTypeRepository typeRepository) {
 
     this.componentModel = componentModel;
