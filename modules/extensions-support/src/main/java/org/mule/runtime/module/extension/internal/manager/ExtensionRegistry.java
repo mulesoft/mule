@@ -30,7 +30,6 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -62,7 +61,6 @@ final class ExtensionRegistry {
       });
 
   private final Map<ExtensionEntityKey, ExtensionModel> extensions = new ConcurrentHashMap<>();
-  private final Set<Class<? extends Enum>> enumClasses = new HashSet<>();
   private final MuleRegistry registry;
 
   /**
@@ -117,18 +115,6 @@ final class ExtensionRegistry {
    */
   Collection<ConfigurationProvider> getConfigurationProviders(ExtensionModel extensionModel) {
     return providersByExtension.getUnchecked(extensionModel).values();
-  }
-
-  /**
-   * Returns all the {@link ConfigurationProvider configuration providers} associated to a given {@link ConfigurationModel configuration
-   * model} owned by the {@code extensionModel}.
-   *
-   * @param extensionModel a registered {@link ExtensionModel}
-   * @return an immutable {@link List}. Might be empty but will never be {@code null}
-   */
-  Collection<ConfigurationProvider> getConfigurationProviders(ExtensionModel extensionModel,
-                                                              ConfigurationModel configurationModel) {
-    return providersByExtension.getUnchecked(extensionModel).get(configurationModel);
   }
 
   /**

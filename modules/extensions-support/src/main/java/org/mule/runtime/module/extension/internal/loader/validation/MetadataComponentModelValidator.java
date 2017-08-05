@@ -49,6 +49,7 @@ import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -268,6 +269,8 @@ public class MetadataComponentModelValidator implements ExtensionModelValidator 
     return (type.isInterface() &&
         metadataType instanceof ObjectType &&
         !isMap(metadataType) &&
-        !type.equals(Message.class));
+        !type.equals(Message.class) &&
+        // TODO: MULE-11774: Temporal fix. Find proper solution
+        !getType(metadataType).equals(Serializable.class));
   }
 }
