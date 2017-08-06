@@ -6,14 +6,17 @@
  */
 package org.mule.runtime.core.api.context.notification;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_STOPPED;
+import static org.mule.runtime.core.api.context.notification.ServerNotificationsTestCase.DummyNotification.EVENT_RECEIVED;
 
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import java.util.EventObject;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -23,7 +26,6 @@ public class ServerNotificationsTestCase extends AbstractMuleContextTestCase imp
 
   private final AtomicBoolean managerStopped = new AtomicBoolean(false);
   private final AtomicInteger managerStoppedEvents = new AtomicInteger(0);
-  private final AtomicInteger componentStartedCount = new AtomicInteger(0);
   private final AtomicInteger customNotificationCount = new AtomicInteger(0);
 
   public ServerNotificationsTestCase() {
@@ -39,15 +41,15 @@ public class ServerNotificationsTestCase extends AbstractMuleContextTestCase imp
 
   @Test
   public void testStandardNotifications() throws Exception {
-    muleContext.registerListener(this);
+    muleContext.getRegistry().lookupObject(NotificationListenerRegistry.class).registerListener(this);
     muleContext.stop();
     assertTrue(managerStopped.get());
   }
 
   @Test
   public void testMultipleRegistrations() throws Exception {
-    muleContext.registerListener(this);
-    muleContext.registerListener(this);
+    muleContext.getRegistry().lookupObject(NotificationListenerRegistry.class).registerListener(this);
+    muleContext.getRegistry().lookupObject(NotificationListenerRegistry.class).registerListener(this);
     muleContext.stop();
     assertTrue(managerStopped.get());
     assertEquals(1, managerStoppedEvents.get());
@@ -55,8 +57,8 @@ public class ServerNotificationsTestCase extends AbstractMuleContextTestCase imp
 
   @Test
   public void testUnregistering() throws Exception {
-    muleContext.registerListener(this);
-    muleContext.unregisterListener(this);
+    muleContext.getRegistry().lookupObject(NotificationListenerRegistry.class).registerListener(this);
+    muleContext.getRegistry().lookupObject(NotificationListenerRegistry.class).unregisterListener(this);
     muleContext.stop();
     // these should still be false because we unregistered ourselves
     assertFalse(managerStopped.get());
@@ -65,11 +67,11 @@ public class ServerNotificationsTestCase extends AbstractMuleContextTestCase imp
   @Test
   public void testMismatchingUnregistrations() throws Exception {
     // this has changed in 2.x. now, unregistering removes all related entries
-    muleContext.registerListener(this);
+    muleContext.getRegistry().lookupObject(NotificationListenerRegistry.class).registerListener(this);
     DummyListener dummy = new DummyListener();
-    muleContext.registerListener(dummy);
-    muleContext.registerListener(dummy);
-    muleContext.unregisterListener(dummy);
+    muleContext.getRegistry().lookupObject(NotificationListenerRegistry.class).registerListener(dummy);
+    muleContext.getRegistry().lookupObject(NotificationListenerRegistry.class).registerListener(dummy);
+    muleContext.getRegistry().lookupObject(NotificationListenerRegistry.class).unregisterListener(dummy);
     muleContext.stop();
 
     assertTrue(managerStopped.get());
@@ -80,19 +82,20 @@ public class ServerNotificationsTestCase extends AbstractMuleContextTestCase imp
   public void testCustomNotifications() throws Exception {
     final CountDownLatch latch = new CountDownLatch(2);
 
-    muleContext.registerListener((DummyNotificationListener) notification -> {
-      if (notification.getAction() == DummyNotification.EVENT_RECEIVED) {
-        customNotificationCount.incrementAndGet();
-        assertEquals("hello", notification.getSource());
-        latch.countDown();
-      }
-    });
+    muleContext.getRegistry().lookupObject(NotificationListenerRegistry.class)
+        .registerListener((DummyNotificationListener) notification -> {
+          if (new IntegerAction(EVENT_RECEIVED).equals(notification.getAction())) {
+            customNotificationCount.incrementAndGet();
+            assertEquals("hello", ((EventObject) notification).getSource());
+            latch.countDown();
+          }
+        });
 
-    muleContext.fireNotification(new DummyNotification("hello", DummyNotification.EVENT_RECEIVED));
-    muleContext.fireNotification(new DummyNotification("hello", DummyNotification.EVENT_RECEIVED));
+    muleContext.getRegistry().lookupObject(NotificationDispatcher.class).dispatch(new DummyNotification("hello", EVENT_RECEIVED));
+    muleContext.getRegistry().lookupObject(NotificationDispatcher.class).dispatch(new DummyNotification("hello", EVENT_RECEIVED));
 
     // Wait for the notifcation event to be fired as they are queued
-    latch.await(2000, TimeUnit.MILLISECONDS);
+    latch.await(2000, MILLISECONDS);
     assertEquals(2, customNotificationCount.get());
   }
 
@@ -102,8 +105,8 @@ public class ServerNotificationsTestCase extends AbstractMuleContextTestCase imp
   }
 
   @Override
-  public void onNotification(ServerNotification notification) {
-    if (notification.getAction() == MuleContextNotification.CONTEXT_STOPPED) {
+  public void onNotification(Notification notification) {
+    if (new IntegerAction(CONTEXT_STOPPED).equals(notification.getAction())) {
       managerStopped.set(true);
       managerStoppedEvents.incrementAndGet();
     }

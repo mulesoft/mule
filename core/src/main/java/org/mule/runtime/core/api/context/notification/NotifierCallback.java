@@ -6,16 +6,13 @@
  */
 package org.mule.runtime.core.api.context.notification;
 
-import org.mule.runtime.core.api.context.notification.ServerNotification;
-import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
-
 /**
- * Callback to actually perform the call to a {@link ServerNotificationListener}.
+ * Callback to actually perform the call to a {@link NotificationListener}.
  *
  * @since 4.0
  */
 @FunctionalInterface
 public interface NotifierCallback {
 
-  void notify(ServerNotificationListener listener, ServerNotification notification);
+  void notify(NotificationListener listener, Notification notification);
 }

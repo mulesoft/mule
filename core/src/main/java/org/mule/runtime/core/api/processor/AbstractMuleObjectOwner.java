@@ -12,6 +12,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setFlowConstruc
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
@@ -37,6 +38,7 @@ public abstract class AbstractMuleObjectOwner<T> extends AbstractAnnotatedObject
   // TODO MULE-10332: Review MuleContextAware vs @Inject usage
   @Inject
   protected MuleContext muleContext;
+
   protected FlowConstruct flowConstruct;
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
 

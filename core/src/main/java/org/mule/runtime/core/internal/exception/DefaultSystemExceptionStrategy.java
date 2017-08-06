@@ -12,4 +12,5 @@ package org.mule.runtime.core.internal.exception;
  * strategy if this is a <code>ConnectException</code>.
  */
 public class DefaultSystemExceptionStrategy extends AbstractSystemExceptionStrategy {
+
 }

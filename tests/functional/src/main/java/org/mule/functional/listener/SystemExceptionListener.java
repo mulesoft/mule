@@ -14,11 +14,12 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.notification.ExceptionNotification;
 import org.mule.runtime.core.api.context.notification.ExceptionNotificationListener;
+import org.mule.runtime.core.api.context.notification.NotificationListenerRegistry;
 import org.mule.runtime.core.api.exception.RollbackSourceCallback;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
-import org.mule.runtime.core.api.context.notification.ExceptionNotification;
-import org.mule.runtime.core.api.context.notification.NotificationException;
+import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.util.concurrent.Latch;
 
 import java.util.ArrayList;
@@ -45,9 +46,9 @@ public class SystemExceptionListener {
     try {
       final SystemExceptionHandler exceptionListener = muleContext.getExceptionListener();
       muleContext.setExceptionListener(new CountingSystemExceptionHandler(exceptionListener));
-      muleContext.registerListener((ExceptionNotificationListener) (notification -> exceptionNotifications
-          .add((ExceptionNotification) notification)));
-    } catch (NotificationException e) {
+      muleContext.getRegistry().lookupObject(NotificationListenerRegistry.class)
+          .registerListener((ExceptionNotificationListener) notification -> exceptionNotifications.add(notification));
+    } catch (RegistrationException e) {
       throw new RuntimeException(e);
     }
   }

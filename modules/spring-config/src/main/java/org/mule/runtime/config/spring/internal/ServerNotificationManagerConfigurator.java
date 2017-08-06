@@ -17,9 +17,9 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.ListenerSubscriptionPair;
+import org.mule.runtime.core.api.context.notification.Notification;
+import org.mule.runtime.core.api.context.notification.NotificationListener;
 import org.mule.runtime.core.api.context.notification.NotificationsProvider;
-import org.mule.runtime.core.api.context.notification.ServerNotification;
-import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.util.Pair;
 
@@ -47,9 +47,9 @@ public class ServerNotificationManagerConfigurator extends AbstractAnnotatedObje
   private ApplicationContext applicationContext;
 
   private Boolean dynamic;
-  private List<NotificationConfig<? extends ServerNotification, ? extends ServerNotificationListener>> enabledNotifications =
+  private List<NotificationConfig<? extends Notification, ? extends NotificationListener>> enabledNotifications =
       new ArrayList<>();
-  private List<NotificationConfig<? extends ServerNotification, ? extends ServerNotificationListener>> disabledNotifications =
+  private List<NotificationConfig<? extends Notification, ? extends NotificationListener>> disabledNotifications =
       new ArrayList<>();
   private Collection<ListenerSubscriptionPair> notificationListeners;
 
@@ -59,8 +59,8 @@ public class ServerNotificationManagerConfigurator extends AbstractAnnotatedObje
 
   @Override
   public void initialise() throws InitialisationException {
-    Map<String, Class<? extends ServerNotification>> eventMap = new HashMap<>(EVENT_MAP);
-    Map<String, Class<? extends ServerNotificationListener>> interfaceMap = new HashMap<>(INTERFACE_MAP);
+    Map<String, Class<? extends Notification>> eventMap = new HashMap<>(EVENT_MAP);
+    Map<String, Class<? extends NotificationListener>> interfaceMap = new HashMap<>(INTERFACE_MAP);
 
     ServerNotificationManager notificationManager = populateNotificationTypeMappings(eventMap, interfaceMap);
 
@@ -69,7 +69,7 @@ public class ServerNotificationManagerConfigurator extends AbstractAnnotatedObje
 
     // Merge:
     // i) explicitly configured notification listeners,
-    // ii) any singleton beans defined in spring that implement ServerNotificationListener.
+    // ii) any singleton beans defined in spring that implement NotificationListener.
     for (ListenerSubscriptionPair sub : getMergedListeners(notificationManager)) {
       // Do this to avoid warnings when the Spring context is refreshed
       if (!notificationManager.isListenerRegistered(sub.getListener())) {
@@ -81,13 +81,13 @@ public class ServerNotificationManagerConfigurator extends AbstractAnnotatedObje
     }
   }
 
-  public ServerNotificationManager populateNotificationTypeMappings(Map<String, Class<? extends ServerNotification>> eventMap,
-                                                                    Map<String, Class<? extends ServerNotificationListener>> interfaceMap)
+  public ServerNotificationManager populateNotificationTypeMappings(Map<String, Class<? extends Notification>> eventMap,
+                                                                    Map<String, Class<? extends NotificationListener>> interfaceMap)
       throws InitialisationException {
     Map<String, NotificationsProvider> providersMap = new HashMap<>();
 
     for (NotificationsProvider provider : muleContext.getRegistry().lookupObjects(NotificationsProvider.class)) {
-      for (Entry<String, Pair<Class<? extends ServerNotification>, Class<? extends ServerNotificationListener>>> entry : provider
+      for (Entry<String, Pair<Class<? extends Notification>, Class<? extends NotificationListener>>> entry : provider
           .getEventListenerMapping().entrySet()) {
 
         final String notificationType = entry.getKey();
@@ -118,8 +118,8 @@ public class ServerNotificationManagerConfigurator extends AbstractAnnotatedObje
   }
 
   private void disableNotifications(ServerNotificationManager notificationManager,
-                                    Map<String, Class<? extends ServerNotification>> eventMap,
-                                    Map<String, Class<? extends ServerNotificationListener>> interfaceMap)
+                                    Map<String, Class<? extends Notification>> eventMap,
+                                    Map<String, Class<? extends NotificationListener>> interfaceMap)
       throws InitialisationException {
     for (NotificationConfig<?, ?> disabledNotification : disabledNotifications) {
       final Supplier<InitialisationException> noNotificationExceptionSupplier =
@@ -140,8 +140,8 @@ public class ServerNotificationManagerConfigurator extends AbstractAnnotatedObje
   }
 
   private void enableNotifications(ServerNotificationManager notificationManager,
-                                   Map<String, Class<? extends ServerNotification>> eventMap,
-                                   Map<String, Class<? extends ServerNotificationListener>> interfaceMap)
+                                   Map<String, Class<? extends Notification>> eventMap,
+                                   Map<String, Class<? extends NotificationListener>> interfaceMap)
       throws InitialisationException {
 
     for (NotificationConfig<?, ?> notification : enabledNotifications) {
@@ -156,8 +156,8 @@ public class ServerNotificationManagerConfigurator extends AbstractAnnotatedObje
     }
   }
 
-  private Optional<Class<? extends ServerNotification>> getEventClass(NotificationConfig config,
-                                                                      Map<String, Class<? extends ServerNotification>> eventMap) {
+  private Optional<Class<? extends Notification>> getEventClass(NotificationConfig config,
+                                                                Map<String, Class<? extends Notification>> eventMap) {
     if (config.getEventClass() != null) {
       return of(config.getEventClass());
     }
@@ -167,8 +167,8 @@ public class ServerNotificationManagerConfigurator extends AbstractAnnotatedObje
     return ofNullable(eventMap.get(config.getInterfaceName()));
   }
 
-  private Optional<Class<? extends ServerNotificationListener>> getInterfaceClass(NotificationConfig config,
-                                                                                  Map<String, Class<? extends ServerNotificationListener>> interfaceMap) {
+  private Optional<Class<? extends NotificationListener>> getInterfaceClass(NotificationConfig config,
+                                                                            Map<String, Class<? extends NotificationListener>> interfaceMap) {
     if (config.getInterfaceClass() != null) {
       return of(config.getInterfaceClass());
     }
@@ -182,10 +182,10 @@ public class ServerNotificationManagerConfigurator extends AbstractAnnotatedObje
     Set<ListenerSubscriptionPair> mergedListeners = new HashSet<>();
 
     // Any singleton bean defined in spring that implements
-    // ServerNotificationListener or a subclass.
+    // NotificationListener or a subclass.
     Set<ListenerSubscriptionPair> adhocListeners = new HashSet<>();
-    for (String name : applicationContext.getBeanNamesForType(ServerNotificationListener.class, false, true)) {
-      adhocListeners.add(new ListenerSubscriptionPair((ServerNotificationListener<?>) applicationContext.getBean(name), null));
+    for (String name : applicationContext.getBeanNamesForType(NotificationListener.class, false, true)) {
+      adhocListeners.add(new ListenerSubscriptionPair((NotificationListener<?>) applicationContext.getBean(name)));
     }
 
     if (notificationListeners != null) {
@@ -218,7 +218,7 @@ public class ServerNotificationManagerConfigurator extends AbstractAnnotatedObje
     this.applicationContext = applicationContext;
   }
 
-  public void setEnabledNotifications(List<NotificationConfig<? extends ServerNotification, ? extends ServerNotificationListener>> enabledNotifications) {
+  public void setEnabledNotifications(List<NotificationConfig<? extends Notification, ? extends NotificationListener>> enabledNotifications) {
     this.enabledNotifications = enabledNotifications;
   }
 
@@ -226,7 +226,7 @@ public class ServerNotificationManagerConfigurator extends AbstractAnnotatedObje
     this.notificationListeners = notificationListeners;
   }
 
-  public void setDisabledNotifications(List<NotificationConfig<? extends ServerNotification, ? extends ServerNotificationListener>> disabledNotifications) {
+  public void setDisabledNotifications(List<NotificationConfig<? extends Notification, ? extends NotificationListener>> disabledNotifications) {
     this.disabledNotifications = disabledNotifications;
   }
 

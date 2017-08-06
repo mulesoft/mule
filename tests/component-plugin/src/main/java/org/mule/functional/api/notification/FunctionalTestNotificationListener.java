@@ -11,12 +11,13 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.CustomNotificationListener;
-import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
+import org.mule.runtime.core.api.context.notification.NotificationListener;
+import org.mule.runtime.core.api.context.notification.NotificationListenerRegistry;
 
 /**
  * By implementing this listener interface and registering the object with the
- * {@link MuleContext#registerListener(ServerNotificationListener)} You can receive {@link FunctionalTestNotification}s from the
- * {@link FunctionalTestProcessor}.
+ * {@link NotificationListenerRegistry#registerListener(NotificationListener)} You can receive
+ * {@link FunctionalTestNotification}s from the {@link FunctionalTestProcessor}.
  *
  * This Notification contains the current {@link Event}, {@link FlowConstruct} and reply message. The resource identifier for this
  * event is the service name that received the message. This means you can register to listen to Notifications from a selected
@@ -35,7 +36,7 @@ import org.mule.runtime.core.api.context.notification.ServerNotificationListener
  * @see FunctionalTestNotificationListener
  * @see MuleContext
  */
-public interface FunctionalTestNotificationListener extends CustomNotificationListener {
+public interface FunctionalTestNotificationListener extends CustomNotificationListener<FunctionalTestNotification> {
 
   @Override
   default boolean isBlocking() {

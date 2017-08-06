@@ -6,59 +6,62 @@
  */
 package org.mule.runtime.core.internal.retry;
 
+import static java.util.Collections.unmodifiableMap;
+
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.retry.RetryContext;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * The RetryContext is used to store any data which carries over from attempt to attempt such as response messages.
  */
-public class DefaultRetryContext implements RetryContext, MuleContextAware {
+public class DefaultRetryContext implements RetryContext {
 
   private Message[] returnMessages;
   private Map<Object, Object> metaInfo = new HashMap<Object, Object>();
   private String description;
   private Throwable lastFailure;
   private boolean failed = false;
-  private MuleContext muleContext;
+  private NotificationDispatcher notificationFirer;
 
-  public DefaultRetryContext(String description, Map<Object, Object> metaInfo) {
+  public DefaultRetryContext(String description, Map<Object, Object> metaInfo, NotificationDispatcher notificationFirer) {
     super();
     this.description = description;
     if (metaInfo != null) {
       this.metaInfo = metaInfo;
     }
+    this.notificationFirer = notificationFirer;
   }
 
-  public void setMuleContext(MuleContext context) {
-    this.muleContext = context;
-  }
-
-  public MuleContext getMuleContext() {
-    return muleContext;
-  }
-
+  @Override
   public Map<Object, Object> getMetaInfo() {
-    return Collections.unmodifiableMap(metaInfo);
+    return unmodifiableMap(metaInfo);
   }
 
+  @Override
   public Message[] getReturnMessages() {
     return returnMessages;
   }
 
+  @Override
+  public NotificationDispatcher getNotificationFirer() {
+    return notificationFirer;
+  }
+
+  @Override
   public Message getFirstReturnMessage() {
     return (returnMessages == null ? null : returnMessages[0]);
   }
 
+  @Override
   public void setReturnMessages(Message[] returnMessages) {
     this.returnMessages = returnMessages;
   }
 
+  @Override
   public void addReturnMessage(Message result) {
     if (returnMessages == null) {
       returnMessages = new Message[] {result};
@@ -69,24 +72,29 @@ public class DefaultRetryContext implements RetryContext, MuleContextAware {
     }
   }
 
+  @Override
   public String getDescription() {
     return description;
   }
 
+  @Override
   public Throwable getLastFailure() {
     return this.lastFailure;
   }
 
+  @Override
   public void setOk() {
     this.failed = false;
     this.lastFailure = null;
   }
 
+  @Override
   public boolean isOk() {
     // note that it might be possible to fail without throwable, so not relying on lastFailure field
     return !this.failed;
   }
 
+  @Override
   public void setFailed(Throwable lastFailure) {
     this.failed = true;
     this.lastFailure = lastFailure;

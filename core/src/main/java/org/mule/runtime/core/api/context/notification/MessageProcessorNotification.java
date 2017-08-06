@@ -14,7 +14,7 @@ import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
 
-public class MessageProcessorNotification extends EnrichedServerNotification implements SynchronousServerEvent {
+public class MessageProcessorNotification extends EnrichedServerNotification {
 
   private static final long serialVersionUID = 1L;
 
@@ -59,5 +59,10 @@ public class MessageProcessorNotification extends EnrichedServerNotification imp
     return EVENT_NAME + "{" + "action=" + getActionName(action) + ", processor=" + getComponent().getLocation().getLocation()
         + ", resourceId="
         + resourceIdentifier + ", serverId=" + serverId + ", timestamp=" + timestamp + "}";
+  }
+
+  @Override
+  public boolean isSynchronous() {
+    return true;
   }
 }

@@ -142,11 +142,11 @@ public class NotificationHelperTestCase extends AbstractMuleTestCase {
 
     ConnectorMessageNotification notification = notificationCaptor.getValue();
     assertThat(notification.getComponent(), is(messageSource));
-    assertThat(notification.getAction(), is(action));
+    assertThat(notification.getAction().getActionId(), is(action));
     assertThat(notification.getComponent().getLocation(), is(location));
   }
 
-  private class TestServerNotification extends ServerNotification {
+  private class TestServerNotification extends AbstractServerNotification {
 
     public TestServerNotification() {
       super("", 0);

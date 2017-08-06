@@ -17,6 +17,7 @@ import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
 import static org.mule.runtime.core.api.util.StringMessageUtils.getBoilerPlate;
 import static org.mule.runtime.core.api.util.StringMessageUtils.truncate;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.functional.api.exception.FunctionalTestException;
 import org.mule.functional.api.notification.FunctionalTestNotification;
 import org.mule.functional.api.notification.FunctionalTestNotificationListener;
@@ -34,7 +35,8 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
-import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.RegistrationException;
@@ -42,6 +44,8 @@ import org.mule.runtime.core.api.registry.RegistrationException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import javax.inject.Inject;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -56,9 +60,18 @@ import org.slf4j.Logger;
  * @see FunctionalTestNotification
  * @see FunctionalTestNotificationListener
  */
-public class FunctionalTestProcessor extends AbstractAnnotatedObject implements Processor, Lifecycle, MuleContextAware {
+public class FunctionalTestProcessor extends AbstractAnnotatedObject implements Processor, Lifecycle {
 
   private static final Logger LOGGER = getLogger(FunctionalTestProcessor.class);
+
+  @Inject
+  private MuleContext muleContext;
+
+  @Inject
+  private ExtendedExpressionManager expressionManager;
+
+  @Inject
+  private NotificationDispatcher notificationFirer;
 
   private EventCallback eventCallback;
   private Object returnData = null;
@@ -73,7 +86,6 @@ public class FunctionalTestProcessor extends AbstractAnnotatedObject implements 
   private String id = "<none>";
   private String processorClass;
   private Processor processor;
-  private MuleContext muleContext;
   private static List<LifecycleCallback> lifecycleCallbacks = new ArrayList<>();
 
 
@@ -112,11 +124,6 @@ public class FunctionalTestProcessor extends AbstractAnnotatedObject implements 
     if (processor != null) {
       startIfNeeded(processor);
     }
-  }
-
-  @Override
-  public void setMuleContext(MuleContext context) {
-    this.muleContext = context;
   }
 
   @Override
@@ -185,7 +192,7 @@ public class FunctionalTestProcessor extends AbstractAnnotatedObject implements 
    * @return a concatenated string of the current payload and the appendString
    */
   protected String append(String contents, Event event) {
-    return contents + muleContext.getExpressionManager().parse(appendString, event, getLocation());
+    return contents + expressionManager.parse(appendString, event, getLocation());
   }
 
   /**
@@ -228,9 +235,9 @@ public class FunctionalTestProcessor extends AbstractAnnotatedObject implements 
 
     Builder replyBuilder = Message.builder(message);
     if (returnData != null) {
-      if (returnData instanceof String && muleContext.getExpressionManager().isExpression(returnData.toString())) {
+      if (returnData instanceof String && expressionManager.isExpression(returnData.toString())) {
         replyBuilder =
-            replyBuilder.value(muleContext.getExpressionManager().parse(returnData.toString(), event, getLocation()));
+            replyBuilder.value(expressionManager.parse(returnData.toString(), event, getLocation()));
       } else {
         replyBuilder = replyBuilder.value(returnData);
       }
@@ -242,9 +249,8 @@ public class FunctionalTestProcessor extends AbstractAnnotatedObject implements 
     Event replyMessage = Event.builder(event).message(replyBuilder.build()).build();
 
     if (isEnableNotifications()) {
-      muleContext
-          .fireNotification(new FunctionalTestNotification(event, getLocation().getRootContainerName(), replyMessage,
-                                                           EVENT_RECEIVED));
+      notificationFirer
+          .dispatch(new FunctionalTestNotification(event, getLocation().getRootContainerName(), replyMessage, EVENT_RECEIVED));
     }
 
     // Time to wait before returning

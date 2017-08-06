@@ -168,6 +168,8 @@ public class MuleProperties {
   public static final String OBJECT_SCHEDULER_POOLS_CONFIG = "_muleSchedulerPoolsConfig";
   public static final String OBJECT_SCHEDULER_BASE_CONFIG = "_muleSchedulerBaseConfig";
   public static final String OBJECT_CLUSTER_SERVICE = "_muleClusterService";
+  public static final String OBJECT_NOTIFICATION_DISPATCHER = "_muleNotificationDispatcher";
+  public static final String OBJECT_NOTIFICATION_LISTENER_REGISTRY = "_muleNotificationListeenrRegistry";
 
   // Not currently used as these need to be instance variables of the MuleContext.
   public static final String OBJECT_NOTIFICATION_MANAGER = "_muleNotificationManager";

@@ -6,31 +6,36 @@
  */
 package org.mule.runtime.config.spring.internal.dsl.processor;
 
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.MuleContextAware;
+import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.DEFAULT_FREQUENCY;
+import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.DEFAULT_RETRY_COUNT;
+
+import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.retry.RetryNotifier;
-import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.async.AsynchronousRetryTemplate;
+import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
 import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
 
+import javax.inject.Inject;
+
 /**
  * {@link ObjectFactory} for reconnection configuration.
  *
- * It will return a {@link RetryPolicyTemplate} that may run synchronously or asynchronously based
- * on the {@code blocking} configuration.
+ * It will return a {@link RetryPolicyTemplate} that may run synchronously or asynchronously based on the {@code blocking}
+ * configuration.
  *
  * @since 4.0
  */
-public class RetryPolicyTemplateObjectFactory extends AbstractAnnotatedObjectFactory<RetryPolicyTemplate>
-    implements MuleContextAware {
+public class RetryPolicyTemplateObjectFactory extends AbstractAnnotatedObjectFactory<RetryPolicyTemplate> {
 
   private boolean blocking;
-  private Integer count = SimpleRetryPolicyTemplate.DEFAULT_RETRY_COUNT;
-  private Integer frequency = SimpleRetryPolicyTemplate.DEFAULT_FREQUENCY;
-  private MuleContext muleContext;
+  private Integer count = DEFAULT_RETRY_COUNT;
+  private Integer frequency = DEFAULT_FREQUENCY;
   private RetryNotifier retryNotifier;
+
+  @Inject
+  private NotificationDispatcher notificationFirer;
 
   /**
    * @param blocking true if the policy must run synchronously when invoked, false if it must run asynchronously.
@@ -61,15 +66,10 @@ public class RetryPolicyTemplateObjectFactory extends AbstractAnnotatedObjectFac
   }
 
   @Override
-  public void setMuleContext(MuleContext context) {
-    this.muleContext = context;
-  }
-
-  @Override
   public RetryPolicyTemplate doGetObject() throws Exception {
     // MULE-13092 ExecutionMediator should use scheduler for retry policy
     SimpleRetryPolicyTemplate retryPolicyTemplate = new SimpleRetryPolicyTemplate(frequency, count);
-    retryPolicyTemplate.setMuleContext(muleContext);
+    retryPolicyTemplate.setNotificationFirer(notificationFirer);
     if (retryNotifier != null) {
       retryPolicyTemplate.setNotifier(retryNotifier);
     }

@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.core.internal.context.notification;
 
-import org.mule.runtime.core.api.context.notification.ServerNotification;
-import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
 import org.mule.runtime.core.api.context.notification.ListenerSubscriptionPair;
+import org.mule.runtime.core.api.context.notification.Notification;
+import org.mule.runtime.core.api.context.notification.NotificationListener;
 import org.mule.runtime.core.api.context.notification.NotifierCallback;
 
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ import java.util.concurrent.ConcurrentMap;
 public class Policy {
 
   // map from event to set of senders
-  private Map<Class<? extends ServerNotification>, Collection<Sender>> eventToSenders =
+  private Map<Class<? extends Notification>, Collection<Sender>> eventToSenders =
       new HashMap<>();
 
   // these are cumulative - set values should never change, they are just a cache of known info
@@ -38,17 +38,17 @@ public class Policy {
   /**
    * For each listener, we check each interface and see what events can be delivered.
    */
-  Policy(Map<Class<? extends ServerNotificationListener>, Set<Class<? extends ServerNotification>>> interfaceToEvents,
+  Policy(Map<Class<? extends NotificationListener>, Set<Class<? extends Notification>>> interfaceToEvents,
          Set<ListenerSubscriptionPair> listenerSubscriptionPairs,
-         Set<Class<? extends ServerNotificationListener>> disabledInterfaces,
-         Set<Class<? extends ServerNotification>> disabledEvents) {
+         Set<Class<? extends NotificationListener>> disabledInterfaces,
+         Set<Class<? extends Notification>> disabledEvents) {
     for (ListenerSubscriptionPair pair : listenerSubscriptionPairs) {
-      ServerNotificationListener listener = pair.getListener();
-      for (Class<? extends ServerNotificationListener> iface : interfaceToEvents.keySet()) {
+      NotificationListener listener = pair.getListener();
+      for (Class<? extends NotificationListener> iface : interfaceToEvents.keySet()) {
         if (notASubclassOfAnyClassInSet(disabledInterfaces, iface)) {
           if (iface.isAssignableFrom(listener.getClass())) {
-            Set<Class<? extends ServerNotification>> events = interfaceToEvents.get(iface);
-            for (Class<? extends ServerNotification> event : events) {
+            Set<Class<? extends Notification>> events = interfaceToEvents.get(iface);
+            for (Class<? extends Notification> event : events) {
               if (notASubclassOfAnyClassInSet(disabledEvents, event)) {
                 knownEventsExact.put(event, Boolean.TRUE);
                 knownEventsSuper.put(event, Boolean.TRUE);
@@ -85,7 +85,7 @@ public class Policy {
     return true;
   }
 
-  public void dispatch(ServerNotification notification, NotifierCallback notifier) {
+  public void dispatch(Notification notification, NotifierCallback notifier) {
     if (null != notification) {
       Class notfnClass = notification.getClass();
       // search if we don't know about this event, or if we do know it is used
@@ -102,10 +102,10 @@ public class Policy {
     }
   }
 
-  protected boolean doDispatch(ServerNotification notification, Class<? extends ServerNotification> notfnClass,
+  protected boolean doDispatch(Notification notification, Class<? extends Notification> notfnClass,
                                NotifierCallback notifier) {
     boolean found = false;
-    for (Class<? extends ServerNotification> event : eventToSenders.keySet()) {
+    for (Class<? extends Notification> event : eventToSenders.keySet()) {
       if (event.isAssignableFrom(notfnClass)) {
         found = true;
         for (Sender sender : eventToSenders.get(event)) {

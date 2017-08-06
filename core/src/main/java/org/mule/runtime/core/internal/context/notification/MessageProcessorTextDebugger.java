@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.context.notification;
 
+import static org.mule.runtime.core.api.context.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE;
+
 import org.mule.runtime.core.api.context.notification.MessageProcessorNotification;
 import org.mule.runtime.core.api.context.notification.MessageProcessorNotificationListener;
 
@@ -27,7 +29,7 @@ public class MessageProcessorTextDebugger implements MessageProcessorNotificatio
 
   @Override
   public void onNotification(MessageProcessorNotification notification) {
-    if (notification.getAction() == MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE) {
+    if (notification.getAction().getActionId() == MESSAGE_PROCESSOR_PRE_INVOKE) {
       messageProcessingFlowTraceManager.onMessageProcessorNotificationPreInvoke(notification);
     }
   }

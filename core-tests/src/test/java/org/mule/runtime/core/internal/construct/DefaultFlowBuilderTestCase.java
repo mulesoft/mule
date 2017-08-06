@@ -19,6 +19,7 @@ import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
@@ -45,7 +46,7 @@ public class DefaultFlowBuilderTestCase extends AbstractMuleTestCase {
 
   public static final String FLOW_NAME = "flowName";
 
-  private MuleContext muleContext = mock(MuleContext.class);
+  private MuleContext muleContext = mockContextWithServices();
   private Builder flowBuilder = new DefaultFlowBuilder(FLOW_NAME, muleContext);
   private ProcessingStrategyFactory defaultProcessingStrategyFactory = mock(ProcessingStrategyFactory.class);
   private ProcessingStrategy processingStrategy = mock(ProcessingStrategy.class);
@@ -68,7 +69,7 @@ public class DefaultFlowBuilderTestCase extends AbstractMuleTestCase {
     assertThat(flow.getMuleContext(), is(muleContext));
     assertThat(flow.getProcessors(), is(empty()));
     assertThat(flow.getSource(), is(nullValue()));
-    assertThat(flow.getExceptionListener(), is(nullValue()));
+    assertThat(flow.getExceptionListener(), sameInstance(muleContext.getDefaultErrorHandler()));
     assertThat(flow.getProcessingStrategy(), sameInstance(processingStrategy));
   }
 

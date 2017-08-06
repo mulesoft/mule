@@ -15,7 +15,7 @@ import org.mule.runtime.core.api.registry.Registry;
  * @see org.mule.runtime.core.api.registry.Registry
  * @see org.mule.runtime.core.api.MuleContext
  */
-public class RegistryNotification extends ServerNotification {
+public class RegistryNotification extends AbstractServerNotification {
 
   /**
    * Serial version

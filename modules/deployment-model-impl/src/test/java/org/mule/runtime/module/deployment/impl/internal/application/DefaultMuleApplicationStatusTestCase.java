@@ -15,7 +15,10 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_INITIALISED;
+
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
+import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
+import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
@@ -59,10 +62,11 @@ public class DefaultMuleApplicationStatusTestCase extends AbstractMuleContextTes
   }
 
   @Test
-  public void initialised() {
+  public void initialised() throws RegistrationException {
     // the context was initialised before we gave it to the application, so we need
     // to fire the notification again since the listener wasn't there
-    muleContext.fireNotification(new MuleContextNotification(muleContext, CONTEXT_INITIALISED));
+    muleContext.getRegistry().lookupObject(NotificationDispatcher.class)
+        .dispatch(new MuleContextNotification(muleContext, CONTEXT_INITIALISED));
     assertStatus(ApplicationStatus.INITIALISED);
   }
 

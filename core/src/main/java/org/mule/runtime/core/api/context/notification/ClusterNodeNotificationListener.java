@@ -8,10 +8,8 @@ package org.mule.runtime.core.api.context.notification;
 
 /**
  * Defines a listener for {@link ClusterNodeNotification}
- *
- * @param <T> cluster node notification type
  */
-public interface ClusterNodeNotificationListener<T extends ClusterNodeNotification>
-    extends ServerNotificationListener<ClusterNodeNotification> {
+public interface ClusterNodeNotificationListener
+    extends NotificationListener<ClusterNodeNotification> {
 
 }

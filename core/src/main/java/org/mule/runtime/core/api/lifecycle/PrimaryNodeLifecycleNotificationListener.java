@@ -8,10 +8,9 @@ package org.mule.runtime.core.api.lifecycle;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.notification.ClusterNodeNotification;
 import org.mule.runtime.core.api.context.notification.ClusterNodeNotificationListener;
-import org.mule.runtime.core.api.context.notification.ServerNotification;
-import org.mule.runtime.core.api.context.notification.NotificationException;
+import org.mule.runtime.core.api.context.notification.NotificationListenerRegistry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,25 +24,22 @@ public class PrimaryNodeLifecycleNotificationListener implements ClusterNodeNoti
 
   protected transient Logger logger = LoggerFactory.getLogger(getClass());
   private Startable startMeOnPrimaryNodeNotification;
-  private MuleContext muleContext;
+  private NotificationListenerRegistry notificationsRegister;
 
-  public PrimaryNodeLifecycleNotificationListener(Startable startMeOnPrimaryNodeNotification, MuleContext muleContext) {
+  public PrimaryNodeLifecycleNotificationListener(Startable startMeOnPrimaryNodeNotification,
+                                                  NotificationListenerRegistry notificationsRegister) {
     this.startMeOnPrimaryNodeNotification = startMeOnPrimaryNodeNotification;
-    this.muleContext = muleContext;
+    this.notificationsRegister = notificationsRegister;
   }
 
   public void register() {
-    try {
-      if (muleContext != null) {
-        muleContext.registerListener(this);
-      }
-    } catch (NotificationException e) {
-      throw new RuntimeException("Unable to register listener", e);
+    if (notificationsRegister != null) {
+      notificationsRegister.registerListener(this);
     }
   }
 
   @Override
-  public void onNotification(ServerNotification notification) {
+  public void onNotification(ClusterNodeNotification notification) {
     try {
       if (startMeOnPrimaryNodeNotification instanceof LifecycleState) {
         if (((LifecycleState) startMeOnPrimaryNodeNotification).isStarted()) {
@@ -72,6 +68,6 @@ public class PrimaryNodeLifecycleNotificationListener implements ClusterNodeNoti
   }
 
   public void unregister() {
-    muleContext.unregisterListener(this);
+    notificationsRegister.unregisterListener(this);
   }
 }

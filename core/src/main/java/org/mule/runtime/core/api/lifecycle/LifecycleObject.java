@@ -6,33 +6,33 @@
  */
 package org.mule.runtime.core.api.lifecycle;
 
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.notification.ServerNotification;
+import org.mule.runtime.core.api.context.notification.Notification;
+import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.util.ClassUtils;
 
 public class LifecycleObject {
 
   private Class type;
-  private ServerNotification preNotification;
-  private ServerNotification postNotification;
+  private Notification preNotification;
+  private Notification postNotification;
 
   public LifecycleObject(Class type) {
     this.type = type;
   }
 
-  public ServerNotification getPostNotification() {
+  public Notification getPostNotification() {
     return postNotification;
   }
 
-  public void setPostNotification(ServerNotification postNotification) {
+  public void setPostNotification(Notification postNotification) {
     this.postNotification = postNotification;
   }
 
-  public ServerNotification getPreNotification() {
+  public Notification getPreNotification() {
     return preNotification;
   }
 
-  public void setPreNotification(ServerNotification preNotification) {
+  public void setPreNotification(Notification preNotification) {
     this.preNotification = preNotification;
   }
 
@@ -44,15 +44,15 @@ public class LifecycleObject {
     this.type = type;
   }
 
-  public void firePreNotification(MuleContext context) {
+  public void firePreNotification(NotificationDispatcher notificationFirer) {
     if (preNotification != null) {
-      context.fireNotification(preNotification);
+      notificationFirer.dispatch(preNotification);
     }
   }
 
-  public void firePostNotification(MuleContext context) {
+  public void firePostNotification(NotificationDispatcher notificationFirer) {
     if (postNotification != null) {
-      context.fireNotification(postNotification);
+      notificationFirer.dispatch(postNotification);
     }
   }
 

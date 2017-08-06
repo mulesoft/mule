@@ -15,6 +15,7 @@ import static org.mule.runtime.core.api.config.i18n.CoreMessages.responseTimedOu
 import static org.mule.runtime.core.api.context.notification.RoutingNotification.ASYNC_REPLY_TIMEOUT;
 import static org.mule.runtime.core.api.context.notification.RoutingNotification.MISSED_ASYNC_REPLY;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -29,10 +30,12 @@ import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.store.ObjectStoreSettings;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.context.notification.RoutingNotification;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.RequestReplyRequesterMessageProcessor;
+import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.routing.ResponseTimeoutException;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.store.DeserializationPostInitialisable;
@@ -64,6 +67,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
   protected MessageSource replyMessageSource;
   private final Processor internalAsyncReplyMessageProcessor = new InternalAsyncReplyMessageProcessor();
   private Scheduler scheduler;
+  private NotificationDispatcher notificationFirer;
   private AsyncReplyMonitoringRunnable replyRunnable;
   protected final Map<String, RequestReplyLatch> locks = new ConcurrentHashMap<>();
   private String storePrefix = "";
@@ -144,6 +148,11 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
             .entryTtl(UNCLAIMED_TIME_TO_LIVE)
             .expirationInterval(UNCLAIMED_INTERVAL)
             .build());
+    try {
+      notificationFirer = muleContext.getRegistry().lookupObject(NotificationDispatcher.class);
+    } catch (RegistrationException e) {
+      throw new InitialisationException(e, this);
+    }
   }
 
   @Override
@@ -241,7 +250,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
       addProcessed(new ProcessedEvents(asyncReplyCorrelationId, EndReason.FINISHED_BY_TIMEOUT));
 
       if (failOnTimeout) {
-        muleContext.fireNotification(new RoutingNotification(event.getMessage(), null, ASYNC_REPLY_TIMEOUT));
+        notificationFirer.dispatch(new RoutingNotification(event.getMessage(), null, ASYNC_REPLY_TIMEOUT));
 
         throw new ResponseTimeoutException(responseTimedOutWaitingForId((int) timeout, asyncReplyCorrelationId), null);
       } else {
@@ -316,10 +325,8 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
                     + correlationId + ". Dropping event");
               }
               // Fire a notification to say we received this message
-              muleContext
-                  .fireNotification(new RoutingNotification(event.getMessage(), event.getContext().getOriginatingLocation()
-                      .getComponentIdentifier().getIdentifier().getNamespace(),
-                                                            MISSED_ASYNC_REPLY));
+              notificationFirer.dispatch(new RoutingNotification(event.getMessage(), event.getContext().getOriginatingLocation()
+                  .getComponentIdentifier().getIdentifier().getNamespace(), MISSED_ASYNC_REPLY));
             } else {
               RequestReplyLatch requestReplyLatch = locks.get(correlationId);
               if (requestReplyLatch != null) {

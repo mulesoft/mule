@@ -6,6 +6,7 @@
  */
 package org.mule.tck.junit4;
 
+import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonMap;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -47,6 +48,7 @@ import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.MuleContextFactory;
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
+import org.mule.runtime.core.api.context.notification.NotificationListenerRegistry;
 import org.mule.runtime.core.api.el.ExpressionExecutor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.RegistrationException;
@@ -191,7 +193,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
             contextStartedLatch.get().countDown();
           }
         };
-    muleContext.registerListener(listener);
+    muleContext.getRegistry().lookupObject(NotificationListenerRegistry.class).registerListener(listener);
 
     muleContext.start();
 
@@ -225,9 +227,9 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
       context = muleContext;
     } else {
       final ClassLoader executionClassLoader = getExecutionClassLoader();
-      final ClassLoader originalContextClassLoader = Thread.currentThread().getContextClassLoader();
+      final ClassLoader originalContextClassLoader = currentThread().getContextClassLoader();
       try {
-        Thread.currentThread().setContextClassLoader(executionClassLoader);
+        currentThread().setContextClassLoader(executionClassLoader);
 
         MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
         List<ConfigurationBuilder> builders = new ArrayList<>();
@@ -250,7 +252,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
           ((DefaultMuleConfiguration) context.getConfiguration()).setShutdownTimeout(0);
         }
       } finally {
-        Thread.currentThread().setContextClassLoader(originalContextClassLoader);
+        currentThread().setContextClassLoader(originalContextClassLoader);
       }
     }
     return context;

@@ -9,9 +9,13 @@ package org.mule.runtime.config.spring.internal;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.tck.util.MuleContextUtils.mockNotificationsHandling;
+
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.registry.MuleRegistry;
+import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -40,7 +44,10 @@ public class SpringLifecycleCallbackTestCase extends AbstractMuleTestCase {
   private SpringLifecycleCallback callback;
 
   @Before
-  public void before() {
+  public void before() throws RegistrationException {
+    final MuleRegistry registry = mock(MuleRegistry.class);
+    mockNotificationsHandling(registry);
+    when(muleContext.getRegistry()).thenReturn(registry);
     springRegistryLifecycleManager = new SpringRegistryLifecycleManager("id", springRegistry, muleContext);
     springRegistryLifecycleManager.registerPhases();
 

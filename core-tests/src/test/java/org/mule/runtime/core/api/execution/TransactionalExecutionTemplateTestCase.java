@@ -14,6 +14,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.Event;
@@ -21,13 +22,14 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.transaction.ExternalTransactionAwareTransactionFactory;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
-import org.mule.runtime.core.api.transaction.xa.IllegalTransactionStateException;
 import org.mule.runtime.core.api.transaction.TransactionTemplateTestUtils;
+import org.mule.runtime.core.api.transaction.xa.IllegalTransactionStateException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.mule.TestTransaction;
@@ -48,7 +50,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 @SmallTest
 public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase {
 
-  protected MuleContext mockMuleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
+  protected MuleContext mockMuleContext = mockContextWithServices();
 
   protected FlowConstruct mockFlow =
       mock(FlowConstruct.class, withSettings().extraInterfaces(AnnotatedObject.class).defaultAnswer(RETURNS_DEEP_STUBS));
@@ -68,7 +70,7 @@ public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
   protected MessagingExceptionHandler mockMessagingExceptionHandler;
 
   @Before
-  public void prepareEvent() {
+  public void prepareEvent() throws RegistrationException {
     when(mockEvent.getMessage()).thenReturn(of(""));
   }
 

@@ -96,7 +96,9 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationExtension;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.context.notification.AbstractServerNotification;
 import org.mule.runtime.core.api.context.notification.ListenerSubscriptionPair;
+import org.mule.runtime.core.api.context.notification.Notification;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.processor.AbstractProcessor;
 import org.mule.runtime.core.api.processor.LoggerMessageProcessor;
@@ -192,6 +194,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * {@link ComponentBuildingDefinition} definitions for the components provided by the core runtime.
@@ -567,7 +570,10 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     componentBuildingDefinitions.add(baseDefinition.withIdentifier("notification-listener")
         .withTypeDefinition(fromType(ListenerSubscriptionPair.class))
         .withConstructorParameterDefinition(fromSimpleReferenceParameter("ref").build())
-        .withConstructorParameterDefinition(fromSimpleParameter("subscription").build()).build());
+        .withConstructorParameterDefinition(fromSimpleParameter("subscription", getNotificationSubscriptionConverter())
+            .withDefaultValue((Predicate<? extends Notification>) (n -> true))
+            .build())
+        .build());
 
     componentBuildingDefinitions.add(baseDefinition.withIdentifier("username-password-filter")
         .withTypeDefinition(fromType(UsernamePasswordAuthenticationFilter.class))
@@ -715,6 +721,11 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
 
   private TypeConverter<String, TransactionType> getTransactionTypeConverter() {
     return TransactionType::valueOf;
+  }
+
+  private TypeConverter<String, Predicate<? extends Notification>> getNotificationSubscriptionConverter() {
+    return subscription -> (notification -> subscription != null ? subscription
+        .equals(((AbstractServerNotification) notification).getResourceIdentifier()) : true);
   }
 
   private List<ComponentBuildingDefinition> getIdempotentValidatorsDefinitions() {

@@ -26,6 +26,8 @@ import org.mule.runtime.core.api.context.notification.MessageProcessorNotificati
 import org.mule.runtime.core.api.context.notification.MessageProcessorNotificationListener;
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
+import org.mule.runtime.core.api.context.notification.Notification;
+import org.mule.runtime.core.api.context.notification.NotificationListener;
 import org.mule.runtime.core.api.context.notification.PipelineMessageNotification;
 import org.mule.runtime.core.api.context.notification.PipelineMessageNotificationListener;
 import org.mule.runtime.core.api.context.notification.RegistryNotification;
@@ -34,8 +36,6 @@ import org.mule.runtime.core.api.context.notification.RoutingNotification;
 import org.mule.runtime.core.api.context.notification.RoutingNotificationListener;
 import org.mule.runtime.core.api.context.notification.SecurityNotification;
 import org.mule.runtime.core.api.context.notification.SecurityNotificationListener;
-import org.mule.runtime.core.api.context.notification.ServerNotification;
-import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
 import org.mule.runtime.core.api.context.notification.TransactionNotification;
 import org.mule.runtime.core.api.context.notification.TransactionNotificationListener;
 
@@ -53,14 +53,14 @@ import java.util.Map;
  *
  * @since 4.0
  */
-public abstract class NotificationConfig<N extends ServerNotification, L extends ServerNotificationListener<N>>
+public abstract class NotificationConfig<N extends Notification, L extends NotificationListener<N>>
     extends AbstractAnnotatedObject {
 
-  public static final Map<String, Class<? extends ServerNotification>> EVENT_MAP;
-  public static final Map<String, Class<? extends ServerNotificationListener>> INTERFACE_MAP;
+  public static final Map<String, Class<? extends Notification>> EVENT_MAP;
+  public static final Map<String, Class<? extends NotificationListener>> INTERFACE_MAP;
 
   static {
-    EVENT_MAP = ImmutableMap.<String, Class<? extends ServerNotification>>builder()
+    EVENT_MAP = ImmutableMap.<String, Class<? extends Notification>>builder()
         .put("CONTEXT", MuleContextNotification.class)
         .put("SECURITY", SecurityNotification.class)
         .put("CONNECTOR-MESSAGE", ConnectorMessageNotification.class)
@@ -77,7 +77,7 @@ public abstract class NotificationConfig<N extends ServerNotification, L extends
         .put("ASYNC-MESSAGE", AsyncMessageNotification.class)
         .build();
 
-    INTERFACE_MAP = ImmutableMap.<String, Class<? extends ServerNotificationListener>>builder()
+    INTERFACE_MAP = ImmutableMap.<String, Class<? extends NotificationListener>>builder()
         .put("CONTEXT", MuleContextNotificationListener.class)
         .put("SECURITY", SecurityNotificationListener.class)
         .put("MANAGEMENT", ManagementNotificationListener.class)
@@ -156,7 +156,7 @@ public abstract class NotificationConfig<N extends ServerNotification, L extends
     return interfaceExplicitlyConfigured;
   }
 
-  public static class EnabledNotificationConfig<N extends ServerNotification, L extends ServerNotificationListener<N>>
+  public static class EnabledNotificationConfig<N extends Notification, L extends NotificationListener<N>>
       extends NotificationConfig<N, L> {
 
     public EnabledNotificationConfig(Class<L> interfaceClass, Class<N> eventClass) {
@@ -168,7 +168,7 @@ public abstract class NotificationConfig<N extends ServerNotification, L extends
     }
   }
 
-  public static class DisabledNotificationConfig<N extends ServerNotification, L extends ServerNotificationListener<N>>
+  public static class DisabledNotificationConfig<N extends Notification, L extends NotificationListener<N>>
       extends NotificationConfig<N, L> {
 
     public DisabledNotificationConfig() {

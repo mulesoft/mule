@@ -19,6 +19,7 @@ import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
@@ -28,6 +29,7 @@ import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.connector.ConnectException;
 import org.mule.runtime.core.api.construct.Pipeline;
+import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.context.notification.PipelineMessageNotification;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
@@ -39,12 +41,16 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory;
+import org.mule.runtime.core.api.processor.strategy.DirectProcessingStrategyFactory;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
+import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.privileged.processor.IdempotentRedeliveryPolicy;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
-import org.mule.runtime.core.api.processor.strategy.DirectProcessingStrategyFactory;
+
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 import java.util.List;
 import java.util.Map;
@@ -53,9 +59,6 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.function.Consumer;
 
 import org.reactivestreams.Publisher;
-
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 
 import reactor.core.publisher.Mono;
 
@@ -114,8 +117,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
   /**
    * A fallback method for creating a {@link ProcessingStrategyFactory} to be used in case the user hasn't specified one through
-   * either , through {@link MuleConfiguration#getDefaultProcessingStrategyFactory()} or the
-   * {@link ProcessingStrategyFactory} class name system property
+   * either , through {@link MuleConfiguration#getDefaultProcessingStrategyFactory()} or the {@link ProcessingStrategyFactory}
+   * class name system property
    *
    * @return a {@link DirectProcessingStrategyFactory}
    */
@@ -302,9 +305,9 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
     @Override
     public Event process(Event event) throws MuleException {
-      getMuleContext().getNotificationManager()
-          .fireNotification(new PipelineMessageNotification(createInfo(event, null, AbstractPipeline.this), AbstractPipeline.this,
-                                                            PROCESS_END));
+      getMuleContext().getRegistry().lookupObject(NotificationDispatcher.class)
+          .dispatch(new PipelineMessageNotification(createInfo(event, null, AbstractPipeline.this), AbstractPipeline.this,
+                                                    PROCESS_END));
       return event;
     }
   }
@@ -313,9 +316,9 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
     @Override
     public Event process(Event event) throws MuleException {
-      getMuleContext().getNotificationManager()
-          .fireNotification(new PipelineMessageNotification(createInfo(event, null, AbstractPipeline.this), AbstractPipeline.this,
-                                                            PROCESS_START));
+      getMuleContext().getRegistry().lookupObject(NotificationDispatcher.class)
+          .dispatch(new PipelineMessageNotification(createInfo(event, null, AbstractPipeline.this), AbstractPipeline.this,
+                                                    PROCESS_START));
 
       long startTime = currentTimeMillis();
 
@@ -336,9 +339,13 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     }
 
     private void fireCompleteNotification(Event event, MessagingException messagingException) {
-      getMuleContext().getNotificationManager()
-          .fireNotification(new PipelineMessageNotification(createInfo(event, messagingException, AbstractPipeline.this),
-                                                            AbstractPipeline.this, PROCESS_COMPLETE));
+      try {
+        getMuleContext().getRegistry().lookupObject(NotificationDispatcher.class)
+            .dispatch(new PipelineMessageNotification(createInfo(event, messagingException, AbstractPipeline.this),
+                                                      AbstractPipeline.this, PROCESS_COMPLETE));
+      } catch (RegistrationException e) {
+        throw new MuleRuntimeException(e);
+      }
     }
 
   }

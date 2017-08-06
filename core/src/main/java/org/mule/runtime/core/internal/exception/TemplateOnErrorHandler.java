@@ -107,11 +107,10 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   }
 
   private void fireEndNotification(Event event, Event result, Throwable throwable) {
-    muleContext.getNotificationManager()
-        .fireNotification(new ErrorHandlerNotification(createInfo(result != null ? result
-            : event, throwable instanceof MessagingException ? (MessagingException) throwable : null,
-                                                                  configuredMessageProcessors),
-                                                       getLocation(), PROCESS_END));
+    notificationFirer.dispatch(new ErrorHandlerNotification(createInfo(result != null ? result
+        : event, throwable instanceof MessagingException ? (MessagingException) throwable : null,
+                                                                       configuredMessageProcessors),
+                                                            getLocation(), PROCESS_END));
   }
 
   protected Function<Event, Publisher<Event>> route(MessagingException exception) {
@@ -236,9 +235,8 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
 
   protected Function<Event, Event> beforeRouting(MessagingException exception) {
     return event -> {
-      muleContext.getNotificationManager()
-          .fireNotification(new ErrorHandlerNotification(createInfo(event, exception, configuredMessageProcessors),
-                                                         getLocation(), PROCESS_START));
+      notificationFirer.dispatch(new ErrorHandlerNotification(createInfo(event, exception, configuredMessageProcessors),
+                                                              getLocation(), PROCESS_START));
       fireNotification(exception, event);
       logException(exception, event);
       processStatistics();

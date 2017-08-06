@@ -7,5 +7,5 @@
 package org.mule.runtime.core.api.context.notification;
 
 public interface PipelineMessageNotificationListener<T extends PipelineMessageNotification>
-    extends ServerNotificationListener<PipelineMessageNotification> {
+    extends NotificationListener<PipelineMessageNotification> {
 }

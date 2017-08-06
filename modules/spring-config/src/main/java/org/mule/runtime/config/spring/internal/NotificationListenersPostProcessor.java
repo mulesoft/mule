@@ -7,7 +7,7 @@
 package org.mule.runtime.config.spring.internal;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
+import org.mule.runtime.core.api.context.notification.NotificationListener;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -30,9 +30,9 @@ public class NotificationListenersPostProcessor implements BeanPostProcessor {
   }
 
   public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-    if (bean instanceof ServerNotificationListener) {
-      if (!muleContext.getNotificationManager().isListenerRegistered((ServerNotificationListener) bean)) {
-        muleContext.getNotificationManager().addListener((ServerNotificationListener) bean);
+    if (bean instanceof NotificationListener) {
+      if (!muleContext.getNotificationManager().isListenerRegistered((NotificationListener) bean)) {
+        muleContext.getNotificationManager().addListener((NotificationListener) bean);
       }
     }
     return bean;

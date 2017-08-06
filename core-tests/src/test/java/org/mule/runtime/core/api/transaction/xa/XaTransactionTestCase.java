@@ -14,7 +14,10 @@ import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -27,7 +30,6 @@ import javax.transaction.xa.XAResource;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Answers;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -36,8 +38,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 @SmallTest
 public class XaTransactionTestCase extends AbstractMuleTestCase {
 
-  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-  private MuleContext mockMuleContext;
+  private MuleContext mockMuleContext = mockContextWithServices();
   @Mock
   private TransactionManager mockTransactionManager;
   @Mock
@@ -48,7 +49,7 @@ public class XaTransactionTestCase extends AbstractMuleTestCase {
   private XAResource mockXaResource;
 
   @Before
-  public void setUpMuleContext() {
+  public void setUpMuleContext() throws RegistrationException {
     when(mockMuleContext.getTransactionManager()).thenReturn(mockTransactionManager);
     when(mockMuleContext.getConfiguration().getId()).thenReturn("appName");
   }

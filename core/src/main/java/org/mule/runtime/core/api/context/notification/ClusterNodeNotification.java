@@ -9,7 +9,7 @@ package org.mule.runtime.core.api.context.notification;
 /**
  * Notifies when there are a cluster node event
  */
-public class ClusterNodeNotification extends ServerNotification implements SynchronousServerEvent {
+public class ClusterNodeNotification extends AbstractServerNotification {
 
   public static final int PRIMARY_CLUSTER_NODE_SELECTED = CLUSTER_NODE_EVENT_ACTION_START_RANGE + 1;
 
@@ -19,5 +19,10 @@ public class ClusterNodeNotification extends ServerNotification implements Synch
 
   public ClusterNodeNotification(Object message, int action) {
     super(message, action);
+  }
+
+  @Override
+  public boolean isSynchronous() {
+    return true;
   }
 }

@@ -7,13 +7,21 @@
 package org.mule.runtime.core.api.transaction.xa;
 
 import static java.lang.System.identityHashCode;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.transaction.Transaction;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.notMuleXaTransaction;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.transactionMarkedForRollback;
+import static org.mule.runtime.core.api.context.notification.TransactionNotification.TRANSACTION_BEGAN;
+import static org.mule.runtime.core.api.context.notification.TransactionNotification.TRANSACTION_COMMITTED;
+import static org.mule.runtime.core.api.context.notification.TransactionNotification.TRANSACTION_ROLLEDBACK;
+
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.tx.TransactionException;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.context.notification.TransactionNotification;
-import org.mule.runtime.core.api.util.UUID;
+import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
+import org.mule.runtime.core.api.util.UUID;
 
 import java.text.MessageFormat;
 
@@ -37,52 +45,59 @@ public abstract class AbstractTransaction implements Transaction {
     this.muleContext = muleContext;
   }
 
+  @Override
   public boolean isRollbackOnly() throws TransactionException {
     int status = getStatus();
     return status == STATUS_MARKED_ROLLBACK || status == STATUS_ROLLEDBACK || status == STATUS_ROLLING_BACK;
   }
 
+  @Override
   public boolean isBegun() throws TransactionException {
     int status = getStatus();
     return status != STATUS_NO_TRANSACTION && status != STATUS_UNKNOWN;
   }
 
+  @Override
   public boolean isRolledBack() throws TransactionException {
     return getStatus() == STATUS_ROLLEDBACK;
   }
 
+  @Override
   public boolean isCommitted() throws TransactionException {
     return getStatus() == STATUS_COMMITTED;
   }
 
+  @Override
   public void begin() throws TransactionException {
     logger.debug("Beginning transaction " + identityHashCode(this));
     doBegin();
     TransactionCoordination.getInstance().bindTransaction(this);
-    fireNotification(new TransactionNotification(this, TransactionNotification.TRANSACTION_BEGAN, getApplicationName()));
+    fireNotification(new TransactionNotification(this, TRANSACTION_BEGAN, getApplicationName()));
   }
 
+  @Override
   public void commit() throws TransactionException {
     try {
       logger.debug("Committing transaction " + identityHashCode(this));
 
       if (isRollbackOnly()) {
-        throw new IllegalTransactionStateException(CoreMessages.transactionMarkedForRollback());
+        throw new IllegalTransactionStateException(transactionMarkedForRollback());
       }
 
       doCommit();
-      fireNotification(new TransactionNotification(this, TransactionNotification.TRANSACTION_COMMITTED, getApplicationName()));
+      fireNotification(new TransactionNotification(this, TRANSACTION_COMMITTED, getApplicationName()));
     } finally {
       TransactionCoordination.getInstance().unbindTransaction(this);
     }
   }
 
+  @Override
   public void rollback() throws TransactionException {
     try {
       logger.debug("Rolling back transaction " + identityHashCode(this));
       setRollbackOnly();
       doRollback();
-      fireNotification(new TransactionNotification(this, TransactionNotification.TRANSACTION_ROLLEDBACK, getApplicationName()));
+      fireNotification(new TransactionNotification(this, TRANSACTION_ROLLEDBACK, getApplicationName()));
     } finally {
       unbindTransaction();
     }
@@ -124,21 +139,29 @@ public abstract class AbstractTransaction implements Transaction {
    */
   protected void fireNotification(TransactionNotification notification) {
     // TODO profile this piece of code
-    muleContext.fireNotification(notification);
+    try {
+      muleContext.getRegistry().lookupObject(NotificationDispatcher.class).dispatch(notification);
+    } catch (RegistrationException e) {
+      throw new MuleRuntimeException(e);
+    }
   }
 
+  @Override
   public boolean isXA() {
     return false;
   }
 
+  @Override
   public void resume() throws TransactionException {
-    throw new IllegalTransactionStateException(CoreMessages.notMuleXaTransaction(this));
+    throw new IllegalTransactionStateException(notMuleXaTransaction(this));
   }
 
+  @Override
   public javax.transaction.Transaction suspend() throws TransactionException {
-    throw new IllegalTransactionStateException(CoreMessages.notMuleXaTransaction(this));
+    throw new IllegalTransactionStateException(notMuleXaTransaction(this));
   }
 
+  @Override
   public String getId() {
     return id;
   }
@@ -163,6 +186,7 @@ public abstract class AbstractTransaction implements Transaction {
     return timeout;
   }
 
+  @Override
   public void setTimeout(int timeout) {
     this.timeout = timeout;
   }
