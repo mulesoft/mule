@@ -72,6 +72,13 @@ final public class MuleDocumentLoader implements DocumentLoader {
 
   private final DocumentLoader defaultLoader = new DefaultDocumentLoader() {
 
+    /**
+     * This code is the same as the corresponding Spring method, but uses our DocumentBuilderFactory because the
+     * global one is changed by Xerces through SPI.
+     *
+     * TODO: remove after MULE-13276 is completed
+     */
+    @Override
     protected DocumentBuilderFactory createDocumentBuilderFactory(int validationMode, boolean namespaceAware)
         throws ParserConfigurationException {
 
