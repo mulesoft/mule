@@ -7,13 +7,13 @@
 package org.mule.runtime.config.spring.internal;
 
 import static java.lang.String.format;
+import static org.mule.runtime.api.connectivity.ConnectivityTestingService.CONNECTIVITY_TESTING_SERVICE_KEY;
 import static org.mule.runtime.api.metadata.MetadataService.METADATA_SERVICE_KEY;
 import static org.mule.runtime.api.value.ValueProviderService.VALUE_PROVIDER_SERVICE_KEY;
 import static org.mule.runtime.config.spring.api.XmlConfigurationDocumentLoader.noValidationDocumentLoader;
 import static org.mule.runtime.config.spring.internal.LazyConnectivityTestingService.NON_LAZY_CONNECTIVITY_TESTING_SERVICE;
 import static org.mule.runtime.config.spring.internal.LazyMetadataService.NON_LAZY_METADATA_SERVICE;
 import static org.mule.runtime.config.spring.internal.LazyValueProviderService.NON_LAZY_VALUE_PROVIDER_SERVICE;
-import static org.mule.runtime.api.connectivity.ConnectivityTestingService.CONNECTIVITY_TESTING_SERVICE_KEY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
@@ -70,13 +70,23 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
           artifactType, pluginsClassLoaders, parentConfigurationProperties);
     this.applicationModel.executeOnEveryMuleComponentTree(componentModel -> componentModel.setEnabled(false));
     muleContext.getCustomizationService().overrideDefaultServiceImpl(CONNECTIVITY_TESTING_SERVICE_KEY,
-                                                                     new LazyConnectivityTestingService(this));
+                                                                     new LazyConnectivityTestingService(this,
+                                                                                                        () -> muleContext
+                                                                                                            .getRegistry()
+                                                                                                            .get(NON_LAZY_CONNECTIVITY_TESTING_SERVICE)));
     muleContext.getCustomizationService().registerCustomServiceClass(NON_LAZY_CONNECTIVITY_TESTING_SERVICE,
                                                                      DefaultConnectivityTestingService.class);
-    muleContext.getCustomizationService().overrideDefaultServiceImpl(METADATA_SERVICE_KEY, new LazyMetadataService(this));
+    muleContext.getCustomizationService().overrideDefaultServiceImpl(METADATA_SERVICE_KEY,
+                                                                     new LazyMetadataService(this,
+                                                                                             () -> muleContext
+                                                                                                 .getRegistry()
+                                                                                                 .get(NON_LAZY_METADATA_SERVICE)));
     muleContext.getCustomizationService().registerCustomServiceClass(NON_LAZY_METADATA_SERVICE, MuleMetadataService.class);
     muleContext.getCustomizationService().overrideDefaultServiceImpl(VALUE_PROVIDER_SERVICE_KEY,
-                                                                     new LazyValueProviderService(this));
+                                                                     new LazyValueProviderService(this,
+                                                                                                  () -> muleContext
+                                                                                                      .getRegistry()
+                                                                                                      .get(NON_LAZY_VALUE_PROVIDER_SERVICE)));
     muleContext.getCustomizationService().registerCustomServiceClass(NON_LAZY_VALUE_PROVIDER_SERVICE,
                                                                      MuleValueProviderService.class);
   }

@@ -17,11 +17,14 @@ import static org.mule.runtime.core.internal.value.MuleValueProviderServiceUtili
 import static org.mule.runtime.extension.api.values.ValueResolvingException.INVALID_LOCATION;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
 import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.value.ValueProviderService;
 import org.mule.runtime.api.value.ValueResult;
 import org.mule.runtime.config.spring.internal.dsl.model.NoSuchComponentModelException;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -36,9 +39,10 @@ import javax.inject.Named;
  * @since 4.0
  * @see ValueProviderService
  */
-public class LazyValueProviderService implements ValueProviderService {
+public class LazyValueProviderService implements ValueProviderService, Initialisable {
 
   public static final String NON_LAZY_VALUE_PROVIDER_SERVICE = "_muleNonLazyValueProviderService";
+  private final Supplier<ValueProviderService> valueProviderServiceSupplier;
 
   private LazyMuleArtifactContext lazyMuleArtifactContext;
 
@@ -46,8 +50,9 @@ public class LazyValueProviderService implements ValueProviderService {
   @Named(NON_LAZY_VALUE_PROVIDER_SERVICE)
   private ValueProviderService providerService;
 
-  LazyValueProviderService(LazyMuleArtifactContext artifactContext) {
+  LazyValueProviderService(LazyMuleArtifactContext artifactContext, Supplier<ValueProviderService> valueProviderServiceSupplier) {
     this.lazyMuleArtifactContext = artifactContext;
+    this.valueProviderServiceSupplier = valueProviderServiceSupplier;
   }
 
   /**
@@ -81,5 +86,10 @@ public class LazyValueProviderService implements ValueProviderService {
 
   private Location locationWithOutConnection(Location location) {
     return isConnection(location) ? deleteLastPartFromLocation(location) : location;
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    this.providerService = valueProviderServiceSupplier.get();
   }
 }
