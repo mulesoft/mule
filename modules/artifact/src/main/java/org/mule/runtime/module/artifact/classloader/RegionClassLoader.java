@@ -74,7 +74,7 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
    */
   public RegionClassLoader(String artifactId, ArtifactDescriptor artifactDescriptor, ClassLoader parent,
                            ClassLoaderLookupPolicy lookupPolicy) {
-    super(artifactId, artifactDescriptor, new URL[0], parent, lookupPolicy, emptyList(), false);
+    super(artifactId, artifactDescriptor, new URL[0], parent, lookupPolicy, emptyList());
   }
 
   @Override

@@ -36,27 +36,7 @@ public class MuleDeployableArtifactClassLoader extends MuleArtifactClassLoader {
                                            ClassLoader parent,
                                            ClassLoaderLookupPolicy lookupPolicy,
                                            List<ArtifactClassLoader> artifactPluginClassLoaders) {
-    this(artifactId, artifactDescriptor, urls, parent, lookupPolicy, artifactPluginClassLoaders, true);
-  }
-
-  /**
-   * Creates a {@link MuleDeployableArtifactClassLoader} with the provided configuration.
-   *
-   * This version allows not registering error hooks, useful for subclasses that need to do it after
-   * their own initialization or not at all.
-   *
-   * @param artifactId artifact unique ID. Non empty.
-   * @param artifactDescriptor descriptor for the artifact owning the created class loader instance.
-   * @param urls the URLs from which to load classes and resources
-   * @param parent parent class loader in the hierarchy
-   * @param lookupPolicy policy for resolving classes and resources
-   * @param artifactPluginClassLoaders class loaders for the plugin artifacts contained by this artifact. Must be not null.
-   * @param initialise whether to configure error hooks or not
-   */
-  protected MuleDeployableArtifactClassLoader(String artifactId, ArtifactDescriptor artifactDescriptor, URL[] urls,
-                                              ClassLoader parent, ClassLoaderLookupPolicy lookupPolicy,
-                                              List<ArtifactClassLoader> artifactPluginClassLoaders, boolean initialise) {
-    super(artifactId, artifactDescriptor, urls, parent, lookupPolicy, initialise);
+    super(artifactId, artifactDescriptor, urls, parent, lookupPolicy);
     checkArgument(artifactPluginClassLoaders != null, "artifact plugin class loaders cannot be null");
     this.artifactPluginClassLoaders = artifactPluginClassLoaders;
   }

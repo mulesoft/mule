@@ -35,7 +35,12 @@ public class ErrorHooksConfigurationTestCase extends AbstractMuleTestCase {
 
   @Test
   public void invokesErrorHooksConfiguration() throws Exception {
-    TestArtifactClassLoader classLoader = createClassLoader(true);
+    TestArtifactClassLoader classLoader = new TestArtifactClassLoader() {
+      @Override
+      protected Boolean isReactorLoaded() {
+        return true;
+      }
+    };
 
     externalSetupText = "notCalled";
     classLoader.setErrorHooksClassLocation(TEST_ERROR_HOOKS_CLASS_LOCATION);
@@ -45,7 +50,12 @@ public class ErrorHooksConfigurationTestCase extends AbstractMuleTestCase {
 
   @Test
   public void doesNotInvokeErrorHooksConfiguration() throws Exception {
-    TestArtifactClassLoader classLoader = createClassLoader(false);
+    TestArtifactClassLoader classLoader = new TestArtifactClassLoader() {
+      @Override
+      protected Boolean isReactorLoaded() {
+        return false;
+      }
+    };
 
     externalSetupText = "notCalled";
     classLoader.setErrorHooksClassLocation(TEST_ERROR_HOOKS_CLASS_LOCATION);
@@ -53,24 +63,9 @@ public class ErrorHooksConfigurationTestCase extends AbstractMuleTestCase {
     assertThat(externalSetupText, is("notCalled"));
   }
 
-  private TestArtifactClassLoader createClassLoader(Boolean reactorLoaded) throws Exception {
-    ClassLoader threadClassLoader = currentThread().getContextClassLoader();
-    URL[] urls = new URL[] {new File("nonexistent/path").toURI().toURL()};
-    return new TestArtifactClassLoader(urls, threadClassLoader, reactorLoaded);
-  }
-
-  private static class TestArtifactClassLoader extends MuleArtifactClassLoader {
-
-    Boolean reactorLoaded;
-
-    TestArtifactClassLoader(URL[] urls, ClassLoader parentCl, Boolean reactorLoaded) {
-      super("testId", new ArtifactDescriptor("test"), urls, parentCl, createLookupPoilicy(), false);
-      this.reactorLoaded = reactorLoaded;
-    }
-
-    @Override
-    public Boolean isReactorLoaded() {
-      return reactorLoaded;
+  private class TestArtifactClassLoader extends MuleArtifactClassLoader {
+    TestArtifactClassLoader() throws Exception {
+      super("testId", new ArtifactDescriptor("test"), new URL[] {new File("nonexistent/path").toURI().toURL()}, currentThread().getContextClassLoader(), createLookupPoilicy());
     }
   }
 

@@ -6,7 +6,7 @@
  */
 package org.mule.module.artifact.classloader;
 
-import static org.mule.runtime.core.internal.util.rx.Operators.setupErrorHooks;
+import static org.mule.runtime.core.api.rx.Exceptions.setupErrorHooks;
 
 import reactor.core.publisher.Hooks;
 

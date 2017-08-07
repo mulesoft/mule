@@ -64,7 +64,12 @@ public class MuleSharedDomainClassLoaderTestCase extends AbstractMuleTestCase {
 
     MuleSharedDomainClassLoader classLoader = new MuleSharedDomainClassLoader(new ArtifactDescriptor(DEFAULT_DOMAIN_NAME),
                                                                               getClass().getClassLoader(), lookupPolicy, urls,
-                                                                              emptyList());
+                                                                              emptyList()) {
+      @Override
+      protected Boolean isReactorLoaded() {
+        return false;
+      }
+    };
 
     assertThat(classLoader.findResource(RESOURCE_FILE_NAME), notNullValue());
   }

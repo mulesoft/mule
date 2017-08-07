@@ -95,14 +95,24 @@ public class MuleApplicationClassLoaderTestCase extends AbstractMuleTestCase {
     // Create app class loader
     domainCL =
         new MuleSharedDomainClassLoader(new DomainDescriptor(DOMAIN_NAME), currentThread().getContextClassLoader(),
-                                        mock(ClassLoaderLookupPolicy.class), emptyList(), emptyList());
+                                        mock(ClassLoaderLookupPolicy.class), emptyList(), emptyList()) {
+          @Override
+          public Boolean isReactorLoaded() {
+            return false;
+          }
+        };
 
     final ApplicationDescriptor applicationDescriptor = new ApplicationDescriptor(APP_NAME);
     ClassLoaderModel classLoaderModel = new ClassLoaderModel.ClassLoaderModelBuilder(applicationDescriptor.getClassLoaderModel())
         .containing(MuleFoldersUtil.getAppClassesFolder(APP_NAME).toURI().toURL()).build();
     applicationDescriptor.setClassLoaderModel(classLoaderModel);
     appCL = new MuleApplicationClassLoader(APP_NAME, applicationDescriptor, domainCL, null, urls,
-                                           mock(ClassLoaderLookupPolicy.class), emptyList());
+                                           mock(ClassLoaderLookupPolicy.class), emptyList()) {
+      @Override
+      public Boolean isReactorLoaded() {
+        return false;
+      }
+    };
   }
 
   @After

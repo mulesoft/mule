@@ -54,33 +54,13 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
    */
   public MuleArtifactClassLoader(String artifactId, ArtifactDescriptor artifactDescriptor, URL[] urls, ClassLoader parent,
                                  ClassLoaderLookupPolicy lookupPolicy) {
-    this(artifactId, artifactDescriptor, urls, parent, lookupPolicy, true);
-  }
-
-  /**
-   * Constructs a new {@link MuleArtifactClassLoader } for the given URLs.
-   *
-   * This version allows not registering error hooks, useful for subclasses that need to do it after
-   * their own initialization or not at all.
-   *
-   * @param artifactId artifact unique ID. Non empty.
-   * @param artifactDescriptor descriptor for the artifact owning the created class loader. Non null.
-   * @param urls the URLs from which to load classes and resources
-   * @param parent the parent class loader for delegation
-   * @param lookupPolicy policy used to guide the lookup process. Non null
-   * @param initialise whether to configure error hooks or not
-   */
-  protected MuleArtifactClassLoader(String artifactId, ArtifactDescriptor artifactDescriptor, URL[] urls, ClassLoader parent,
-                                    ClassLoaderLookupPolicy lookupPolicy, Boolean initialise) {
     super(urls, parent, lookupPolicy);
     checkArgument(!isEmpty(artifactId), "artifactId cannot be empty");
     checkArgument(artifactDescriptor != null, "artifactDescriptor cannot be null");
     this.artifactId = artifactId;
     this.artifactDescriptor = artifactDescriptor;
 
-    if (initialise) {
-      configureErrorHooks();
-    }
+    configureErrorHooks();
   }
 
   @Override
@@ -131,11 +111,11 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
     shutdownListeners.clear();
   }
 
-  public void setResourceReleaserClassLocation(String resourceReleaserClassLocation) {
+  protected void setResourceReleaserClassLocation(String resourceReleaserClassLocation) {
     this.resourceReleaserClassLocation = resourceReleaserClassLocation;
   }
 
-  public void setErrorHooksClassLocation(String errorHooksClassLocation) {
+  protected void setErrorHooksClassLocation(String errorHooksClassLocation) {
     this.errorHooksClassLocation = errorHooksClassLocation;
   }
 
@@ -155,7 +135,7 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
   }
 
   /**
-   * Creates a ResourceReleaser using this classloader, only used outside in unit tests.
+   * Creates a {@link ResourceReleaser} using this classloader, only used outside in unit tests.
    */
   protected ResourceReleaser createResourceReleaserInstance() {
     return createCustomInstance(resourceReleaserClassLocation);
