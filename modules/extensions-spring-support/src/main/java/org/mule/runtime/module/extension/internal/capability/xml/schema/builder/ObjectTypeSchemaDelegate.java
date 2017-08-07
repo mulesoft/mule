@@ -387,7 +387,8 @@ final class ObjectTypeSchemaDelegate {
     QName typeQName = getTypeQName(typeDsl, type);
     TopLevelElement abstractElement = registerAbstractElement(typeQName, typeDsl, null);
     TypeUtils.getSubstitutionGroup(type)
-        .ifPresent((substitutionGroup) -> abstractElement.setSubstitutionGroup(resolveSubstitutionGroup(substitutionGroup)));
+        .ifPresent((substitutionGroup) -> abstractElement
+            .setSubstitutionGroup(builder.resolveSubstitutionGroup(substitutionGroup)));
     return abstractElement;
   }
 
@@ -418,16 +419,6 @@ final class ObjectTypeSchemaDelegate {
     registeredGlobalElementTypes.put(typeDsl.getPrefix() + getAbstractElementName(typeDsl), abstractElement);
 
     return abstractElement;
-  }
-
-  private QName resolveSubstitutionGroup(SubstitutionGroup userConfiguredSubstitutionGroup) {
-    String namespaceUri = builder.getNamespaceUri(userConfiguredSubstitutionGroup.getPrefix());
-    if (namespaceUri != null) {
-      return new QName(namespaceUri, userConfiguredSubstitutionGroup.getElement(), userConfiguredSubstitutionGroup.getPrefix());
-    }
-    throw new IllegalArgumentException(String
-        .format("prefix: %s, element: %s is not a valid substitutionGroup. Prefix does not exist.",
-                userConfiguredSubstitutionGroup.getPrefix(), userConfiguredSubstitutionGroup.getElement()));
   }
 
   private QName getAbstractElementSubstitutionGroup(DslElementSyntax typeDsl, Optional<DslElementSyntax> baseDsl) {
