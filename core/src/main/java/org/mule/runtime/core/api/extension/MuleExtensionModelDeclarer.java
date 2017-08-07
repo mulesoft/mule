@@ -9,6 +9,7 @@ package org.mule.runtime.core.api.extension;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.api.meta.model.error.ErrorModelBuilder.newError;
 import static org.mule.runtime.extension.internal.loader.util.InfrastructureParameterBuilder.addReconnectionStrategyParameter;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
@@ -29,7 +30,6 @@ import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclarer;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
-import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.core.api.source.SchedulingStrategy;
 import org.mule.runtime.core.api.source.polling.CronScheduler;
 import org.mule.runtime.core.api.source.polling.FixedFrequencyScheduler;
@@ -125,7 +125,7 @@ class MuleExtensionModelDeclarer {
 
     validator.onDefaultParameterGroup()
         .withOptionalParameter("idExpression")
-        .ofType(typeLoader.load(Object.class))
+        .ofType(typeLoader.load(String.class))
         .defaultingTo("#[id]")
         .withDsl(ParameterDslConfiguration.builder().allowsReferences(false).build())
         .describedAs("Defines one or more expressions to use when extracting the ID from the message. "
@@ -139,7 +139,7 @@ class MuleExtensionModelDeclarer {
 
     validator.onDefaultParameterGroup()
         .withOptionalParameter("objectStore")
-        .ofType(typeLoader.load(ObjectStore.class))
+        .ofType(typeLoader.load(String.class))
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The object store where the IDs of the processed events are going to be stored.");
 
@@ -230,6 +230,7 @@ class MuleExtensionModelDeclarer {
 
         }.getType()))
         .defaultingTo("#[payload]")
+        .withExpressionSupport(REQUIRED)
         .describedAs("An expression to that returns a java collection, object array, map or DOM nodes.");
 
     forEach.onDefaultParameterGroup()
