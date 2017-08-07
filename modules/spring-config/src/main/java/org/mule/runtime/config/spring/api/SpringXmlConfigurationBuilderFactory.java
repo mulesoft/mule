@@ -34,6 +34,11 @@ public final class SpringXmlConfigurationBuilderFactory {
     return new SpringXmlConfigurationBuilder(new String[] {configResource}, lazyInit);
   }
 
+  public static ConfigurationBuilder createConfigurationBuilder(String[] configResources, boolean lazyInit)
+      throws ConfigurationException {
+    return new SpringXmlConfigurationBuilder(configResources, lazyInit);
+  }
+
   public static ConfigurationBuilder createConfigurationBuilder(String[] configResources, MuleContext domainContext)
       throws ConfigurationException {
     final SpringXmlConfigurationBuilder springXmlConfigurationBuilder =
