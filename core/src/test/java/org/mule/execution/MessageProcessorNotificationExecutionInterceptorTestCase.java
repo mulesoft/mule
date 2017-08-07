@@ -100,12 +100,16 @@ public class MessageProcessorNotificationExecutionInterceptorTestCase extends Ab
         }).when(mockNotificationManager).fireNotification(Mockito.any(ServerNotification.class));
         MuleEvent result = messageProcessorNotificationExecutionInterceptor.execute(mockMessageProcessor, mockMuleEvent);
         assertThat(result, is(mockResultMuleEvent));
-        assertThat(serverNotifications.size(), Is.is(2));
+        assertThat(serverNotifications.size(), Is.is(3));
         MessageProcessorNotification beforeMessageProcessorNotification = (MessageProcessorNotification) serverNotifications.get(0);
-        MessageProcessorNotification afterMessageProcessorNotification = (MessageProcessorNotification) serverNotifications.get(1);
+        MessageProcessorNotification beforeMessageProcessorNotificationOriginalEvent= (MessageProcessorNotification) serverNotifications.get(1);
+        MessageProcessorNotification afterMessageProcessorNotification = (MessageProcessorNotification) serverNotifications.get(2);
         assertThat(beforeMessageProcessorNotification.getAction(), is(MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE));
         assertThat(beforeMessageProcessorNotification.getProcessor(), is(mockMessageProcessor));
-        assertThat(beforeMessageProcessorNotification.getExceptionThrown(), IsNull.nullValue());
+        assertThat(beforeMessageProcessorNotificationOriginalEvent.getExceptionThrown(), IsNull.nullValue());
+        assertThat(beforeMessageProcessorNotificationOriginalEvent.getAction(), is(MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE_ORIGINAL_EVENT));
+        assertThat(beforeMessageProcessorNotificationOriginalEvent.getProcessor(), is(mockMessageProcessor));
+        assertThat(beforeMessageProcessorNotificationOriginalEvent.getExceptionThrown(), IsNull.nullValue());
         assertThat(afterMessageProcessorNotification.getAction(), is(MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE));
         assertThat(afterMessageProcessorNotification.getProcessor(), is(mockMessageProcessor));
         assertThat(afterMessageProcessorNotification.getExceptionThrown(), IsNull.nullValue());
@@ -238,12 +242,16 @@ public class MessageProcessorNotificationExecutionInterceptorTestCase extends Ab
         catch (MessagingException e)
         {
         }
-        assertThat(serverNotifications.size(), Is.is(2));
+        assertThat(serverNotifications.size(), Is.is(3));
         MessageProcessorNotification beforeMessageProcessorNotification = (MessageProcessorNotification) serverNotifications.get(0);
-        MessageProcessorNotification afterMessageProcessorNotification = (MessageProcessorNotification) serverNotifications.get(1);
+        MessageProcessorNotification beforeMessageProcessorNotificationOriginalEvent = (MessageProcessorNotification) serverNotifications.get(1);
+        MessageProcessorNotification afterMessageProcessorNotification = (MessageProcessorNotification) serverNotifications.get(2);
         assertThat(beforeMessageProcessorNotification.getAction(), is(MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE));
         assertThat(beforeMessageProcessorNotification.getProcessor(), is(mockMessageProcessor));
         assertThat(beforeMessageProcessorNotification.getExceptionThrown(), IsNull.nullValue());
+        assertThat(beforeMessageProcessorNotificationOriginalEvent.getAction(), is(MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE_ORIGINAL_EVENT));
+        assertThat(beforeMessageProcessorNotificationOriginalEvent.getProcessor(), is(mockMessageProcessor));
+        assertThat(beforeMessageProcessorNotificationOriginalEvent.getExceptionThrown(), IsNull.nullValue());
         assertThat(afterMessageProcessorNotification.getAction(), is(MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE));
         assertThat(afterMessageProcessorNotification.getProcessor(), is(mockMessageProcessor));
         assertThat(afterMessageProcessorNotification.getExceptionThrown(), Is.is(mockMessagingException));
