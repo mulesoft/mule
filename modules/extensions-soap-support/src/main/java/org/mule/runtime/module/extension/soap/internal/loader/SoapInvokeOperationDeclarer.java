@@ -47,8 +47,8 @@ import org.mule.runtime.module.extension.soap.internal.metadata.InvokeRequestTyp
 import org.mule.runtime.module.extension.soap.internal.metadata.WebServiceTypeKey;
 import org.mule.runtime.module.extension.soap.internal.runtime.connection.ForwardingSoapClient;
 import org.mule.runtime.module.extension.soap.internal.runtime.operation.SoapOperationExecutorFactory;
-import org.mule.runtime.soap.api.message.SoapAttributes;
-import org.mule.runtime.soap.api.message.SoapOutputPayload;
+import org.mule.runtime.extension.api.soap.SoapAttributes;
+import org.mule.runtime.extension.api.soap.SoapOutputPayload;
 import com.google.common.collect.ImmutableMap;
 import java.io.InputStream;
 import java.util.Map;
