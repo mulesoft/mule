@@ -32,6 +32,7 @@ import org.mule.runtime.api.meta.model.SubTypesModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.extension.api.declaration.type.TypeUtils;
+import org.mule.runtime.extension.api.declaration.type.annotation.BaseType;
 import org.mule.runtime.extension.api.declaration.type.annotation.SubstitutionGroup;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
@@ -291,12 +292,9 @@ final class ObjectTypeSchemaDelegate {
     if (baseDsl.isPresent()) {
       return new QName(baseDsl.get().getNamespace(), getBaseTypeName(baseType), baseDsl.get().getPrefix());
     }
-    String prefix = MULE_ABSTRACT_EXTENSION_TYPE.getPrefix();
-    String namespace = MULE_ABSTRACT_EXTENSION_TYPE.getNamespaceURI();
-    Optional<String> base = TypeUtils.getBaseType(type);
+    Optional<BaseType> base = TypeUtils.getBaseType(type);
     if(base.isPresent()) { //means that the baseType was defined by the user
-      String element = base.get();
-      return new QName(namespace,element,prefix);
+      return new QName(builder.getNamespaceUri(base.get().getPrefix()),base.get().getType(),base.get().getPrefix());
     }
     return MULE_ABSTRACT_EXTENSION_TYPE;
   }
