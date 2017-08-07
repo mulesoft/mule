@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
+import static com.google.common.collect.ImmutableMap.copyOf;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -13,10 +14,9 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
-import static org.mule.runtime.core.api.util.collection.Collectors.toImmutableMap;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toMap;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
@@ -43,8 +43,9 @@ import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.internal.execution.ExceptionCallback;
-import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
-import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
+import org.mule.runtime.extension.api.runtime.config.ConfiguredComponent;
 import org.mule.runtime.extension.api.runtime.source.ParameterizedSource;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
@@ -52,8 +53,6 @@ import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionHan
 import org.mule.runtime.module.extension.internal.runtime.operation.IllegalSourceException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ObjectBasedParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionFactory;
 
 import java.util.Map;
@@ -71,7 +70,7 @@ import org.slf4j.Logger;
  * @since 4.0
  */
 public class ExtensionMessageSource extends ExtensionComponent<SourceModel> implements MessageSource, ExceptionCallback,
-    ParameterizedSource {
+    ParameterizedSource, ConfiguredComponent {
 
   private static final Logger LOGGER = getLogger(ExtensionMessageSource.class);
 
@@ -147,6 +146,10 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     }
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public Optional<ConfigurationInstance> getConfigurationInstance() {
     return sourceAdapter.getConfigurationInstance();
   }
@@ -393,19 +396,12 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
   @Override
   public Map<String, Object> getInitialisationParameters() {
-    final ValueResolvingContext ctx = from(getInitialiserEvent());
-    Map<String, ValueResolver<?>> resolvers = sourceAdapterFactory.getSourceParameters().getResolvers();
-    return resolvers.entrySet().stream()
-        .collect(toImmutableMap(entry -> entry.getKey(), entry -> {
-          try {
-            return entry.getValue().resolve(ctx);
-          } catch (MuleException e) {
-            throw new MuleRuntimeException(createStaticMessage(format(
-                                                                      "Could not resolve parameter '%s' for message source at location '%s'",
-                                                                      entry.getKey()),
-                                                               getLocation().toString()),
-                                           e);
-          }
-        }));
+    try {
+      return copyOf(toMap(sourceAdapterFactory.getSourceParameters(), getInitialiserEvent()));
+    } catch (Exception e) {
+      throw new MuleRuntimeException(createStaticMessage(format("Could not resolve parameters message source at location '%s'",
+                                                                getLocation().toString()),
+                                                         e));
+    }
   }
 }

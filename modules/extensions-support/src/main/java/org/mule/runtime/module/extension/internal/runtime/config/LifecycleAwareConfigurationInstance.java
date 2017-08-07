@@ -26,6 +26,7 @@ import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationInstanceNotification;
 import org.mule.runtime.core.api.connector.ConnectionManager;
@@ -35,8 +36,9 @@ import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.time.TimeSupplier;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
-import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
-import org.mule.runtime.extension.api.runtime.ConfigurationStats;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationState;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
 import org.mule.runtime.extension.api.runtime.Interceptable;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.module.extension.internal.loader.AbstractInterceptable;
@@ -45,6 +47,7 @@ import org.mule.runtime.module.extension.internal.runtime.connectivity.NoConnect
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.locks.Lock;
+import java.util.function.Function;
 
 import javax.inject.Inject;
 
@@ -72,6 +75,7 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
   private final String name;
   private final ConfigurationModel model;
   private final Object value;
+  private final Function<Event, ConfigurationState> configurationStateResolver;
   private final Optional<ConnectionProvider> connectionProvider;
 
   private ConfigurationStats configurationStats;
@@ -108,12 +112,17 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
    * @param interceptors the {@link List} of {@link Interceptor interceptors} that applies
    * @param connectionProvider an {@link Optional} containing the {@link ConnectionProvider} to use
    */
-  public LifecycleAwareConfigurationInstance(String name, ConfigurationModel model, Object value,
-                                             List<Interceptor> interceptors, Optional<ConnectionProvider> connectionProvider) {
+  public LifecycleAwareConfigurationInstance(String name,
+                                             ConfigurationModel model,
+                                             Object value,
+                                             Function<Event, ConfigurationState> configurationStateResolver,
+                                             List<Interceptor> interceptors,
+                                             Optional<ConnectionProvider> connectionProvider) {
     super(interceptors);
     this.name = name;
     this.model = model;
     this.value = value;
+    this.configurationStateResolver = configurationStateResolver;
     this.connectionProvider = connectionProvider;
   }
 
@@ -317,6 +326,11 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
   public ConfigurationStats getStatistics() {
     checkState(configurationStats != null, "can't get statistics before initialise() is invoked");
     return configurationStats;
+  }
+
+  @Override
+  public ConfigurationState getState(Object event) {
+    return configurationStateResolver.apply((Event) event);
   }
 
   private void initStats() {

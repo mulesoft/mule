@@ -36,7 +36,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
 import org.mule.runtime.module.extension.internal.runtime.ImmutableExpirationPolicy;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderResolver;
@@ -80,6 +80,9 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
 
   @Mock
   private ConnectionProviderResolver connectionProviderResolver;
+
+  @Mock
+  private ConnectionProvider connectionProvider;
 
   private ExpirationPolicy expirationPolicy;
 

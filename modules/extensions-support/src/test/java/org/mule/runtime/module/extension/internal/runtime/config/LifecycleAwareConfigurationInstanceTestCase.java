@@ -36,6 +36,7 @@ import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.retry.RetryNotifier;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
@@ -43,7 +44,8 @@ import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
-import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationState;
 import org.mule.runtime.module.extension.internal.AbstractInterceptableContractTestCase;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
@@ -88,6 +90,9 @@ public class LifecycleAwareConfigurationInstanceTestCase
 
   @Mock
   private ConfigurationModel configurationModel;
+
+  @Mock
+  private ConfigurationState configurationState;
 
   @Mock
   protected Lifecycle value;
@@ -135,7 +140,12 @@ public class LifecycleAwareConfigurationInstanceTestCase
       reset(connectionProvider.get());
     }
     setup(connectionManager);
-    return new LifecycleAwareConfigurationInstance(NAME, configurationModel, value, getInterceptors(), connectionProvider);
+    return new LifecycleAwareConfigurationInstance(NAME,
+                                                   configurationModel,
+                                                   value,
+                                                   event -> configurationState,
+                                                   getInterceptors(),
+                                                   connectionProvider);
   }
 
   private void setup(ConnectionManagerAdapter connectionManager) {
@@ -300,5 +310,10 @@ public class LifecycleAwareConfigurationInstanceTestCase
   public void getStatistics() throws Exception {
     interceptable.initialise();
     assertThat(interceptable.getStatistics(), is(notNullValue()));
+  }
+
+  @Test
+  public void getState() {
+    assertThat(interceptable.getState(mock(Event.class)), is(sameInstance(configurationState)));
   }
 }

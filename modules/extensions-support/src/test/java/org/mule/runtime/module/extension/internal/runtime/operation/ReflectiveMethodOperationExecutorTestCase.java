@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.util.Collections.emptyList;
+import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -34,7 +35,8 @@ import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationState;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.DefaultExecutionContext;
@@ -50,7 +52,6 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -93,6 +94,9 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
   @Mock
   private ComponentLocation location;
 
+  @Mock
+  private ConfigurationState configurationState;
+
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private MuleContext muleContext;
 
@@ -108,9 +112,15 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
   public void init() throws Exception {
     initHeisenberg();
     configurationInstance =
-        new LifecycleAwareConfigurationInstance(CONFIG_NAME, configurationModel, config, emptyList(), Optional.empty());
+        new LifecycleAwareConfigurationInstance(CONFIG_NAME,
+                                                configurationModel,
+                                                config,
+                                                event -> configurationState,
+                                                emptyList(),
+                                                empty());
+
     when(muleEvent.getMessage().getPayload()).thenReturn(new TypedValue<>(null, DATA_TYPE));
-    when(operationModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(Optional.empty());
+    when(operationModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(empty());
     operationContext = new DefaultExecutionContext(extensionModel, of(configurationInstance), parameters.asMap(), operationModel,
                                                    muleEvent, cursorProviderFactory, streamingManager, location,
                                                    muleContext);

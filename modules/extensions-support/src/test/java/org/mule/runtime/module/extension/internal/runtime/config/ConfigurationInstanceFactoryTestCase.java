@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.config;
 
 import static java.util.Arrays.asList;
+import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -29,7 +30,7 @@ import org.mule.runtime.api.meta.model.source.SourceCallbackModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.Interceptable;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectivityModelProperty;
@@ -44,8 +45,6 @@ import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.Kiwi;
 
 import com.google.common.collect.ImmutableList;
-
-import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -122,7 +121,7 @@ public class ConfigurationInstanceFactoryTestCase extends AbstractMuleTestCase {
   @Test
   public void createFromResolverSetResult() throws Exception {
     ResolverSetResult result = ResolverSetResult.newBuilder().build();
-    ConfigurationInstance configurationInstance = factory.createConfiguration(CONFIG_NAME, result, Optional.empty());
+    ConfigurationInstance configurationInstance = factory.createConfiguration(CONFIG_NAME, result, event, empty());
 
     assertConfiguration(configurationInstance);
     assertThat(configurationInstance.getConnectionProvider().isPresent(), is(false));

@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime;
 
 import static java.util.Collections.emptyList;
+import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.hamcrest.CoreMatchers.is;
@@ -22,7 +23,8 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
-import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationState;
 import org.mule.runtime.module.extension.internal.runtime.config.LifecycleAwareConfigurationInstance;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -31,7 +33,6 @@ import org.mule.tck.size.SmallTest;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -77,6 +78,9 @@ public class DefaultExecutionContextTestCase extends AbstractMuleTestCase {
   @Mock
   private StreamingManager streamingManager;
 
+  @Mock
+  private ConfigurationState configurationState;
+
   private Object configurationInstance = new Object();
   private ConfigurationInstance configuration;
   private DefaultExecutionContext<OperationModel> operationContext;
@@ -84,8 +88,13 @@ public class DefaultExecutionContextTestCase extends AbstractMuleTestCase {
 
   @Before
   public void before() {
-    configuration = new LifecycleAwareConfigurationInstance(CONFIG_NAME, configurationModel, configurationInstance, emptyList(),
-                                                            Optional.empty());
+    configuration =
+        new LifecycleAwareConfigurationInstance(CONFIG_NAME,
+                                                configurationModel,
+                                                configurationInstance,
+                                                event -> configurationState,
+                                                emptyList(),
+                                                empty());
     Map<String, Object> parametersMap = new HashMap<>();
     parametersMap.put(PARAM_NAME, VALUE);
     when(resolverSetResult.asMap()).thenReturn(parametersMap);

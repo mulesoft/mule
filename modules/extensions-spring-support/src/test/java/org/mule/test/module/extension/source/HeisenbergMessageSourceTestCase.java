@@ -10,31 +10,39 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.SOURCE_ERROR_RESPONSE_GENERATE;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.SOURCE_ERROR_RESPONSE_SEND;
 import static org.mule.tck.junit4.matcher.ErrorTypeMatcher.errorType;
 import static org.mule.tck.junit4.matcher.IsEmptyOptional.empty;
 import static org.mule.tck.probe.PollingProber.probe;
+import static org.mule.test.heisenberg.extension.HeisenbergConnectionProvider.SAUL_OFFICE_NUMBER;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.sourceTimesStarted;
 import static org.mule.test.heisenberg.extension.HeisenbergSource.CORE_POOL_SIZE_ERROR_MESSAGE;
 import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatus.ERROR_BODY;
 import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatus.ERROR_INVOKE;
 import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatus.SUCCESS;
 import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
+import static org.mule.test.heisenberg.extension.model.HealthStatus.CANCER;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationState;
+import org.mule.runtime.extension.api.runtime.config.ConfiguredComponent;
 import org.mule.runtime.extension.api.runtime.source.ParameterizedSource;
 import org.mule.test.heisenberg.extension.HeisenbergSource;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
+import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Optional;
 
+import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -198,6 +206,37 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
     Map<String, Object> parameters = source.getInitialisationParameters();
     assertThat(parameters.get("initialBatchNumber"), is(0));
     assertThat(parameters.get("corePoolSize"), is(1));
+  }
+
+  @Test
+  public void obtainSourceConfigParameters() throws Exception {
+    ConfigurationComponentLocator locator = muleContext.getRegistry().lookupObject(ConfigurationComponentLocator.class);
+    AnnotatedObject element = locator.find(Location.builder().globalName("source").addSourcePart().build()).get();
+    assertThat(element, is(instanceOf(ConfiguredComponent.class)));
+
+    ConfiguredComponent source = (ConfiguredComponent) element;
+    ConfigurationState configurationState = source.getConfigurationInstance().get().getState(testEvent());
+
+    Map<String, Object> configParameters = configurationState.getConfigParameters();
+
+    assertThat(configParameters.size(), is(13));
+    assertParameter(configParameters, "enemies", hasSize(0));
+    assertParameter(configParameters, "monthlyIncomes", hasSize(2));
+    assertParameter(configParameters, "cancer", is(true));
+    assertParameter(configParameters, "money", equalTo(new BigDecimal("0")));
+    assertParameter(configParameters, "initialHealth", is(CANCER));
+    assertParameter(configParameters, "endingHealth", is(CANCER));
+    assertParameter(configParameters, "name", is("Heisenberg"));
+    assertParameter(configParameters, "age", is(50));
+    assertParameter(configParameters, "brotherInLaw", is(notNullValue()));
+
+    Map<String, Object> connectionParameters = configurationState.getConnectionParameters();
+    assertThat(connectionParameters.size(), is(1));
+    assertParameter(connectionParameters, "saulPhoneNumber", equalTo(SAUL_OFFICE_NUMBER));
+  }
+
+  private void assertParameter(Map<String, Object> parameters, String propertyName, Matcher matcher) {
+    assertThat(parameters.get(propertyName), matcher);
   }
 
   protected void startFlow(String flowName) throws Exception {

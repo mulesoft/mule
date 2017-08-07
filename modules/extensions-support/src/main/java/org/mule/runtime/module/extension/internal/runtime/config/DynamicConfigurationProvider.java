@@ -28,10 +28,10 @@ import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.util.Pair;
-import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
-import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
-import org.mule.runtime.extension.api.runtime.ConfigurationStats;
-import org.mule.runtime.extension.api.runtime.ExpirableConfigurationProvider;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
+import org.mule.runtime.extension.api.runtime.config.ExpirableConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
@@ -156,7 +156,7 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
 
   private ConfigurationInstance createConfiguration(ResolverSetResult result, Event event) throws MuleException {
     ConfigurationInstance configuration = configurationInstanceFactory
-        .createConfiguration(getName(), result, ofNullable(connectionProviderResolver.resolve(from(event))));
+        .createConfiguration(getName(), result, event, ofNullable(connectionProviderResolver));
 
     registerConfiguration(configuration);
 

@@ -12,8 +12,9 @@ import static java.util.stream.Collectors.toList;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
-import org.mule.runtime.extension.api.runtime.ConfigurationStats;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationState;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
 import org.mule.runtime.extension.api.runtime.Interceptable;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
@@ -110,6 +111,11 @@ class PrecalculatedExecutionContextAdapter extends AbstractExecutionContextAdapt
     @Override
     public Object getValue() {
       return decorated.getValue();
+    }
+
+    @Override
+    public ConfigurationState getState(Object event) {
+      return decorated.getState(event);
     }
 
     @Override
