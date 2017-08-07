@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.api.security;
 
+import org.mule.runtime.api.security.SecurityContext;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.core.api.Event;
 

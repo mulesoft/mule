@@ -28,7 +28,6 @@ import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.ErrorTypeLocator;
 import org.mule.runtime.core.api.execution.MessageProcessContext;
 import org.mule.runtime.core.api.execution.MessageProcessingManager;
@@ -141,8 +140,9 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
       try {
         sourceAdapter.stop();
       } catch (Exception e) {
-        throw new DefaultMuleException(format("Found exception stopping source '%s' of flow '%s'", sourceAdapter.getName(),
-                                              flowConstruct.getName()),
+        throw new DefaultMuleException(format("Found exception stopping source '%s' of root component '%s'",
+                                              sourceAdapter.getName(),
+                                              getLocation().getRootContainerName()),
                                        e);
       }
     }
@@ -159,7 +159,6 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
         .setConfigurationInstance(getConfigurationInstance().orElse(null))
         .setTransactionConfig(transactionConfig.get())
         .setSource(this)
-        .setFlowConstruct(flowConstruct)
         .setListener(messageProcessor)
         .setProcessingManager(messageProcessingManager)
         .setMuleContext(muleContext)
@@ -175,8 +174,8 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     Optional<ConnectionException> connectionException = extractConnectionException(exception);
     if (connectionException.isPresent()) {
       try {
-        LOGGER.warn(format("Message source '%s' on flow '%s' threw exception. Restarting...", sourceAdapter.getName(),
-                           flowConstruct.getName()),
+        LOGGER.warn(format("Message source '%s' on root component '%s' threw exception. Restarting...", sourceAdapter.getName(),
+                           getLocation().getRootContainerName()),
                     exception);
         restart();
       } catch (Throwable e) {
@@ -188,8 +187,8 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   }
 
   private void notifyExceptionAndShutDown(Throwable exception) {
-    LOGGER.error(format("Message source on flow '%s' threw exception. Shutting down it forever...",
-                        flowConstruct.getName()),
+    LOGGER.error(format("Message source on root component '%s' threw exception. Shutting down it forever...",
+                        getLocation().getRootContainerName()),
                  exception);
     shutdown();
   }
@@ -201,8 +200,8 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
         disposeSource();
         startSource();
       } else {
-        LOGGER.warn(format("Message source '%s' on flow '%s' is stopped. Not doing restart", sourceAdapter.getName(),
-                           flowConstruct.getName()));
+        LOGGER.warn(format("Message source '%s' on root component '%s' is stopped. Not doing restart", sourceAdapter.getName(),
+                           getLocation().getRootContainerName()));
       }
     }
   }
@@ -243,7 +242,9 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     try {
       stopIfNeeded(this);
     } catch (Exception e) {
-      LOGGER.error(format("Failed to stop source '%s' on flow '%s'", sourceAdapter.getName(), flowConstruct.getName()), e);
+      LOGGER
+          .error(format("Failed to stop source '%s' on flow '%s'", sourceAdapter.getName(), getLocation().getRootContainerName()),
+                 e);
     }
     disposeIfNeeded(this, LOGGER);
   }
@@ -295,11 +296,6 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
       @Override
       public MessageSource getMessageSource() {
         return ExtensionMessageSource.this;
-      }
-
-      @Override
-      public FlowConstruct getFlowConstruct() {
-        return flowConstruct;
       }
 
       @Override
@@ -370,9 +366,9 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     if (!configurationModel.getSourceModel(sourceModel.getName()).isPresent()
         && !configurationProvider.getExtensionModel().getSourceModel(sourceModel.getName()).isPresent()) {
       throw new IllegalSourceException(format(
-                                              "Flow '%s' defines an usage of operation '%s' which points to configuration '%s'. "
+                                              "Root component '%s' defines an usage of operation '%s' which points to configuration '%s'. "
                                                   + "The selected config does not support that operation.",
-                                              flowConstruct.getName(), sourceModel.getName(),
+                                              getLocation().getRootContainerName(), sourceModel.getName(),
                                               configurationProvider.getName()));
     }
   }

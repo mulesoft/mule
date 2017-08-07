@@ -71,7 +71,7 @@ public class TransactionalOperationTestCase extends AbstractExtensionFunctionalT
   @Test
   public void pagedOperationInTx() throws Exception {
     Event event = flowRunner("pagedOperationInTx").run();
-    Collection<Integer> accumulator = (Collection<Integer>) event.getVariable("accumulator").getValue();
+    Collection<Integer> accumulator = (Collection<Integer>) event.getVariables().get("accumulator").getValue();
     assertThat(accumulator, is(notNullValue()));
     assertThat(accumulator, hasSize(2));
 
@@ -85,7 +85,7 @@ public class TransactionalOperationTestCase extends AbstractExtensionFunctionalT
   @Test
   public void pagedOperationWithoutTx() throws Exception {
     Event event = flowRunner("pagedOperationWithoutTx").run();
-    Collection<Integer> accumulator = (Collection<Integer>) event.getVariable("accumulator").getValue();
+    Collection<Integer> accumulator = (Collection<Integer>) event.getVariables().get("accumulator").getValue();
     assertThat(accumulator, is(notNullValue()));
     assertThat(accumulator, hasSize(2));
 

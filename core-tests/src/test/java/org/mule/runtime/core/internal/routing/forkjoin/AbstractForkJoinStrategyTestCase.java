@@ -34,7 +34,6 @@ import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException
 import static reactor.core.publisher.Flux.fromIterable;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.Event;
@@ -253,8 +252,8 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
     Event result =
         from(strategy.forkJoin(original, fromIterable(asList(pair1, pair2)), processingStrategy, 2, true)).block();
 
-    assertThat(result.getVariableNames(), hasSize(3));
-    assertThat(result.getVariableNames(), hasItems(beforeVarName, fooVarName, foo2VarName));
+    assertThat(result.getVariables().keySet(), hasSize(3));
+    assertThat(result.getVariables().keySet(), hasItems(beforeVarName, fooVarName, foo2VarName));
   }
 
   @Test

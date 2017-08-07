@@ -7,16 +7,18 @@
 package org.mule.runtime.core.privileged.processor.chain;
 
 import static java.util.Collections.singletonList;
-
+import static java.util.Optional.ofNullable;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.processor.ReferenceProcessor;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * <p>
@@ -80,13 +82,15 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
     if (tempList.size() == 1 && tempList.get(0) instanceof SimpleMessageProcessorChain) {
       return (MessageProcessorChain) tempList.get(0);
     } else {
-      return new SimpleMessageProcessorChain("(inner chain) of " + name, new ArrayList<>(tempList));
+      return new SimpleMessageProcessorChain("(inner chain) of " + name, ofNullable(processingStrategy),
+                                             new ArrayList<>(tempList));
     }
   }
 
   protected MessageProcessorChain createInterceptingChain(Processor head, List<Processor> processors,
                                                           List<Processor> processorsForLifecycle) {
-    return new DefaultMessageProcessorChain("(outer intercepting chain) of " + name, head, processors, processorsForLifecycle);
+    return new DefaultMessageProcessorChain("(outer intercepting chain) of " + name, ofNullable(processingStrategy), head,
+                                            processors, processorsForLifecycle);
   }
 
   @Override
@@ -124,8 +128,9 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
 
   static class SimpleMessageProcessorChain extends AbstractMessageProcessorChain {
 
-    SimpleMessageProcessorChain(String name, List<Processor> processors) {
-      super(name, processors);
+    SimpleMessageProcessorChain(String name, Optional<ProcessingStrategy> processingStrategyOptional,
+                                List<Processor> processors) {
+      super(name, processingStrategyOptional, processors);
     }
 
   }
@@ -135,9 +140,10 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
     private Processor head;
     private List<Processor> processorsForLifecycle;
 
-    protected DefaultMessageProcessorChain(String name, Processor head, List<Processor> processors,
+    protected DefaultMessageProcessorChain(String name, Optional<ProcessingStrategy> processingStrategyOptional, Processor head,
+                                           List<Processor> processors,
                                            List<Processor> processorsForLifecycle) {
-      super(name, processors);
+      super(name, processingStrategyOptional, processors);
       this.head = head;
       this.processorsForLifecycle = processorsForLifecycle;
     }

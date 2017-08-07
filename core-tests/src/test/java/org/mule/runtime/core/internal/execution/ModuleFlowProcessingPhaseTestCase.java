@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.execution;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.argThat;
@@ -18,6 +19,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.SOURCE_ERROR_RESPONSE_GENERATE;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.SOURCE_ERROR_RESPONSE_SEND;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.SOURCE_RESPONSE_GENERATE;
@@ -34,9 +36,10 @@ import static org.mule.tck.junit4.matcher.MessagingExceptionMatcher.withEventTha
 import static reactor.core.publisher.Mono.create;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.just;
-
+import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
@@ -47,9 +50,9 @@ import org.mule.runtime.core.api.execution.MessageProcessContext;
 import org.mule.runtime.core.api.message.ErrorBuilder;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.message.ErrorTypeBuilder;
-import org.mule.runtime.core.internal.policy.SourcePolicyFailureResult;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.internal.policy.SourcePolicy;
+import org.mule.runtime.core.internal.policy.SourcePolicyFailureResult;
 import org.mule.runtime.core.internal.policy.SourcePolicySuccessResult;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.matcher.EventMatcher;
@@ -125,7 +128,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     moduleFlowProcessingPhase = new ModuleFlowProcessingPhase(policyManager);
     initialiseIfNeeded(moduleFlowProcessingPhase, muleContext);
 
-    flow = mock(FlowConstruct.class);
+    flow = mock(FlowConstruct.class, withSettings().extraInterfaces(AnnotatedObject.class));
     final MessagingExceptionHandler exceptionHandler = mock(MessagingExceptionHandler.class);
     when(flow.getExceptionListener()).thenReturn(exceptionHandler);
     when(exceptionHandler.apply(any()))
@@ -133,11 +136,11 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     when(flow.getMuleContext()).thenReturn(muleContext);
 
     context = mock(MessageProcessContext.class);
-    when(context.getFlowConstruct()).thenReturn(flow);
     final MessageSource source = mock(MessageSource.class);
-    when(source.getLocation()).thenReturn(fromSingleComponent("/0"));
+    when(source.getRootContainerName()).thenReturn("root");
     when(context.getMessageSource()).thenReturn(source);
     when(context.getTransactionConfig()).thenReturn(empty());
+    when(muleContext.getConfigurationComponentLocator().find(any(Location.class))).thenReturn(of(flow));
 
     template = mock(ModuleFlowProcessingPhaseTemplate.class);
     when(template.getMessage()).thenReturn(Message.of(null));

@@ -27,7 +27,6 @@ import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STOPPED;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static reactor.core.publisher.Mono.just;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.lifecycle.LifecycleException;
@@ -163,10 +162,10 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
 
   private void assertSucessfulProcessing(Event response) throws MuleException {
     assertThat(response.getMessageAsString(muleContext), equalTo(TEST_PAYLOAD + "abcdef"));
-    assertThat(response.getVariable("thread").getValue(), not(sameInstance(currentThread())));
+    assertThat(response.getVariables().get("thread").getValue(), not(sameInstance(currentThread())));
 
     assertThat(sensingMessageProcessor.event.getMessageAsString(muleContext), equalTo(TEST_PAYLOAD + "abc"));
-    assertThat(sensingMessageProcessor.event.getVariable("thread").getValue(), not(sameInstance(currentThread())));
+    assertThat(sensingMessageProcessor.event.getVariables().get("thread").getValue(), not(sameInstance(currentThread())));
   }
 
   @Test

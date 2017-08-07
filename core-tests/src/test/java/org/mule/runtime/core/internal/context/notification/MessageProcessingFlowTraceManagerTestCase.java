@@ -224,7 +224,7 @@ public class MessageProcessingFlowTraceManagerTestCase extends AbstractMuleTestC
     manager.onPipelineNotificationStart(buildPipelineNotification(eventCopy, asyncFlowName));
     manager.onMessageProcessorNotificationPreInvoke(buildProcessorNotification(eventCopy, createMockProcessor("/asyncComp")));
 
-    assertThat(event.getContext().getProcessorsTrace(),
+    assertThat(event.getInternalContext().getProcessorsTrace(),
                hasExecutedProcessors("/comp @ " + APP_ID + ":null:null", "/asyncComp @ " + APP_ID + ":null:null"));
   }
 
@@ -301,7 +301,7 @@ public class MessageProcessingFlowTraceManagerTestCase extends AbstractMuleTestC
 
     manager.onPipelineNotificationComplete(pipelineNotification);
 
-    assertThat(event.getContext().getProcessorsTrace(),
+    assertThat(event.getInternalContext().getProcessorsTrace(),
                hasExecutedProcessors("/scatter-gather @ " + APP_ID + ":null:null", "/route_0 @ " + APP_ID + ":null:null",
                                      NESTED_FLOW_NAME + "_ref @ " + APP_ID + ":null:null",
                                      "/route_1 @ " + APP_ID + ":null:null"));
@@ -341,6 +341,7 @@ public class MessageProcessingFlowTraceManagerTestCase extends AbstractMuleTestC
   protected Event buildEvent(String eventId, FlowCallStack flowStack) {
     Event event = mock(Event.class);
     when(event.getContext()).thenReturn(messageContext);
+    when(event.getInternalContext()).thenReturn(messageContext);
     when(event.getFlowCallStack()).thenReturn(flowStack);
     return event;
   }

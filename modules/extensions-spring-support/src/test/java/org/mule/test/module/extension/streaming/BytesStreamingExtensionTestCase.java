@@ -110,8 +110,8 @@ public class BytesStreamingExtensionTestCase extends AbstractStreamingExtensionT
   @Description("Rewing a stream and consume it twice")
   public void rewind() throws Exception {
     Event result = flowRunner("rewind").withPayload(data).run();
-    Message firstRead = (Message) result.getVariable("firstRead").getValue();
-    Message secondRead = (Message) result.getVariable("secondRead").getValue();
+    Message firstRead = (Message) result.getVariables().get("firstRead").getValue();
+    Message secondRead = (Message) result.getVariables().get("secondRead").getValue();
 
     assertThat(firstRead.getPayload().getValue(), equalTo(data));
     assertThat(secondRead.getPayload().getValue(), equalTo(data));

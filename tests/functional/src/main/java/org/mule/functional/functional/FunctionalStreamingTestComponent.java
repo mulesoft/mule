@@ -9,14 +9,13 @@ package org.mule.functional.functional;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.IOUtils.ifInputStream;
 import static org.mule.runtime.core.api.util.StringMessageUtils.getBoilerPlate;
-
 import org.mule.functional.api.component.EventCallback;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.Processor;
@@ -40,7 +39,7 @@ import org.slf4j.LoggerFactory;
  *
  * @see EventCallback
  */
-public abstract class FunctionalStreamingTestComponent implements Processor, MuleContextAware, FlowConstructAware {
+public abstract class FunctionalStreamingTestComponent extends AbstractAnnotatedObject implements Processor, MuleContextAware {
 
   protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -53,7 +52,6 @@ public abstract class FunctionalStreamingTestComponent implements Processor, Mul
   private String summary = null;
   private long targetSize = -1;
 
-  private FlowConstruct flowConstruct;
   private MuleContext muleContext;
 
   public FunctionalStreamingTestComponent() {
@@ -158,7 +156,7 @@ public abstract class FunctionalStreamingTestComponent implements Processor, Mul
 
     summary = result.toString();
 
-    String msg = getBoilerPlate("Message Received in service: " + flowConstruct.getName() + ". " + summary
+    String msg = getBoilerPlate("Message Received in service: " + this.getLocation().getRootContainerName() + ". " + summary
         + "\n callback: " + eventCallback, '*', 80);
 
     logger.info(msg);
@@ -176,11 +174,6 @@ public abstract class FunctionalStreamingTestComponent implements Processor, Mul
   @Override
   public void setMuleContext(MuleContext context) {
     this.muleContext = context;
-  }
-
-  @Override
-  public void setFlowConstruct(FlowConstruct flowConstruct) {
-    this.flowConstruct = flowConstruct;
   }
 
   /**

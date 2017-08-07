@@ -8,7 +8,6 @@ package org.mule.runtime.core.api.processor;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setFlowConstructIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
@@ -17,8 +16,6 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 
 import java.util.List;
@@ -32,12 +29,11 @@ import org.slf4j.LoggerFactory;
  * An object that owns Mule objects and delegates startup/shutdown events to them.
  */
 public abstract class AbstractMuleObjectOwner<T> extends AbstractAnnotatedObject
-    implements Lifecycle, MuleContextAware, FlowConstructAware {
+    implements Lifecycle, MuleContextAware {
 
   // TODO MULE-10332: Review MuleContextAware vs @Inject usage
   @Inject
   protected MuleContext muleContext;
-  protected FlowConstruct flowConstruct;
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
   @Override
@@ -46,25 +42,14 @@ public abstract class AbstractMuleObjectOwner<T> extends AbstractAnnotatedObject
     setMuleContextIfNeeded(getOwnedObjects(), muleContext);
   }
 
-  @Override
-  public void setFlowConstruct(FlowConstruct flowConstruct) {
-    this.flowConstruct = flowConstruct;
-    setFlowConstructIfNeeded(getOwnedObjects(), flowConstruct);
-  }
-
   public MuleContext getMuleContext() {
     return muleContext;
-  }
-
-  public FlowConstruct getFlowConstruct() {
-    return flowConstruct;
   }
 
   @Override
   public void initialise() throws InitialisationException {
     // TODO TMULE-10764 This shouldn't happen here.
     setMuleContext(muleContext);
-    setFlowConstruct(flowConstruct);
     initialiseIfNeeded(getOwnedObjects(), true, muleContext);
   }
 

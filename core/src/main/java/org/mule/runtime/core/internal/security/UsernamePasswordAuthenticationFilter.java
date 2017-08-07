@@ -19,7 +19,7 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.security.DefaultMuleAuthentication;
 import org.mule.runtime.core.api.security.DefaultMuleCredentials;
-import org.mule.runtime.core.api.security.SecurityContext;
+import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.security.UnauthorisedException;
 import org.mule.runtime.core.api.security.AbstractAuthenticationFilter;

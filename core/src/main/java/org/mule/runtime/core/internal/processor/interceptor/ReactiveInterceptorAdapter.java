@@ -15,7 +15,6 @@ import static org.mule.runtime.core.internal.interception.DefaultInterceptionEve
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_PARAMS;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.fromFuture;
-
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -43,6 +42,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+
 
 
 /**
@@ -149,7 +149,7 @@ public class ReactiveInterceptorAdapter
   }
 
   private Map<String, Object> getResolvedParams(final Event eventWithResolvedParams) {
-    return (Map<String, Object>) eventWithResolvedParams.getParameters().get(INTERCEPTION_RESOLVED_PARAMS).getValue();
+    return (Map<String, Object>) eventWithResolvedParams.getInternalParameters().get(INTERCEPTION_RESOLVED_PARAMS);
   }
 
   private Function<Event, Event> doAfter(ComponentLocation componentLocation, ProcessorInterceptor interceptor,
@@ -176,10 +176,10 @@ public class ReactiveInterceptorAdapter
   }
 
   private Event addResolvedParameters(Event event, Processor component, Map<String, String> dslParameters) {
-    boolean sameComponent = event.getParameters().containsKey(INTERCEPTION_COMPONENT)
-        ? component.equals(event.getParameters().get(INTERCEPTION_COMPONENT).getValue()) : false;
+    boolean sameComponent = event.getInternalParameters().containsKey(INTERCEPTION_COMPONENT)
+        ? component.equals(event.getInternalParameters().get(INTERCEPTION_COMPONENT)) : false;
 
-    if (!sameComponent || !event.getParameters().containsKey(INTERCEPTION_RESOLVED_PARAMS)) {
+    if (!sameComponent || !event.getInternalParameters().containsKey(INTERCEPTION_RESOLVED_PARAMS)) {
       return resolveParameters(removeResolvedParameters(event), component, dslParameters);
     } else {
       return event;
@@ -187,20 +187,20 @@ public class ReactiveInterceptorAdapter
   }
 
   private Event removeResolvedParameters(Event event) {
-    if (event.getParameters().containsKey(INTERCEPTION_RESOLVED_CONTEXT)) {
-      Processor processor = (Processor) event.getParameters().get(INTERCEPTION_COMPONENT).getValue();
+    if (event.getInternalParameters().containsKey(INTERCEPTION_RESOLVED_CONTEXT)) {
+      Processor processor = (Processor) event.getInternalParameters().get(INTERCEPTION_COMPONENT);
 
       if (processor instanceof ParametersResolverProcessor) {
         ((ParametersResolverProcessor) processor)
-            .disposeResolvedParameters((ExecutionContext<OperationModel>) event.getParameters().get(INTERCEPTION_RESOLVED_CONTEXT)
-                .getValue());
+            .disposeResolvedParameters((ExecutionContext<OperationModel>) event.getInternalParameters()
+                .get(INTERCEPTION_RESOLVED_CONTEXT));
       }
     }
 
     return Event.builder(event)
-        .removeParameter(INTERCEPTION_RESOLVED_PARAMS)
-        .removeParameter(INTERCEPTION_COMPONENT)
-        .removeParameter(INTERCEPTION_RESOLVED_CONTEXT)
+        .removeInternalParameter(INTERCEPTION_RESOLVED_PARAMS)
+        .removeInternalParameter(INTERCEPTION_COMPONENT)
+        .removeInternalParameter(INTERCEPTION_RESOLVED_CONTEXT)
         .build();
   }
 
@@ -233,6 +233,6 @@ public class ReactiveInterceptorAdapter
     interceptionEventParams.put(INTERCEPTION_RESOLVED_PARAMS, resolvedParameters);
     interceptionEventParams.put(INTERCEPTION_COMPONENT, processor);
 
-    return Event.builder(event).parameters(interceptionEventParams).build();
+    return Event.builder(event).internalParameters(interceptionEventParams).build();
   }
 }

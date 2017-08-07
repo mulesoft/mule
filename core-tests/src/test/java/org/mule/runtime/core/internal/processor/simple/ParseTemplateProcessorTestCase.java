@@ -143,7 +143,8 @@ public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
 
     Event response = parseTemplateProcessor.process(mockMuleEvent);
     assertNotNull(response);
-    assertEquals(payload, (String) response.getMessage().getPayload().getValue());
-    assertEquals("Parsed", (String) ((Message) response.getVariable("some_target_variable").getValue()).getPayload().getValue());
+    assertEquals(payload, response.getMessage().getPayload().getValue());
+    assertEquals("Parsed",
+                 ((Message) response.getVariables().get("some_target_variable").getValue()).getPayload().getValue());
   }
 }

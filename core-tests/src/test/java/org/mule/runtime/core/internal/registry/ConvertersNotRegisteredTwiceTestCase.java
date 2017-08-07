@@ -69,4 +69,7 @@ public class ConvertersNotRegisteredTwiceTestCase extends AbstractMuleContextTes
     Set<T> noDuplicates = new HashSet<>(collection);
     assertThat(noDuplicates, hasSize(collection.size()));
   }
+
+  @Override
+  protected void createTestFlow(MuleContext context) {}
 }

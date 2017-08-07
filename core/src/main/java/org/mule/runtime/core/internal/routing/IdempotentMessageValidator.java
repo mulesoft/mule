@@ -15,10 +15,9 @@ import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.el.BindingContextUtils.CORRELATION_ID;
-import static org.mule.runtime.core.el.BindingContextUtils.NULL_BINDING_CONTEXT;
+import static org.mule.runtime.internal.el.BindingContextUtils.CORRELATION_ID;
+import static org.mule.runtime.internal.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -33,7 +32,6 @@ import org.mule.runtime.api.store.ObjectStoreSettings;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
@@ -42,21 +40,20 @@ import org.mule.runtime.core.api.routing.DuplicateMessageException;
 import org.slf4j.Logger;
 
 /**
- * <code>IdempotentMessageValidator</code> ensures that only unique messages are passed on. It does this by checking the
- * unique ID of the incoming message. To compute the unique ID an expression or DW script can be used, even Crypto functions
- * from DW capable of computing hashes(SHA,MD5) from the data. Note that the underlying endpoint must support unique
- * message IDs for this to work, otherwise a <code>UniqueIdNotSupportedException</code> is thrown.<br>
+ * <code>IdempotentMessageValidator</code> ensures that only unique messages are passed on. It does this by checking the unique ID
+ * of the incoming message. To compute the unique ID an expression or DW script can be used, even Crypto functions from DW capable
+ * of computing hashes(SHA,MD5) from the data. Note that the underlying endpoint must support unique message IDs for this to work,
+ * otherwise a <code>UniqueIdNotSupportedException</code> is thrown.<br>
  * <p>
  * <b>EIP Reference:</b> <a href="http://www.eaipatterns.com/IdempotentReceiver.html">
  * http://www.eaipatterns.com/IdempotentReceiver.html</a>
  */
 public class IdempotentMessageValidator extends AbstractAnnotatedObject
-    implements Processor, MuleContextAware, FlowConstructAware, Initialisable, Disposable {
+    implements Processor, MuleContextAware, Initialisable, Disposable {
 
   private static final Logger LOGGER = getLogger(IdempotentMessageValidator.class);
 
   protected MuleContext muleContext;
-  protected FlowConstruct flowConstruct;
 
   protected volatile ObjectStore<String> store;
   protected String storePrefix;
@@ -70,15 +67,11 @@ public class IdempotentMessageValidator extends AbstractAnnotatedObject
   }
 
   @Override
-  public void setFlowConstruct(FlowConstruct flowConstruct) {
-    this.flowConstruct = flowConstruct;
-  }
-
-  @Override
   public void initialise() throws InitialisationException {
     if (storePrefix == null) {
       storePrefix =
-          format("%s.%s.%s", muleContext.getConfiguration().getId(), flowConstruct.getName(), this.getClass().getName());
+          format("%s.%s.%s", muleContext.getConfiguration().getId(), getLocation().getRootContainerName(),
+                 this.getClass().getName());
     }
     if (store == null) {
       this.store = createMessageIdStore();
@@ -170,7 +163,7 @@ public class IdempotentMessageValidator extends AbstractAnnotatedObject
       }
       return !store.contains(id);
     } catch (MuleException e) {
-      LOGGER.error("Exception attempting to determine idempotency of incoming message for " + flowConstruct.getName()
+      LOGGER.error("Exception attempting to determine idempotency of incoming message for " + getLocation().getRootContainerName()
           + " from the connector "
           + event.getContext().getOriginatingLocation().getComponentIdentifier().getIdentifier().getNamespace(), e);
       return false;

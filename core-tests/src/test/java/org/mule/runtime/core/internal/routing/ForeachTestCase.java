@@ -230,7 +230,8 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
     expectedException.expect(is(MessagingException.class));
     expectedException.expect(new FailingProcessorMatcher(failingProcessor));
     expectedException.expectCause(is(throwable));
-    process(foreach, eventBuilder().message(of(new DummyNestedIterableClass().iterator())).build(), false);
+    process(foreach, eventBuilder().message(of(new DummyNestedIterableClass().iterator())).build(),
+            false);
   }
 
   @Test
@@ -243,7 +244,8 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
     foreach.setIgnoreErrorType("ANY");
     foreach.initialise();
 
-    process(foreach, eventBuilder().message(of(new DummyNestedIterableClass().iterator())).build(), false);
+    process(foreach, eventBuilder().message(of(new DummyNestedIterableClass().iterator())).build(),
+            false);
   }
 
   @Test
@@ -257,7 +259,8 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
     expectedException.expect(instanceOf(MessagingException.class));
     expectedException.expect(new FailingProcessorMatcher(foreach));
     expectedException.expectCause(instanceOf(ExpressionRuntimeException.class));
-    process(foreach, eventBuilder().message(of(new DummyNestedIterableClass().iterator())).build(), false);
+    process(foreach, eventBuilder().message(of(new DummyNestedIterableClass().iterator())).build(),
+            false);
   }
 
   @Test
@@ -286,7 +289,8 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
     foreachMp.setCollectionExpression("vars.collection");
     foreachMp.initialise();
 
-    foreachMp.process(eventBuilder().addVariable("collection", asList(1, 2, 3)).message(of(null)).build());
+    foreachMp
+        .process(eventBuilder().addVariable("collection", asList(1, 2, 3)).message(of(null)).build());
 
     assertThat(processedEvents, hasSize(2));
     assertThat(processedEvents.get(0).getMessageAsString(muleContext), is("[1, 2]:foo:zas"));

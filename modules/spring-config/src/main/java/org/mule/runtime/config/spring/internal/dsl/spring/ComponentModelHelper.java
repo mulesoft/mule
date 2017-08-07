@@ -10,7 +10,6 @@ import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
 import static org.mule.runtime.config.spring.api.dsl.model.ApplicationModel.FLOW_IDENTIFIER;
-
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.config.spring.api.dsl.model.ComponentModel;
@@ -125,13 +124,17 @@ public class ComponentModelHelper {
       // This is the case of components that are references
       return;
     }
+    updateAnnotationValue(annotationKey, annotationValue, beanDefinition);
+  }
+
+  public static void updateAnnotationValue(QName annotationKey, Object annotationValue, BeanDefinition beanDefinition) {
     PropertyValue propertyValue =
         beanDefinition.getPropertyValues().getPropertyValue(AnnotatedObject.PROPERTY_NAME);
     Map<QName, Object> annotations;
     if (propertyValue == null) {
       annotations = new HashMap<>();
       propertyValue = new PropertyValue(AnnotatedObject.PROPERTY_NAME, annotations);
-      componentModel.getBeanDefinition().getPropertyValues().addPropertyValue(propertyValue);
+      beanDefinition.getPropertyValues().addPropertyValue(propertyValue);
     } else {
       annotations = (Map<QName, Object>) propertyValue.getValue();
     }

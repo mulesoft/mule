@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.core.el.mvel;
 
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
 import org.mule.mvel2.ParserConfiguration;
 import org.mule.mvel2.integration.VariableResolver;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 
 public class VariableVariableResolverFactory extends MuleBaseVariableResolverFactory {
 
@@ -31,7 +31,7 @@ public class VariableVariableResolverFactory extends MuleBaseVariableResolverFac
     if (event == null) {
       return false;
     }
-    return event.getVariableNames().contains(name)
+    return event.getVariables().containsKey(name)
         || (event.getSession() != null && event.getSession().getPropertyNamesAsSet().contains(name));
   }
 
@@ -39,7 +39,7 @@ public class VariableVariableResolverFactory extends MuleBaseVariableResolverFac
   @Override
   public VariableResolver getVariableResolver(String name) {
 
-    if (event != null && event.getVariableNames().contains(name)) {
+    if (event != null && event.getVariables().containsKey(name)) {
       return new FlowVariableVariableResolver(name);
     } else if (event != null && event.getSession().getPropertyNamesAsSet().contains(name)) {
       return new SessionVariableVariableResolver(name);
@@ -79,7 +79,7 @@ public class VariableVariableResolverFactory extends MuleBaseVariableResolverFac
 
     @Override
     public Object getValue() {
-      return event.getVariable(name).getValue();
+      return event.getVariables().get(name).getValue();
     }
 
     @Override

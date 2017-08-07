@@ -10,7 +10,6 @@ package org.mule.runtime.config.spring.internal.dsl.processor.factory;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.enricher.MessageEnricher;
@@ -21,11 +20,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * {@link ObjectFactory} to create a
- * {@link org.mule.runtime.core.internal.enricher.MessageEnricher}.
+ * {@link ObjectFactory} to create a {@link org.mule.runtime.core.internal.enricher.MessageEnricher}.
  */
 public class MessageEnricherObjectFactory extends AbstractAnnotatedObjectFactory<MessageEnricher>
-    implements MuleContextAware, FlowConstructAware {
+    implements MuleContextAware {
 
   private Processor messageProcessor;
   private String source;
@@ -59,15 +57,9 @@ public class MessageEnricherObjectFactory extends AbstractAnnotatedObjectFactory
     for (MessageEnricher.EnrichExpressionPair enrichExpressionPair : enrichExpressionPairs) {
       messageEnricher.addEnrichExpressionPair(enrichExpressionPair);
     }
-    messageEnricher.setFlowConstruct(flowConstruct);
     messageEnricher.setMuleContext(muleContext);
     messageEnricher.setMessageProcessor(messageProcessor);
     return messageEnricher;
-  }
-
-  @Override
-  public void setFlowConstruct(FlowConstruct flowConstruct) {
-    this.flowConstruct = flowConstruct;
   }
 
   @Override

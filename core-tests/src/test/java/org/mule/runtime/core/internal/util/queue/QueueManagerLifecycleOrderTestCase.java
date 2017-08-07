@@ -117,7 +117,7 @@ public class QueueManagerLifecycleOrderTestCase extends AbstractMuleTestCase {
   private class RecordingFlow extends DefaultFlowBuilder.DefaultFlow {
 
     public RecordingFlow(String name, MuleContext muleContext) {
-      super(name, muleContext, null, emptyList(), empty(), empty(), INITIAL_STATE_STARTED, DEFAULT_MAX_CONCURRENCY);
+      super(name, muleContext, null, emptyList(), empty(), empty(), INITIAL_STATE_STARTED, DEFAULT_MAX_CONCURRENCY, null);
     }
 
     @Override

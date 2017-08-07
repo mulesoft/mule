@@ -15,14 +15,12 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.getSimpleName;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.construct.FlowConstructInvalidException;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
@@ -72,12 +70,13 @@ public abstract class AbstractFlowConstruct extends AbstractAnnotatedObject impl
   private final String initialState;
 
   public AbstractFlowConstruct(String name, MuleContext muleContext, Optional<MessagingExceptionHandler> exceptionListener,
-                               String initialState) {
+                               String initialState, FlowConstructStatistics statistics) {
     this.muleContext = muleContext;
     this.name = name;
     this.exceptionListener = exceptionListener.orElse(muleContext.getDefaultErrorHandler());
     this.initialState = initialState;
     this.lifecycleManager = new FlowConstructLifecycleManager(this, muleContext);
+    this.statistics = statistics;
   }
 
   @Override
@@ -180,14 +179,13 @@ public abstract class AbstractFlowConstruct extends AbstractAnnotatedObject impl
     return statistics;
   }
 
-  protected void doInitialise() throws MuleException {
-    configureStatistics();
-  }
+  protected void doInitialise() throws MuleException {}
 
-  protected void configureStatistics() {
-    statistics = new DefaultFlowConstructStatistics(getConstructType(), name);
+  public static FlowConstructStatistics createFlowStatistics(String flowName, MuleContext muleContext) {
+    DefaultFlowConstructStatistics statistics = new DefaultFlowConstructStatistics("Flow", flowName);
     statistics.setEnabled(muleContext.getStatistics().isEnabled());
     muleContext.getStatistics().add(statistics);
+    return statistics;
   }
 
   protected void doStart() throws MuleException {
@@ -219,9 +217,6 @@ public abstract class AbstractFlowConstruct extends AbstractAnnotatedObject impl
   }
 
   protected void injectFlowConstructMuleContext(Object candidate) {
-    if (candidate instanceof FlowConstructAware) {
-      ((FlowConstructAware) candidate).setFlowConstruct(this);
-    }
     if (candidate instanceof MuleContextAware) {
       ((MuleContextAware) candidate).setMuleContext(muleContext);
     }

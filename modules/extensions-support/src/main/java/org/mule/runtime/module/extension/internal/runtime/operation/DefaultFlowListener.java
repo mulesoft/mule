@@ -24,8 +24,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Default implementatio of {@link FlowListener}.
  * <p>
- * It uses an {@link Event}'s response {@link Publisher} to suscribe to the event
- * termination and execute the necessary logic.
+ * It uses an {@link Event}'s response {@link Publisher} to suscribe to the event termination and execute the necessary logic.
  *
  * @since 4.0
  */
@@ -48,7 +47,7 @@ public class DefaultFlowListener implements FlowListener {
   public DefaultFlowListener(ExtensionModel extensionModel, OperationModel operationModel, Event event) {
     this.extensionModel = extensionModel;
     this.operationModel = operationModel;
-    from(event.getContext().getResponsePublisher()).doAfterTerminate((responseEvent, t) -> onTerminate(responseEvent, t))
+    from(event.getInternalContext().getResponsePublisher()).doAfterTerminate((responseEvent, t) -> onTerminate(responseEvent, t))
         .subscribe();
   }
 

@@ -15,17 +15,19 @@ import static org.mule.runtime.core.api.processor.MessageProcessors.newExplicitC
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedConsumer;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
-import static org.mule.runtime.core.internal.util.ProcessingStrategyUtils.isSynchronousProcessing;
 import static org.mule.runtime.core.internal.routing.FirstSuccessfulRoutingStrategy.validateMessageIsNotConsumable;
+import static org.mule.runtime.core.internal.util.ProcessingStrategyUtils.isSynchronousProcessing;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.fromIterable;
 import static reactor.core.publisher.Flux.just;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
+import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.api.processor.Processor;
@@ -60,6 +62,11 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
 
   @Inject
   private SchedulerService schedulerService;
+
+  @Inject
+  private ConfigurationComponentLocator componentLocator;
+
+  private FlowConstruct flowConstruct;
 
   /**
    * Timeout in milliseconds to be applied to each route. Values lower or equal to zero means no timeout
@@ -123,6 +130,8 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
   @Override
   public void initialise() throws InitialisationException {
     try {
+      flowConstruct = FlowConstruct.getFromAnnotatedObject(componentLocator, this);
+
       buildRouteChains();
 
       if (timeout <= 0) {
@@ -191,4 +200,7 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
     this.routes = routes;
   }
 
+  public void setComponentLocator(ConfigurationComponentLocator componentLocator) {
+    this.componentLocator = componentLocator;
+  }
 }

@@ -119,7 +119,7 @@ public class MessageProcessors {
    */
   public static Event processToApply(Event event, ReactiveProcessor processor) throws MuleException {
     try {
-      return just(event).transform(processor).switchIfEmpty(from(event.getContext().getResponsePublisher())).block();
+      return just(event).transform(processor).switchIfEmpty(from(event.getInternalContext().getResponsePublisher())).block();
     } catch (Throwable e) {
       throw rxExceptionToMuleException(e);
     }
@@ -147,7 +147,7 @@ public class MessageProcessors {
     try {
       return just(event)
           .transform(publisher -> from(publisher).then(request -> Mono
-              .from(internalProcessWithChildContext(request, processor, child(event.getContext(), empty()), false))))
+              .from(internalProcessWithChildContext(request, processor, child(event.getInternalContext(), empty()), false))))
           .block();
     } catch (Throwable e) {
       throw rxExceptionToMuleException(e);
@@ -167,7 +167,7 @@ public class MessageProcessors {
    */
   public static Publisher<Event> processWithChildContext(Event event, ReactiveProcessor processor,
                                                          Optional<ComponentLocation> componentLocation) {
-    return internalProcessWithChildContext(event, processor, child(event.getContext(), componentLocation), true);
+    return internalProcessWithChildContext(event, processor, child(event.getInternalContext(), componentLocation), true);
   }
 
   /**
@@ -186,7 +186,8 @@ public class MessageProcessors {
   public static Publisher<Event> processWithChildContext(Event event, ReactiveProcessor processor,
                                                          Optional<ComponentLocation> componentLocation,
                                                          MessagingExceptionHandler exceptionHandler) {
-    return internalProcessWithChildContext(event, processor, child(event.getContext(), componentLocation, exceptionHandler),
+    return internalProcessWithChildContext(event, processor,
+                                           child(event.getInternalContext(), componentLocation, exceptionHandler),
                                            true);
   }
 
@@ -200,11 +201,12 @@ public class MessageProcessors {
           }
         })
         .switchIfEmpty(from(child.getResponsePublisher()))
-        .map(result -> builder(event.getContext(), result).build())
-        .doOnError(MessagingException.class, me -> me.setProcessedEvent(builder(event.getContext(), me.getEvent()).build()))
+        .map(result -> builder(event.getInternalContext(), result).build())
+        .doOnError(MessagingException.class,
+                   me -> me.setProcessedEvent(builder(event.getInternalContext(), me.getEvent()).build()))
         .doOnSuccess(result -> {
           if (result == null && completeParentOnEmpty) {
-            event.getContext().success();
+            event.getInternalContext().success();
           }
         });
   }

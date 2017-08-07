@@ -12,7 +12,6 @@ import static java.lang.System.setProperty;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
-import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.apache.commons.io.FileUtils.copyFile;
@@ -110,11 +109,11 @@ import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.policy.PolicyParametrization;
 import org.mule.runtime.core.api.policy.PolicyPointcut;
 import org.mule.runtime.core.api.registry.MuleRegistry;
+import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.api.util.concurrent.Latch;
 import org.mule.runtime.core.internal.config.StartupContext;
-import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
 import org.mule.runtime.deployment.model.api.domain.Domain;
@@ -154,16 +153,7 @@ import org.mule.tck.probe.file.FileExists;
 import org.mule.tck.util.CompilerUtils.ExtensionCompiler;
 import org.mule.tck.util.CompilerUtils.JarCompiler;
 import org.mule.tck.util.CompilerUtils.SingleClassCompiler;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.mockito.verification.VerificationMode;
+import org.mule.test.runner.classloader.TestContainerModuleDiscoverer;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -175,10 +165,23 @@ import java.net.URL;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.mockito.verification.VerificationMode;
 
 @RunWith(Parameterized.class)
 public class DeploymentServiceTestCase extends AbstractMuleTestCase {
@@ -493,7 +496,9 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     applicationDeploymentListener = mock(DeploymentListener.class);
     domainDeploymentListener = mock(DeploymentListener.class);
-    moduleDiscoverer = new TestContainerModuleDiscoverer(singletonList(PRIVILEGED_EXTENSION_ARTIFACT_FULL_ID));
+    Set<String> privilegedArtifactIds = new HashSet<>();
+    privilegedArtifactIds.add(PRIVILEGED_EXTENSION_ARTIFACT_FULL_ID);
+    moduleDiscoverer = new TestContainerModuleDiscoverer(privilegedArtifactIds);
     moduleRepository = new DefaultModuleRepository(moduleDiscoverer);
     MuleArtifactResourcesRegistry muleArtifactResourcesRegistry =
         new MuleArtifactResourcesRegistry.Builder().moduleRepository(moduleRepository).build();
@@ -4172,7 +4177,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     mainFlow.process(Event.builder(DefaultEventContext.create(mainFlow, TEST_CONNECTOR_LOCATION))
         .message(muleMessage)
-        .flow(mainFlow).build());
+        .flow(mainFlow)
+        .build());
   }
 
   private void assertZombieApplication(String appId) {
@@ -4243,8 +4249,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     public Event process(Event event) throws MuleException {
       invocationCount++;
       String variableName = "policyParameter";
-      if (event.getVariableNames().contains(variableName)) {
-        policyParametrization += event.getVariable(variableName).getValue();
+      if (event.getVariables().keySet().contains(variableName)) {
+        policyParametrization += event.getVariables().get(variableName).getValue();
       }
 
       return event;

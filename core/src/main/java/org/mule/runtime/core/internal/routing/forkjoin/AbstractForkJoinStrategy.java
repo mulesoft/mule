@@ -10,14 +10,12 @@ package org.mule.runtime.core.internal.routing.forkjoin;
 import static java.lang.Long.MAX_VALUE;
 import static java.lang.String.format;
 import static java.time.Duration.ofMillis;
-import static java.util.OptionalInt.empty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.Event.builder;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContext;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrapCompositeException;
 import static reactor.core.publisher.Flux.from;
 import static reactor.util.concurrent.QueueSupplier.XS_BUFFER_SIZE;
-
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.exception.MessagingException;
@@ -31,11 +29,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.OptionalInt;
-import java.util.OptionalLong;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -124,8 +119,9 @@ public abstract class AbstractForkJoinStrategy implements ForkJoinStrategy {
 
   private Consumer<List<Event>> copyVars(Event.Builder result) {
     return list -> list.stream()
-        .forEach(event -> event.getVariableNames().stream()
-            .forEach(name -> result.addVariable(name, event.getVariable(name))));
+        .forEach(event -> event.getVariables().forEach((key, value) -> {
+          result.addVariable(key, value);
+        }));
   }
 
 

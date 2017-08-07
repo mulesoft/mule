@@ -8,7 +8,6 @@ package org.mule.runtime.core.el.context;
 
 import static java.util.Collections.emptyMap;
 import static org.mule.runtime.core.api.Event.getVariableValueOrNull;
-
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.el.ExtendedExpressionLanguageAdaptor;
 
@@ -49,7 +48,7 @@ public class EventVariablesMapContext extends AbstractMapContext<Object> {
 
   @Override
   public Set<String> keySet() {
-    return event.getVariableNames();
+    return event.getVariables().keySet();
   }
 
   @Override
@@ -61,10 +60,10 @@ public class EventVariablesMapContext extends AbstractMapContext<Object> {
   @Override
   public String toString() {
     Map<String, Object> map = new HashMap<>();
-    for (String key : event.getVariableNames()) {
-      Object value = event.getVariable(key) != null ? event.getVariable(key).getValue() : null;
-      map.put(key, value);
-    }
+    event.getVariables().forEach((key, value) -> {
+      Object object = value != null ? value.getValue() : null;
+      map.put(key, object);
+    });
     return map.toString();
   }
 }

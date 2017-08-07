@@ -69,13 +69,15 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
     fs.setFailureExpression("#[mel:payload is Integer]");
     fs.initialise();
 
-    assertThat(fs.process(eventBuilder().message(of("")).build()).getMessageAsString(muleContext), is("abc"));
+    assertThat(fs.process(eventBuilder().message(of("")).build()).getMessageAsString(muleContext),
+               is("abc"));
   }
 
   @Test
   public void testRouteReturnsNullEvent() throws Exception {
     Processor nullReturningMp = event -> null;
     FirstSuccessful fs = createFirstSuccessfulRouter(nullReturningMp);
+    fs.setAnnotations(getAppleFlowComponentLocationAnnotations());
     fs.initialise();
 
     assertThat(fs.process(testEvent()), nullValue());
@@ -85,6 +87,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
   public void testRouteReturnsNullMessage() throws Exception {
     Processor nullEventMp = event -> Event.builder(event).message(null).build();
     FirstSuccessful fs = createFirstSuccessfulRouter(nullEventMp);
+    fs.setAnnotations(getAppleFlowComponentLocationAnnotations());
     fs.initialise();
 
     try {
@@ -97,10 +100,10 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
 
   private FirstSuccessful createFirstSuccessfulRouter(Processor... processors) throws Exception {
     FirstSuccessful fs = new FirstSuccessful();
+    fs.setAnnotations(getAppleFlowComponentLocationAnnotations());
     final FlowConstruct flow = mock(FlowConstruct.class, withSettings().extraInterfaces(AnnotatedObject.class));
     when(flow.getMuleContext()).thenReturn(muleContext);
     when(((AnnotatedObject) flow).getLocation()).thenReturn(TEST_CONNECTOR_LOCATION);
-    fs.setFlowConstruct(flow);
     fs.setMuleContext(muleContext);
 
     fs.setRoutes(asList(processors));

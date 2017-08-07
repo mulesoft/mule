@@ -10,7 +10,7 @@ import static java.lang.String.format;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
-import org.mule.runtime.config.spring.privileged.dsl.processor.MessageProcessorChainFactoryBean;
+import org.mule.runtime.core.privileged.processor.objectfactory.MessageProcessorChainObjectFactory;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder;
@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public class ModuleOperationMessageProcessorChainFactoryBean extends MessageProcessorChainFactoryBean {
+public class ModuleOperationMessageProcessorChainFactoryBean extends MessageProcessorChainObjectFactory {
 
   private Map<String, String> properties = new HashMap<>();
   private Map<String, String> parameters = new HashMap<>();

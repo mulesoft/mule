@@ -9,29 +9,27 @@ package org.mule.runtime.core.internal.construct.processor;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
+import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.InternalMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.ObjectUtils;
 
 public class FlowConstructStatisticsMessageProcessor extends AbstractAnnotatedObject
-    implements Processor, FlowConstructAware, InternalMessageProcessor {
+    implements Processor, InternalMessageProcessor {
 
-  protected FlowConstruct flowConstruct;
+  protected FlowConstructStatistics flowConstructStatistics;
 
-  @Override
-  public Event process(Event event) throws MuleException {
-    if (flowConstruct.getStatistics().isEnabled()) {
-      flowConstruct.getStatistics().incReceivedEvents();
-    }
-
-    return event;
+  public FlowConstructStatisticsMessageProcessor(FlowConstructStatistics flowConstructStatistics) {
+    this.flowConstructStatistics = flowConstructStatistics;
   }
 
   @Override
-  public void setFlowConstruct(FlowConstruct flowConstruct) {
-    this.flowConstruct = flowConstruct;
+  public Event process(Event event) throws MuleException {
+    if (flowConstructStatistics.isEnabled()) {
+      flowConstructStatistics.incReceivedEvents();
+    }
+
+    return event;
   }
 
   @Override

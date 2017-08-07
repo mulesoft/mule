@@ -21,7 +21,6 @@ import static org.mule.runtime.core.api.processor.MessageProcessors.processWithC
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -34,7 +33,6 @@ import org.mule.runtime.core.api.exception.ErrorTypeRepository;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
-import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
@@ -171,7 +169,6 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   }
 
   private void processStatistics() {
-    FlowConstructStatistics statistics = flowConstruct.getStatistics();
     if (statistics != null && statistics.isEnabled()) {
       statistics.incExecutionError();
     }
@@ -182,7 +179,6 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     super.doInitialise(muleContext);
 
     if (configuredMessageProcessors != null) {
-      configuredMessageProcessors.setFlowConstruct(flowConstruct);
       configuredMessageProcessors.setMuleContext(muleContext);
     }
 

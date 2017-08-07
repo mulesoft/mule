@@ -197,7 +197,7 @@ public class SplitterTestCase extends AbstractMuleContextTestCase {
         assertEquals(((InternalMessage) msg).getOutboundProperty(key), outboundProps.get(key));
       }
       for (String key : invocationProps.keySet()) {
-        assertEquals(event.getVariable(key).getValue(), invocationProps.get(key));
+        assertEquals(event.getVariables().get(key).getValue(), invocationProps.get(key));
       }
     }
   }

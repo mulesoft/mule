@@ -7,9 +7,9 @@
 package org.mule.runtime.core.api.execution;
 
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.exception.ErrorTypeLocator;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
-import org.mule.runtime.core.api.exception.ErrorTypeLocator;
 
 import java.util.Optional;
 import java.util.concurrent.Executor;
@@ -38,19 +38,14 @@ public interface MessageProcessContext {
   MessageSource getMessageSource();
 
   /**
-   * @return the {@link FlowConstruct} were the incoming message is going to be executed. Can not be null
-   */
-  FlowConstruct getFlowConstruct();
-
-  /**
    * @return the {@link Executor} were the incoming message must be processed. If null it will be executed in the same thread were
    *         the message was received
    */
   Executor getFlowExecutionExecutor();
 
   /**
-   * @return the {@link TransactionConfig} associated to the {@link MessageSource} that received the message. If {@link Optional#empty()} then no
-   *         transaction config will be used.
+   * @return the {@link TransactionConfig} associated to the {@link MessageSource} that received the message. If
+   *         {@link Optional#empty()} then no transaction config will be used.
    */
   Optional<TransactionConfig> getTransactionConfig();
 

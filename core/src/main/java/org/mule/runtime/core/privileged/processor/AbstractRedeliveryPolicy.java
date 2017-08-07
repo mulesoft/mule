@@ -10,12 +10,10 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
 
 /**
  * Implement a redelivery policy for Mule. This is similar to JMS retry policies that will redeliver a message a maximum number of
@@ -24,16 +22,10 @@ import org.mule.runtime.core.api.config.i18n.CoreMessages;
  * to be considered "consumed".
  */
 public abstract class AbstractRedeliveryPolicy extends AbstractInterceptingMessageProcessor
-    implements Processor, Lifecycle, MuleContextAware, FlowConstructAware {
+    implements Processor, Lifecycle, MuleContextAware {
 
-  protected FlowConstruct flowConstruct;
   protected int maxRedeliveryCount;
   public static final int REDELIVERY_FAIL_ON_FIRST = 0;
-
-  @Override
-  public void setFlowConstruct(FlowConstruct flowConstruct) {
-    this.flowConstruct = flowConstruct;
-  }
 
   @Override
   public void initialise() throws InitialisationException {

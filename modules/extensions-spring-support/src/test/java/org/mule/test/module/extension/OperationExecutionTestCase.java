@@ -100,7 +100,7 @@ public class OperationExecutionTestCase extends AbstractExtensionFunctionalTestC
 
     assertThat(responseEvent.getMessage().getPayload().getValue(), is(EMPTY_STRING));
 
-    Message responseMessage = (Message) responseEvent.getVariable("myFace").getValue();
+    Message responseMessage = (Message) responseEvent.getVariables().get("myFace").getValue();
     assertThat(responseMessage.getPayload().getValue(), is(HEISENBERG));
   }
 

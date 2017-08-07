@@ -22,7 +22,7 @@ public class PropertyEnricherDataTypePropagator extends AbstractEnricherDataType
     if (node instanceof AssignmentNode) {
       String assignmentVar = ((AssignmentNode) node).getAssignmentVar();
 
-      if (event.getVariableNames().contains(assignmentVar)) {
+      if (event.getVariables().containsKey(assignmentVar)) {
         builder.addVariable(assignmentVar, typedValue.getValue(), typedValue.getDataType());
         return true;
       } else if (event.getSession().getPropertyNamesAsSet().contains(assignmentVar)) {

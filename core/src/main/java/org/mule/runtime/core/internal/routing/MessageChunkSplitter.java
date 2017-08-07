@@ -6,13 +6,11 @@
  */
 package org.mule.runtime.core.internal.routing;
 
-import static java.util.OptionalInt.of;
 import static org.mule.runtime.core.api.message.GroupCorrelation.of;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
-import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.api.routing.RoutingException;
 
 import java.util.ArrayList;

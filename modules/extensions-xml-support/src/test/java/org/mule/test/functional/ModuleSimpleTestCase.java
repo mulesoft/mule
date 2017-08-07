@@ -33,9 +33,9 @@ public class ModuleSimpleTestCase extends AbstractXmlExtensionMuleArtifactFuncti
   @Parameterized.Parameters(name = "{index}: Running tests for {0} ")
   public static Collection<Object[]> data() {
     return asList(new Object[][] {
-        //simple scenario
+        // simple scenario
         {"flows/flows-using-module-simple.xml", new String[] {"modules/module-simple.xml"}},
-        //nested modules scenario
+        // nested modules scenario
         {"flows/nested/flows-using-module-simple-proxy.xml",
             new String[] {"modules/module-simple.xml", "modules/nested/module-simple-proxy.xml"}}
     });
@@ -79,14 +79,14 @@ public class ModuleSimpleTestCase extends AbstractXmlExtensionMuleArtifactFuncti
   public void testSetPayloadNoSideEffectFlowVariable() throws Exception {
     Event muleEvent = flowRunner("testSetPayloadNoSideEffectFlowVariable").run();
     assertThat(muleEvent.getMessage().getPayload().getValue(), is("10"));
-    assertThat(muleEvent.getVariable("testVar").getValue(), is("unchanged value"));
+    assertThat(muleEvent.getVariables().get("testVar").getValue(), is("unchanged value"));
   }
 
   @Test
   public void testDoNothingFlow() throws Exception {
     Event muleEvent = flowRunner("testDoNothingFlow").run();
     assertThat(muleEvent.getMessage().getPayload().getValue(), is("before calling"));
-    assertThat(muleEvent.getVariable("variableBeforeCalling").getValue(), is("value of flowvar before calling"));
+    assertThat(muleEvent.getVariables().get("variableBeforeCalling").getValue(), is("value of flowvar before calling"));
   }
 
   @Test
@@ -111,7 +111,7 @@ public class ModuleSimpleTestCase extends AbstractXmlExtensionMuleArtifactFuncti
   public void testSetPayloadHardcodedFlowWithTarget() throws Exception {
     Event event = flowRunner("testSetPayloadHardcodedFlowWithTarget").run();
     assertThat(event.getMessage().getPayload().getValue(), nullValue());
-    final TypedValue<Object> targetVariable = event.getVariable("target-variable");
+    final TypedValue<?> targetVariable = event.getVariables().get("target-variable");
     assertThat(targetVariable, notNullValue());
     assertThat(targetVariable.getValue(), instanceOf(Message.class));
     Message targetMessage = (Message) targetVariable.getValue();
@@ -122,7 +122,7 @@ public class ModuleSimpleTestCase extends AbstractXmlExtensionMuleArtifactFuncti
   public void testSetPayloadHardcodedFlowWithTargetOverridingAnExistingVariable() throws Exception {
     Event event = flowRunner("testSetPayloadHardcodedFlowWithTargetOverridingAnExistingVariable").run();
     assertThat(event.getMessage().getPayload().getValue(), nullValue());
-    final TypedValue<Object> targetVariable = event.getVariable("existing-variable");
+    final TypedValue<?> targetVariable = event.getVariables().get("existing-variable");
     assertThat(targetVariable, notNullValue());
     assertThat(targetVariable.getValue(), instanceOf(Message.class));
     Message targetMessage = (Message) targetVariable.getValue();

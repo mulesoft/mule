@@ -57,8 +57,8 @@ public class ObjectStreamingExtensionTestCase extends AbstractStreamingExtension
   @Description("Stores an object stream in a variable leaving without modifying the original payload")
   public void getObjectStreamWithTargetVariable() throws Exception {
     Event event = flowRunner("getStreamWithTarget").withPayload(data).run();
-    assertThat(event.getVariable(MY_STREAM_VAR).getValue(), is(instanceOf(Iterator.class)));
-    assertThat(IteratorUtils.toList((Iterator) event.getVariable(MY_STREAM_VAR).getValue()), equalTo(data));
+    assertThat(event.getVariables().get(MY_STREAM_VAR).getValue(), is(instanceOf(Iterator.class)));
+    assertThat(IteratorUtils.toList((Iterator) event.getVariables().get(MY_STREAM_VAR).getValue()), equalTo(data));
     assertThat(event.getMessage().getPayload().getValue(), is(instanceOf(List.class)));
     assertThat(event.getMessage().getPayload().getValue(), equalTo(data));
   }

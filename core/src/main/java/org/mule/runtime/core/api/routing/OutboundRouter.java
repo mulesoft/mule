@@ -7,7 +7,6 @@
 package org.mule.runtime.core.api.routing;
 
 import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
@@ -20,7 +19,7 @@ import java.util.List;
  * Outbound Router.
  */
 public interface OutboundRouter
-    extends MatchableRouter, RouterStatisticsRecorder, Lifecycle, MuleContextAware, FlowConstructAware {
+    extends MatchableRouter, RouterStatisticsRecorder, Lifecycle, MuleContextAware {
 
   void setTransactionConfig(TransactionConfig transactionConfig);
 

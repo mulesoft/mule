@@ -333,7 +333,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
   }
 
   private void assertVariableDataType(Event event, DataType dataType) {
-    DataType actualDataType = event.getVariable(TEST_PROPERTY).getDataType();
+    DataType actualDataType = event.getVariables().get(TEST_PROPERTY).getDataType();
     assertThat(actualDataType, like(dataType));
   }
 

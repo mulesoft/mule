@@ -9,21 +9,20 @@ package org.mule.runtime.core.internal.execution;
 import static org.mule.runtime.core.api.context.notification.ConnectorMessageNotification.MESSAGE_ERROR_RESPONSE;
 import static org.mule.runtime.core.api.context.notification.ConnectorMessageNotification.MESSAGE_RESPONSE;
 import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.exception.MessagingException;
+import org.mule.runtime.core.api.execution.FlowProcessingPhaseTemplate;
+import org.mule.runtime.core.api.execution.MessageProcessContext;
 import org.mule.runtime.core.api.execution.MessageProcessTemplate;
+import org.mule.runtime.core.api.execution.RequestResponseFlowProcessingPhaseTemplate;
+import org.mule.runtime.core.api.execution.ResponseDispatchException;
 import org.mule.runtime.core.api.execution.TransactionalExecutionTemplate;
 import org.mule.runtime.core.api.scheduler.SchedulerBusyException;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
-import org.mule.runtime.core.api.exception.MessagingException;
-import org.mule.runtime.core.api.execution.FlowProcessingPhaseTemplate;
-import org.mule.runtime.core.api.execution.MessageProcessContext;
-import org.mule.runtime.core.api.execution.RequestResponseFlowProcessingPhaseTemplate;
-import org.mule.runtime.core.api.execution.ResponseDispatchException;
 
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -49,11 +48,13 @@ public class FlowProcessingPhase extends NotificationFiringProcessingPhase<FlowP
                        final MessageProcessContext messageProcessContext, final PhaseResultNotifier phaseResultNotifier) {
     Runnable flowExecutionWork = () -> {
       try {
+        FlowConstruct flowConstruct =
+            muleContext.getRegistry().get(messageProcessContext.getMessageSource().getRootContainerName());
         try {
           final AtomicReference exceptionThrownDuringFlowProcessing = new AtomicReference();
           TransactionalExecutionTemplate<Event> transactionTemplate =
-              createTransactionalExecutionTemplate(messageProcessContext.getFlowConstruct()
-                  .getMuleContext(), messageProcessContext.getTransactionConfig().orElse(new MuleTransactionConfig()));
+              createTransactionalExecutionTemplate(muleContext, messageProcessContext.getTransactionConfig()
+                  .orElse(new MuleTransactionConfig()));
           Event response = transactionTemplate.execute(() -> {
             try {
               Object message = flowProcessingPhaseTemplate.getOriginalMessage();
@@ -64,7 +65,7 @@ public class FlowProcessingPhase extends NotificationFiringProcessingPhase<FlowP
               muleEvent = flowProcessingPhaseTemplate.beforeRouteEvent(muleEvent);
               muleEvent = flowProcessingPhaseTemplate.routeEvent(muleEvent);
               muleEvent = flowProcessingPhaseTemplate.afterRouteEvent(muleEvent);
-              sendResponseIfNeccessary(messageProcessContext.getMessageSource(), messageProcessContext.getFlowConstruct(),
+              sendResponseIfNeccessary(messageProcessContext.getMessageSource(), flowConstruct,
                                        muleEvent, flowProcessingPhaseTemplate);
               return muleEvent;
             } catch (Exception e) {
@@ -74,14 +75,14 @@ public class FlowProcessingPhase extends NotificationFiringProcessingPhase<FlowP
           });
           if (exceptionThrownDuringFlowProcessing.get() != null
               && !(exceptionThrownDuringFlowProcessing.get() instanceof ResponseDispatchException)) {
-            sendResponseIfNeccessary(messageProcessContext.getMessageSource(), messageProcessContext.getFlowConstruct(),
+            sendResponseIfNeccessary(messageProcessContext.getMessageSource(), flowConstruct,
                                      response, flowProcessingPhaseTemplate);
           }
           flowProcessingPhaseTemplate.afterSuccessfulProcessingFlow(response);
         } catch (ResponseDispatchException e) {
           flowProcessingPhaseTemplate.afterFailureProcessingFlow(e);
         } catch (MessagingException e) {
-          sendFailureResponseIfNeccessary(messageProcessContext.getMessageSource(), messageProcessContext.getFlowConstruct(), e,
+          sendFailureResponseIfNeccessary(messageProcessContext.getMessageSource(), flowConstruct, e,
                                           flowProcessingPhaseTemplate);
           flowProcessingPhaseTemplate.afterFailureProcessingFlow(e);
         }

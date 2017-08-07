@@ -10,7 +10,7 @@ import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.api.security.Credentials;
 import org.mule.runtime.api.security.CredentialsBuilder;
 import org.mule.runtime.core.api.security.DefaultMuleAuthentication;
-import org.mule.runtime.core.api.security.SecurityContext;
+import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.extension.api.security.AuthenticationHandler;
 import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.api.security.SecurityProviderNotFoundException;

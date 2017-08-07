@@ -84,7 +84,7 @@ public class SourcePolicyProcessor implements Processor {
                                                  buildSourceExecutionWithPolicyFunction(executionIdentifier, sourceEvent));
           return just(sourceEvent)
               .map(event -> policyEventConverter.createEvent(sourceEvent,
-                                                             builder(sourceEvent.getContext()).message(of(null)).build()))
+                                                             builder(sourceEvent.getInternalContext()).message(of(null)).build()))
               .transform(policy.getPolicyChain())
               .map(event -> policyEventConverter.createEvent(event, sourceEvent));
         });

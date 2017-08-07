@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.spring.internal;
 
+import static java.util.Collections.unmodifiableList;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -13,6 +14,7 @@ import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.meta.AnnotatedObject;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -53,5 +55,13 @@ public class SpringConfigurationComponentLocator implements ConfigurationCompone
     return componentsMap.values().stream()
         .filter(component -> component.getLocation().getComponentIdentifier().getIdentifier().equals(componentIdentifier))
         .collect(toList());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public List<AnnotatedObject> findAll() {
+    return unmodifiableList(new ArrayList<>(componentsMap.values()));
   }
 }

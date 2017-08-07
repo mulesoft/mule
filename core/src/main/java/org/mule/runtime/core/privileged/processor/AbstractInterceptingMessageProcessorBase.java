@@ -6,17 +6,15 @@
  */
 package org.mule.runtime.core.privileged.processor;
 
+import static org.mule.runtime.core.api.construct.FlowConstruct.getFromAnnotatedObject;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static reactor.core.publisher.Flux.from;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.util.ObjectUtils;
@@ -30,12 +28,11 @@ import org.slf4j.LoggerFactory;
  * of setNext and holds the next message processor as an attribute.
  */
 public abstract class AbstractInterceptingMessageProcessorBase extends AbstractAnnotatedObject
-    implements Processor, MuleContextAware, FlowConstructAware {
+    implements Processor, MuleContextAware {
 
   protected Logger logger = LoggerFactory.getLogger(getClass());
 
   protected MuleContext muleContext;
-  protected FlowConstruct flowConstruct;
 
   @Override
   public void setMuleContext(MuleContext context) {
@@ -45,9 +42,8 @@ public abstract class AbstractInterceptingMessageProcessorBase extends AbstractA
     }
   }
 
-  @Override
-  public void setFlowConstruct(FlowConstruct flowConstruct) {
-    this.flowConstruct = flowConstruct;
+  public FlowConstruct getFlowConstruct() {
+    return getFromAnnotatedObject(muleContext.getConfigurationComponentLocator(), this);
   }
 
   public final Processor getListener() {
