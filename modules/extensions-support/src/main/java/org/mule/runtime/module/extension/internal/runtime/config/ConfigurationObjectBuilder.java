@@ -7,12 +7,15 @@
 package org.mule.runtime.module.extension.internal.runtime.config;
 
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getConfigurationFactory;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.core.api.util.Pair;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationFactory;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConfigurationFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ResolverSetBasedObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 
 /**
  * Implementation of {@link ObjectBuilder} to create instances that match a given {@link ConfigurationModel}.
@@ -23,7 +26,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
  *
  * @since 3.7.0
  */
-public final class ConfigurationObjectBuilder<T> extends ResolverSetBasedObjectBuilder<T> {
+public final class ConfigurationObjectBuilder<T> extends ResolverSetBasedObjectBuilder<Pair<T, ResolverSetResult>> {
 
   private final ConfigurationModel configurationModel;
 
@@ -36,7 +39,14 @@ public final class ConfigurationObjectBuilder<T> extends ResolverSetBasedObjectB
    * Creates a new instance by using the {@link ConfigurationFactory} in the {@link ConfigurationFactoryModelProperty}
    */
   @Override
-  protected T instantiateObject() {
-    return (T) getConfigurationFactory(configurationModel).newInstance();
+  protected Pair<T, ResolverSetResult> instantiateObject() {
+    return new Pair<>((T) getConfigurationFactory(configurationModel).newInstance(), null);
+  }
+
+  @Override
+  public Pair<T, ResolverSetResult> build(ResolverSetResult result) throws MuleException {
+    T value = instantiateObject().getFirst();
+    populate(result, value);
+    return new Pair<>(value, result);
   }
 }

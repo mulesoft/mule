@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
+import static java.util.Optional.of;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -65,7 +66,12 @@ public class ConnectionProviderResolver<C> extends AbstractAnnotatedObject
    */
   @Override
   public Optional<ResolverSet> getResolverSet() {
-    return Optional.of(resolverSet);
+    return of(resolverSet);
+  }
+
+  @Override
+  public Optional<ConnectionProviderObjectBuilder<C>> getObjectBuilder() {
+    return of(objectBuilder);
   }
 
   public void setOwnerConfigName(String ownerConfigName) {

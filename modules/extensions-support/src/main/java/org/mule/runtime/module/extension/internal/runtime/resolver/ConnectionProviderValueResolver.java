@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
+import static java.util.Optional.empty;
 import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.module.extension.internal.runtime.config.ConnectionProviderObjectBuilder;
 
 import java.util.Optional;
 
@@ -22,6 +24,10 @@ public interface ConnectionProviderValueResolver<C> extends ValueResolver<Connec
    * @return the {@link ResolverSet} that will be used to resolve the values from a given event if there is any.
    */
   default Optional<ResolverSet> getResolverSet() {
-    return Optional.empty();
+    return empty();
+  }
+
+  default Optional<ConnectionProviderObjectBuilder<C>> getObjectBuilder() {
+    return empty();
   }
 }

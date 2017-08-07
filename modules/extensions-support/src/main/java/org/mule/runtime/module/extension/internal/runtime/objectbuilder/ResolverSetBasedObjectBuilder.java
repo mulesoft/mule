@@ -75,10 +75,13 @@ public abstract class ResolverSetBasedObjectBuilder<T> implements ObjectBuilder<
   public T build(ResolverSetResult result) throws MuleException {
     T object = instantiateObject();
 
+    populate(result, object);
+    return object;
+  }
+
+  protected void populate(ResolverSetResult result, Object object) throws MuleException {
     setValues(object, result, groupValueSetters);
     setValues(object, result, singleValueSetters);
-
-    return object;
   }
 
   private List<ValueSetter> createSingleValueSetters(Class<?> prototypeClass, ResolverSet resolverSet) {
