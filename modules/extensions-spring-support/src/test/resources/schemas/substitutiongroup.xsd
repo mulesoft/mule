@@ -6,6 +6,7 @@
     <xs:import namespace="http://www.mulesoft.org/schema/mule/core" schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule.xsd"></xs:import>
     <xs:import namespace="http://www.mulesoft.org/schema/mule/extension" schemaLocation="http://www.mulesoft.org/schema/mule/extension/current/mule-extension.xsd"></xs:import>
     <xs:import namespace="http://www.mulesoft.org/schema/mule/heisenberg" schemaLocation="http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd"></xs:import>
+    <xs:import namespace="http://www.mulesoft.org/schema/mule/ee/core" schemaLocation="http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd"></xs:import>
     <xs:complexType name="org.mule.test.substitutiongroup.extension.SomeExportedPojo">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
