@@ -58,7 +58,6 @@
         <body>
             <mule:set-payload value="despite writing the payload, it won't be propagated because of the void return type" />
         </body>
-        <output type="void"/>
     </operation>
 
     <operation name="set-payload-param-value-appender">

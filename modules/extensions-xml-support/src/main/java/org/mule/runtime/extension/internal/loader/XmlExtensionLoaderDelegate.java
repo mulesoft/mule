@@ -26,7 +26,7 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.config.spring.api.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
 import static org.mule.runtime.extension.internal.loader.catalog.loader.common.XmlMatcher.match;
-
+import com.google.common.collect.ImmutableMap;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.catalog.api.TypeResolver;
@@ -63,8 +63,8 @@ import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.internal.loader.catalog.loader.common.XmlMatcher;
 import org.mule.runtime.extension.internal.loader.catalog.loader.xml.TypesCatalogXmlLoader;
 import org.mule.runtime.extension.internal.loader.catalog.model.TypesCatalog;
-
-import com.google.common.collect.ImmutableMap;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import java.io.IOException;
 import java.net.URL;
@@ -75,9 +75,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 /**
  * Describes an {@link ExtensionModel} by scanning an XML provided in the constructor
@@ -409,29 +406,48 @@ final class XmlExtensionLoaderDelegate {
 
   private void extractOutputType(OperationDeclarer operationDeclarer, ComponentModel componentModel) {
     // output processing
-    ComponentModel outputComponentModel = componentModel.getInnerComponents()
-        .stream()
-        .filter(child -> child.getIdentifier().equals(OPERATION_OUTPUT_IDENTIFIER)).findFirst()
-        .orElseThrow(() -> new IllegalArgumentException("Having an operation without <output> is not supported"));
-
-    String receivedOutputType = outputComponentModel.getParameters().get(TYPE_ATTRIBUTE);
-    MetadataType outputType = extractType(receivedOutputType);
-    operationDeclarer.withOutput().describedAs(getDescription(outputComponentModel))
-        .ofType(outputType);
+    extractOutputType(operationDeclarer.withOutput(), OPERATION_OUTPUT_IDENTIFIER, componentModel);
+    //    ComponentModel outputComponentModel = componentModel.getInnerComponents()
+    //        .stream()
+    //        .filter(child -> child.getIdentifier().equals(OPERATION_OUTPUT_IDENTIFIER)).findFirst()
+    //        .orElseThrow(() -> new IllegalArgumentException("Having an operation without <output> is not supported"));
+    //
+    //    String receivedOutputType = outputComponentModel.getParameters().get(TYPE_ATTRIBUTE);
+    //    MetadataType outputType = extractType(receivedOutputType);
+    //    operationDeclarer.withOutput().describedAs(getDescription(outputComponentModel))
+    //        .ofType(outputType);
 
     // output attribute processing
+    extractOutputType(operationDeclarer.withOutputAttributes(), OPERATION_OUTPUT_ATTRIBUTES_IDENTIFIER, componentModel);
+    //    Optional<ComponentModel> outputAttributesComponentModel = componentModel.getInnerComponents()
+    //        .stream()
+    //        .filter(child -> child.getIdentifier().equals(OPERATION_OUTPUT_ATTRIBUTES_IDENTIFIER)).findFirst();
+    //    OutputDeclarer outputAttributesDeclarer = operationDeclarer.withOutputAttributes();
+    //
+    //    if (outputAttributesComponentModel.isPresent()) {
+    //      String receivedOutputAttributeType = outputAttributesComponentModel.get().getParameters().get(TYPE_ATTRIBUTE);
+    //      final MetadataType metadataType = extractType(receivedOutputAttributeType);
+    //      outputAttributesDeclarer.describedAs(getDescription(outputAttributesComponentModel.get()))
+    //          .ofType(metadataType);
+    //    } else {
+    //      outputAttributesDeclarer.ofType(BaseTypeBuilder.create(JAVA).voidType().build());
+    //    }
+  }
+
+  private void extractOutputType(OutputDeclarer outputDeclarer, ComponentIdentifier componentIdentifier,
+                                 ComponentModel componentModel) {
+
     Optional<ComponentModel> outputAttributesComponentModel = componentModel.getInnerComponents()
         .stream()
-        .filter(child -> child.getIdentifier().equals(OPERATION_OUTPUT_ATTRIBUTES_IDENTIFIER)).findFirst();
-    OutputDeclarer outputAttributesDeclarer = operationDeclarer.withOutputAttributes();
+        .filter(child -> child.getIdentifier().equals(componentIdentifier)).findFirst();
 
     if (outputAttributesComponentModel.isPresent()) {
       String receivedOutputAttributeType = outputAttributesComponentModel.get().getParameters().get(TYPE_ATTRIBUTE);
       final MetadataType metadataType = extractType(receivedOutputAttributeType);
-      outputAttributesDeclarer.describedAs(getDescription(outputAttributesComponentModel.get()))
+      outputDeclarer.describedAs(getDescription(outputAttributesComponentModel.get()))
           .ofType(metadataType);
     } else {
-      outputAttributesDeclarer.ofType(BaseTypeBuilder.create(JAVA).voidType().build());
+      outputDeclarer.ofType(BaseTypeBuilder.create(JAVA).voidType().build());
     }
   }
 
