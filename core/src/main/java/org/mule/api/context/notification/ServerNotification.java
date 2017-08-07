@@ -6,6 +6,7 @@
  */
 package org.mule.api.context.notification;
 
+import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
@@ -84,14 +85,23 @@ public abstract class ServerNotification extends EventObject implements MuleCont
 
     protected transient MuleContext muleContext;
 
-    public ServerNotification(Object message, int action)
+    public ServerNotification(Object resource, int action)
     {
-        this(message, action, null);
+        this(resource, action, null);
     }
 
-    public ServerNotification(Object message, int action, String resourceIdentifier)
+    public ServerNotification(Object resource, int action, String resourceIdentifier)
     {
-        super((message == null ? NULL_MESSAGE : message));
+        this((resource == null ? NULL_MESSAGE : resource), action, resourceIdentifier, false);
+    }
+
+    /**
+     * @param referenceOriginalResource: false by default. If true, the original resource will be referenced by the notification.
+     *                           This attribute will only be applied to <code>MuleMessage</code> and <code>MuleEvent</code> resources.
+     */
+    public ServerNotification(Object resource, int action, String resourceIdentifier, boolean referenceOriginalResource)
+    {
+        super(referenceOriginalResource ? resource : copyResource(resource));
         this.action = action;
         this.resourceIdentifier = resourceIdentifier;
         timestamp = System.currentTimeMillis();
@@ -213,6 +223,24 @@ public abstract class ServerNotification extends EventObject implements MuleCont
         {
             throw new IllegalArgumentException("No action called: " + action);
         }
+    }
+
+    /**
+     * This method provides a copy of <code>ThreadSafeAccess</code> objects to not reference to the original objects in the notification.
+     * @return a copy of the resource if it is an instance of <code>MuleEvent</code> or <code>MuleMessage</code> returns a copy of it. Otherwise, the same resource.
+     */
+    private static Object copyResource(Object resource)
+    {
+        if (resource instanceof DefaultMuleEvent)
+        {
+            return DefaultMuleEvent.copy((DefaultMuleEvent) resource);
+        }
+        else if (resource instanceof MuleMessage)
+        {
+            return cloneMessage((MuleMessage) resource);
+        }
+
+        return resource;
     }
 
 }

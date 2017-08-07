@@ -50,6 +50,8 @@ class MessageProcessorNotificationExecutionInterceptor implements MessageProcess
         {
             fireNotification(notificationManager, event.getFlowConstruct(), event, messageProcessor,
                              null, MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE);
+            fireNotification(notificationManager, event.getFlowConstruct(), event, messageProcessor,
+                             null, MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE_ORIGINAL_EVENT);
         }
 
         MuleEvent eventToProcess = event;

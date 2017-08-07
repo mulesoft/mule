@@ -38,7 +38,7 @@ public class PipelineMessageNotification extends ServerNotification implements B
 
     public PipelineMessageNotification(Pipeline pipeline, MuleEvent event, int action)
     {
-        super(event, action, pipeline.getName());
+        super(event, action, pipeline.getName(), true);
     }
 
     public PipelineMessageNotification(Pipeline pipeline,
