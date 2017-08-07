@@ -13,7 +13,7 @@ import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
-import org.mule.runtime.module.extension.internal.manager.ExtensionManagerFactory;
+import org.mule.runtime.module.extension.api.manager.ExtensionManagerFactory;
 
 import java.util.List;
 

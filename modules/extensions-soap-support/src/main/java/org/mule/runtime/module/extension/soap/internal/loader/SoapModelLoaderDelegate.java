@@ -23,7 +23,7 @@ import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFacto
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.soap.MessageDispatcherProvider;
 import org.mule.runtime.module.extension.internal.loader.enricher.ErrorsModelFactory;
-import org.mule.runtime.module.extension.internal.loader.java.ModelLoaderDelegate;
+import org.mule.runtime.module.extension.api.loader.ModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser;
 import org.mule.runtime.module.extension.internal.loader.java.TypeAwareConfigurationFactory;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConfigurationFactoryModelProperty;
@@ -40,7 +40,7 @@ import java.util.Set;
  *
  * @since 4.0
  */
-final class SoapModelLoaderDelegate implements ModelLoaderDelegate {
+public final class SoapModelLoaderDelegate implements ModelLoaderDelegate {
 
   private final SoapInvokeOperationDeclarer operationDeclarer;
   private final SoapServiceProviderDeclarer serviceProviderDeclarer;
@@ -48,7 +48,7 @@ final class SoapModelLoaderDelegate implements ModelLoaderDelegate {
   private final String version;
   private final ClassTypeLoader typeLoader;
 
-  SoapModelLoaderDelegate(Class<?> extensionType, String version) {
+  public SoapModelLoaderDelegate(Class<?> extensionType, String version) {
     this.extensionType = extensionType;
     this.version = version;
     this.typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();

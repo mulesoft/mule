@@ -11,7 +11,7 @@ import static org.mule.runtime.module.extension.internal.resources.BaseExtension
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.capability.xml.description.DescriptionDeclarationEnricher;
-import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader;
+import org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader;
 
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedOptions;

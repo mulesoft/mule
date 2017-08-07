@@ -43,7 +43,7 @@ import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.metadata.NullMetadataKey;
-import org.mule.runtime.module.extension.internal.metadata.MultilevelMetadataKeyBuilder;
+import org.mule.runtime.module.extension.api.metadata.MultilevelMetadataKeyBuilder;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.test.runner.RunnerDelegateTo;

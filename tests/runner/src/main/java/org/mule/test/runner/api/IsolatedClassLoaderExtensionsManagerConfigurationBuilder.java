@@ -19,8 +19,8 @@ import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManagerFactory;
-import org.mule.runtime.module.extension.internal.manager.ExtensionManagerFactory;
+import org.mule.runtime.module.extension.api.manager.DefaultExtensionManagerFactory;
+import org.mule.runtime.module.extension.api.manager.ExtensionManagerFactory;
 
 import java.lang.reflect.Method;
 import java.net.URL;

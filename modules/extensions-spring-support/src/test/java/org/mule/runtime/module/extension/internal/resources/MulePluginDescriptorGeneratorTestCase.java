@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.resources;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.loadExtension;
+import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.loadExtension;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;

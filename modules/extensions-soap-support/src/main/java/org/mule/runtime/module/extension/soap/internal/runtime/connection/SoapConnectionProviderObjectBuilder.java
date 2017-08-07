@@ -27,7 +27,7 @@ import org.mule.runtime.module.extension.internal.runtime.config.ConnectionProvi
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultResolverSetBasedObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
-import org.mule.runtime.module.extension.soap.internal.runtime.connection.transport.DefaultHttpMessageDispatcherProvider;
+import org.mule.runtime.module.extension.soap.api.runtime.connection.transport.DefaultHttpMessageDispatcherProvider;
 import org.mule.runtime.soap.api.client.SoapClient;
 
 /**

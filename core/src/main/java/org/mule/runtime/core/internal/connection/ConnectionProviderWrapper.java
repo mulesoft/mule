@@ -118,10 +118,4 @@ public abstract class ConnectionProviderWrapper<C> implements ConnectionProvider
   public Optional<PoolingProfile> getPoolingProfile() {
     return empty();
   }
-
-  public static ConnectionProvider unwrapProviderWrapper(ConnectionProvider connectionProvider) {
-    return connectionProvider instanceof ConnectionProviderWrapper
-        ? unwrapProviderWrapper(((ConnectionProviderWrapper) connectionProvider).getDelegate())
-        : connectionProvider;
-  }
 }
