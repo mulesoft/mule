@@ -6,12 +6,14 @@
  */
 package org.mule.module.artifact.classloader;
 
-import static org.mule.runtime.core.api.rx.Exceptions.setupErrorHooks;
+import static org.mule.runtime.core.internal.util.rx.Operators.setupErrorHooks;
 
 import reactor.core.publisher.Hooks;
 
 /**
  * Registers reactor-core error handling hooks when dynamically loaded into each plugin class loader.
+ *
+ * @since 4.0
  */
 public class ErrorHooksConfiguration {
 

@@ -6,13 +6,22 @@
  */
 package org.mule.runtime.core.internal.util.rx;
 
-import org.mule.runtime.core.api.Event;
+import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
+import static org.mule.runtime.core.api.util.ExceptionUtils.getRootCauseException;
+import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.exception.MessagingException;
+
+import java.lang.reflect.Method;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
+import org.slf4j.Logger;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.SynchronousSink;
 
@@ -20,6 +29,8 @@ import reactor.core.publisher.SynchronousSink;
  * Reusable operators to be use with project reactor.
  */
 public final class Operators {
+
+  private static Logger logger = getLogger(Operators.class);
 
   private Operators() {}
 
@@ -75,6 +86,42 @@ public final class Operators {
     @Override
     public void onComplete() {
 
+    }
+  }
+
+  /**
+   * Register reactor hooks using the provided class. This needs to use reflection because reactor could be
+   * loaded on different class loaders.
+   *
+   * In reactor 3.1, the error handler will be explicitly defined for each flux instead of globally.
+   */
+  public static void setupErrorHooks(Class clazz) {
+    try {
+      // Ensure reactor operatorError hook is always registered
+      BiFunction<Throwable, Object, Throwable> onOperationErrorFunction = (throwable, signal) -> {
+        // Unwrap all throwables to be consistent with reactor default hook.
+        throwable = unwrap(throwable);
+        // Only apply hook for Event signals.
+        if (signal instanceof Event) {
+          return throwable instanceof MessagingException ? throwable
+              : new MessagingException((Event) signal, getRootCauseException(throwable));
+        } else {
+          return throwable;
+        }
+      };
+      Method onOperatorError = clazz.getMethod("onOperatorError", BiFunction.class);
+      onOperatorError.invoke(null, onOperationErrorFunction);
+
+      // Log dropped events/errors rather than blow up which causes cryptic timeouts and stack traces
+      Method onErrorDropped = clazz.getMethod("onErrorDropped", Consumer.class);
+      Consumer<Object> onErrorDroppedFunction = error -> logger.error("ERROR DROPPED UNEXPECTEDLY " + error);
+      onErrorDropped.invoke(null, onErrorDroppedFunction);
+
+      Method onNextDropped = clazz.getMethod("onNextDropped", Consumer.class);
+      Consumer<Object> onNextDroppedFunction = event -> logger.error("EVENT DROPPED UNEXPECTEDLY " + event);
+      onNextDropped.invoke(null, onNextDroppedFunction);
+    } catch (Exception e) {
+      throw new RuntimeException("Failed to configure reactor hooks", e);
     }
   }
 

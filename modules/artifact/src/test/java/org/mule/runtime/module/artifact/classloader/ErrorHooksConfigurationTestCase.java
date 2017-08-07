@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.artifact.classloader;
 
+import static java.lang.Thread.currentThread;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.runtime.module.artifact.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
@@ -34,9 +35,7 @@ public class ErrorHooksConfigurationTestCase extends AbstractMuleTestCase {
 
   @Test
   public void invokesErrorHooksConfiguration() throws Exception {
-    ClassLoader threadClassLoader = Thread.currentThread().getContextClassLoader();
-    URL[] urls = new URL[] {new File("nonexistent/path").toURI().toURL()};
-    TestArtifactClassLoader classLoader = new TestArtifactClassLoader(urls, threadClassLoader);
+    TestArtifactClassLoader classLoader = createClassLoader(true);
 
     externalSetupText = "notCalled";
     classLoader.setErrorHooksClassLocation(TEST_ERROR_HOOKS_CLASS_LOCATION);
@@ -44,15 +43,34 @@ public class ErrorHooksConfigurationTestCase extends AbstractMuleTestCase {
     assertThat(externalSetupText, is("called"));
   }
 
+  @Test
+  public void doesNotInvokeErrorHooksConfiguration() throws Exception {
+    TestArtifactClassLoader classLoader = createClassLoader(false);
+
+    externalSetupText = "notCalled";
+    classLoader.setErrorHooksClassLocation(TEST_ERROR_HOOKS_CLASS_LOCATION);
+    classLoader.configureErrorHooks();
+    assertThat(externalSetupText, is("notCalled"));
+  }
+
+  private TestArtifactClassLoader createClassLoader(Boolean reactorLoaded) throws Exception {
+    ClassLoader threadClassLoader = currentThread().getContextClassLoader();
+    URL[] urls = new URL[] {new File("nonexistent/path").toURI().toURL()};
+    return new TestArtifactClassLoader(urls, threadClassLoader, reactorLoaded);
+  }
+
   private static class TestArtifactClassLoader extends MuleArtifactClassLoader {
 
-    TestArtifactClassLoader(URL[] urls, ClassLoader parentCl) {
+    Boolean reactorLoaded;
+
+    TestArtifactClassLoader(URL[] urls, ClassLoader parentCl, Boolean reactorLoaded) {
       super("testId", new ArtifactDescriptor("test"), urls, parentCl, createLookupPoilicy(), false);
+      this.reactorLoaded = reactorLoaded;
     }
 
     @Override
     public Boolean isReactorLoaded() {
-      return true;
+      return reactorLoaded;
     }
   }
 

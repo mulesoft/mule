@@ -58,8 +58,17 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
   }
 
   /**
-   * Alternative constructor that allows not registering error hooks, useful for subclasses that need to do it after
+   * Constructs a new {@link MuleArtifactClassLoader } for the given URLs.
+   *
+   * This version allows not registering error hooks, useful for subclasses that need to do it after
    * their own initialization or not at all.
+   *
+   * @param artifactId artifact unique ID. Non empty.
+   * @param artifactDescriptor descriptor for the artifact owning the created class loader. Non null.
+   * @param urls the URLs from which to load classes and resources
+   * @param parent the parent class loader for delegation
+   * @param lookupPolicy policy used to guide the lookup process. Non null
+   * @param initialise whether to configure error hooks or not
    */
   protected MuleArtifactClassLoader(String artifactId, ArtifactDescriptor artifactDescriptor, URL[] urls, ClassLoader parent,
                                     ClassLoaderLookupPolicy lookupPolicy, Boolean initialise) {
@@ -130,14 +139,14 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
     this.errorHooksClassLocation = errorHooksClassLocation;
   }
 
-  protected Object createCustomInstance(String classLocation) {
+  private <T> T createCustomInstance(String classLocation) {
     InputStream classStream = null;
     try {
       classStream = this.getClass().getResourceAsStream(classLocation);
       byte[] classBytes = IOUtils.toByteArray(classStream);
       classStream.close();
       Class clazz = this.defineClass(null, classBytes, 0, classBytes.length);
-      return clazz.newInstance();
+      return (T) clazz.newInstance();
     } catch (Exception e) {
       throw new RuntimeException("Can not create instance from resource: " + classLocation, e);
     } finally {
@@ -145,8 +154,11 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
     }
   }
 
+  /**
+   * Creates a ResourceReleaser using this classloader, only used outside in unit tests.
+   */
   protected ResourceReleaser createResourceReleaserInstance() {
-    return (ResourceReleaser) createCustomInstance(resourceReleaserClassLocation);
+    return createCustomInstance(resourceReleaserClassLocation);
   }
 
   /**
@@ -166,6 +178,9 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
     }
   }
 
+  /**
+   * Checks if reactor-core is available, only used outside in unit tests.
+   */
   protected Boolean isReactorLoaded() {
     try {
       Class reactorHooks = loadClass("reactor.core.publisher.Hooks");

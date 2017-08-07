@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.module.artifact.classloader;
 
+import static org.mule.runtime.module.artifact.classloader.ErrorHooksConfigurationTestCase.setExternalSetupText;
+
 public class TestErrorHooksConfiguration {
 
   static {
-    ErrorHooksConfigurationTestCase.setExternalSetupText("called");
+    setExternalSetupText("called");
   }
 }
 

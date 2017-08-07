@@ -43,7 +43,7 @@ public class TestContainerClassLoaderFactory extends ContainerClassLoaderFactory
   private final URL[] urls;
   private final URLClassLoader classLoader;
   private final DefaultModuleRepository testContainerModuleRepository;
-  private MuleArtifactClassLoader containerClassLoader;
+  private ArtifactClassLoader containerClassLoader;
 
   /**
    * Factory class that extends the default way to create a container {@link ArtifactClassLoader} in order to support the
