@@ -29,7 +29,7 @@ public class LocalStoreAliasConfigTestCase extends AbstractMuleContextTestCase {
 
   @Override
   protected ConfigurationBuilder getBuilder() throws Exception {
-    return new SpringXmlConfigurationBuilder(new String[0], emptyMap(), APP);
+    return new SpringXmlConfigurationBuilder(new String[0], emptyMap(), APP, false);
   }
 
   @Test

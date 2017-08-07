@@ -10,15 +10,14 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.runtime.api.component.location.Location.builder;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTIVITY_TESTING_SERVICE;
-import org.hamcrest.Matcher;
-
-import org.mule.runtime.api.component.location.Location;
+import static org.mule.runtime.api.connectivity.ConnectivityTestingService.CONNECTIVITY_TESTING_SERVICE_KEY;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
+import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.tck.junit4.rule.SystemProperty;
+
+import org.hamcrest.Matcher;
 
 /**
  * Utils to do connectivity testing over configurations on a Mule application
@@ -64,7 +63,7 @@ public class TestConnectivityUtils {
 
   private void assertConnection(String configName, boolean isSuccess, Matcher<Exception> exceptionMatcher,
                                 Matcher<ErrorType> codeMatcher) {
-    ConnectivityTestingService testingService = muleContext.getRegistry().get(OBJECT_CONNECTIVITY_TESTING_SERVICE);
+    ConnectivityTestingService testingService = muleContext.getRegistry().get(CONNECTIVITY_TESTING_SERVICE_KEY);
     ConnectionValidationResult validationResult = testingService.testConnection(builder().globalName(configName).build());
     assertThat(validationResult.isValid(), is(isSuccess));
     if (!isSuccess) {

@@ -7,7 +7,7 @@
 package org.mule.runtime.module.tooling.api.connectivity;
 
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
-import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
+import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 
 /**
  * Builder for creating a {@code ConnectivityTestingService} from a set of extensions and an {@code ArtifactConfiguration} that

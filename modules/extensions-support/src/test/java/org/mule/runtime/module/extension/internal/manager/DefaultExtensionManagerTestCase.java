@@ -26,9 +26,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.metadata.api.builder.BaseTypeBuilder.create;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
+import static org.mule.runtime.api.metadata.MetadataService.METADATA_SERVICE_KEY;
 import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_METADATA_SERVICE;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplicitConfigurationProviderName;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
@@ -45,6 +45,7 @@ import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.extension.ExtensionManager;
@@ -215,7 +216,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
     when(connectionManagerAdapter.getDefaultRetryPolicyTemplate()).thenReturn(new NoRetryPolicyTemplate());
     when(muleContext.getRegistry().lookupObject(OBJECT_CONNECTION_MANAGER))
         .thenReturn(connectionManagerAdapter);
-    when(muleContext.getRegistry().get(OBJECT_METADATA_SERVICE)).thenReturn(mock(MuleMetadataService.class));
+    when(muleContext.getRegistry().get(METADATA_SERVICE_KEY)).thenReturn(mock(MuleMetadataService.class));
     when(muleContext.getRegistry().get(OBJECT_CONNECTION_MANAGER)).thenReturn(connectionManagerAdapter);
   }
 

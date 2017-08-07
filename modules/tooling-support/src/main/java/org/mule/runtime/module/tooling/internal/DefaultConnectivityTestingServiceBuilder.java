@@ -15,7 +15,7 @@ import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.
 import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.updateArtifactPom;
 import org.mule.maven.client.api.MavenClientProvider;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
-import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
+import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.globalconfig.api.GlobalConfigLoader;

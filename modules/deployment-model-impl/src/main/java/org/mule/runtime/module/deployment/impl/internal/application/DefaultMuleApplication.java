@@ -10,8 +10,11 @@ import static java.lang.String.format;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCause;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.metadata.MetadataService.METADATA_SERVICE_KEY;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.api.value.ValueProviderService.VALUE_PROVIDER_SERVICE_KEY;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
+import static org.mule.runtime.api.connectivity.ConnectivityTestingService.CONNECTIVITY_TESTING_SERVICE_KEY;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.newBuilder;
@@ -20,7 +23,7 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.value.ValueProviderService;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
+import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
@@ -46,6 +49,7 @@ import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContext
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainRepository;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.service.ServiceRepository;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -257,17 +261,17 @@ public class DefaultMuleApplication implements Application {
 
   @Override
   public ConnectivityTestingService getConnectivityTestingService() {
-    return artifactContext.getConnectivityTestingService();
+    return (ConnectivityTestingService) artifactContext.getRegistry().lookupByName(CONNECTIVITY_TESTING_SERVICE_KEY).get();
   }
 
   @Override
   public MetadataService getMetadataService() {
-    return artifactContext.getMetadataService();
+    return (MetadataService) artifactContext.getRegistry().lookupByName(METADATA_SERVICE_KEY).get();
   }
 
   @Override
   public ValueProviderService getValueProviderService() {
-    return artifactContext.getValueProviderService();
+    return (ValueProviderService) artifactContext.getRegistry().lookupByName(VALUE_PROVIDER_SERVICE_KEY).get();
   }
 
   @Override

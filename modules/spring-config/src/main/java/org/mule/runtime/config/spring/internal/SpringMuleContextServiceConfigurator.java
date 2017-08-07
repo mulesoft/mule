@@ -6,9 +6,11 @@
  */
 package org.mule.runtime.config.spring.internal;
 
+import static org.mule.runtime.api.metadata.MetadataService.METADATA_SERVICE_KEY;
 import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT_SERIALIZER_NAME;
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_IN_MEMORY_OBJECT_STORE_KEY;
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
+import static org.mule.runtime.api.value.ValueProviderService.VALUE_PROVIDER_SERVICE_KEY;
 import static org.mule.runtime.config.spring.internal.InjectParamsFromContextServiceProxy.createInjectProviderParamsServiceProxy;
 import static org.mule.runtime.core.api.config.MuleProperties.LOCAL_OBJECT_LOCK_FACTORY;
 import static org.mule.runtime.core.api.config.MuleProperties.LOCAL_OBJECT_STORE_MANAGER;
@@ -17,7 +19,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_COMPONENT_I
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONFIGURATION_COMPONENT_LOCATOR;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONFIGURATION_PROPERTIES;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTIVITY_TESTING_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONVERTER_RESOLVER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER;
@@ -32,7 +33,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCAL_STORE
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCK_FACTORY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCK_PROVIDER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MESSAGE_PROCESSING_FLOW_TRACE_MANAGER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_METADATA_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_NOTIFICATION_HANDLER;
@@ -52,10 +52,9 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STREAMING_M
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSACTION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSFORMATION_SERVICE;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_VALUE_PROVIDER_SERVICE;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
+import static org.mule.runtime.api.connectivity.ConnectivityTestingService.CONNECTIVITY_TESTING_SERVICE_KEY;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
-
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
@@ -120,9 +119,9 @@ import org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean;
 import org.mule.runtime.core.internal.util.store.MuleObjectStoreManager;
 import org.mule.runtime.core.internal.value.MuleValueProviderService;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
 import java.util.Map;
 import java.util.Optional;
@@ -130,9 +129,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
 
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 
 
 /**
@@ -174,9 +173,9 @@ class SpringMuleContextServiceConfigurator {
       .put(OBJECT_EXTENSION_MANAGER, getBeanDefinition(ExtensionManagerFactoryBean.class))
       .put(OBJECT_TIME_SUPPLIER, getBeanDefinition(TimeSupplier.class))
       .put(OBJECT_CONNECTION_MANAGER, getBeanDefinition(DefaultConnectionManager.class))
-      .put(OBJECT_METADATA_SERVICE, getBeanDefinition(MuleMetadataService.class))
+      .put(METADATA_SERVICE_KEY, getBeanDefinition(MuleMetadataService.class))
       .put(OBJECT_MULE_CONFIGURATION, getBeanDefinition(DefaultMuleConfiguration.class))
-      .put(OBJECT_VALUE_PROVIDER_SERVICE, getBeanDefinition(MuleValueProviderService.class))
+      .put(VALUE_PROVIDER_SERVICE_KEY, getBeanDefinition(MuleValueProviderService.class))
       .put(OBJECT_OBJECT_NAME_PROCESSOR, getBeanDefinition(MuleObjectNameProcessor.class))
       .put(OBJECT_POLICY_MANAGER, getBeanDefinition(DefaultPolicyManager.class))
       .put(OBJECT_PROCESSOR_INTERCEPTOR_MANAGER, getBeanDefinition(DefaultProcessorInterceptorManager.class))
@@ -207,7 +206,7 @@ class SpringMuleContextServiceConfigurator {
       .put(OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR, getBeanDefinition(MuleConnectorOperationLocator.class))
       .put(OBJECT_EXCEPTION_LOCATION_PROVIDER, getBeanDefinition(MessagingExceptionLocationProvider.class))
       .put(OBJECT_MESSAGE_PROCESSING_FLOW_TRACE_MANAGER, getBeanDefinition(MessageProcessingFlowTraceManager.class))
-      .put(OBJECT_CONNECTIVITY_TESTING_SERVICE, getBeanDefinition(DefaultConnectivityTestingService.class))
+      .put(CONNECTIVITY_TESTING_SERVICE_KEY, getBeanDefinition(DefaultConnectivityTestingService.class))
       .put(OBJECT_COMPONENT_INITIAL_STATE_MANAGER, getBeanDefinition(DefaultComponentInitialStateManager.class))
       .put(OBJECT_STREAMING_MANAGER, getBeanDefinition(DefaultStreamingManager.class))
       .put(OBJECT_TRANSFORMATION_SERVICE, getBeanDefinition(DefaultTransformationService.class))
