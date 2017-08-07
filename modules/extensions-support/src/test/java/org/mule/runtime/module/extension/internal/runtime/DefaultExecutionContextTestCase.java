@@ -144,4 +144,5 @@ public class DefaultExecutionContextTestCase extends AbstractMuleTestCase {
   public void removeNullValueVariable() {
     operationContext.removeVariable(null);
   }
+
 }

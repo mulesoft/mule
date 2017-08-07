@@ -8,9 +8,11 @@ package org.mule.runtime.core.internal.processor.chain;
 
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Constructs a {@link MessageProcessorChain} in the same way that the {@link DefaultMessageProcessorChainBuilder} constructs
@@ -18,9 +20,10 @@ import java.util.List;
  */
 public class ExplicitMessageProcessorChainBuilder extends DefaultMessageProcessorChainBuilder {
 
-  protected MessageProcessorChain createInterceptingChain(Processor head, List<Processor> processors,
+  protected MessageProcessorChain createInterceptingChain(Processor head, Optional<ProcessingStrategy> processingStrategyOptional,
+                                                          List<Processor> processors,
                                                           List<Processor> processorForLifecycle) {
-    return new ExplicitMessageProcessorChain(name, head, processors, processorForLifecycle);
+    return new ExplicitMessageProcessorChain(name, processingStrategyOptional, head, processors, processorForLifecycle);
   }
 
   /**
@@ -28,9 +31,10 @@ public class ExplicitMessageProcessorChainBuilder extends DefaultMessageProcesso
    */
   public static class ExplicitMessageProcessorChain extends DefaultMessageProcessorChain {
 
-    protected ExplicitMessageProcessorChain(String name, Processor head, List<Processor> processors,
+    protected ExplicitMessageProcessorChain(String name, Optional<ProcessingStrategy> processingStrategyOptional, Processor head,
+                                            List<Processor> processors,
                                             List<Processor> processorsForLifecycle) {
-      super(name, head, processors, processorsForLifecycle);
+      super(name, processingStrategyOptional, head, processors, processorsForLifecycle);
     }
 
   }

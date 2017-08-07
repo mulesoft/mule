@@ -21,16 +21,15 @@ import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static reactor.core.publisher.Mono.from;
-
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.transformer.AbstractTransformer;
+import org.mule.runtime.core.internal.util.SerializationUtils;
 import org.mule.runtime.core.privileged.transformer.simple.ByteArrayToObject;
 import org.mule.runtime.core.privileged.transformer.simple.SerializableToByteArray;
-import org.mule.runtime.core.internal.util.SerializationUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.ByteArrayInputStream;
@@ -38,7 +37,6 @@ import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -148,7 +146,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
         .message(of("whatever"))
         .addVariable("test", "val")
         .build();
-    event.getVariableNames().add("other");
+    event.getVariables().keySet().add("other");
   }
 
   public void testFlowVarNamesRemoveMutable() throws Exception {
@@ -157,8 +155,8 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
         .addVariable("test", "val")
         .build();
     event = Event.builder(event).addVariable("test", "val").build();
-    event.getVariableNames().remove("test");
-    assertNull(event.getVariable("test").getValue());
+    event.getVariables().keySet().remove("test");
+    assertNull(event.getVariables().get("test").getValue());
   }
 
   @Test
@@ -173,19 +171,9 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
 
     copy = Event.builder(copy).addVariable("foo", "bar2").build();
 
-    assertEquals("bar", event.getVariable("foo").getValue());
+    assertEquals("bar", event.getVariables().get("foo").getValue());
 
-    assertEquals("bar2", copy.getVariable("foo").getValue());
-  }
-
-  @Test(expected = NoSuchElementException.class)
-  public void testGetFlowVarNonexistent() throws Exception {
-    testEvent().getVariable("foo").getValue();
-  }
-
-  @Test(expected = NoSuchElementException.class)
-  public void testGetFlowVarDataTypeNonexistent() throws Exception {
-    testEvent().getVariable("foo").getDataType();
+    assertEquals("bar2", copy.getVariables().get("foo").getValue());
   }
 
   @Test
@@ -200,7 +188,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     Event after =
         (Event) SerializationUtils.deserialize(org.apache.commons.lang3.SerializationUtils.serialize(before), muleContext);
 
-    after.getContext().success(result);
+    after.getInternalContext().success(result);
 
     assertThat(before.getContext().getId(), equalTo(after.getContext().getId()));
 
@@ -208,7 +196,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     // fails with timeout.
     expectedException.expect(IllegalStateException.class);
     expectedException.expectMessage(startsWith(TIMEOUT_ILLEGAL_ARGUMENT_EXCEPTION_MESSAGE));
-    from(before.getContext().getResponsePublisher()).block(ofMillis(BLOCK_TIMEOUT));
+    from(before.getInternalContext().getResponsePublisher()).block(ofMillis(BLOCK_TIMEOUT));
   }
 
   @Test
@@ -234,12 +222,12 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     Event after =
         (Event) SerializationUtils.deserialize(org.apache.commons.lang3.SerializationUtils.serialize(before), muleContext);
 
-    after.getContext().success(result);
+    after.getInternalContext().success(result);
 
     assertThat(before.getContext().getId(), equalTo(after.getContext().getId()));
 
     // Publisher is conserved after serialization so attempting to obtain result via before event is successful.
-    assertThat(from(before.getContext().getResponsePublisher()).block(), equalTo(result));
+    assertThat(from(before.getInternalContext().getResponsePublisher()).block(), equalTo(result));
 
     // Cache entry is removed on deserialization
     assertThat(((Pipeline) before.getFlowConstruct()).getSerializationEventContextCache().get(before.getContext().getId()),

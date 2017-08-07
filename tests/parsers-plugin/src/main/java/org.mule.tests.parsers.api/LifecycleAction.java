@@ -4,12 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.construct;
+package org.mule.tests.parsers.api;
 
-/**
- * Implemented by objects that require the {@link FlowConstruct} to be injected.
- */
-public interface FlowConstructAware {
+public enum LifecycleAction {
 
-  void setFlowConstruct(FlowConstruct flowConstruct);
+  GET_OBJECT, INITIALISE, START, STOP, DISPOSE
+
 }

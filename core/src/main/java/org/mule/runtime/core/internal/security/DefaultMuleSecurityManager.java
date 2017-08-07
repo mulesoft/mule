@@ -11,12 +11,12 @@ import static org.mule.runtime.core.api.config.i18n.CoreMessages.authorizationAt
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.security.Authentication;
+import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.api.security.SecurityProviderNotFoundException;
 import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
 import org.mule.runtime.core.api.lifecycle.LifecycleTransitionResult;
 import org.mule.runtime.core.api.security.EncryptionStrategy;
-import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.security.SecurityProvider;
 import org.mule.runtime.core.api.security.UnauthorisedException;

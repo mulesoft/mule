@@ -28,6 +28,6 @@ public class FlowVarEnricherDataTypePropagator extends AbstractVariableEnricherD
 
   @Override
   protected boolean containsVariable(Event event, String propertyName) {
-    return event.getVariableNames().contains(propertyName);
+    return event.getVariables().containsKey(propertyName);
   }
 }

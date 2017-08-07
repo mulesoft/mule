@@ -38,7 +38,7 @@ public final class Operators {
         if (result != null) {
           sink.next(result);
         } else {
-          event.getContext().success();
+          event.getInternalContext().success();
         }
       }
     };

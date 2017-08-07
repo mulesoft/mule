@@ -52,7 +52,7 @@ public class AssertionMessageProcessor extends AbstractAnnotatedObject implement
       throw new InvalidExpressionException(expression, result.errorMessage().orElse("Invalid exception"));
     }
     latch = new CountDownLatch(count);
-    addAssertion(getLocation().getRootContainerName(), this);
+    addAssertion(getRootContainerName(), this);
   }
 
   @Override
@@ -72,7 +72,7 @@ public class AssertionMessageProcessor extends AbstractAnnotatedObject implement
    * <li>count was set & count processes were done => ok</li>
    * <li>count was set & count processes were not done => fail</li>
    * <li>count was not set & at least one processing were done => ok</li>
-   * 
+   *
    * @throws InterruptedException
    */
   @Override

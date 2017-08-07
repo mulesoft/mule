@@ -14,7 +14,6 @@ import static org.mockito.Mockito.verify;
 import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -89,7 +88,7 @@ public class DefaultSchedulerMessageSourceTestCase extends AbstractMuleContextTe
   private DefaultSchedulerMessageSource createMessageSource() throws Exception {
     schedulerMessageSource =
         new DefaultSchedulerMessageSource(muleContext, scheduler());
-    schedulerMessageSource.setFlowConstruct(getTestFlow(muleContext));
+    schedulerMessageSource.setAnnotations(getAppleFlowComponentLocationAnnotations());
     schedulerMessageSource.initialise();
     return schedulerMessageSource;
   }

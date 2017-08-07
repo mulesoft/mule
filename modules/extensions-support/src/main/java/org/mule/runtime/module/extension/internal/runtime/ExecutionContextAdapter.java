@@ -43,7 +43,7 @@ public interface ExecutionContextAdapter<M extends ComponentModel> extends Event
   /**
    * Sets a variable of the given {@code key} and {@code value}.
    *
-   * @param key   the variable's key. Cannot be {@code null}
+   * @param key the variable's key. Cannot be {@code null}
    * @param value the associated value. Cannot be {@code null}
    * @return the value previously associated with the {@code key} or {@code null} if no such association existed.
    */

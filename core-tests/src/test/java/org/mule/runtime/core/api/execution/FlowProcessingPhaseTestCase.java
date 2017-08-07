@@ -7,6 +7,7 @@
 package org.mule.runtime.core.api.execution;
 
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
@@ -19,7 +20,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.context.notification.ConnectorMessageNotification.MESSAGE_ERROR_RESPONSE;
 import static org.mule.runtime.core.api.context.notification.ConnectorMessageNotification.MESSAGE_RESPONSE;
+import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -73,11 +77,22 @@ public class FlowProcessingPhaseTestCase extends AbstractMuleTestCase {
   private MuleException mockException;
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private NotificationHelper notificationHelper;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private MessageSource messageSource;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private MuleContext muleContext;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS, extraInterfaces = {AnnotatedObject.class})
+  private FlowConstruct flowConstruct;
 
   @Before
   public void before() {
-    phase.setMuleContext(mock(MuleContext.class));
+    phase.setMuleContext(muleContext);
+    ComponentLocation mockComponentLocation = mock(ComponentLocation.class);
+    when(mockComponentLocation.getRootContainerName()).thenReturn("root");
+    when(messageSource.getLocation()).thenReturn(mockComponentLocation);
     when(mockContext.getTransactionConfig()).thenReturn(empty());
+    when(mockContext.getMessageSource()).thenReturn(messageSource);
+    when(muleContext.getRegistry().get(any())).thenReturn(this.flowConstruct);
   }
 
   @Test
@@ -104,7 +119,7 @@ public class FlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     when(mockContext.supportsAsynchronousProcessing()).thenReturn(false);
     phase.runPhase(mockRequestResponseTemplate, mockContext, mockNotifier);
     InOrder inOrderVerify =
-        Mockito.inOrder(mockContext, mockContext.getFlowConstruct(), mockRequestResponseTemplate, mockNotifier);
+        Mockito.inOrder(mockContext, mockRequestResponseTemplate, mockNotifier);
     inOrderVerify.verify(mockContext, atLeastOnce()).getTransactionConfig();
     inOrderVerify.verify(mockRequestResponseTemplate).getEvent();
     inOrderVerify.verify(mockRequestResponseTemplate).beforeRouteEvent(any(Event.class));

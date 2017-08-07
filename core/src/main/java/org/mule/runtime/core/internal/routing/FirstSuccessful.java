@@ -26,7 +26,8 @@ public class FirstSuccessful extends AbstractOutboundRouter {
   public void initialise() throws InitialisationException {
     super.initialise();
     routingStrategy =
-        new FirstSuccessfulRoutingStrategy(flowConstruct, failureExpression, (route, event) -> doProcessRoute(route, event));
+        new FirstSuccessfulRoutingStrategy(getMuleContext().getExpressionManager(), failureExpression,
+                                           (route, event) -> doProcessRoute(route, event), getLocation());
   }
 
   /**

@@ -14,7 +14,6 @@ import static org.mule.runtime.core.api.context.notification.MessageProcessorNot
 import static org.mule.runtime.core.api.context.notification.MessageProcessorNotification.createFrom;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setFlowConstructIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
@@ -24,7 +23,6 @@ import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
@@ -32,8 +30,6 @@ import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.context.notification.MessageProcessorNotification;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.exception.MessagingException;
@@ -49,6 +45,7 @@ import org.mule.runtime.core.internal.processor.interceptor.ReactiveInterceptorA
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -73,8 +70,10 @@ abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObject imp
   private ProcessingStrategy processingStrategy;
   private StreamingManager streamingManager;
 
-  AbstractMessageProcessorChain(String name, List<Processor> processors) {
+  AbstractMessageProcessorChain(String name, Optional<ProcessingStrategy> processingStrategyOptional,
+                                List<Processor> processors) {
     this.name = name;
+    this.processingStrategy = processingStrategyOptional.orElse(null);
     this.processors = processors;
   }
 
@@ -170,12 +169,12 @@ abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObject imp
     interceptors.add((processor, next) -> stream -> from(stream).concatMap(event -> just(event)
         .transform(next)
         .onErrorResume(RejectedExecutionException.class,
-                       throwable -> Mono.from(event.getContext()
+                       throwable -> Mono.from(event.getInternalContext()
                            .error(updateMessagingExceptionWithError(new MessagingException(event, throwable, processor),
                                                                     processor, muleContext)))
                            .then(Mono.empty()))
         .onErrorResume(MessagingException.class,
-                       throwable -> Mono.from(event.getContext().error(throwable)).then(Mono.empty()))));
+                       throwable -> Mono.from(event.getInternalContext().error(throwable)).then(Mono.empty()))));
 
     return interceptors;
   }
@@ -272,15 +271,6 @@ abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObject imp
   public void setMuleContext(MuleContext muleContext) {
     this.muleContext = muleContext;
     setMuleContextIfNeeded(getMessageProcessorsForLifecycle(), muleContext);
-  }
-
-  @Override
-  public void setFlowConstruct(FlowConstruct flowConstruct) {
-    if (flowConstruct instanceof Pipeline
-        && ((Pipeline) flowConstruct).getProcessingStrategy() != null) {
-      processingStrategy = ((Pipeline) flowConstruct).getProcessingStrategy();
-    }
-    setFlowConstructIfNeeded(getMessageProcessorsForLifecycle(), flowConstruct);
   }
 
   @Override

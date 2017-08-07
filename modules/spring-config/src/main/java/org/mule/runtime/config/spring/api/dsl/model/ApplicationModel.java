@@ -29,7 +29,6 @@ import static org.mule.runtime.extension.api.util.NameUtils.pluralize;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.DOMAIN_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.EE_DOMAIN_PREFIX;
-
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.app.declaration.ElementDeclaration;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -106,7 +105,6 @@ public class ApplicationModel {
   public static final String MULE_DOMAIN_ROOT_ELEMENT = "mule-domain";
   public static final String IMPORT_ELEMENT = "import";
   public static final String POLICY_ROOT_ELEMENT = "policy";
-  public static final String ANNOTATIONS = "annotations";
   public static final String ERROR_HANDLER = "error-handler";
   public static final String ERROR_MAPPING = "error-mapping";
   public static final String MAX_REDELIVERY_ATTEMPTS_ROLLBACK_ES_ATTRIBUTE = "maxRedeliveryAttempts";
@@ -117,7 +115,6 @@ public class ApplicationModel {
   public static final String NAME_ATTRIBUTE = "name";
   public static final String REFERENCE_ATTRIBUTE = "ref";
   public static final String VALUE_ATTRIBUTE = "value";
-  public static final String PROCESSOR_REFERENCE_ELEMENT = "processor";
   public static final String TRANSFORMER_REFERENCE_ELEMENT = "transformer";
   public static final String ANNOTATION_ELEMENT = "annotations";
   public static final String CONFIGURATION_ELEMENT = "configuration";
@@ -126,7 +123,6 @@ public class ApplicationModel {
   public static final String DESCRIPTION_ELEMENT = "description";
   public static final String PROPERTIES_ELEMENT = "properties";
   public static final String FLOW_ELEMENT = "flow";
-  public static final String FLOW_REF_ELEMENT = "flow-ref";
   public static final String SUBFLOW_ELEMENT = "sub-flow";
   private static final String MODULE_OPERATION_CHAIN_ELEMENT = "module-operation-chain";
 
@@ -163,16 +159,12 @@ public class ApplicationModel {
       builder().namespace(DOMAIN_PREFIX).name(MULE_DOMAIN_ROOT_ELEMENT).build();
   public static final ComponentIdentifier MULE_EE_DOMAIN_IDENTIFIER =
       builder().namespace(EE_DOMAIN_PREFIX).name(MULE_DOMAIN_ROOT_ELEMENT).build();
-  public static final ComponentIdentifier POLICY_IDENTIFIER =
-      builder().namespace(POLICY_ROOT_ELEMENT).name(POLICY_ROOT_ELEMENT).build();
   public static final ComponentIdentifier MULE_PROPERTY_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(PROPERTY_ELEMENT).build();
   public static final ComponentIdentifier MULE_PROPERTIES_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(PROPERTIES_ELEMENT).build();
   public static final ComponentIdentifier ANNOTATIONS_ELEMENT_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(ANNOTATION_ELEMENT).build();
-  public static final ComponentIdentifier PROCESSOR_IDENTIFIER =
-      builder().namespace(CORE_PREFIX).name(PROCESSOR_REFERENCE_ELEMENT).build();
   public static final ComponentIdentifier TRANSFORMER_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(TRANSFORMER_REFERENCE_ELEMENT).build();
   public static final ComponentIdentifier CONFIGURATION_IDENTIFIER =
@@ -183,14 +175,10 @@ public class ApplicationModel {
       builder().namespace(DOC_NAMESPACE).name(DESCRIPTION_ELEMENT).build();
   public static final ComponentIdentifier DESCRIPTION_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(DESCRIPTION_ELEMENT).build();
-  public static final ComponentIdentifier ANNOTATIONS_IDENTIFIER =
-      builder().namespace(CORE_PREFIX).name(ANNOTATIONS).build();
   public static final ComponentIdentifier OBJECT_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(OBJECT_ELEMENT).build();
   public static final ComponentIdentifier FLOW_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(FLOW_ELEMENT).build();
-  public static final ComponentIdentifier FLOW_REF_IDENTIFIER =
-      builder().namespace(CORE_PREFIX).name(FLOW_REF_ELEMENT).build();
   public static final ComponentIdentifier SUBFLOW_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(SUBFLOW_ELEMENT).build();
   public static final ComponentIdentifier REDELIVERY_POLICY_IDENTIFIER =

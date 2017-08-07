@@ -30,12 +30,14 @@ public class RunnerConfiguration {
   private static final String TEST_INCLUSIONS = "testInclusions";
   private static final String EXPORT_PLUGIN_CLASSES = "exportPluginClasses";
   private static final String SHARED_RUNTIME_LIBS = "sharedRuntimeLibs";
+  private static final String EXTRA_PRIVILEGED_ARTIFACTS = "extraPrivilegedArtifacts";
 
   private Set<String> providedExclusions;
   private Set<String> testExclusions;
   private Set<String> testInclusions;
   private Set<Class> exportPluginClasses;
   private Set<String> sharedRuntimeLibs;
+  private Set<String> extraPrivilegedArtifacts;
 
   private String loadedFromTestClass;
 
@@ -63,6 +65,10 @@ public class RunnerConfiguration {
     return testInclusions;
   }
 
+  public Set<String> getExtraPrivilegedArtifacts() {
+    return extraPrivilegedArtifacts;
+  }
+
   /**
    * Creates an instance of the the configuration by reading the class annotated with {@link ArtifactClassLoaderRunnerConfig}.
    *
@@ -80,6 +86,7 @@ public class RunnerConfiguration {
     runnerConfiguration.exportPluginClasses = new HashSet<>(readAttribute(EXPORT_PLUGIN_CLASSES, testClass));
 
     runnerConfiguration.sharedRuntimeLibs = new HashSet<>(readAttribute(SHARED_RUNTIME_LIBS, testClass));
+    runnerConfiguration.extraPrivilegedArtifacts = new HashSet<>(readAttribute(EXTRA_PRIVILEGED_ARTIFACTS, testClass));
 
     return runnerConfiguration;
   }

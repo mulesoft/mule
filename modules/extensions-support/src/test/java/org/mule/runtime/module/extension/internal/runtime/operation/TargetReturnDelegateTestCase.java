@@ -37,7 +37,7 @@ public class TargetReturnDelegateTestCase extends ValueReturnDelegateTestCase {
 
   @Override
   protected Message getOutputMessage(Event result) {
-    Message message = (Message) result.getVariable(TARGET).getValue();
+    Message message = (Message) result.getVariables().get(TARGET).getValue();
 
     assertThat(message, is(notNullValue()));
     return message;

@@ -6,12 +6,11 @@
  */
 package org.mule.runtime.core.internal.routing;
 
-import static java.util.Collections.singletonMap;
 import static java.util.Optional.of;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
@@ -43,10 +42,8 @@ public class AggregatorTestCase extends AbstractMuleContextTestCase {
     MuleSession session = new DefaultMuleSession();
 
     TestEventAggregator router = new TestEventAggregator(3);
-    router.setMuleContext(muleContext);
-    router.setFlowConstruct(flow);
-    router.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
-    router.initialise();
+    router.setAnnotations(getAppleFlowComponentLocationAnnotations());
+    initialiseIfNeeded(router, true, muleContext);
 
     EventContext context = DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION, "foo");
 

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.processor.chain;
 
+import static java.util.Optional.empty;
 import static reactor.core.publisher.Flux.from;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
@@ -38,7 +39,7 @@ public class SubflowMessageProcessorChainBuilder extends ExplicitMessageProcesso
 
     SubFlowMessageProcessorChain(String name, Processor head, List<Processor> processors,
                                  List<Processor> processorsForLifecycle) {
-      super(name, head, processors, processorsForLifecycle);
+      super(name, empty(), head, processors, processorsForLifecycle);
       this.subFlowName = name;
     }
 

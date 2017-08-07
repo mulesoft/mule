@@ -131,7 +131,7 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
       }
       MessagingExceptionStrategyAcceptorDelegate acceptsAllStrategy =
           new MessagingExceptionStrategyAcceptorDelegate(defaultExceptionStrategy);
-      initialiseIfNeeded(acceptsAllStrategy, muleContext, flowConstruct);
+      initialiseIfNeeded(acceptsAllStrategy, muleContext);
       this.exceptionListeners.add(acceptsAllStrategy);
     }
   }

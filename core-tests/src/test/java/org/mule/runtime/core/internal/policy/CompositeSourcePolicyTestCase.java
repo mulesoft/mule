@@ -91,7 +91,7 @@ public class CompositeSourcePolicyTestCase extends AbstractMuleTestCase {
     when(nextProcessResultEvent.getMessage()).thenReturn(mock(Message.class));
     when(flowExecutionProcessor.apply(any())).thenAnswer(invocation -> {
       Mono<Event> mono = from(invocation.getArgumentAt(0, Publisher.class));
-      return mono.doOnNext(event -> event.getContext().success(event));
+      return mono.doOnNext(event -> event.getInternalContext().success(event));
     });
     when(firstPolicy.getPolicyChain().apply(any())).thenReturn(just(firstPolicyResultEvent));
     when(secondPolicy.getPolicyChain().apply(any())).thenReturn(just(secondPolicyResultEvent));
@@ -182,7 +182,7 @@ public class CompositeSourcePolicyTestCase extends AbstractMuleTestCase {
     reset(flowExecutionProcessor);
     when(flowExecutionProcessor.apply(any())).thenAnswer(invocation -> {
       Mono<Event> mono = from(invocation.getArgumentAt(0, Publisher.class));
-      mono.doOnNext(event -> event.getContext().error(policyException)).subscribe();
+      mono.doOnNext(event -> event.getInternalContext().error(policyException)).subscribe();
       return empty();
     });
     compositeSourcePolicy = new CompositeSourcePolicy(asList(firstPolicy, secondPolicy), sourcePolicyParametersTransformer,

@@ -104,7 +104,6 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
 
     irp.setMaxRedeliveryCount(MAX_REDELIVERY_COUNT);
     irp.setUseSecureHash(true);
-    irp.setFlowConstruct(mock(FlowConstruct.class));
     irp.setMuleContext(mockMuleContext);
     irp.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
     irp.setListener(mockFailingMessageProcessor);

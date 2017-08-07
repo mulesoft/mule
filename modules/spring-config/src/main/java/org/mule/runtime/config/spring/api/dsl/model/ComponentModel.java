@@ -28,6 +28,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.BeanReference;
+
 /**
  * An {@code ComponentModel} represents the user configuration of a component (flow, config, message processor, etc) defined in an
  * artifact configuration file.

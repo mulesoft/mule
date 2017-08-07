@@ -166,7 +166,9 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
 
   @Override
   public void stop() throws MuleException {
-    scheduler.stop();
+    if (scheduler != null) {
+      scheduler.stop();
+    }
   }
 
   @Override
@@ -371,7 +373,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
     MultipleRequestReplierEvent multipleEvent = (MultipleRequestReplierEvent) store.retrieve(correlationId);
     Event event = multipleEvent.getEvent();
     // TODO MULE-10302 remove this.
-    if (event.getFlowConstruct() == null) {
+    if (event.getMuleContext() == null) {
       try {
         DeserializationPostInitialisable.Implementation.init(event, muleContext);
       } catch (Exception e) {

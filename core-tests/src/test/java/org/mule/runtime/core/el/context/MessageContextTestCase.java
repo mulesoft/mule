@@ -7,7 +7,6 @@
 package org.mule.runtime.core.el.context;
 
 import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
@@ -32,7 +31,6 @@ import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.message.InternalMessage;
 
 import java.util.Optional;
-import java.util.OptionalInt;
 
 import org.junit.Before;
 import org.junit.Test;

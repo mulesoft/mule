@@ -45,7 +45,6 @@ import static org.mule.test.metadata.extension.resolver.TestNoConfigMetadataReso
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.just;
-
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
@@ -76,6 +75,7 @@ import org.mule.tck.size.SmallTest;
 import org.mule.weave.v2.el.WeaveDefaultExpressionLanguageFactoryService;
 
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -91,14 +91,18 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class OperationMessageProcessorTestCase extends AbstractOperationMessageProcessorTestCase {
 
   private static final String SOME_PARAM_NAME = "someParam";
+  private static final String FLOW_NAME = "flowName";
 
   @Rule
   public ExpectedException expectedException = none();
 
   @Override
   protected OperationMessageProcessor createOperationMessageProcessor() {
-    return new OperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetType, resolverSet,
-                                         cursorStreamProviderFactory, extensionManager, mockPolicyManager);
+    OperationMessageProcessor operationMessageProcessor =
+        new OperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetType, resolverSet,
+                                      cursorStreamProviderFactory, extensionManager, mockPolicyManager);
+    operationMessageProcessor.setAnnotations(getFlowComponentLocationAnnotations(FLOW_NAME));
+    return operationMessageProcessor;
   }
 
   @Test
@@ -151,7 +155,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     when(operationExecutor.execute(any(ExecutionContext.class)))
         .thenReturn(just(builder().output(payload).mediaType(mediaType).attributes(attributes).build()));
 
-    InternalMessage message = (InternalMessage) messageProcessor.process(event).getVariable(TARGET_VAR).getValue();
+    InternalMessage message = (InternalMessage) messageProcessor.process(event).getVariables().get(TARGET_VAR).getValue();
     assertThat(message, is(notNullValue()));
 
     assertThat(message.getPayload().getValue(), is(sameInstance(payload)));
@@ -228,7 +232,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     Object value = new Object();
     when(operationExecutor.execute(any(ExecutionContext.class))).thenReturn(just(value));
 
-    InternalMessage message = (InternalMessage) messageProcessor.process(event).getVariable(TARGET_VAR).getValue();
+    InternalMessage message = (InternalMessage) messageProcessor.process(event).getVariables().get(TARGET_VAR).getValue();
     assertThat(message, is(notNullValue()));
     assertThat(message.getPayload().getValue(), is(sameInstance(value)));
   }
@@ -236,7 +240,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
   @Test
   public void operationWithExpressionInTargetParameter() throws Exception {
 
-    String flowName = "flowName";
+    String flowName = FLOW_NAME;
     expectedException.expect(IllegalOperationException.class);
     expectedException.expectMessage(format(INVALID_TARGET_MESSAGE, flowName, operationModel.getName(), "an expression"));
 
@@ -251,7 +255,6 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     FlowConstruct flowConstruct = mock(FlowConstruct.class);
     when(flowConstruct.getName()).thenReturn(flowName);
 
-    messageProcessor.setFlowConstruct(flowConstruct);
     messageProcessor.setMuleContext(context);
     messageProcessor.initialise();
   }
@@ -259,7 +262,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
   @Test
   public void operationWithFlowvarsPrefixInTargetParameter() throws Exception {
 
-    String flowName = "flowName";
+    String flowName = FLOW_NAME;
     expectedException.expect(IllegalOperationException.class);
     expectedException
         .expectMessage(format(INVALID_TARGET_MESSAGE, flowName, operationModel.getName(), format("the '%s' prefix", FLOW_VARS)));
@@ -271,7 +274,6 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     FlowConstruct flowConstruct = mock(FlowConstruct.class);
     when(flowConstruct.getName()).thenReturn(flowName);
 
-    messageProcessor.setFlowConstruct(flowConstruct);
     messageProcessor.setMuleContext(context);
     messageProcessor.initialise();
   }
@@ -318,6 +320,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
 
   @Test
   public void skipPolicyWithNoComponentLocation() throws Exception {
+    messageProcessor.setAnnotations(new HashMap<>());
     messageProcessor.process(event);
 
     assertThat(mockOperationPolicy, is(nullValue()));
@@ -362,7 +365,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
         (PrecalculatedExecutionContextAdapter) spy(resolveParameters.getContext());
 
     messageProcessor.process(Event.builder(event)
-        .parameters(singletonMap(INTERCEPTION_RESOLVED_CONTEXT, context))
+        .internalParameters(singletonMap(INTERCEPTION_RESOLVED_CONTEXT, context))
         .build());
 
     verify(operationExecutor).execute(any(ExecutionContext.class));

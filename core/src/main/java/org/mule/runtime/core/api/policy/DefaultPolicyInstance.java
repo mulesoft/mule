@@ -13,10 +13,10 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.error;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -36,7 +36,8 @@ import org.slf4j.Logger;
 
 
 //TODO MULE-10963 - Remove FlowConstruct implementation once MPs don't depend on FlowConstructAware anymore.
-public class DefaultPolicyInstance implements PolicyInstance, FlowConstruct, MuleContextAware, Lifecycle {
+public class DefaultPolicyInstance extends AbstractAnnotatedObject
+    implements PolicyInstance, FlowConstruct, MuleContextAware, Lifecycle {
 
   private final static Logger logger = getLogger(DefaultPolicyInstance.class);
 
@@ -50,8 +51,8 @@ public class DefaultPolicyInstance implements PolicyInstance, FlowConstruct, Mul
 
   @Override
   public void initialise() throws InitialisationException {
-    initialiseIfNeeded(operationPolicyChain, muleContext, this);
-    initialiseIfNeeded(sourcePolicyChain, muleContext, this);
+    initialiseIfNeeded(operationPolicyChain, muleContext);
+    initialiseIfNeeded(sourcePolicyChain, muleContext);
     lifecycleStateManager.fireInitialisePhase((phaseNam, object) -> {
     });
   }

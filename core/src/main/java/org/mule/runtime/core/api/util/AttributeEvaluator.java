@@ -13,7 +13,7 @@ import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
-import static org.mule.runtime.core.el.BindingContextUtils.NULL_BINDING_CONTEXT;
+import static org.mule.runtime.internal.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;

@@ -59,6 +59,7 @@ public class ArtifactIsolatedClassLoaderBuilder {
   private Set<String> testExclusions = emptySet();
   private Set<String> testInclusions = emptySet();
   private Set<String> sharedPluginLibCoordinates = emptySet();
+  private Set<String> extraPrivilegedArtifacts = emptySet();
   private Set<Class> exportPluginClasses = emptySet();
   private boolean extensionMetadataGenerationEnabled = false;
   private Set<String> providedInclusions = emptySet();
@@ -144,6 +145,19 @@ public class ArtifactIsolatedClassLoaderBuilder {
    */
   public ArtifactIsolatedClassLoaderBuilder setExtraBootPackages(List<String> extraBootPackages) {
     this.extraBootPackages = extraBootPackages;
+    return this;
+  }
+
+  /**
+   * Sets the {@link List} of {@link String}s containing the extra privileged artifacts defined to be appended to the container in
+   * addition to the pre-defined ones.
+   *
+   * @param extraPrivilegedArtifacts {@link List} of {@link String}s containing the extra privileged artifacts defined to be
+   *        appended to the container in addition to the pre-defined ones.
+   * @return this
+   */
+  public ArtifactIsolatedClassLoaderBuilder setExtraPrivilegedArtifacts(Set<String> extraPrivilegedArtifacts) {
+    this.extraPrivilegedArtifacts = extraPrivilegedArtifacts;
     return this;
   }
 
@@ -258,7 +272,8 @@ public class ArtifactIsolatedClassLoaderBuilder {
     }
 
     ArtifactsUrlClassification artifactsUrlClassification = classPathClassifier.classify(context);
-    return isolatedClassLoaderFactory.createArtifactClassLoader(context.getExtraBootPackages(), artifactsUrlClassification);
+    return isolatedClassLoaderFactory.createArtifactClassLoader(context.getExtraBootPackages(), extraPrivilegedArtifacts,
+                                                                artifactsUrlClassification);
   }
 
   /**

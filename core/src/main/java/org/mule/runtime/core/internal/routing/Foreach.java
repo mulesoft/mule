@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.routing;
 
-import static java.util.Collections.emptySet;
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.exception.MuleException.INFO_LOCATION_KEY;
@@ -19,6 +19,7 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.exception.MessagingException;
@@ -32,7 +33,7 @@ import org.mule.runtime.core.internal.routing.outbound.AbstractMessageSequenceSp
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,11 +73,11 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     String parentMessageProp = rootMessageVariableName != null ? rootMessageVariableName : ROOT_MESSAGE_PROPERTY;
     Object previousCounterVar = null;
     Object previousRootMessageVar = null;
-    if (event.getVariableNames().contains(counterVariableName)) {
-      previousCounterVar = event.getVariable(counterVariableName).getValue();
+    if (event.getVariables().containsKey(counterVariableName)) {
+      previousCounterVar = event.getVariables().get(counterVariableName).getValue();
     }
-    if (event.getVariableNames().contains(parentMessageProp)) {
-      previousRootMessageVar = event.getVariable(parentMessageProp).getValue();
+    if (event.getVariables().containsKey(parentMessageProp)) {
+      previousRootMessageVar = event.getVariables().get(parentMessageProp).getValue();
     }
     Message message = event.getMessage();
     final Builder requestBuilder = Event.builder(event);
@@ -159,15 +160,15 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
 
       @Override
       protected void propagateFlowVars(Event previousResult, final Builder builder) {
-        for (String flowVarName : resolvePropagatedFlowVars(previousResult)) {
-          builder.addVariable(flowVarName, previousResult.getVariable(flowVarName).getValue(),
-                              previousResult.getVariable(flowVarName).getDataType());
+        for (String flowVarName : resolvePropagatedFlowVars(previousResult).keySet()) {
+          builder.addVariable(flowVarName, previousResult.getVariables().get(flowVarName).getValue(),
+                              previousResult.getVariables().get(flowVarName).getDataType());
         }
       }
 
       @Override
-      protected Set<String> resolvePropagatedFlowVars(Event previousResult) {
-        return previousResult != null ? previousResult.getVariableNames() : emptySet();
+      protected Map<String, TypedValue<?>> resolvePropagatedFlowVars(Event previousResult) {
+        return previousResult != null ? previousResult.getVariables() : emptyMap();
       }
 
     };

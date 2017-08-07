@@ -12,7 +12,6 @@ import static org.mule.runtime.core.api.config.i18n.CoreMessages.errorInvokingMe
 import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createScopeTransactionalExecutionTemplate;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setFlowConstructIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
@@ -136,7 +135,6 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
     if (messagingExceptionHandler == null) {
       messagingExceptionHandler = muleContext.getDefaultErrorHandler();
     }
-    setFlowConstructIfNeeded(messagingExceptionHandler, flowConstruct);
     initialiseIfNeeded(messagingExceptionHandler, true, muleContext);
     super.initialise();
   }

@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.policy;
 
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.EventContext;
 
 /**
  * Helper class that creates an {@link Event} maintaining variables from different scopes.
@@ -25,11 +26,8 @@ public class PolicyEventConverter {
    */
   public Event createEvent(Event event, Event variablesProviderEvent) {
     Event.Builder eventBuilder =
-        Event.builder(variablesProviderEvent.getContext()).message(event.getMessage()).session(event.getSession());
-    for (String variableName : variablesProviderEvent.getVariableNames()) {
-      eventBuilder.addVariable(variableName, variablesProviderEvent.getVariable(variableName).getValue(),
-                               variablesProviderEvent.getVariable(variableName).getDataType());
-    }
+        Event.builder((EventContext) variablesProviderEvent.getContext()).message(event.getMessage()).session(event.getSession());
+    eventBuilder.variables(variablesProviderEvent.getVariables());
     return eventBuilder.build();
   }
 

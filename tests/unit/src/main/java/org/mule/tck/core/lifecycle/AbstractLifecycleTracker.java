@@ -9,13 +9,14 @@ package org.mule.tck.core.lifecycle;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class AbstractLifecycleTracker implements Lifecycle, MuleContextAware {
+public abstract class AbstractLifecycleTracker extends AbstractAnnotatedObject implements Lifecycle, MuleContextAware {
 
   private final List<String> tracker = new ArrayList<>();
   private MuleContext muleContext;

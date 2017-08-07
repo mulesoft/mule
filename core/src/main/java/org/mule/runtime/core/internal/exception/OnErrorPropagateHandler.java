@@ -111,11 +111,4 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
     }
   }
 
-  @Override
-  public void setFlowConstruct(FlowConstruct flowConstruct) {
-    super.setFlowConstruct(flowConstruct);
-    if (redeliveryExceeded != null) {
-      redeliveryExceeded.setFlowConstruct(flowConstruct);
-    }
-  }
 }

@@ -8,7 +8,6 @@ package org.mule.runtime.core.api.policy;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static reactor.core.publisher.Mono.from;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -19,7 +18,6 @@ import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
@@ -36,7 +34,7 @@ import org.reactivestreams.Publisher;
  * @since 4.0
  */
 public class PolicyChain extends AbstractAnnotatedObject
-    implements Initialisable, Startable, FlowConstructAware, Stoppable, Disposable, Processor {
+    implements Initialisable, Startable, Stoppable, Disposable, Processor {
 
   @Inject
   private MuleContext muleContext;
@@ -51,10 +49,9 @@ public class PolicyChain extends AbstractAnnotatedObject
 
   @Override
   public final void initialise() throws InitialisationException {
-    initialiseIfNeeded(processors, muleContext, flowConstruct);
+    initialiseIfNeeded(processors, muleContext);
     processorChain = new DefaultMessageProcessorChainBuilder().chain(this.processors).build();
     processorChain.setMuleContext(muleContext);
-    processorChain.setFlowConstruct(flowConstruct);
     processorChain.initialise();
   }
 
@@ -81,11 +78,6 @@ public class PolicyChain extends AbstractAnnotatedObject
   @Override
   public Publisher<Event> apply(Publisher<Event> publisher) {
     return from(publisher).transform(processorChain);
-  }
-
-  @Override
-  public void setFlowConstruct(FlowConstruct flowConstruct) {
-    this.flowConstruct = flowConstruct;
   }
 
 }

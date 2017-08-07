@@ -41,7 +41,6 @@ public class ResponseAssertionMessageProcessorTestCase extends AssertionMessageP
   public void responseProcess() throws Exception {
     ResponseAssertionMessageProcessor asp = createAssertionMessageProcessor();
     asp.setListener(testNonBlockingProcessor);
-    asp.setFlowConstruct(flowConstruct);
     asp.setExpressionManager(expressionManager);
     asp.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent("flow")));
     asp.setExpression(TRUE_EXPRESSION);
@@ -63,7 +62,6 @@ public class ResponseAssertionMessageProcessorTestCase extends AssertionMessageP
 
     ResponseAssertionMessageProcessor asp = createAssertionMessageProcessor();
     asp.setListener(testNonBlockingProcessor);
-    asp.setFlowConstruct(flowConstruct);
     asp.setExpressionManager(expressionManager);
     asp.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent("flow")));
     asp.setExpression(TRUE_EXPRESSION);

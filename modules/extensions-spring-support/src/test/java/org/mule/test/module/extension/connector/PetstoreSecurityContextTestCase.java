@@ -17,7 +17,7 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.api.security.SecurityProviderNotFoundException;
 import org.mule.runtime.core.api.security.DefaultMuleAuthentication;
-import org.mule.runtime.core.api.security.SecurityContext;
+import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.core.api.security.SecurityProvider;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import org.mule.test.runner.RunnerDelegateTo;

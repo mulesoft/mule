@@ -97,11 +97,14 @@ public class IsolatedClassLoaderFactory {
    *
    * @param extraBootPackages {@link List} of {@link String}s of extra boot packages to be appended to the container
    *        {@link ClassLoader}
+   * @param extraPrivilegedArtifacts {@link List} of {@link String}s of extra privileged artifacts. Each value needs to have the
+   *        form groupId:versionId.
    * @param artifactsUrlClassification the {@link ArtifactsUrlClassification} that defines the different {@link URL}s for each
    *        {@link ClassLoader}
    * @return a {@link ArtifactClassLoaderHolder} that would be used to run the test
    */
   public ArtifactClassLoaderHolder createArtifactClassLoader(List<String> extraBootPackages,
+                                                             Set<String> extraPrivilegedArtifacts,
                                                              ArtifactsUrlClassification artifactsUrlClassification) {
     JarInfo testJarInfo = getTestJarInfo(artifactsUrlClassification);
     Map<String, LookupStrategy> appExportedLookupStrategies = new HashMap<>();
@@ -116,7 +119,9 @@ public class IsolatedClassLoaderFactory {
     List<ArtifactClassLoader> serviceArtifactClassLoaders;
 
     DefaultModuleRepository moduleRepository =
-        new DefaultModuleRepository(new ContainerModuleDiscoverer(ContainerClassLoaderFactory.class.getClassLoader()));
+        new DefaultModuleRepository(new TestContainerModuleDiscoverer(extraPrivilegedArtifacts,
+                                                                      new ContainerModuleDiscoverer(ContainerClassLoaderFactory.class
+                                                                          .getClassLoader())));
 
     try (final TestContainerClassLoaderFactory testContainerClassLoaderFactory =
         new TestContainerClassLoaderFactory(extraBootPackages, artifactsUrlClassification.getContainerUrls().toArray(new URL[0]),

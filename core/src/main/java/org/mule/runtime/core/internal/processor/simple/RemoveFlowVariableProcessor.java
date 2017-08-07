@@ -17,7 +17,7 @@ public class RemoveFlowVariableProcessor extends AbstractRemoveVariablePropertyP
 
   @Override
   protected Set<String> getPropertyNames(Event event) {
-    return event.getVariableNames();
+    return event.getVariables().keySet();
   }
 
   @Override

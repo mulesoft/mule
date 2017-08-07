@@ -13,8 +13,6 @@ import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.collections.ListUtils.union;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setFlowConstructIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.management.stats.RouterStatistics.TYPE_OUTBOUND;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
@@ -31,8 +29,6 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.management.stats.RouterStatistics;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
@@ -50,7 +46,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.reactivestreams.Publisher;
 
 public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject implements SelectiveRouter,
-    RouterStatisticsRecorder, Lifecycle, FlowConstructAware, MuleContextAware {
+    RouterStatisticsRecorder, Lifecycle, MuleContextAware {
 
   private final List<MessageProcessorExpressionPair> conditionalMessageProcessors = new ArrayList<>();
   private Optional<MessageProcessorChain> defaultProcessor = empty();
@@ -59,20 +55,10 @@ public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject im
   final AtomicBoolean initialised = new AtomicBoolean(false);
   final AtomicBoolean starting = new AtomicBoolean(false);
   final AtomicBoolean started = new AtomicBoolean(false);
-  private FlowConstruct flowConstruct;
   private MuleContext muleContext;
 
   public AbstractSelectiveRouter() {
     routerStatistics = new RouterStatistics(TYPE_OUTBOUND);
-  }
-
-  @Override
-  public void setFlowConstruct(FlowConstruct flowConstruct) {
-    this.flowConstruct = flowConstruct;
-    conditionalMessageProcessors.forEach(pair -> pair.setFlowConstruct(flowConstruct));
-    conditionalMessageProcessors.forEach(pair -> pair.setMuleContext(muleContext));
-    setMuleContextIfNeeded(defaultProcessor, muleContext);
-    setFlowConstructIfNeeded(defaultProcessor, flowConstruct);
   }
 
   @Override
@@ -84,9 +70,6 @@ public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject im
   public void initialise() throws InitialisationException {
     synchronized (conditionalMessageProcessors) {
       for (Object o : getLifecycleManagedObjects()) {
-        if (o instanceof FlowConstructAware) {
-          ((FlowConstructAware) o).setFlowConstruct(flowConstruct);
-        }
         if (o instanceof MuleContextAware) {
           ((MuleContextAware) o).setMuleContext(muleContext);
         }
@@ -206,10 +189,6 @@ public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject im
 
   private <O> O transitionLifecycleManagedObjectForAddition(O managedObject) {
     try {
-      if ((flowConstruct != null) && (managedObject instanceof FlowConstructAware)) {
-        ((FlowConstructAware) managedObject).setFlowConstruct(flowConstruct);
-      }
-
       if ((muleContext != null) && (managedObject instanceof MuleContextAware)) {
         ((MuleContextAware) managedObject).setMuleContext(muleContext);
       }

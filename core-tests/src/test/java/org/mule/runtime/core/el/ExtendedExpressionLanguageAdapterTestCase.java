@@ -166,7 +166,7 @@ public class ExtendedExpressionLanguageAdapterTestCase extends AbstractWeaveExpr
                                                            TEST_CONNECTOR_LOCATION,
                                                            emptyBindingContext);
     assertThat(result.getValue(), is(nullValue()));
-    assertThat(builder1.build().getVariableNames(), contains("key"));
+    assertThat(builder1.build().getVariables().keySet(), contains("key"));
 
     Event.Builder builder2 = builder(event);
     TypedValue result2 = expressionLanguageAdapter.evaluate("vars.put(\'key\',\'value\')",
@@ -175,7 +175,7 @@ public class ExtendedExpressionLanguageAdapterTestCase extends AbstractWeaveExpr
                                                             TEST_CONNECTOR_LOCATION,
                                                             emptyBindingContext);
     assertThat(result2.getValue(), is(nullValue()));
-    assertThat(builder2.build().getVariableNames(), not(contains("key")));
+    assertThat(builder2.build().getVariables().keySet(), not(contains("key")));
   }
 
   @Test

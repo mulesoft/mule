@@ -15,12 +15,16 @@ import static org.mule.runtime.core.api.processor.MessageProcessors.processWithC
 import static org.mule.runtime.core.api.util.ExceptionUtils.getMessagingExceptionCause;
 import static org.mule.runtime.core.privileged.routing.outbound.AbstractOutboundRouter.DEFAULT_FAILURE_EXPRESSION;
 import static reactor.core.publisher.Flux.from;
+
+import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
+import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.AbstractMuleObjectOwner;
@@ -34,6 +38,8 @@ import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
+
+import javax.inject.Inject;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
@@ -54,6 +60,9 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Router {
   private static final long DEFAULT_MILLIS_BETWEEN_RETRIES = 60 * 1000;
   private static final int DEFAULT_RETRIES = 5;
 
+  @Inject
+  private ConfigurationComponentLocator componentLocator;
+
   private int maxRetries = DEFAULT_RETRIES;
   private Long millisBetweenRetries = DEFAULT_MILLIS_BETWEEN_RETRIES;
   private String failureExpression = DEFAULT_FAILURE_EXPRESSION;
@@ -61,6 +70,7 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Router {
   private Predicate<Event> shouldRetry;
   private SimpleRetryPolicyTemplate policyTemplate;
   private Scheduler timer;
+  private FlowConstruct flowConstruct;
 
   @Override
   public void initialise() throws InitialisationException {
@@ -74,6 +84,7 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Router {
         new SimpleRetryPolicyTemplate(millisBetweenRetries, maxRetries, timer);
     shouldRetry = event -> (muleContext.getExpressionManager().evaluateBoolean(failureExpression, event,
                                                                                getLocation(), false, true));
+    flowConstruct = (FlowConstruct) componentLocator.find(Location.builder().globalName(getRootContainerName()).build()).get();
   }
 
   @Override

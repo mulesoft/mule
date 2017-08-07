@@ -69,7 +69,7 @@ public class CursorManager {
    * @return a {@link CursorContext}
    */
   public CursorProvider manage(CursorProvider provider, Event creatorEvent) {
-    final EventContext ownerContext = getRoot(creatorEvent.getContext());
+    final EventContext ownerContext = getRoot(creatorEvent.getInternalContext());
     registerEventContext(ownerContext);
     registry.getUnchecked(ownerContext.getId()).addProvider(provider);
 
@@ -130,7 +130,7 @@ public class CursorManager {
   }
 
   private EventContext getRoot(EventContext eventContext) {
-    return eventContext.getParentContext()
+    return eventContext.getInternalParentContext()
         .map(this::getRoot)
         .orElse(eventContext);
   }

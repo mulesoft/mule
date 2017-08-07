@@ -19,8 +19,6 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 
 import java.util.Collection;
@@ -53,25 +51,6 @@ public class LifecycleUtils {
     if (object instanceof Initialisable) {
       ((Initialisable) object).initialise();
     }
-  }
-
-  /**
-   * The same as {@link #initialiseIfNeeded(Object, MuleContext)}, only that it also checks if it implements
-   * {@link FlowConstructAware}, in which case it will invoke {@link FlowConstructAware#setFlowConstruct(FlowConstruct)} with the
-   * given {@code flowConstruct}
-   *
-   * @param object the object you're trying to initialise
-   * @param muleContext a {@link MuleContext}
-   * @param flowConstruct the {@link FlowConstruct} in which the object is defined.
-   * @throws InitialisationException
-   */
-  public static void initialiseIfNeeded(Object object, MuleContext muleContext, FlowConstruct flowConstruct)
-      throws InitialisationException {
-    object = unwrap(object);
-    if (flowConstruct != null && object instanceof FlowConstructAware) {
-      ((FlowConstructAware) object).setFlowConstruct(flowConstruct);
-    }
-    initialiseIfNeeded(object, muleContext);
   }
 
   /**
@@ -290,31 +269,6 @@ public class LifecycleUtils {
     if (muleContext.isStopped() || muleContext.isStopping()) {
       throw new IllegalStateException(errorMessage);
     }
-  }
-
-  /**
-   * Sets an objects {@link FlowConstruct} if it implements {@link FlowConstructAware}.
-   *
-   * @param object the object to inject the {@link FlowConstruct} into.
-   * @param flowConstruct the {@link FlowConstruct} in which the object is defined.
-   * @throws InitialisationException
-   */
-  public static void setFlowConstructIfNeeded(Object object, FlowConstruct flowConstruct) {
-    object = unwrap(object);
-    if (object != null && object instanceof FlowConstructAware) {
-      ((FlowConstructAware) object).setFlowConstruct(flowConstruct);
-    }
-  }
-
-  /**
-   * Sets an objects {@link FlowConstruct} if it implements {@link FlowConstructAware}.
-   *
-   * @param objects the objects to inject the {@link FlowConstruct} into.
-   * @param flowConstruct the {@link FlowConstruct} in which the object is defined.
-   * @throws InitialisationException
-   */
-  public static void setFlowConstructIfNeeded(Collection<? extends Object> objects, FlowConstruct flowConstruct) {
-    objects.forEach(o -> setFlowConstructIfNeeded(o, flowConstruct));
   }
 
   /**

@@ -7,6 +7,7 @@
 package org.mule.runtime.core.privileged.routing.requestreply;
 
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.connector.ReplyToHandler;

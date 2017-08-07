@@ -19,6 +19,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
@@ -43,6 +44,8 @@ import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -51,9 +54,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 
 @Feature(ERROR_HANDLING)
 @Story(ON_ERROR_CONTINUE)
@@ -97,7 +97,6 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
     flow.initialise();
     onErrorContinueHandler = new OnErrorContinueHandler();
     onErrorContinueHandler.setMuleContext(mockMuleContext);
-    onErrorContinueHandler.setFlowConstruct(flow);
     onErrorContinueHandler.setNotificationFirer(mock(NotificationDispatcher.class));
 
     final MuleRegistry registry = mockMuleContext.getRegistry();
@@ -141,7 +140,8 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
         .setMessageProcessors(asList(createChagingEventMessageProcessor(Event.builder(context).message(muleMessage).flow(flow)
             .build()),
                                      createChagingEventMessageProcessor(lastEventCreated)));
-    onErrorContinueHandler.initialise();
+    onErrorContinueHandler.setAnnotations(getAppleFlowComponentLocationAnnotations());
+    initialiseIfNeeded(onErrorContinueHandler, true, muleContext);
     when(mockException.handled()).thenReturn(true);
     Event exceptionHandlingResult = onErrorContinueHandler.handleException(mockException, muleEvent);
 
