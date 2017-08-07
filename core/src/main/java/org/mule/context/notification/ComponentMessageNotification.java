@@ -41,7 +41,7 @@ public class ComponentMessageNotification extends ServerNotification
                                         FlowConstruct flowConstruct,
                                         int action)
     {
-        super(cloneMessage(message), action);
+        super(message, action);
         this.flowConstruct = flowConstruct;
         this.component = component;
         resourceIdentifier = flowConstruct.getName();
