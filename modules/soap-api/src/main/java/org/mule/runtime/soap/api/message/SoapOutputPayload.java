@@ -28,7 +28,8 @@ public class SoapOutputPayload {
   private final Map<String, TypedValue<InputStream>> attachments;
   private final Map<String, String> headers;
 
-  public SoapOutputPayload(InputStream body, Map<String, SoapAttachment> attachments, Map<String, String> headers, StreamingHelper helper) {
+  public SoapOutputPayload(InputStream body, Map<String, SoapAttachment> attachments, Map<String, String> headers,
+                           StreamingHelper helper) {
     this.body = wrapBody(body, helper);
     this.headers = copyOf(headers);
     this.attachments = wrapAttachments(attachments, helper);

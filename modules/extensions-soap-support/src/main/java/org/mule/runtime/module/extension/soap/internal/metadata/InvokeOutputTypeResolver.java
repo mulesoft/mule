@@ -39,6 +39,7 @@ public final class InvokeOutputTypeResolver extends BaseInvokeResolver implement
       throws MetadataResolvingException, ConnectionException {
     SoapClient client = getClient(context, key);
     SoapOperationMetadata metadata = client.getMetadataResolver().getOutputMetadata(key.getOperation());
-    return buildOutputType(metadata.getBodyType(), metadata.getHeadersType(), metadata.getAttachmentsType(), context.getTypeBuilder());
+    return buildOutputType(metadata.getBodyType(), metadata.getHeadersType(), metadata.getAttachmentsType(),
+                           context.getTypeBuilder());
   }
 }
