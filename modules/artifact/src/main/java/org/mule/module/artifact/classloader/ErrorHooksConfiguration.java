@@ -13,6 +13,10 @@ import reactor.core.publisher.Hooks;
 /**
  * Registers reactor-core error handling hooks when dynamically loaded into each plugin class loader.
  *
+ * IMPORTANT: this class is on a different package than the rest of the classes in this module. The reason of that is that this
+ * class must be loaded by each artifact class loader that is being disposed. So, it cannot contain any of the prefixes that force
+ * a class to be loaded from the container.
+ *
  * @since 4.0
  */
 public class ErrorHooksConfiguration {
