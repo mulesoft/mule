@@ -9,7 +9,7 @@ package org.mule.test.substitutiongroup.extension;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
-@XmlHints(substitutionGroup = "ee:some-ee-component")
+@XmlHints(substitutionGroup = "ee:cpu-light")
 public class EESGPojo {
 
   @Parameter

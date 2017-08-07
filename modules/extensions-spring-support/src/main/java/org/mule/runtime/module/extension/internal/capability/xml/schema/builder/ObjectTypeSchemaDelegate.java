@@ -266,7 +266,7 @@ final class ObjectTypeSchemaDelegate {
       return registeredComplexTypesHolders.get(typeId).getComplexType();
     }
 
-    QName base = getComplexTypeBase(baseType);
+    QName base = getComplexTypeBase(type,baseType);
     Collection<ObjectFieldType> fields;
     if (baseType == null) {
       fields = type.getFields();
@@ -286,13 +286,19 @@ final class ObjectTypeSchemaDelegate {
   /**
    * @return the {@link QName} of the {@code base} type for which the new {@link ComplexType} declares an {@code extension}
    */
-  private QName getComplexTypeBase(ObjectType baseType) {
+  private QName getComplexTypeBase(ObjectType type, ObjectType baseType) {
     Optional<DslElementSyntax> baseDsl = builder.getDslResolver().resolve(baseType);
-    if (!baseDsl.isPresent()) {
-      return MULE_ABSTRACT_EXTENSION_TYPE;
+    if (baseDsl.isPresent()) {
+      return new QName(baseDsl.get().getNamespace(), getBaseTypeName(baseType), baseDsl.get().getPrefix());
     }
-
-    return new QName(baseDsl.get().getNamespace(), getBaseTypeName(baseType), baseDsl.get().getPrefix());
+    String prefix = MULE_ABSTRACT_EXTENSION_TYPE.getPrefix();
+    String namespace = MULE_ABSTRACT_EXTENSION_TYPE.getNamespaceURI();
+    Optional<String> base = TypeUtils.getBaseType(type);
+    if(base.isPresent()) { //means that the baseType was defined by the user
+      String element = base.get();
+      return new QName(namespace,element,prefix);
+    }
+    return MULE_ABSTRACT_EXTENSION_TYPE;
   }
 
   private ComplexType declarePojoAsType(ObjectType metadataType, QName base, String description,

@@ -9,7 +9,7 @@ package org.mule.test.substitutiongroup.extension;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
-@XmlHints(substitutionGroup = "heisenberg:some-component", allowTopLevelDefinition = true)
+@XmlHints(substitutionGroup = "heisenberg:global-abstract-weapon", allowTopLevelDefinition = true)
 public class SomeExportedPojo {
 
   @Parameter

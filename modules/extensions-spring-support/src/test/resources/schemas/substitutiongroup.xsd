@@ -14,7 +14,7 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" substitutionGroup="heisenberg:some-component" abstract="true" name="abstract-some-exported-pojo"></xs:element>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-shared-extension" abstract="true" name="abstract-some-exported-pojo"></xs:element>
     <xs:element xmlns:sg="http://www.mulesoft.org/schema/mule/sg" substitutionGroup="sg:abstract-some-exported-pojo" name="some-exported-pojo">
         <xs:complexType>
             <xs:complexContent>
@@ -70,7 +70,7 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns:sg="http://www.mulesoft.org/schema/mule/sg" xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" type="sg:org.mule.test.substitutiongroup.extension.SomePojo" substitutionGroup="heisenberg:some-component" abstract="true" name="abstract-some-pojo"></xs:element>
+    <xs:element xmlns:sg="http://www.mulesoft.org/schema/mule/sg" xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" type="sg:org.mule.test.substitutiongroup.extension.SomePojo" substitutionGroup="heisenberg:global-abstract-investment" abstract="true" name="abstract-some-pojo"></xs:element>
     <xs:complexType name="org.mule.test.substitutiongroup.extension.EESGPojo">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
@@ -78,7 +78,7 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:sg="http://www.mulesoft.org/schema/mule/sg" type="sg:org.mule.test.substitutiongroup.extension.EESGPojo" substitutionGroup="ee:some-ee-component" abstract="true" name="abstract-eesg-pojo"></xs:element>
+    <xs:element xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:sg="http://www.mulesoft.org/schema/mule/sg" type="sg:org.mule.test.substitutiongroup.extension.EESGPojo" substitutionGroup="ee:cpu-light" abstract="true" name="abstract-eesg-pojo"></xs:element>
     <xs:complexType name="org.mule.test.substitutiongroup.extension.MuleSGPojo">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
@@ -86,5 +86,5 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:sg="http://www.mulesoft.org/schema/mule/sg" type="sg:org.mule.test.substitutiongroup.extension.MuleSGPojo" substitutionGroup="mule:some-core-component" abstract="true" name="abstract-mule-s-g-pojo"></xs:element>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:sg="http://www.mulesoft.org/schema/mule/sg" type="sg:org.mule.test.substitutiongroup.extension.MuleSGPojo" substitutionGroup="mule:abstract-shared-extension" abstract="true" name="abstract-mule-s-g-pojo"></xs:element>
 </xs:schema>

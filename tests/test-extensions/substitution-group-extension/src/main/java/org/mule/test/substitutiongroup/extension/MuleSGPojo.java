@@ -9,7 +9,7 @@ package org.mule.test.substitutiongroup.extension;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
-@XmlHints(substitutionGroup = "mule:some-core-component")
+@XmlHints(substitutionGroup = "mule:abstract-shared-extension")
 public class MuleSGPojo {
 
   @Parameter
