@@ -13,6 +13,8 @@ import static org.mule.runtime.api.metadata.resolving.FailureCode.COMPONENT_NOT_
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.metadata.MetadataKey;
@@ -25,9 +27,7 @@ import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.config.spring.internal.dsl.model.NoSuchComponentModelException;
 
 import java.util.Optional;
-
-import javax.inject.Inject;
-import javax.inject.Named;
+import java.util.function.Supplier;
 
 /**
  * {@link MetadataService} implementation that initialises the required components before doing test connectivity.
@@ -37,18 +37,18 @@ import javax.inject.Named;
  *
  * @since 4.0
  */
-public class LazyMetadataService implements MetadataService {
+public class LazyMetadataService implements MetadataService, Initialisable {
 
   public static final String NON_LAZY_METADATA_SERVICE = "_muleNonLazyMetadataService";
 
   private final LazyMuleArtifactContext lazyMuleArtifactContext;
+  private final Supplier<MetadataService> metadataServiceSupplier;
 
-  @Inject
-  @Named(NON_LAZY_METADATA_SERVICE)
   private MetadataService metadataService;
 
-  public LazyMetadataService(LazyMuleArtifactContext lazyMuleArtifactContext) {
+  public LazyMetadataService(LazyMuleArtifactContext lazyMuleArtifactContext, Supplier<MetadataService> metadataServiceSupplier) {
     this.lazyMuleArtifactContext = lazyMuleArtifactContext;
+    this.metadataServiceSupplier = metadataServiceSupplier;
   }
 
   /**
@@ -135,5 +135,10 @@ public class LazyMetadataService implements MetadataService {
       return of(failure(builder.onComponent()));
     }
     return empty();
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    this.metadataService = metadataServiceSupplier.get();
   }
 }

@@ -11,35 +11,35 @@ import static org.mule.runtime.api.connection.ConnectionValidationResult.failure
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
-import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.config.spring.internal.dsl.model.NoSuchComponentModelException;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.exception.ObjectNotFoundException;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.config.spring.internal.dsl.model.NoSuchComponentModelException;
 
 import java.util.List;
-
-import javax.inject.Inject;
-import javax.inject.Named;
+import java.util.function.Supplier;
 
 /**
- * {@link ConnectivityTestingService} implementation that initialises the required
- * components before doing test connectivity.
+ * {@link ConnectivityTestingService} implementation that initialises the required components before doing test connectivity.
  *
- * This guarantees that if the application has been created lazily, the requested
- * components exists before the execution of the actual {@link ConnectivityTestingService}.
+ * This guarantees that if the application has been created lazily, the requested components exists before the execution of the
+ * actual {@link ConnectivityTestingService}.
  */
-public class LazyConnectivityTestingService implements ConnectivityTestingService {
+public class LazyConnectivityTestingService implements ConnectivityTestingService, Initialisable {
 
   public static final String NON_LAZY_CONNECTIVITY_TESTING_SERVICE = "_muleNonLazyConnectivityTestingService";
 
   private final LazyComponentInitializer lazyComponentInitializer;
+  private final Supplier<ConnectivityTestingService> connectivityTestingServiceSupplier;
 
-  @Inject
-  @Named(NON_LAZY_CONNECTIVITY_TESTING_SERVICE)
   private ConnectivityTestingService connectivityTestingService;
 
-  public LazyConnectivityTestingService(LazyComponentInitializer lazyComponentInitializer) {
+  public LazyConnectivityTestingService(LazyComponentInitializer lazyComponentInitializer,
+                                        Supplier<ConnectivityTestingService> connectivityTestingServiceSupplier) {
     this.lazyComponentInitializer = lazyComponentInitializer;
+    this.connectivityTestingServiceSupplier = connectivityTestingServiceSupplier;
   }
 
   @Override
@@ -70,5 +70,10 @@ public class LazyConnectivityTestingService implements ConnectivityTestingServic
 
   private String lastMessage(List<Throwable> causalChain) {
     return causalChain.get(causalChain.size() - 1).getMessage();
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    this.connectivityTestingService = connectivityTestingServiceSupplier.get();
   }
 }
