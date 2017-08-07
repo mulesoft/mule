@@ -8,14 +8,21 @@ package org.mule.module.cxf.issues;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mule.api.security.tls.TlsConfiguration.DISABLE_SYSTEM_PROPERTIES_MAPPING_PROPERTY;
 import static org.mule.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
 import org.mule.api.MuleMessage;
+import org.mule.module.cxf.wssec.ClientPasswordCallback;
 import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.tck.junit4.rule.SystemProperty;
+import org.mule.util.IOUtils;
 
+import org.custommonkey.xmlunit.XMLUnit;
+import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -27,6 +34,9 @@ import org.junit.Test;
  */
 public class ProxyServiceDecryptedNotAvailableAsPayload extends FunctionalTestCase
 {
+
+    @ClassRule
+    public static SystemProperty disablePropertiesMapping = new SystemProperty("com.sun.net.ssl.checkRevocation", "false");
 
     private static final String SOAP_REQUEST =
             "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">" +
@@ -40,7 +50,12 @@ public class ProxyServiceDecryptedNotAvailableAsPayload extends FunctionalTestCa
 
     private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(POST.name()).disableStatusCodeValidation().build();
 
-
+    @Before
+    public void doSetUp() throws Exception
+    {
+        ClientPasswordCallback.setPassword("secret");
+    }
+    
     @Test
     public void testDecryptedPayloadAvailable() throws Exception
     {
