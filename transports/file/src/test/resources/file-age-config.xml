@@ -14,5 +14,5 @@
     <flow name="testageFlow1">
         <file:inbound-endpoint path="src/main/resources/Dir2"  fileAge="${fileAgeEndpoint}"/>
         <echo-component/>
-    </flow>z
+    </flow>
 </mule>
