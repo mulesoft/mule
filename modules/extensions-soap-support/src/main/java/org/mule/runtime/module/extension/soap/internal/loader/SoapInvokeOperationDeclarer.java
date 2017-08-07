@@ -15,7 +15,6 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
-import org.mule.metadata.api.builder.UnionTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
@@ -48,6 +47,7 @@ import org.mule.runtime.module.extension.soap.internal.metadata.InvokeRequestTyp
 import org.mule.runtime.module.extension.soap.internal.metadata.WebServiceTypeKey;
 import org.mule.runtime.module.extension.soap.internal.runtime.connection.ForwardingSoapClient;
 import org.mule.runtime.module.extension.soap.internal.runtime.operation.SoapOperationExecutorFactory;
+import org.mule.runtime.soap.api.message.SoapAttributes;
 import org.mule.runtime.soap.api.message.SoapOutputPayload;
 import com.google.common.collect.ImmutableMap;
 import java.io.InputStream;
@@ -116,12 +116,8 @@ public class SoapInvokeOperationDeclarer {
   }
 
   private void declareOutput(OperationDeclarer operation, ClassTypeLoader loader) {
-    UnionTypeBuilder output = TYPE_BUILDER.unionType();
-    output.id(Object.class.getName());
-    output.of().stringType();
-    output.of(loader.load(SoapOutputPayload.class));
-    operation.withOutput().ofDynamicType(output.build());
-    operation.withOutputAttributes().ofDynamicType(TYPE_BUILDER.nullType().build());
+    operation.withOutput().ofDynamicType(loader.load(SoapOutputPayload.class));
+    operation.withOutputAttributes().ofType(loader.load(SoapAttributes.class));
   }
 
   /**
