@@ -18,10 +18,14 @@ public abstract class AbstractMessageProcessorNotificationTestCase extends Abstr
         super(variant, configResources);
     }
 
-    protected RestrictedNode pre()
+    protected RestrictedNode pre ()
     {
-        return new Node(MessageProcessorNotification.class, MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE);
+        Node preNotification = new Node(MessageProcessorNotification.class, MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE);
+        Node preNotificationOriginalEvent = new Node(MessageProcessorNotification.class, MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE_ORIGINAL_EVENT);
+        return new Node().serial(preNotification).serial(preNotificationOriginalEvent);
     }
+
+
 
     protected RestrictedNode post()
     {
