@@ -743,12 +743,7 @@ public final class SchemaBuilder {
 
   QName resolveSubstitutionGroup(SubstitutionGroup userConfiguredSubstitutionGroup) {
     String namespaceUri = getNamespaceUri(userConfiguredSubstitutionGroup.getPrefix());
-    if (namespaceUri != null) {
-      return new QName(namespaceUri, userConfiguredSubstitutionGroup.getElement(), userConfiguredSubstitutionGroup.getPrefix());
-    }
-    throw new IllegalArgumentException(String
-        .format("prefix: %s, element: %s is not a valid substitutionGroup. Prefix does not exist.",
-                userConfiguredSubstitutionGroup.getPrefix(), userConfiguredSubstitutionGroup.getElement()));
+    return new QName(namespaceUri, userConfiguredSubstitutionGroup.getElement(), userConfiguredSubstitutionGroup.getPrefix());
   }
 
   String getNamespaceUri(String prefix) {
@@ -766,6 +761,8 @@ public final class SchemaBuilder {
       registerExtensionImport(extensionModelFromPrefix.get());
       return extensionModelFromPrefix.get().getXmlDslModel().getNamespace();
     }
-    return null;
+    throw new IllegalArgumentException(String
+        .format("prefix: %s inside substitutionGroup does not exist. It does not relate to any imported namespaces",
+                prefix));
   }
 }
