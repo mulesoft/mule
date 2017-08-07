@@ -13,10 +13,12 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -45,7 +47,7 @@ public class DefaultFlowBuilderTestCase extends AbstractMuleTestCase {
 
   public static final String FLOW_NAME = "flowName";
 
-  private MuleContext muleContext = mock(MuleContext.class);
+  private MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
   private Builder flowBuilder = new DefaultFlowBuilder(FLOW_NAME, muleContext);
   private ProcessingStrategyFactory defaultProcessingStrategyFactory = mock(ProcessingStrategyFactory.class);
   private ProcessingStrategy processingStrategy = mock(ProcessingStrategy.class);
@@ -68,7 +70,7 @@ public class DefaultFlowBuilderTestCase extends AbstractMuleTestCase {
     assertThat(flow.getMuleContext(), is(muleContext));
     assertThat(flow.getProcessors(), is(empty()));
     assertThat(flow.getSource(), is(nullValue()));
-    assertThat(flow.getExceptionListener(), is(nullValue()));
+    assertThat(flow.getExceptionListener(), is(notNullValue()));
     assertThat(flow.getProcessingStrategy(), sameInstance(processingStrategy));
   }
 

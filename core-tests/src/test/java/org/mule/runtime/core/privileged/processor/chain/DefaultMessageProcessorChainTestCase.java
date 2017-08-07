@@ -50,8 +50,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.exception.ErrorTypeLocator;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
@@ -548,7 +546,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     AppendingInterceptingMP mp2 = new AppendingInterceptingMP("2");
     Processor chain = builder.chain(mp1, mp2).build();
     ((MuleContextAware) chain).setMuleContext(muleContext);
-    ((FlowConstructAware) chain).setFlowConstruct(mock(FlowConstruct.class));
     ((Lifecycle) chain).initialise();
     ((Lifecycle) chain).start();
     ((Lifecycle) chain).stop();
@@ -567,7 +564,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     AppendingInterceptingMP mpb = new AppendingInterceptingMP("b");
     Processor chain = builder.chain(mp1, nestedBuilder.chain(mpa, mpb).build(), mp2).build();
     ((MuleContextAware) chain).setMuleContext(muleContext);
-    ((FlowConstructAware) chain).setFlowConstruct(mock(FlowConstruct.class));
     ((Lifecycle) chain).initialise();
     ((Lifecycle) chain).start();
     ((Lifecycle) chain).stop();
@@ -686,10 +682,10 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
   @Test
   public void testAll() throws Exception {
     ScatterGatherRouter scatterGatherRouter = new ScatterGatherRouter();
+    scatterGatherRouter.setAnnotations(getAppleFlowComponentLocationAnnotations());
     scatterGatherRouter.addRoute(getAppendingMP("1"));
     scatterGatherRouter.addRoute(getAppendingMP("2"));
     scatterGatherRouter.addRoute(getAppendingMP("3"));
-    scatterGatherRouter.setFlowConstruct(flow);
     initialiseIfNeeded(scatterGatherRouter, true, muleContext);
     scatterGatherRouter.start();
 
@@ -708,10 +704,12 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
   @Test
   public void testChoice() throws Exception {
     ChoiceRouter choiceRouter = new ChoiceRouter();
+    choiceRouter.setAnnotations(getAppleFlowComponentLocationAnnotations());
     choiceRouter.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
     choiceRouter.addRoute("true", newChain(getAppendingMP("1")));
     choiceRouter.addRoute("true", newChain(getAppendingMP("2")));
     choiceRouter.addRoute("true", newChain(getAppendingMP("3")));
+    initialiseIfNeeded(choiceRouter, muleContext);
 
     assertThat(process(newChain(choiceRouter), getTestEventUsingFlow("0")).getMessage().getPayload().getValue(), equalTo("01"));
   }
@@ -753,9 +751,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     if (messageProcessor instanceof MuleContextAware) {
       ((MuleContextAware) messageProcessor).setMuleContext(muleContext);
     }
-    if (messageProcessor instanceof FlowConstructAware) {
-      ((FlowConstructAware) messageProcessor).setFlowConstruct(flow);
-    }
     try {
       return super.process(messageProcessor, event);
     } finally {
@@ -785,7 +780,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
   }
 
   private void assertLifecycle(AppendingInterceptingMP mp) {
-    assertTrue(mp.flowConstuctInjected);
     assertTrue(mp.muleContextInjected);
     assertTrue(mp.initialised);
     assertTrue(mp.started);
@@ -814,7 +808,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     }
   }
 
-  class AppendingMP implements Processor, Lifecycle, FlowConstructAware, MuleContextAware {
+  class AppendingMP implements Processor, Lifecycle, MuleContextAware {
 
     String appendString;
     boolean muleContextInjected;
@@ -872,17 +866,12 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
       this.muleContextInjected = true;
     }
 
-    @Override
-    public void setFlowConstruct(FlowConstruct flowConstruct) {
-      this.flowConstuctInjected = true;
-    }
   }
 
-  class AppendingInterceptingMP extends AbstractInterceptingMessageProcessor implements FlowConstructAware, Lifecycle {
+  class AppendingInterceptingMP extends AbstractInterceptingMessageProcessor implements Lifecycle {
 
     String appendString;
     boolean muleContextInjected;
-    boolean flowConstuctInjected;
     boolean initialised;
     boolean started;
     boolean stopped;
@@ -959,11 +948,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
       super.setMuleContext(context);
     }
 
-    @Override
-    public void setFlowConstruct(FlowConstruct flowConstruct) {
-      this.flowConstuctInjected = true;
-      super.setFlowConstruct(flowConstruct);
-    }
   }
 
   static class ReturnNullMP implements Processor {
@@ -1013,6 +997,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     when(event.getSession()).thenReturn(mock(MuleSession.class));
     when(event.getError()).thenReturn(empty());
     when(event.getContext()).thenReturn(eventContext);
+    when(event.getInternalContext()).thenReturn(eventContext);
     return event;
   }
 

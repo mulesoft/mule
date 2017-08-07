@@ -11,10 +11,10 @@ import static org.mule.runtime.core.DefaultEventContext.create;
 import static org.mule.runtime.core.api.Event.builder;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToScheduleWork;
+import static org.mule.runtime.core.api.construct.FlowConstruct.getFromAnnotatedObject;
 import static org.mule.runtime.core.api.context.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
 import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static reactor.core.publisher.Mono.just;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.CreateException;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -26,7 +26,6 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.source.SchedulerMessageSource;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.context.notification.ConnectorMessageNotification;
 import org.mule.runtime.core.api.context.notification.NotificationHelper;
@@ -47,7 +46,7 @@ import java.util.concurrent.ScheduledFuture;
  * </p>
  */
 public class DefaultSchedulerMessageSource extends AbstractAnnotatedObject
-    implements MessageSource, FlowConstructAware, SchedulerMessageSource, MuleContextAware, Initialisable, Disposable {
+    implements MessageSource, SchedulerMessageSource, MuleContextAware, Initialisable, Disposable {
 
   private final PeriodicScheduler scheduler;
   private final NotificationHelper notificationHelper;
@@ -135,7 +134,9 @@ public class DefaultSchedulerMessageSource extends AbstractAnnotatedObject
   private void pollWith(final Message request) {
     try {
       just(request)
-          .map(message -> builder(create(flowConstruct, getLocation())).message(request).flow(flowConstruct).build())
+          .map(message -> builder(create(muleContext.getUniqueIdString(), muleContext.getId(), getLocation())).message(request)
+              .flow(flowConstruct)
+              .build())
           .doOnNext(event -> setCurrentEvent(event))
           .doOnNext(event -> notificationHelper.fireNotification(this, event, getLocation(), muleContext, MESSAGE_RECEIVED))
           .transform(listener)
@@ -157,6 +158,7 @@ public class DefaultSchedulerMessageSource extends AbstractAnnotatedObject
    */
   @Override
   public void initialise() throws InitialisationException {
+    this.flowConstruct = getFromAnnotatedObject(muleContext.getConfigurationComponentLocator(), this);
     createScheduler();
   }
 
@@ -174,11 +176,6 @@ public class DefaultSchedulerMessageSource extends AbstractAnnotatedObject
       pollingExecutor.stop();
       pollingExecutor = null;
     }
-  }
-
-  @Override
-  public void setFlowConstruct(FlowConstruct flowConstruct) {
-    this.flowConstruct = flowConstruct;
   }
 
   @Override

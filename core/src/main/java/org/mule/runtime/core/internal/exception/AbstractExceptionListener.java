@@ -12,7 +12,6 @@ import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.defaultString;
 import static org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.core.api.context.notification.SecurityNotification.SECURITY_AUTHENTICATION_FAILED;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.security.SecurityException;
@@ -23,7 +22,6 @@ import org.mule.runtime.core.api.context.notification.ExceptionNotification;
 import org.mule.runtime.core.api.context.notification.SecurityNotification;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.exception.MessagingException;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.TypedException;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.Processor;
@@ -58,6 +56,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
   protected String logException = TRUE.toString();
 
   protected String globalName;
+  protected FlowConstructStatistics statistics;
 
   @Override
   public String getGlobalName() {
@@ -134,7 +133,6 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
    * @param t the fatal exception to log
    */
   protected void logFatal(Event event, Throwable t) {
-    FlowConstructStatistics statistics = flowConstruct.getStatistics();
     if (statistics != null && statistics.isEnabled()) {
       statistics.incFatalError();
     }
@@ -193,4 +191,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
     }
   }
 
+  public void setStatistics(FlowConstructStatistics statistics) {
+    this.statistics = statistics;
+  }
 }

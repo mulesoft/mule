@@ -26,7 +26,7 @@ import org.reactivestreams.Publisher;
  * @see Event
  * @since 4.0
  */
-public interface EventContext {
+public interface EventContext extends org.mule.runtime.api.event.EventContext {
 
   /**
    * Unique time-based id (UUID) for this {@link EventContext}.
@@ -106,7 +106,7 @@ public interface EventContext {
    * 
    * @return {@code this} context's parent or {@link Optional#empty()} if it doesn't have one
    */
-  Optional<EventContext> getParentContext();
+  Optional<org.mule.runtime.api.event.EventContext> getParentContext();
 
   /**
    * A {@link Publisher} that completes when a response is ready or an error was produced for this {@link EventContext} but
@@ -147,4 +147,6 @@ public interface EventContext {
    * @return publisher that completes when this {@link EventContext} and all child context have completed.
    */
   Publisher<Void> getCompletionPublisher();
+
+  Optional<EventContext> getInternalParentContext();
 }

@@ -57,7 +57,7 @@ public class PagedOperationMessageProcessor extends OperationMessageProcessor {
   protected Mono<Event> doProcess(Event event, ExecutionContextAdapter<OperationModel> operationContext) {
     return super.doProcess(event, operationContext).map(resultEvent -> {
       PagingProvider<?, ?> pagingProvider = getTarget()
-          .map(target -> getPagingProvider(resultEvent.getVariable(target).getValue()))
+          .map(target -> getPagingProvider(resultEvent.getVariables().get(target).getValue()))
           .orElseGet(() -> getPagingProvider(resultEvent.getMessage()));
 
       if (pagingProvider == null) {

@@ -75,8 +75,8 @@ public class TargetOutputMessageReturnDelegateTestCase extends AbstractMuleTestC
 
     Event result = delegate.asReturnValue(payload, operationContext);
     assertMessage(result.getMessage());
-    assertThat(result.getVariable(TARGET).getValue(), is(instanceOf(Message.class)));
-    Message message = (Message) result.getVariable(TARGET).getValue();
+    assertThat(result.getVariables().get(TARGET).getValue(), is(instanceOf(Message.class)));
+    Message message = (Message) result.getVariables().get(TARGET).getValue();
     assertThat(message.getPayload().getValue(), is(payload));
   }
 
@@ -85,7 +85,7 @@ public class TargetOutputMessageReturnDelegateTestCase extends AbstractMuleTestC
     delegate = createDelegate(PAYLOAD);
     Event result = delegate.asReturnValue(payload, operationContext);
     assertMessage(result.getMessage());
-    assertThat(result.getVariable(TARGET).getValue(), is(payload));
+    assertThat(result.getVariables().get(TARGET).getValue(), is(payload));
   }
 
   @Test
@@ -94,8 +94,8 @@ public class TargetOutputMessageReturnDelegateTestCase extends AbstractMuleTestC
     MediaType mediaType = MediaType.APPLICATION_JSON.withCharset(Charset.defaultCharset());
     Event result = delegate.asReturnValue(Result.builder().output(payload).mediaType(mediaType).build(), operationContext);
     assertMessage(result.getMessage());
-    assertThat(result.getVariable(TARGET).getValue(), is(payload));
-    assertThat(result.getVariable(TARGET).getDataType().getMediaType(), is(mediaType));
+    assertThat(result.getVariables().get(TARGET).getValue(), is(payload));
+    assertThat(result.getVariables().get(TARGET).getDataType().getMediaType(), is(mediaType));
   }
 
   private void assertMessage(Message message) {

@@ -56,22 +56,21 @@ import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.execution.MessageProcessContext;
+import org.mule.runtime.core.api.execution.MessageProcessingManager;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
+import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
+import org.mule.runtime.core.api.streaming.StreamingManager;
+import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.util.ExceptionUtils;
 import org.mule.runtime.core.internal.execution.ExceptionCallback;
-import org.mule.runtime.core.api.execution.MessageProcessContext;
-import org.mule.runtime.core.api.execution.MessageProcessingManager;
-import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
-import org.mule.tck.core.streaming.SimpleByteBufferManager;
 import org.mule.runtime.core.internal.streaming.bytes.factory.NullCursorStreamProviderFactory;
-import org.mule.runtime.core.api.streaming.StreamingManager;
-import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
 import org.mule.runtime.extension.api.model.ImmutableOutputModel;
@@ -86,6 +85,7 @@ import org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.SourceCallbackModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.tck.core.streaming.SimpleByteBufferManager;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher;
 import org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver;
@@ -250,7 +250,6 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
     messageSource = getNewExtensionMessageSourceInstance();
 
     sourceCallback = spy(DefaultSourceCallback.builder()
-        .setFlowConstruct(flowConstruct)
         .setSourceModel(sourceModel)
         .setProcessingManager(messageProcessingManager)
         .setListener(messageProcessor)
@@ -499,7 +498,7 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
         new ExtensionMessageSource(extensionModel, sourceModel, sourceAdapterFactory, configurationProvider,
                                    retryPolicyTemplate, cursorStreamProviderFactory, extensionManager);
     messageSource.setListener(messageProcessor);
-    messageSource.setFlowConstruct(flowConstruct);
+    messageSource.setAnnotations(getAppleFlowComponentLocationAnnotations());
     muleContext.getInjector().inject(messageSource);
     return messageSource;
   }

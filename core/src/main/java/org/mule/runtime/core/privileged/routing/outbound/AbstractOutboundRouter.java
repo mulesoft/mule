@@ -21,8 +21,6 @@ import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.DispatchException;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
@@ -165,9 +163,6 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
     if (route instanceof MuleContextAware) {
       ((MuleContextAware) route).setMuleContext(muleContext);
     }
-    if (route instanceof FlowConstructAware) {
-      ((FlowConstructAware) route).setFlowConstruct(flowConstruct);
-    }
     if (route instanceof Initialisable) {
       ((Initialisable) route).initialise();
     }
@@ -271,11 +266,6 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
   @Override
   public void setMuleContext(MuleContext context) {
     super.setMuleContext(context);
-  }
-
-  @Override
-  public void setFlowConstruct(FlowConstruct flowConstruct) {
-    super.setFlowConstruct(flowConstruct);
   }
 
 }

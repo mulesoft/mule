@@ -8,7 +8,6 @@ package org.mule.runtime.core.internal.processor;
 
 import static java.lang.Thread.currentThread;
 import static java.time.Duration.ofMillis;
-import static java.util.Collections.singletonMap;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -18,7 +17,6 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
@@ -87,9 +85,9 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
     Event result = process(messageProcessor, request);
 
     // Complete parent context so we can assert event context completion based on async completion.
-    request.getContext().success(result);
+    request.getInternalContext().success(result);
 
-    assertCompletionNotDone(request.getContext());
+    assertCompletionNotDone(request.getInternalContext());
 
     // Permit async processing now we have already asserted that response alone is not enough to complete event context.
     asyncEntryLatch.countDown();
@@ -97,14 +95,14 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
     assertThat(latch.await(LOCK_TIMEOUT, MILLISECONDS), is(true));
 
     // Block until async completes, not just target processor.
-    from(target.sensedEvent.getContext().getCompletionPublisher()).block(ofMillis(BLOCK_TIMEOUT));
+    from(target.sensedEvent.getInternalContext().getCompletionPublisher()).block(ofMillis(BLOCK_TIMEOUT));
     assertThat(target.sensedEvent, notNullValue());
 
     // Block to ensure async fully completes before testing state
-    from(request.getContext().getCompletionPublisher()).block(ofMillis(BLOCK_TIMEOUT));
+    from(request.getInternalContext().getCompletionPublisher()).block(ofMillis(BLOCK_TIMEOUT));
 
-    assertCompletionDone(target.sensedEvent.getContext());
-    assertCompletionDone(request.getContext());
+    assertCompletionDone(target.sensedEvent.getInternalContext());
+    assertCompletionDone(request.getInternalContext());
 
     assertTargetEvent(request);
     assertResponse(result);
@@ -136,7 +134,6 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
     flow = builder("flow", muleContext).processingStrategyFactory(new BlockingProcessingStrategyFactory()).build();
     flow.initialise();
     flow.start();
-    messageProcessor.setFlowConstruct(flow);
 
     process();
   }
@@ -147,7 +144,6 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
     flow = builder("flow", muleContext).processingStrategyFactory(new DirectProcessingStrategyFactory()).build();
     flow.initialise();
     flow.start();
-    messageProcessor.setFlowConstruct(flow);
 
     process();
   }
@@ -170,8 +166,7 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
   private AsyncDelegateMessageProcessor createAsyncDelegateMessageProcessor(Processor listener, FlowConstruct flowConstruct)
       throws Exception {
     AsyncDelegateMessageProcessor mp = new AsyncDelegateMessageProcessor(newChain(listener), "thread");
-    mp.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
-    mp.setFlowConstruct(flowConstruct);
+    mp.setAnnotations(getAppleFlowComponentLocationAnnotations());
     initialiseIfNeeded(mp, true, muleContext);
     return mp;
   }

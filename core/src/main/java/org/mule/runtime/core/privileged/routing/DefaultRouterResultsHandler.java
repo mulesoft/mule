@@ -9,7 +9,6 @@ package org.mule.runtime.core.privileged.routing;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
-
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
@@ -98,9 +97,9 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler {
 
     List<Message> list = new ArrayList<>();
     for (Event event : nonNullResults) {
-      for (String flowVarName : event.getVariableNames()) {
-        resultBuilder.addVariable(flowVarName, event.getVariable(flowVarName).getValue(),
-                                  event.getVariable(flowVarName).getDataType());
+      for (String flowVarName : event.getVariables().keySet()) {
+        resultBuilder.addVariable(flowVarName, event.getVariables().get(flowVarName).getValue(),
+                                  event.getVariables().get(flowVarName).getDataType());
       }
       list.add(event.getMessage());
     }

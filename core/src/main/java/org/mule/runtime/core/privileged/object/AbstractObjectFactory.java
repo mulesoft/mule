@@ -11,7 +11,6 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.lifecycle.InitialisationCallback;
 import org.mule.runtime.core.api.object.ObjectFactory;
 import org.mule.runtime.core.api.util.BeanUtils;
@@ -28,7 +27,7 @@ import org.slf4j.LoggerFactory;
  * Creates object instances based on the class and sets any properties. This factory is also responsible for applying any object
  * processors on the object before the lifecycle callbacks are called.
  */
-public abstract class AbstractObjectFactory extends AbstractAnnotatedObject implements ObjectFactory, FlowConstructAware {
+public abstract class AbstractObjectFactory extends AbstractAnnotatedObject implements ObjectFactory {
 
   public static final String ATTRIBUTE_OBJECT_CLASS_NAME = "objectClassName";
   public static final String ATTRIBUTE_OBJECT_CLASS = "objectClass";
@@ -81,10 +80,6 @@ public abstract class AbstractObjectFactory extends AbstractAnnotatedObject impl
     }
   }
 
-  public void setFlowConstruct(FlowConstruct flowConstruct) {
-    this.flowConstruct = flowConstruct;
-  }
-
   public void initialise() throws InitialisationException {
     if ((objectClassName == null) || (objectClass == null)) {
       throw new InitialisationException(I18nMessageFactory.createStaticMessage("Object factory has not been initialized."), this);
@@ -114,10 +109,6 @@ public abstract class AbstractObjectFactory extends AbstractAnnotatedObject impl
 
     if (properties != null) {
       BeanUtils.populateWithoutFail(object, properties, true);
-    }
-
-    if (object instanceof FlowConstructAware) {
-      ((FlowConstructAware) object).setFlowConstruct(flowConstruct);
     }
 
     if (isAutoWireObject()) {

@@ -110,7 +110,7 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
 
   private static final Logger LOGGER = getLogger(OperationMessageProcessor.class);
   static final String INVALID_TARGET_MESSAGE =
-      "Flow '%s' defines an invalid usage of operation '%s' which uses %s as target";
+      "Root component '%s' defines an invalid usage of operation '%s' which uses %s as target";
 
   private final ExtensionModel extensionModel;
   private final OperationModel operationModel;
@@ -154,7 +154,7 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
       Optional<ConfigurationInstance> configuration;
       OperationExecutionFunction operationExecutionFunction;
 
-      if (event.getParameters().containsKey(INTERCEPTION_RESOLVED_CONTEXT)) {
+      if (event.getInternalParameters().containsKey(INTERCEPTION_RESOLVED_CONTEXT)) {
         // If the event already contains an execution context, use that one.
         ExecutionContextAdapter<OperationModel> operationContext = getPrecalculatedContext(event);
         configuration = operationContext.getConfiguration();
@@ -204,7 +204,7 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
   }
 
   private PrecalculatedExecutionContextAdapter getPrecalculatedContext(Event event) {
-    return (PrecalculatedExecutionContextAdapter) (event.getParameters().get(INTERCEPTION_RESOLVED_CONTEXT).getValue());
+    return (PrecalculatedExecutionContextAdapter) (event.getInternalParameters().get(INTERCEPTION_RESOLVED_CONTEXT));
   }
 
   protected Mono<Event> doProcess(Event event, ExecutionContextAdapter<OperationModel> operationContext) {
@@ -252,10 +252,12 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
     }
 
     if (target.startsWith(FLOW_VARS)) {
-      throw new IllegalOperationException(format(INVALID_TARGET_MESSAGE, flowConstruct.getName(), operationModel.getName(),
+      throw new IllegalOperationException(format(INVALID_TARGET_MESSAGE, getLocation().getRootContainerName(),
+                                                 operationModel.getName(),
                                                  format("the '%s' prefix", FLOW_VARS)));
     } else if (muleContext.getExpressionManager().isExpression(target)) {
-      throw new IllegalOperationException(format(INVALID_TARGET_MESSAGE, flowConstruct.getName(), operationModel.getName(),
+      throw new IllegalOperationException(format(INVALID_TARGET_MESSAGE, getLocation().getRootContainerName(),
+                                                 operationModel.getName(),
                                                  "an expression"));
     }
 
@@ -316,9 +318,9 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
     if (!configurationModel.getOperationModel(operationModel.getName()).isPresent() &&
         !configurationProvider.getExtensionModel().getOperationModel(operationModel.getName()).isPresent()) {
       throw new IllegalOperationException(format(
-                                                 "Flow '%s' defines an usage of operation '%s' which points to configuration '%s'. "
+                                                 "Root component '%s' defines an usage of operation '%s' which points to configuration '%s'. "
                                                      + "The selected config does not support that operation.",
-                                                 flowConstruct.getName(), operationModel.getName(),
+                                                 getLocation().getRootContainerName(), operationModel.getName(),
                                                  configurationProvider.getName()));
     }
   }

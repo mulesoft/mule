@@ -11,6 +11,7 @@ import static org.mule.runtime.core.api.config.i18n.CoreMessages.authSetButNoCon
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.authorizationDeniedOnEndpoint;
 
 import org.mule.runtime.api.i18n.I18nMessage;
+import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.api.security.ServerSecurityException;
 import org.mule.runtime.core.api.Event;
 

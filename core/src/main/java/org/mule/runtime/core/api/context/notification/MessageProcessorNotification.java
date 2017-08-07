@@ -38,7 +38,7 @@ public class MessageProcessorNotification extends EnrichedServerNotification imp
   public static MessageProcessorNotification createFrom(Event event, ComponentLocation componentLocation, Processor processor,
                                                         MessagingException exceptionThrown, int action) {
     EnrichedNotificationInfo notificationInfo = createInfo(event, exceptionThrown, processor);
-    return new MessageProcessorNotification(notificationInfo, componentLocation, event.getContext(), action);
+    return new MessageProcessorNotification(notificationInfo, componentLocation, event.getInternalContext(), action);
   }
 
   public Processor getProcessor() {

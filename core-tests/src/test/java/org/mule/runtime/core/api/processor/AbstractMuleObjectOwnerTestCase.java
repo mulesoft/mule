@@ -13,7 +13,6 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.tck.size.SmallTest;
 
@@ -49,7 +48,6 @@ public class AbstractMuleObjectOwnerTestCase {
         return Arrays.asList(mockObject1, mockObject2);
       }
     };
-    abstractMuleObjectOwner.setFlowConstruct(mockFlowConstruct);
     abstractMuleObjectOwner.setMuleContext(mockMuleContext);
   }
 
@@ -61,8 +59,6 @@ public class AbstractMuleObjectOwnerTestCase {
     // TODO TMULE-10764 Injection should only happen once
     verify(mockObject1, times(2)).setMuleContext(mockMuleContext);
     verify(mockObject2, times(2)).setMuleContext(mockMuleContext);
-    verify(mockObject1, times(2)).setFlowConstruct(mockFlowConstruct);
-    verify(mockObject2, times(2)).setFlowConstruct(mockFlowConstruct);
   }
 
   @Test
@@ -86,13 +82,10 @@ public class AbstractMuleObjectOwnerTestCase {
     verify(mockObject2).stop();
   }
 
-  public class TestClass implements Lifecycle, MuleContextAware, FlowConstructAware {
+  public class TestClass implements Lifecycle, MuleContextAware {
 
     @Override
     public void dispose() {}
-
-    @Override
-    public void setFlowConstruct(FlowConstruct flowConstruct) {}
 
     @Override
     public void initialise() throws InitialisationException {}

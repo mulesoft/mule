@@ -17,7 +17,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
-
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -26,12 +25,11 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.config.spring.internal.MuleArtifactContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
@@ -42,6 +40,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.util.concurrent.UncheckedExecutionException;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
@@ -52,7 +51,6 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-
 import reactor.core.publisher.Mono;
 
 public class FlowRefFactoryBean extends AbstractAnnotatedObject
@@ -77,12 +75,12 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
     return new FlowRefMessageProcessor();
   }
 
-  protected Processor getReferencedFlow(String name, FlowConstruct flowConstruct) throws MuleException {
+  protected Processor getReferencedFlow(String name) throws MuleException {
     if (name == null) {
       throw new MuleRuntimeException(CoreMessages.objectIsNull(name));
     }
 
-    Processor referencedFlow = ((Processor) applicationContext.getBean(name));
+    Processor referencedFlow = getReferencedProcessor(name);
     if (referencedFlow == null) {
       throw new MuleRuntimeException(CoreMessages.objectIsNull(name));
     }
@@ -90,13 +88,15 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
     // for subflows, we create a new one so it must be initialised manually
     if (!(referencedFlow instanceof Flow)) {
       if (referencedFlow instanceof AnnotatedObject) {
-        ((AnnotatedObject) referencedFlow).setAnnotations(getAnnotations());
+        Map<QName, Object> annotations = new HashMap<>(((AnnotatedObject) referencedFlow).getAnnotations());
+        annotations.put(ROOT_CONTAINER_NAME_KEY, getRootContainerName());
+        ((AnnotatedObject) referencedFlow).setAnnotations(annotations);
       }
       if (referencedFlow instanceof Initialisable) {
-        prepareProcessor(referencedFlow, flowConstruct);
+        prepareProcessor(referencedFlow);
         if (referencedFlow instanceof MessageProcessorChain) {
           for (Processor processor : ((MessageProcessorChain) referencedFlow).getMessageProcessors()) {
-            prepareProcessor(processor, flowConstruct);
+            prepareProcessor(processor);
           }
         }
         initialiseIfNeeded(referencedFlow);
@@ -107,10 +107,17 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
     return referencedFlow;
   }
 
-  private void prepareProcessor(Processor p, FlowConstruct flowConstruct) {
-    if (p instanceof FlowConstructAware) {
-      ((FlowConstructAware) p).setFlowConstruct(flowConstruct);
+  private Processor getReferencedProcessor(String name) {
+    if (applicationContext instanceof MuleArtifactContext) {
+      MuleArtifactContext muleArtifactContext = (MuleArtifactContext) applicationContext;
+      if (muleArtifactContext.getBeanFactory().getBeanDefinition(name).isPrototype()) {
+        muleArtifactContext.getPrototypeBeanWithRootContainer(name, getRootContainerName());
+      }
     }
+    return (Processor) applicationContext.getBean(name);
+  }
+
+  private void prepareProcessor(Processor p) {
     if (p instanceof MuleContextAware) {
       ((MuleContextAware) p).setMuleContext(muleContext);
     }
@@ -136,10 +143,9 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
     this.muleContext = context;
   }
 
-  private class FlowRefMessageProcessor
-      implements AnnotatedProcessor, FlowConstructAware, Stoppable, Disposable {
+  private class FlowRefMessageProcessor extends AbstractAnnotatedObject
+      implements AnnotatedProcessor, Stoppable, Disposable {
 
-    private FlowConstruct flowConstruct;
     private LoadingCache<String, Processor> cache;
     private boolean isExpression;
 
@@ -150,7 +156,7 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
 
             @Override
             public Processor load(String key) throws Exception {
-              return getReferencedFlow(key, flowConstruct);
+              return getReferencedFlow(key);
             }
           });
 
@@ -206,26 +212,6 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
     }
 
     @Override
-    public Object getAnnotation(QName name) {
-      return FlowRefFactoryBean.this.getAnnotation(name);
-    }
-
-    @Override
-    public Map<QName, Object> getAnnotations() {
-      return FlowRefFactoryBean.this.getAnnotations();
-    }
-
-    @Override
-    public void setAnnotations(Map<QName, Object> annotations) {
-      FlowRefFactoryBean.this.setAnnotations(annotations);
-    }
-
-    @Override
-    public void setFlowConstruct(FlowConstruct flowConstruct) {
-      this.flowConstruct = flowConstruct;
-    }
-
-    @Override
     public ComponentLocation getLocation() {
       return FlowRefFactoryBean.this.getLocation();
     }
@@ -249,5 +235,6 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
       cache.invalidateAll();
       cache.cleanUp();
     }
+
   }
 }

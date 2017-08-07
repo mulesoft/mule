@@ -60,8 +60,8 @@ public class BindingContextUtils {
     BindingContext.Builder contextBuilder = BindingContext.builder(baseContext);
 
     Map<String, TypedValue<?>> flowVars = new HashMap<>();
-    event.getVariableNames().forEach(name -> {
-      TypedValue<?> value = event.getVariable(name);
+    event.getVariables().keySet().forEach(name -> {
+      TypedValue<?> value = event.getVariables().get(name);
       flowVars.put(name, value);
     });
     contextBuilder.addBinding(VARS,

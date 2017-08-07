@@ -29,7 +29,6 @@ import java.time.OffsetTime;
 import java.util.Optional;
 
 import org.reactivestreams.Publisher;
-
 import reactor.core.publisher.Mono;
 
 /**
@@ -148,7 +147,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
       exceptionHandler =
           context instanceof AbstractEventContext ? ((AbstractEventContext) context).getExceptionHandler()
               : NULL_ERROR_HANDLER;
-      context = context.getParentContext().orElse(null);
+      context = context.getInternalParentContext().orElse(null);
     }
     return child(parent, componentLocation, exceptionHandler);
   }
@@ -220,7 +219,12 @@ public final class DefaultEventContext extends AbstractEventContext implements S
   }
 
   @Override
-  public Optional<EventContext> getParentContext() {
+  public Optional<org.mule.runtime.api.event.EventContext> getParentContext() {
+    return empty();
+  }
+
+  @Override
+  public Optional<EventContext> getInternalParentContext() {
     return empty();
   }
 
@@ -331,7 +335,12 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     }
 
     @Override
-    public Optional<EventContext> getParentContext() {
+    public Optional<org.mule.runtime.api.event.EventContext> getParentContext() {
+      return of(parent);
+    }
+
+    @Override
+    public Optional<EventContext> getInternalParentContext() {
       return of(parent);
     }
 

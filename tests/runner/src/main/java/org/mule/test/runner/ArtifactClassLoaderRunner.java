@@ -213,6 +213,7 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
     Set<String> excludedArtifactsList = getExcludedArtifacts(excludedProperties);
     builder.setExcludedArtifacts(excludedArtifactsList);
     builder.setExtraBootPackages(getExtraBootPackages(excludedProperties));
+    builder.setExtraPrivilegedArtifacts(runnerConfiguration.getExtraPrivilegedArtifacts());
 
 
     final ClassPathUrlProvider classPathUrlProvider = new ClassPathUrlProvider();

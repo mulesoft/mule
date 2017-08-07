@@ -7,7 +7,6 @@
 package org.mule.runtime.core.internal.routing.requestreply;
 
 import static java.util.Collections.singletonMap;
-import static java.util.OptionalInt.of;
 import static junit.framework.Assert.assertNull;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
@@ -18,7 +17,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
@@ -49,7 +47,6 @@ import org.mule.tck.probe.PollingProber;
 import java.beans.ExceptionListener;
 import java.util.Map;
 import java.util.Optional;
-import java.util.OptionalInt;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -110,7 +107,6 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     asyncReplyMP = new TestAsyncRequestReplyRequester(muleContext);
     SensingNullMessageProcessor target = getSensingNullMessageProcessor();
     AsyncDelegateMessageProcessor asyncMP = createAsyncMessageProcessor(target);
-    asyncMP.setFlowConstruct(flow);
     initialiseIfNeeded(asyncMP, true, muleContext);
     asyncMP.start();
     asyncReplyMP.setListener(asyncMP);
@@ -130,7 +126,6 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     SensingNullMessageProcessor target = getSensingNullMessageProcessor();
     target.setWaitTime(30000);
     AsyncDelegateMessageProcessor asyncMP = createAsyncMessageProcessor(target);
-    asyncMP.setFlowConstruct(flow);
     initialiseIfNeeded(asyncMP, true, muleContext);
     asyncMP.start();
     asyncReplyMP.setListener(asyncMP);
@@ -259,7 +254,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
   protected AsyncDelegateMessageProcessor createAsyncMessageProcessor(SensingNullMessageProcessor target)
       throws InitialisationException {
     asyncMP = new AsyncDelegateMessageProcessor(newChain(target));
-    asyncMP.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
+    asyncMP.setAnnotations(getAppleFlowComponentLocationAnnotations());
     initialiseIfNeeded(asyncMP, true, muleContext);
     return asyncMP;
   }

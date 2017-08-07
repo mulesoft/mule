@@ -14,6 +14,7 @@ import static org.mule.runtime.api.message.Message.of;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.internal.interception.DefaultInterceptionEvent;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -35,7 +36,8 @@ public class DefaultInterceptionEventTestCase extends AbstractMuleTestCase {
 
   @Test
   public void changeSession() throws MuleException {
-    final Event event = getEventBuilder().message(of(TEST_PAYLOAD)).session(mock(MuleSession.class)).build();
+    final Event event =
+        getEventBuilder().message(of(TEST_PAYLOAD)).session(mock(MuleSession.class)).build();
     final DefaultInterceptionEvent interceptionEvent = new DefaultInterceptionEvent(event);
 
     final MuleSession session = mock(MuleSession.class);

@@ -35,6 +35,10 @@ import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.connector.ConnectionManager;
+import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
@@ -285,14 +289,14 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable 
 
     FieldSetter<Object, ConnectionProvider> setter = connectionSetter.get();
     ConfigurationInstance config = configurationInstance.orElseThrow(() -> new DefaultMuleException(createStaticMessage(
-                                                                                                                        "Message Source on Flow '%s' requires a connection but it doesn't point to any configuration. Please review your "
+                                                                                                                        "Message Source on root component '%s' requires a connection but it doesn't point to any configuration. Please review your "
                                                                                                                             + "application",
                                                                                                                         componentLocation
                                                                                                                             .getRootContainerName())));
 
     if (!config.getConnectionProvider().isPresent()) {
       throw new DefaultMuleException(createStaticMessage(format(
-                                                                "Message Source on Flow '%s' requires a connection, but points to config '%s' which doesn't specify any. "
+                                                                "Message Source on root component '%s' requires a connection, but points to config '%s' which doesn't specify any. "
                                                                     + "Please review your application",
                                                                 componentLocation.getRootContainerName(), config.getName())));
     }

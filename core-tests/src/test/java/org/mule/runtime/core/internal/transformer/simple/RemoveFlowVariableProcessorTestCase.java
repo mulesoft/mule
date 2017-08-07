@@ -28,16 +28,16 @@ public class RemoveFlowVariableProcessorTestCase extends AbstractRemoveVariableP
 
   @Override
   protected void addMockedPropeerties(Event mockEvent, Set<String> properties) {
-    when(mockEvent.getVariableNames()).thenReturn(properties);
+    when(mockEvent.getVariables().keySet()).thenReturn(properties);
   }
 
   @Override
   protected void verifyRemoved(Event mockEvent, String key) {
-    assertThat(mockEvent.getVariableNames(), not(contains(key)));
+    assertThat(mockEvent.getVariables().keySet(), not(contains(key)));
   }
 
   @Override
   protected void verifyNotRemoved(Event mockEvent, String key) {
-    assertThat(mockEvent.getVariable(key).getValue(), not(nullValue()));
+    assertThat(mockEvent.getVariables().get(key).getValue(), not(nullValue()));
   }
 }

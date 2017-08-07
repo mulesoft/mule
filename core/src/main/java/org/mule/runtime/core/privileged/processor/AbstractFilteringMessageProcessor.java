@@ -65,7 +65,7 @@ public abstract class AbstractFilteringMessageProcessor extends AbstractIntercep
           if (isThrowOnUnaccepted()) {
             sink.error(filterUnacceptedException(builder.build()));
           } else {
-            event.getContext().success();
+            event.getInternalContext().success();
           }
         }
       }).transform(applyNext());
@@ -76,7 +76,7 @@ public abstract class AbstractFilteringMessageProcessor extends AbstractIntercep
           if (accept(event, builder)) {
             return just(event).transform(applyNext());
           } else {
-            return just(event).transform(unacceptedMessageProcessor).doFinally(signalType -> event.getContext().success())
+            return just(event).transform(unacceptedMessageProcessor).doFinally(signalType -> event.getInternalContext().success())
                 .materialize()
                 .then(s -> empty());
           }

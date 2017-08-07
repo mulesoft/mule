@@ -92,4 +92,13 @@ public @interface ArtifactClassLoaderRunnerConfig {
    */
   String[] testInclusions() default {};
 
+  /**
+   * Artifacts to be included as privileged artifacts for the all the modules. In format {@code [groupId]:[artifactId].
+   * <p/>
+   * This allows to add test plugins as privileged artifacts without having to modify the mule-module.properties of each module.
+   *
+   * @return Artifacts to be included as privileged artifacts. In format {@code [groupId]:[artifactId].
+   */
+  String[] extraPrivilegedArtifacts() default {};
+
 }

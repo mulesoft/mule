@@ -17,6 +17,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
@@ -30,7 +31,8 @@ import org.reactivestreams.Publisher;
  * Test async non-blocking {@link Processor} implementation that will return control to the Flow in a custom {@link Scheduler}
  * thread in the same way as, for example, a HTTP requester would.
  */
-public class TestNonBlockingProcessor implements Processor, Initialisable, Disposable, MuleContextAware {
+public class TestNonBlockingProcessor extends AbstractAnnotatedObject
+    implements Processor, Initialisable, Disposable, MuleContextAware {
 
   private static int MAX_THREADS = 8;
   private MuleContext muleContext;

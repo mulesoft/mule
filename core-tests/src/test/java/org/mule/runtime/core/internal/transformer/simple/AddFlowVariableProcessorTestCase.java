@@ -27,22 +27,22 @@ public class AddFlowVariableProcessorTestCase extends AbstractAddVariablePropert
 
   @Override
   protected void verifyAdded(Event event, String key, String value) {
-    assertThat(event.getVariable(key).getValue(), is(value));
+    assertThat(event.getVariables().get(key).getValue(), is(value));
   }
 
   @Override
   protected void verifyNotAdded(Event event) {
-    assertThat(event.getVariableNames(), empty());
+    assertThat(event.getVariables().keySet(), empty());
   }
 
   @Override
   protected void verifyRemoved(Event event, String key) {
-    assertThat(event.getVariableNames(), not(contains(key)));
+    assertThat(event.getVariables().keySet(), not(contains(key)));
   }
 
   @Override
   protected DataType getVariableDataType(Event event, String key) {
-    return event.getVariable(key).getDataType();
+    return event.getVariables().get(key).getDataType();
   }
 
 }

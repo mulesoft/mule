@@ -46,7 +46,7 @@ public class VariablesTestCase extends AbstractELTestCase {
     Message message = of("");
     Event event = Event.builder(context).message(message).flow(flowConstruct)
         .addVariable("foo", "bar").build();
-    assertEquals(event.getVariable("foo").getValue(), evaluate("flowVars['foo']", event));
+    assertEquals(event.getVariables().get("foo").getValue(), evaluate("flowVars['foo']", event));
   }
 
   @Test
@@ -56,7 +56,7 @@ public class VariablesTestCase extends AbstractELTestCase {
         .addVariable("foo", "bar_old").build();
     Event.Builder eventBuilder = Event.builder(event);
     evaluate("flowVars['foo']='bar'", event, eventBuilder);
-    assertEquals("bar", eventBuilder.build().getVariable("foo").getValue());
+    assertEquals("bar", eventBuilder.build().getVariables().get("foo").getValue());
   }
 
   @Test
@@ -65,7 +65,7 @@ public class VariablesTestCase extends AbstractELTestCase {
     Event event = Event.builder(context).message(message).flow(flowConstruct).build();
     Event.Builder eventBuilder = Event.builder(event);
     evaluate("flowVars['foo']='bar'", event, eventBuilder);
-    assertEquals("bar", eventBuilder.build().getVariable("foo").getValue());
+    assertEquals("bar", eventBuilder.build().getVariables().get("foo").getValue());
   }
 
   @Test
@@ -112,7 +112,7 @@ public class VariablesTestCase extends AbstractELTestCase {
     Event event = Event.builder(context).message(message).flow(flowConstruct)
         .addVariable("foo", "bar").build();
     event.getSession().setProperty("foo", "NOTbar");
-    assertEquals(event.getVariable("foo").getValue(), evaluate("foo", event));
+    assertEquals(event.getVariables().get("foo").getValue(), evaluate("foo", event));
   }
 
   @Test
@@ -146,7 +146,7 @@ public class VariablesTestCase extends AbstractELTestCase {
         .addVariable("foo", "bar_old").build();
     Event.Builder eventBuilder = Event.builder(event);
     evaluate("foo='bar'", event, eventBuilder);
-    assertEquals("bar", eventBuilder.build().getVariable("foo").getValue());
+    assertEquals("bar", eventBuilder.build().getVariables().get("foo").getValue());
   }
 
   @Test

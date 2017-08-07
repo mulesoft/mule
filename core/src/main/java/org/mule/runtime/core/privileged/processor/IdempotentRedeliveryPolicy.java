@@ -23,10 +23,10 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.exception.MessageRedeliveredException;
 import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.internal.transformer.simple.ByteArrayToHexString;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
 import org.mule.runtime.core.internal.util.store.ObjectStorePartition;
 import org.mule.runtime.core.internal.util.store.ProvidedObjectStoreWrapper;
-import org.mule.runtime.core.internal.transformer.simple.ByteArrayToHexString;
 
 import java.io.InputStream;
 import java.security.MessageDigest;
@@ -100,7 +100,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
   private Supplier<ObjectStore> internalObjectStoreSupplier() {
     return () -> {
       ObjectStoreManager objectStoreManager = muleContext.getObjectStoreManager();
-      return objectStoreManager.createObjectStore(flowConstruct.getName() + "." + getClass().getName(),
+      return objectStoreManager.createObjectStore(getLocation().getRootContainerName() + "." + getClass().getName(),
                                                   ObjectStoreSettings.builder()
                                                       .persistent(false)
                                                       .entryTtl((long) 60 * 5 * 1000)
@@ -160,7 +160,8 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
       }
 
       try {
-        Event returnEvent = processNext(Event.builder(DefaultEventContext.child(event.getContext(), empty()), event).build());
+        Event returnEvent =
+            processNext(Event.builder(DefaultEventContext.child(event.getInternalContext(), empty()), event).build());
         counter = findCounter(messageId);
         if (counter != null) {
           resetCounter(messageId);

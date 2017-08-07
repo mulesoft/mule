@@ -12,7 +12,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setFlowConstructIfNeeded;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.RECEIVE_TIMEOUT;
 import static org.mule.tck.processor.FlowAssert.addAssertion;
 import static reactor.core.Exceptions.propagate;
@@ -23,8 +22,6 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.expression.InvalidExpressionException;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
@@ -39,7 +36,7 @@ import com.eaio.uuid.UUID;
 import reactor.core.publisher.Flux;
 
 public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
-    implements InterceptingMessageProcessor, FlowConstructAware, Startable {
+    implements InterceptingMessageProcessor, Startable {
 
   private static final ThreadLocal<String> taskTokenInThread = new ThreadLocal<>();
 
@@ -194,8 +191,4 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
     }
   }
 
-  @Override
-  public void setFlowConstruct(FlowConstruct flowConstruct) {
-    setFlowConstructIfNeeded(next, flowConstruct);
-  }
 }

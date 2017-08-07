@@ -57,7 +57,6 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
     flow = mock(Flow.class, RETURNS_DEEP_STUBS);
     OnErrorPropagateHandler exceptionHandler = new OnErrorPropagateHandler();
     exceptionHandler.setMuleContext(muleContext);
-    exceptionHandler.setFlowConstruct(flow);
     exceptionHandler.initialise();
     when(flow.getExceptionListener()).thenReturn(exceptionHandler);
     eventContext = DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION);
@@ -76,16 +75,17 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
 
   private ReactiveProcessor map = publisher -> from(publisher).map(in -> output);
   private ReactiveProcessor ackAndStop = publisher -> from(publisher).then(in -> {
-    in.getContext().success();
+    in.getInternalContext().success();
     return empty();
   });
   private ReactiveProcessor respondAndStop = publisher -> from(publisher).then(in -> {
-    in.getContext().success(response);
+    in.getInternalContext().success(response);
     return empty();
   });
-  private ReactiveProcessor ackAndMap = publisher -> from(publisher).doOnNext(in -> in.getContext().success()).map(in -> output);
+  private ReactiveProcessor ackAndMap =
+      publisher -> from(publisher).doOnNext(in -> in.getInternalContext().success()).map(in -> output);
   private ReactiveProcessor respondAndMap =
-      publisher -> from(publisher).doOnNext(in -> in.getContext().success(response)).map(in -> output);
+      publisher -> from(publisher).doOnNext(in -> in.getInternalContext().success(response)).map(in -> output);
   private ReactiveProcessor error = publisher -> from(publisher).map(in -> {
     throw exception;
   });

@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.security.SecurityContext;
+import org.mule.runtime.api.security.SecurityContext;
 
 import java.io.Serializable;
 import java.util.Set;

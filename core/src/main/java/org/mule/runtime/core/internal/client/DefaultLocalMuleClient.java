@@ -32,11 +32,10 @@ import org.mule.runtime.core.api.client.MuleClientFlowConstruct;
 import org.mule.runtime.core.api.client.OperationOptions;
 import org.mule.runtime.core.api.connector.ConnectorOperationLocator;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.functional.Either;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.internal.message.InternalMessage.Builder;
-import org.mule.runtime.core.api.processor.Processor;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -82,9 +81,6 @@ public class DefaultLocalMuleClient implements MuleClient {
     final Processor connectorMessageProcessor = getConnectorMessageProcessLocator()
         .locateConnectorOperation(url, newOptions().outbound().build(), REQUEST_RESPONSE);
     if (connectorMessageProcessor != null) {
-      if (connectorMessageProcessor instanceof FlowConstructAware) {
-        ((FlowConstructAware) connectorMessageProcessor).setFlowConstruct(flowConstruct);
-      }
       return createEitherResult(connectorMessageProcessor.process(createMuleEvent(message)));
     } else {
       throw createUnsupportedUrlException(url);
@@ -111,9 +107,6 @@ public class DefaultLocalMuleClient implements MuleClient {
     final Processor connectorMessageProcessor = getConnectorMessageProcessLocator()
         .locateConnectorOperation(url, operationOptions, REQUEST_RESPONSE);
     if (connectorMessageProcessor != null) {
-      if (connectorMessageProcessor instanceof FlowConstructAware) {
-        ((FlowConstructAware) connectorMessageProcessor).setFlowConstruct(flowConstruct);
-      }
       return createEitherResult(returnEvent(connectorMessageProcessor.process(createMuleEvent(message))));
     } else {
       throw createUnsupportedUrlException(url);
@@ -150,9 +143,6 @@ public class DefaultLocalMuleClient implements MuleClient {
     final Processor connectorMessageProcessor = getConnectorMessageProcessLocator()
         .locateConnectorOperation(url, newOptions().outbound().build(), ONE_WAY);
     if (connectorMessageProcessor != null) {
-      if (connectorMessageProcessor instanceof FlowConstructAware) {
-        ((FlowConstructAware) connectorMessageProcessor).setFlowConstruct(flowConstruct);
-      }
       connectorMessageProcessor.process(createMuleEvent(message));
     } else {
       throw createUnsupportedUrlException(url);
@@ -164,9 +154,6 @@ public class DefaultLocalMuleClient implements MuleClient {
     final Processor connectorMessageProcessor =
         getConnectorMessageProcessLocator().locateConnectorOperation(url, operationOptions, ONE_WAY);
     if (connectorMessageProcessor != null) {
-      if (connectorMessageProcessor instanceof FlowConstructAware) {
-        ((FlowConstructAware) connectorMessageProcessor).setFlowConstruct(flowConstruct);
-      }
       connectorMessageProcessor.process(createMuleEvent(message));
     } else {
       dispatch(url, message);
@@ -179,9 +166,6 @@ public class DefaultLocalMuleClient implements MuleClient {
     final Processor connectorMessageProcessor =
         getConnectorMessageProcessLocator().locateConnectorOperation(url, operationOptions, ONE_WAY);
     if (connectorMessageProcessor != null) {
-      if (connectorMessageProcessor instanceof FlowConstructAware) {
-        ((FlowConstructAware) connectorMessageProcessor).setFlowConstruct(flowConstruct);
-      }
       final Event event = connectorMessageProcessor.process(createMuleEvent(of(null)));
       if (event == null) {
         return right(empty());

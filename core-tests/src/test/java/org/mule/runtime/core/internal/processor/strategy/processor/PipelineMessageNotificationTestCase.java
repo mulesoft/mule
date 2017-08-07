@@ -175,7 +175,7 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
     public TestPipeline(String name, MuleContext muleContext, MessageSource messageSource, List<Processor> messageProcessors,
                         ErrorHandler errorHandler) {
       super(name, muleContext, messageSource, messageProcessors, ofNullable(errorHandler), empty(), INITIAL_STATE_STARTED,
-            DEFAULT_MAX_CONCURRENCY);
+            DEFAULT_MAX_CONCURRENCY, createFlowStatistics(name, muleContext));
     }
 
     @Override
@@ -226,11 +226,13 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
       }
 
       if (exceptionExpected) {
-        return expectedAction == notification.getAction() && exception != null && notification.getMessage() != null
-            && (this.event == null || this.event.getMessage().equals(notification.getMessage()));
+        return expectedAction == notification.getAction() && exception != null && notification.getEvent() != null
+            && notification.getEvent().getMessage() != null
+            && (this.event == null || this.event.getMessage().equals(notification.getEvent().getMessage()));
       } else {
-        return expectedAction == notification.getAction() && exception == null && notification.getMessage() != null
-            && (this.event == null || this.event.getMessage().equals(notification.getMessage()));
+        return expectedAction == notification.getAction() && exception == null && notification.getEvent() != null
+            && notification.getEvent().getMessage() != null
+            && (this.event == null || this.event.getMessage().equals(notification.getEvent().getMessage()));
       }
     }
   }

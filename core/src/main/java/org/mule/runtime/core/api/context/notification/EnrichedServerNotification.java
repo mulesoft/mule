@@ -7,14 +7,8 @@
 package org.mule.runtime.core.api.context.notification;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.message.Error;
-import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.meta.AnnotatedObject;
-import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.message.GroupCorrelation;
-
-import java.util.Map;
-import java.util.Optional;
 
 /**
  * This notification type includes information about the event, exception and flow where it occurred.
@@ -43,24 +37,12 @@ public abstract class EnrichedServerNotification extends ServerNotification {
     return notificationInfo;
   }
 
-  public String getUniqueId() {
-    return notificationInfo.getUniqueId();
-  }
-
   public String getCorrelationId() {
-    return notificationInfo.getCorrelationId();
+    return notificationInfo.getEvent().getCorrelationId();
   }
 
-  public Optional<GroupCorrelation> getGroupCorrelation() {
-    return notificationInfo.getGroupCorrelation();
-  }
-
-  public Message getMessage() {
-    return notificationInfo.getMessage();
-  }
-
-  public Optional<Error> getError() {
-    return notificationInfo.getError();
+  public Event getEvent() {
+    return notificationInfo.getEvent();
   }
 
   public AnnotatedObject getComponent() {
@@ -73,14 +55,6 @@ public abstract class EnrichedServerNotification extends ServerNotification {
 
   public Exception getException() {
     return notificationInfo.getException();
-  }
-
-  public Map<String, TypedValue> getVariables() {
-    return notificationInfo.getVariables();
-  }
-
-  public String getOriginatingFlowName() {
-    return notificationInfo.getOriginatingFlowName();
   }
 
   @Override

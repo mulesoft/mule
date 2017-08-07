@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.routing;
 
-import static org.mule.runtime.core.el.BindingContextUtils.NULL_BINDING_CONTEXT;
+import static org.mule.runtime.internal.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;

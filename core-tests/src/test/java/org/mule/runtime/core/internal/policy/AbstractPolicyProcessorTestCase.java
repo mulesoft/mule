@@ -75,7 +75,7 @@ public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCa
 
     Event resultEvent = just(initialEventWithVars).transform(policyProcessor).block();
 
-    assertEquals(resultEvent.getVariableNames(), initialEventWithVars.getVariableNames());
+    assertEquals(resultEvent.getVariables().keySet(), initialEventWithVars.getVariables().keySet());
   }
 
   @Test
@@ -89,7 +89,8 @@ public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCa
     just(initialEventWithVars).transform(policyProcessor).block();
 
     verify(flowProcessor).apply(eventCaptor.capture());
-    assertEquals(((Event) from(eventCaptor.getValue()).block()).getVariableNames(), initialEventWithVars.getVariableNames());
+    assertEquals(((Event) from(eventCaptor.getValue()).block()).getVariables().keySet(),
+                 initialEventWithVars.getVariables().keySet());
   }
 
   @Test

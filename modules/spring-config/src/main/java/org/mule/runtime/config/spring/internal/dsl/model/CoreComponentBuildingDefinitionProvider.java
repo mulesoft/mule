@@ -59,7 +59,6 @@ import static org.mule.runtime.internal.dsl.DslConstants.POOLING_PROFILE_ELEMENT
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
-
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.DataUnit;
@@ -98,8 +97,8 @@ import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.context.notification.ListenerSubscriptionPair;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
-import org.mule.runtime.core.api.processor.AbstractProcessor;
 import org.mule.runtime.core.api.processor.LoggerMessageProcessor;
+import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.RetryNotifier;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
@@ -175,6 +174,7 @@ import org.mule.runtime.core.internal.transformer.simple.ObjectToString;
 import org.mule.runtime.core.internal.transformer.simple.StringAppendTransformer;
 import org.mule.runtime.core.privileged.expression.ExpressionConfig;
 import org.mule.runtime.core.privileged.processor.IdempotentRedeliveryPolicy;
+import org.mule.runtime.core.privileged.processor.objectfactory.MessageProcessorChainObjectFactory;
 import org.mule.runtime.core.privileged.processor.simple.AbstractAddVariablePropertyProcessor;
 import org.mule.runtime.core.privileged.transformer.simple.ByteArrayToObject;
 import org.mule.runtime.core.privileged.transformer.simple.ByteArrayToSerializable;
@@ -326,15 +326,13 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .build());
 
     componentBuildingDefinitions
-        .add(baseDefinition.withIdentifier(PROCESSOR).withTypeDefinition(fromType(AbstractProcessor.class)).build());
-    componentBuildingDefinitions
         .add(baseDefinition.withIdentifier(TRANSFORMER).withTypeDefinition(fromType(Transformer.class)).build());
     componentBuildingDefinitions.add(baseDefinition.withIdentifier(CUSTOM_PROCESSOR)
         .withTypeDefinition(fromConfigurationAttribute(CLASS_ATTRIBUTE)
             .checkingThatIsClassOrInheritsFrom(MESSAGE_PROCESSOR_CLASS))
         .asPrototype().build());
     componentBuildingDefinitions.add(baseDefinition.withIdentifier(PROCESSOR_CHAIN)
-        .withTypeDefinition(fromType(Processor.class)).withObjectFactoryType(MessageProcessorChainFactoryBean.class)
+        .withTypeDefinition(fromType(Processor.class)).withObjectFactoryType(MessageProcessorChainObjectFactory.class)
         .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
         .asPrototype().build());
     componentBuildingDefinitions.add(baseDefinition.withIdentifier(ROUTE)
@@ -343,7 +341,8 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .asPrototype().build());
     addModuleOperationChainParser(componentBuildingDefinitions);
     componentBuildingDefinitions.add(baseDefinition.withIdentifier(SUB_FLOW)
-        .withTypeDefinition(fromType(Processor.class)).withObjectFactoryType(SubflowMessageProcessorChainFactoryBean.class)
+        .withTypeDefinition(fromType(MessageProcessorChain.class))
+        .withObjectFactoryType(SubflowMessageProcessorChainFactoryBean.class)
         .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
         .withSetterParameterDefinition(NAME, fromSimpleParameter(NAME).build()).asPrototype().build());
     componentBuildingDefinitions
@@ -364,11 +363,20 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
                                            fromChildConfiguration(MessagingExceptionHandler.class).build())
             .withSetterParameterDefinition("maxConcurrency", fromSimpleParameter("maxConcurrency").build())
             .build());
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier(FLOW_REF)
+
+    Builder processorRefBuilder = baseDefinition
         .withTypeDefinition(fromType(AnnotatedProcessor.class))
-        .withObjectFactoryType(FlowRefFactoryBean.class)
+        .withObjectFactoryType(FlowRefFactoryBean.class);
+
+    componentBuildingDefinitions.add(processorRefBuilder
+        .withIdentifier(FLOW_REF)
         .withSetterParameterDefinition("name", fromSimpleParameter("name").build())
         .build());
+    componentBuildingDefinitions.add(processorRefBuilder
+        .withIdentifier(PROCESSOR)
+        .withSetterParameterDefinition("name", fromSimpleParameter("ref").build())
+        .build());
+
     componentBuildingDefinitions.add(baseDefinition.withIdentifier(SCATTER_GATHER)
         .withTypeDefinition(fromType(ScatterGatherRouter.class)).withObjectFactoryType(ScatterGatherRouterFactoryBean.class)
         .withSetterParameterDefinition("timeout", fromSimpleParameter("timeout").build())

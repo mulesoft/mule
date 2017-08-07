@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.execution;
 
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doCallRealMethod;
@@ -15,11 +16,14 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
+import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.api.execution.EndPhaseTemplate;
 import org.mule.runtime.core.api.execution.FlowProcessingPhaseTemplate;
@@ -53,9 +57,14 @@ public class MuleMessageProcessingManagerTestCase extends org.mule.tck.junit4.Ab
   private TestMessageProcessTemplateAndContext completeMessageProcessTemplateAndContext;
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private SystemExceptionHandler mockExceptionListener;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS, extraInterfaces = {AnnotatedObject.class})
+  private FlowConstruct flowConstruct;
 
   @Before
   public void setUp() {
+    when(completeMessageProcessTemplateAndContext.getMessageSource().getLocation().getRootContainerName()).thenReturn("root");
+    when(mockMuleContext.getConfigurationComponentLocator().find(any(Location.class)))
+        .thenReturn(of((AnnotatedObject) flowConstruct));
     when(mockMuleContext.getErrorTypeRepository()).thenReturn(createDefaultErrorTypeRepository());
     when(completeMessageProcessTemplateAndContext.getTransactionConfig()).thenReturn(empty());
   }

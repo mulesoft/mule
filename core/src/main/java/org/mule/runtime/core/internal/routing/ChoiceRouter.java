@@ -8,7 +8,6 @@ package org.mule.runtime.core.internal.routing;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.RoutePathNotFoundException;
 
@@ -40,11 +39,6 @@ public class ChoiceRouter extends AbstractSelectiveRouter {
     } catch (RoutePathNotFoundException e) {
       return event1 -> event1;
     }
-  }
-
-  @Override
-  public void setFlowConstruct(FlowConstruct flowConstruct) {
-    super.setFlowConstruct(flowConstruct);
   }
 
   @Override

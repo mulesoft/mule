@@ -7,10 +7,10 @@
 package org.mule.runtime.core.privileged.processor.chain;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
+import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +30,7 @@ abstract class AbstractMessageProcessorChainBuilder implements MessageProcessorC
 
   protected List processors = new ArrayList();
   protected String name;
-  protected FlowConstruct flowConstruct;
+  protected ProcessingStrategy processingStrategy;
   protected MuleContext muleContext;
 
   // Argument is of type Object because it could be a MessageProcessor or a MessageProcessorBuilder
@@ -46,4 +46,7 @@ abstract class AbstractMessageProcessorChainBuilder implements MessageProcessorC
     this.name = name;
   }
 
+  public void setProcessingStrategy(ProcessingStrategy processingStrategy) {
+    this.processingStrategy = processingStrategy;
+  }
 }

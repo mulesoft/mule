@@ -7,7 +7,7 @@
 package org.mule.runtime.core.internal.security;
 
 import org.mule.runtime.api.security.Authentication;
-import org.mule.runtime.core.api.security.SecurityContext;
+import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.core.api.security.SecurityContextFactory;
 
 public class DefaultSecurityContextFactory implements SecurityContextFactory {

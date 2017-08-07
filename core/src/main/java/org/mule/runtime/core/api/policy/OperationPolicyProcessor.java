@@ -69,7 +69,7 @@ public class OperationPolicyProcessor implements Processor {
       PolicyStateId policyStateId = new PolicyStateId(operationEvent.getContext().getCorrelationId(), policy.getPolicyId());
       Optional<Event> latestPolicyState = policyStateHandler.getLatestState(policyStateId);
       Event variablesProviderEvent =
-          latestPolicyState.orElseGet(() -> Event.builder(operationEvent.getContext()).message(of(null)).build());
+          latestPolicyState.orElseGet(() -> Event.builder(operationEvent.getInternalContext()).message(of(null)).build());
       policyStateHandler.updateState(policyStateId, variablesProviderEvent);
       Event policyEvent = policyEventConverter.createEvent(operationEvent, variablesProviderEvent);
       Processor operationCall = buildOperationExecutionWithPolicyFunction(nextProcessor, operationEvent);
