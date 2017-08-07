@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.mule.tests</groupId>
         <artifactId>mule-test-extensions-parent</artifactId>
-        <version>4.0.0-BETA.x-SNAPSHOT</version>
+        <version>4.0.0-BETA.5</version>
     </parent>
 
     <artifactId>mule-subtypes-extension</artifactId>
