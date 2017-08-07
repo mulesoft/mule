@@ -39,6 +39,11 @@ import org.mule.runtime.extension.api.error.MuleErrors;
 
 import com.google.gson.reflect.TypeToken;
 
+/**
+ * An {@link ExtensionDeclarer} for Mule's Core Runtime
+ *
+ * @since 4.0
+ */
 class MuleExtensionModelDeclarer {
 
   ExtensionDeclarer createExtensionModel() {
