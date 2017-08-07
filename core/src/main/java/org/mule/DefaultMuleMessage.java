@@ -1852,8 +1852,8 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
                 }
                 else
                 {
-                    throw newException("Only owner thread can write to message: "
-                            + ownerThread.get() + "/" + Thread.currentThread());
+                    throw newException("Thread with name " + Thread.currentThread().getName() + " is trying to access to the message with hashcode " + System.identityHashCode(this) + " and id " + this.id
+                                       + ". However its owner is " + ownerThread.get());
                 }
             }
         }

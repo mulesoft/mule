@@ -29,6 +29,7 @@ public class MessageProcessorNotification extends ServerNotification implements 
     public static final int MESSAGE_PROCESSOR_PRE_INVOKE = MESSAGE_PROCESSOR_EVENT_ACTION_START_RANGE + 1;
     public static final int MESSAGE_PROCESSOR_POST_INVOKE = MESSAGE_PROCESSOR_EVENT_ACTION_START_RANGE + 2;
 
+
     private final transient MessageProcessor processor;
 
     static
