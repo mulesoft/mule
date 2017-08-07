@@ -26,6 +26,9 @@ import org.mule.runtime.config.spring.internal.dsl.model.NoSuchComponentModelExc
 
 import java.util.Optional;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 /**
  * {@link MetadataService} implementation that initialises the required components before doing test connectivity.
  *
@@ -36,13 +39,16 @@ import java.util.Optional;
  */
 public class LazyMetadataService implements MetadataService {
 
+  public static final String NON_LAZY_METADATA_SERVICE = "_muleNonLazyMetadataService";
+
   private final LazyMuleArtifactContext lazyMuleArtifactContext;
-  private final MetadataService metadataService;
 
-  public LazyMetadataService(LazyMuleArtifactContext lazyMuleArtifactContext, MetadataService metadataService) {
+  @Inject
+  @Named(NON_LAZY_METADATA_SERVICE)
+  private MetadataService metadataService;
 
+  public LazyMetadataService(LazyMuleArtifactContext lazyMuleArtifactContext) {
     this.lazyMuleArtifactContext = lazyMuleArtifactContext;
-    this.metadataService = metadataService;
   }
 
   /**

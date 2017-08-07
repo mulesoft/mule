@@ -22,6 +22,7 @@ import static org.mule.runtime.core.api.util.UUID.getUUID;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
+import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
@@ -285,7 +286,7 @@ public class ArtifactContextBuilder {
    * @param enableLazyInit when true the artifact resources from the mule configuration won't be created at startup. The artifact
    *        components from the configuration will be created on demand when requested. For instance, when using
    *        {@link ArtifactContext#getConnectivityTestingService()} and then invoking
-   *        {@link org.mule.runtime.core.api.connectivity.ConnectivityTestingService#testConnection(Location)} will cause the
+   *        {@link ConnectivityTestingService#testConnection(Location)} will cause the
    *        creation of the component requested to do test connectivity, if it was not already created. when false, the
    *        application will be created completely at startup.
    * @return the builder

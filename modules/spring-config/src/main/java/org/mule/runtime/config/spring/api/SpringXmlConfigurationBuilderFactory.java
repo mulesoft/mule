@@ -8,7 +8,6 @@ package org.mule.runtime.config.spring.api;
 
 import static java.util.Collections.emptyMap;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
-
 import org.mule.runtime.config.spring.internal.SpringXmlConfigurationBuilder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
@@ -38,7 +37,7 @@ public final class SpringXmlConfigurationBuilderFactory {
   public static ConfigurationBuilder createConfigurationBuilder(String[] configResources, MuleContext domainContext)
       throws ConfigurationException {
     final SpringXmlConfigurationBuilder springXmlConfigurationBuilder =
-        new SpringXmlConfigurationBuilder(configResources, emptyMap(), APP);
+        new SpringXmlConfigurationBuilder(configResources, emptyMap(), APP, false);
     if (domainContext != null) {
       springXmlConfigurationBuilder.setParentContext(domainContext);
     }
@@ -54,6 +53,6 @@ public final class SpringXmlConfigurationBuilderFactory {
   public static ConfigurationBuilder createConfigurationBuilder(String[] configResources, Map<String, String> artifactProperties,
                                                                 ArtifactType artifactType)
       throws ConfigurationException {
-    return new SpringXmlConfigurationBuilder(configResources, artifactProperties, artifactType);
+    return new SpringXmlConfigurationBuilder(configResources, artifactProperties, artifactType, false);
   }
 }

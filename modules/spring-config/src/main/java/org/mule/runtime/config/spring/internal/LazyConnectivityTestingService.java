@@ -13,10 +13,13 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.config.spring.internal.dsl.model.NoSuchComponentModelException;
-import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
-import org.mule.runtime.core.api.exception.ObjectNotFoundException;
+import org.mule.runtime.api.connectivity.ConnectivityTestingService;
+import org.mule.runtime.api.exception.ObjectNotFoundException;
 
 import java.util.List;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 /**
  * {@link ConnectivityTestingService} implementation that initialises the required
@@ -27,13 +30,16 @@ import java.util.List;
  */
 public class LazyConnectivityTestingService implements ConnectivityTestingService {
 
-  private final LazyComponentInitializer lazyComponentInitializer;
-  private final ConnectivityTestingService connectivityTestingService;
+  public static final String NON_LAZY_CONNECTIVITY_TESTING_SERVICE = "_muleNonLazyConnectivityTestingService";
 
-  public LazyConnectivityTestingService(LazyComponentInitializer lazyComponentInitializer,
-                                        ConnectivityTestingService connectivityTestingService) {
+  private final LazyComponentInitializer lazyComponentInitializer;
+
+  @Inject
+  @Named(NON_LAZY_CONNECTIVITY_TESTING_SERVICE)
+  private ConnectivityTestingService connectivityTestingService;
+
+  public LazyConnectivityTestingService(LazyComponentInitializer lazyComponentInitializer) {
     this.lazyComponentInitializer = lazyComponentInitializer;
-    this.connectivityTestingService = connectivityTestingService;
   }
 
   @Override

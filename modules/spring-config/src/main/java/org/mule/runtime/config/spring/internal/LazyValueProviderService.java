@@ -16,14 +16,15 @@ import static org.mule.runtime.core.internal.value.MuleValueProviderServiceUtili
 import static org.mule.runtime.core.internal.value.MuleValueProviderServiceUtility.isConnection;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.INVALID_LOCATION;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
-
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.value.ValueProviderService;
 import org.mule.runtime.api.value.ValueResult;
 import org.mule.runtime.config.spring.internal.dsl.model.NoSuchComponentModelException;
-import org.mule.runtime.core.internal.value.MuleValueProviderService;
 
 import java.util.Optional;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 /**
  * {@link ValueProviderService} implementation flavour that initialises just the required components before executing the
@@ -37,12 +38,16 @@ import java.util.Optional;
  */
 public class LazyValueProviderService implements ValueProviderService {
 
+  public static final String NON_LAZY_VALUE_PROVIDER_SERVICE = "_muleNonLazyValueProviderService";
+
   private LazyMuleArtifactContext lazyMuleArtifactContext;
+
+  @Inject
+  @Named(NON_LAZY_VALUE_PROVIDER_SERVICE)
   private ValueProviderService providerService;
 
-  LazyValueProviderService(LazyMuleArtifactContext artifactContext, MuleValueProviderService providerServiceDelegate) {
+  LazyValueProviderService(LazyMuleArtifactContext artifactContext) {
     this.lazyMuleArtifactContext = artifactContext;
-    this.providerService = providerServiceDelegate;
   }
 
   /**

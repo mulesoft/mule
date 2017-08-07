@@ -7,11 +7,11 @@
 package org.mule.runtime.module.extension.internal.runtime.config;
 
 import static java.util.Optional.of;
+import static org.mule.runtime.api.metadata.MetadataService.METADATA_SERVICE_KEY;
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_METADATA_SERVICE;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.extension.api.metadata.NullMetadataResolver.NULL_CATEGORY_NAME;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
@@ -33,6 +33,7 @@ import org.mule.runtime.api.metadata.MetadataKeyProvider;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.MetadataKeysContainerBuilder;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
+import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.api.util.Reference;
@@ -82,7 +83,7 @@ public final class ConfigurationProviderToolingAdapter extends StaticConfigurati
                                       MuleContext muleContext) {
     super(name, extensionModel, configurationModel, configuration, muleContext);
     this.configuration = configuration;
-    this.metadataService = muleContext.getRegistry().get(OBJECT_METADATA_SERVICE);
+    this.metadataService = muleContext.getRegistry().get(METADATA_SERVICE_KEY);
     this.connectionManager = muleContext.getRegistry().get(OBJECT_CONNECTION_MANAGER);
   }
 
