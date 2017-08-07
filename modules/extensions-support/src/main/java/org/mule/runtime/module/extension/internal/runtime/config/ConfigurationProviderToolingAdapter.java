@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.runtime.config;
 
 import static java.util.Optional.of;
-import static org.mule.runtime.api.metadata.MetadataService.METADATA_SERVICE_KEY;
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
@@ -22,6 +21,7 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getMetadataResolverFactory;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -33,7 +33,6 @@ import org.mule.runtime.api.metadata.MetadataKeyProvider;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.MetadataKeysContainerBuilder;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
-import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.api.util.Reference;
@@ -41,6 +40,7 @@ import org.mule.runtime.api.value.Value;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ConnectionManager;
+import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
 import org.mule.runtime.core.internal.metadata.DefaultMetadataContext;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
@@ -59,12 +59,11 @@ import java.util.concurrent.Callable;
 
 /**
  * Adds the capability to expose tooling focused capabilities associated with the {@link StaticConfigurationProvider}'s
- * components.
- * So sar the capabilities are:
+ * components. So sar the capabilities are:
  * <ul>
  * <li>{@link MetadataKeyProvider}, to resolve {@link MetadataKey metadata keys} associated to a configuration</li>
- * <li>{@link ConfigurationParameterValueProvider}, to resolve {@link Value values} associated to a configuration and
- * their related connection</li>
+ * <li>{@link ConfigurationParameterValueProvider}, to resolve {@link Value values} associated to a configuration and their
+ * related connection</li>
  * </ul>
  *
  * @since 4.0
@@ -83,8 +82,12 @@ public final class ConfigurationProviderToolingAdapter extends StaticConfigurati
                                       MuleContext muleContext) {
     super(name, extensionModel, configurationModel, configuration, muleContext);
     this.configuration = configuration;
-    this.metadataService = muleContext.getRegistry().get(METADATA_SERVICE_KEY);
     this.connectionManager = muleContext.getRegistry().get(OBJECT_CONNECTION_MANAGER);
+    try {
+      this.metadataService = muleContext.getRegistry().lookupObject(MuleMetadataService.class);
+    } catch (RegistrationException e) {
+      throw new MuleRuntimeException(e);
+    }
   }
 
   /**
