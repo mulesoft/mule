@@ -27,7 +27,9 @@ import java.net.URL;
 
 /**
  * {@link ArtifactClassLoader} builder for class loaders required by {@link Application} artifacts for Tooling.
- * The main different between this kind of applications vs the ones
+ * The main different between this kind of applications vs the ones deployed through the deployment service is that
+ * Tooling has to access the {@link ArtifactClassLoader} and it should be simple for Tooling to dispose resources, therefore
+ * a {@link ToolingArtifactClassLoader} is created by this builder.
  *
  * @since 4.0
  */

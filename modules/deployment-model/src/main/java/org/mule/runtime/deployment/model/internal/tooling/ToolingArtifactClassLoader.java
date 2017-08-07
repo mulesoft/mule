@@ -47,6 +47,9 @@ public class ToolingArtifactClassLoader implements ArtifactClassLoader {
     this.delegateArtifactClassLoader = delegateArtifactClassLoader;
   }
 
+  /**
+   * @return {@link List} for {@link ArtifactClassLoader} for the plugins of the region.
+   */
   public List<ArtifactClassLoader> getArtifactPluginClassLoaders() {
     return regionClassLoader.getArtifactPluginClassLoaders();
   }
