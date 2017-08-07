@@ -136,11 +136,12 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(coreExtensionModel.getConnectionProviders(), empty());
 
     assertThat(coreExtensionModel.getErrorModels(),
-               hasItem(newError("TRANSFORMATION", "CORE")
-                   .withParent(newError("TRANSFORMATION", "MULE").withParent(errorMuleAny).build()).build()));
+               hasItem((newError("TRANSFORMATION", "MULE").withParent(errorMuleAny).build())));
     assertThat(coreExtensionModel.getErrorModels(),
-               hasItem(newError("CORRELATION_TIMEOUT", "CORE")
-                   .withParent(newError("ANY", "CORE").withParent(errorMuleAny).build()).build()));
+               hasItem(newError("CONNECTIVITY", "MULE").withParent(errorMuleAny).build()));
+    assertThat(coreExtensionModel.getErrorModels(),
+               hasItem(newError("RETRY_EXHAUSTED", "MULE").withParent(errorMuleAny).build()));
+    assertThat(coreExtensionModel.getErrorModels(), hasItem(errorMuleAny));
 
     assertThat(coreExtensionModel.getSourceModels(), hasSize(1));
 
@@ -204,8 +205,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     final OperationModel transformModel = coreExtensionModel.getOperationModel("transform").get();
 
     assertThat(transformModel.getErrorModels(),
-               hasItem(newError("TRANSFORMATION", "CORE")
-                   .withParent(newError("TRANSFORMATION", "MULE").withParent(errorMuleAny).build()).build()));
+               hasItem(newError("TRANSFORMATION", "MULE").withParent(errorMuleAny).build()));
     assertThat(transformModel.getExecutionType(), is(CPU_INTENSIVE));
 
     // TODO MULE-11935 a way is needed to determine the return type of the trasformer in the extension model.
@@ -328,9 +328,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
   public void collectionAggregator() {
     final OperationModel collectionAggregatorModel = coreExtensionModel.getOperationModel("collectionAggregator").get();
 
-    assertThat(collectionAggregatorModel.getErrorModels(),
-               hasItem(newError("CORRELATION_TIMEOUT", "CORE")
-                   .withParent(newError("ANY", "CORE").withParent(errorMuleAny).build()).build()));
+    assertThat(collectionAggregatorModel.getErrorModels(), is(empty()));
     assertThat(collectionAggregatorModel.getExecutionType(), is(BLOCKING));
 
     assertThat(collectionAggregatorModel.getOutput().getType(), instanceOf(DefaultArrayType.class));

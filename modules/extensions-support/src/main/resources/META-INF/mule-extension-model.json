@@ -40,20 +40,7 @@
       "kind": "operation",
       "blocking": true,
       "executionType": "BLOCKING",
-      "errors": [
-        {
-          "type": "CORRELATION_TIMEOUT",
-          "namespace": "CORE",
-          "parent": {
-            "type": "ANY",
-            "namespace": "CORE",
-            "parent": {
-              "type": "ANY",
-              "namespace": "MULE"
-            }
-          }
-        }
-      ],
+      "errors": [],
       "output": {
         "type": {
           "format": "java",
@@ -856,14 +843,10 @@
       "errors": [
         {
           "type": "TRANSFORMATION",
-          "namespace": "CORE",
+          "namespace": "MULE",
           "parent": {
-            "type": "TRANSFORMATION",
-            "namespace": "MULE",
-            "parent": {
-              "type": "ANY",
-              "namespace": "MULE"
-            }
+            "type": "ANY",
+            "namespace": "MULE"
           }
         }
       ],
@@ -2931,19 +2914,7 @@
   "errors": [
     {
       "type": "TRANSFORMATION",
-      "namespace": "CORE",
-      "parent": {
-        "type": "TRANSFORMATION",
-        "namespace": "MULE",
-        "parent": {
-          "type": "ANY",
-          "namespace": "MULE"
-        }
-      }
-    },
-    {
-      "type": "ANY",
-      "namespace": "CORE",
+      "namespace": "MULE",
       "parent": {
         "type": "ANY",
         "namespace": "MULE"
@@ -2955,18 +2926,6 @@
       "parent": {
         "type": "ANY",
         "namespace": "MULE"
-      }
-    },
-    {
-      "type": "CONNECTIVITY",
-      "namespace": "CORE",
-      "parent": {
-        "type": "CONNECTIVITY",
-        "namespace": "MULE",
-        "parent": {
-          "type": "ANY",
-          "namespace": "MULE"
-        }
       }
     },
     {
@@ -2982,31 +2941,7 @@
       }
     },
     {
-      "type": "CORRELATION_TIMEOUT",
-      "namespace": "CORE",
-      "parent": {
-        "type": "ANY",
-        "namespace": "CORE",
-        "parent": {
-          "type": "ANY",
-          "namespace": "MULE"
-        }
-      }
-    },
-    {
       "type": "RETRY_EXHAUSTED",
-      "namespace": "CORE",
-      "parent": {
-        "type": "RETRY_EXHAUSTED",
-        "namespace": "MULE",
-        "parent": {
-          "type": "ANY",
-          "namespace": "MULE"
-        }
-      }
-    },
-    {
-      "type": "TRANSFORMATION",
       "namespace": "MULE",
       "parent": {
         "type": "ANY",
