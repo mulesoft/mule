@@ -211,11 +211,11 @@ public final class MetadataMediator<T extends ComponentModel> {
                                                        resolveParameterGroupModelType(
                                                                                       constructModel.getParameterGroupModels(),
                                                                                       inputMetadataDescriptor.getAllParameters()),
+                                                       constructModel.getNestedComponents(),
+                                                       constructModel.allowsTopLevelDeclaration(),
                                                        constructModel.getDisplayModel().orElse(null),
                                                        constructModel.getStereotypes(),
-                                                       constructModel.getModelProperties(),
-                                                       constructModel.getNestedComponents(),
-                                                       constructModel.allowsTopLevelDeclaration()));
+                                                       constructModel.getModelProperties()));
       }
 
       @Override
@@ -229,6 +229,7 @@ public final class MetadataMediator<T extends ComponentModel> {
                                                        resolveParameterGroupModelType(
                                                                                       operationModel.getParameterGroupModels(),
                                                                                       inputMetadataDescriptor.getAllParameters()),
+                                                       operationModel.getNestedComponents(),
                                                        typedOutputModel, typedAttributesModel, operationModel.isBlocking(),
                                                        operationModel.getExecutionType(), operationModel.requiresConnection(),
                                                        operationModel.isTransactional(),
@@ -236,8 +237,7 @@ public final class MetadataMediator<T extends ComponentModel> {
                                                        operationModel.getDisplayModel().orElse(null),
                                                        operationModel.getErrorModels(),
                                                        operationModel.getStereotypes(),
-                                                       operationModel.getModelProperties(),
-                                                       operationModel.getNestedComponents()));
+                                                       operationModel.getModelProperties()));
       }
 
       @Override
@@ -251,6 +251,7 @@ public final class MetadataMediator<T extends ComponentModel> {
                                                     sourceModel.hasResponse(),
                                                     resolveParameterGroupModelType(sourceModel.getParameterGroupModels(),
                                                                                    inputMetadataDescriptor.getAllParameters()),
+                                                    sourceModel.getNestedComponents(),
                                                     typedOutputModel, typedAttributesModel,
                                                     resolveSourceCallbackType(sourceModel.getSuccessCallback(),
                                                                               inputMetadataDescriptor.getAllParameters()),
@@ -263,9 +264,7 @@ public final class MetadataMediator<T extends ComponentModel> {
                                                     sourceModel.supportsStreaming(),
                                                     sourceModel.getDisplayModel().orElse(null),
                                                     sourceModel.getStereotypes(),
-                                                    sourceModel.getErrorModels(),
-                                                    sourceModel.getModelProperties(),
-                                                    sourceModel.getNestedComponents()));
+                                                    sourceModel.getErrorModels(), sourceModel.getModelProperties()));
       }
     });
 

@@ -33,7 +33,6 @@ import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.core.api.source.SchedulingStrategy;
 import org.mule.runtime.core.api.source.polling.CronScheduler;
 import org.mule.runtime.core.api.source.polling.FixedFrequencyScheduler;
-import org.mule.runtime.core.internal.routing.AggregationStrategy;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.error.MuleErrors;
 
@@ -164,7 +163,7 @@ class MuleExtensionModelDeclarer {
 
     async.withChain();
     async.onDefaultParameterGroup()
-        .withOptionalParameter("schedulerName") //TODO "name" => "schedulerName"
+        .withOptionalParameter("name")
         .withExpressionSupport(NOT_SUPPORTED)
         .ofType(typeLoader.load(String.class))
         .describedAs("Name that will be used to name the async scheduler");
@@ -182,7 +181,7 @@ class MuleExtensionModelDeclarer {
     flowRef.withOutputAttributes().ofType(BaseTypeBuilder.create(JAVA).anyType().build());
 
     flowRef.onDefaultParameterGroup()
-        .withRequiredParameter("flowName") //TODO rename "name" => "flowName"
+        .withRequiredParameter("name")
         .ofType(typeLoader.load(String.class))
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The name of the flow to call");
@@ -230,7 +229,7 @@ class MuleExtensionModelDeclarer {
     forEach.withChain();
 
     forEach.onDefaultParameterGroup()
-        .withOptionalParameter("elements") //TODO rename "collection" => "elements"
+        .withOptionalParameter("collection")
         .ofType(typeLoader.load(new TypeToken<Iterable<Object>>() {
 
         }.getType()))
@@ -294,9 +293,9 @@ class MuleExtensionModelDeclarer {
         .withStereotype(MuleExtensionModelProvider.FLOW_STEREOTYPE);
 
     flow.onDefaultParameterGroup().withOptionalParameter("initialState").defaultingTo("started")
-        .ofType(typeLoader.load(String.class));
-    flow.onDefaultParameterGroup().withOptionalParameter("processingStrategy").defaultingTo("synchronous")
-        .ofType(typeLoader.load(String.class));
+        .ofType(BaseTypeBuilder.create(JAVA).stringType().id(String.class.getName()).enumOf("started", "stopped").build());
+    flow.onDefaultParameterGroup().withOptionalParameter("maxConcurrency")
+        .ofType(typeLoader.load(Integer.class));
 
     flow.withComponent("source")
         .withAllowedStereotypes(MuleExtensionModelProvider.SOURCE_STEREOTYPE);
@@ -313,26 +312,11 @@ class MuleExtensionModelDeclarer {
     scatterGather.withRoute("route").withMinOccurs(2);
 
     scatterGather.onDefaultParameterGroup()
-        .withOptionalParameter("parallel")
-        .ofType(typeLoader.load(boolean.class))
-        .defaultingTo(true)
-        .withExpressionSupport(NOT_SUPPORTED)
-        .describedAs("Whether the configured routes will run in parallel (default is true).");
-
-    scatterGather.onDefaultParameterGroup()
         .withOptionalParameter("timeout")
         .ofType(typeLoader.load(Long.class))
         .defaultingTo(0)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("Sets a timeout in milliseconds for each route. Values lower or equals than zero means no timeout.");
-
-    scatterGather.onDefaultParameterGroup()
-        .withOptionalParameter("customAggregationStrategy")
-        .ofType(typeLoader.load(AggregationStrategy.class))
-        .withExpressionSupport(NOT_SUPPORTED)
-        .withDsl(ParameterDslConfiguration.builder().allowsReferences(false).build())
-        .describedAs("Allows customizing the logic used for aggregation the events back together.");
-
   }
 
   private void declareTry(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
@@ -380,15 +364,14 @@ class MuleExtensionModelDeclarer {
         .describedAs("Error handler used to propagate errors. It will rollback any transaction and not consume messages.");
     declareOnErrorRoute(typeLoader, onErrorPropagate);
 
-    //TODO errorHandler.isOneRouteRequired(true);
-
+    //TODO MULE-13277 errorHandler.isOneRouteRequired(true);
   }
 
   private void declareOnErrorRoute(ClassTypeLoader typeLoader, NestedRouteDeclarer onError) {
     onError.withChain();
 
     onError.onDefaultParameterGroup()
-        .withOptionalParameter("handlerName") //TODO name => handlerName
+        .withOptionalParameter("name")
         .withExpressionSupport(NOT_SUPPORTED)
         .ofType(typeLoader.load(String.class))
         .describedAs("The expression that will be evaluated to determine if this exception strategy should be executed. "
@@ -467,6 +450,7 @@ class MuleExtensionModelDeclarer {
 
   private void declareConfiguration(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
     ConstructDeclarer configuration = extensionDeclarer.withConstruct("configuration")
+        .allowingTopLevelDefinition()
         .describedAs("Specifies defaults and general settings for the Mule instance.");
 
     addReconnectionStrategyParameter(configuration.getDeclaration());
@@ -516,7 +500,7 @@ class MuleExtensionModelDeclarer {
             + "If both type of transactions are used then the approximated maximum space used will be twice the configured value.");
 
     configuration.onDefaultParameterGroup()
-        .withOptionalParameter("defaultObjectSerializerRef")
+        .withOptionalParameter("defaultObjectSerializer-ref")
         .ofType(typeLoader.load(String.class))
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("An optional reference to an ObjectSerializer to be used as the application's default");

@@ -347,9 +347,9 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
     when(group.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(empty());
     when(group.getParameterModels()).thenReturn(asList(offending));
 
-    SourceModel sourceModel = new ImmutableSourceModel(SOURCE_NAME, "", false, asList(group), null, null,
-                                                       of(sourceCallbackModel), empty(), empty(), false, false, false, null,
-                                                       emptySet(), emptySet(), emptySet(), emptyList());
+    SourceModel sourceModel = new ImmutableSourceModel(SOURCE_NAME, "", false, asList(group), emptyList(), null, null,
+                                                       of(sourceCallbackModel), empty(), empty(), false, false, false,
+                                                       null, emptySet(), emptySet(), emptySet());
     when(extensionModel.getSourceModels()).thenReturn(asList(sourceModel));
     validate();
   }
