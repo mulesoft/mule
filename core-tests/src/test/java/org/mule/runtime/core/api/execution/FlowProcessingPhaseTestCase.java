@@ -92,8 +92,7 @@ public class FlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     when(messageSource.getLocation()).thenReturn(mockComponentLocation);
     when(mockContext.getTransactionConfig()).thenReturn(empty());
     when(mockContext.getMessageSource()).thenReturn(messageSource);
-    when(muleContext.getConfigurationComponentLocator().find(any(Location.class)))
-        .thenReturn(of((AnnotatedObject) this.flowConstruct));
+    when(muleContext.getRegistry().get(any())).thenReturn(this.flowConstruct);
   }
 
   @Test

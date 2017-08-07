@@ -16,7 +16,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
-import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.AnnotatedObject;
@@ -43,9 +42,7 @@ import org.mockito.Answers;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
@@ -62,9 +59,9 @@ public class MuleMessageProcessingManagerTestCase extends org.mule.tck.junit4.Ab
 
   @Before
   public void setUp() {
-    when(completeMessageProcessTemplateAndContext.getMessageSource().getLocation().getRootContainerName()).thenReturn("root");
-    when(mockMuleContext.getConfigurationComponentLocator().find(any(Location.class)))
-        .thenReturn(of((AnnotatedObject) flowConstruct));
+    String flowName = "root";
+    when(completeMessageProcessTemplateAndContext.getMessageSource().getRootContainerName()).thenReturn(flowName);
+    when(mockMuleContext.getRegistry().get(flowName)).thenReturn(flowConstruct);
     when(mockMuleContext.getErrorTypeRepository()).thenReturn(createDefaultErrorTypeRepository());
     when(completeMessageProcessTemplateAndContext.getTransactionConfig()).thenReturn(empty());
   }
@@ -118,14 +115,10 @@ public class MuleMessageProcessingManagerTestCase extends org.mule.tck.junit4.Ab
     FailureMessageProcessPhase failureMessageProcessPhase =
         mock(FailureMessageProcessPhase.class, Answers.RETURNS_DEEP_STUBS.get());
     when(failureMessageProcessPhase.supportsTemplate(any(MessageProcessTemplate.class))).thenCallRealMethod();
-    doAnswer(new Answer() {
-
-      @Override
-      public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
-        PhaseResultNotifier phaseResultNotifier = (PhaseResultNotifier) invocationOnMock.getArguments()[2];
-        phaseResultNotifier.phaseFailure(new DefaultMuleException("error"));
-        return null;
-      }
+    doAnswer(invocationOnMock -> {
+      PhaseResultNotifier phaseResultNotifier = (PhaseResultNotifier) invocationOnMock.getArguments()[2];
+      phaseResultNotifier.phaseFailure(new DefaultMuleException("error"));
+      return null;
     }).when(failureMessageProcessPhase).runPhase(any(MessageProcessTemplate.class), any(MessageProcessContext.class),
                                                  any(PhaseResultNotifier.class));
     return failureMessageProcessPhase;
