@@ -58,7 +58,6 @@ import org.mule.runtime.config.spring.api.dsl.model.DslElementModel;
 import org.mule.runtime.config.spring.api.dsl.model.DslElementModelFactory;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.extension.api.annotation.dsl.xml.TypeXmlHints;
-import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
