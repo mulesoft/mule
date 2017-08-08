@@ -10,7 +10,9 @@ import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.util.Pair;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 
 import java.util.Optional;
 
@@ -32,7 +34,7 @@ public interface ImplicitConnectionProviderFactory {
    * @throws IllegalArgumentException if the {@code extensionModel} doesn't have any {@link ConnectionProviderModel} which can be
    *         used implicitly
    */
-  <T> ConnectionProvider<T> createImplicitConnectionProvider(String configName, Event event);
+  <T> Pair<ConnectionProvider<T>, ResolverSetResult> createImplicitConnectionProvider(String configName, Event event);
 
   /**
    * @return whether the {@link ResolverSet} used for resolving the {@link ConnectionProvider} is dynamic or not.

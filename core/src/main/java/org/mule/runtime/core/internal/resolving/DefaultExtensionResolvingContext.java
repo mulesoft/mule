@@ -15,7 +15,7 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.resolving.ExtensionResolvingContext;
 import org.mule.runtime.core.api.connector.ConnectionManager;
-import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 
 import java.util.Optional;
 

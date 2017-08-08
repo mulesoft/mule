@@ -22,10 +22,12 @@ import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.collection.Collectors.toImmutableList;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedFields;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.dsl.DslResolvingContext;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
@@ -43,6 +45,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 import org.mule.runtime.api.util.Reference;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.internal.metadata.NullMetadataResolverFactory;
 import org.mule.runtime.extension.api.annotation.param.RefName;
@@ -75,15 +78,19 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Operation
 import org.mule.runtime.module.extension.internal.loader.java.property.RequireNameField;
 import org.mule.runtime.module.extension.internal.loader.java.property.SourceFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.execution.OperationExecutorFactoryWrapper;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.function.Function;
@@ -120,6 +127,19 @@ public class MuleExtensionUtils {
       }
     }
     return false;
+  }
+
+  public static Map<String, Object> toMap(ResolverSet resolverSet, Event event) throws MuleException {
+    final ValueResolvingContext ctx = from(event);
+    ImmutableMap.Builder<String, Object> map = ImmutableMap.builder();
+    for (Entry<String, ValueResolver<?>> entry : resolverSet.getResolvers().entrySet()) {
+      Object value = entry.getValue().resolve(ctx);
+      if (value != null) {
+        map.put(entry.getKey(), value);
+      }
+    }
+
+    return map.build();
   }
 
   /**

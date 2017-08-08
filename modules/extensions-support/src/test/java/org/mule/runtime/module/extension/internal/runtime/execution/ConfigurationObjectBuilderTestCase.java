@@ -75,7 +75,7 @@ public class ConfigurationObjectBuilderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void build() throws Exception {
-    TestConfig testConfig = configurationObjectBuilder.build(from(event));
+    TestConfig testConfig = configurationObjectBuilder.build(from(event)).getFirst();
     assertThat(testConfig.getName(), is(NAME_VALUE));
     assertThat(testConfig.getDescription(), is(DESCRIPTION_VALUE));
   }

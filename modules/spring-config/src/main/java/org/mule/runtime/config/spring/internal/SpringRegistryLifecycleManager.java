@@ -46,7 +46,7 @@ import org.mule.runtime.core.internal.lifecycle.phases.MuleContextStopPhase;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.core.internal.registry.AbstractRegistryBroker;
 import org.mule.runtime.core.internal.routing.requestreply.AbstractAsyncRequestReplyRequester;
-import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 
 import java.util.LinkedHashSet;
 import java.util.Set;

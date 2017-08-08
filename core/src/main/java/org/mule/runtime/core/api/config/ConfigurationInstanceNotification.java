@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api.config;
 
 import org.mule.runtime.core.api.context.notification.CustomNotification;
-import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 
 /**
  * Custom notification that communicates the change of state in a {@link ConfigurationInstance}

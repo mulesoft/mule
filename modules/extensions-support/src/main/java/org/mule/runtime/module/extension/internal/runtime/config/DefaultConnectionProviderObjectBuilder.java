@@ -16,6 +16,7 @@ import org.mule.runtime.api.meta.model.connection.ConnectionManagementType;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
+import org.mule.runtime.core.api.util.Pair;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.connection.ErrorTypeHandlerConnectionProviderWrapper;
 import org.mule.runtime.core.internal.connection.PoolingConnectionProviderWrapper;
@@ -47,16 +48,17 @@ public class DefaultConnectionProviderObjectBuilder<C> extends ConnectionProvide
   }
 
   @Override
-  public final ConnectionProvider<C> build(ResolverSetResult result) throws MuleException {
+  public final Pair<ConnectionProvider<C>, ResolverSetResult> build(ResolverSetResult result) throws MuleException {
     ConnectionProvider<C> provider = doBuild(result);
 
     provider = applyConnectionManagement(provider);
     provider = applyErrorHandling(provider);
-    return provider;
+
+    return new Pair<>(provider, result);
   }
 
   protected ConnectionProvider<C> doBuild(ResolverSetResult result) throws MuleException {
-    ConnectionProvider<C> provider = super.build(result);
+    ConnectionProvider<C> provider = super.build(result).getFirst();
     injectRefName(providerModel, provider, ownerConfigName);
 
     return provider;

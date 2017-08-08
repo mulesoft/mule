@@ -10,8 +10,8 @@ import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.util.Pair;
 import org.mule.runtime.module.extension.internal.runtime.config.DefaultImplicitConnectionProviderFactory;
 import org.mule.runtime.module.extension.internal.runtime.config.ImplicitConnectionProviderFactory;
 
@@ -20,14 +20,14 @@ import java.util.Optional;
 /**
  * Uses a {@link ImplicitConnectionProviderFactory} to create an implicit {@link ConnectionProvider}.
  * <p>
- * This is a static {@link ValueResolver}. The {@link ConnectionProvider} is created the first time the {@link #resolve(Event)}
+ * This is a static {@link ValueResolver}. The {@link ConnectionProvider} is created the first time the {@link #resolve(ValueResolvingContext)}
  * method is invoked on {@code this} instance. Subsequent invocations will return the same instance.
  * <p>
  * This class is thread-safe
  *
  * @since 4.0
  */
-public final class ImplicitConnectionProviderValueResolver implements ConnectionProviderValueResolver {
+public final class ImplicitConnectionProviderValueResolver<C> implements ConnectionProviderValueResolver<C> {
 
   private final ImplicitConnectionProviderFactory implicitConnectionProviderFactory;
   private final String configName;
@@ -42,7 +42,7 @@ public final class ImplicitConnectionProviderValueResolver implements Connection
   }
 
   @Override
-  public ConnectionProvider resolve(ValueResolvingContext context) throws MuleException {
+  public Pair<ConnectionProvider<C>, ResolverSetResult> resolve(ValueResolvingContext context) throws MuleException {
     return implicitConnectionProviderFactory.createImplicitConnectionProvider(configName, context.getEvent());
   }
 
