@@ -1361,11 +1361,11 @@
         <xsd:sequence>
             <xsd:element ref="abstract-reconnect-notifier" minOccurs="0" maxOccurs="1"/>
         </xsd:sequence>
-        <!--<xsd:attribute name="blocking" type="substitutableBoolean" default="true">-->
-            <!--<xsd:annotation>-->
-                <!--<xsd:documentation>If false, the reconnection strategy will run in a separate scheduler</xsd:documentation>-->
-            <!--</xsd:annotation>-->
-        <!--</xsd:attribute>-->
+        <xsd:attribute name="blocking" type="substitutableBoolean" default="true">
+            <xsd:annotation>
+                <xsd:documentation>If false, the reconnection strategy will run in a separate scheduler</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
     </xsd:complexType>
 
     <xsd:element name="abstract-reconnect-notifier" abstract="true" type="abstractReconnectNotifierType">
@@ -1385,16 +1385,6 @@
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-
-    <xsd:element name="reconnect" type="reconnectSimpleStrategyType"
-                 substitutionGroup="abstract-reconnection-strategy">
-        <xsd:annotation>
-            <xsd:documentation>
-                A reconnection strategy that allows the user to configure how many times a reconnection should be attempted and how long to wait between attempts.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
     <xsd:complexType name="reconnectSimpleStrategyType">
         <xsd:complexContent>
             <xsd:extension base="abstractReconnectionStrategyType">
