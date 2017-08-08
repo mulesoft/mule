@@ -1,10 +1,10 @@
 {
   "name": "substitutionGroup",
   "description": "",
-  "version": "4.0",
+  "version": "4.0.0-SNAPSHOT",
   "vendor": "Mulesoft",
   "category": "COMMUNITY",
-  "minMuleVersion": "4.0.0",
+  "minMuleVersion": "4.0.0-SNAPSHOT",
   "xmlDsl": {
     "prefix": "sg",
     "namespace": "http://www.mulesoft.org/schema/mule/sg",
@@ -17,149 +17,7 @@
   "privilegedPackages": [],
   "privilegedArtifacts": [],
   "externalLibraries": [],
-  "importedTypes": [
-    {
-      "format": "java",
-      "type": "Object",
-      "annotations": {
-        "typeId": "org.mule.test.heisenberg.extension.model.Ricin",
-        "classInformation": {
-          "hasDefaultConstructor": true,
-          "isInterface": false,
-          "isInstantiable": true,
-          "isAbstract": false,
-          "isFinal": false,
-          "implementedInterfaces": [
-            "org.mule.test.heisenberg.extension.model.Weapon"
-          ],
-          "parent": "",
-          "genericTypes": []
-        },
-        "typeXmlHints": {
-          "allowInlineDefinition": true,
-          "allowTopLevelDefinition": true
-        },
-        "typeAlias": {
-          "value": "Ricin"
-        }
-      },
-      "fields": [
-        {
-          "key": {
-            "name": "microgramsPerKilo",
-            "required": "true"
-          },
-          "model": {
-            "type": "Number",
-            "annotations": {
-              "typeId": "java.lang.Long"
-            }
-          },
-          "annotations": {
-            "parameterPurpose": {
-              "role": "BEHAVIOUR"
-            },
-            "expressionSupport": {
-              "value": "SUPPORTED"
-            }
-          }
-        },
-        {
-          "key": {
-            "name": "destination",
-            "required": "true"
-          },
-          "model": {
-            "type": "Object",
-            "annotations": {
-              "typeId": "org.mule.test.heisenberg.extension.model.KnockeableDoor",
-              "classInformation": {
-                "hasDefaultConstructor": true,
-                "isInterface": false,
-                "isInstantiable": true,
-                "isAbstract": false,
-                "isFinal": false,
-                "implementedInterfaces": [],
-                "parent": "",
-                "genericTypes": []
-              },
-              "typeXmlHints": {
-                "allowInlineDefinition": true,
-                "allowTopLevelDefinition": true
-              },
-              "typeAlias": {
-                "value": "door"
-              }
-            },
-            "fields": [
-              {
-                "key": {
-                  "name": "victim",
-                  "required": "true"
-                },
-                "model": {
-                  "type": "String",
-                  "annotations": {
-                    "typeId": "java.lang.String"
-                  }
-                },
-                "annotations": {
-                  "parameterPurpose": {
-                    "role": "BEHAVIOUR"
-                  },
-                  "expressionSupport": {
-                    "value": "SUPPORTED"
-                  }
-                }
-              },
-              {
-                "key": {
-                  "name": "address",
-                  "required": "true"
-                },
-                "model": {
-                  "type": "String",
-                  "annotations": {
-                    "typeId": "java.lang.String"
-                  }
-                },
-                "annotations": {
-                  "parameterPurpose": {
-                    "role": "BEHAVIOUR"
-                  },
-                  "expressionSupport": {
-                    "value": "SUPPORTED"
-                  }
-                }
-              },
-              {
-                "key": {
-                  "name": "previous"
-                },
-                "model": "#..",
-                "annotations": {
-                  "parameterPurpose": {
-                    "role": "BEHAVIOUR"
-                  },
-                  "expressionSupport": {
-                    "value": "SUPPORTED"
-                  }
-                }
-              }
-            ]
-          },
-          "annotations": {
-            "parameterPurpose": {
-              "role": "BEHAVIOUR"
-            },
-            "expressionSupport": {
-              "value": "SUPPORTED"
-            }
-          }
-        }
-      ]
-    }
-  ],
+  "importedTypes": [],
   "configurations": [
     {
       "parameterGroupModels": [
@@ -214,32 +72,6 @@
               },
               "elementReferences": [],
               "name": "muleSGPojo",
-              "description": "",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "@ref:org.mule.test.substitutiongroup.extension.MuleEnterprisePojo"
-              },
-              "hasDynamicType": false,
-              "required": true,
-              "isConfigOverride": false,
-              "expressionSupport": "SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 3
-              },
-              "elementReferences": [],
-              "name": "muleEnterprisePojo",
               "description": "",
               "modelProperties": {}
             }
@@ -313,60 +145,6 @@
   ],
   "modelProperties": {},
   "types": [
-    {
-      "format": "java",
-      "type": "Object",
-      "annotations": {
-        "typeId": "org.mule.test.substitutiongroup.extension.MuleEnterprisePojo",
-        "classInformation": {
-          "hasDefaultConstructor": true,
-          "isInterface": false,
-          "isInstantiable": true,
-          "isAbstract": false,
-          "isFinal": false,
-          "implementedInterfaces": [],
-          "parent": "",
-          "genericTypes": []
-        },
-        "typeXmlHints": {
-          "allowInlineDefinition": true,
-          "allowTopLevelDefinition": false,
-          "substitutionGroup": {
-            "prefix": "ee",
-            "element": "abstract-event-copy-strategy"
-          },
-          "baseType": {
-            "prefix": "ee",
-            "element": "abstractEventCopyStrategyType"
-          }
-        },
-        "typeAlias": {
-          "value": "MuleEnterprisePojo"
-        }
-      },
-      "fields": [
-        {
-          "key": {
-            "name": "innerParameter"
-          },
-          "model": {
-            "type": "Boolean",
-            "annotations": {
-              "typeId": "boolean"
-            }
-          },
-          "annotations": {
-            "parameterPurpose": {
-              "role": "BEHAVIOUR"
-            },
-            "default": "false",
-            "expressionSupport": {
-              "value": "SUPPORTED"
-            }
-          }
-        }
-      ]
-    },
     {
       "format": "java",
       "type": "Object",
