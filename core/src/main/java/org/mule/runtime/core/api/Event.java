@@ -32,7 +32,7 @@ import java.util.Optional;
  * Represents any data event occurring in the Mule environment. All data sent or received within the mule environment will be
  * passed between components as an Event.
  * <p>
- * Holds a oad and provides helper methods for obtaining the data in a format that the receiving Mule component understands. The
+ * Holds a Message payload and provides helper methods for obtaining the data in a format that the receiving Mule component understands. The
  * event can also maintain any number of properties that can be set and retrieved by Mule components.
  *
  * @see Message
@@ -227,13 +227,6 @@ public interface Event extends Serializable, org.mule.runtime.api.event.Event {
   static Builder builder(Event event) {
     return new DefaultEventBuilder(event);
   }
-
-  /**
-   * Creates a {@link BindingContext} for the target event to use with a {@link MuleExpressionLanguage}.
-   *
-   * @return a {@link BindingContext} representing the data of the target event.
-   */
-  BindingContext asBindingContext();
 
   /**
    * Create new {@link Builder} based on an existing {@link Event} instance and and {@link EventContext}. A new

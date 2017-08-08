@@ -37,10 +37,6 @@ public abstract class EnrichedServerNotification extends AbstractServerNotificat
     return notificationInfo;
   }
 
-  public String getCorrelationId() {
-    return notificationInfo.getEvent().getCorrelationId();
-  }
-
   public Event getEvent() {
     return notificationInfo.getEvent();
   }

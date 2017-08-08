@@ -47,7 +47,6 @@ public class DefaultAuthenticationHandler implements AuthenticationHandler {
     Authentication authResult = manager.authenticate(authentication);
 
     SecurityContext context = manager.createSecurityContext(authResult);
-    context.setAuthentication(authResult);
     session.setSecurityContext(context);
   }
 

@@ -46,7 +46,6 @@ public class MessageProcessorChainObjectFactory extends AbstractAnnotatedObjectF
     }
     MessageProcessorChain messageProcessorChain = builder.build();
     messageProcessorChain.setMuleContext(muleContext);
-    messageProcessorChain.setAnnotations(getAnnotations());
     return messageProcessorChain;
   }
 

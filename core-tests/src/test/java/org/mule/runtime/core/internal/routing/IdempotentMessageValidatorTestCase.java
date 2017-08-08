@@ -14,7 +14,7 @@ import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.el.BindingContextUtils.NULL_BINDING_CONTEXT;
+import static org.mule.runtime.internal.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;

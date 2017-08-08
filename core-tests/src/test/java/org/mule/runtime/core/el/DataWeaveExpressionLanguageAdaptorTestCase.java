@@ -32,17 +32,16 @@ import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
-import static org.mule.runtime.core.el.BindingContextUtils.ATTRIBUTES;
-import static org.mule.runtime.core.el.BindingContextUtils.DATA_TYPE;
-import static org.mule.runtime.core.el.BindingContextUtils.ERROR;
-import static org.mule.runtime.core.el.BindingContextUtils.PARAMETERS;
-import static org.mule.runtime.core.el.BindingContextUtils.PAYLOAD;
-import static org.mule.runtime.core.el.BindingContextUtils.PROPERTIES;
-import static org.mule.runtime.core.el.BindingContextUtils.VARS;
 import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.FLOW;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
+import static org.mule.runtime.internal.el.BindingContextUtils.ATTRIBUTES;
 import static org.mule.runtime.internal.el.BindingContextUtils.AUTHENTICATION;
-import static org.mule.runtime.internal.el.BindingContextUtils.VARIABLES;
+import static org.mule.runtime.internal.el.BindingContextUtils.DATA_TYPE;
+import static org.mule.runtime.internal.el.BindingContextUtils.ERROR;
+import static org.mule.runtime.internal.el.BindingContextUtils.PARAMETERS;
+import static org.mule.runtime.internal.el.BindingContextUtils.PAYLOAD;
+import static org.mule.runtime.internal.el.BindingContextUtils.PROPERTIES;
+import static org.mule.runtime.internal.el.BindingContextUtils.VARS;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.EXPRESSION_LANGUAGE;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.ExpressionLanguageStory.SUPPORT_DW;
 import org.mule.runtime.api.el.BindingContext;
@@ -55,8 +54,8 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.security.Authentication;
-import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.api.security.SecurityContext;
+import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleManifest;
@@ -73,7 +72,6 @@ import com.google.common.collect.Sets;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
@@ -278,7 +276,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
     Event event = spy(testEvent());
     TypedValue<String> varValue = new TypedValue<>("", STRING);
     ImmutableMap<String, TypedValue<?>> variablesMap = ImmutableMap.<String, TypedValue<?>>builder()
-        .put(PAYLOAD, varValue).put(ATTRIBUTES, varValue).put(ERROR, varValue).put(VARIABLES, varValue).put(FLOW, varValue)
+        .put(PAYLOAD, varValue).put(ATTRIBUTES, varValue).put(ERROR, varValue).put(VARS, varValue).put(FLOW, varValue)
         .build();
     when(event.getVariables()).thenReturn(variablesMap);
     String flowName = "myFlowName";

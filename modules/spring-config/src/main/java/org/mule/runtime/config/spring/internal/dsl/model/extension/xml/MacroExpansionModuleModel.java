@@ -12,13 +12,12 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.config.spring.api.dsl.model.ApplicationModel.NAME_ATTRIBUTE;
-import static org.mule.runtime.core.el.BindingContextUtils.PARAMETERS;
-import static org.mule.runtime.core.el.BindingContextUtils.PROPERTIES;
 import static org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder.MODULE_CONFIG_GLOBAL_ELEMENT_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
-
+import static org.mule.runtime.internal.el.BindingContextUtils.PARAMETERS;
+import static org.mule.runtime.internal.el.BindingContextUtils.PROPERTIES;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;

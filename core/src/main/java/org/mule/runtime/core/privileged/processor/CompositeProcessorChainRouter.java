@@ -14,7 +14,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.UUID.getUUID;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
@@ -32,7 +31,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Component to be used that supports a collection of {@link MessageProcessorChain} and executes them in order.
  * <p/>
- * Meant to be used be runtime privileged extensions that needs to construct top level chains of execution.
+ * Meant to be used by runtime privileged extensions that need to construct top level chains of execution.
  * 
  * @since 4.0
  */
@@ -46,16 +45,12 @@ public class CompositeProcessorChainRouter extends AbstractAnnotatedObject imple
   private String name;
   private List<MessageProcessorChain> processorChains = emptyList();
 
-  public Event process(Event event) {
+  public Event process(Event event) throws MuleException {
     org.mule.runtime.core.api.Event.Builder builder =
         org.mule.runtime.core.api.Event.builder(DefaultEventContext.create(getUUID(), muleContext.getId(), getLocation()));
     org.mule.runtime.core.api.Event defaultEvent = builder.from(event).build();
-    try {
-      for (MessageProcessorChain processorChain : processorChains) {
-        defaultEvent = processorChain.process(defaultEvent);
-      }
-    } catch (MuleException e) {
-      throw new MuleRuntimeException(e);
+    for (MessageProcessorChain processorChain : processorChains) {
+      defaultEvent = processorChain.process(defaultEvent);
     }
     return defaultEvent;
   }

@@ -413,7 +413,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
   @Test
   public void interceptorThrowsExceptionBefore() throws Exception {
-    // TODO fix or create jira issue
+    // TODO MULE-13274 - fix interceptor infrastructure since it was working due to mutability of the event
     if (useMockInterceptor == true && processor instanceof OperationProcessorInApp) {
       return;
     }
@@ -864,7 +864,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
   @Test
   public void firstInterceptorMutatesEventAroundAfterProceed() throws Exception {
-    // TODO fix or create jira issue
+    // TODO MULE-13274 - fix interceptor infrastructure since it was working due to mutability of the event
     if (useMockInterceptor == true && processor instanceof OperationProcessorInApp) {
       return;
     }
@@ -942,7 +942,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
   @Test
   public void firstInterceptorThrowsExceptionBefore() throws Exception {
-    // TODO fix or create jira issue
+    // TODO MULE-13274 - fix interceptor infrastructure since it was working due to mutability of the event
     if (useMockInterceptor == true && processor instanceof OperationProcessorInApp) {
       return;
     }
@@ -979,7 +979,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
   @Test
   public void secondInterceptorThrowsExceptionBefore() throws Exception {
-    // TODO fix or create jira issue
+    // TODO MULE-13274 - fix interceptor infrastructure since it was working due to mutability of the event
     if (useMockInterceptor == true && processor instanceof OperationProcessorInApp) {
       return;
     }
@@ -1049,7 +1049,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
   @Test
   public void secondInterceptorThrowsExceptionAfter() throws Exception {
-    // TODO fix or create jira issue
+    // TODO MULE-13274 - fix interceptor infrastructure since it was working due to mutability of the event
     if (useMockInterceptor == true && processor instanceof OperationProcessorInApp) {
       return;
     }
@@ -1120,7 +1120,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
   @Test
   public void secondInterceptorThrowsExceptionAround() throws Exception {
-    // TODO fix or create jira issue
+    // TODO MULE-13274 - fix interceptor infrastructure since it was working due to mutability of the event
     if (useMockInterceptor == true && processor instanceof OperationProcessorInApp) {
       return;
     }
@@ -1158,7 +1158,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
   @Test
   public void firstInterceptorThrowsExceptionAroundAfterProceed() throws Exception {
-    // TODO fix or create jira issue
+    // TODO MULE-13274 - fix interceptor infrastructure since it was working due to mutability of the event
     if (useMockInterceptor == true && processor instanceof OperationProcessorInApp) {
       return;
     }
@@ -1197,7 +1197,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
   @Test
   public void secondInterceptorThrowsExceptionAroundAfterProceed() throws Exception {
-    // TODO fix or create jira issue
+    // TODO MULE-13274 - fix interceptor infrastructure since it was working due to mutability of the event
     if (useMockInterceptor == true && processor instanceof OperationProcessorInApp) {
       return;
     }

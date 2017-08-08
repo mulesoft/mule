@@ -15,9 +15,7 @@ import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
 import java.util.LinkedList;
 import java.util.List;
 
-public class LifecycleSensingObjectFactory extends AbstractAnnotatedObjectFactory<Processor> implements Lifecycle
-
-{
+public class LifecycleSensingObjectFactory extends AbstractAnnotatedObjectFactory<Processor> implements Lifecycle {
 
   private List<LifecycleAction> lifecycleActions = new LinkedList<>();
 

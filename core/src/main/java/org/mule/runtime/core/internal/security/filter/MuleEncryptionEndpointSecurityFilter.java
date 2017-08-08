@@ -66,7 +66,6 @@ public class MuleEncryptionEndpointSecurityFilter extends AbstractOperationSecur
     }
 
     SecurityContext context = getSecurityManager().createSecurityContext(authentication);
-    context.setAuthentication(authentication);
     event.getSession().setSecurityContext(context);
     return event;
   }

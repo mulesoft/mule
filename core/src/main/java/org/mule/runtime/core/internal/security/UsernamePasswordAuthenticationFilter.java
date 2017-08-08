@@ -61,7 +61,6 @@ public class UsernamePasswordAuthenticationFilter extends AbstractAuthentication
     }
 
     SecurityContext context = getSecurityManager().createSecurityContext(authResult);
-    context.setAuthentication(authResult);
     event.getSession().setSecurityContext(context);
 
     return event;
