@@ -2206,6 +2206,13 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="targetValue" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Expression to apply to the output when saved to a target
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
