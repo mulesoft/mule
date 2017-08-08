@@ -21,21 +21,13 @@ import java.util.function.Function;
  * <li>Performs parallel execution of route pairs subject to {@code maxConcurrency}.
  * <li>Merges variables using a last-wins strategy.
  * <li>Waits for the completion of all routes before emitting a result event, with an optional timeout.
- * <li>Collects results into a result {@link InternalEvent} with a {@link java.util.Map<String, org.mule.runtime.api.message.Message>}
- * payload where the {@link java.util.Map} key is a string representation of the sequence number of the
- * {@link org.mule.runtime.core.api.routing.ForkJoinStrategy.RoutingPair}.
+ * <li>Collects results into a result {@link InternalEvent} with a {@link java.util.Map<String,
+ * org.mule.runtime.api.message.Message>} payload where the {@link java.util.Map} key is a string representation of the sequence
+ * number of the {@link org.mule.runtime.core.api.routing.ForkJoinStrategy.RoutingPair}.
  * <li>Will processor all routes, regardless of errors, and propagating a composite exception where there were one or more errors.
  * </ul>
  */
-public class CollectMapForkJoinStrategy extends AbstractForkJoinStrategy {
-
-  public CollectMapForkJoinStrategy() {
-    super();
-  }
-
-  public CollectMapForkJoinStrategy(long timeout) {
-    super(timeout);
-  }
+public class CollectMapForkJoinStrategyFactory extends AbstractForkJoinStrategyFactory {
 
   @Override
   protected Function<List<InternalEvent>, InternalEvent> createResultEvent(InternalEvent original,

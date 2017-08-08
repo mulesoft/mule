@@ -13,10 +13,13 @@ import org.mule.runtime.core.api.routing.AggregationContext;
 import org.mule.runtime.core.api.routing.RouterResultsHandler;
 import org.mule.runtime.core.privileged.routing.DefaultRouterResultsHandler;
 
+import java.util.Collections;
+
 /**
- * If no routes generated exeption then it returns a new {@link InternalEvent} under the rules of {@link DefaultRouterResultsHandler} (you
- * can change this behaviour by overriding {@link #aggregateWithoutFailedRoutes(AggregationContext)}. Otherwise, a
- * {@link CompositeRoutingException} is thrown (override {@link #aggregateWithFailedRoutes(AggregationContext) to customize}
+ * If no routes generated exeption then it returns a new {@link InternalEvent} under the rules of
+ * {@link DefaultRouterResultsHandler} (you can change this behaviour by overriding
+ * {@link #aggregateWithoutFailedRoutes(AggregationContext)}. Otherwise, a {@link CompositeRoutingException} is thrown (override
+ * {@link #aggregateWithFailedRoutes(AggregationContext) to customize}
  * 
  * @since 3.5.0
  */
@@ -38,7 +41,8 @@ public class CollectAllAggregationStrategy implements AggregationStrategy {
   }
 
   protected InternalEvent aggregateWithFailedRoutes(AggregationContext context) throws MuleException {
-    throw new CompositeRoutingException(context.collectRouteExceptions());
+    // TODO MULE-13216 Rework scatter-gather to be non-blocking and use ForkJoinStrategy API
+    throw new CompositeRoutingException(new RoutingResult(Collections.emptyMap(), Collections.emptyMap()));
   }
 
 }
