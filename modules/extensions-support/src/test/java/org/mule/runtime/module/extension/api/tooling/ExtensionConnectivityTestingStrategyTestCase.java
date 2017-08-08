@@ -11,14 +11,17 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ConnectionManager;
+import org.mule.runtime.core.api.util.Pair;
 import org.mule.runtime.core.internal.connection.DefaultConnectionManager;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Before;
@@ -74,7 +77,7 @@ public class ExtensionConnectivityTestingStrategyTestCase extends AbstractMuleTe
   }
 
   private ConnectionValidationResult testConnectivityWithConnectionProvider(boolean isValidConnection) throws MuleException {
-    when(connectionProviderResolver.resolve(any())).thenReturn(connectionProvider);
+    when(connectionProviderResolver.resolve(any())).thenReturn(new Pair<>(connectionProvider, mock(ResolverSetResult.class)));
     when(connectionProvider.validate(any())).thenReturn(validationResult);
     when(validationResult.isValid()).thenReturn(isValidConnection);
     ConnectionValidationResult connectionResult =

@@ -215,7 +215,7 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
     assertThat(element, is(instanceOf(ConfiguredComponent.class)));
 
     ConfiguredComponent source = (ConfiguredComponent) element;
-    ConfigurationState configurationState = source.getConfigurationInstance().get().getState(testEvent());
+    ConfigurationState configurationState = source.getConfigurationInstance().get().getState();
 
     Map<String, Object> configParameters = configurationState.getConfigParameters();
 

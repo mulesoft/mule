@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.util.Pair;
 
 import java.util.Optional;
 
@@ -18,15 +19,18 @@ import java.util.Optional;
  */
 public class StaticConnectionProviderResolver<C> implements ConnectionProviderValueResolver<C> {
 
-  private final StaticValueResolver<ConnectionProvider<C>> valueResolver;
+  private final ConnectionProvider<C> connectionProvider;
+  private final ResolverSetResult resolverSetResult;
 
-  public StaticConnectionProviderResolver(StaticValueResolver<ConnectionProvider<C>> valueResolver) {
-    this.valueResolver = valueResolver;
+  public StaticConnectionProviderResolver(ConnectionProvider<C> connectionProvider,
+                                          ResolverSetResult resolverSetResult) {
+    this.connectionProvider = connectionProvider;
+    this.resolverSetResult = resolverSetResult;
   }
 
   @Override
-  public ConnectionProvider<C> resolve(ValueResolvingContext context) throws MuleException {
-    return valueResolver.resolve(context);
+  public Pair<ConnectionProvider<C>, ResolverSetResult> resolve(ValueResolvingContext context) throws MuleException {
+    return new Pair<>(connectionProvider, resolverSetResult);
   }
 
   @Override

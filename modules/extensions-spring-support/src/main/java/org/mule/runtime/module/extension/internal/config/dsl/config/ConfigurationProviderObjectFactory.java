@@ -26,7 +26,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionPro
 import org.mule.runtime.module.extension.internal.runtime.resolver.ImplicitConnectionProviderValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticConnectionProviderResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 
 import java.util.Optional;
 
@@ -120,7 +119,7 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
       if (requiresConnection) {
         return new ImplicitConnectionProviderValueResolver(name, extensionModel, configurationModel, muleContext);
       }
-      return new StaticConnectionProviderResolver(new StaticValueResolver<>(null));
+      return new StaticConnectionProviderResolver(null, null);
     });
   }
 

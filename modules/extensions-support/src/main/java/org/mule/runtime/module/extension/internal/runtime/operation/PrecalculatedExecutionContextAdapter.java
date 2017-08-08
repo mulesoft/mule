@@ -114,8 +114,8 @@ class PrecalculatedExecutionContextAdapter extends AbstractExecutionContextAdapt
     }
 
     @Override
-    public ConfigurationState getState(Object event) {
-      return decorated.getState(event);
+    public ConfigurationState getState() {
+      return decorated.getState();
     }
 
     @Override

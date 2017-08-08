@@ -9,20 +9,23 @@ package org.mule.runtime.module.extension.internal.runtime.config;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getConnectionProviderFactory;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
+import org.mule.runtime.core.api.util.Pair;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ResolverSetBasedObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 
 /**
  * Implementation of {@link ResolverSetBasedObjectBuilder} which produces instances of {@link ConnectionProviderModel}
  *
  * @since 4.0
  */
-public abstract class ConnectionProviderObjectBuilder<C> extends ResolverSetBasedObjectBuilder<ConnectionProvider<C>> {
+public abstract class ConnectionProviderObjectBuilder<C> extends ResolverSetBasedObjectBuilder<Pair<ConnectionProvider<C>, ResolverSetResult>> {
 
   protected final ConnectionProviderModel providerModel;
   protected final boolean disableValidation;
@@ -77,9 +80,15 @@ public abstract class ConnectionProviderObjectBuilder<C> extends ResolverSetBase
   /**
    * {@inheritDoc}
    */
+  protected Pair<ConnectionProvider<C>, ResolverSetResult> instantiateObject() {
+    return new Pair<>((ConnectionProvider<C>)  getConnectionProviderFactory(providerModel).newInstance(), null);
+  }
+
   @Override
-  protected ConnectionProvider instantiateObject() {
-    return getConnectionProviderFactory(providerModel).newInstance();
+  public Pair<ConnectionProvider<C>, ResolverSetResult> build(ResolverSetResult result) throws MuleException {
+    ConnectionProvider<C> value = instantiateObject().getFirst();
+    populate(result, value);
+    return new Pair<>(value, result);
   }
 
   /**

@@ -115,7 +115,7 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
         new LifecycleAwareConfigurationInstance(CONFIG_NAME,
                                                 configurationModel,
                                                 config,
-                                                event -> configurationState,
+                                                configurationState,
                                                 emptyList(),
                                                 empty());
 

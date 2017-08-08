@@ -36,6 +36,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.core.api.util.Pair;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
 import org.mule.runtime.module.extension.internal.runtime.ImmutableExpirationPolicy;
@@ -139,7 +140,7 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
   public void resolveCachedWithProviderParams() throws Exception {
     ResolverSet providerResolverSet = mock(ResolverSet.class);
     when(connectionProviderResolver.getResolverSet()).thenReturn(Optional.of(providerResolverSet));
-    when(providerResolverSet.resolve(from(event))).thenReturn(mock(ResolverSetResult.class));
+    when(providerResolverSet.resolve(from(event))).thenReturn(resolverSetResult);
 
     final int count = 10;
     HeisenbergExtension config = (HeisenbergExtension) provider.get(event).getValue();
@@ -223,7 +224,7 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
     final String expectedExceptionMessage = "Init failed!";
     doThrow(new RuntimeException(expectedExceptionMessage)).when(connProvider).initialise();
 
-    when(connectionProviderResolver.resolve(any())).thenReturn((ConnectionProvider) connProvider);
+    when(connectionProviderResolver.resolve(any())).thenReturn(new Pair<>(connProvider, mock(ResolverSetResult.class)));
 
     expected.expectCause(hasMessage(is(InitialisationException.class.getName() + ": " + expectedExceptionMessage)));
 
@@ -243,7 +244,7 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
     final RuntimeException toThrow = new RuntimeException("Start failed!");
     doThrow(toThrow).when(connProvider).start();
 
-    when(connectionProviderResolver.resolve(any())).thenReturn((ConnectionProvider) connProvider);
+    when(connectionProviderResolver.resolve(any())).thenReturn(new Pair<>(connProvider, resolverSetResult));
 
     expected.expectCause(sameInstance(toThrow));
 

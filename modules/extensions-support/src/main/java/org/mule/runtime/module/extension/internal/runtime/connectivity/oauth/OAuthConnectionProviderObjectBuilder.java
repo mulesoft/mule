@@ -38,6 +38,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
+import org.mule.runtime.core.api.util.Pair;
 import org.mule.runtime.core.api.util.StringMessageUtils;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
@@ -97,7 +98,7 @@ public class OAuthConnectionProviderObjectBuilder<C> extends DefaultConnectionPr
   }
 
   @Override
-  public ConnectionProvider<C> build(ValueResolvingContext context) throws MuleException {
+  public Pair<ConnectionProvider<C>, ResolverSetResult> build(ValueResolvingContext context) throws MuleException {
     ResolverSetResult result = resolverSet.resolve(context);
     ConnectionProvider<C> provider = super.doBuild(result);
 
@@ -109,12 +110,13 @@ public class OAuthConnectionProviderObjectBuilder<C> extends DefaultConnectionPr
                                          getCustomParameters(result),
                                          getCallbackValues());
 
-    return new OAuthConnectionProviderWrapper<>(provider,
-                                                config,
-                                                getCallbackValues(),
-                                                oauthManager,
-                                                disableValidation,
-                                                retryPolicyTemplate);
+    provider = new OAuthConnectionProviderWrapper<>(provider,
+                                                    config,
+                                                    getCallbackValues(),
+                                                    oauthManager,
+                                                    disableValidation,
+                                                    retryPolicyTemplate);
+    return new Pair<>(provider, result);
   }
 
   private AuthCodeConfig buildAuthCodeConfig(Event event) throws MuleException {

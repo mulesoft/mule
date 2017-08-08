@@ -6,24 +6,19 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.config;
 
-import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getConnectedComponents;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.createInterceptors;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.injectRefName;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toMap;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
-import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.util.Pair;
-import org.mule.runtime.core.api.util.func.CheckedFunction;
-import org.mule.runtime.core.api.util.func.CheckedSupplier;
 import org.mule.runtime.extension.api.runtime.InterceptorFactory;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationState;
@@ -34,7 +29,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetRe
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
-import java.util.Map;
+import java.util.Collections;
 import java.util.Optional;
 
 /**
@@ -76,32 +71,6 @@ public final class ConfigurationInstanceFactory<T> {
   /**
    * Creates a new instance using the given {@code event} to obtain the configuration's parameter values.
    * <p>
-   * This method tries to automatically infer a {@link ConnectionProvider}. The first step is to determine if the
-   * {@link ExtensionModel} which owns the {@link #configurationModel} has any {@link OperationModel} which requires a connection.
-   * If the answer is no, then it just provides a {@code null} connection provider. Otherwise, it uses a
-   * {@link ImplicitConnectionProviderFactory} to construct an implicit {@link ConnectionProvider}.
-   *
-   * @param name  the name of the configuration to return
-   * @param event the current {@link Event}
-   * @return a {@link ConfigurationInstance}
-   * @throws MuleException if an error is encountered
-   */
-  public ConfigurationInstance createConfiguration(String name, Event event)
-      throws MuleException {
-    ValueResolver<ConnectionProvider> providerResolver;
-    if (requiresConnection) {
-      providerResolver =
-          new StaticValueResolver<>(implicitConnectionProviderFactory.createImplicitConnectionProvider(name, event));
-    } else {
-      providerResolver = NULL_CONNECTION_PROVIDER;
-    }
-
-    return createConfiguration(name, event, providerResolver);
-  }
-
-  /**
-   * Creates a new instance using the given {@code event} to obtain the configuration's parameter values.
-   * <p>
    * This method overload allows specifying a {@link ValueResolver} to provide the {@link ConnectionProvider} that the
    * configuration will use to obtain connections. If the connection does not need such a concept you can provide a {@code null}
    *
@@ -111,20 +80,26 @@ public final class ConfigurationInstanceFactory<T> {
    * @return a {@link ConfigurationInstance}
    * @throws MuleException if an error is encountered
    */
-  public ConfigurationInstance createConfiguration(String name,
+  public <C> ConfigurationInstance createConfiguration(String name,
                                                    Event event,
-                                                   ValueResolver<ConnectionProvider> connectionProviderResolver)
+                                                   ConnectionProviderValueResolver<C> connectionProviderResolver)
       throws MuleException {
 
-    if (!requiresConnection) {
-      connectionProviderResolver = NULL_CONNECTION_PROVIDER;
+    Optional<Pair<ConnectionProvider<C>, ResolverSetResult>> connectionProvider;
+
+    Pair<T, ResolverSetResult> configValue = createConfigurationInstance(name, event);
+    if (requiresConnection) {
+      connectionProvider = Optional.ofNullable(connectionProviderResolver.resolve(from(event)));
+    } else {
+      connectionProvider = empty();
     }
 
-    Optional<ConnectionProvider> connectionProvider = Optional.ofNullable(connectionProviderResolver.resolve(from(event)));
-    Pair<T, ResolverSetResult> configValue = createConfigurationInstance(name, event);
-
-    return new LifecycleAwareConfigurationInstance(name, configurationModel, configValue, createState(connectionProviderResolver),
-                                                   createInterceptors(configurationModel), connectionProvider);
+    return new LifecycleAwareConfigurationInstance(name,
+                                                   configurationModel,
+                                                   configValue,
+                                                   createState(configValue.getSecond(), connectionProvider),
+                                                   createInterceptors(configurationModel),
+                                                   connectionProvider.map(Pair::getFirst));
   }
 
   /**
@@ -135,15 +110,15 @@ public final class ConfigurationInstanceFactory<T> {
    * @return a {@link ConfigurationInstance}
    * @throws MuleException if an error is encountered
    */
-  public ConfigurationInstance createConfiguration(String name,
-                                                   ResolverSetResult resolverSetResult,
-                                                   Event event,
-                                                   Optional<ConnectionProviderValueResolver<?>> connectionProviderResolver)
+  public <C> ConfigurationInstance createConfiguration(String name,
+                                                       ResolverSetResult resolverSetResult,
+                                                       Event event,
+                                                       Optional<ConnectionProviderValueResolver<C>> connectionProviderResolver)
       throws MuleException {
 
     Pair<T, ResolverSetResult> configValue = createConfigurationInstance(name, resolverSetResult);
 
-    Optional<ConnectionProvider> connectionProvider;
+    Optional<Pair<ConnectionProvider<C>, ResolverSetResult>> connectionProvider;
 
     if (requiresConnection && connectionProviderResolver.isPresent()) {
       connectionProvider = ofNullable(connectionProviderResolver.get().resolve(from(event)));
@@ -154,9 +129,9 @@ public final class ConfigurationInstanceFactory<T> {
     return new LifecycleAwareConfigurationInstance(name,
                                                    configurationModel,
                                                    configValue.getFirst(),
-                                                   createState(connectionProviderResolver.orElse(null)),
+                                                   createState(configValue.getSecond(), connectionProvider),
                                                    createInterceptors(configurationModel),
-                                                   connectionProvider);
+                                                   connectionProvider.map(Pair::getFirst));
   }
 
   /**
@@ -167,33 +142,31 @@ public final class ConfigurationInstanceFactory<T> {
    * @return a {@link ConfigurationInstance}
    * @throws MuleException if an error is encountered
    */
-  public ConfigurationInstance createConfiguration(String name,
-                                                   ResolverSetResult configValues,
-                                                   Event event,
-                                                   ConnectionProviderValueResolver connectionProviderResolver,
-                                                   ResolverSetResult connectionProviderValues) throws MuleException {
+  public <C> ConfigurationInstance createConfiguration(String name,
+                                                       ResolverSetResult configValues,
+                                                       Event event,
+                                                       ConnectionProviderValueResolver<C> connectionProviderResolver,
+                                                       ResolverSetResult connectionProviderValues) throws MuleException {
     Pair<T, ResolverSetResult> configValue = createConfigurationInstance(name, configValues);
 
-    Optional<ConnectionProvider> connectionProvider;
+    Optional<Pair<ConnectionProvider<C>, ResolverSetResult>> connectionProvider = empty();
 
     if (requiresConnection) {
-      connectionProvider = connectionProviderResolver.getObjectBuilder().map(
-          (CheckedFunction<ConnectionProviderObjectBuilder<Object>, ConnectionProvider<Object>>) builder ->
-                  builder.build(connectionProviderValues));
+      if (connectionProviderResolver.getObjectBuilder().isPresent()) {
+        connectionProvider = ofNullable(connectionProviderResolver.getObjectBuilder().get().build(connectionProviderValues));
+      }
 
       if (!connectionProvider.isPresent()) {
-        connectionProvider = ofNullable((ConnectionProvider) connectionProviderResolver.resolve(from(event)));
+        connectionProvider = ofNullable(connectionProviderResolver.resolve(from(event)));
       }
-    } else {
-      connectionProvider = empty();
     }
 
     return new LifecycleAwareConfigurationInstance(name,
                                                    configurationModel,
                                                    configValue.getFirst(),
-                                                   createState(connectionProviderValues.orElse(null)),
+                                                   createState(configValue.getSecond(), connectionProvider),
                                                    createInterceptors(configurationModel),
-                                                   connectionProvider);
+                                                   connectionProvider.map(Pair::getFirst));
   }
 
   private Pair<T, ResolverSetResult> createConfigurationInstance(String name, ResolverSetResult resolverSetResult)
@@ -211,20 +184,10 @@ public final class ConfigurationInstanceFactory<T> {
     return config;
   }
 
-  private CheckedFunction<Event, ConfigurationState> createState(ValueResolver<ConnectionProvider> connectionProviderResolver)
-      throws MuleException {
-    return event -> {
-      Map<String, Object> connectionParameters;
-      if (connectionProviderResolver instanceof ConnectionProviderValueResolver) {
-        connectionParameters =
-            (Map<String, Object>) ((ConnectionProviderValueResolver) connectionProviderResolver).getResolverSet()
-                .map((CheckedFunction<ResolverSet, Map<String, Object>>) resolverSet -> toMap(resolverSet, event))
-                .orElse(emptyMap());
-      } else {
-        connectionParameters = emptyMap();
-      }
-
-      return new ImmutableConfigurationState(toMap(resolverSet, event), connectionParameters);
-    };
+  private <C> ConfigurationState createState(ResolverSetResult configValues,
+                                             Optional<Pair<ConnectionProvider<C>, ResolverSetResult>> connectionProvider) {
+    return new ImmutableConfigurationState(
+        configValues.asMap(),
+        connectionProvider.map(p -> p.getSecond().asMap()).orElseGet(Collections::emptyMap));
   }
 }

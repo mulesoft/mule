@@ -11,6 +11,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.util.Pair;
 import org.mule.runtime.module.extension.internal.runtime.config.DefaultImplicitConnectionProviderFactory;
 import org.mule.runtime.module.extension.internal.runtime.config.ImplicitConnectionProviderFactory;
 
@@ -26,7 +27,7 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public final class ImplicitConnectionProviderValueResolver implements ConnectionProviderValueResolver {
+public final class ImplicitConnectionProviderValueResolver<C> implements ConnectionProviderValueResolver<C> {
 
   private final ImplicitConnectionProviderFactory implicitConnectionProviderFactory;
   private final String configName;
@@ -41,7 +42,7 @@ public final class ImplicitConnectionProviderValueResolver implements Connection
   }
 
   @Override
-  public ConnectionProvider resolve(ValueResolvingContext context) throws MuleException {
+  public Pair<ConnectionProvider<C>, ResolverSetResult> resolve(ValueResolvingContext context) throws MuleException {
     return implicitConnectionProviderFactory.createImplicitConnectionProvider(configName, context.getEvent());
   }
 

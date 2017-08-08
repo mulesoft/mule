@@ -36,14 +36,13 @@ import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.retry.RetryNotifier;
+import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
+import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
-import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
-import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationState;
 import org.mule.runtime.module.extension.internal.AbstractInterceptableContractTestCase;
@@ -143,7 +142,7 @@ public class LifecycleAwareConfigurationInstanceTestCase
     return new LifecycleAwareConfigurationInstance(NAME,
                                                    configurationModel,
                                                    value,
-                                                   event -> configurationState,
+                                                   configurationState,
                                                    getInterceptors(),
                                                    connectionProvider);
   }
@@ -314,6 +313,6 @@ public class LifecycleAwareConfigurationInstanceTestCase
 
   @Test
   public void getState() {
-    assertThat(interceptable.getState(mock(Event.class)), is(sameInstance(configurationState)));
+    assertThat(interceptable.getState(), is(sameInstance(configurationState)));
   }
 }

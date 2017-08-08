@@ -92,7 +92,7 @@ public class DefaultExecutionContextTestCase extends AbstractMuleTestCase {
         new LifecycleAwareConfigurationInstance(CONFIG_NAME,
                                                 configurationModel,
                                                 configurationInstance,
-                                                event -> configurationState,
+                                                configurationState,
                                                 emptyList(),
                                                 empty());
     Map<String, Object> parametersMap = new HashMap<>();

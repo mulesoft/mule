@@ -30,15 +30,15 @@ import org.mule.runtime.api.meta.model.source.SourceCallbackModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.Interceptable;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectivityModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.execution.ConfigurationObjectBuilderTestCase;
 import org.mule.runtime.module.extension.internal.runtime.execution.ConfigurationObjectBuilderTestCase.TestConfig;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
-import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Banana;
@@ -86,6 +86,9 @@ public class ConfigurationInstanceFactoryTestCase extends AbstractMuleTestCase {
   private Event event;
 
   @Mock
+  private ConnectionProviderValueResolver<Object> connectionProviderValueResolver;
+
+  @Mock
   private MuleContext muleContext;
 
   private ResolverSet resolverSet;
@@ -113,7 +116,7 @@ public class ConfigurationInstanceFactoryTestCase extends AbstractMuleTestCase {
   @Test
   public void createFromEvent() throws Exception {
     ConfigurationInstance configurationInstance =
-        factory.createConfiguration(CONFIG_NAME, event, new StaticValueResolver<>(null));
+        factory.createConfiguration(CONFIG_NAME, event, connectionProviderValueResolver);
 
     assertConfiguration(configurationInstance);
   }

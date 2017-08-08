@@ -16,6 +16,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.util.Pair;
 import org.mule.runtime.module.extension.internal.runtime.config.ConnectionProviderObjectBuilder;
 
 import java.util.Optional;
@@ -30,7 +31,7 @@ public class ConnectionProviderResolver<C> extends AbstractAnnotatedObject
     implements ConnectionProviderValueResolver<C>, Initialisable, Startable {
 
   private final ConnectionProviderObjectBuilder<C> objectBuilder;
-  private final ObjectBuilderValueResolver<ConnectionProvider<C>> valueResolver;
+  private final ObjectBuilderValueResolver<Pair<ConnectionProvider<C>, ResolverSetResult>> valueResolver;
   private final ResolverSet resolverSet;
 
   /**
@@ -49,7 +50,7 @@ public class ConnectionProviderResolver<C> extends AbstractAnnotatedObject
    * {@inheritDoc}
    */
   @Override
-  public ConnectionProvider<C> resolve(ValueResolvingContext context) throws MuleException {
+  public Pair<ConnectionProvider<C>, ResolverSetResult> resolve(ValueResolvingContext context) throws MuleException {
     return valueResolver.resolve(context);
   }
 
