@@ -1934,6 +1934,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 1,
                     "tabName": "Redelivery"
                   },
                   "elementReferences": [],
@@ -2328,6 +2329,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 2,
                     "tabName": "Redelivery"
                   },
                   "elementReferences": [],
