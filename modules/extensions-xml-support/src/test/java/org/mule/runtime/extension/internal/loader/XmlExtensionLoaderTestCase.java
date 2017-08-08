@@ -53,7 +53,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     Optional<OperationModel> operationModelOptional = extensionModel.getOperationModel("set-payload-concat-params-values");
     assertThat(operationModelOptional.isPresent(), is(true));
     final OperationModel operationModel = operationModelOptional.get();
-    assertThat(operationModel.getAllParameterModels().size(), is(3));
+    assertThat(operationModel.getAllParameterModels().size(), is(4));
     assertThat(operationModel.getAllParameterModels().get(0).getName(), is("value1"));
     assertThat(operationModel.getAllParameterModels().get(1).getName(), is("value2"));
     assertThat(operationModel.getAllParameterModels().get(2).getName(), is(TARGET_PARAMETER_NAME));
