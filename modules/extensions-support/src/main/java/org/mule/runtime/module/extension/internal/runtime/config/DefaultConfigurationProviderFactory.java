@@ -57,7 +57,8 @@ public final class DefaultConfigurationProviderFactory implements ConfigurationP
                                                                  ConfigurationModel configurationModel,
                                                                  ResolverSet resolverSet,
                                                                  ConnectionProviderValueResolver connectionProviderResolver,
-                                                                 MuleContext muleContext) throws Exception {
+                                                                 MuleContext muleContext)
+      throws Exception {
     return withExtensionClassLoader(extensionModel, () -> {
       configureConnectionProviderResolver(name, connectionProviderResolver);
       ConfigurationInstance configuration;

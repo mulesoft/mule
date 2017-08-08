@@ -37,8 +37,7 @@ public class ExtensionConnectivityTestingStrategy implements ConnectivityTesting
   @Inject
   private ConnectionManager connectionManager;
 
-  public ExtensionConnectivityTestingStrategy() {
-  }
+  public ExtensionConnectivityTestingStrategy() {}
 
   /**
    * Used for testing purposes
@@ -69,8 +68,8 @@ public class ExtensionConnectivityTestingStrategy implements ConnectivityTesting
         return connectionManager.testConnectivity(configurationInstance);
       } else {
         throw new MuleRuntimeException(createStaticMessage(
-            format("testConnectivity was invoked with an object type %s not supported.",
-                   connectivityTestingObject.getClass().getName())));
+                                                           format("testConnectivity was invoked with an object type %s not supported.",
+                                                                  connectivityTestingObject.getClass().getName())));
       }
     } catch (Exception e) {
       return failure("Failed to obtain connectivity testing object", e);

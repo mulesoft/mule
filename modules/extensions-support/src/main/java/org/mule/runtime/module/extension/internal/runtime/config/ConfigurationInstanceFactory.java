@@ -26,11 +26,12 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Intercept
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
-import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
 import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Reusable and thread-safe factory that creates instances of {@link ConfigurationInstance}
@@ -43,8 +44,6 @@ import java.util.Optional;
  * @since 4.0
  */
 public final class ConfigurationInstanceFactory<T> {
-
-  private static final ValueResolver<ConnectionProvider> NULL_CONNECTION_PROVIDER = new StaticValueResolver<>(null);
 
   private final ExtensionModel extensionModel;
   private final ConfigurationModel configurationModel;
@@ -81,8 +80,8 @@ public final class ConfigurationInstanceFactory<T> {
    * @throws MuleException if an error is encountered
    */
   public <C> ConfigurationInstance createConfiguration(String name,
-                                                   Event event,
-                                                   ConnectionProviderValueResolver<C> connectionProviderResolver)
+                                                       Event event,
+                                                       ConnectionProviderValueResolver<C> connectionProviderResolver)
       throws MuleException {
 
     Optional<Pair<ConnectionProvider<C>, ResolverSetResult>> connectionProvider;
@@ -96,7 +95,7 @@ public final class ConfigurationInstanceFactory<T> {
 
     return new LifecycleAwareConfigurationInstance(name,
                                                    configurationModel,
-                                                   configValue,
+                                                   configValue.getFirst(),
                                                    createState(configValue.getSecond(), connectionProvider),
                                                    createInterceptors(configurationModel),
                                                    connectionProvider.map(Pair::getFirst));
@@ -146,12 +145,13 @@ public final class ConfigurationInstanceFactory<T> {
                                                        ResolverSetResult configValues,
                                                        Event event,
                                                        ConnectionProviderValueResolver<C> connectionProviderResolver,
-                                                       ResolverSetResult connectionProviderValues) throws MuleException {
+                                                       ResolverSetResult connectionProviderValues)
+      throws MuleException {
     Pair<T, ResolverSetResult> configValue = createConfigurationInstance(name, configValues);
 
     Optional<Pair<ConnectionProvider<C>, ResolverSetResult>> connectionProvider = empty();
 
-    if (requiresConnection) {
+    if (requiresConnection && connectionProviderResolver != null) {
       if (connectionProviderResolver.getObjectBuilder().isPresent()) {
         connectionProvider = ofNullable(connectionProviderResolver.getObjectBuilder().get().build(connectionProviderValues));
       }
@@ -187,7 +187,14 @@ public final class ConfigurationInstanceFactory<T> {
   private <C> ConfigurationState createState(ResolverSetResult configValues,
                                              Optional<Pair<ConnectionProvider<C>, ResolverSetResult>> connectionProvider) {
     return new ImmutableConfigurationState(
-        configValues.asMap(),
-        connectionProvider.map(p -> p.getSecond().asMap()).orElseGet(Collections::emptyMap));
+                                           nullSafeMap(configValues),
+                                           connectionProvider.map(p -> nullSafeMap(p.getSecond()))
+                                               .orElseGet(Collections::emptyMap));
+  }
+
+  private Map<String, Object> nullSafeMap(ResolverSetResult result) {
+    return result.asMap().entrySet().stream()
+        .filter(entry -> entry.getValue() != null)
+        .collect(Collectors.toMap(entry -> entry.getKey(), entry -> entry.getValue()));
   }
 }

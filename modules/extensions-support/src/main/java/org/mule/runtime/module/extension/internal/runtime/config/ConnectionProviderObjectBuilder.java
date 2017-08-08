@@ -25,7 +25,8 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetRe
  *
  * @since 4.0
  */
-public abstract class ConnectionProviderObjectBuilder<C> extends ResolverSetBasedObjectBuilder<Pair<ConnectionProvider<C>, ResolverSetResult>> {
+public abstract class ConnectionProviderObjectBuilder<C>
+    extends ResolverSetBasedObjectBuilder<Pair<ConnectionProvider<C>, ResolverSetResult>> {
 
   protected final ConnectionProviderModel providerModel;
   protected final boolean disableValidation;
@@ -81,7 +82,7 @@ public abstract class ConnectionProviderObjectBuilder<C> extends ResolverSetBase
    * {@inheritDoc}
    */
   protected Pair<ConnectionProvider<C>, ResolverSetResult> instantiateObject() {
-    return new Pair<>((ConnectionProvider<C>)  getConnectionProviderFactory(providerModel).newInstance(), null);
+    return new Pair<>((ConnectionProvider<C>) getConnectionProviderFactory(providerModel).newInstance(), null);
   }
 
   @Override
