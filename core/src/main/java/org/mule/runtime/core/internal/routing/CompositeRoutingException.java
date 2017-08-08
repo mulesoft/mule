@@ -9,66 +9,46 @@ package org.mule.runtime.core.internal.routing;
 
 import static java.lang.System.lineSeparator;
 import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.api.message.Message.of;
+
 import org.mule.runtime.api.exception.ComposedErrorException;
+import org.mule.runtime.api.exception.ErrorMessageAwareException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.message.Error;
-import org.mule.runtime.core.api.exception.MessagingException;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.processor.Router;
 import org.mule.runtime.core.internal.config.ExceptionHelper;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 
 /**
- * This is a {@link MessagingException} used to aggregate exceptions thrown by several routes in the context of a single
- * {@link Router} Exceptions are correlated to each route through a sequential id
+ * A {@link MuleException} used to aggregate exceptions thrown by several routes in the context of a single {@link Router}. This
+ * exception implements {@link ComposedErrorException} so that a composite {@link Error} is created and also implements
+ * {@link ErrorMessageAwareException} to provide an error message using {@link RoutingResult} that provides access to all route
+ * results for use in error handlers.
  * 
  * @since 3.5.0
+ * @see RoutingResult
  */
-public class CompositeRoutingException extends MuleException implements ComposedErrorException {
+public class CompositeRoutingException extends MuleException implements ComposedErrorException, ErrorMessageAwareException {
 
   private static final String MESSAGE_TITLE = "Exception(s) were found for route(s): ";
 
   private static final long serialVersionUID = -4421728527040579607L;
 
-  private final Map<String, Throwable> exceptions;
+  private final RoutingResult routingResult;
 
   /**
    * Constructs a new {@link CompositeRoutingException}
    * 
-   * @param message message describing the failure
-   * @param exceptions a {@link Map} in which the key is an {@link Integer} describing the index of the route that generated the
-   *        error and the value is the {@link Throwable} itself
+   * @param routingResult routing result object containing the results from all routes.
    */
-  public CompositeRoutingException(I18nMessage message, Map<String, Throwable> exceptions) {
-    super(message);
-    this.exceptions = Collections.unmodifiableMap(exceptions);
-  }
-
-  public CompositeRoutingException(Map<String, Throwable> exceptions) {
-    this(buildExceptionMessage(exceptions), exceptions);
-  }
-
-  /**
-   * Returns the {@link Exception} for the given route index
-   * 
-   * @param index the index of a failing route
-   * @return an {@link Exception} or <code>null</code> if no {@link Exception} was found for that index
-   */
-  public Throwable getExceptionForRouteIndex(int index) {
-    return this.exceptions.get(Integer.toString(index));
-  }
-
-  /**
-   * @return a {@link Map} in which the key is an {@link Integer} describing the number of the route that generated the error and
-   *         the value is the {@link Exception} itself
-   */
-  public Map<String, Throwable> getExceptions() {
-    return this.exceptions;
+  public CompositeRoutingException(RoutingResult routingResult) {
+    super(buildExceptionMessage(routingResult));
+    this.routingResult = routingResult;
   }
 
   @Override
@@ -76,23 +56,24 @@ public class CompositeRoutingException extends MuleException implements Composed
     StringBuilder builder = new StringBuilder();
     builder.append(MESSAGE_TITLE).append(lineSeparator());
 
-    for (Entry<String, Throwable> entry : getExceptions().entrySet()) {
+    for (Entry<String, Error> entry : routingResult.getFailures().entrySet()) {
       String routeSubtitle = String.format("Route %d:", entry.getKey());
-      MuleException muleException = ExceptionHelper.getRootMuleException(entry.getValue());
+      MuleException muleException = ExceptionHelper.getRootMuleException(entry.getValue().getCause());
       if (muleException != null) {
         builder.append(routeSubtitle).append(muleException.getDetailedMessage());
       } else {
-        builder.append(routeSubtitle).append("Caught exception in Exception Strategy: " + entry.getValue().getMessage());
+        builder.append(routeSubtitle)
+            .append("Caught exception in Exception Strategy: " + entry.getValue().getCause().getMessage());
       }
     }
     return builder.toString();
   }
 
-  private static I18nMessage buildExceptionMessage(Map<String, Throwable> exceptions) {
+  private static I18nMessage buildExceptionMessage(RoutingResult routingResult) {
     StringBuilder builder = new StringBuilder();
-    for (String route : exceptions.keySet()) {
-      Throwable routeException = exceptions.get(route);
-      builder.append(lineSeparator() + "\t").append(route).append(": ")
+    for (Entry<String, Error> routeResult : routingResult.getFailures().entrySet()) {
+      Throwable routeException = routeResult.getValue().getCause();
+      builder.append(lineSeparator() + "\t").append(routeResult.getKey()).append(": ")
           .append(routeException.getCause() != null ? routeException.getCause().getMessage() : routeException.getMessage());
     }
 
@@ -102,10 +83,16 @@ public class CompositeRoutingException extends MuleException implements Composed
 
   @Override
   public List<Error> getErrors() {
-    return exceptions.values().stream()
-        .filter(t -> t instanceof MessagingException && ((MessagingException) t).getEvent().getError().isPresent())
-        .map(me -> ((MessagingException) me).getEvent().getError().get())
-        .collect(toList());
+    return routingResult.getFailures().values().stream().collect(toList());
   }
 
+  @Override
+  public Message getErrorMessage() {
+    return of(routingResult);
+  }
+
+  @Override
+  public Throwable getRootCause() {
+    return this;
+  }
 }

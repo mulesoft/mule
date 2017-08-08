@@ -18,6 +18,7 @@ import static reactor.core.publisher.Mono.from;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.routing.ForkJoinStrategy;
 import org.mule.runtime.core.api.routing.ForkJoinStrategy.RoutingPair;
 
@@ -27,12 +28,14 @@ import org.junit.Test;
 public class JoinOnlyForkJoinStrategyTestCase extends AbstractForkJoinStrategyTestCase {
 
   @Override
-  protected ForkJoinStrategy createStrategy(long timeout) {
-    return new JoinOnlyForkJoinStrategy(timeout);
+  protected ForkJoinStrategy createStrategy(ProcessingStrategy processingStrategy, int concurrency, boolean delayErrors,
+                                            long timeout) {
+    return new JoinOnlyForkJoinStrategyFactory().createForkJoinStrategy(processingStrategy, concurrency, delayErrors, timeout,
+                                                                        timeoutErrorType);
   }
 
   @Test
-  public void joinOnly() throws Exception {
+  public void joinOnly() throws Throwable {
 
     Event original = testEvent();
 
@@ -40,12 +43,11 @@ public class JoinOnlyForkJoinStrategyTestCase extends AbstractForkJoinStrategyTe
     Processor processor2 = createEchoProcessorSpy();
     Processor processor3 = createEchoProcessorSpy();
 
-    RoutingPair pair1 = of(testEvent(), processor1);
-    RoutingPair pair2 = of(testEvent(), processor2);
-    RoutingPair pair3 = of(testEvent(), processor3);
+    RoutingPair pair1 = of(testEvent(), createChain(processor1));
+    RoutingPair pair2 = of(testEvent(), createChain(processor2));
+    RoutingPair pair3 = of(testEvent(), createChain(processor3));
 
-    Event result =
-        from(strategy.forkJoin(original, fromIterable(asList(pair1, pair2, pair3)), processingStrategy, 3, true)).block();
+    Event result = invokeStrategyBlocking(strategy, original, asList(pair1, pair2, pair3));
 
     assertThat(result, is(original));
     verify(processor1, times(1)).process(any(Event.class));

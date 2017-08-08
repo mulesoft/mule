@@ -19,6 +19,7 @@ import static reactor.core.publisher.Mono.from;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.routing.ForkJoinStrategy;
 import org.mule.runtime.core.api.routing.ForkJoinStrategy.RoutingPair;
 
@@ -29,25 +30,25 @@ import org.junit.Test;
 public class CollectListForkJoinStrategyTestCase extends AbstractForkJoinStrategyTestCase {
 
   @Override
-  protected ForkJoinStrategy createStrategy(long timeout) {
-    return new CollectListForkJoinStrategy(timeout);
+  protected ForkJoinStrategy createStrategy(ProcessingStrategy processingStrategy, int concurrency, boolean delayErrors,
+                                            long timeout) {
+    return new CollectListForkJoinStrategyFactory().createForkJoinStrategy(processingStrategy, concurrency, delayErrors, timeout,
+                                                                           timeoutErrorType);
   }
 
   @Test
-  public void collectList() throws Exception {
+  public void collectList() throws Throwable {
 
     Event original = testEvent();
     Message route1Result = of("1");
     Message route2Result = of("2");
     Message route3Result = of("3");
 
-    RoutingPair pair1 = of(testEvent(), event -> builder(event).message(route1Result).build());
-    RoutingPair pair2 = of(testEvent(), event -> builder(event).message(route2Result).build());
-    RoutingPair pair3 = of(testEvent(), event -> builder(event).message(route3Result).build());
+    RoutingPair pair1 = of(testEvent(), createChain(event -> builder(event).message(route1Result).build()));
+    RoutingPair pair2 = of(testEvent(), createChain(event -> builder(event).message(route2Result).build()));
+    RoutingPair pair3 = of(testEvent(), createChain(event -> builder(event).message(route3Result).build()));
 
-    Event result =
-        from(strategy.forkJoin(original, fromIterable(asList(pair1, pair2, pair3)),
-                               processingStrategy, 1, true)).block();
+    Event result = invokeStrategyBlocking(strategy, original, asList(pair1, pair2, pair3));
 
     assertThat(result.getMessage().getPayload().getValue(), instanceOf(List.class));
     List<Message> resultList = (List<Message>) result.getMessage().getPayload().getValue();

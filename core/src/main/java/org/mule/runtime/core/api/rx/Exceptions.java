@@ -172,20 +172,6 @@ public class Exceptions {
     return throwable;
   }
 
-  public static List<Throwable> unwrapCompositeException(Throwable throwable) {
-    // TODO https://github.com/reactor/reactor-core/issues/771
-    // TODO https://github.com/reactor/reactor-core/issues/772
-    if (throwable.getClass().equals(Throwable.class) && throwable.getMessage().equals("Multiple exceptions")) {
-      List<Throwable> list = new ArrayList<>();
-      for (Throwable suppressed : throwable.getSuppressed()) {
-        list.addAll(unwrapCompositeException(suppressed));
-      }
-      return list;
-    } else {
-      return singletonList(unwrap(throwable));
-    }
-  }
-
   /**
    * Propagate an exception through streams even if it's considered fatal by Reactor.
    *
