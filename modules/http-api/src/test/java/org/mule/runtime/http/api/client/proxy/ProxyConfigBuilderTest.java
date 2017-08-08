@@ -39,11 +39,13 @@ public class ProxyConfigBuilderTest extends AbstractProxyConfigTestCase<ProxyCon
 
   @Test
   public void fullConfig() {
-    ProxyConfig config = proxyConfigBuilder.host(HOST).port(PORT).username(USERNAME).password(PASSWORD).build();
+    ProxyConfig config =
+        proxyConfigBuilder.host(HOST).port(PORT).username(USERNAME).password(PASSWORD).nonProxyHosts(NON_PROXY_HOSTS).build();
     assertThat(config.getHost(), is(HOST));
     assertThat(config.getPort(), is(PORT));
     assertThat(config.getPassword(), is(PASSWORD));
     assertThat(config.getUsername(), is(USERNAME));
+    assertThat(config.getNonProxyHosts(), is(NON_PROXY_HOSTS));
   }
 
 }

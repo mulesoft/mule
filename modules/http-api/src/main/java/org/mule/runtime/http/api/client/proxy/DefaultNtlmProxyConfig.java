@@ -13,8 +13,8 @@ class DefaultNtlmProxyConfig extends DefaultProxyConfig implements ProxyConfig.N
 
   private String ntlmDomain;
 
-  DefaultNtlmProxyConfig(String host, int port, String username, String password, String ntlmDomain) {
-    super(host, port, username, password);
+  DefaultNtlmProxyConfig(String host, int port, String username, String password, String ntlmDomain, String nonProxyHosts) {
+    super(host, port, username, password, nonProxyHosts);
     this.ntlmDomain = ntlmDomain;
   }
 

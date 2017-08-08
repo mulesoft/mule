@@ -40,11 +40,12 @@ public class NtlmProxyConfigBuilderTest extends AbstractProxyConfigTestCase<Ntlm
   @Test
   public void fullConfig() {
     NtlmProxyConfig config = ntlmProxyConfigBuilder.host(HOST).port(PORT).ntlmDomain(NTLM_DOMAIN)
-        .username(USERNAME).password(PASSWORD).build();
+        .username(USERNAME).password(PASSWORD).nonProxyHosts(NON_PROXY_HOSTS).build();
     assertThat(config.getHost(), is(HOST));
     assertThat(config.getPort(), is(PORT));
     assertThat(config.getNtlmDomain(), is(NTLM_DOMAIN));
     assertThat(config.getPassword(), is(PASSWORD));
     assertThat(config.getUsername(), is(USERNAME));
+    assertThat(config.getNonProxyHosts(), is(NON_PROXY_HOSTS));
   }
 }

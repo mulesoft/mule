@@ -19,6 +19,7 @@ public abstract class AbstractProxyConfigTestCase<B extends BaseProxyConfigBuild
   protected static final int PORT = 8080;
   protected static final String USERNAME = "username";
   protected static final String PASSWORD = "password";
+  protected static final String NON_PROXY_HOSTS = "host1,host2";
 
 
   @Test
