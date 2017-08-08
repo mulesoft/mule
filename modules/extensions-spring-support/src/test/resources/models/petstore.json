@@ -13440,10 +13440,9 @@
           "parent": "",
           "genericTypes": []
         },
-        "xmlHints": {
+        "typeXmlHints": {
           "allowInlineDefinition": true,
-          "allowTopLevelDefinition": true,
-          "allowReferences": true
+          "allowTopLevelDefinition": true
         },
         "typeAlias": {
           "value": "PhoneNumber"

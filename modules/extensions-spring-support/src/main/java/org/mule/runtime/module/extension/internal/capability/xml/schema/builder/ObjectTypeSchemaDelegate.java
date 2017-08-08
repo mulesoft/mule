@@ -267,7 +267,7 @@ final class ObjectTypeSchemaDelegate {
       return registeredComplexTypesHolders.get(typeId).getComplexType();
     }
 
-    QName base = getComplexTypeBase(type,baseType);
+    QName base = getComplexTypeBase(type, baseType);
     Collection<ObjectFieldType> fields;
     if (baseType == null) {
       fields = type.getFields();
@@ -293,8 +293,8 @@ final class ObjectTypeSchemaDelegate {
       return new QName(baseDsl.get().getNamespace(), getBaseTypeName(baseType), baseDsl.get().getPrefix());
     }
     Optional<BaseType> base = TypeUtils.getBaseType(type);
-    if(base.isPresent()) { //means that the baseType was defined by the user
-      return new QName(builder.getNamespaceUri(base.get().getPrefix()),base.get().getType(),base.get().getPrefix());
+    if (base.isPresent()) { //means that the baseType was defined by the user
+      return new QName(builder.getNamespaceUri(base.get().getPrefix()), base.get().getType(), base.get().getPrefix());
     }
     return MULE_ABSTRACT_EXTENSION_TYPE;
   }

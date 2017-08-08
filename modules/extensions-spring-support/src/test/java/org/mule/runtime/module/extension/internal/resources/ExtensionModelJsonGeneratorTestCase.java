@@ -36,6 +36,7 @@ import org.mule.test.metadata.extension.MetadataExtension;
 import org.mule.test.oauth.TestOAuthExtension;
 import org.mule.test.petstore.extension.PetStoreConnector;
 import org.mule.test.ram.RickAndMortyExtension;
+import org.mule.test.soap.extension.FootballSoapExtension;
 import org.mule.test.substitutiongroup.extension.SubstitutionGroupExtension;
 import org.mule.test.subtypes.extension.SubTypesMappingConnector;
 import org.mule.test.transactional.TransactionalExtension;
@@ -122,7 +123,46 @@ public class ExtensionModelJsonGeneratorTestCase extends AbstractMuleTestCase {
                                                                                                              "test-fn.json"),
                                                                           new ExtensionJsonGeneratorTestUnit(javaLoader,
                                                                                                              ValuesExtension.class,
-                                                                                                             "values.json"));
+                                                                                                             "values.json"),
+    new ExtensionJsonGeneratorTestUnit(javaLoader,
+                                       PetStoreConnector.class,
+                                       "petstore.json"),
+    new ExtensionJsonGeneratorTestUnit(javaLoader,
+                                       MetadataExtension.class,
+                                       "metadata.json"),
+    new ExtensionJsonGeneratorTestUnit(javaLoader,
+                                       HeisenbergExtension.class,
+                                       "heisenberg.json"),
+    new ExtensionJsonGeneratorTestUnit(javaLoader,
+                                       SubstitutionGroupExtension.class,
+                                       "substitutiongroup.json"),
+    new ExtensionJsonGeneratorTestUnit(javaLoader,
+                                       TransactionalExtension.class,
+                                       "tx-ext.json"),
+    new ExtensionJsonGeneratorTestUnit(javaLoader,
+                                       SubTypesMappingConnector.class,
+                                       "subtypes.json"),
+    new ExtensionJsonGeneratorTestUnit(javaLoader,
+                                       MarvelExtension.class,
+                                       "marvel.json"),
+    new ExtensionJsonGeneratorTestUnit(soapLoader,
+                                       FootballSoapExtension.class,
+                                       "soap.json"),
+    new ExtensionJsonGeneratorTestUnit(soapLoader,
+                                       RickAndMortyExtension.class,
+                                       "ram.json"),
+    new ExtensionJsonGeneratorTestUnit(javaLoader,
+                                       TypedValueExtension.class,
+                                       "typed-value.json"),
+    new ExtensionJsonGeneratorTestUnit(javaLoader,
+                                       TestOAuthExtension.class,
+                                       "test-oauth.json"),
+    new ExtensionJsonGeneratorTestUnit(javaLoader,
+                                       WeaveFunctionExtension.class,
+                                       "test-fn.json"),
+    new ExtensionJsonGeneratorTestUnit(javaLoader,
+                                       ValuesExtension.class,
+                                       "values.json"));
 
     BiFunction<Class<?>, ExtensionModelLoader, ExtensionModel> createExtensionModel = (extension, loader) -> {
       ExtensionModel model = loadExtension(extension, loader);

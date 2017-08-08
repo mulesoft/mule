@@ -80,10 +80,9 @@
           "parent": "",
           "genericTypes": []
         },
-        "xmlHints": {
+        "typeXmlHints": {
           "allowInlineDefinition": true,
-          "allowTopLevelDefinition": true,
-          "allowReferences": true
+          "allowTopLevelDefinition": true
         },
         "typeAlias": {
           "value": "Ricin"
@@ -129,10 +128,9 @@
                 "parent": "",
                 "genericTypes": []
               },
-              "xmlHints": {
+              "typeXmlHints": {
                 "allowInlineDefinition": true,
-                "allowTopLevelDefinition": true,
-                "allowReferences": true
+                "allowTopLevelDefinition": true
               },
               "typeAlias": {
                 "value": "door"
@@ -3015,10 +3013,9 @@
           "parent": "",
           "genericTypes": []
         },
-        "xmlHints": {
+        "typeXmlHints": {
           "allowInlineDefinition": true,
-          "allowTopLevelDefinition": true,
-          "allowReferences": true
+          "allowTopLevelDefinition": true
         },
         "typeAlias": {
           "value": "CarDoor"
@@ -3207,10 +3204,9 @@
           "parent": "",
           "genericTypes": []
         },
-        "xmlHints": {
+        "typeXmlHints": {
           "allowInlineDefinition": true,
-          "allowTopLevelDefinition": true,
-          "allowReferences": true
+          "allowTopLevelDefinition": true
         },
         "typeAlias": {
           "value": "HouseDoor"
@@ -3489,10 +3485,9 @@
           "parent": "",
           "genericTypes": []
         },
-        "xmlHints": {
+        "typeXmlHints": {
           "allowInlineDefinition": true,
-          "allowTopLevelDefinition": true,
-          "allowReferences": true
+          "allowTopLevelDefinition": true
         },
         "typeAlias": {
           "value": "Revolver"
@@ -3537,10 +3532,9 @@
           "parent": "org.mule.test.subtypes.extension.ParentShape",
           "genericTypes": []
         },
-        "xmlHints": {
+        "typeXmlHints": {
           "allowInlineDefinition": true,
-          "allowTopLevelDefinition": true,
-          "allowReferences": true
+          "allowTopLevelDefinition": true
         },
         "typeAlias": {
           "value": "Square"
@@ -3780,10 +3774,9 @@
                 "parent": "org.mule.test.subtypes.extension.ParentShape",
                 "genericTypes": []
               },
-              "xmlHints": {
+              "typeXmlHints": {
                 "allowInlineDefinition": true,
-                "allowTopLevelDefinition": true,
-                "allowReferences": true
+                "allowTopLevelDefinition": true
               },
               "typeAlias": {
                 "value": "Square"
@@ -3890,10 +3883,9 @@
                 "parent": "",
                 "genericTypes": []
               },
-              "xmlHints": {
+              "typeXmlHints": {
                 "allowInlineDefinition": true,
-                "allowTopLevelDefinition": true,
-                "allowReferences": true
+                "allowTopLevelDefinition": true
               },
               "typeAlias": {
                 "value": "Ricin"
@@ -3939,10 +3931,9 @@
                       "parent": "",
                       "genericTypes": []
                     },
-                    "xmlHints": {
+                    "typeXsmlHints": {
                       "allowInlineDefinition": true,
-                      "allowTopLevelDefinition": true,
-                      "allowReferences": true
+                      "allowTopLevelDefinition": true
                     },
                     "typeAlias": {
                       "value": "door"
@@ -4407,10 +4398,9 @@
           "parent": "org.mule.test.subtypes.extension.ParentShape",
           "genericTypes": []
         },
-        "xmlHints": {
+        "typeXmlHints": {
           "allowInlineDefinition": true,
-          "allowTopLevelDefinition": true,
-          "allowReferences": true
+          "allowTopLevelDefinition": true
         },
         "typeAlias": {
           "value": "triangleAlias"

@@ -35,10 +35,9 @@
           "parent": "",
           "genericTypes": []
         },
-        "xmlHints": {
+        "typeXmlHints": {
           "allowInlineDefinition": true,
-          "allowTopLevelDefinition": true,
-          "allowReferences": true
+          "allowTopLevelDefinition": true
         },
         "typeAlias": {
           "value": "Ricin"
@@ -84,10 +83,9 @@
                 "parent": "",
                 "genericTypes": []
               },
-              "xmlHints": {
+              "typeXmlHints": {
                 "allowInlineDefinition": true,
-                "allowTopLevelDefinition": true,
-                "allowReferences": true
+                "allowTopLevelDefinition": true
               },
               "typeAlias": {
                 "value": "door"
@@ -330,10 +328,9 @@
           "parent": "",
           "genericTypes": []
         },
-        "xmlHints": {
+        "typeXmlHints": {
           "allowInlineDefinition": true,
           "allowTopLevelDefinition": false,
-          "allowReferences": true,
           "substitutionGroup": {
             "prefix": "ee",
             "element": "some-ee-component"
@@ -381,10 +378,9 @@
           "parent": "",
           "genericTypes": []
         },
-        "xmlHints": {
+        "typeXmlHints": {
           "allowInlineDefinition": true,
           "allowTopLevelDefinition": false,
-          "allowReferences": true,
           "substitutionGroup": {
             "prefix": "mule",
             "element": "some-core-component"
@@ -432,10 +428,9 @@
           "parent": "",
           "genericTypes": []
         },
-        "xmlHints": {
+        "typeXmlHints": {
           "allowInlineDefinition": true,
           "allowTopLevelDefinition": true,
-          "allowReferences": true,
           "substitutionGroup": {
             "prefix": "heisenberg",
             "element": "some-component"
@@ -483,10 +478,9 @@
           "parent": "",
           "genericTypes": []
         },
-        "xmlHints": {
+        "typeXmlHints": {
           "allowInlineDefinition": true,
           "allowTopLevelDefinition": false,
-          "allowReferences": true,
           "substitutionGroup": {
             "prefix": "heisenberg",
             "element": "some-component"

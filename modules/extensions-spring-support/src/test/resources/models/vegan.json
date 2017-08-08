@@ -8536,10 +8536,9 @@
                 "parent": "",
                 "genericTypes": []
               },
-              "xmlHints": {
+              "typeXmlHints": {
                 "allowInlineDefinition": true,
-                "allowTopLevelDefinition": true,
-                "allowReferences": true
+                "allowTopLevelDefinition": true
               },
               "typeAlias": {
                 "value": "HealthyFood"
@@ -8676,10 +8675,9 @@
                 "parent": "",
                 "genericTypes": []
               },
-              "xmlHints": {
+              "typeXmlHints": {
                 "allowInlineDefinition": true,
-                "allowTopLevelDefinition": true,
-                "allowReferences": true
+                "allowTopLevelDefinition": true
               },
               "typeAlias": {
                 "value": "HealthyFood"
@@ -8808,10 +8806,9 @@
           "parent": "",
           "genericTypes": []
         },
-        "xmlHints": {
+        "typeXmlHints": {
           "allowInlineDefinition": true,
-          "allowTopLevelDefinition": true,
-          "allowReferences": true
+          "allowTopLevelDefinition": true
         },
         "typeAlias": {
           "value": "GroupedFood"
@@ -8959,10 +8956,9 @@
           "parent": "",
           "genericTypes": []
         },
-        "xmlHints": {
+        "typeXmlHints": {
           "allowInlineDefinition": true,
-          "allowTopLevelDefinition": true,
-          "allowReferences": true
+          "allowTopLevelDefinition": true
         },
         "typeAlias": {
           "value": "HealthyFood"

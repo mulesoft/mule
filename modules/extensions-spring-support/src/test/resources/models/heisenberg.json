@@ -16115,10 +16115,9 @@
                         "parent": "",
                         "genericTypes": []
                       },
-                      "xmlHints": {
+                      "typeXmlHints": {
                         "allowInlineDefinition": true,
-                        "allowTopLevelDefinition": true,
-                        "allowReferences": true
+                        "allowTopLevelDefinition": true
                       },
                       "typeAlias": {
                         "value": "Ricin"
@@ -16164,10 +16163,9 @@
                               "parent": "",
                               "genericTypes": []
                             },
-                            "xmlHints": {
+                            "typeXmlHints": {
                               "allowInlineDefinition": true,
-                              "allowTopLevelDefinition": true,
-                              "allowReferences": true
+                              "allowTopLevelDefinition": true
                             },
                             "typeAlias": {
                               "value": "door"
@@ -16279,10 +16277,9 @@
                       "parent": "",
                       "genericTypes": []
                     },
-                    "xmlHints": {
+                    "typeXmlHints": {
                       "allowInlineDefinition": true,
-                      "allowTopLevelDefinition": true,
-                      "allowReferences": true
+                      "allowTopLevelDefinition": true
                     },
                     "typeAlias": {
                       "value": "door"
@@ -16379,10 +16376,9 @@
                         "parent": "",
                         "genericTypes": []
                       },
-                      "xmlHints": {
+                      "typeXmlHints": {
                         "allowInlineDefinition": true,
-                        "allowTopLevelDefinition": true,
-                        "allowReferences": true
+                        "allowTopLevelDefinition": true
                       },
                       "typeAlias": {
                         "value": "Ricin"
@@ -16428,10 +16424,9 @@
                               "parent": "",
                               "genericTypes": []
                             },
-                            "xmlHints": {
+                            "typeXmlHints": {
                               "allowInlineDefinition": true,
-                              "allowTopLevelDefinition": true,
-                              "allowReferences": true
+                              "allowTopLevelDefinition": true
                             },
                             "typeAlias": {
                               "value": "door"
@@ -17015,10 +17010,9 @@
                   "parent": "",
                   "genericTypes": []
                 },
-                "xmlHints": {
+                "typeXmlHints": {
                   "allowInlineDefinition": true,
-                  "allowTopLevelDefinition": true,
-                  "allowReferences": true
+                  "allowTopLevelDefinition": true
                 },
                 "typeAlias": {
                   "value": "door"
@@ -18606,10 +18600,9 @@
           "parent": "org.mule.test.heisenberg.extension.model.Investment",
           "genericTypes": []
         },
-        "xmlHints": {
+        "typeXmlHints": {
           "allowInlineDefinition": true,
-          "allowTopLevelDefinition": true,
-          "allowReferences": true
+          "allowTopLevelDefinition": true
         },
         "typeAlias": {
           "value": "CarWash"
@@ -19376,10 +19369,9 @@
           "parent": "",
           "genericTypes": []
         },
-        "xmlHints": {
+        "typeXmlHints": {
           "allowInlineDefinition": true,
-          "allowTopLevelDefinition": true,
-          "allowReferences": true
+          "allowTopLevelDefinition": true
         },
         "typeAlias": {
           "value": "door"
@@ -19751,10 +19743,9 @@
           "parent": "",
           "genericTypes": []
         },
-        "xmlHints": {
+        "typeXmlHints": {
           "allowInlineDefinition": true,
-          "allowTopLevelDefinition": true,
-          "allowReferences": true
+          "allowTopLevelDefinition": true
         },
         "typeAlias": {
           "value": "RecursiveChainA"
@@ -19800,10 +19791,9 @@
                 "parent": "",
                 "genericTypes": []
               },
-              "xmlHints": {
+              "typeXmlHints": {
                 "allowInlineDefinition": true,
-                "allowTopLevelDefinition": true,
-                "allowReferences": true
+                "allowTopLevelDefinition": true
               },
               "typeAlias": {
                 "value": "RecursiveChainB"
@@ -19901,10 +19891,9 @@
                   "parent": "",
                   "genericTypes": []
                 },
-                "xmlHints": {
+                "typeXmlHints": {
                   "allowInlineDefinition": true,
-                  "allowTopLevelDefinition": true,
-                  "allowReferences": true
+                  "allowTopLevelDefinition": true
                 },
                 "typeAlias": {
                   "value": "RecursiveChainB"
@@ -19996,10 +19985,9 @@
           "parent": "",
           "genericTypes": []
         },
-        "xmlHints": {
+        "typeXmlHints": {
           "allowInlineDefinition": true,
-          "allowTopLevelDefinition": true,
-          "allowReferences": true
+          "allowTopLevelDefinition": true
         },
         "typeAlias": {
           "value": "RecursiveChainB"
@@ -20045,10 +20033,9 @@
                 "parent": "",
                 "genericTypes": []
               },
-              "xmlHints": {
+              "typeXmlHints": {
                 "allowInlineDefinition": true,
-                "allowTopLevelDefinition": true,
-                "allowReferences": true
+                "allowTopLevelDefinition": true
               },
               "typeAlias": {
                 "value": "RecursiveChainA"
@@ -20146,10 +20133,9 @@
                   "parent": "",
                   "genericTypes": []
                 },
-                "xmlHints": {
+                "typeXmlHints": {
                   "allowInlineDefinition": true,
-                  "allowTopLevelDefinition": true,
-                  "allowReferences": true
+                  "allowTopLevelDefinition": true
                 },
                 "typeAlias": {
                   "value": "RecursiveChainA"
@@ -20241,10 +20227,9 @@
           "parent": "",
           "genericTypes": []
         },
-        "xmlHints": {
+        "typeXmlHints": {
           "allowInlineDefinition": true,
-          "allowTopLevelDefinition": true,
-          "allowReferences": true
+          "allowTopLevelDefinition": true
         },
         "typeAlias": {
           "value": "RecursivePojo"
@@ -20338,10 +20323,9 @@
           "parent": "",
           "genericTypes": []
         },
-        "xmlHints": {
+        "typeXmlHints": {
           "allowInlineDefinition": true,
-          "allowTopLevelDefinition": true,
-          "allowReferences": true
+          "allowTopLevelDefinition": true
         },
         "typeAlias": {
           "value": "Ricin"
@@ -20387,10 +20371,9 @@
                 "parent": "",
                 "genericTypes": []
               },
-              "xmlHints": {
+              "typeXmlHints": {
                 "allowInlineDefinition": true,
-                "allowTopLevelDefinition": true,
-                "allowReferences": true
+                "allowTopLevelDefinition": true
               },
               "typeAlias": {
                 "value": "door"
