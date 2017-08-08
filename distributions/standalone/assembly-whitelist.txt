@@ -147,7 +147,7 @@
 /mule-standalone-${productVersion}/lib/mule/mule-module-http-policy-api-1.0.0-BETA.5.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-service-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-container-${productVersion}.jar
-/mule-standalone-${productVersion}/lib/mule/mule-module-policy-api-1.0.0-BETA.5.jar
+/mule-standalone-${productVersion}/lib/mule/mule-module-policy-api-1.0.0-FD.2.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-repository-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-spring-config-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-spring-security-${productVersion}.jar
