@@ -17,6 +17,7 @@ import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeO
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.TRANSPORT_HEADERS_PARAM;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.justOrEmpty;
+
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.MuleExpressionLanguage;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -31,21 +32,19 @@ import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.extension.api.soap.SoapAttachment;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionArgumentResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.StreamingHelperArgumentResolver;
 import org.mule.runtime.module.extension.soap.internal.runtime.connection.ForwardingSoapClient;
 import org.mule.runtime.soap.api.client.SoapClient;
 import org.mule.runtime.soap.api.message.SoapRequest;
 import org.mule.runtime.soap.api.message.SoapRequestBuilder;
 import org.mule.runtime.soap.api.message.SoapResponse;
 import org.mule.runtime.soap.internal.exception.error.SoapExceptionEnricher;
-
+import org.reactivestreams.Publisher;
+import javax.inject.Inject;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-
-import javax.inject.Inject;
-
-import org.reactivestreams.Publisher;
 
 /**
  * {@link OperationExecutor} implementation that executes SOAP operations using a provided {@link SoapClient}.
@@ -61,6 +60,7 @@ public final class SoapOperationExecutor implements OperationExecutor {
   private DefaultTransformationService transformationService;
 
   private final ConnectionArgumentResolver connectionResolver = new ConnectionArgumentResolver();
+  private final StreamingHelperArgumentResolver streamingHelperArgumentResolver = new StreamingHelperArgumentResolver();
   private final SoapExceptionEnricher soapExceptionEnricher = new SoapExceptionEnricher();
 
   /**
@@ -74,7 +74,7 @@ public final class SoapOperationExecutor implements OperationExecutor {
       Map<String, String> customHeaders = connection.getCustomHeaders(serviceId, getOperation(context));
       SoapRequest request = getRequest(context, customHeaders);
       SoapResponse response = connection.getSoapClient(serviceId).consume(request);
-      return justOrEmpty(response.getAsResult());
+      return justOrEmpty(response.getAsResult(streamingHelperArgumentResolver.resolve(context)));
     } catch (MessageTransformerException | TransformerException | MessagingException e) {
       return error(e);
     } catch (Exception e) {

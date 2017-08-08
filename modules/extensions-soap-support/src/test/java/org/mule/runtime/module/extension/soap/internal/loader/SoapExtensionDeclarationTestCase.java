@@ -34,7 +34,6 @@ import static org.mule.test.soap.extension.CalcioServiceProvider.CALCIO_ID;
 import org.mule.metadata.api.model.BinaryType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
-import org.mule.metadata.api.model.UnionType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
@@ -98,7 +97,8 @@ public class SoapExtensionDeclarationTestCase extends AbstractSoapExtensionDecla
   }
 
   private void assertOperation(OperationModel operation) {
-    assertThat(operation.getOutput().getType(), is(instanceOf(UnionType.class)));
+    assertThat(operation.getOutput().getType(), is(instanceOf(ObjectType.class)));
+    assertThat(operation.getOutputAttributes().getType(), is(instanceOf(ObjectType.class)));
     assertErrorModels(operation.getErrorModels());
     assertThat(operation.getName(), is(OPERATION_NAME));
     assertThat(operation.getDescription(), is(OPERATION_DESCRIPTION));

@@ -1,99 +1,19 @@
 {
-  "name": "RAM",
-  "description": "",
+  "name": "soap",
+  "description": "Soap Connect Test Extension",
   "version": "4.0.0-SNAPSHOT",
   "vendor": "Mulesoft",
   "category": "COMMUNITY",
   "minMuleVersion": "4.0.0",
   "xmlDsl": {
-    "prefix": "ram",
-    "namespace": "http://www.mulesoft.org/schema/mule/ram",
-    "schemaLocation": "http://www.mulesoft.org/schema/mule/ram/current/mule-ram.xsd",
+    "prefix": "soap",
+    "namespace": "http://www.mulesoft.org/schema/mule/soap",
+    "schemaLocation": "http://www.mulesoft.org/schema/mule/soap/current/mule-soap.xsd",
     "schemaVersion": "4.0.0-SNAPSHOT",
-    "xsdFileName": "mule-ram.xsd"
+    "xsdFileName": "mule-soap.xsd"
   },
   "resources": [],
-  "subTypes": [
-    {
-      "baseType": {
-        "format": "java",
-        "type": "Object",
-        "annotations": {
-          "typeId": "org.mule.runtime.extension.api.soap.MessageDispatcherProvider",
-          "classInformation": {
-            "hasDefaultConstructor": false,
-            "isInterface": true,
-            "isInstantiable": false,
-            "isAbstract": true,
-            "isFinal": false,
-            "implementedInterfaces": [
-              "org.mule.runtime.api.connection.ConnectionProvider"
-            ],
-            "parent": "",
-            "genericTypes": []
-          },
-          "typeAlias": {
-            "value": "MessageDispatcherProvider"
-          }
-        },
-        "fields": []
-      },
-      "subTypes": [
-        {
-          "format": "java",
-          "type": "@ref:org.mule.test.ram.MiniverseDispatcherProvider"
-        },
-        {
-          "format": "java",
-          "type": "@ref:org.mule.test.ram.DefaultPortalGunDispatcherProvider"
-        },
-        {
-          "format": "java",
-          "type": "Object",
-          "annotations": {
-            "typeId": "org.mule.runtime.module.extension.soap.api.runtime.connection.transport.DefaultHttpMessageDispatcherProvider",
-            "classInformation": {
-              "hasDefaultConstructor": true,
-              "isInterface": false,
-              "isInstantiable": true,
-              "isAbstract": false,
-              "isFinal": false,
-              "implementedInterfaces": [
-                "org.mule.runtime.extension.api.soap.HttpMessageDispatcherProvider",
-                "org.mule.runtime.api.lifecycle.Lifecycle"
-              ],
-              "parent": "",
-              "genericTypes": []
-            },
-            "typeAlias": {
-              "value": "DefaultHttpMessageDispatcherProvider"
-            }
-          },
-          "fields": [
-            {
-              "key": {
-                "name": "requesterConfig"
-              },
-              "model": {
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
-              },
-              "annotations": {
-                "parameterPurpose": {
-                  "role": "BEHAVIOUR"
-                },
-                "expressionSupport": {
-                  "value": "SUPPORTED"
-                }
-              }
-            }
-          ]
-        }
-      ]
-    }
-  ],
+  "subTypes": [],
   "privilegedPackages": [],
   "privilegedArtifacts": [],
   "externalLibraries": [],
@@ -116,15 +36,27 @@
               }
             },
             {
+              "type": "BAD_RESPONSE",
+              "namespace": "SOAP",
+              "parent": {
+                "type": "ANY",
+                "namespace": "SOAP",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            },
+            {
               "type": "ANY",
               "namespace": "MULE"
             },
             {
-              "type": "TIMEOUT",
-              "namespace": "RAM",
+              "type": "RETRY_EXHAUSTED",
+              "namespace": "SOAP",
               "parent": {
-                "type": "ANY",
-                "namespace": "RAM",
+                "type": "RETRY_EXHAUSTED",
+                "namespace": "MULE",
                 "parent": {
                   "type": "ANY",
                   "namespace": "MULE"
@@ -132,31 +64,11 @@
               }
             },
             {
-              "type": "SOAP_FAULT",
-              "namespace": "RAM",
+              "type": "CONNECTIVITY",
+              "namespace": "SOAP",
               "parent": {
-                "type": "ANY",
-                "namespace": "RAM",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "ANY",
-              "namespace": "RAM",
-              "parent": {
-                "type": "ANY",
-                "namespace": "MULE"
-              }
-            },
-            {
-              "type": "CANNOT_DISPATCH",
-              "namespace": "RAM",
-              "parent": {
-                "type": "ANY",
-                "namespace": "RAM",
+                "type": "CONNECTIVITY",
+                "namespace": "MULE",
                 "parent": {
                   "type": "ANY",
                   "namespace": "MULE"
@@ -165,10 +77,10 @@
             },
             {
               "type": "BAD_REQUEST",
-              "namespace": "RAM",
+              "namespace": "SOAP",
               "parent": {
                 "type": "ANY",
-                "namespace": "RAM",
+                "namespace": "SOAP",
                 "parent": {
                   "type": "ANY",
                   "namespace": "MULE"
@@ -176,11 +88,11 @@
               }
             },
             {
-              "type": "RETRY_EXHAUSTED",
-              "namespace": "RAM",
+              "type": "CANNOT_DISPATCH",
+              "namespace": "SOAP",
               "parent": {
-                "type": "RETRY_EXHAUSTED",
-                "namespace": "MULE",
+                "type": "ANY",
+                "namespace": "SOAP",
                 "parent": {
                   "type": "ANY",
                   "namespace": "MULE"
@@ -196,23 +108,11 @@
               }
             },
             {
-              "type": "BAD_RESPONSE",
-              "namespace": "RAM",
+              "type": "ENCODING",
+              "namespace": "SOAP",
               "parent": {
                 "type": "ANY",
-                "namespace": "RAM",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "CONNECTIVITY",
-              "namespace": "RAM",
-              "parent": {
-                "type": "CONNECTIVITY",
-                "namespace": "MULE",
+                "namespace": "SOAP",
                 "parent": {
                   "type": "ANY",
                   "namespace": "MULE"
@@ -221,10 +121,10 @@
             },
             {
               "type": "INVALID_WSDL",
-              "namespace": "RAM",
+              "namespace": "SOAP",
               "parent": {
                 "type": "ANY",
-                "namespace": "RAM",
+                "namespace": "SOAP",
                 "parent": {
                   "type": "ANY",
                   "namespace": "MULE"
@@ -232,11 +132,31 @@
               }
             },
             {
-              "type": "ENCODING",
-              "namespace": "RAM",
+              "type": "SOAP_FAULT",
+              "namespace": "SOAP",
               "parent": {
                 "type": "ANY",
-                "namespace": "RAM",
+                "namespace": "SOAP",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            },
+            {
+              "type": "ANY",
+              "namespace": "SOAP",
+              "parent": {
+                "type": "ANY",
+                "namespace": "MULE"
+              }
+            },
+            {
+              "type": "TIMEOUT",
+              "namespace": "SOAP",
+              "parent": {
+                "type": "ANY",
+                "namespace": "SOAP",
                 "parent": {
                   "type": "ANY",
                   "namespace": "MULE"
@@ -419,17 +339,7 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": false,
-          "stereotypes": [
-            {
-              "type": "PROCESSOR",
-              "namespace": "MULE",
-              "parent": {
-                "type": "ANY",
-                "namespace": "MULE"
-              }
-            }
-          ],
-          "nestedComponents": [],
+          "stereotypes": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -709,46 +619,6 @@
                   },
                   "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "String",
-                    "annotations": {
-                      "typeId": "org.mule.runtime.api.meta.TargetType",
-                      "enum": {
-                        "type": "[Ljava.lang.String;",
-                        "values": [
-                          "PAYLOAD",
-                          "MESSAGE"
-                        ]
-                      }
-                    }
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "defaultValue": "PAYLOAD",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": true,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "tabName": "Advanced"
-                  },
-                  "elementReferences": [],
-                  "name": "targetType",
-                  "displayModel": {
-                    "displayName": "Target Output"
-                  },
-                  "description": "The type of the operation\u0027s output that will be stored in the target variable",
-                  "modelProperties": {}
                 }
               ],
               "exclusiveParametersModels": [],
@@ -834,6 +704,36 @@
                     }
                   },
                   "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "SUPPORTED",
+                  "defaultValue": "http://some-url.com",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 1
+                  },
+                  "elementReferences": [],
+                  "name": "leaguesAddress",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  "hasDynamicType": false,
                   "required": true,
                   "isConfigOverride": false,
                   "expressionSupport": "SUPPORTED",
@@ -850,65 +750,7 @@
                     "order": 2
                   },
                   "elementReferences": [],
-                  "name": "wsdlUrl",
-                  "description": "",
-                  "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "String",
-                    "annotations": {
-                      "typeId": "java.lang.String"
-                    }
-                  },
-                  "hasDynamicType": false,
-                  "required": true,
-                  "isConfigOverride": false,
-                  "expressionSupport": "SUPPORTED",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": true,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "order": 3
-                  },
-                  "elementReferences": [],
-                  "name": "service",
-                  "description": "",
-                  "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "String",
-                    "annotations": {
-                      "typeId": "java.lang.String"
-                    }
-                  },
-                  "hasDynamicType": false,
-                  "required": true,
-                  "isConfigOverride": false,
-                  "expressionSupport": "SUPPORTED",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": true,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "order": 4
-                  },
-                  "elementReferences": [],
-                  "name": "port",
+                  "name": "laLigaAddress",
                   "description": "",
                   "modelProperties": {}
                 }
@@ -916,64 +758,6 @@
               "exclusiveParametersModels": [],
               "showInDsl": false,
               "name": "General",
-              "description": "",
-              "modelProperties": {}
-            },
-            {
-              "parameters": [
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "Object",
-                    "annotations": {
-                      "typeId": "org.mule.runtime.extension.api.soap.MessageDispatcherProvider",
-                      "classInformation": {
-                        "hasDefaultConstructor": false,
-                        "isInterface": true,
-                        "isInstantiable": false,
-                        "isAbstract": true,
-                        "isFinal": false,
-                        "implementedInterfaces": [
-                          "org.mule.runtime.api.connection.ConnectionProvider"
-                        ],
-                        "parent": "",
-                        "genericTypes": []
-                      },
-                      "typeAlias": {
-                        "value": "MessageDispatcherProvider"
-                      }
-                    },
-                    "fields": []
-                  },
-                  "hasDynamicType": false,
-                  "required": true,
-                  "isConfigOverride": false,
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": true,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "order": 1,
-                    "tabName": "Transport"
-                  },
-                  "elementReferences": [],
-                  "name": "transport",
-                  "displayModel": {
-                    "displayName": "Transport Configuration"
-                  },
-                  "description": "",
-                  "modelProperties": {}
-                }
-              ],
-              "exclusiveParametersModels": [],
-              "showInDsl": false,
-              "name": "Transport Configuration",
               "description": "",
               "modelProperties": {}
             },
@@ -1360,12 +1144,891 @@
               "modelProperties": {}
             }
           ],
-          "name": "rick-and-morty-connection",
+          "name": "base-connection",
+          "description": "",
+          "modelProperties": {}
+        },
+        {
+          "connectionManagementType": "POOLING",
+          "externalLibraryModels": [],
+          "parameterGroupModels": [
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Union",
+                    "annotations": {
+                      "typeId": "java.lang.Object",
+                      "typeAlias": {
+                        "value": "ReconnectionStrategy"
+                      }
+                    },
+                    "of": [
+                      {
+                        "type": "Object",
+                        "annotations": {
+                          "typeId": "java.lang.Object",
+                          "typeAlias": {
+                            "value": "reconnect"
+                          }
+                        },
+                        "fields": [
+                          {
+                            "key": {
+                              "name": "frequency"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "typeId": "java.lang.Long",
+                                "default": "2000"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "count"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "typeId": "java.lang.Integer",
+                                "default": "2"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "How many reconnection attempts to make"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "typeId": "java.lang.Boolean",
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Object",
+                        "annotations": {
+                          "typeId": "java.lang.Object",
+                          "typeAlias": {
+                            "value": "reconnect-forever"
+                          }
+                        },
+                        "fields": [
+                          {
+                            "key": {
+                              "name": "frequency"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "typeId": "java.lang.Long",
+                                "default": "2000"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "tabName": "Advanced"
+                  },
+                  "elementReferences": [],
+                  "name": "reconnectionStrategy",
+                  "description": "A retry strategy in case of connectivity errors",
+                  "modelProperties": {
+                    "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                      "value": {
+                        "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
+                        "localPart": "abstract-reconnection-strategy",
+                        "prefix": "mule"
+                      }
+                    },
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 3
+                    }
+                  }
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Boolean",
+                    "annotations": {
+                      "typeId": "boolean"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "tabName": "Advanced"
+                  },
+                  "elementReferences": [],
+                  "name": "disableValidation",
+                  "description": "Disables connection validation",
+                  "modelProperties": {
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 4
+                    }
+                  }
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Object",
+                    "annotations": {
+                      "typeId": "org.mule.runtime.api.config.PoolingProfile",
+                      "description": {
+                        "value": "A pooling profile is used to configure the pooling behaviour of Mule components. Each component can have its own pooling profile."
+                      }
+                    },
+                    "fields": [
+                      {
+                        "key": {
+                          "name": "maxActive"
+                        },
+                        "model": {
+                          "type": "Number",
+                          "annotations": {
+                            "int": {},
+                            "typeId": "java.lang.Integer",
+                            "default": "5"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "Controls the maximum number of Mule components that can be borrowed from a session at one time. When set to a negative value, there is no limit to the number of components that may be active at one time. When maxActive is exceeded, the pool is said to be exhausted."
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "maxIdle"
+                        },
+                        "model": {
+                          "type": "Number",
+                          "annotations": {
+                            "int": {},
+                            "typeId": "java.lang.Integer",
+                            "default": "5"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "Controls the maximum number of Mule components that can sit idle in the pool at any time. When set to a negative value, there is no limit to the number of Mule components that may be idle at one time."
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "maxWait"
+                        },
+                        "model": {
+                          "type": "Number",
+                          "annotations": {
+                            "int": {},
+                            "typeId": "java.lang.Long",
+                            "default": "4000"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "Specifies the number of milliseconds to wait for a pooled component to become available when the pool is exhausted and the exhaustedAction is set to WHEN_EXHAUSTED_WAIT."
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "minEvictionMillis"
+                        },
+                        "model": {
+                          "type": "Number",
+                          "annotations": {
+                            "int": {},
+                            "typeId": "java.lang.Integer",
+                            "default": "1800000"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "Determines the minimum amount of time an object may sit idle in the pool before it is eligible for eviction. When non-positive, no objects will be evicted from the pool due to idle time alone."
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "evictionCheckIntervalMillis"
+                        },
+                        "model": {
+                          "type": "Number",
+                          "annotations": {
+                            "int": {},
+                            "typeId": "java.lang.Integer",
+                            "default": "-1"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "Specifies the number of milliseconds between runs of the object evictor. When non-positive, no object evictor is executed."
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "exhaustedAction"
+                        },
+                        "model": {
+                          "type": "String",
+                          "annotations": {
+                            "typeId": "java.lang.String",
+                            "enum": {
+                              "type": "[Ljava.lang.String;",
+                              "values": [
+                                "WHEN_EXHAUSTED_GROW",
+                                "WHEN_EXHAUSTED_WAIT",
+                                "WHEN_EXHAUSTED_FAIL"
+                              ]
+                            },
+                            "default": "WHEN_EXHAUSTED_GROW"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "Specifies the behavior of the Mule component pool when the pool is exhausted. Possible values are: \"WHEN_EXHAUSTED_FAIL\", which will throw a NoSuchElementException, \"WHEN_EXHAUSTED_WAIT\", which will block by invoking Object.wait(long) until a new or idle object is available, or WHEN_EXHAUSTED_GROW, which will create a new Mule instance and return it, essentially making maxActive meaningless. If a positive maxWait value is supplied, it will block for at most that many milliseconds, after which a NoSuchElementException will be thrown. If maxThreadWait is a negative value, it will block indefinitely."
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "initialisationPolicy"
+                        },
+                        "model": {
+                          "type": "String",
+                          "annotations": {
+                            "typeId": "java.lang.String",
+                            "enum": {
+                              "type": "[Ljava.lang.String;",
+                              "values": [
+                                "INITIALISE_NONE",
+                                "INITIALISE_ONE",
+                                "INITIALISE_ALL"
+                              ]
+                            },
+                            "default": "INITIALISE_ONE"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "Determines how components in a pool should be initialized. The possible values are: INITIALISE_NONE (will not load any components into the pool on startup), INITIALISE_ONE (will load one initial component into the pool on startup), or INITIALISE_ALL (will load all components in the pool on startup)"
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "disabled"
+                        },
+                        "model": {
+                          "type": "Boolean",
+                          "annotations": {
+                            "typeId": "java.lang.Boolean",
+                            "default": "false"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "Whether pooling should be disabled"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "tabName": "Advanced"
+                  },
+                  "elementReferences": [],
+                  "name": "poolingProfile",
+                  "description": "Characteristics of the connection pool",
+                  "modelProperties": {
+                    "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                      "value": {
+                        "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
+                        "localPart": "pooling-profile",
+                        "prefix": "mule"
+                      }
+                    },
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 5
+                    }
+                  }
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "showInDsl": false,
+              "name": "Connection",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "name": "higuain-gp-connection",
+          "description": "This a nice description about the league where higuain is a star *",
+          "modelProperties": {}
+        },
+        {
+          "connectionManagementType": "POOLING",
+          "externalLibraryModels": [],
+          "parameterGroupModels": [
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 1
+                  },
+                  "elementReferences": [],
+                  "name": "firstDivision",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 2
+                  },
+                  "elementReferences": [],
+                  "name": "secondDivision",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 3
+                  },
+                  "elementReferences": [],
+                  "name": "wsdlLocation",
+                  "description": "",
+                  "modelProperties": {}
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "showInDsl": false,
+              "name": "General",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Union",
+                    "annotations": {
+                      "typeId": "java.lang.Object",
+                      "typeAlias": {
+                        "value": "ReconnectionStrategy"
+                      }
+                    },
+                    "of": [
+                      {
+                        "type": "Object",
+                        "annotations": {
+                          "typeId": "java.lang.Object",
+                          "typeAlias": {
+                            "value": "reconnect"
+                          }
+                        },
+                        "fields": [
+                          {
+                            "key": {
+                              "name": "frequency"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "typeId": "java.lang.Long",
+                                "default": "2000"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "count"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "typeId": "java.lang.Integer",
+                                "default": "2"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "How many reconnection attempts to make"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "typeId": "java.lang.Boolean",
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Object",
+                        "annotations": {
+                          "typeId": "java.lang.Object",
+                          "typeAlias": {
+                            "value": "reconnect-forever"
+                          }
+                        },
+                        "fields": [
+                          {
+                            "key": {
+                              "name": "frequency"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "typeId": "java.lang.Long",
+                                "default": "2000"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "tabName": "Advanced"
+                  },
+                  "elementReferences": [],
+                  "name": "reconnectionStrategy",
+                  "description": "A retry strategy in case of connectivity errors",
+                  "modelProperties": {
+                    "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                      "value": {
+                        "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
+                        "localPart": "abstract-reconnection-strategy",
+                        "prefix": "mule"
+                      }
+                    },
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 3
+                    }
+                  }
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Boolean",
+                    "annotations": {
+                      "typeId": "boolean"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "tabName": "Advanced"
+                  },
+                  "elementReferences": [],
+                  "name": "disableValidation",
+                  "description": "Disables connection validation",
+                  "modelProperties": {
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 4
+                    }
+                  }
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Object",
+                    "annotations": {
+                      "typeId": "org.mule.runtime.api.config.PoolingProfile",
+                      "description": {
+                        "value": "A pooling profile is used to configure the pooling behaviour of Mule components. Each component can have its own pooling profile."
+                      }
+                    },
+                    "fields": [
+                      {
+                        "key": {
+                          "name": "maxActive"
+                        },
+                        "model": {
+                          "type": "Number",
+                          "annotations": {
+                            "int": {},
+                            "typeId": "java.lang.Integer",
+                            "default": "5"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "Controls the maximum number of Mule components that can be borrowed from a session at one time. When set to a negative value, there is no limit to the number of components that may be active at one time. When maxActive is exceeded, the pool is said to be exhausted."
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "maxIdle"
+                        },
+                        "model": {
+                          "type": "Number",
+                          "annotations": {
+                            "int": {},
+                            "typeId": "java.lang.Integer",
+                            "default": "5"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "Controls the maximum number of Mule components that can sit idle in the pool at any time. When set to a negative value, there is no limit to the number of Mule components that may be idle at one time."
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "maxWait"
+                        },
+                        "model": {
+                          "type": "Number",
+                          "annotations": {
+                            "int": {},
+                            "typeId": "java.lang.Long",
+                            "default": "4000"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "Specifies the number of milliseconds to wait for a pooled component to become available when the pool is exhausted and the exhaustedAction is set to WHEN_EXHAUSTED_WAIT."
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "minEvictionMillis"
+                        },
+                        "model": {
+                          "type": "Number",
+                          "annotations": {
+                            "int": {},
+                            "typeId": "java.lang.Integer",
+                            "default": "1800000"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "Determines the minimum amount of time an object may sit idle in the pool before it is eligible for eviction. When non-positive, no objects will be evicted from the pool due to idle time alone."
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "evictionCheckIntervalMillis"
+                        },
+                        "model": {
+                          "type": "Number",
+                          "annotations": {
+                            "int": {},
+                            "typeId": "java.lang.Integer",
+                            "default": "-1"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "Specifies the number of milliseconds between runs of the object evictor. When non-positive, no object evictor is executed."
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "exhaustedAction"
+                        },
+                        "model": {
+                          "type": "String",
+                          "annotations": {
+                            "typeId": "java.lang.String",
+                            "enum": {
+                              "type": "[Ljava.lang.String;",
+                              "values": [
+                                "WHEN_EXHAUSTED_GROW",
+                                "WHEN_EXHAUSTED_WAIT",
+                                "WHEN_EXHAUSTED_FAIL"
+                              ]
+                            },
+                            "default": "WHEN_EXHAUSTED_GROW"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "Specifies the behavior of the Mule component pool when the pool is exhausted. Possible values are: \"WHEN_EXHAUSTED_FAIL\", which will throw a NoSuchElementException, \"WHEN_EXHAUSTED_WAIT\", which will block by invoking Object.wait(long) until a new or idle object is available, or WHEN_EXHAUSTED_GROW, which will create a new Mule instance and return it, essentially making maxActive meaningless. If a positive maxWait value is supplied, it will block for at most that many milliseconds, after which a NoSuchElementException will be thrown. If maxThreadWait is a negative value, it will block indefinitely."
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "initialisationPolicy"
+                        },
+                        "model": {
+                          "type": "String",
+                          "annotations": {
+                            "typeId": "java.lang.String",
+                            "enum": {
+                              "type": "[Ljava.lang.String;",
+                              "values": [
+                                "INITIALISE_NONE",
+                                "INITIALISE_ONE",
+                                "INITIALISE_ALL"
+                              ]
+                            },
+                            "default": "INITIALISE_ONE"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "Determines how components in a pool should be initialized. The possible values are: INITIALISE_NONE (will not load any components into the pool on startup), INITIALISE_ONE (will load one initial component into the pool on startup), or INITIALISE_ALL (will load all components in the pool on startup)"
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "disabled"
+                        },
+                        "model": {
+                          "type": "Boolean",
+                          "annotations": {
+                            "typeId": "java.lang.Boolean",
+                            "default": "false"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "Whether pooling should be disabled"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "tabName": "Advanced"
+                  },
+                  "elementReferences": [],
+                  "name": "poolingProfile",
+                  "description": "Characteristics of the connection pool",
+                  "modelProperties": {
+                    "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                      "value": {
+                        "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
+                        "localPart": "pooling-profile",
+                        "prefix": "mule"
+                      }
+                    },
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 5
+                    }
+                  }
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "showInDsl": false,
+              "name": "Connection",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "name": "la-liga-connection",
           "description": "",
           "modelProperties": {}
         }
       ],
       "messageSources": [],
+      "functions": [],
       "name": "config",
       "description": "Default configuration",
       "modelProperties": {}
@@ -1373,7 +2036,6 @@
   ],
   "operations": [],
   "functions": [],
-  "constructs": [],
   "connectionProviders": [],
   "messageSources": [],
   "errors": [
@@ -1386,15 +2048,27 @@
       }
     },
     {
+      "type": "BAD_RESPONSE",
+      "namespace": "SOAP",
+      "parent": {
+        "type": "ANY",
+        "namespace": "SOAP",
+        "parent": {
+          "type": "ANY",
+          "namespace": "MULE"
+        }
+      }
+    },
+    {
       "type": "ANY",
       "namespace": "MULE"
     },
     {
-      "type": "TIMEOUT",
-      "namespace": "RAM",
+      "type": "RETRY_EXHAUSTED",
+      "namespace": "SOAP",
       "parent": {
-        "type": "ANY",
-        "namespace": "RAM",
+        "type": "RETRY_EXHAUSTED",
+        "namespace": "MULE",
         "parent": {
           "type": "ANY",
           "namespace": "MULE"
@@ -1402,31 +2076,11 @@
       }
     },
     {
-      "type": "SOAP_FAULT",
-      "namespace": "RAM",
+      "type": "CONNECTIVITY",
+      "namespace": "SOAP",
       "parent": {
-        "type": "ANY",
-        "namespace": "RAM",
-        "parent": {
-          "type": "ANY",
-          "namespace": "MULE"
-        }
-      }
-    },
-    {
-      "type": "ANY",
-      "namespace": "RAM",
-      "parent": {
-        "type": "ANY",
-        "namespace": "MULE"
-      }
-    },
-    {
-      "type": "CANNOT_DISPATCH",
-      "namespace": "RAM",
-      "parent": {
-        "type": "ANY",
-        "namespace": "RAM",
+        "type": "CONNECTIVITY",
+        "namespace": "MULE",
         "parent": {
           "type": "ANY",
           "namespace": "MULE"
@@ -1435,10 +2089,10 @@
     },
     {
       "type": "BAD_REQUEST",
-      "namespace": "RAM",
+      "namespace": "SOAP",
       "parent": {
         "type": "ANY",
-        "namespace": "RAM",
+        "namespace": "SOAP",
         "parent": {
           "type": "ANY",
           "namespace": "MULE"
@@ -1446,11 +2100,11 @@
       }
     },
     {
-      "type": "RETRY_EXHAUSTED",
-      "namespace": "RAM",
+      "type": "CANNOT_DISPATCH",
+      "namespace": "SOAP",
       "parent": {
-        "type": "RETRY_EXHAUSTED",
-        "namespace": "MULE",
+        "type": "ANY",
+        "namespace": "SOAP",
         "parent": {
           "type": "ANY",
           "namespace": "MULE"
@@ -1466,23 +2120,11 @@
       }
     },
     {
-      "type": "BAD_RESPONSE",
-      "namespace": "RAM",
+      "type": "ENCODING",
+      "namespace": "SOAP",
       "parent": {
         "type": "ANY",
-        "namespace": "RAM",
-        "parent": {
-          "type": "ANY",
-          "namespace": "MULE"
-        }
-      }
-    },
-    {
-      "type": "CONNECTIVITY",
-      "namespace": "RAM",
-      "parent": {
-        "type": "CONNECTIVITY",
-        "namespace": "MULE",
+        "namespace": "SOAP",
         "parent": {
           "type": "ANY",
           "namespace": "MULE"
@@ -1491,10 +2133,10 @@
     },
     {
       "type": "INVALID_WSDL",
-      "namespace": "RAM",
+      "namespace": "SOAP",
       "parent": {
         "type": "ANY",
-        "namespace": "RAM",
+        "namespace": "SOAP",
         "parent": {
           "type": "ANY",
           "namespace": "MULE"
@@ -1502,11 +2144,31 @@
       }
     },
     {
-      "type": "ENCODING",
-      "namespace": "RAM",
+      "type": "SOAP_FAULT",
+      "namespace": "SOAP",
       "parent": {
         "type": "ANY",
-        "namespace": "RAM",
+        "namespace": "SOAP",
+        "parent": {
+          "type": "ANY",
+          "namespace": "MULE"
+        }
+      }
+    },
+    {
+      "type": "ANY",
+      "namespace": "SOAP",
+      "parent": {
+        "type": "ANY",
+        "namespace": "MULE"
+      }
+    },
+    {
+      "type": "TIMEOUT",
+      "namespace": "SOAP",
+      "parent": {
+        "type": "ANY",
+        "namespace": "SOAP",
         "parent": {
           "type": "ANY",
           "namespace": "MULE"
@@ -1515,69 +2177,5 @@
     }
   ],
   "modelProperties": {},
-  "types": [
-    {
-      "format": "java",
-      "type": "Object",
-      "annotations": {
-        "typeId": "org.mule.test.ram.DefaultPortalGunDispatcherProvider",
-        "classInformation": {
-          "hasDefaultConstructor": true,
-          "isInterface": false,
-          "isInstantiable": true,
-          "isAbstract": false,
-          "isFinal": false,
-          "implementedInterfaces": [],
-          "parent": "org.mule.test.ram.AbstractScienceTransportProvider",
-          "genericTypes": []
-        },
-        "typeAlias": {
-          "value": "DefaultPortalGunDispatcherProvider"
-        }
-      },
-      "fields": [
-        {
-          "key": {
-            "name": "responseMessage",
-            "required": "true"
-          },
-          "model": {
-            "type": "String",
-            "annotations": {
-              "typeId": "java.lang.String"
-            }
-          },
-          "annotations": {
-            "parameterPurpose": {
-              "role": "BEHAVIOUR"
-            },
-            "expressionSupport": {
-              "value": "SUPPORTED"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "format": "java",
-      "type": "Object",
-      "annotations": {
-        "typeId": "org.mule.test.ram.MiniverseDispatcherProvider",
-        "classInformation": {
-          "hasDefaultConstructor": true,
-          "isInterface": false,
-          "isInstantiable": true,
-          "isAbstract": false,
-          "isFinal": false,
-          "implementedInterfaces": [],
-          "parent": "org.mule.test.ram.AbstractScienceTransportProvider",
-          "genericTypes": []
-        },
-        "typeAlias": {
-          "value": "MiniverseDispatcherProvider"
-        }
-      },
-      "fields": []
-    }
-  ]
+  "types": []
 }
