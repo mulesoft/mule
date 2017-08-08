@@ -4,7 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.loader.java;
+package org.mule.runtime.module.extension.api.loader.java;
+
+import org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader;
+import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaModelLoaderDelegate;
 
 /**
  * Loads an extension by introspecting a class which uses the Extensions API annotations

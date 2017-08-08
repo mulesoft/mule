@@ -14,8 +14,8 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
 import static org.mule.runtime.core.api.util.collection.Collectors.toImmutableMap;
+import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -55,7 +55,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValu
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionFactory;
-import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 
 import java.util.Map;
 import java.util.Optional;
@@ -394,7 +393,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
   @Override
   public Map<String, Object> getInitialisationParameters() {
-    final ValueResolvingContext ctx = from(MuleExtensionUtils.getInitialiserEvent());
+    final ValueResolvingContext ctx = from(getInitialiserEvent());
     Map<String, ValueResolver<?>> resolvers = sourceAdapterFactory.getSourceParameters().getResolvers();
     return resolvers.entrySet().stream()
         .collect(toImmutableMap(entry -> entry.getKey(), entry -> {
