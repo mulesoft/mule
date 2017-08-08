@@ -4,8 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.spring.util;
 
+package org.mule.runtime.config.spring.internal.util;
+
+import static java.util.Collections.emptySet;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.config.spring.api.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
@@ -18,10 +20,21 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 
-import static java.util.Collections.emptySet;
+/**
+ * Utility class for registering {@link ComponentBuildingDefinition}.
+ */
+public final class ComponentBuildingDefinitionUtils {
 
-public class ComponentBuildingDefinitionUtils {
-
+  /**
+   * Registers the {@link ComponentBuildingDefinition} by searching in {@link ServiceRegistry} for {@link ComponentBuildingDefinitionProvider providers}.
+   * {@link ExtensionBuildingDefinitionProvider} is handled in particular to set it with the {@link List} of {@link ExtensionModel extensionModels}.
+   *
+   * @param serviceRegistry {@link ServiceRegistry} for look up operation.
+   * @param classLoader {@link ClassLoader} to look up for providers.
+   * @param componentBuildingDefinitionRegistry {@link ComponentBuildingDefinitionRegistry} to register the {@link ComponentBuildingDefinition}.
+   * @param extensionModels list of {@link ExtensionModel} to be added in case if there is a {@link ExtensionBuildingDefinitionProvider} in the list of providers discovered.
+   * @param providerListFunction {@link Function} to get the list of {@link ComponentBuildingDefinition} for extensions allowing them to be cached them and reused.
+   */
   public static void registerComponentBuildingDefinitions(ServiceRegistry serviceRegistry, ClassLoader classLoader,
                                                           ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry,
                                                           Optional<Set<ExtensionModel>> extensionModels,
