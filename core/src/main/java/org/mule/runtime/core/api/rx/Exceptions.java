@@ -7,16 +7,12 @@
 package org.mule.runtime.core.api.rx;
 
 import static java.util.Collections.singletonList;
-import static org.mule.runtime.core.api.util.ExceptionUtils.getRootCauseException;
-import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.isBubbling;
 import static reactor.core.Exceptions.propagate;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MuleFatalException;
 import org.mule.runtime.core.api.util.func.CheckedBiConsumer;
 import org.mule.runtime.core.api.util.func.CheckedBiFunction;
@@ -25,7 +21,6 @@ import org.mule.runtime.core.api.util.func.CheckedConsumer;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.core.api.util.func.CheckedPredicate;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -35,14 +30,10 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import org.slf4j.Logger;
-
 /**
  * Utilities for working with checked exceptions with project reactor.
  */
 public class Exceptions {
-
-  private static Logger logger = getLogger(Exceptions.class);
 
   private static final String REACTIVE_EXCEPTION_CLASS_NAME = "reactor.core.Exceptions$ReactiveException";
 
@@ -219,42 +210,6 @@ public class Exceptions {
       return new MuleRuntimeException(unwrap(t));
     } else {
       return t;
-    }
-  }
-
-  /**
-   * Register reactor hooks using the provided class. This needs to use reflection because reactor could be
-   * loaded on different class loaders.
-   *
-   * In reactor 3.1, the error handler will be explicitly defined for each flux instead of globally.
-   */
-  public static void setupErrorHooks(Class clazz) {
-    try {
-      // Ensure reactor operatorError hook is always registered
-      BiFunction<Throwable, Object, Throwable> onOperationErrorFunction = (throwable, signal) -> {
-        // Unwrap all throwables to be consistent with reactor default hook.
-        throwable = unwrap(throwable);
-        // Only apply hook for Event signals.
-        if (signal instanceof Event) {
-          return throwable instanceof MessagingException ? throwable
-              : new MessagingException((Event) signal, getRootCauseException(throwable));
-        } else {
-          return throwable;
-        }
-      };
-      Method onOperatorError = clazz.getMethod("onOperatorError", BiFunction.class);
-      onOperatorError.invoke(null, onOperationErrorFunction);
-
-      // Log dropped events/errors rather than blow up which causes cryptic timeouts and stack traces
-      Method onErrorDropped = clazz.getMethod("onErrorDropped", Consumer.class);
-      Consumer<Object> onErrorDroppedFunction = error -> logger.error("ERROR DROPPED UNEXPECTEDLY " + error);
-      onErrorDropped.invoke(null, onErrorDroppedFunction);
-
-      Method onNextDropped = clazz.getMethod("onNextDropped", Consumer.class);
-      Consumer<Object> onNextDroppedFunction = event -> logger.error("EVENT DROPPED UNEXPECTEDLY " + event);
-      onNextDropped.invoke(null, onNextDroppedFunction);
-    } catch (Exception e) {
-      throw new RuntimeException("Failed to configure reactor hooks", e);
     }
   }
 }

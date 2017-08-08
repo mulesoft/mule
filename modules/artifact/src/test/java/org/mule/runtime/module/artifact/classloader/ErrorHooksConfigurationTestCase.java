@@ -9,7 +9,10 @@ package org.mule.runtime.module.artifact.classloader;
 import static java.lang.Thread.currentThread;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Matchers.any;
 import static org.mule.runtime.module.artifact.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.when;
 
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -19,9 +22,15 @@ import java.io.File;
 import java.net.URL;
 import java.util.Map;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 @SmallTest
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(MuleArtifactClassLoader.class)
 public class ErrorHooksConfigurationTestCase extends AbstractMuleTestCase {
 
   private static String externalSetupText;
@@ -33,39 +42,34 @@ public class ErrorHooksConfigurationTestCase extends AbstractMuleTestCase {
   public static final String TEST_ERROR_HOOKS_CLASS_LOCATION =
       "/org/mule/runtime/module/artifact/classloader/TestErrorHooksConfiguration.class";
 
+  @Before
+  public void setUp() throws Exception {
+    mockStatic(MuleArtifactClassLoader.class);
+    when(MuleArtifactClassLoader.class, "getErrorHooksClassLocation").thenReturn(TEST_ERROR_HOOKS_CLASS_LOCATION);
+    externalSetupText = "notCalled";
+  }
+
   @Test
   public void invokesErrorHooksConfiguration() throws Exception {
-    TestArtifactClassLoader classLoader = new TestArtifactClassLoader() {
-      @Override
-      protected Boolean isReactorLoaded() {
-        return true;
-      }
-    };
+    when(MuleArtifactClassLoader.class, "isReactorLoaded", any(MuleArtifactClassLoader.class)).thenReturn(true);
 
-    externalSetupText = "notCalled";
-    classLoader.setErrorHooksClassLocation(TEST_ERROR_HOOKS_CLASS_LOCATION);
-    classLoader.configureErrorHooks();
+    TestArtifactClassLoader classLoader = new TestArtifactClassLoader();
     assertThat(externalSetupText, is("called"));
   }
 
   @Test
   public void doesNotInvokeErrorHooksConfiguration() throws Exception {
-    TestArtifactClassLoader classLoader = new TestArtifactClassLoader() {
-      @Override
-      protected Boolean isReactorLoaded() {
-        return false;
-      }
-    };
+    when(MuleArtifactClassLoader.class, "isReactorLoaded", any(MuleArtifactClassLoader.class)).thenReturn(false);
 
-    externalSetupText = "notCalled";
-    classLoader.setErrorHooksClassLocation(TEST_ERROR_HOOKS_CLASS_LOCATION);
-    classLoader.configureErrorHooks();
+    TestArtifactClassLoader classLoader = new TestArtifactClassLoader();
     assertThat(externalSetupText, is("notCalled"));
   }
 
   private class TestArtifactClassLoader extends MuleArtifactClassLoader {
+
     TestArtifactClassLoader() throws Exception {
-      super("testId", new ArtifactDescriptor("test"), new URL[] {new File("nonexistent/path").toURI().toURL()}, currentThread().getContextClassLoader(), createLookupPoilicy());
+      super("testId", new ArtifactDescriptor("test"), new URL[] {new File("nonexistent/path").toURI().toURL()},
+            currentThread().getContextClassLoader(), createLookupPoilicy());
     }
   }
 

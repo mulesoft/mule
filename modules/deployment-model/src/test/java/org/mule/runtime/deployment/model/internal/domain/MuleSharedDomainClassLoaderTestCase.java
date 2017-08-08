@@ -10,50 +10,53 @@ import static java.util.Collections.emptyList;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainClassesFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.when;
+
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
+import org.mule.runtime.module.artifact.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.junit4.rule.SystemProperty;
+import org.mule.tck.junit4.rule.SystemPropertyTemporaryFolder;
 import org.mule.tck.size.SmallTest;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.runner.RunWith;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 @SmallTest
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(MuleArtifactClassLoader.class)
+@PowerMockIgnore("javax.management.*")
 public class MuleSharedDomainClassLoaderTestCase extends AbstractMuleTestCase {
 
   public static final String RESOURCE_FILE_NAME = "file.properties";
-  @ClassRule
-  public static TemporaryFolder temporaryFolder = new TemporaryFolder();
+
   @Rule
-  public final SystemProperty muleHomeSystemProperty =
-      new SystemProperty(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY, temporaryFolder.getRoot().getCanonicalPath());
-  private final File muleHomeFolder;
+  public SystemPropertyTemporaryFolder temporaryFolder =
+      new SystemPropertyTemporaryFolder(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY);
   private final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
 
-  public MuleSharedDomainClassLoaderTestCase() throws IOException {
-    muleHomeFolder = temporaryFolder.getRoot();
-  }
-
   @Before
-  public void setUp() throws IOException {
-    temporaryFolder.delete();
-    temporaryFolder.create();
+  public void setUp() throws Exception {
+    mockStatic(MuleArtifactClassLoader.class);
+    when(MuleArtifactClassLoader.class, "isReactorLoaded", any(MuleArtifactClassLoader.class)).thenReturn(false);
   }
 
   @Test
@@ -64,12 +67,7 @@ public class MuleSharedDomainClassLoaderTestCase extends AbstractMuleTestCase {
 
     MuleSharedDomainClassLoader classLoader = new MuleSharedDomainClassLoader(new ArtifactDescriptor(DEFAULT_DOMAIN_NAME),
                                                                               getClass().getClassLoader(), lookupPolicy, urls,
-                                                                              emptyList()) {
-      @Override
-      protected Boolean isReactorLoaded() {
-        return false;
-      }
-    };
+                                                                              emptyList());
 
     assertThat(classLoader.findResource(RESOURCE_FILE_NAME), notNullValue());
   }

@@ -43,7 +43,8 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.runtime.core.api.rx.Exceptions.setupErrorHooks;
+import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
+import static org.mule.runtime.core.api.util.ExceptionUtils.getRootCauseException;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.core.internal.util.JdkVersionUtils.getSupportedJdks;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -65,6 +66,7 @@ import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.DefaultTransformationService;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
@@ -86,6 +88,7 @@ import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.exception.ErrorTypeLocator;
 import org.mule.runtime.core.api.exception.ErrorTypeRepository;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.RollbackSourceCallback;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
@@ -253,7 +256,22 @@ public class DefaultMuleContext implements MuleContext {
   // If this runs inside a Mule classloader it's automatically loaded, but in unit tests that
   // are run outside we need to set it up here.
   static {
-    setupErrorHooks(Hooks.class);
+    // Ensure reactor operatorError hook is always registered.
+    Hooks.onOperatorError((throwable, signal) -> {
+      // Unwrap all throwables to be consistent with reactor default hook.
+      throwable = unwrap(throwable);
+      // Only apply hook for Event signals.
+      if (signal instanceof Event) {
+        return throwable instanceof MessagingException ? throwable
+            : new MessagingException((Event) signal, getRootCauseException(throwable));
+      } else {
+        return throwable;
+      }
+    });
+
+    // Log dropped events/errors rather than blow up which causes cryptic timeouts and stack traces.
+    Hooks.onErrorDropped(error -> logger.error("ERROR DROPPED UNEXPECTEDLY " + error));
+    Hooks.onNextDropped(event -> logger.error("EVENT DROPPED UNEXPECTEDLY " + event));
   }
 
   public DefaultMuleContext() {
