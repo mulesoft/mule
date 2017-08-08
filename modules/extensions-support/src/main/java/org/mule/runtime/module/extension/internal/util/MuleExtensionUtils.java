@@ -103,7 +103,7 @@ public class MuleExtensionUtils {
   public static boolean returnsListOfMessages(HasOutputModel componentModel) {
     MetadataType outputType = componentModel.getOutput().getType();
     return outputType instanceof ArrayType &&
-      Message.class.getName().equals(getTypeId(((ArrayType) outputType).getType()).orElse(null));
+        Message.class.getName().equals(getTypeId(((ArrayType) outputType).getType()).orElse(null));
   }
 
   /**
@@ -143,7 +143,7 @@ public class MuleExtensionUtils {
   public static List<ConnectionProviderModel> getAllConnectionProviders(ExtensionModel extensionModel,
                                                                         ConfigurationModel configurationModel) {
     return ImmutableList.<ConnectionProviderModel>builder().addAll(configurationModel.getConnectionProviders())
-      .addAll(extensionModel.getConnectionProviders()).build();
+        .addAll(extensionModel.getConnectionProviders()).build();
   }
 
   /**
@@ -178,8 +178,8 @@ public class MuleExtensionUtils {
    */
   public static List<Interceptor> createInterceptors(EnrichableModel model) {
     return model.getModelProperty(InterceptorsModelProperty.class)
-      .map(p -> createInterceptors(p.getInterceptorFactories()))
-      .orElse(ImmutableList.of());
+        .map(p -> createInterceptors(p.getInterceptorFactories()))
+        .orElse(ImmutableList.of());
   }
 
   /**
@@ -205,7 +205,7 @@ public class MuleExtensionUtils {
 
   private static InterceptorsModelProperty getOrCreateInterceptorModelProperty(BaseDeclaration declaration) {
     InterceptorsModelProperty property =
-      (InterceptorsModelProperty) declaration.getModelProperty(InterceptorsModelProperty.class).orElse(null);
+        (InterceptorsModelProperty) declaration.getModelProperty(InterceptorsModelProperty.class).orElse(null);
     if (property == null) {
       property = new InterceptorsModelProperty(emptyList());
       declaration.addModelProperty(property);
@@ -235,7 +235,7 @@ public class MuleExtensionUtils {
    */
   public static java.util.Optional<Method> getImplementingMethod(OperationDeclaration operationDeclaration) {
     return operationDeclaration.getModelProperty(ImplementingMethodModelProperty.class)
-      .map(ImplementingMethodModelProperty::getMethod);
+        .map(ImplementingMethodModelProperty::getMethod);
   }
 
   /**
@@ -257,7 +257,7 @@ public class MuleExtensionUtils {
    */
   public static ClassLoader getClassLoader(ExtensionModel extensionModel) {
     return extensionModel.getModelProperty(ClassLoaderModelProperty.class).map(ClassLoaderModelProperty::getClassLoader)
-      .orElse(currentThread().getContextClassLoader());
+        .orElse(currentThread().getContextClassLoader());
   }
 
   /**
@@ -279,10 +279,10 @@ public class MuleExtensionUtils {
 
       if (!configNameField.getDeclaringClass().isInstance(target)) {
         throw new IllegalConfigurationModelDefinitionException(
-          format("field '%s' is annotated with @%s but not defined on an instance of type '%s'",
-                 configNameField.toString(),
-                 RefName.class.getSimpleName(),
-                 target.getClass().getName()));
+                                                               format("field '%s' is annotated with @%s but not defined on an instance of type '%s'",
+                                                                      configNameField.toString(),
+                                                                      RefName.class.getSimpleName(),
+                                                                      target.getClass().getName()));
       }
       new FieldSetter<>(configNameField).set(target, configName);
     });
@@ -295,8 +295,8 @@ public class MuleExtensionUtils {
       return;
     } else if (fields.size() > 1) {
       throw new IllegalModelDefinitionException(format(
-        "Class '%s' has %d fields annotated with @%s. Only one field may carry that annotation",
-        type.getName(), fields.size(), RefName.class));
+                                                       "Class '%s' has %d fields annotated with @%s. Only one field may carry that annotation",
+                                                       type.getName(), fields.size(), RefName.class));
     }
 
     new FieldSetter<>(fields.get(0)).set(target, refName);
@@ -351,10 +351,10 @@ public class MuleExtensionUtils {
                              ConfigurationFactoryModelProperty.class,
                              ConfigurationFactoryModelProperty::getConfigurationFactory,
                              () -> new IllegalConfigurationModelDefinitionException(
-                               format("Configuration '%s' does not provide a %s",
-                                      configurationModel.getName(),
-                                      ConfigurationFactory.class
-                                        .getName())));
+                                                                                    format("Configuration '%s' does not provide a %s",
+                                                                                           configurationModel.getName(),
+                                                                                           ConfigurationFactory.class
+                                                                                               .getName())));
   }
 
   /**
@@ -367,8 +367,8 @@ public class MuleExtensionUtils {
    */
   public static MetadataResolverFactory getMetadataResolverFactory(EnrichableModel model) {
     return model.getModelProperty(MetadataResolverFactoryModelProperty.class)
-      .map(MetadataResolverFactoryModelProperty::getMetadataResolverFactory)
-      .orElse(new NullMetadataResolverFactory());
+        .map(MetadataResolverFactoryModelProperty::getMetadataResolverFactory)
+        .orElse(new NullMetadataResolverFactory());
   }
 
   /**
@@ -382,13 +382,13 @@ public class MuleExtensionUtils {
    */
   public static OperationExecutorFactory getOperationExecutorFactory(OperationModel operationModel) {
     OperationExecutorFactory executorFactory =
-      fromModelProperty(operationModel,
-                        OperationExecutorModelProperty.class,
-                        OperationExecutorModelProperty::getExecutorFactory,
-                        () -> new IllegalOperationModelDefinitionException(format("Operation '%s' does not provide a %s",
-                                                                                  operationModel.getName(),
-                                                                                  OperationExecutorFactory.class
-                                                                                    .getSimpleName())));
+        fromModelProperty(operationModel,
+                          OperationExecutorModelProperty.class,
+                          OperationExecutorModelProperty::getExecutorFactory,
+                          () -> new IllegalOperationModelDefinitionException(format("Operation '%s' does not provide a %s",
+                                                                                    operationModel.getName(),
+                                                                                    OperationExecutorFactory.class
+                                                                                        .getSimpleName())));
 
     return new OperationExecutorFactoryWrapper(executorFactory, createInterceptors(operationModel));
   }
@@ -407,9 +407,9 @@ public class MuleExtensionUtils {
                              SourceFactoryModelProperty.class,
                              SourceFactoryModelProperty::getSourceFactory,
                              () -> new IllegalSourceModelDefinitionException(
-                               format("Source '%s' does not provide a %s",
-                                      sourceModel.getName(),
-                                      SourceFactory.class.getSimpleName())));
+                                                                             format("Source '%s' does not provide a %s",
+                                                                                    sourceModel.getName(),
+                                                                                    SourceFactory.class.getSimpleName())));
   }
 
   /**
@@ -426,10 +426,10 @@ public class MuleExtensionUtils {
                              ConnectionProviderFactoryModelProperty.class,
                              ConnectionProviderFactoryModelProperty::getConnectionProviderFactory,
                              () -> new IllegalConnectionProviderModelDefinitionException(
-                               format("Connection Provider '%s' does not provide a %s",
-                                      connectionProviderModel.getName(),
-                                      ConnectionProviderFactory.class
-                                        .getSimpleName())));
+                                                                                         format("Connection Provider '%s' does not provide a %s",
+                                                                                                connectionProviderModel.getName(),
+                                                                                                ConnectionProviderFactory.class
+                                                                                                    .getSimpleName())));
   }
 
   /**
@@ -446,9 +446,9 @@ public class MuleExtensionUtils {
                              ConnectionTypeModelProperty.class,
                              ConnectionTypeModelProperty::getConnectionType,
                              () -> new IllegalConnectionProviderModelDefinitionException(
-                               format("Connection Provider '%s' does not specify a connection type",
-                                      connectionProviderModel
-                                        .getName())));
+                                                                                         format("Connection Provider '%s' does not specify a connection type",
+                                                                                                connectionProviderModel
+                                                                                                    .getName())));
   }
 
   private static <T, P extends ModelProperty> T fromModelProperty(EnrichableModel model,
