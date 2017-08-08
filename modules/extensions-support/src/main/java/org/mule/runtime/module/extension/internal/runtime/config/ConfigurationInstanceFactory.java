@@ -45,7 +45,6 @@ import java.util.stream.Collectors;
  */
 public final class ConfigurationInstanceFactory<T> {
 
-  private final ExtensionModel extensionModel;
   private final ConfigurationModel configurationModel;
   private final ConfigurationObjectBuilder<T> configurationObjectBuilder;
   private final ImplicitConnectionProviderFactory implicitConnectionProviderFactory;
@@ -54,12 +53,13 @@ public final class ConfigurationInstanceFactory<T> {
   /**
    * Creates a new instance which provides instances derived from the given {@code configurationModel} and {@code resolverSet}
    *
+   * @param extensionModel     the {@link ExtensionModel} that owns the {@code configurationModel}
    * @param configurationModel the {@link ConfigurationModel} that describes the configurations to be created
    * @param resolverSet        the {@link ResolverSet} which provides the values for the configuration's parameters
+   * @param muleContext        the current {@link MuleContext}
    */
   public ConfigurationInstanceFactory(ExtensionModel extensionModel, ConfigurationModel configurationModel,
                                       ResolverSet resolverSet, MuleContext muleContext) {
-    this.extensionModel = extensionModel;
     this.configurationModel = configurationModel;
     configurationObjectBuilder = new ConfigurationObjectBuilder<>(configurationModel, resolverSet);
     requiresConnection = !getConnectedComponents(extensionModel, configurationModel).isEmpty();
@@ -104,18 +104,20 @@ public final class ConfigurationInstanceFactory<T> {
   /**
    * Creates a new instance using the given {@code resolverSetResult} to obtain the configuration's parameter values
    *
-   * @param name              the name of the configuration to return
-   * @param resolverSetResult the {@link ResolverSetResult} with previously evaluated values
+   * @param name                       the name of the configuration to return
+   * @param configValues               the {@link ResolverSetResult} with the evaluated config parameters values
+   * @param event                      the current {@link Event}
+   * @param connectionProviderResolver an optional resolver to obtain a {@link ConnectionProvider}
    * @return a {@link ConfigurationInstance}
    * @throws MuleException if an error is encountered
    */
   public <C> ConfigurationInstance createConfiguration(String name,
-                                                       ResolverSetResult resolverSetResult,
+                                                       ResolverSetResult configValues,
                                                        Event event,
                                                        Optional<ConnectionProviderValueResolver<C>> connectionProviderResolver)
       throws MuleException {
 
-    Pair<T, ResolverSetResult> configValue = createConfigurationInstance(name, resolverSetResult);
+    Pair<T, ResolverSetResult> configValue = createConfigurationInstance(name, configValues);
 
     Optional<Pair<ConnectionProvider<C>, ResolverSetResult>> connectionProvider;
 
@@ -134,10 +136,14 @@ public final class ConfigurationInstanceFactory<T> {
   }
 
   /**
-   * Creates a new instance using the given {@code resolverSetResult} to obtain the configuration's parameter values
+   * Creates a new instance using the given {@code configValues} and {@code connectionProviderValues} to obtain the
+   * configuration's parameter values
    *
-   * @param name         the name of the configuration to return
-   * @param configValues the {@link ResolverSetResult} with previously evaluated values
+   * @param name                       the name of the configuration to return
+   * @param configValues               the {@link ResolverSetResult} with the evaluated config parameters values
+   * @param event                      the current {@link Event}
+   * @param connectionProviderResolver a resolver to obtain a {@link ConnectionProvider}
+   * @param connectionProviderValues   e {@link ResolverSetResult} with the evaluated connection parameters values
    * @return a {@link ConfigurationInstance}
    * @throws MuleException if an error is encountered
    */
