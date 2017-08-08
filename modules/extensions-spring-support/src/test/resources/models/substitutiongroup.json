@@ -1,7 +1,7 @@
 {
   "name": "substitutionGroup",
   "description": "",
-  "version": "4.0.0-SNAPSHOT",
+  "version": "4.0",
   "vendor": "Mulesoft",
   "category": "COMMUNITY",
   "minMuleVersion": "4.0.0",
@@ -9,7 +9,7 @@
     "prefix": "sg",
     "namespace": "http://www.mulesoft.org/schema/mule/sg",
     "schemaLocation": "http://www.mulesoft.org/schema/mule/sg/current/mule-sg.xsd",
-    "schemaVersion": "4.0.0-SNAPSHOT",
+    "schemaVersion": "4.0",
     "xsdFileName": "mule-sg.xsd"
   },
   "resources": [],
@@ -194,7 +194,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "@ref:org.mule.test.substitutiongroup.extension.EESGPojo"
+                "type": "@ref:org.mule.test.substitutiongroup.extension.MuleSGPojo"
               },
               "hasDynamicType": false,
               "required": true,
@@ -213,14 +213,14 @@
                 "order": 2
               },
               "elementReferences": [],
-              "name": "eesgPojo",
+              "name": "muleSGPojo",
               "description": "",
               "modelProperties": {}
             },
             {
               "type": {
                 "format": "java",
-                "type": "@ref:org.mule.test.substitutiongroup.extension.MuleSGPojo"
+                "type": "@ref:org.mule.test.substitutiongroup.extension.MuleEnterprisePojo"
               },
               "hasDynamicType": false,
               "required": true,
@@ -239,7 +239,7 @@
                 "order": 3
               },
               "elementReferences": [],
-              "name": "muleSGPojo",
+              "name": "muleEnterprisePojo",
               "description": "",
               "modelProperties": {}
             }
@@ -317,7 +317,7 @@
       "format": "java",
       "type": "Object",
       "annotations": {
-        "typeId": "org.mule.test.substitutiongroup.extension.EESGPojo",
+        "typeId": "org.mule.test.substitutiongroup.extension.MuleEnterprisePojo",
         "classInformation": {
           "hasDefaultConstructor": true,
           "isInterface": false,
@@ -333,11 +333,15 @@
           "allowTopLevelDefinition": false,
           "substitutionGroup": {
             "prefix": "ee",
-            "element": "some-ee-component"
+            "element": "abstract-event-copy-strategy"
+          },
+          "baseType": {
+            "prefix": "ee",
+            "element": "abstractEventCopyStrategyType"
           }
         },
         "typeAlias": {
-          "value": "EESGPojo"
+          "value": "MuleEnterprisePojo"
         }
       },
       "fields": [
@@ -383,7 +387,7 @@
           "allowTopLevelDefinition": false,
           "substitutionGroup": {
             "prefix": "mule",
-            "element": "some-core-component"
+            "element": "abstract-shared-extension"
           }
         },
         "typeAlias": {
@@ -433,7 +437,7 @@
           "allowTopLevelDefinition": true,
           "substitutionGroup": {
             "prefix": "heisenberg",
-            "element": "some-component"
+            "element": "global-abstract-weapon"
           }
         },
         "typeAlias": {
@@ -483,7 +487,11 @@
           "allowTopLevelDefinition": false,
           "substitutionGroup": {
             "prefix": "heisenberg",
-            "element": "some-component"
+            "element": "global-abstract-weapon"
+          },
+          "baseType": {
+            "prefix": "heisenberg",
+            "element": "org.mule.test.heisenberg.extension.model.Weapon"
           }
         },
         "typeAlias": {

@@ -26,4 +26,7 @@ public class SubstitutionGroupExtension {
   @Parameter
   private MuleSGPojo muleSGPojo;
 
+  @Parameter
+  private MuleEnterprisePojo muleEnterprisePojo;
+
 }
