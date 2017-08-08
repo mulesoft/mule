@@ -3247,7 +3247,7 @@
                   "password": false,
                   "text": false,
                   "query": false,
-                  "order": 2
+                  "order": 3
                 },
                 "elementReferences": [],
                 "name": "stringValue",
@@ -3501,6 +3501,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 2,
                 "tabName": "Redelivery"
               },
               "elementReferences": [],
