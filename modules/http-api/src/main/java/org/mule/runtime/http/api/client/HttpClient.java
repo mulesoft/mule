@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.http.api.client;
 
+import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 
@@ -39,12 +40,12 @@ public interface HttpClient {
    * @param request the {@link HttpRequest} to send
    * @param responseTimeout the time (in milliseconds) to wait for a response
    * @param followRedirects whether or not to follow redirect responses
-   * @param authentication the optional {@link HttpRequestAuthentication} to use
+   * @param authentication the optional {@link HttpAuthentication} to use
    * @return the received {@link HttpResponse}
    * @throws IOException if an error occurs while executing
    * @throws TimeoutException if {@code responseTimeout} is exceeded
    */
-  HttpResponse send(HttpRequest request, int responseTimeout, boolean followRedirects, HttpRequestAuthentication authentication)
+  HttpResponse send(HttpRequest request, int responseTimeout, boolean followRedirects, HttpAuthentication authentication)
       throws IOException, TimeoutException;
 
   /**
@@ -59,10 +60,10 @@ public interface HttpClient {
    * @param request the {@link HttpRequest} to send
    * @param responseTimeout the time (in milliseconds) to wait for a response
    * @param followRedirects whether or not to follow redirect responses
-   * @param authentication the optional {@link HttpRequestAuthentication} to use
+   * @param authentication the optional {@link HttpAuthentication} to use
    * @return a {@link CompletableFuture} that will complete once the {@link HttpResponse} is available
    */
   CompletableFuture<HttpResponse> sendAsync(HttpRequest request, int responseTimeout, boolean followRedirects,
-                                            HttpRequestAuthentication authentication);
+                                            HttpAuthentication authentication);
 
 }

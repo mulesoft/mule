@@ -4,8 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.http.api.client;
+package org.mule.runtime.http.api.client.auth;
 
+/**
+ * Supported HTTP authentication schemes.
+ *
+ * @since 4.0
+ */
 public enum HttpAuthenticationType {
-  BASIC, DIGEST, NTLM;
+
+  BASIC,
+
+  DIGEST,
+
+  NTLM;
 }

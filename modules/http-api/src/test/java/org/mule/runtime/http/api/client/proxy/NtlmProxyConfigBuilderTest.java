@@ -11,6 +11,8 @@ import static org.junit.Assert.assertThat;
 import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_SERVICE;
 import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.PROXY_CONFIG_BUILDER;
 
+import org.mule.runtime.http.api.client.proxy.ProxyConfig.NtlmProxyConfig;
+
 import org.junit.Test;
 
 import io.qameta.allure.Feature;
