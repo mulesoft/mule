@@ -816,6 +816,9 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
               && toTransform.getScope().equals(COMPILE)) {
             return toTransform.setScope(PROVIDED);
           }
+          if (rootArtifactType == MODULE && toTransform.getScope().equals(COMPILE)) {
+            return toTransform.setScope(PROVIDED);
+          }
           Artifact artifact = toTransform.getArtifact();
           if (context.getSharedPluginLibCoordinates().contains(artifact.getGroupId() + ":" + artifact.getArtifactId())) {
             return toTransform.setScope(COMPILE);
