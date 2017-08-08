@@ -26,7 +26,6 @@
                 </jms:message>
             </jms:publish>
         </body>
-        <output type="void"/>
     </operation>
 
     <operation name="do-consume">
