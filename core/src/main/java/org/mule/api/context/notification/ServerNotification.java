@@ -60,7 +60,7 @@ public abstract class ServerNotification extends EventObject implements MuleCont
     public static final int CUSTOM_EVENT_ACTION_START_RANGE = 100000;
 
     public static final int NULL_ACTION = 0;
-    public static final Object NULL_MESSAGE = "";
+    public static final Object NULL_RESOURCE = "";
 
     public final String EVENT_NAME = ClassUtils.getClassName(getClass());
 
@@ -92,7 +92,7 @@ public abstract class ServerNotification extends EventObject implements MuleCont
 
     public ServerNotification(Object resource, int action, String resourceIdentifier)
     {
-        this((resource == null ? NULL_MESSAGE : resource), action, resourceIdentifier, false);
+        this(resource, action, resourceIdentifier, false);
     }
 
     /**
@@ -101,7 +101,7 @@ public abstract class ServerNotification extends EventObject implements MuleCont
      */
     public ServerNotification(Object resource, int action, String resourceIdentifier, boolean referenceOriginalResource)
     {
-        super(referenceOriginalResource ? resource : copyResource(resource));
+        super(referenceOriginalResource ? verifyNullResource(resource) : copyResource(resource));
         this.action = action;
         this.resourceIdentifier = resourceIdentifier;
         timestamp = System.currentTimeMillis();
@@ -231,6 +231,8 @@ public abstract class ServerNotification extends EventObject implements MuleCont
      */
     private static Object copyResource(Object resource)
     {
+        resource = verifyNullResource(resource);
+
         if (resource instanceof DefaultMuleEvent)
         {
             return DefaultMuleEvent.copy((DefaultMuleEvent) resource);
@@ -238,6 +240,16 @@ public abstract class ServerNotification extends EventObject implements MuleCont
         else if (resource instanceof MuleMessage)
         {
             return cloneMessage((MuleMessage) resource);
+        }
+
+        return resource;
+    }
+
+    private static Object verifyNullResource(Object resource)
+    {
+        if (resource == null)
+        {
+            return NULL_RESOURCE;
         }
 
         return resource;
