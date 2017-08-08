@@ -40,4 +40,24 @@ public interface ProxyConfig {
    */
   String getPassword();
 
+  /**
+   * HTTP proxy configuration for making HTTP requests through an NTLM authenticated proxy.
+   *
+   * @since 4.0
+   */
+  interface NtlmProxyConfig extends ProxyConfig {
+
+    /**
+     * @return a {@link NtlmProxyConfigBuilder}.
+     */
+    static NtlmProxyConfigBuilder builder() {
+      return new NtlmProxyConfigBuilder();
+    }
+
+    /**
+     * @return the HTTP proxy user domain
+     */
+    String getNtlmDomain();
+
+  }
 }
