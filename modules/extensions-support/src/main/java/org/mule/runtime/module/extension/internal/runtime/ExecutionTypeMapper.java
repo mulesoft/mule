@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.runtime;
 
-import static org.mule.runtime.api.meta.model.ExecutionType.BLOCKING;
-import static org.mule.runtime.api.meta.model.ExecutionType.CPU_INTENSIVE;
-import static org.mule.runtime.api.meta.model.ExecutionType.CPU_LITE;
-import org.mule.runtime.api.meta.model.ExecutionType;
+import static org.mule.runtime.api.meta.model.operation.ExecutionType.BLOCKING;
+import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_INTENSIVE;
+import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_LITE;
+import org.mule.runtime.api.meta.model.operation.ExecutionType;
 import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 
 public final class ExecutionTypeMapper {

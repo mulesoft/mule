@@ -12,7 +12,7 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.get
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.StringType;
-import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.meta.model.ExecutableComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
@@ -25,8 +25,8 @@ import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
-import org.mule.runtime.extension.api.values.ValueProvider;
 import org.mule.runtime.extension.api.util.NameUtils;
+import org.mule.runtime.extension.api.values.ValueProvider;
 import org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty.InjectableParameterInfo;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
@@ -120,8 +120,8 @@ public final class ValueProviderModelValidator implements ExtensionModelValidato
       }
     }
 
-    if (supportsConnectionsAndConfigs && modelProperty.usesConnection() && model instanceof ComponentModel) {
-      boolean requiresConnection = ((ComponentModel) model).requiresConnection();
+    if (supportsConnectionsAndConfigs && modelProperty.usesConnection() && model instanceof ExecutableComponentModel) {
+      boolean requiresConnection = ((ExecutableComponentModel) model).requiresConnection();
       if (requiresConnection != modelProperty.usesConnection()) {
         problemsReporter.addError(new Problem(model,
                                               format("The Value Provider [%s] defines that requires a connection, but is used in the %s '%s' which is connection less",

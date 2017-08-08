@@ -23,7 +23,6 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFA
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
-
 import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
@@ -38,6 +37,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.WithOutputDeclaration;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
@@ -45,13 +45,15 @@ import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Apple;
+
+import java.io.ByteArrayInputStream;
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import java.io.ByteArrayInputStream;
-import java.util.List;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -160,7 +162,7 @@ public class MimeTypeParametersDeclarationEnricherTestCase extends AbstractMuleT
     assertThat(parameter.getDefaultValue(), is(nullValue()));
   }
 
-  private void mockOutput(ComponentDeclaration<?> declaration, MetadataType type) {
+  private void mockOutput(WithOutputDeclaration declaration, MetadataType type) {
     OutputDeclaration output = mock(OutputDeclaration.class);
     when(output.getType()).thenReturn(type);
     when(declaration.getOutput()).thenReturn(output);

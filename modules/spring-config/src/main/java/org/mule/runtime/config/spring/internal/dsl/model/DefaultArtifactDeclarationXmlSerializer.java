@@ -15,15 +15,8 @@ import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_S
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
-import static org.mule.runtime.internal.dsl.DslConstants.FLOW_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
-import org.mule.runtime.api.app.declaration.ConfigurationElementDeclaration;
 import org.mule.runtime.api.app.declaration.ElementDeclaration;
-import org.mule.runtime.api.app.declaration.FlowElementDeclaration;
-import org.mule.runtime.api.app.declaration.GlobalElementDeclarationVisitor;
-import org.mule.runtime.api.app.declaration.TopLevelParameterDeclaration;
-import org.mule.runtime.api.app.declaration.fluent.ParameterSimpleValue;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.config.spring.api.dsl.ArtifactDeclarationXmlSerializer;
@@ -94,35 +87,9 @@ public class DefaultArtifactDeclarationXmlSerializer implements ArtifactDeclarat
       XmlDslElementModelConverter toXmlConverter = XmlDslElementModelConverter.getDefault(doc);
       DslElementModelFactory modelResolver = DslElementModelFactory.getDefault(context);
 
-      final GlobalElementDeclarationVisitor declarationVisitor = new GlobalElementDeclarationVisitor() {
-
-        @Override
-        public void visit(ConfigurationElementDeclaration declaration) {
-          appendChildElement(toXmlConverter, doc.getDocumentElement(), modelResolver, declaration);
-        }
-
-        @Override
-        public void visit(TopLevelParameterDeclaration declaration) {
-          appendChildElement(toXmlConverter, doc.getDocumentElement(), modelResolver, declaration);
-        }
-
-        @Override
-        public void visit(FlowElementDeclaration flowDeclaration) {
-          Element flow = doc.createElement(FLOW_ELEMENT_IDENTIFIER);
-          flow.setAttribute(NAME_ATTRIBUTE_NAME, flowDeclaration.getRefName());
-
-          flowDeclaration.getParameterGroups()
-              .forEach(g -> g.getParameters().stream().filter(p -> p.getValue() instanceof ParameterSimpleValue)
-                  .forEach(p -> flow.setAttribute(p.getName(), ((ParameterSimpleValue) p.getValue()).getValue())));
-
-          flowDeclaration.getComponents()
-              .forEach(declaration -> appendChildElement(toXmlConverter, flow, modelResolver, declaration));
-
-          doc.getDocumentElement().appendChild(flow);
-        }
-      };
-
-      artifact.getGlobalElements().forEach(declaration -> declaration.accept(declarationVisitor));
+      artifact.getGlobalElements()
+          .forEach(declaration -> appendChildElement(toXmlConverter, doc.getDocumentElement(),
+                                                     modelResolver, (ElementDeclaration) declaration));
 
       List<String> cDataElements = getCDataElements(doc.getDocumentElement());
 

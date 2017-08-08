@@ -25,7 +25,7 @@ import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.ResourcesGenerator;
 import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
-import org.mule.runtime.module.extension.internal.util.NullDslResolvingContext;
+import org.mule.runtime.internal.dsl.NullDslResolvingContext;
 
 import java.io.File;
 import java.io.FileOutputStream;

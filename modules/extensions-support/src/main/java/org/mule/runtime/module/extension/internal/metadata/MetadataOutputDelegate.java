@@ -20,6 +20,7 @@ import org.mule.metadata.message.MessageMetadataType;
 import org.mule.metadata.message.MessageMetadataTypeBuilder;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.meta.model.HasOutputModel;
 import org.mule.runtime.api.meta.model.OutputModel;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
@@ -69,13 +70,20 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
    * resolution fails for any reason.
    */
   MetadataResult<OutputMetadataDescriptor> getOutputMetadataDescriptor(MetadataContext context, Object key) {
+    if (!(component instanceof HasOutputModel)) {
+      return failure(MetadataFailure.Builder.newFailure()
+          .withMessage("The given component has not output definition to be described").onComponent());
+    }
+
     MetadataResult<MetadataType> output = getOutputMetadata(context, key);
     MetadataResult<MetadataType> attributes = getOutputAttributesMetadata(context, key);
 
+    HasOutputModel componentWithOutput = (HasOutputModel) this.component;
     MetadataResult<TypeMetadataDescriptor> outputDescriptor =
-        toMetadataDescriptorResult(component.getOutput().getType(), component.getOutput().hasDynamicType(), output);
+        toMetadataDescriptorResult(componentWithOutput.getOutput().getType(), componentWithOutput.getOutput().hasDynamicType(),
+                                   output);
     MetadataResult<TypeMetadataDescriptor> attributesDescriptor =
-        toMetadataDescriptorResult(component.getOutputAttributes().getType(), false, attributes);
+        toMetadataDescriptorResult(componentWithOutput.getOutputAttributes().getType(), false, attributes);
 
     OutputMetadataDescriptor descriptor = OutputMetadataDescriptor.builder()
         .withReturnType(outputDescriptor.get())
@@ -110,7 +118,7 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
    * @return a {@link MetadataResult} with the {@link MetadataType} of the component's output
    */
   private MetadataResult<MetadataType> getOutputMetadata(final MetadataContext context, final Object key) {
-    OutputModel output = component.getOutput();
+    OutputModel output = ((HasOutputModel) component).getOutput();
     if (isVoid(output.getType()) || !output.hasDynamicType()) {
       return success(output.getType());
     }
@@ -139,7 +147,7 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
    * @return a {@link MetadataResult} with the {@link MetadataType} of the components output {@link Message#getAttributes()}
    */
   private MetadataResult<MetadataType> getOutputAttributesMetadata(final MetadataContext context, Object key) {
-    OutputModel attributes = component.getOutputAttributes();
+    OutputModel attributes = ((HasOutputModel) component).getOutputAttributes();
     if (isVoid(attributes.getType()) || !attributes.hasDynamicType()) {
       return success(attributes.getType());
     }
@@ -179,7 +187,7 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
   private MetadataType adaptToListIfNecessary(MetadataType resolvedType, Object key, MetadataContext metadataContext)
       throws MetadataResolvingException {
 
-    MetadataType componentOutputType = component.getOutput().getType();
+    MetadataType componentOutputType = ((HasOutputModel) component).getOutput().getType();
     if (!isCollection(componentOutputType)) {
       return resolvedType;
     }
@@ -202,7 +210,7 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
     MessageMetadataTypeBuilder message = new MessageMetadataTypeBuilder().payload(type);
     staticAttributes.ifPresent(message::attributes);
 
-    if (component.getOutputAttributes().hasDynamicType()) {
+    if (((HasOutputModel) component).getOutputAttributes().hasDynamicType()) {
       MetadataResult<MetadataType> attributes = resolveOutputAttributesMetadata(context, key, Objects::nonNull);
       if (!attributes.isSuccess()) {
         throw new MetadataResolvingException("Could not resolve attributes of List<Message> output",

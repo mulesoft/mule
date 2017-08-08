@@ -126,7 +126,11 @@ public class DefaultXmlDslElementModelConverter implements XmlDslElementModelCon
 
           if (!configured.get() && innerDsl.supportsChildDeclaration() && inner.isExplicitInDsl()) {
             Element childElement = createElement(innerDsl, inner.getConfiguration());
-            writeApplicationElement(childElement, inner, element);
+            if (isEETransform(childElement)) {
+              element.appendChild(populateEETransform(inner));
+            } else {
+              writeApplicationElement(childElement, inner, element);
+            }
           }
         });
 

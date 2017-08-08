@@ -9,8 +9,10 @@ package org.mule.runtime.module.extension.internal.util;
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
+import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_ALWAYS_BEGIN;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_ALWAYS_JOIN;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_JOIN_IF_POSSIBLE;
@@ -18,13 +20,17 @@ import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_NON
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_NOT_SUPPORTED;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.collection.Collectors.toImmutableList;
+import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
+import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedFields;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.HasOutputModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -56,6 +62,7 @@ import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory
 import org.mule.runtime.extension.api.runtime.source.SourceFactory;
 import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
 import org.mule.runtime.extension.api.tx.SourceTransactionalAction;
+import org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConfigurationFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectionProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectionTypeModelProperty;
@@ -74,7 +81,9 @@ import com.google.common.collect.ImmutableList;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.function.Function;
@@ -91,7 +100,7 @@ public class MuleExtensionUtils {
    * @param componentModel a {@link ComponentModel}
    * @return Whether the {@code componentModel} returns a list of messages
    */
-  public static boolean returnsListOfMessages(ComponentModel componentModel) {
+  public static boolean returnsListOfMessages(HasOutputModel componentModel) {
     MetadataType outputType = componentModel.getOutput().getType();
     return outputType instanceof ArrayType &&
         Message.class.getName().equals(getTypeId(((ArrayType) outputType).getType()).orElse(null));
@@ -465,6 +474,18 @@ public class MuleExtensionUtils {
 
   private static String getExtensionsErrorNamespace(XmlDslModel dslModel) {
     return dslModel.getPrefix().toUpperCase();
+  }
+
+  public static ExtensionModel loadExtension(Class<?> clazz) {
+    return loadExtension(clazz, new HashMap<>());
+  }
+
+  public static ExtensionModel loadExtension(Class<?> clazz, Map<String, Object> params) {
+    params.put(TYPE_PROPERTY_NAME, clazz.getName());
+    params.put(VERSION, "4.0.0-SNAPSHOT");
+    //TODO MULE-11797: as this utils is consumed from org.mule.runtime.module.extension.internal.capability.xml.schema.AbstractXmlResourceFactory.generateResource(org.mule.runtime.api.meta.model.ExtensionModel), this util should get dropped once the ticket gets implemented.
+    final DslResolvingContext dslResolvingContext = getDefault(emptySet());
+    return new DefaultJavaExtensionModelLoader().loadExtensionModel(clazz.getClassLoader(), dslResolvingContext, params);
   }
 
   public static String getImplicitConfigurationProviderName(ExtensionModel extensionModel,

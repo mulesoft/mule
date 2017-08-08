@@ -774,7 +774,7 @@
     <xsd:simpleType name="transactionType">
         <xsd:annotation>
             <xsd:documentation>
-                Transaction types supported. Availability will depend on the runtime version, though STANDARD is always available.
+                Transaction types supported. Availability will depend on the runtime version, though LOCAL is always available.
             </xsd:documentation>
         </xsd:annotation>
         <xsd:restriction base="xsd:NMTOKEN">

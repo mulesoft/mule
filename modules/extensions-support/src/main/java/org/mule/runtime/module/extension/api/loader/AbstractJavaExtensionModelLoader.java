@@ -22,9 +22,7 @@ import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.module.extension.internal.loader.enricher.BooleanParameterDeclarationEnricher;
-import org.mule.runtime.module.extension.internal.loader.enricher.RefNameDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ConnectionDeclarationEnricher;
-import org.mule.runtime.module.extension.internal.loader.enricher.MimeTypeParametersDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.DisplayDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.DynamicMetadataDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ElementReferenceDeclarionEnricher;
@@ -37,13 +35,16 @@ import org.mule.runtime.module.extension.internal.loader.enricher.JavaExportedTy
 import org.mule.runtime.module.extension.internal.loader.enricher.JavaOAuthDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.JavaPrivilegedExportedTypesDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.JavaXmlDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.enricher.MimeTypeParametersDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ParameterLayoutOrderDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.enricher.RedeliveryPolicyDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.enricher.RefNameDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.SubTypesDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ValueProvidersParameterDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.validation.ComponentLocationModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.ConfigurationModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.ConnectionProviderModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.ExportedTypesModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.ComponentLocationModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.JavaSubtypesModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.MetadataComponentModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.NullSafeModelValidator;
@@ -51,6 +52,7 @@ import org.mule.runtime.module.extension.internal.loader.validation.OAuthConnect
 import org.mule.runtime.module.extension.internal.loader.validation.OperationParametersTypeModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.OperationReturnTypeModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.ParameterGroupModelValidator;
+import org.mule.runtime.module.extension.internal.loader.validation.ParameterPluralNameModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.ParameterTypeModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.PrivilegedApiValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.ValueProviderModelValidator;
@@ -74,6 +76,7 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
                                                                                          new OperationParametersTypeModelValidator(),
                                                                                          new ParameterGroupModelValidator(),
                                                                                          new ParameterTypeModelValidator(),
+                                                                                         new ParameterPluralNameModelValidator(),
                                                                                          new OAuthConnectionProviderModelValidator(),
                                                                                          new ValueProviderModelValidator(),
                                                                                          new PrivilegedApiValidator(),
@@ -95,6 +98,7 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
                                                                                                new JavaExportedTypesDeclarationEnricher(),
                                                                                                new JavaPrivilegedExportedTypesDeclarationEnricher(),
                                                                                                new JavaOAuthDeclarationEnricher(),
+                                                                                               new RedeliveryPolicyDeclarationEnricher(),
                                                                                                new SubTypesDeclarationEnricher(),
                                                                                                new ExtensionDescriptionsEnricher(),
                                                                                                new ValueProvidersParameterDeclarationEnricher(),

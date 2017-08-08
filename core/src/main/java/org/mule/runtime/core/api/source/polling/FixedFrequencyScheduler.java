@@ -10,6 +10,7 @@ package org.mule.runtime.core.api.source.polling;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.extension.api.annotation.Alias;
 
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -17,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Implementation of {@link PeriodicScheduler} for a fixed-frequency job.
  */
+@Alias("fixed-frequency")
 public class FixedFrequencyScheduler extends PeriodicScheduler {
 
   /**

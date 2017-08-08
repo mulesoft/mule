@@ -22,13 +22,13 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthParameterModelProperty;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.extension.internal.loader.validator.ParameterModelValidator;
 import org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty;
 import org.mule.runtime.extension.internal.property.QNameModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.Before;
@@ -39,7 +39,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class ParameterModelValidatorTestCase extends AbstractMuleTestCase {
+public class ParameterPluralNameModelValidatorTestCase extends AbstractMuleTestCase {
 
   @Mock(answer = RETURNS_DEEP_STUBS)
   private ExtensionModel extensionModel;
@@ -53,7 +53,7 @@ public class ParameterModelValidatorTestCase extends AbstractMuleTestCase {
   @Mock
   private ParameterModel invalidParameterModel;
 
-  private ParameterModelValidator validator = new ParameterModelValidator();
+  private ParameterPluralNameModelValidator validator = new ParameterPluralNameModelValidator();
 
   @Before
   public void before() {
@@ -84,21 +84,10 @@ public class ParameterModelValidatorTestCase extends AbstractMuleTestCase {
     when(invalidParameterModel.getLayoutModel()).thenReturn(Optional.empty());
   }
 
-  @Test
-  public void validModel() {
-    when(validParameterModel.getType()).thenReturn(toMetadataType(String.class));
-    when(validParameterModel.getName()).thenReturn("url");
-    mockParameters(operationModel, validParameterModel);
-
-    validate(extensionModel, validator);
-  }
-
   @Test(expected = IllegalModelDefinitionException.class)
-  public void invalidModelDueToDefaultValueWhenRequired() {
-    when(invalidParameterModel.getType()).thenReturn(toMetadataType(String.class));
-    when(invalidParameterModel.isRequired()).thenReturn(true);
-    when(invalidParameterModel.getName()).thenReturn("url");
-    when(invalidParameterModel.getDefaultValue()).thenReturn("default");
+  public void invalidModelDueToListWithoutPluralName() {
+    when(invalidParameterModel.getType()).thenReturn(toMetadataType(List.class));
+    when(invalidParameterModel.getName()).thenReturn("thing");
     mockParameters(operationModel, invalidParameterModel);
     validate(extensionModel, validator);
   }

@@ -179,7 +179,6 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
     mockConfigurationInstance(extension1ConfigurationModel, configInstance);
     mockInterceptors(extension1ConfigurationModel, null);
     when(extension1ConfigurationModel.getOperationModels()).thenReturn(ImmutableList.of(extension1OperationModel));
-    when(extension1ConfigurationModel.getFunctionModels()).thenReturn(emptyList());
     when(extension1ConfigurationModel.getSourceModels()).thenReturn(ImmutableList.of());
     when(extension1ConfigurationModel.getConnectionProviders()).thenReturn(asList(connectionProviderModel));
     when(connectionProviderModel.getAllParameterModels()).thenReturn(emptyList());
@@ -192,6 +191,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
     when(extensionModel1.getOperationModel(EXTENSION1_OPERATION_NAME)).thenReturn(of(extension1OperationModel));
     when(extension1OperationModel.getName()).thenReturn(EXTENSION1_OPERATION_NAME);
     when(extensionModel1.getFunctionModels()).thenReturn(emptyList());
+    when(extensionModel1.getConstructModels()).thenReturn(emptyList());
     when(extension1ConfigurationInstance.getValue()).thenReturn(configInstance);
     when(extension1ConfigurationInstance.getModel()).thenReturn(extension1ConfigurationModel);
     when(extension1ConfigurationInstance.getName()).thenReturn(EXTENSION1_CONFIG_INSTANCE_NAME);

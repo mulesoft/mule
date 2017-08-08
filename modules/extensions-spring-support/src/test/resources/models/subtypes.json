@@ -706,7 +706,17 @@
           "transactional": false,
           "requiresConnection": false,
           "supportsStreaming": false,
-          "stereotypes": [],
+          "stereotypes": [
+            {
+              "type": "PROCESSOR",
+              "namespace": "MULE",
+              "parent": {
+                "type": "ANY",
+                "namespace": "MULE"
+              }
+            }
+          ],
+          "nestedComponents": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -845,7 +855,17 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": false,
-          "stereotypes": [],
+          "stereotypes": [
+            {
+              "type": "PROCESSOR",
+              "namespace": "MULE",
+              "parent": {
+                "type": "ANY",
+                "namespace": "MULE"
+              }
+            }
+          ],
+          "nestedComponents": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -1187,7 +1207,6 @@
         }
       ],
       "messageSources": [],
-      "functions": [],
       "name": "config",
       "description": "Default configuration",
       "modelProperties": {}
@@ -1219,7 +1238,17 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "stereotypes": [],
+      "stereotypes": [
+        {
+          "type": "PROCESSOR",
+          "namespace": "MULE",
+          "parent": {
+            "type": "ANY",
+            "namespace": "MULE"
+          }
+        }
+      ],
+      "nestedComponents": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -1368,7 +1397,17 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "stereotypes": [],
+      "stereotypes": [
+        {
+          "type": "PROCESSOR",
+          "namespace": "MULE",
+          "parent": {
+            "type": "ANY",
+            "namespace": "MULE"
+          }
+        }
+      ],
+      "nestedComponents": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -1557,7 +1596,17 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "stereotypes": [],
+      "stereotypes": [
+        {
+          "type": "PROCESSOR",
+          "namespace": "MULE",
+          "parent": {
+            "type": "ANY",
+            "namespace": "MULE"
+          }
+        }
+      ],
+      "nestedComponents": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -1752,7 +1801,17 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "stereotypes": [],
+      "stereotypes": [
+        {
+          "type": "PROCESSOR",
+          "namespace": "MULE",
+          "parent": {
+            "type": "ANY",
+            "namespace": "MULE"
+          }
+        }
+      ],
+      "nestedComponents": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -1924,7 +1983,17 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "stereotypes": [],
+      "stereotypes": [
+        {
+          "type": "PROCESSOR",
+          "namespace": "MULE",
+          "parent": {
+            "type": "ANY",
+            "namespace": "MULE"
+          }
+        }
+      ],
+      "nestedComponents": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -2206,6 +2275,7 @@
     }
   ],
   "functions": [],
+  "constructs": [],
   "connectionProviders": [
     {
       "connectionManagementType": "NONE",
@@ -2485,7 +2555,17 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "stereotypes": [],
+      "stereotypes": [
+        {
+          "type": "SOURCE",
+          "namespace": "MULE",
+          "parent": {
+            "type": "ANY",
+            "namespace": "MULE"
+          }
+        }
+      ],
+      "nestedComponents": [],
       "parameterGroupModels": [
         {
           "parameters": [

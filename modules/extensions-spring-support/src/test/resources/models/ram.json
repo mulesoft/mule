@@ -450,7 +450,17 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": false,
-          "stereotypes": [],
+          "stereotypes": [
+            {
+              "type": "PROCESSOR",
+              "namespace": "MULE",
+              "parent": {
+                "type": "ANY",
+                "namespace": "MULE"
+              }
+            }
+          ],
+          "nestedComponents": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -1387,7 +1397,6 @@
         }
       ],
       "messageSources": [],
-      "functions": [],
       "name": "config",
       "description": "Default configuration",
       "modelProperties": {}
@@ -1395,6 +1404,7 @@
   ],
   "operations": [],
   "functions": [],
+  "constructs": [],
   "connectionProviders": [],
   "messageSources": [],
   "errors": [

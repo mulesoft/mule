@@ -357,7 +357,7 @@ public final class ExtensionsTestUtils {
 
   public static void mockMetadataResolverFactory(EnrichableModel model, MetadataResolverFactory factory) {
     Optional<MetadataResolverFactoryModelProperty> property = factory != null
-        ? of(new MetadataResolverFactoryModelProperty(factory))
+        ? of(new MetadataResolverFactoryModelProperty(() -> factory))
         : empty();
 
     when(model.getModelProperty(MetadataResolverFactoryModelProperty.class)).thenReturn(property);

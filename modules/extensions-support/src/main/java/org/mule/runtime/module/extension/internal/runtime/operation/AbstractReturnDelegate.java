@@ -16,6 +16,7 @@ import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIM
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.returnsListOfMessages;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.meta.model.HasOutputModel;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.streaming.CursorProvider;
@@ -60,7 +61,7 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
   protected AbstractReturnDelegate(ComponentModel componentModel,
                                    CursorProviderFactory cursorProviderFactory,
                                    MuleContext muleContext) {
-    returnsListOfMessages = returnsListOfMessages(componentModel);
+    returnsListOfMessages = componentModel instanceof HasOutputModel && returnsListOfMessages((HasOutputModel) componentModel);
     this.muleContext = muleContext;
     this.cursorProviderFactory = cursorProviderFactory;
   }

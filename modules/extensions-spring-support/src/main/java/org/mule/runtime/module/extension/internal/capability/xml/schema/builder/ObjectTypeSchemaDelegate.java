@@ -43,13 +43,14 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Ob
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelComplexType;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelElement;
 
-import javax.xml.namespace.QName;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import javax.xml.namespace.QName;
 
 /**
  * Builder delegation class to generate an XSD schema that describes an {@link ObjectType}

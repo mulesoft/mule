@@ -53,6 +53,7 @@ import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.HasOutputModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
@@ -581,7 +582,8 @@ public final class IntrospectionUtils {
   }
 
   public static boolean isVoid(ComponentModel componentModel) {
-    return componentModel.getOutput().getType() instanceof VoidType;
+    return componentModel instanceof HasOutputModel
+        && ((HasOutputModel) componentModel).getOutput().getType() instanceof VoidType;
   }
 
   private static boolean isVoid(Class<?> type) {
