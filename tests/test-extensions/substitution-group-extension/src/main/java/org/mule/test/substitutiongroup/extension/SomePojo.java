@@ -6,10 +6,10 @@
  */
 package org.mule.test.substitutiongroup.extension;
 
-import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
+import org.mule.runtime.extension.api.annotation.dsl.xml.TypeXmlHints;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
-@XmlHints(substitutionGroup = "heisenberg:global-abstract-weapon", baseType = "heisenberg:org.mule.test.heisenberg.extension.model.Weapon")
+@TypeXmlHints(substitutionGroup = "heisenberg:global-abstract-weapon", baseType = "heisenberg:org.mule.test.heisenberg.extension.model.Weapon")
 public class SomePojo {
 
   @Parameter

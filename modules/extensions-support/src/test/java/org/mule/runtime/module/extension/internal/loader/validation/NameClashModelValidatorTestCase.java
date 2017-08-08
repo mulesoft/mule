@@ -39,7 +39,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceCallbackModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
-import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
+import org.mule.runtime.extension.api.annotation.dsl.xml.TypeXmlHints;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.model.source.ImmutableSourceModel;
 import org.mule.runtime.extension.internal.loader.validator.NameClashModelValidator;
@@ -495,7 +495,7 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
     ExtensionsTestUtils.validate(extensionModel, validator);
   }
 
-  @XmlHints(allowTopLevelDefinition = true)
+  @TypeXmlHints(allowTopLevelDefinition = true)
   private static class TopLevelTest {
 
     public TopLevelTest() {
@@ -509,7 +509,7 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
     }
   }
 
-  @XmlHints(allowTopLevelDefinition = true)
+  @TypeXmlHints(allowTopLevelDefinition = true)
   private static class TopLevelConfig {
 
     public TopLevelConfig() {
@@ -536,7 +536,6 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
     }
   }
 
-  @XmlHints(allowInlineDefinition = false)
   private static class NoChildTest {
 
     private String id;

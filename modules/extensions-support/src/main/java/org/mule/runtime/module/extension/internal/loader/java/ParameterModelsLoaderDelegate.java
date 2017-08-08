@@ -339,7 +339,6 @@ public final class ParameterModelsLoaderDelegate {
                                                                hints -> parameter.withDsl(ParameterDslConfiguration.builder()
                                                                    .allowsInlineDefinition(hints.allowInlineDefinition())
                                                                    .allowsReferences(hints.allowReferences())
-                                                                   .allowTopLevelDefinition(hints.allowTopLevelDefinition())
                                                                    .build()));
   }
 

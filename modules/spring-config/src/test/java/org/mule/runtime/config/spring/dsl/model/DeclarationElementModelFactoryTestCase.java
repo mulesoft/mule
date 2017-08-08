@@ -57,6 +57,7 @@ import org.mule.runtime.api.meta.type.TypeCatalog;
 import org.mule.runtime.config.spring.api.dsl.model.DslElementModel;
 import org.mule.runtime.config.spring.api.dsl.model.DslElementModelFactory;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
+import org.mule.runtime.extension.api.annotation.dsl.xml.TypeXmlHints;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
@@ -371,7 +372,7 @@ public class DeclarationElementModelFactoryTestCase {
   }
 
 
-  @XmlHints(allowTopLevelDefinition = true)
+  @TypeXmlHints(allowTopLevelDefinition = true)
   public static class ComplexTypePojo {
 
     @Parameter

@@ -10,7 +10,6 @@ package org.mule.test.parameter.resolver.extension.extension;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Sources;
-import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
@@ -28,7 +27,6 @@ public class ParameterResolverExtension {
 
   @Parameter
   @Optional
-  @XmlHints(allowTopLevelDefinition = true)
   private ParameterResolver<KnockeableDoor> doorResolver;
 
   @Parameter
