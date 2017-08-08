@@ -3931,7 +3931,7 @@
                       "parent": "",
                       "genericTypes": []
                     },
-                    "typeXsmlHints": {
+                    "typeXmlHints": {
                       "allowInlineDefinition": true,
                       "allowTopLevelDefinition": true
                     },
