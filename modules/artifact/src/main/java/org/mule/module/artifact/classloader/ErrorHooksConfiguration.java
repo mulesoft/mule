@@ -10,7 +10,7 @@ import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.api.util.ExceptionUtils.getRootCauseException;
 import static org.slf4j.LoggerFactory.getLogger;
 
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.rx.Exceptions;
 
@@ -36,9 +36,9 @@ public class ErrorHooksConfiguration {
       // Unwrap all throwables to be consistent with reactor default hook.
       throwable = unwrap(throwable);
       // Only apply hook for Event signals.
-      if (signal instanceof Event) {
+      if (signal instanceof InternalEvent) {
         return throwable instanceof MessagingException ? throwable
-            : new MessagingException((Event) signal, getRootCauseException(throwable));
+            : new MessagingException((InternalEvent) signal, getRootCauseException(throwable));
       } else {
         return throwable;
       }
