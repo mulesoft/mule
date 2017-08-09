@@ -197,8 +197,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
     }
   }
 
-  public void setNotificationFirer(NotificationDispatcher notificationFirer)
-  {
+  public void setNotificationFirer(NotificationDispatcher notificationFirer) {
     this.notificationFirer = notificationFirer;
   }
 

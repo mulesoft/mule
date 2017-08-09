@@ -26,7 +26,6 @@ import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueR
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedFields;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
@@ -47,10 +46,6 @@ import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.InternalEvent;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
-import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.internal.metadata.NullMetadataResolverFactory;
 import org.mule.runtime.extension.api.annotation.param.RefName;
@@ -101,8 +96,6 @@ import java.util.concurrent.Callable;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import javax.xml.namespace.QName;
-
 /**
  * Utilities for handling {@link ExtensionModel extensions}
  *
@@ -136,7 +129,7 @@ public class MuleExtensionUtils {
     return false;
   }
 
-  public static Map<String, Object> toMap(ResolverSet resolverSet, Event event) throws MuleException {
+  public static Map<String, Object> toMap(ResolverSet resolverSet, InternalEvent event) throws MuleException {
     final ValueResolvingContext ctx = from(event);
     ImmutableMap.Builder<String, Object> map = ImmutableMap.builder();
     for (Entry<String, ValueResolver<?>> entry : resolverSet.getResolvers().entrySet()) {

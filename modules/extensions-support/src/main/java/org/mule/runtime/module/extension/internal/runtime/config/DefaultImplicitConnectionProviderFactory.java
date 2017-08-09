@@ -71,7 +71,8 @@ public final class DefaultImplicitConnectionProviderFactory<T> implements Implic
    * {@inheritDoc}
    */
   @Override
-  public <T> Pair<ConnectionProvider<T>, ResolverSetResult> createImplicitConnectionProvider(String configName, InternalEvent event) {
+  public <T> Pair<ConnectionProvider<T>, ResolverSetResult> createImplicitConnectionProvider(String configName,
+                                                                                             InternalEvent event) {
     ResolverSet resolverSet = resolverSetProvider.get();
     ConnectionProviderObjectBuilder<T> builder =
         new DefaultConnectionProviderObjectBuilder<>(connectionProviderModel, resolverSet, getConnectionManager(muleContext),

@@ -111,4 +111,7 @@ public class SimpleRegistryBootstrapTransformersTestCase extends AbstractMuleCon
       return false;
     }
   }
+
+  @Override
+  protected void createTestFlow(MuleContext context) {}
 }
