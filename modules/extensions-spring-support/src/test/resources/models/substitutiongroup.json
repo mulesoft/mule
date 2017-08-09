@@ -4,12 +4,12 @@
   "version": "4.0.0-SNAPSHOT",
   "vendor": "Mulesoft",
   "category": "COMMUNITY",
-  "minMuleVersion": "4.0.0-SNAPSHOT",
+  "minMuleVersion": "4.0.0",
   "xmlDsl": {
     "prefix": "sg",
     "namespace": "http://www.mulesoft.org/schema/mule/sg",
     "schemaLocation": "http://www.mulesoft.org/schema/mule/sg/current/mule-sg.xsd",
-    "schemaVersion": "4.0",
+    "schemaVersion": "4.0.0-SNAPSHOT",
     "xsdFileName": "mule-sg.xsd"
   },
   "resources": [],
@@ -87,7 +87,6 @@
       "operations": [],
       "connectionProviders": [],
       "messageSources": [],
-      "functions": [],
       "name": "config",
       "description": "Default configuration",
       "modelProperties": {}
@@ -95,6 +94,7 @@
   ],
   "operations": [],
   "functions": [],
+  "constructs": [],
   "connectionProviders": [],
   "messageSources": [],
   "errors": [
@@ -267,7 +267,7 @@
             "prefix": "heisenberg",
             "element": "global-abstract-weapon"
           },
-          "baseType": {
+          "dslBaseType": {
             "prefix": "heisenberg",
             "element": "org.mule.test.heisenberg.extension.model.Weapon"
           }
