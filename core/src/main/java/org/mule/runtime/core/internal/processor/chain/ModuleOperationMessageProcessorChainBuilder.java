@@ -15,7 +15,6 @@ import static org.mule.runtime.core.internal.message.InternalMessage.builder;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
-
 import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.utils.MetadataTypeUtils;
@@ -31,14 +30,13 @@ import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.Pair;
+import org.reactivestreams.Publisher;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
-import org.reactivestreams.Publisher;
 
 /**
  * Creates a chain for any operation, where it parametrizes two type of values (parameter and property) to the inner processors
@@ -203,7 +201,7 @@ public class ModuleOperationMessageProcessorChainBuilder extends ExplicitMessage
       }
 
       Object evaluatedResult;
-      if (metadataType.getMetadataFormat().getValidMimeTypes().contains(MetadataFormat.JAVA)) {
+      if (MetadataFormat.JAVA.equals(metadataType.getMetadataFormat())) {
         evaluatedResult = expressionManager.evaluate(value, event, headLocation).getValue();
       } else {
         final String mediaType = metadataType.getMetadataFormat().getValidMimeTypes().iterator().next();
