@@ -11,6 +11,7 @@ import static org.hamcrest.Matchers.is;
 import static java.lang.Long.parseLong;
 import static org.mule.transport.file.FileTestUtils.createDataFile;
 import static org.mule.util.FileUtils.openDirectory;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 
@@ -67,7 +68,7 @@ public class FileAgeTestCase extends FunctionalTestCase
     @Test
     public void fileAgeInheritedFromConnectorIsHonored() throws Exception
     {
-        File createdFile = createDataFile(temporaryDirectory, TEST_MESSAGE, "UTF-8");
+        File createdFile = createDataFile(temporaryDirectory, TEST_MESSAGE, UTF_8.name());
         Thread.sleep(parseLong(CONNECTOR_FILE_AGE) - DELTA_TIME);
         assertThat(createdFile.exists(), is(true));
     }
@@ -75,7 +76,7 @@ public class FileAgeTestCase extends FunctionalTestCase
     @Test
     public void overrodeFileAgeInEndpointIsHonored() throws Exception
     {
-        File createdFile = createDataFile(secondTemporaryDirectory, TEST_MESSAGE, "UTF-8");
+        File createdFile = createDataFile(secondTemporaryDirectory, TEST_MESSAGE, UTF_8.name());
         Thread.sleep(parseLong(ENDPOINT_FILE_AGE) - DELTA_TIME);
         assertThat(createdFile.exists(), is(true));
     }
@@ -83,7 +84,7 @@ public class FileAgeTestCase extends FunctionalTestCase
     @Test
     public void fileAgeInEndpointIsHonoredWhenAbsentInReferredConnector() throws Exception
     {
-        File createdFile = createDataFile(thirdTemporaryDirectory, TEST_MESSAGE, "UTF-8");
+        File createdFile = createDataFile(thirdTemporaryDirectory, TEST_MESSAGE, UTF_8.name());
         Thread.sleep(parseLong(ENDPOINT_FILE_AGE) - DELTA_TIME);
         assertThat(createdFile.exists(), is(true));
     }
