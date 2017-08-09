@@ -10784,7 +10784,7 @@
           "parent": "org.mule.test.metadata.extension.model.animals.Animal",
           "genericTypes": []
         },
-        "typeXmlHints": {
+        "typeDsl": {
           "allowInlineDefinition": true,
           "allowTopLevelDefinition": true
         },
@@ -10847,7 +10847,7 @@
           "parent": "",
           "genericTypes": []
         },
-        "typeXmlHints": {
+        "typeDsl": {
           "allowInlineDefinition": true,
           "allowTopLevelDefinition": true
         },
@@ -10901,7 +10901,7 @@
           "parent": "",
           "genericTypes": []
         },
-        "typeXmlHints": {
+        "typeDsl": {
           "allowInlineDefinition": true,
           "allowTopLevelDefinition": true
         },

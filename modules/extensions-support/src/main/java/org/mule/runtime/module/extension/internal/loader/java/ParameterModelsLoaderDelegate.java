@@ -336,10 +336,12 @@ public final class ParameterModelsLoaderDelegate {
 
   private void parseParameterDsl(ExtensionParameter extensionParameter, ParameterDeclarer parameter) {
     extensionParameter.getAnnotation(ParameterDsl.class).ifPresent(
-                                                               parameterDsl -> parameter.withDsl(ParameterDslConfiguration.builder()
-                                                                   .allowsInlineDefinition(parameterDsl.allowInlineDefinition())
-                                                                   .allowsReferences(parameterDsl.allowReferences())
-                                                                   .build()));
+                                                                   parameterDsl -> parameter
+                                                                       .withDsl(ParameterDslConfiguration.builder()
+                                                                           .allowsInlineDefinition(parameterDsl
+                                                                               .allowInlineDefinition())
+                                                                           .allowsReferences(parameterDsl.allowReferences())
+                                                                           .build()));
   }
 
   private void checkAnnotationsNotUsedMoreThanOnce(List<? extends ExtensionParameter> parameters,

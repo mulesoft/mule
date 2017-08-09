@@ -80,7 +80,7 @@
           "parent": "",
           "genericTypes": []
         },
-        "typeXmlHints": {
+        "typeDsl": {
           "allowInlineDefinition": true,
           "allowTopLevelDefinition": true
         },
@@ -128,7 +128,7 @@
                 "parent": "",
                 "genericTypes": []
               },
-              "typeXmlHints": {
+              "typeDsl": {
                 "allowInlineDefinition": true,
                 "allowTopLevelDefinition": true
               },
@@ -3013,7 +3013,7 @@
           "parent": "",
           "genericTypes": []
         },
-        "typeXmlHints": {
+        "typeDsl": {
           "allowInlineDefinition": true,
           "allowTopLevelDefinition": true
         },
@@ -3204,7 +3204,7 @@
           "parent": "",
           "genericTypes": []
         },
-        "typeXmlHints": {
+        "typeDsl": {
           "allowInlineDefinition": true,
           "allowTopLevelDefinition": true
         },
@@ -3485,7 +3485,7 @@
           "parent": "",
           "genericTypes": []
         },
-        "typeXmlHints": {
+        "typeDsl": {
           "allowInlineDefinition": true,
           "allowTopLevelDefinition": true
         },
@@ -3532,7 +3532,7 @@
           "parent": "org.mule.test.subtypes.extension.ParentShape",
           "genericTypes": []
         },
-        "typeXmlHints": {
+        "typeDsl": {
           "allowInlineDefinition": true,
           "allowTopLevelDefinition": true
         },
@@ -3774,7 +3774,7 @@
                 "parent": "org.mule.test.subtypes.extension.ParentShape",
                 "genericTypes": []
               },
-              "typeXmlHints": {
+              "typeDsl": {
                 "allowInlineDefinition": true,
                 "allowTopLevelDefinition": true
               },
@@ -3883,7 +3883,7 @@
                 "parent": "",
                 "genericTypes": []
               },
-              "typeXmlHints": {
+              "typeDsl": {
                 "allowInlineDefinition": true,
                 "allowTopLevelDefinition": true
               },
@@ -3931,7 +3931,7 @@
                       "parent": "",
                       "genericTypes": []
                     },
-                    "typeXmlHints": {
+                    "typeDsl": {
                       "allowInlineDefinition": true,
                       "allowTopLevelDefinition": true
                     },
@@ -4398,7 +4398,7 @@
           "parent": "org.mule.test.subtypes.extension.ParentShape",
           "genericTypes": []
         },
-        "typeXmlHints": {
+        "typeDsl": {
           "allowInlineDefinition": true,
           "allowTopLevelDefinition": true
         },

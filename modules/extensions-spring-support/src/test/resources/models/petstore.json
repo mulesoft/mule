@@ -13440,7 +13440,7 @@
           "parent": "",
           "genericTypes": []
         },
-        "typeXmlHints": {
+        "typeDsl": {
           "allowInlineDefinition": true,
           "allowTopLevelDefinition": true
         },

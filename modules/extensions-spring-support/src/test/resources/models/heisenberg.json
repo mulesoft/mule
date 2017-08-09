@@ -16115,7 +16115,7 @@
                         "parent": "",
                         "genericTypes": []
                       },
-                      "typeXmlHints": {
+                      "typeDsl": {
                         "allowInlineDefinition": true,
                         "allowTopLevelDefinition": true
                       },
@@ -16163,7 +16163,7 @@
                               "parent": "",
                               "genericTypes": []
                             },
-                            "typeXmlHints": {
+                            "typeDsl": {
                               "allowInlineDefinition": true,
                               "allowTopLevelDefinition": true
                             },
@@ -16277,7 +16277,7 @@
                       "parent": "",
                       "genericTypes": []
                     },
-                    "typeXmlHints": {
+                    "typeDsl": {
                       "allowInlineDefinition": true,
                       "allowTopLevelDefinition": true
                     },
@@ -16376,7 +16376,7 @@
                         "parent": "",
                         "genericTypes": []
                       },
-                      "typeXmlHints": {
+                      "typeDsl": {
                         "allowInlineDefinition": true,
                         "allowTopLevelDefinition": true
                       },
@@ -16424,7 +16424,7 @@
                               "parent": "",
                               "genericTypes": []
                             },
-                            "typeXmlHints": {
+                            "typeDsl": {
                               "allowInlineDefinition": true,
                               "allowTopLevelDefinition": true
                             },
@@ -17010,7 +17010,7 @@
                   "parent": "",
                   "genericTypes": []
                 },
-                "typeXmlHints": {
+                "typeDsl": {
                   "allowInlineDefinition": true,
                   "allowTopLevelDefinition": true
                 },
@@ -18600,7 +18600,7 @@
           "parent": "org.mule.test.heisenberg.extension.model.Investment",
           "genericTypes": []
         },
-        "typeXmlHints": {
+        "typeDsl": {
           "allowInlineDefinition": true,
           "allowTopLevelDefinition": true
         },
@@ -19369,7 +19369,7 @@
           "parent": "",
           "genericTypes": []
         },
-        "typeXmlHints": {
+        "typeDsl": {
           "allowInlineDefinition": true,
           "allowTopLevelDefinition": true
         },
@@ -19743,7 +19743,7 @@
           "parent": "",
           "genericTypes": []
         },
-        "typeXmlHints": {
+        "typeDsl": {
           "allowInlineDefinition": true,
           "allowTopLevelDefinition": true
         },
@@ -19791,7 +19791,7 @@
                 "parent": "",
                 "genericTypes": []
               },
-              "typeXmlHints": {
+              "typeDsl": {
                 "allowInlineDefinition": true,
                 "allowTopLevelDefinition": true
               },
@@ -19891,7 +19891,7 @@
                   "parent": "",
                   "genericTypes": []
                 },
-                "typeXmlHints": {
+                "typeDsl": {
                   "allowInlineDefinition": true,
                   "allowTopLevelDefinition": true
                 },
@@ -19985,7 +19985,7 @@
           "parent": "",
           "genericTypes": []
         },
-        "typeXmlHints": {
+        "typeDsl": {
           "allowInlineDefinition": true,
           "allowTopLevelDefinition": true
         },
@@ -20033,7 +20033,7 @@
                 "parent": "",
                 "genericTypes": []
               },
-              "typeXmlHints": {
+              "typeDsl": {
                 "allowInlineDefinition": true,
                 "allowTopLevelDefinition": true
               },
@@ -20133,7 +20133,7 @@
                   "parent": "",
                   "genericTypes": []
                 },
-                "typeXmlHints": {
+                "typeDsl": {
                   "allowInlineDefinition": true,
                   "allowTopLevelDefinition": true
                 },
@@ -20227,7 +20227,7 @@
           "parent": "",
           "genericTypes": []
         },
-        "typeXmlHints": {
+        "typeDsl": {
           "allowInlineDefinition": true,
           "allowTopLevelDefinition": true
         },
@@ -20323,7 +20323,7 @@
           "parent": "",
           "genericTypes": []
         },
-        "typeXmlHints": {
+        "typeDsl": {
           "allowInlineDefinition": true,
           "allowTopLevelDefinition": true
         },
@@ -20371,7 +20371,7 @@
                 "parent": "",
                 "genericTypes": []
               },
-              "typeXmlHints": {
+              "typeDsl": {
                 "allowInlineDefinition": true,
                 "allowTopLevelDefinition": true
               },
