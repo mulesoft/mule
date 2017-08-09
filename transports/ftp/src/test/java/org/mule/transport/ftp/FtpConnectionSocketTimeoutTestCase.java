@@ -52,11 +52,11 @@ public class FtpConnectionSocketTimeoutTestCase extends AbstractFtpServerTestCas
 
     private static String CONNECTION_TIMEOUT = "1000";
 
-    private static int TEST_DELTA =13000;
+    private static int TEST_DELTA = 13000;
 
     private static int SERVER_DELTA = 3000;
 
-    private static long WAIT_TIMEOUT  = parseLong(CONNECTION_TIMEOUT) + TEST_DELTA;
+    private static long WAIT_TIMEOUT = parseLong(CONNECTION_TIMEOUT) + TEST_DELTA;
 
     private static long SERVER_SLEEP = parseLong(CONNECTION_TIMEOUT) + SERVER_DELTA;
 
@@ -69,11 +69,11 @@ public class FtpConnectionSocketTimeoutTestCase extends AbstractFtpServerTestCas
 
     private Ftplet ftplet;
 
-    private String nameScenario ;
+    private String nameScenario;
 
-    private static Latch latch ;
+    private static Latch latch;
 
-    private static Exception receiverException ;
+    private static Exception receiverException;
 
     public FtpConnectionSocketTimeoutTestCase(ConfigVariant configVariant, String configResource, Ftplet ftpLet, String nameScenario)
     {
@@ -91,12 +91,12 @@ public class FtpConnectionSocketTimeoutTestCase extends AbstractFtpServerTestCas
     }
 
     @Parameterized.Parameters
-    public static Collection<Object []> data()
+    public static Collection<Object[]> data()
     {
-        List<Object []> parameters  = new ArrayList<>();
-        parameters.add(new Object[]{FLOW, "ftp-connection-timeout-config-flow.xml", ftpLetOnConnectSleep, "Connection Scenario"});
+        List<Object[]> parameters = new ArrayList<>();
+        parameters.add(new Object[] {FLOW, "ftp-connection-timeout-config-flow.xml", ftpLetOnConnectSleep, "Connection Scenario"});
         parameters.add(new Object[] {FLOW, "ftp-connection-timeout-config-flow.xml", ftpLetOnCommandSleep, "Connection Commands Scenario"});
-        parameters.add(new Object[] { FLOW, "ftp-connection-timeout-config-flow.xml", ftpLetOnNoOpCommandSleep, "NOOP Commands Scenario"});
+        parameters.add(new Object[] {FLOW, "ftp-connection-timeout-config-flow.xml", ftpLetOnNoOpCommandSleep, "NOOP Commands Scenario"});
         return parameters;
     }
 
@@ -109,7 +109,7 @@ public class FtpConnectionSocketTimeoutTestCase extends AbstractFtpServerTestCas
         MuleMessage result = client.send("vm://in", testMessage, new SimpleOptions(WAIT_TIMEOUT));
         assertThat(result, is(notNullValue()));
         assertException(result.getExceptionPayload().getRootException());
-   }
+    }
 
     @Test
     public void testReceiverTimeout() throws Exception
@@ -131,7 +131,8 @@ public class FtpConnectionSocketTimeoutTestCase extends AbstractFtpServerTestCas
         muleContext.stop();
     }
 
-    private static Ftplet ftpLetOnCommandSleep = new DefaultFtplet(){
+    private static Ftplet ftpLetOnCommandSleep = new DefaultFtplet()
+    {
         @Override
         public FtpletResult beforeCommand(FtpSession session, FtpRequest request) throws FtpException, IOException
         {
@@ -141,11 +142,12 @@ public class FtpConnectionSocketTimeoutTestCase extends AbstractFtpServerTestCas
     };
 
 
-    private static Ftplet ftpLetOnNoOpCommandSleep = new DefaultFtplet(){
+    private static Ftplet ftpLetOnNoOpCommandSleep = new DefaultFtplet()
+    {
         @Override
         public FtpletResult beforeCommand(FtpSession session, FtpRequest request) throws FtpException, IOException
         {
-            if(NOOP_COMMAND.equals(request.getCommand()))
+            if (NOOP_COMMAND.equals(request.getCommand()))
             {
                 sleep();
             }
@@ -153,7 +155,8 @@ public class FtpConnectionSocketTimeoutTestCase extends AbstractFtpServerTestCas
         }
     };
 
-    private static Ftplet ftpLetOnConnectSleep = new DefaultFtplet(){
+    private static Ftplet ftpLetOnConnectSleep = new DefaultFtplet()
+    {
         @Override
         public FtpletResult onConnect(FtpSession session) throws FtpException, IOException
         {
@@ -186,12 +189,12 @@ public class FtpConnectionSocketTimeoutTestCase extends AbstractFtpServerTestCas
         @Override
         protected FTPFile[] listFiles() throws Exception
         {
-            FTPFile[] files ;
+            FTPFile[] files;
             try
             {
                 files = super.listFiles();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 receiverException = e;
                 latch.countDown();
