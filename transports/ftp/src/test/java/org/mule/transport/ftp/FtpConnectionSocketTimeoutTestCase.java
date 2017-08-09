@@ -52,7 +52,7 @@ public class FtpConnectionSocketTimeoutTestCase extends AbstractFtpServerTestCas
 
     private static String CONNECTION_TIMEOUT = "1000";
 
-    private static int TEST_DELTA = 13000;
+    private static int TEST_DELTA = 2000;
 
     private static int SERVER_DELTA = 3000;
 
@@ -115,7 +115,7 @@ public class FtpConnectionSocketTimeoutTestCase extends AbstractFtpServerTestCas
     public void testReceiverTimeout() throws Exception
     {
         muleContext.start();
-        latch.await(WAIT_TIMEOUT, MILLISECONDS);
+        latch.await();
         assertException(getRootCause(receiverException));
     }
 
@@ -123,12 +123,6 @@ public class FtpConnectionSocketTimeoutTestCase extends AbstractFtpServerTestCas
     {
         assertThat("An timeout exception should be triggered in the " + nameScenario, exception, is(notNullValue()));
         assertThat("SocketTimeoutException should be triggered in the " + nameScenario, exception.getMessage(), containsString(ERROR_MESSAGE));
-    }
-
-    @After
-    public void tearDown() throws Exception
-    {
-        muleContext.stop();
     }
 
     private static Ftplet ftpLetOnCommandSleep = new DefaultFtplet()
