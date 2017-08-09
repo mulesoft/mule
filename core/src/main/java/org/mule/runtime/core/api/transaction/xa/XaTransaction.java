@@ -6,18 +6,14 @@
  */
 package org.mule.runtime.core.api.transaction.xa;
 
-import org.mule.runtime.api.tx.MuleXaObject;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.tx.TransactionException;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
+import org.mule.runtime.api.tx.MuleXaObject;
+import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.api.util.Preconditions;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.transaction.TransactionRollbackException;
 import org.mule.runtime.core.api.transaction.TransactionStatusException;
-
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
 import javax.transaction.HeuristicRollbackException;
 import javax.transaction.InvalidTransactionException;
@@ -27,6 +23,10 @@ import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
 import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * <code>XaTransaction</code> represents an XA transaction in Mule.
@@ -387,7 +387,7 @@ public class XaTransaction extends AbstractTransaction {
 
     @Override
     public int hashCode() {
-      return System.identityHashCode(resourceFactory);
+      return Objects.hashCode(resourceFactory);
     }
 
     @Override
