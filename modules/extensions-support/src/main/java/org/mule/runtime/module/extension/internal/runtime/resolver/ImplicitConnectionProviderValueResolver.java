@@ -10,7 +10,6 @@ import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.util.Pair;
 import org.mule.runtime.module.extension.internal.runtime.config.DefaultImplicitConnectionProviderFactory;
@@ -21,11 +20,7 @@ import java.util.Optional;
 /**
  * Uses a {@link ImplicitConnectionProviderFactory} to create an implicit {@link ConnectionProvider}.
  * <p>
-<<<<<<< HEAD
  * This is a static {@link ValueResolver}. The {@link ConnectionProvider} is created the first time the {@link #resolve(ValueResolvingContext)}
-=======
- * This is a static {@link ValueResolver}. The {@link ConnectionProvider} is created the first time the {@link #resolve(InternalEvent)}
->>>>>>> pr feedback
  * method is invoked on {@code this} instance. Subsequent invocations will return the same instance.
  * <p>
  * This class is thread-safe
