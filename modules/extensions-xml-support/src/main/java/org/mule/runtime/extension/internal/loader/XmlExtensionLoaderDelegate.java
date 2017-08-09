@@ -27,6 +27,7 @@ import static org.mule.runtime.config.spring.api.XmlConfigurationDocumentLoader.
 import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
 import static org.mule.runtime.extension.internal.loader.catalog.loader.common.XmlMatcher.match;
 import com.google.common.collect.ImmutableMap;
+import org.apache.commons.lang3.StringUtils;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.catalog.api.TypeResolver;
@@ -44,6 +45,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OutputDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclarer;
+import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
 import org.mule.runtime.config.spring.api.XmlConfigurationDocumentLoader;
@@ -57,6 +59,7 @@ import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.GlobalEle
 import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.OperationComponentModelModelProperty;
 import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.XmlExtensionModelProperty;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
@@ -103,6 +106,11 @@ final class XmlExtensionLoaderDelegate {
   private static final String MIN_MULE_VERSION = "minMuleVersion";
   private static final String DOC_DESCRIPTION = "doc:description";
   private static final String PASSWORD = "password";
+  private static final String ORDER_ATTRIBUTE = "order";
+  private static final String TAB_ATTRIBUTE = "tab";
+  private static final String DISPLAY_NAME_ATTRIBUTE = "displayName";
+  private static final String SUMMARY_ATTRIBUTE = "summary";
+  private static final String EXAMPLE_ATTRIBUTE = "example";
   private static final String ROLE = "role";
   private static final String ATTRIBUTE_USE = "use";
 
@@ -362,15 +370,38 @@ final class XmlExtensionLoaderDelegate {
   private void extractParameter(ParameterizedDeclarer parameterizedDeclarer, ComponentModel param, ParameterRole role) {
     Map<String, String> parameters = param.getParameters();
     String receivedInputType = parameters.get(TYPE_ATTRIBUTE);
-    LayoutModel layoutModel = parseBoolean(parameters.get(PASSWORD)) ? builder().asPassword().build()
-        : builder().build();
+    final LayoutModel.LayoutModelBuilder layoutModelBuilder = builder();
+    if (parseBoolean(parameters.get(PASSWORD))) {
+      layoutModelBuilder.asPassword();
+    }
+    layoutModelBuilder.order(getOrder(parameters.get(ORDER_ATTRIBUTE)));
+    layoutModelBuilder.tabName(getTab(parameters.get(TAB_ATTRIBUTE)));
+
+    final DisplayModel.DisplayModelBuilder displayModelBuilder = DisplayModel.builder();
+    displayModelBuilder.displayName(parameters.get(DISPLAY_NAME_ATTRIBUTE));
+    displayModelBuilder.summary(parameters.get(SUMMARY_ATTRIBUTE));
+    displayModelBuilder.example(parameters.get(EXAMPLE_ATTRIBUTE));
+
     MetadataType parameterType = extractType(receivedInputType);
 
     ParameterDeclarer parameterDeclarer = getParameterDeclarer(parameterizedDeclarer, parameters);
     parameterDeclarer.describedAs(getDescription(param))
-        .withLayout(layoutModel)
+        .withLayout(layoutModelBuilder.build())
+        .withDisplayModel(displayModelBuilder.build())
         .withRole(role)
         .ofType(parameterType);
+  }
+
+  private String getTab(String tab) {
+    return StringUtils.isBlank(tab) ? Placement.DEFAULT_TAB : tab;
+  }
+
+  private int getOrder(final String order) {
+    try {
+      return Integer.parseInt(order);
+    } catch (NumberFormatException e) {
+      return Placement.DEFAULT_ORDER;
+    }
   }
 
   /**

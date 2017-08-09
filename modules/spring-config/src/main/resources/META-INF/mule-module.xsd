@@ -85,6 +85,11 @@
                 <xsd:attribute name="type" use="required" type="xsd:string"/>
                 <xsd:attribute name="password" type="xsd:boolean" default="false"/>
                 <xsd:attribute name="role" type="roleParameterType" default="BEHAVIOUR"/>
+                <xsd:attribute name="summary" type="xsd:string" use="optional"/>
+                <xsd:attribute name="example" type="xsd:string" use="optional"/>
+                <xsd:attribute name="displayName" type="xsd:string" use="optional"/>
+                <xsd:attribute name="order" type="xsd:int" use="optional"/>
+                <xsd:attribute name="tab" type="xsd:string" use="optional"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -137,6 +142,11 @@
                 <xsd:attribute name="use" type="useType" default="AUTO"/>
                 <xsd:attribute name="type" type="xsd:string" use="required"/>
                 <xsd:attribute name="password" type="xsd:boolean" default="false"/>
+                <xsd:attribute name="summary" type="xsd:string" use="optional"/>
+                <xsd:attribute name="example" type="xsd:string" use="optional"/>
+                <xsd:attribute name="displayName" type="xsd:string" use="optional"/>
+                <xsd:attribute name="order" type="xsd:int" use="optional"/>
+                <xsd:attribute name="tab" type="xsd:string" use="optional"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
