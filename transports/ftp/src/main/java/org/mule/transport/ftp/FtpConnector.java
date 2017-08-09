@@ -169,13 +169,23 @@ public class FtpConnector extends AbstractInboundEndpointNameableConnector
         this.connectionFactoryClass = connectionFactoryClass;
     }
 
-    public FTPClient getFtp(EndpointURI uri) throws Exception
+    public FTPClient getFtp(EndpointURI uri) throws ConnectException
     {
+        FTPClient client;
         if (logger.isDebugEnabled())
         {
             logger.debug(">>> retrieving client for " + uri);
         }
-        return (FTPClient) getFtpPool(uri).borrowObject();
+        try
+        {
+            client = (FTPClient) getFtpPool(uri).borrowObject();
+        }
+        catch(Exception e)
+        {
+            throw new ConnectException(e, this);
+        }
+
+        return client;
     }
 
     public void releaseFtp(EndpointURI uri, FTPClient client) throws Exception
@@ -580,7 +590,15 @@ public class FtpConnector extends AbstractInboundEndpointNameableConnector
             {
                 try
                 {
-                    getRetryPolicyTemplate().execute(callbackReconnection, muleContext.getWorkManager());
+                    RetryContext context = getRetryPolicyTemplate().execute(callbackReconnection, muleContext.getWorkManager());
+                    if(client[0] != null)
+                    {
+                        return storeFileStream(client[0], filename, uri);
+                    }
+                    else
+                    {
+                        throw new ConnectException(context.getLastFailure(), this);
+                    }
                 }
                 catch (RetryPolicyExhaustedException retryPolicyExhaustedException)
                 {
@@ -591,8 +609,6 @@ public class FtpConnector extends AbstractInboundEndpointNameableConnector
             {
                 throw new IllegalArgumentException(ASYNCHRONOUS_RECONNECTION_ERROR_MESSAGE);
             }
-
-            return storeFileStream(client[0], filename, uri);
         }
         catch (ConnectException ce)
         {

@@ -6,6 +6,7 @@
  */
 package org.mule.transport.ftp;
 
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.endpoint.EndpointURI;
 
 import java.io.IOException;
@@ -60,8 +61,8 @@ public class FtpConnectionFactory implements PoolableObjectFactory
     protected FTPClient createFtpClient()
     {
         FTPClient ftpClient = new FTPClient();
+        ftpClient.setDefaultTimeout(connectionTimeout);
         ftpClient.setConnectTimeout(connectionTimeout);
-
         return ftpClient;
     }
 
@@ -77,11 +78,12 @@ public class FtpConnectionFactory implements PoolableObjectFactory
         FTPClient client = (FTPClient) obj;
         try
         {
+            client.setSoTimeout(connectionTimeout);
             return client.sendNoOp();
         }
         catch (IOException e)
         {
-            return false;
+            throw new MuleRuntimeException(e);
         }
     }
 
