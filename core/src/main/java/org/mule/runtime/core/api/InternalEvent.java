@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.core.api;
 
-import org.mule.runtime.api.el.BindingContext;
-import org.mule.runtime.api.el.MuleExpressionLanguage;
+import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -37,17 +37,26 @@ import java.util.Optional;
  *
  * @see Message
  */
-public interface Event extends Serializable, org.mule.runtime.api.event.Event {
+public interface InternalEvent extends Serializable, Event {
 
   class CurrentEventHolder {
 
-    private static final ThreadLocal<Event> currentEvent = new ThreadLocal<>();
+    private static final ThreadLocal<InternalEvent> currentEvent = new ThreadLocal<>();
   }
 
   /**
-   * @return the context applicable to all events created from the same root {@link Event} from a {@link MessageSource}.
+   * @return the context applicable to all events created from the same root {@link InternalEvent} from a {@link MessageSource}.
    */
-  EventContext getInternalContext();
+  @Override
+  InternalEventContext getContext();
+
+  /**
+   * The security context for this session. If not null outbound, inbound and/or method invocations will be authenticated using
+   * this context
+   *
+   * @return the context for this session or null if the request is not secure.
+   */
+  SecurityContext getSecurityContext();
 
   /**
    * Internal parameters used by the runtime to pass information around.
@@ -61,6 +70,14 @@ public interface Event extends Serializable, org.mule.runtime.api.event.Event {
    * @return the correlation metadata of this message.
    */
   Optional<GroupCorrelation> getGroupCorrelation();
+
+  /**
+   * The returned value will depend on the {@link MessageSource} that created this event, and the flow that is executing the
+   * event.
+   *
+   * @return the correlation id to use for this event.
+   */
+  String getCorrelationId();
 
   /**
    * Returns the contents of the message as a byte array.
@@ -214,46 +231,38 @@ public interface Event extends Serializable, org.mule.runtime.api.event.Event {
    * @param context the context to create event instance with.
    * @return new builder instance.
    */
-  static Builder builder(EventContext context) {
+  static Builder builder(InternalEventContext context) {
     return new DefaultEventBuilder(context);
   }
 
   /**
-   * Create new {@link Builder} based on an existing {@link Event} instance. The existing {@link EventContext} is conserved.
+   * Create new {@link Builder} based on an existing {@link InternalEvent} instance. The existing {@link InternalEventContext} is conserved.
    *
    * @param event existing event to use as a template to create builder instance
    * @return new builder instance.
    */
-  static Builder builder(Event event) {
+  static Builder builder(InternalEvent event) {
     return new DefaultEventBuilder(event);
   }
 
   /**
-   * Create new {@link Builder} based on an existing {@link Event} instance and and {@link EventContext}. A new
-   * {@link EventContext} is used instead of the existing instance referenced by the existing {@link Event}. This builder should
-   * only be used in some specific scenarios like {@code flow-ref} where a new Flow executing the same {@link Event} needs a new
+   * Create new {@link Builder} based on an existing {@link InternalEvent} instance and and {@link InternalEventContext}. A new
+   * {@link InternalEventContext} is used instead of the existing instance referenced by the existing {@link InternalEvent}. This builder should
+   * only be used in some specific scenarios like {@code flow-ref} where a new Flow executing the same {@link InternalEvent} needs a new
    * context.
    *
    * @param event existing event to use as a template to create builder instance
    * @param context the context to create event instance with.
    * @return new builder instance.
    */
-  static Builder builder(EventContext context, Event event) {
+  static Builder builder(InternalEventContext context, InternalEvent event) {
     return new DefaultEventBuilder(context, event);
   }
 
   interface Builder {
 
     /**
-     * Sets the configuration provided by the {@link org.mule.runtime.api.event.Event} into the builder
-     *
-     * @param event the event to get the data from
-     * @return the builder instance
-     */
-    Builder from(org.mule.runtime.api.event.Event event);
-
-    /**
-     * Set the {@link Message} to construct {@link Event} with.
+     * Set the {@link Message} to construct {@link InternalEvent} with.
      *
      * @param message the message instance.
      * @return the builder instance
@@ -300,28 +309,28 @@ public interface Event extends Serializable, org.mule.runtime.api.event.Event {
      * {@link ModuleOperationMessageProcessorChainBuilder.ModuleOperationProcessorChain}.
      * <p>
      * For every module's <operation/> being consumed in a Mule Application, when being macro expanded, these properties will be
-     * feed to it in a new and isolated {@link Event}, so that we can guarantee that for each invocation there's a real variable
+     * feed to it in a new and isolated {@link InternalEvent}, so that we can guarantee that for each invocation there's a real variable
      * scoping for them.
      *
      * @param properties properties to be set.
      * @return the builder instance
      * @see #parameters(Map)
      */
-    Builder properties(Map<String, Object> properties);
+    Builder properties(Map<String, ?> properties);
 
     /**
      * Set a map of parameters to be consumed within a
      * {@link ModuleOperationMessageProcessorChainBuilder.ModuleOperationProcessorChain}.
      * <p>
      * For every module's <operation/> being consumed in a Mule Application, when being macro expanded, these parameters will be
-     * feed to it in a new and isolated {@link Event}, so that we can guarantee that for each invocation there's a real variable
+     * feed to it in a new and isolated {@link InternalEvent}, so that we can guarantee that for each invocation there's a real variable
      * scoping for them.
      *
      * @param parameters parameters to be set.
      * @return the builder instance
      * @see #properties(Map)
      */
-    Builder parameters(Map<String, Object> parameters);
+    Builder parameters(Map<String, ?> parameters);
 
     /**
      * Add a parameter.
@@ -379,7 +388,7 @@ public interface Event extends Serializable, org.mule.runtime.api.event.Event {
     Builder removeInternalParameter(String key);
 
     /**
-     * Set correlationId overriding the correlationId from {@link EventContext#getCorrelationId()} that came from the source
+     * Set correlationId overriding the correlationId from {@link InternalEventContext#getCorrelationId()} that came from the source
      * system or that was configured in the connector source. This is only used to support transports and should not be used
      * otherwise.
      *
@@ -450,11 +459,11 @@ public interface Event extends Serializable, org.mule.runtime.api.event.Event {
     Builder session(MuleSession session);
 
     /**
-     * Build a new {@link Event} based on the state configured in the {@link Builder}.
+     * Build a new {@link InternalEvent} based on the state configured in the {@link Builder}.
      *
-     * @return new {@link Event} instance.
+     * @return new {@link InternalEvent} instance.
      */
-    Event build();
+    InternalEvent build();
 
   }
 
@@ -467,7 +476,7 @@ public interface Event extends Serializable, org.mule.runtime.api.event.Event {
    * @param <T> the variable type
    * @return the value of the variables if it exists otherwise {@code null}.
    */
-  static <T> T getVariableValueOrNull(String key, Event event) {
+  static <T> T getVariableValueOrNull(String key, InternalEvent event) {
     if (event.getVariables().containsKey(key)) {
       return (T) event.getVariables().get(key).getValue();
     } else {
@@ -480,7 +489,7 @@ public interface Event extends Serializable, org.mule.runtime.api.event.Event {
    *
    * @return event for currently executing thread.
    */
-  static Event getCurrentEvent() {
+  static InternalEvent getCurrentEvent() {
     return CurrentEventHolder.currentEvent.get();
   }
 
@@ -489,7 +498,7 @@ public interface Event extends Serializable, org.mule.runtime.api.event.Event {
    *
    * @param event event for currently executing thread.
    */
-  static void setCurrentEvent(Event event) {
+  static void setCurrentEvent(InternalEvent event) {
     CurrentEventHolder.currentEvent.set(event);
   }
 

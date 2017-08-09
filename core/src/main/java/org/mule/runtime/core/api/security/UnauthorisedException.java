@@ -8,7 +8,6 @@ package org.mule.runtime.core.api.security;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.i18n.I18nMessage;
-import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.api.security.ServerSecurityException;
 
 /**

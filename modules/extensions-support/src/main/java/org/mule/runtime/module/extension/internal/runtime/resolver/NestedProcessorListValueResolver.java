@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static org.mule.runtime.core.api.util.collection.Collectors.toImmutableList;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.NestedProcessor;
 import org.mule.runtime.core.api.processor.Processor;
@@ -18,7 +18,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 /**
- * An {@link AbstractNestedProcessorValueResolver} which wraps the given {@link Event} in a {@link List} of
+ * An {@link AbstractNestedProcessorValueResolver} which wraps the given {@link InternalEvent} in a {@link List} of
  * {@link NestedProcessor}. This resolver returns new instances per every invocation
  *
  * @since 3.7.0

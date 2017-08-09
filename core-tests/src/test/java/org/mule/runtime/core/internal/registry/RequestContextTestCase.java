@@ -7,12 +7,12 @@
 package org.mule.runtime.core.internal.registry;
 
 import static org.junit.Assert.assertEquals;
-import static org.mule.runtime.core.api.Event.setCurrentEvent;
+import static org.mule.runtime.core.api.InternalEvent.setCurrentEvent;
 import static org.mule.tck.MuleTestUtils.createErrorMock;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -38,7 +38,7 @@ public class RequestContextTestCase extends AbstractMuleTestCase {
     runThread(testEvent(), true);
   }
 
-  protected void runThread(Event event, boolean doTest) throws InterruptedException {
+  protected void runThread(InternalEvent event, boolean doTest) throws InterruptedException {
     AtomicBoolean success = new AtomicBoolean(false);
     Thread thread = new Thread(new SetExceptionPayload(event, success));
     thread.start();
@@ -51,10 +51,10 @@ public class RequestContextTestCase extends AbstractMuleTestCase {
 
   private class SetExceptionPayload implements Runnable {
 
-    private Event event;
+    private InternalEvent event;
     private AtomicBoolean success;
 
-    public SetExceptionPayload(Event event, AtomicBoolean success) {
+    public SetExceptionPayload(InternalEvent event, AtomicBoolean success) {
       this.event = event;
       this.success = success;
     }
@@ -63,7 +63,7 @@ public class RequestContextTestCase extends AbstractMuleTestCase {
     public void run() {
       try {
         Exception exception = new Exception();
-        event = Event.builder(event)
+        event = InternalEvent.builder(event)
             .message(InternalMessage.builder(event.getMessage()).exceptionPayload(new DefaultExceptionPayload(exception)).build())
             .error(createErrorMock(exception)).build();
         setCurrentEvent(event);

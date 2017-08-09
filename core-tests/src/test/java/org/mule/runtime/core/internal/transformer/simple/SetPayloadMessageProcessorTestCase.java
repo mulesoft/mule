@@ -23,7 +23,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
@@ -54,7 +54,7 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleContextTestC
 
     when(muleContext.getExpressionManager()).thenReturn(expressionManager);
     when(muleContext.getConfiguration()).thenReturn(mock(MuleConfiguration.class));
-    when(expressionManager.parse(anyString(), any(Event.class), any(ComponentLocation.class)))
+    when(expressionManager.parse(anyString(), any(InternalEvent.class), any(ComponentLocation.class)))
         .thenAnswer(invocation -> (String) invocation.getArguments()[0]);
   }
 
@@ -63,7 +63,7 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleContextTestC
     setPayloadMessageProcessor.setValue(null);
     setPayloadMessageProcessor.initialise();
 
-    Event response = setPayloadMessageProcessor.process(testEvent());
+    InternalEvent response = setPayloadMessageProcessor.process(testEvent());
 
     assertThat(response.getMessage().getPayload().getValue(), is(nullValue()));
   }
@@ -75,7 +75,7 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleContextTestC
 
     when(expressionManager.isExpression(PLAIN_TEXT)).thenReturn(false);
 
-    Event response = setPayloadMessageProcessor.process(testEvent());
+    InternalEvent response = setPayloadMessageProcessor.process(testEvent());
 
     assertThat(response.getMessage().getPayload().getValue(), is(PLAIN_TEXT));
   }
@@ -87,10 +87,10 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleContextTestC
     setPayloadMessageProcessor.initialise();
     TypedValue typedValue = new TypedValue(PLAIN_TEXT, DataType.STRING);
     when(expressionManager.evaluate(EXPRESSION, testEvent())).thenReturn(typedValue);
-    when(expressionManager.evaluate(eq(EXPRESSION), eq(testEvent()), any(Event.Builder.class), eq(null)))
+    when(expressionManager.evaluate(eq(EXPRESSION), eq(testEvent()), any(InternalEvent.Builder.class), eq(null)))
         .thenReturn(typedValue);
 
-    Event response = setPayloadMessageProcessor.process(testEvent());
+    InternalEvent response = setPayloadMessageProcessor.process(testEvent());
 
     assertThat(response.getMessage().getPayload().getValue(), is(PLAIN_TEXT));
   }
@@ -100,7 +100,7 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleContextTestC
     setPayloadMessageProcessor.setValue(null);
     setPayloadMessageProcessor.initialise();
 
-    Event response = setPayloadMessageProcessor.process(testEvent());
+    InternalEvent response = setPayloadMessageProcessor.process(testEvent());
 
     assertThat(response.getMessage().getPayload().getDataType(), like(Object.class, MediaType.ANY, null));
   }
@@ -121,7 +121,7 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleContextTestC
     setPayloadMessageProcessor.setDataType(DataType.builder().charset(CUSTOM_ENCODING).build());
     setPayloadMessageProcessor.initialise();
 
-    Event response = setPayloadMessageProcessor.process(testEvent());
+    InternalEvent response = setPayloadMessageProcessor.process(testEvent());
 
     assertThat(response.getMessage().getPayload().getDataType(), like(String.class, MediaType.ANY, CUSTOM_ENCODING));
   }
@@ -132,7 +132,7 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleContextTestC
     setPayloadMessageProcessor.setDataType(DataType.builder().mediaType(MediaType.APPLICATION_XML).build());
     setPayloadMessageProcessor.initialise();
 
-    Event response = setPayloadMessageProcessor.process(testEvent());
+    InternalEvent response = setPayloadMessageProcessor.process(testEvent());
 
     assertThat(response.getMessage().getPayload().getDataType(), like(String.class, MediaType.APPLICATION_XML, null));
   }

@@ -22,8 +22,8 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static reactor.core.publisher.Mono.from;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.EventContext;
+import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.InternalEventContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Processor;
@@ -80,14 +80,14 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
 
   @Test
   public void process() throws Exception {
-    Event request = testEvent();
+    InternalEvent request = testEvent();
 
-    Event result = process(messageProcessor, request);
+    InternalEvent result = process(messageProcessor, request);
 
     // Complete parent context so we can assert event context completion based on async completion.
-    request.getInternalContext().success(result);
+    request.getContext().success(result);
 
-    assertCompletionNotDone(request.getInternalContext());
+    assertCompletionNotDone(request.getContext());
 
     // Permit async processing now we have already asserted that response alone is not enough to complete event context.
     asyncEntryLatch.countDown();
@@ -95,14 +95,14 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
     assertThat(latch.await(LOCK_TIMEOUT, MILLISECONDS), is(true));
 
     // Block until async completes, not just target processor.
-    from(target.sensedEvent.getInternalContext().getCompletionPublisher()).block(ofMillis(BLOCK_TIMEOUT));
+    from(target.sensedEvent.getContext().getCompletionPublisher()).block(ofMillis(BLOCK_TIMEOUT));
     assertThat(target.sensedEvent, notNullValue());
 
     // Block to ensure async fully completes before testing state
-    from(request.getInternalContext().getCompletionPublisher()).block(ofMillis(BLOCK_TIMEOUT));
+    from(request.getContext().getCompletionPublisher()).block(ofMillis(BLOCK_TIMEOUT));
 
-    assertCompletionDone(target.sensedEvent.getInternalContext());
-    assertCompletionDone(request.getInternalContext());
+    assertCompletionDone(target.sensedEvent.getContext());
+    assertCompletionDone(request.getContext());
 
     assertTargetEvent(request);
     assertResponse(result);
@@ -114,8 +114,8 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
     TransactionCoordination.getInstance().bindTransaction(transaction);
 
     try {
-      Event request = testEvent();
-      Event result = process(messageProcessor, request);
+      InternalEvent request = testEvent();
+      InternalEvent result = process(messageProcessor, request);
 
       // Wait until processor in async is executed to allow assertions on sensed event
       asyncEntryLatch.countDown();
@@ -148,7 +148,7 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
     process();
   }
 
-  private void assertTargetEvent(Event request) {
+  private void assertTargetEvent(InternalEvent request) {
     // Assert that event is processed in async thread
     assertNotNull(target.sensedEvent);
     assertThat(request, not(sameInstance(target.sensedEvent)));
@@ -157,7 +157,7 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
     assertThat(target.thread, not(sameInstance(currentThread())));
   }
 
-  private void assertResponse(Event result) throws MuleException {
+  private void assertResponse(InternalEvent result) throws MuleException {
     // Assert that response is echoed by async and no exception is thrown in flow
     assertThat(testEvent(), sameInstance(result));
     assertThat(exceptionThrown, nullValue());
@@ -171,21 +171,21 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
     return mp;
   }
 
-  private void assertCompletionDone(EventContext parent) {
+  private void assertCompletionDone(InternalEventContext parent) {
     assertThat(from(parent.getCompletionPublisher()).toFuture().isDone(), is(true));
   }
 
-  private void assertCompletionNotDone(EventContext child1) {
+  private void assertCompletionNotDone(InternalEventContext child1) {
     assertThat(from(child1.getCompletionPublisher()).toFuture().isDone(), is(false));
   }
 
   class TestListener implements Processor {
 
-    Event sensedEvent;
+    InternalEvent sensedEvent;
     Thread thread;
 
     @Override
-    public Event process(Event event) throws MuleException {
+    public InternalEvent process(InternalEvent event) throws MuleException {
       try {
         asyncEntryLatch.await();
       } catch (InterruptedException e) {

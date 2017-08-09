@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.transformer.simple;
 
-import static org.mule.runtime.core.api.Event.getCurrentEvent;
+import static org.mule.runtime.core.api.InternalEvent.getCurrentEvent;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.errorReadingStream;
 import static org.mule.runtime.core.api.util.IOUtils.copyLarge;
 

@@ -7,13 +7,13 @@
 package org.mule.runtime.core.internal.policy;
 
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.api.Event.builder;
+import static org.mule.runtime.core.api.InternalEvent.builder;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyChain;
 import org.mule.runtime.core.api.policy.PolicyNextActionMessageProcessor;
@@ -32,9 +32,9 @@ import org.reactivestreams.Publisher;
  * {@link org.mule.runtime.core.api.source.MessageSource} which typically is a flow execution.
  * 
  * This class enforces the scoping of variables between the actual behaviour and the policy that may be applied to it. To enforce
- * such scoping of variables it uses {@link PolicyStateHandler} so the last {@link Event} modified by the policy behaviour can be
- * stored and retrieve for later usages. It also uses {@link PolicyEventConverter} as a helper class to convert an {@link Event}
- * from the policy to the next operation {@link Event} or from the next operation result to the {@link Event} that must continue
+ * such scoping of variables it uses {@link PolicyStateHandler} so the last {@link InternalEvent} modified by the policy behaviour can be
+ * stored and retrieve for later usages. It also uses {@link PolicyEventConverter} as a helper class to convert an {@link InternalEvent}
+ * from the policy to the next operation {@link InternalEvent} or from the next operation result to the {@link InternalEvent} that must continue
  * the execution of the policy.
  * 
  * If a non-empty {@code sourcePolicyParametersTransformer} is passed to this class, then it will be used to convert the result of
@@ -71,12 +71,12 @@ public class SourcePolicyProcessor implements Processor {
    * @throws MuleException
    */
   @Override
-  public Event process(Event sourceEvent) throws MuleException {
+  public InternalEvent process(InternalEvent sourceEvent) throws MuleException {
     return processToApply(sourceEvent, this);
   }
 
   @Override
-  public Publisher<Event> apply(Publisher<Event> publisher) {
+  public Publisher<InternalEvent> apply(Publisher<InternalEvent> publisher) {
     return from(publisher)
         .then(sourceEvent -> {
           String executionIdentifier = sourceEvent.getContext().getCorrelationId();
@@ -84,22 +84,22 @@ public class SourcePolicyProcessor implements Processor {
                                                  buildSourceExecutionWithPolicyFunction(executionIdentifier, sourceEvent));
           return just(sourceEvent)
               .map(event -> policyEventConverter.createEvent(sourceEvent,
-                                                             builder(sourceEvent.getInternalContext()).message(of(null)).build()))
+                                                             builder(sourceEvent.getContext()).message(of(null)).build()))
               .transform(policy.getPolicyChain())
               .map(event -> policyEventConverter.createEvent(event, sourceEvent));
         });
   }
 
-  private Processor buildSourceExecutionWithPolicyFunction(String executionIdentifier, Event sourceEvent) {
+  private Processor buildSourceExecutionWithPolicyFunction(String executionIdentifier, InternalEvent sourceEvent) {
     return new Processor() {
 
       @Override
-      public Event process(Event event) throws MuleException {
+      public InternalEvent process(InternalEvent event) throws MuleException {
         return processToApply(event, this);
       }
 
       @Override
-      public Publisher<Event> apply(Publisher<Event> publisher) {
+      public Publisher<InternalEvent> apply(Publisher<InternalEvent> publisher) {
         return from(publisher)
             .then(event -> just(event)
                 .doOnNext(request -> policyStateHandler.updateState(new PolicyStateId(executionIdentifier, policy.getPolicyId()),

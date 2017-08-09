@@ -40,7 +40,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.config.spring.internal.factories.FlowRefFactoryBean;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -70,7 +70,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleContextTestCase {
   private static final String DYNAMIC_NON_EXISTANT = "#['nonExistant']";
   private static final String NON_EXISTANT = "nonExistant";
 
-  private Event result;
+  private InternalEvent result;
   private Flow targetFlow = mock(Flow.class, INITIALIZABLE_MESSAGE_PROCESSOR);
   private MessageProcessorChain targetSubFlow = mock(MessageProcessorChain.class, INITIALIZABLE_MESSAGE_PROCESSOR);
   private ApplicationContext applicationContext = mock(ApplicationContext.class);
@@ -136,7 +136,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void dynamicFlowRefSubContextAware() throws Exception {
-    Event event = testEvent();
+    InternalEvent event = testEvent();
     MuleContextAware targetMuleContextAware = mock(MuleContextAware.class, INITIALIZABLE_MESSAGE_PROCESSOR);
     when(((Processor) targetMuleContextAware).apply(any(Publisher.class))).thenReturn(just(result));
 
@@ -148,13 +148,13 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void dynamicFlowRefSubFlowMessageProcessorChain() throws Exception {
-    Event event = testEvent();
+    InternalEvent event = testEvent();
 
     Processor targetSubFlowConstructAware = (Processor) mock(Object.class, INITIALIZABLE_MESSAGE_PROCESSOR);
-    when(targetSubFlowConstructAware.process(any(Event.class))).thenReturn(result);
+    when(targetSubFlowConstructAware.process(any(InternalEvent.class))).thenReturn(result);
     Processor targetMuleContextAwareAware =
         (Processor) mock(MuleContextAware.class, INITIALIZABLE_MESSAGE_PROCESSOR);
-    when(targetMuleContextAwareAware.process(any(Event.class))).thenReturn(result);
+    when(targetMuleContextAwareAware.process(any(InternalEvent.class))).thenReturn(result);
 
     MessageProcessorChain targetSubFlowChain = mock(MessageProcessorChain.class, INITIALIZABLE_MESSAGE_PROCESSOR);
     when(targetSubFlowChain.apply(any(Publisher.class))).thenReturn(just(result));
@@ -177,7 +177,8 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleContextTestCase {
   @Test(expected = MuleRuntimeException.class)
   public void dynamicFlowRefDoesNotExist() throws Exception {
     doReturn(true).when(expressionManager).isExpression(anyString());
-    doReturn("other").when(expressionManager).parse(eq(DYNAMIC_NON_EXISTANT), any(Event.class), any(ComponentLocation.class));
+    doReturn("other").when(expressionManager).parse(eq(DYNAMIC_NON_EXISTANT), any(InternalEvent.class),
+                                                    any(ComponentLocation.class));
 
     getFlowRefProcessor(createFlowRefFactoryBean(DYNAMIC_NON_EXISTANT)).process(testEvent());
   }
@@ -195,20 +196,20 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleContextTestCase {
     doReturn(false).when(expressionManager).isExpression(anyString());
     when(applicationContext.getBean(eq(STATIC_REFERENCED_FLOW))).thenReturn(target);
     when(target.apply(any())).thenAnswer(invocation -> {
-      Mono<Event> mono = from(invocation.getArgumentAt(0, Publisher.class));
-      return mono.doOnNext(event -> event.getInternalContext().success(result)).map(event -> result);
+      Mono<InternalEvent> mono = from(invocation.getArgumentAt(0, Publisher.class));
+      return mono.doOnNext(event -> event.getContext().success(result)).map(event -> result);
     });
     return createFlowRefFactoryBean(STATIC_REFERENCED_FLOW);
   }
 
   private FlowRefFactoryBean createDynamicFlowRefFactoryBean(Processor target) throws InitialisationException {
     doReturn(true).when(expressionManager).isExpression(anyString());
-    doReturn(PARSED_DYNAMIC_REFERENCED_FLOW).when(expressionManager).parse(eq(DYNAMIC_REFERENCED_FLOW), any(Event.class),
+    doReturn(PARSED_DYNAMIC_REFERENCED_FLOW).when(expressionManager).parse(eq(DYNAMIC_REFERENCED_FLOW), any(InternalEvent.class),
                                                                            any(ComponentLocation.class));
     when(applicationContext.getBean(eq(PARSED_DYNAMIC_REFERENCED_FLOW))).thenReturn(target);
     when(target.apply(any())).thenAnswer(invocation -> {
-      Mono<Event> mono = from(invocation.getArgumentAt(0, Publisher.class));
-      return mono.doOnNext(event -> event.getInternalContext().success(result)).map(event -> result);
+      Mono<InternalEvent> mono = from(invocation.getArgumentAt(0, Publisher.class));
+      return mono.doOnNext(event -> event.getContext().success(result)).map(event -> result);
     });
     return createFlowRefFactoryBean(DYNAMIC_REFERENCED_FLOW);
   }

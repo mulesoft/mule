@@ -25,7 +25,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExtendedExpressionLanguageAdaptor;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
@@ -87,7 +87,7 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
   }
 
   @Override
-  public TypedValue evaluate(String expression, Event event, BindingContext context) {
+  public TypedValue evaluate(String expression, InternalEvent event, BindingContext context) {
     String sanitized = sanitize(expression);
     if (isPayloadExpression(sanitized)) {
       return event.getMessage().getPayload();
@@ -102,14 +102,15 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
   }
 
   @Override
-  public TypedValue evaluate(String expression, DataType expectedOutputType, Event event, BindingContext context)
+  public TypedValue evaluate(String expression, DataType expectedOutputType, InternalEvent event, BindingContext context)
       throws ExpressionRuntimeException {
     BindingContext.Builder contextBuilder = bindingContextBuilderFor(event, context);
     return sanitizeAndEvaluate(expression, exp -> expressionExecutor.evaluate(exp, expectedOutputType, contextBuilder.build()));
   }
 
   @Override
-  public TypedValue evaluate(String expression, DataType expectedOutputType, Event event, ComponentLocation componentLocation,
+  public TypedValue evaluate(String expression, DataType expectedOutputType, InternalEvent event,
+                             ComponentLocation componentLocation,
                              BindingContext context, boolean failOnNull)
       throws ExpressionRuntimeException {
     BindingContext.Builder contextBuilder = bindingContextBuilderFor(event, context);
@@ -118,12 +119,14 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
   }
 
   @Override
-  public TypedValue evaluate(String expression, Event event, ComponentLocation componentLocation, BindingContext bindingContext) {
+  public TypedValue evaluate(String expression, InternalEvent event, ComponentLocation componentLocation,
+                             BindingContext bindingContext) {
     return evaluate(expression, event, null, componentLocation, bindingContext);
   }
 
   @Override
-  public TypedValue evaluate(String expression, Event event, Event.Builder eventBuilder, ComponentLocation componentLocation,
+  public TypedValue evaluate(String expression, InternalEvent event, InternalEvent.Builder eventBuilder,
+                             ComponentLocation componentLocation,
                              BindingContext context) {
     String sanitized = sanitize(expression);
     if (isPayloadExpression(sanitized)) {
@@ -142,7 +145,7 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
   }
 
   @Override
-  public Iterator<TypedValue<?>> split(String expression, Event event, ComponentLocation componentLocation,
+  public Iterator<TypedValue<?>> split(String expression, InternalEvent event, ComponentLocation componentLocation,
                                        BindingContext bindingContext)
       throws ExpressionRuntimeException {
     BindingContext.Builder contextBuilder = bindingContextBuilderFor(event, bindingContext);
@@ -151,20 +154,22 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
   }
 
   @Override
-  public Iterator<TypedValue<?>> split(String expression, Event event, BindingContext bindingContext)
+  public Iterator<TypedValue<?>> split(String expression, InternalEvent event, BindingContext bindingContext)
       throws ExpressionRuntimeException {
     BindingContext.Builder contextBuilder = bindingContextBuilderFor(event, bindingContext);
     return sanitizeAndEvaluate(expression, exp -> expressionExecutor.split(exp, contextBuilder.build()));
   }
 
   @Override
-  public void enrich(String expression, Event event, Event.Builder eventBuilder, ComponentLocation componentLocation,
+  public void enrich(String expression, InternalEvent event, InternalEvent.Builder eventBuilder,
+                     ComponentLocation componentLocation,
                      Object object) {
     throw new UnsupportedOperationException("Enrichment is not allowed, yet.");
   }
 
   @Override
-  public void enrich(String expression, Event event, Event.Builder eventBuilder, ComponentLocation componentLocation,
+  public void enrich(String expression, InternalEvent event, InternalEvent.Builder eventBuilder,
+                     ComponentLocation componentLocation,
                      TypedValue value) {
     throw new UnsupportedOperationException("Enrichment is not allowed, yet.");
   }
@@ -198,7 +203,7 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
     return contextBuilder;
   }
 
-  private BindingContext.Builder bindingContextBuilderFor(Event event, BindingContext context) {
+  private BindingContext.Builder bindingContextBuilderFor(InternalEvent event, BindingContext context) {
     if (event != null) {
       return BindingContext.builder(addEventBindings(event, context));
     } else {

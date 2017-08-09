@@ -25,7 +25,7 @@ import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.client.MuleClientFlowConstruct;
@@ -87,7 +87,7 @@ public class DefaultLocalMuleClient implements MuleClient {
     }
   }
 
-  private Either<Error, Message> createEitherResult(Event muleEvent) {
+  private Either<Error, Message> createEitherResult(InternalEvent muleEvent) {
     if (muleEvent == null) {
       // This should never return a null event. This happen because of mule 3.x behaviour with filters.
       // We will just return an error in this case.
@@ -166,7 +166,7 @@ public class DefaultLocalMuleClient implements MuleClient {
     final Processor connectorMessageProcessor =
         getConnectorMessageProcessLocator().locateConnectorOperation(url, operationOptions, ONE_WAY);
     if (connectorMessageProcessor != null) {
-      final Event event = connectorMessageProcessor.process(createMuleEvent(of(null)));
+      final InternalEvent event = connectorMessageProcessor.process(createMuleEvent(of(null)));
       if (event == null) {
         return right(empty());
       }
@@ -179,15 +179,15 @@ public class DefaultLocalMuleClient implements MuleClient {
     }
   }
 
-  protected Event createMuleEvent(Message message) throws MuleException {
+  protected InternalEvent createMuleEvent(Message message) throws MuleException {
     return baseEventBuilder(message).build();
   }
 
-  private org.mule.runtime.core.api.Event.Builder baseEventBuilder(Message message) {
-    return Event.builder(create(flowConstruct, fromSingleComponent("muleClient"))).message(message).flow(flowConstruct);
+  private InternalEvent.Builder baseEventBuilder(Message message) {
+    return InternalEvent.builder(create(flowConstruct, fromSingleComponent("muleClient"))).message(message).flow(flowConstruct);
   }
 
-  protected Event returnEvent(Event event) {
+  protected InternalEvent returnEvent(InternalEvent event) {
     if (event != null) {
       return event;
     } else {

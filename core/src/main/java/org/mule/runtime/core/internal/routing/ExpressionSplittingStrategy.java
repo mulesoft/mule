@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.routing;
 import static org.mule.runtime.internal.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.util.collection.SplittingStrategy;
 
@@ -21,7 +21,7 @@ import java.util.Iterator;
  * 
  * @since 4.0
  */
-public class ExpressionSplittingStrategy implements SplittingStrategy<Event, Iterator<TypedValue<?>>> {
+public class ExpressionSplittingStrategy implements SplittingStrategy<InternalEvent, Iterator<TypedValue<?>>> {
 
   public static final String DEFAULT_SPIT_EXPRESSION = "#[payload]";
   private final String expression;
@@ -48,7 +48,7 @@ public class ExpressionSplittingStrategy implements SplittingStrategy<Event, Ite
   }
 
   @Override
-  public Iterator<TypedValue<?>> split(Event event) {
+  public Iterator<TypedValue<?>> split(InternalEvent event) {
     Iterator<TypedValue<?>> result = expressionManager.split(expression, event, NULL_BINDING_CONTEXT);
     return result != null ? result : Collections.<TypedValue<?>>emptyList().iterator();
   }

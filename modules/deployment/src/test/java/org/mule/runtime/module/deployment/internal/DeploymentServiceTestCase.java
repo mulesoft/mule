@@ -102,7 +102,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.internal.DefaultModuleRepository;
 import org.mule.runtime.core.DefaultEventContext;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.exception.MessagingException;
@@ -4175,7 +4175,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
         (Flow) deploymentService.getApplications().get(0).getMuleContext().getRegistry().lookupFlowConstruct(flowName);
     Message muleMessage = of(TEST_MESSAGE);
 
-    mainFlow.process(Event.builder(DefaultEventContext.create(mainFlow, TEST_CONNECTOR_LOCATION))
+    mainFlow.process(InternalEvent.builder(DefaultEventContext.create(mainFlow, TEST_CONNECTOR_LOCATION))
         .message(muleMessage)
         .flow(mainFlow)
         .build());
@@ -4246,7 +4246,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     public static volatile String policyParametrization = "";
 
     @Override
-    public Event process(Event event) throws MuleException {
+    public InternalEvent process(InternalEvent event) throws MuleException {
       invocationCount++;
       String variableName = "policyParameter";
       if (event.getVariables().keySet().contains(variableName)) {

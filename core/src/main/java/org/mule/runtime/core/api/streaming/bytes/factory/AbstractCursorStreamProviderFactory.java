@@ -8,7 +8,7 @@ package org.mule.runtime.core.api.streaming.bytes.factory;
 
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.internal.streaming.CursorManager;
 import org.mule.runtime.core.api.streaming.bytes.ByteBufferManager;
 import org.mule.runtime.core.api.streaming.StreamingManager;
@@ -44,7 +44,7 @@ public abstract class AbstractCursorStreamProviderFactory implements CursorStrea
    * {@inheritDoc}
    */
   @Override
-  public final Object of(Event event, InputStream inputStream) {
+  public final Object of(InternalEvent event, InputStream inputStream) {
     if (inputStream instanceof CursorStream) {
       return streamingManager.manage(((CursorStream) inputStream).getProvider(), event);
     }
@@ -71,6 +71,6 @@ public abstract class AbstractCursorStreamProviderFactory implements CursorStrea
    * @param event
    * @return
    */
-  protected abstract Object resolve(InputStream inputStream, Event event);
+  protected abstract Object resolve(InputStream inputStream, InternalEvent event);
 
 }

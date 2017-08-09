@@ -20,7 +20,7 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_XML;
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
-import static org.mule.runtime.core.api.Event.setCurrentEvent;
+import static org.mule.runtime.core.api.InternalEvent.setCurrentEvent;
 import static org.mule.runtime.core.api.message.DefaultMultiPartPayload.BODY_ATTRIBUTES;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsUrl;
 import static org.mule.runtime.core.api.util.IOUtils.toMuleMessagePart;

@@ -17,11 +17,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.api.Event.setCurrentEvent;
+import static org.mule.runtime.core.api.InternalEvent.setCurrentEvent;
 import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static reactor.core.publisher.Mono.from;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.transformer.Transformer;
@@ -60,7 +60,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     assertNotNull(serialized);
     ByteArrayToObject trans = new ByteArrayToObject();
     trans.setMuleContext(muleContext);
-    Event deserialized = (Event) trans.transform(serialized);
+    InternalEvent deserialized = (InternalEvent) trans.transform(serialized);
 
     // Assert that deserialized event is not null
     assertNotNull(deserialized);
@@ -79,7 +79,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
   @Test
   public void testEventSerializationRestart() throws Exception {
     // Create and register artifacts
-    Event event = createEventToSerialize();
+    InternalEvent event = createEventToSerialize();
 
     // Serialize
     Serializable serialized = (Serializable) createSerializableToByteArrayTransformer().transform(event);
@@ -96,7 +96,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     createAndRegisterTransformersEndpointBuilderService();
 
     // Deserialize
-    Event deserialized = (Event) trans.transform(serialized);
+    InternalEvent deserialized = (InternalEvent) trans.transform(serialized);
 
     // Assert that deserialized event is not null
     assertNotNull(deserialized);
@@ -105,7 +105,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     assertNotNull(deserialized.getSession());
   }
 
-  private Event createEventToSerialize() throws Exception {
+  private InternalEvent createEventToSerialize() throws Exception {
     createAndRegisterTransformersEndpointBuilderService();
     return testEvent();
   }
@@ -117,7 +117,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     for (int i = 0; i < 108; i++) {
       payload.append("1234567890");
     }
-    Event testEvent = eventBuilder().message(of(new ByteArrayInputStream(payload.toString().getBytes()))).build();
+    InternalEvent testEvent = eventBuilder().message(of(new ByteArrayInputStream(payload.toString().getBytes()))).build();
     setCurrentEvent(testEvent);
     byte[] serializedEvent = muleContext.getObjectSerializer().getExternalProtocol().serialize(testEvent);
     testEvent = muleContext.getObjectSerializer().getExternalProtocol().deserialize(serializedEvent);
@@ -142,7 +142,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
 
   @Test(expected = UnsupportedOperationException.class)
   public void testFlowVarNamesAddImmutable() throws Exception {
-    Event event = eventBuilder()
+    InternalEvent event = eventBuilder()
         .message(of("whatever"))
         .addVariable("test", "val")
         .build();
@@ -150,26 +150,26 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
   }
 
   public void testFlowVarNamesRemoveMutable() throws Exception {
-    Event event = eventBuilder()
+    InternalEvent event = eventBuilder()
         .message(of("whatever"))
         .addVariable("test", "val")
         .build();
-    event = Event.builder(event).addVariable("test", "val").build();
+    event = InternalEvent.builder(event).addVariable("test", "val").build();
     event.getVariables().keySet().remove("test");
     assertNull(event.getVariables().get("test").getValue());
   }
 
   @Test
   public void testFlowVarsNotShared() throws Exception {
-    Event event = eventBuilder()
+    InternalEvent event = eventBuilder()
         .message(of("whatever"))
         .addVariable("foo", "bar")
         .build();
-    event = Event.builder(event).addVariable("foo", "bar").build();
+    event = InternalEvent.builder(event).addVariable("foo", "bar").build();
 
-    Event copy = Event.builder(event).build();
+    InternalEvent copy = InternalEvent.builder(event).build();
 
-    copy = Event.builder(copy).addVariable("foo", "bar2").build();
+    copy = InternalEvent.builder(copy).addVariable("foo", "bar2").build();
 
     assertEquals("bar", event.getVariables().get("foo").getValue());
 
@@ -179,16 +179,17 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
   @Test
   public void eventContextSerializationNoPipelinePublisherLost() throws Exception {
 
-    Event result = testEvent();
-    Event before = testEvent();
+    InternalEvent result = testEvent();
+    InternalEvent before = testEvent();
 
     // Remove Flow to simulate deserialization when Flow is not available
     muleContext.getRegistry().unregisterObject(APPLE_FLOW);
 
-    Event after =
-        (Event) SerializationUtils.deserialize(org.apache.commons.lang3.SerializationUtils.serialize(before), muleContext);
+    InternalEvent after =
+        (InternalEvent) SerializationUtils.deserialize(org.apache.commons.lang3.SerializationUtils.serialize(before),
+                                                       muleContext);
 
-    after.getInternalContext().success(result);
+    after.getContext().success(result);
 
     assertThat(before.getContext().getId(), equalTo(after.getContext().getId()));
 
@@ -196,14 +197,14 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     // fails with timeout.
     expectedException.expect(IllegalStateException.class);
     expectedException.expectMessage(startsWith(TIMEOUT_ILLEGAL_ARGUMENT_EXCEPTION_MESSAGE));
-    from(before.getInternalContext().getResponsePublisher()).block(ofMillis(BLOCK_TIMEOUT));
+    from(before.getContext().getResponsePublisher()).block(ofMillis(BLOCK_TIMEOUT));
   }
 
   @Test
   public void eventContextSerializationEventContextGarbageCollected() throws Exception {
 
     Flow flow = getTestFlow(muleContext);
-    Event before = eventBuilder().message(of(null)).flow(flow).build();
+    InternalEvent before = eventBuilder().message(of(null)).flow(flow).build();
     String beforeId = before.getContext().getId();
 
     byte[] bytes = org.apache.commons.lang3.SerializationUtils.serialize(before);
@@ -216,18 +217,19 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void eventContextSerializationPublisherConserved() throws Exception {
-    Event result = testEvent();
-    Event before = eventBuilder().message(of(null)).flow(getTestFlow(muleContext)).build();
+    InternalEvent result = testEvent();
+    InternalEvent before = eventBuilder().message(of(null)).flow(getTestFlow(muleContext)).build();
 
-    Event after =
-        (Event) SerializationUtils.deserialize(org.apache.commons.lang3.SerializationUtils.serialize(before), muleContext);
+    InternalEvent after =
+        (InternalEvent) SerializationUtils.deserialize(org.apache.commons.lang3.SerializationUtils.serialize(before),
+                                                       muleContext);
 
-    after.getInternalContext().success(result);
+    after.getContext().success(result);
 
     assertThat(before.getContext().getId(), equalTo(after.getContext().getId()));
 
     // Publisher is conserved after serialization so attempting to obtain result via before event is successful.
-    assertThat(from(before.getInternalContext().getResponsePublisher()).block(), equalTo(result));
+    assertThat(from(before.getContext().getResponsePublisher()).block(), equalTo(result));
 
     // Cache entry is removed on deserialization
     assertThat(((Pipeline) before.getFlowConstruct()).getSerializationEventContextCache().get(before.getContext().getId()),

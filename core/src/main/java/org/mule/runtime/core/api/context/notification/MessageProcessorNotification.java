@@ -9,8 +9,8 @@ package org.mule.runtime.core.api.context.notification;
 import static org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo.createInfo;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.EventContext;
+import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.InternalEventContext;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
 
@@ -26,26 +26,27 @@ public class MessageProcessorNotification extends EnrichedServerNotification {
     registerAction("message processor post invoke", MESSAGE_PROCESSOR_POST_INVOKE);
   }
 
-  private EventContext eventContext;
+  private InternalEventContext eventContext;
 
   public MessageProcessorNotification(EnrichedNotificationInfo notificationInfo, ComponentLocation componentLocation,
-                                      EventContext eventContext,
+                                      InternalEventContext eventContext,
                                       int action) {
     super(notificationInfo, action, componentLocation != null ? componentLocation.getRootContainerName() : null);
     this.eventContext = eventContext;
   }
 
-  public static MessageProcessorNotification createFrom(Event event, ComponentLocation componentLocation, Processor processor,
+  public static MessageProcessorNotification createFrom(InternalEvent event, ComponentLocation componentLocation,
+                                                        Processor processor,
                                                         MessagingException exceptionThrown, int action) {
     EnrichedNotificationInfo notificationInfo = createInfo(event, exceptionThrown, processor);
-    return new MessageProcessorNotification(notificationInfo, componentLocation, event.getInternalContext(), action);
+    return new MessageProcessorNotification(notificationInfo, componentLocation, event.getContext(), action);
   }
 
   public Processor getProcessor() {
     return (Processor) getComponent();
   }
 
-  public EventContext getEventContext() {
+  public InternalEventContext getEventContext() {
     return eventContext;
   }
 

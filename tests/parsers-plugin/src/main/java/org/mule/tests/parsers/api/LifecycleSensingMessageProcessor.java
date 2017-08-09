@@ -6,7 +6,7 @@
  */
 package org.mule.tests.parsers.api;
 
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
@@ -53,7 +53,7 @@ public class LifecycleSensingMessageProcessor implements Lifecycle, Processor {
   }
 
   @Override
-  public Event process(Event event) throws MuleException {
+  public InternalEvent process(InternalEvent event) throws MuleException {
     return event;
   }
 }

@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.construct.processor;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.InternalMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
@@ -24,7 +24,7 @@ public class FlowConstructStatisticsMessageProcessor extends AbstractAnnotatedOb
   }
 
   @Override
-  public Event process(Event event) throws MuleException {
+  public InternalEvent process(InternalEvent event) throws MuleException {
     if (flowConstructStatistics.isEnabled()) {
       flowConstructStatistics.incReceivedEvents();
     }

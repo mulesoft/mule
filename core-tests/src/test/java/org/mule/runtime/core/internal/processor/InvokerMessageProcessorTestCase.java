@@ -14,7 +14,7 @@ import static org.junit.Assert.fail;
 import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -164,7 +164,7 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleContextTestCase
     invoker.setMethodName("testArrayArg");
     invoker.setArguments(Collections.singletonList(new String[] {"#[mel:'1']", "#[mel:'2']"}));
     invoker.initialise();
-    Event result = invoker.process(testEvent());
+    InternalEvent result = invoker.process(testEvent());
     assertEquals(String[].class, result.getMessage().getPayload().getDataType().getType());
     assertEquals("1", ((String[]) result.getMessage().getPayload().getValue())[0]);
     assertEquals("2", ((String[]) result.getMessage().getPayload().getValue())[1]);
@@ -175,7 +175,7 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleContextTestCase
     invoker.setMethodName("testListArg");
     invoker.setArguments(Collections.singletonList(Collections.singletonList("#[mel:'1']")));
     invoker.initialise();
-    Event result = invoker.process(testEvent());
+    InternalEvent result = invoker.process(testEvent());
     assertTrue(List.class.isAssignableFrom(result.getMessage().getPayload().getDataType().getType()));
     assertEquals("1", ((List) result.getMessage().getPayload().getValue()).get(0));
   }
@@ -186,7 +186,7 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleContextTestCase
     invoker.setArguments(Collections
         .singletonList(Collections.singletonList(Collections.singletonMap("#[mel:'key']", "#[mel:'val']"))));
     invoker.initialise();
-    Event result = invoker.process(testEvent());
+    InternalEvent result = invoker.process(testEvent());
     assertTrue(List.class.isAssignableFrom(result.getMessage().getPayload().getDataType().getType()));
     assertEquals("val", ((Map) ((List) result.getMessage().getPayload().getValue()).get(0)).get("key"));
   }
@@ -196,7 +196,7 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleContextTestCase
     invoker.setMethodName("testMapArg");
     invoker.setArguments(Collections.singletonList(Collections.singletonMap("#[mel:'key']", "#[mel:'val']")));
     invoker.initialise();
-    Event result = invoker.process(testEvent());
+    InternalEvent result = invoker.process(testEvent());
     assertTrue(Map.class.isAssignableFrom(result.getMessage().getPayload().getDataType().getType()));
     assertEquals("val", ((Map) result.getMessage().getPayload().getValue()).get("key"));
   }

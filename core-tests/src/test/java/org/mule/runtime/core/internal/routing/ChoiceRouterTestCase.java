@@ -14,13 +14,11 @@ import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
 import static org.mule.runtime.core.api.management.stats.RouterStatistics.TYPE_OUTBOUND;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
-import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.management.stats.RouterStatistics;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
-import org.mule.runtime.core.internal.routing.ChoiceRouter;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 import org.mule.tck.testmodels.mule.TestMessageProcessor;
 
@@ -48,7 +46,7 @@ public class ChoiceRouterTestCase extends AbstractReactiveProcessorTestCase {
 
   @Test
   public void testNoRoute() throws Exception {
-    Event inputEvent = fooEvent();
+    InternalEvent inputEvent = fooEvent();
     assertThat(process(choiceRouter, inputEvent), is(inputEvent));
   }
 
@@ -63,7 +61,7 @@ public class ChoiceRouterTestCase extends AbstractReactiveProcessorTestCase {
   @Test
   public void testNoMatchingNorDefaultRoute() throws Exception {
     choiceRouter.addRoute(payloadZapExpression(), newChain(new TestMessageProcessor("bar")));
-    Event inputEvent = fooEvent();
+    InternalEvent inputEvent = fooEvent();
     assertThat(process(choiceRouter, inputEvent), is(inputEvent));
   }
 
@@ -103,7 +101,7 @@ public class ChoiceRouterTestCase extends AbstractReactiveProcessorTestCase {
     choiceRouter.setMuleContext(muleContext);
     choiceRouter.initialise();
 
-    Event inputEvent = zapEvent();
+    InternalEvent inputEvent = zapEvent();
     assertThat(process(choiceRouter, inputEvent), is(inputEvent));
   }
 
@@ -117,11 +115,11 @@ public class ChoiceRouterTestCase extends AbstractReactiveProcessorTestCase {
     assertThat(process(choiceRouter, zapEvent()).getMessage().getPayload().getValue(), is("zap:bar"));
   }
 
-  protected Event fooEvent() throws MuleException {
+  protected InternalEvent fooEvent() throws MuleException {
     return eventBuilder().message(of("foo")).build();
   }
 
-  protected Event zapEvent() throws MuleException {
+  protected InternalEvent zapEvent() throws MuleException {
     return eventBuilder().message(of("zap")).build();
   }
 

@@ -19,11 +19,10 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
 
 import org.reactivestreams.Publisher;
 
@@ -47,12 +46,12 @@ public class TestNonBlockingProcessor extends AbstractAnnotatedObject
   }
 
   @Override
-  public Event process(final Event event) throws MuleException {
+  public InternalEvent process(final InternalEvent event) throws MuleException {
     return event;
   }
 
   @Override
-  public Publisher<Event> apply(Publisher<Event> publisher) {
+  public Publisher<InternalEvent> apply(Publisher<InternalEvent> publisher) {
     return from(publisher).flatMap(event -> {
       if (isTransactionActive()) {
         return publisher;

@@ -15,7 +15,7 @@ import static org.slf4j.helpers.NOPLogger.NOP_LOGGER;
 
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
@@ -65,7 +65,7 @@ public class TransactionAwareWorkQueueProcessingStrategyFactory extends WorkQueu
     }
 
     @Override
-    protected Consumer<Event> createOnEventConsumer() {
+    protected Consumer<InternalEvent> createOnEventConsumer() {
       // Do nothing given event should still be processed when transaction is active
       return event -> {
       };
@@ -87,7 +87,7 @@ public class TransactionAwareWorkQueueProcessingStrategyFactory extends WorkQueu
       }
 
       @Override
-      public void accept(Event event) {
+      public void accept(InternalEvent event) {
         if (isTransactionActive()) {
           syncSink.accept(event);
         } else {

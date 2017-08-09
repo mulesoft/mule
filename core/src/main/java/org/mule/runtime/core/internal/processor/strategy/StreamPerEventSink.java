@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.processor.strategy;
 import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static reactor.core.publisher.Mono.just;
 
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.processor.Sink;
 
 import java.util.function.Consumer;
@@ -23,23 +23,24 @@ import reactor.core.publisher.Mono;
  */
 public class StreamPerEventSink implements Sink {
 
-  private Function<Publisher<Event>, Publisher<Event>> processor;
-  private Consumer<Event> eventConsumer;
+  private Function<Publisher<InternalEvent>, Publisher<InternalEvent>> processor;
+  private Consumer<InternalEvent> eventConsumer;
 
   /**
    * Creates a {@link StreamPerEventSink}.
    *
    * @param processor the processor to process events emitted onto stream, typically this processor will represent the flow
    *        pipeline.
-   * @param eventConsumer event consumer called just before {@link Event}'s emission.
+   * @param eventConsumer event consumer called just before {@link InternalEvent}'s emission.
    */
-  public StreamPerEventSink(Function<Publisher<Event>, Publisher<Event>> processor, Consumer<Event> eventConsumer) {
+  public StreamPerEventSink(Function<Publisher<InternalEvent>, Publisher<InternalEvent>> processor,
+                            Consumer<InternalEvent> eventConsumer) {
     this.processor = processor;
     this.eventConsumer = eventConsumer;
   }
 
   @Override
-  public void accept(Event event) {
+  public void accept(InternalEvent event) {
     just(event)
         .doOnNext(request -> eventConsumer.accept(request))
         .transform(processor)

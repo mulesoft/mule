@@ -8,19 +8,19 @@ package org.mule.runtime.core.el.mvel;
 
 import org.mule.mvel2.ParserConfiguration;
 import org.mule.mvel2.integration.VariableResolver;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 
 public class VariableVariableResolverFactory extends MuleBaseVariableResolverFactory {
 
   private static final long serialVersionUID = -4433478558175131280L;
 
-  private Event event;
-  private Event.Builder eventBuilder;
+  private InternalEvent event;
+  private InternalEvent.Builder eventBuilder;
 
   // TODO MULE-10471 Immutable event used in MEL/Scripting should be shared for consistency
-  public VariableVariableResolverFactory(ParserConfiguration parserConfiguration, MuleContext muleContext, Event event,
-                                         Event.Builder eventBuilder) {
+  public VariableVariableResolverFactory(ParserConfiguration parserConfiguration, MuleContext muleContext, InternalEvent event,
+                                         InternalEvent.Builder eventBuilder) {
     this.event = event;
     this.eventBuilder = eventBuilder;
   }

@@ -10,13 +10,14 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.api.security.SecurityProviderNotFoundException;
 import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 
 /**
  * <code>AuthenticationFilter</code> is a base filter for authenticating messages.
  */
 public interface AuthenticationFilter extends SecurityFilter {
 
-  Event authenticate(Event event) throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
+  InternalEvent authenticate(InternalEvent event)
+      throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
       SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, InitialisationException;
 }

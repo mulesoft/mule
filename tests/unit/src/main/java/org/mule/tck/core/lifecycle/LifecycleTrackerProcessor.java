@@ -9,7 +9,7 @@ package org.mule.tck.core.lifecycle;
 import static org.mockito.Mockito.mock;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.management.stats.ComponentStatistics;
 import org.mule.runtime.core.api.processor.Processor;
@@ -37,8 +37,8 @@ public class LifecycleTrackerProcessor extends AbstractLifecycleTracker implemen
   }
 
   @Override
-  public Event process(Event event) throws MuleException {
-    event = Event.builder(event)
+  public InternalEvent process(InternalEvent event) throws MuleException {
+    event = InternalEvent.builder(event)
         .addVariable(LIFECYCLE_TRACKER_PROCESSOR_PROPERTY, getTracker().toString())
         .addVariable(FLOW_CONSRUCT_PROPERTY, FlowConstruct.getFromAnnotatedObject(componentLocator, this)).build();
     return event;

@@ -15,7 +15,7 @@ import static org.junit.Assert.fail;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.PartitionableObjectStore;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean;
@@ -32,7 +32,7 @@ import org.junit.Test;
 
 public class EventGroupTestCase extends AbstractMuleContextTestCase {
 
-  private PartitionableObjectStore<Event> objectStore;
+  private PartitionableObjectStore<InternalEvent> objectStore;
 
   @Before
   public void before() throws RegistrationException {
@@ -51,7 +51,7 @@ public class EventGroupTestCase extends AbstractMuleContextTestCase {
     assertTrue(eg.iterator().hasNext());
 
     // now add events while we iterate over the group
-    Iterator<Event> i = eg.iterator();
+    Iterator<InternalEvent> i = eg.iterator();
     assertNotNull(i.next());
     eg.addEvent(eventBuilder().message(Message.of("foo3")).build());
     assertNotNull(i.next());
@@ -170,7 +170,7 @@ public class EventGroupTestCase extends AbstractMuleContextTestCase {
     eg.addEvent(eventBuilder().message(Message.of("foo2")).build());
 
     Object[] array1 = IteratorUtils.toArray(eg.iterator(false));
-    Event[] array2 = eg.toArray(false);
+    InternalEvent[] array2 = eg.toArray(false);
     assertTrue(Arrays.equals(array1, array2));
   }
 
@@ -181,14 +181,14 @@ public class EventGroupTestCase extends AbstractMuleContextTestCase {
     String es = eg.toString();
     assertTrue(es.endsWith("events=0}"));
 
-    Event firstEvent = eventBuilder().message(Message.of("foo")).build();
+    InternalEvent firstEvent = eventBuilder().message(Message.of("foo")).build();
     String firstId = firstEvent.getCorrelationId();
     eg.addEvent(firstEvent);
     es = eg.toString();
     assertTrue(es.contains("events=1"));
     assertTrue(es.endsWith("[" + firstId + "]}"));
 
-    Event secondEvent = eventBuilder()
+    InternalEvent secondEvent = eventBuilder()
         .message(Message.of("foo2"))
         .build();
     String secondId = secondEvent.getCorrelationId();
@@ -205,9 +205,9 @@ public class EventGroupTestCase extends AbstractMuleContextTestCase {
     eg.initEventsStore(objectStore);
     assertFalse(eg.iterator().hasNext());
 
-    Event event1 = eventBuilder().message(Message.of("foo1")).build();
-    Event event2 = eventBuilder().message(Message.of("foo2")).build();
-    Event event3 = eventBuilder().message(Message.of("foo3")).build();
+    InternalEvent event1 = eventBuilder().message(Message.of("foo1")).build();
+    InternalEvent event2 = eventBuilder().message(Message.of("foo2")).build();
+    InternalEvent event3 = eventBuilder().message(Message.of("foo3")).build();
 
     event1.getSession().setProperty("key1", "value1");
     event1.getSession().setProperty("key2", "value2");
@@ -222,7 +222,7 @@ public class EventGroupTestCase extends AbstractMuleContextTestCase {
     eg.addEvent(event3);
     System.out.println(event3.getSession());
 
-    Event result = eg.getMessageCollectionEvent();
+    InternalEvent result = eg.getMessageCollectionEvent();
     assertEquals("value1", result.getSession().getProperty("key1"));
     // Cannot assert this because the ordering of events aren't ordered. See MULE-5998
     // assertEquals("value2NEW", result.getSession().getProperty("key2"));

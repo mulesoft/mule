@@ -16,7 +16,7 @@ import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.NON_BLO
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -36,9 +36,9 @@ import reactor.core.publisher.Mono;
 
 /**
  * Abstract base test case extending {@link AbstractMuleContextTestCase} to be used when a {@link Processor} or {@link Flow} that
- * implements both {@link Processor#process(Event)} and {@link Processor#apply(Publisher)} needs paramatized tests so that both
+ * implements both {@link Processor#process(InternalEvent)} and {@link Processor#apply(Publisher)} needs paramatized tests so that both
  * approaches are tested with the same test method. Test cases that extend this abstract class should use (@link
- * {@link #process(Processor, Event)} to invoke {@link Processor}'s as part of the test, rather than invoking them directly.
+ * {@link #process(Processor, InternalEvent)} to invoke {@link Processor}'s as part of the test, rather than invoking them directly.
  */
 @RunWith(Parameterized.class)
 public abstract class AbstractReactiveProcessorTestCase extends AbstractMuleContextTestCase {
@@ -97,11 +97,11 @@ public abstract class AbstractReactiveProcessorTestCase extends AbstractMuleCont
   }
 
   @Override
-  protected Event process(Processor processor, Event event) throws Exception {
+  protected InternalEvent process(Processor processor, InternalEvent event) throws Exception {
     return process(processor, event, true);
   }
 
-  protected Event process(Processor processor, Event event, boolean unwrapMessagingException) throws Exception {
+  protected InternalEvent process(Processor processor, InternalEvent event, boolean unwrapMessagingException) throws Exception {
     setMuleContextIfNeeded(processor, muleContext);
     try {
       switch (mode) {
@@ -130,7 +130,7 @@ public abstract class AbstractReactiveProcessorTestCase extends AbstractMuleCont
 
   public enum Mode {
     /**
-     * Test using {@link Processor#process(Event)} blocking API.
+     * Test using {@link Processor#process(InternalEvent)} blocking API.
      */
     BLOCKING,
     /**

@@ -6,7 +6,7 @@
  */
 package org.mule.functional.api.component;
 
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -27,7 +27,7 @@ public class InvocationCountMessageProcessor implements Processor, Initialisable
 
 
   @Override
-  public Event process(Event event) throws MuleException {
+  public InternalEvent process(InternalEvent event) throws MuleException {
     invocationCount.incrementAndGet();
     return event;
   }

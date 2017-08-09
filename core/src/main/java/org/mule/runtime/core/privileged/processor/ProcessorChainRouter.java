@@ -9,17 +9,17 @@ package org.mule.runtime.core.privileged.processor;
 import static java.util.Collections.emptyList;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.runtime.core.api.util.UUID.getUUID;
+import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
-import org.mule.runtime.core.DefaultEventContext;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ProcessorChainRouter extends AbstractAnnotatedObject implements Lifecycle {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(CompositeProcessorChainRouter.class);
+  private static Logger LOGGER = getLogger(ProcessorChainRouter.class);
 
   @Inject
   private MuleContext muleContext;
@@ -50,12 +50,9 @@ public class ProcessorChainRouter extends AbstractAnnotatedObject implements Lif
   private List<Processor> processors = emptyList();
   private MessageProcessorChain processorChain;
 
-  public Event process(Event event) {
-    org.mule.runtime.core.api.Event.Builder builder =
-        org.mule.runtime.core.api.Event.builder(DefaultEventContext.create(getUUID(), muleContext.getId(), getLocation()));
-    org.mule.runtime.core.api.Event defaultEvent = builder.from(event).build();
+  public Event process(InternalEvent event) {
     try {
-      return processorChain.process(defaultEvent);
+      return processorChain.process(event);
     } catch (MuleException e) {
       throw new MuleRuntimeException(e);
     }
@@ -77,7 +74,7 @@ public class ProcessorChainRouter extends AbstractAnnotatedObject implements Lif
 
   @Override
   public void start() throws MuleException {
-    LifecycleUtils.startIfNeeded(processorChain);
+    startIfNeeded(processorChain);
   }
 
   @Override

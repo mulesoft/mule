@@ -29,7 +29,7 @@ import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
@@ -68,7 +68,7 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
   private static final DataType DATA_TYPE = STRING;
 
   @Mock(answer = RETURNS_DEEP_STUBS)
-  private Event muleEvent;
+  private InternalEvent muleEvent;
 
   @Mock
   private ResolverSetResult parameters;

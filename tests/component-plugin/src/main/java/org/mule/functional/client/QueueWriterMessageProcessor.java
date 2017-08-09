@@ -14,7 +14,7 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.Processor;
@@ -22,7 +22,7 @@ import org.mule.runtime.core.api.session.DefaultMuleSession;
 import org.mule.runtime.core.api.util.AttributeEvaluator;
 
 /**
- * Writes {@link Event} to a test connector's queue.
+ * Writes {@link InternalEvent} to a test connector's queue.
  */
 public class QueueWriterMessageProcessor extends AbstractAnnotatedObject implements Processor, MuleContextAware, Initialisable {
 
@@ -33,18 +33,18 @@ public class QueueWriterMessageProcessor extends AbstractAnnotatedObject impleme
   private Class contentJavaType;
 
   @Override
-  public Event process(Event event) throws MuleException {
+  public InternalEvent process(InternalEvent event) throws MuleException {
     TestConnectorConfig connectorConfig = muleContext.getRegistry().lookupObject(DEFAULT_CONFIG_ID);
-    Event copy;
+    InternalEvent copy;
     if (attributeEvaluator == null) {
-      copy = Event.builder(event).session(new DefaultMuleSession(event.getSession()))
+      copy = InternalEvent.builder(event).session(new DefaultMuleSession(event.getSession()))
           // Queue works based on MuleEvent for testing purposes. A real operation
           // would not be aware of the error field and just the plain message would be sent.
           .error(null)
           .build();
     } else {
       Object payloadValue = attributeEvaluator.resolveTypedValue(event).getValue();
-      copy = Event.builder(event).message(Message.builder(event.getMessage()).value(payloadValue).build())
+      copy = InternalEvent.builder(event).message(Message.builder(event.getMessage()).value(payloadValue).build())
           .session(new DefaultMuleSession(event.getSession()))
           // Queue works based on MuleEvent for testing purposes. A real operation
           // would not be aware of the error field and just the plain message would be sent.

@@ -10,7 +10,7 @@ import org.mule.mvel2.ParserConfiguration;
 import org.mule.mvel2.integration.VariableResolver;
 import org.mule.mvel2.integration.VariableResolverFactory;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.el.context.EventVariablesMapContext;
@@ -33,13 +33,13 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
   public static final String FLOW_VARS = "flowVars";
   public static final String SESSION_VARS = "sessionVars";
 
-  protected Event event;
-  protected Event.Builder eventBuilder;
+  protected InternalEvent event;
+  protected InternalEvent.Builder eventBuilder;
   protected MuleContext muleContext;
 
   // TODO MULE-10471 Immutable event used in MEL/Scripting should be shared for consistency
   public MessageVariableResolverFactory(final ParserConfiguration parserConfiguration, final MuleContext muleContext,
-                                        final Event event, final Event.Builder eventBuilder) {
+                                        final InternalEvent event, final InternalEvent.Builder eventBuilder) {
     this.event = event;
     this.eventBuilder = eventBuilder;
     this.muleContext = muleContext;
@@ -52,7 +52,7 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
    * @param next
    */
   public MessageVariableResolverFactory(final ParserConfiguration parserConfiguration, final MuleContext muleContext,
-                                        final Event event, final Event.Builder eventBuilder,
+                                        final InternalEvent event, final InternalEvent.Builder eventBuilder,
                                         final VariableResolverFactory next) {
     this(parserConfiguration, muleContext, event, eventBuilder);
     setNextFactory(next);
@@ -107,7 +107,7 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
     return super.getNextFactoryVariableResolver(name);
   }
 
-  private MessagingException wrapIfNecessary(Event event, Throwable exception) {
+  private MessagingException wrapIfNecessary(InternalEvent event, Throwable exception) {
     if (exception instanceof MessagingException) {
       return (MessagingException) exception;
     } else {

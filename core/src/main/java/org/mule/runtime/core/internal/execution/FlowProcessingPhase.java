@@ -11,7 +11,7 @@ import static org.mule.runtime.core.api.context.notification.ConnectorMessageNot
 import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.execution.FlowProcessingPhaseTemplate;
@@ -52,16 +52,16 @@ public class FlowProcessingPhase extends NotificationFiringProcessingPhase<FlowP
             muleContext.getRegistry().get(messageProcessContext.getMessageSource().getRootContainerName());
         try {
           final AtomicReference exceptionThrownDuringFlowProcessing = new AtomicReference();
-          TransactionalExecutionTemplate<Event> transactionTemplate =
+          TransactionalExecutionTemplate<InternalEvent> transactionTemplate =
               createTransactionalExecutionTemplate(muleContext, messageProcessContext.getTransactionConfig()
                   .orElse(new MuleTransactionConfig()));
-          Event response = transactionTemplate.execute(() -> {
+          InternalEvent response = transactionTemplate.execute(() -> {
             try {
               Object message = flowProcessingPhaseTemplate.getOriginalMessage();
               if (message == null) {
                 return null;
               }
-              Event muleEvent = flowProcessingPhaseTemplate.getEvent();
+              InternalEvent muleEvent = flowProcessingPhaseTemplate.getEvent();
               muleEvent = flowProcessingPhaseTemplate.beforeRouteEvent(muleEvent);
               muleEvent = flowProcessingPhaseTemplate.routeEvent(muleEvent);
               muleEvent = flowProcessingPhaseTemplate.afterRouteEvent(muleEvent);
@@ -121,7 +121,7 @@ public class FlowProcessingPhase extends NotificationFiringProcessingPhase<FlowP
     }
   }
 
-  private void sendResponseIfNeccessary(MessageSource messageSource, FlowConstruct flow, Event muleEvent,
+  private void sendResponseIfNeccessary(MessageSource messageSource, FlowConstruct flow, InternalEvent muleEvent,
                                         FlowProcessingPhaseTemplate flowProcessingPhaseTemplate)
       throws MuleException {
     if (flowProcessingPhaseTemplate instanceof RequestResponseFlowProcessingPhaseTemplate) {

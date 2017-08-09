@@ -20,7 +20,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.DefaultTransformationService;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionExecutor;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -44,8 +44,8 @@ public class WildcardExpressionLanguageFunctionTestCase extends AbstractMuleTest
   protected MVELExpressionLanguageContext context;
   protected WildcardExpressionLanguageFuntion wildcardFunction;
   protected MuleContext muleContext;
-  private Event event;
-  private Event.Builder eventBuilder;
+  private InternalEvent event;
+  private InternalEvent.Builder eventBuilder;
   private InternalMessage message;
 
   @Before
@@ -213,10 +213,10 @@ public class WildcardExpressionLanguageFunctionTestCase extends AbstractMuleTest
 
   @SuppressWarnings("unchecked")
   protected void addMessageToContextWithPayload(String payload) throws TransformerException {
-    event = mock(Event.class);
+    event = mock(InternalEvent.class);
     when(event.getFlowCallStack()).thenReturn(new DefaultFlowCallStack());
     when(event.getError()).thenReturn(empty());
-    eventBuilder = Event.builder(event);
+    eventBuilder = InternalEvent.builder(event);
     message = mock(InternalMessage.class);
     when(event.getMessage()).thenAnswer(invocation -> message);
     InternalMessage transformedMessage = mock(InternalMessage.class, RETURNS_DEEP_STUBS);

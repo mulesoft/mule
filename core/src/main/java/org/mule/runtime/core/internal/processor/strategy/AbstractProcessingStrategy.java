@@ -12,7 +12,7 @@ import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTr
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
@@ -37,11 +37,11 @@ public abstract class AbstractProcessingStrategy implements ProcessingStrategy {
     return new DirectSink(pipeline, createOnEventConsumer());
   }
 
-  protected Consumer<Event> createOnEventConsumer() {
+  protected Consumer<InternalEvent> createOnEventConsumer() {
     return event -> {
       if (isTransactionActive()) {
-        event.getInternalContext().error(new MessagingException(event,
-                                                                new DefaultMuleException(createStaticMessage(TRANSACTIONAL_ERROR_MESSAGE))));
+        event.getContext().error(new MessagingException(event,
+                                                        new DefaultMuleException(createStaticMessage(TRANSACTIONAL_ERROR_MESSAGE))));
       }
     };
   }
@@ -55,19 +55,19 @@ public abstract class AbstractProcessingStrategy implements ProcessingStrategy {
    */
   static final class ReactorSink implements Sink, Disposable {
 
-    private final BlockingSink<Event> blockingSink;
+    private final BlockingSink<InternalEvent> blockingSink;
     private final reactor.core.Disposable disposable;
     private final Consumer onEventConsumer;
 
-    ReactorSink(BlockingSink<Event> blockingSink, reactor.core.Disposable disposable,
-                Consumer<Event> onEventConsumer) {
+    ReactorSink(BlockingSink<InternalEvent> blockingSink, reactor.core.Disposable disposable,
+                Consumer<InternalEvent> onEventConsumer) {
       this.blockingSink = blockingSink;
       this.disposable = disposable;
       this.onEventConsumer = onEventConsumer;
     }
 
     @Override
-    public void accept(Event event) {
+    public void accept(InternalEvent event) {
       onEventConsumer.accept(event);
       // TODO MULE-11449 Implement handling of back-pressure via OVERLOAD exception type.
       blockingSink.accept(event);

@@ -17,7 +17,7 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.functional.Either;
@@ -64,14 +64,14 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
   private SourcePolicyProcessorFactory sourcePolicyProcessorFactory;
 
   @Override
-  public SourcePolicy createSourcePolicyInstance(ComponentLocation sourceLocation, Event sourceEvent,
+  public SourcePolicy createSourcePolicyInstance(ComponentLocation sourceLocation, InternalEvent sourceEvent,
                                                  Processor flowExecutionProcessor,
                                                  MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor) {
     PolicyPointcutParameters sourcePointcutParameters = createSourcePointcutParameters(sourceLocation, sourceEvent);
     List<Policy> parameterizedPolicies = policyProvider.findSourceParameterizedPolicies(sourcePointcutParameters);
     if (parameterizedPolicies.isEmpty()) {
       return event -> just(sourceEvent).transform(flowExecutionProcessor)
-          .defaultIfEmpty(Event.builder(sourceEvent).message(of(null)).build())
+          .defaultIfEmpty(InternalEvent.builder(sourceEvent).message(of(null)).build())
           .<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>>map(flowExecutionResult -> right(new SourcePolicySuccessResult(flowExecutionResult,
                                                                                                                                         () -> messageSourceResponseParametersProcessor
                                                                                                                                             .getSuccessfulExecutionResponseParametersFunction()
@@ -94,7 +94,7 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
   }
 
   @Override
-  public OperationPolicy createOperationPolicy(ComponentLocation operationLocation, Event event,
+  public OperationPolicy createOperationPolicy(ComponentLocation operationLocation, InternalEvent event,
                                                Map<String, Object> operationParameters,
                                                OperationExecutionFunction operationExecutionFunction) {
 
@@ -144,7 +144,7 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
   }
 
   private PolicyPointcutParameters createSourcePointcutParameters(ComponentLocation sourceLocation,
-                                                                  Event sourceEvent) {
+                                                                  InternalEvent sourceEvent) {
     return createPointcutParameters(sourceLocation, SourcePolicyPointcutParametersFactory.class, sourcePointcutFactories,
                                     factory -> factory
                                         .supportsSourceIdentifier(sourceLocation.getComponentIdentifier().getIdentifier()),

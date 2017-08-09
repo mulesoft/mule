@@ -36,8 +36,8 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.DefaultTransformationService;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.Event.Builder;
+import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.InternalEvent.Builder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
@@ -460,11 +460,11 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
         }
       }
     }
-    return Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR_LOCATION)).flow(flowConstruct);
+    return InternalEvent.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR_LOCATION)).flow(flowConstruct);
   }
 
   @Override
-  protected Event.Builder getEventBuilder() throws MuleException {
+  protected InternalEvent.Builder getEventBuilder() throws MuleException {
     return eventBuilder();
   }
 
@@ -601,7 +601,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
     return (T) getPayload(message, DataType.fromType(clazz));
   }
 
-  protected Event process(Processor processor, Event event) throws Exception {
+  protected InternalEvent process(Processor processor, InternalEvent event) throws Exception {
     setMuleContextIfNeeded(processor, muleContext);
     return processor.process(event);
   }

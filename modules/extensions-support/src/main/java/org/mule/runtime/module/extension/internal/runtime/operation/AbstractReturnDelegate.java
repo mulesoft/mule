@@ -20,7 +20,7 @@ import org.mule.runtime.api.meta.model.HasOutputModel;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.streaming.CursorProvider;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.internal.util.message.MessageUtils;
@@ -68,7 +68,7 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
 
   protected Message toMessage(Object value, ExecutionContextAdapter operationContext) {
     final MediaType mediaType = resolveMediaType(value, operationContext);
-    final Event event = operationContext.getEvent();
+    final InternalEvent event = operationContext.getEvent();
 
     if (value instanceof Result) {
       return MessageUtils.toMessage((Result) value, mediaType, cursorProviderFactory, event);

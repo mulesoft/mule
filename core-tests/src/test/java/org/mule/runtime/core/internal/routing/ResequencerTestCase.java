@@ -21,8 +21,8 @@ import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.DefaultEventContext;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.EventContext;
+import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.InternalEventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.construct.Flow;
@@ -61,20 +61,23 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase {
     router.setAnnotations(getAppleFlowComponentLocationAnnotations());
     initialiseIfNeeded(router, true, muleContext);
 
-    EventContext context = DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION, "foo");
+    InternalEventContext context = DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION, "foo");
 
     Message message1 = Message.of("test event A");
     Message message2 = Message.of("test event B");
     Message message3 = Message.of("test event C");
 
-    Event event1 = Event.builder(context).message(message1).flow(getTestFlow(muleContext)).session(session).build();
-    Event event2 = Event.builder(context).message(message2).flow(getTestFlow(muleContext)).session(session).build();
-    Event event3 = Event.builder(context).message(message3).flow(getTestFlow(muleContext)).session(session).build();
+    InternalEvent event1 =
+        InternalEvent.builder(context).message(message1).flow(getTestFlow(muleContext)).session(session).build();
+    InternalEvent event2 =
+        InternalEvent.builder(context).message(message2).flow(getTestFlow(muleContext)).session(session).build();
+    InternalEvent event3 =
+        InternalEvent.builder(context).message(message3).flow(getTestFlow(muleContext)).session(session).build();
 
     assertNull(router.process(event2));
     assertNull(router.process(event3));
 
-    Event resultEvent = router.process(event1);
+    InternalEvent resultEvent = router.process(event1);
     assertNotNull(resultEvent);
     Message resultMessage = resultEvent.getMessage();
     assertNotNull(resultMessage);
@@ -100,15 +103,18 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase {
     router.setAnnotations(fakeComponentLocationAnnotations);
     initialiseIfNeeded(router, true, muleContext);
 
-    EventContext context = DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION, "foo");
+    InternalEventContext context = DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION, "foo");
 
     Message message1 = Message.of("test event A");
     Message message2 = Message.of("test event B");
     Message message3 = Message.of("test event C");
 
-    Event event1 = Event.builder(context).message(message1).flow(getTestFlow(muleContext)).session(session).build();
-    Event event2 = Event.builder(context).message(message2).flow(getTestFlow(muleContext)).session(session).build();
-    Event event3 = Event.builder(context).message(message3).flow(getTestFlow(muleContext)).session(session).build();
+    InternalEvent event1 =
+        InternalEvent.builder(context).message(message1).flow(getTestFlow(muleContext)).session(session).build();
+    InternalEvent event2 =
+        InternalEvent.builder(context).message(message2).flow(getTestFlow(muleContext)).session(session).build();
+    InternalEvent event3 =
+        InternalEvent.builder(context).message(message3).flow(getTestFlow(muleContext)).session(session).build();
 
     // set a resequencing comparator. We need to reset the router since it will
     // not process the same event group
@@ -122,7 +128,7 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase {
     assertNull(router.process(event2));
     assertNull(router.process(event3));
 
-    Event resultEvent = router.process(event1);
+    InternalEvent resultEvent = router.process(event1);
     assertNotNull(resultEvent);
     Message resultMessage = resultEvent.getMessage();
     assertNotNull(resultMessage);
@@ -164,7 +170,8 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase {
     @Override
     public int compare(Object o1, Object o2) {
       try {
-        return ((Event) o1).getMessageAsString(muleContext).compareTo(((Event) o2).getMessageAsString(muleContext));
+        return ((InternalEvent) o1).getMessageAsString(muleContext)
+            .compareTo(((InternalEvent) o2).getMessageAsString(muleContext));
       } catch (MuleException e) {
         throw new IllegalArgumentException(e.getMessage());
       }

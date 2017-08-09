@@ -27,7 +27,7 @@ import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.management.stats.RouterStatistics;
@@ -155,19 +155,19 @@ public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject im
   }
 
   @Override
-  public Event process(Event event) throws MuleException {
+  public InternalEvent process(InternalEvent event) throws MuleException {
     return processToApply(event, this);
   }
 
   @Override
-  public Publisher<Event> apply(Publisher<Event> publisher) {
+  public Publisher<InternalEvent> apply(Publisher<InternalEvent> publisher) {
     return from(publisher).flatMap(checkedFunction(event -> {
       Processor processor = getProcessorToRoute(event);
       return just(event).transform(processor).doOnComplete(() -> updateStatistics(processor));
     }));
   }
 
-  protected Processor getProcessorToRoute(Event event) throws RoutePathNotFoundException {
+  protected Processor getProcessorToRoute(InternalEvent event) throws RoutePathNotFoundException {
     Optional<Processor> selectedProcessor = selectProcessor(event);
     return (selectedProcessor.isPresent() ? selectedProcessor : defaultProcessor)
         .orElseThrow(() -> new RoutePathNotFoundException(createStaticMessage("Can't process message because no route has been found matching any filter and no default route is defined"),
@@ -177,7 +177,7 @@ public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject im
   /**
    * @return the processor selected according to the specific router strategy.
    */
-  protected abstract Optional<Processor> selectProcessor(Event event);
+  protected abstract Optional<Processor> selectProcessor(InternalEvent event);
 
   private Collection<?> getLifecycleManagedObjects() {
     if (!defaultProcessor.isPresent()) {

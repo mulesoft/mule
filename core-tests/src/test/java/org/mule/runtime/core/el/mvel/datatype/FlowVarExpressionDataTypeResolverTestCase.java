@@ -10,7 +10,7 @@ package org.mule.runtime.core.el.mvel.datatype;
 import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.FLOW_VARS;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 
 public class FlowVarExpressionDataTypeResolverTestCase extends AbstractVarExpressionDataTypeResolverTestCase {
 
@@ -19,7 +19,7 @@ public class FlowVarExpressionDataTypeResolverTestCase extends AbstractVarExpres
   }
 
   @Override
-  protected Event setVariable(Event event, Object propertyValue, DataType dataType) {
-    return Event.builder(event).addVariable(PROPERTY_NAME, propertyValue, dataType).build();
+  protected InternalEvent setVariable(InternalEvent event, Object propertyValue, DataType dataType) {
+    return InternalEvent.builder(event).addVariable(PROPERTY_NAME, propertyValue, dataType).build();
   }
 }

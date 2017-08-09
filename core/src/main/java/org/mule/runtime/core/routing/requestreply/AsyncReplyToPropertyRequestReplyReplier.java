@@ -7,7 +7,7 @@
 package org.mule.runtime.core.routing.requestreply;
 
 import static org.mule.runtime.core.api.MessageExchangePattern.REQUEST_RESPONSE;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.core.api.connector.DefaultReplyToHandler;
 import org.mule.runtime.core.privileged.routing.requestreply.AbstractReplyToPropertyRequestReplyReplier;
@@ -24,7 +24,7 @@ public class AsyncReplyToPropertyRequestReplyReplier extends AbstractReplyToProp
   }
 
   @Override
-  protected boolean shouldProcessEvent(Event event) {
+  protected boolean shouldProcessEvent(InternalEvent event) {
     return !messageExchangePattern.hasResponse() && event.getReplyToHandler() instanceof DefaultReplyToHandler;
   }
 

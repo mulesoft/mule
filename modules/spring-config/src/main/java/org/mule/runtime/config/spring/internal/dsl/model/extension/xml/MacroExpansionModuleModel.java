@@ -27,7 +27,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
 import org.mule.runtime.config.spring.api.dsl.model.ApplicationModel;
 import org.mule.runtime.config.spring.api.dsl.model.ComponentModel;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.ArrayList;
@@ -294,7 +294,7 @@ public class MacroExpansionModuleModel {
    * @param name of the parameter (either a <property> or a <parameter>)
    * @param prefix binding to append for the expression to be replaced in the <module>'s code
    * @return the expression that access a variable through a direct binding (aka: a "static expression", as it doesn't use the
-   *         {@link Event})
+   *         {@link InternalEvent})
    */
   private String getReplaceableExpression(String name, String prefix) {
     return "#[" + prefix + "." + name + "]";

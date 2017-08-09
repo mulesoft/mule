@@ -16,7 +16,7 @@ import static org.mule.test.heisenberg.extension.DEARadioSource.MESSAGES_PER_POL
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.concurrent.Latch;
 import org.mule.test.heisenberg.extension.model.types.DEAOfficerAttributes;
@@ -45,7 +45,7 @@ public class ListOfMessagesSourceTestCase extends AbstractExtensionFunctionalTes
   }
 
   @Override
-  public Event process(Event event) throws MuleException {
+  public InternalEvent process(InternalEvent event) throws MuleException {
     List<Message> payload = (List<Message>) event.getMessage().getPayload().getValue();
     if (capturedPayload.compareAndSet(null, payload)) {
       latch.release();

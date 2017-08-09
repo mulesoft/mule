@@ -15,7 +15,7 @@ import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.Difference;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -63,19 +63,19 @@ public class ModuleXsdCustomTypeTestCase extends AbstractXmlExtensionMuleArtifac
     user.put("userId", "somename-id");
     final Map<String, Object> payload = new HashMap<>();
     payload.put("User", user);
-    final Event muleEvent = flowRunner("testIsXsdType1FromPayloadFlow").withPayload(payload).run();
+    final InternalEvent muleEvent = flowRunner("testIsXsdType1FromPayloadFlow").withPayload(payload).run();
     compareXML((String) muleEvent.getMessage().getPayload().getValue(), XML_TYPE1_SAMPLE);
   }
 
   @Test
   public void testSendingXsdType1FromExpression() throws Exception {
-    final Event muleEvent = flowRunner("testIsXsdType1FromExpressionFlow").run();
+    final InternalEvent muleEvent = flowRunner("testIsXsdType1FromExpressionFlow").run();
     compareXML((String) muleEvent.getMessage().getPayload().getValue(), XML_TYPE1_SAMPLE);
   }
 
   @Test
   public void testIsXsdType1WithNamespaceFromExpression() throws Exception {
-    final Event muleEvent = flowRunner("testIsXsdType1WithNamespaceFromExpressionFlow").run();
+    final InternalEvent muleEvent = flowRunner("testIsXsdType1WithNamespaceFromExpressionFlow").run();
     compareXML((String) muleEvent.getMessage().getPayload().getValue(), XML_TYPE1_SAMPLE_WITH_NAMESPACE);
   }
 

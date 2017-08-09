@@ -13,11 +13,13 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.UUID.getUUID;
 import org.mule.runtime.api.event.Event;
+import org.mule.runtime.api.event.InputEvent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.DefaultEventContext;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 
@@ -45,10 +47,13 @@ public class CompositeProcessorChainRouter extends AbstractAnnotatedObject imple
   private String name;
   private List<MessageProcessorChain> processorChains = emptyList();
 
-  public Event process(Event event) throws MuleException {
-    org.mule.runtime.core.api.Event.Builder builder =
-        org.mule.runtime.core.api.Event.builder(DefaultEventContext.create(getUUID(), muleContext.getId(), getLocation()));
-    org.mule.runtime.core.api.Event defaultEvent = builder.from(event).build();
+  public Event process(InputEvent inputEvent) throws MuleException {
+    InternalEvent.Builder builder =
+        InternalEvent.builder(DefaultEventContext.create(getUUID(), muleContext.getId(), getLocation()));
+    InternalEvent defaultEvent = builder.variables(inputEvent.getVariables())
+        .properties(inputEvent.getProperties())
+        .parameters(inputEvent.getParameters())
+        .error(inputEvent.getError().orElse(null)).build();
     for (MessageProcessorChain processorChain : processorChains) {
       defaultEvent = processorChain.process(defaultEvent);
     }

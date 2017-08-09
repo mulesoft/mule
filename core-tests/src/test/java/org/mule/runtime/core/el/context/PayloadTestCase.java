@@ -17,7 +17,7 @@ import static org.mule.runtime.api.message.Message.of;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 
@@ -27,9 +27,9 @@ import org.mockito.ArgumentCaptor;
 
 public class PayloadTestCase extends AbstractELTestCase {
 
-  private Event event;
+  private InternalEvent event;
   private Message message;
-  private Event.Builder eventBuilder;
+  private InternalEvent.Builder eventBuilder;
 
   public PayloadTestCase(String mvelOptimizer) {
     super(mvelOptimizer);
@@ -37,8 +37,8 @@ public class PayloadTestCase extends AbstractELTestCase {
 
   @Before
   public void setup() {
-    event = mock(Event.class);
-    eventBuilder = mock(Event.Builder.class);
+    event = mock(InternalEvent.class);
+    eventBuilder = mock(InternalEvent.Builder.class);
     when(event.getFlowCallStack()).thenReturn(new DefaultFlowCallStack());
     when(event.getError()).thenReturn(empty());
     message = mock(InternalMessage.class);

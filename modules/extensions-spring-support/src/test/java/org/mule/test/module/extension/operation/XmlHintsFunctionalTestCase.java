@@ -10,7 +10,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
@@ -37,7 +37,7 @@ public class XmlHintsFunctionalTestCase extends AbstractExtensionFunctionalTestC
 
   @Test
   public void fruitOnExpression() throws Exception {
-    Event event = eatFromExpression(new Apple());
+    InternalEvent event = eatFromExpression(new Apple());
     assertThat(getPayloadAsString(event.getMessage()), equalTo("tasty " + Apple.class.getSimpleName()));
   }
 
@@ -69,7 +69,7 @@ public class XmlHintsFunctionalTestCase extends AbstractExtensionFunctionalTestC
     expectedException.expectMessage(containsString("I SHALL NEVER EAT " + MEAT));
   }
 
-  private Event eatFromExpression(Object value) throws Exception {
+  private InternalEvent eatFromExpression(Object value) throws Exception {
     return flowRunner("eatFromExpression").withPayload(value).run();
   }
 }

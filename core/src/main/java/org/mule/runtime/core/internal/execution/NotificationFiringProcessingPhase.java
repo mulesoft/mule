@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.core.internal.execution;
 
-import static org.mule.runtime.core.api.Event.getCurrentEvent;
+import static org.mule.runtime.core.api.InternalEvent.getCurrentEvent;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.execution.MessageProcessTemplate;
@@ -34,7 +34,7 @@ public abstract class NotificationFiringProcessingPhase<Template extends Message
 
   protected MuleContext muleContext;
 
-  protected void fireNotification(Object source, Event event, FlowConstruct flow, int action) {
+  protected void fireNotification(Object source, InternalEvent event, FlowConstruct flow, int action) {
     try {
       if (event == null) {
         // Null result only happens when there's a filter in the chain.

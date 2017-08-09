@@ -8,7 +8,7 @@ package org.mule.tck.core.lifecycle;
 
 import static org.mockito.Mockito.mock;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.component.Component;
 import org.mule.runtime.core.api.management.stats.ComponentStatistics;
 
@@ -31,7 +31,7 @@ public class LifecycleTrackerComponent extends AbstractLifecycleTracker implemen
   }
 
   @Override
-  public Event process(Event event) throws MuleException {
+  public InternalEvent process(InternalEvent event) throws MuleException {
     return event;
   }
 }

@@ -26,7 +26,7 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.config.spring.internal.MuleArtifactContext;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.construct.Flow;
@@ -164,12 +164,12 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
     }
 
     @Override
-    public Event process(Event event) throws MuleException {
+    public InternalEvent process(InternalEvent event) throws MuleException {
       return processToApply(event, this);
     }
 
     @Override
-    public Publisher<Event> apply(Publisher<Event> publisher) {
+    public Publisher<InternalEvent> apply(Publisher<InternalEvent> publisher) {
       return from(publisher).flatMap(event -> {
         Processor referencedProcessor;
         try {
@@ -191,7 +191,7 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
       });
     }
 
-    protected Processor resolveReferencedProcessor(Event event) throws MuleException {
+    protected Processor resolveReferencedProcessor(InternalEvent event) throws MuleException {
       String flowName;
       if (isExpression) {
         flowName = muleContext.getExpressionManager().parse(refName, event, getLocation());

@@ -7,7 +7,7 @@
 package org.mule.runtime.core.internal.processor.chain;
 
 import static org.mule.runtime.api.message.Message.of;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.NestedProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 
@@ -27,9 +27,9 @@ public class NestedProcessorChain implements NestedProcessor {
   /**
    * Event that will be cloned for dispatching
    */
-  private Event event;
+  private InternalEvent event;
 
-  public NestedProcessorChain(Event event, Processor chain) {
+  public NestedProcessorChain(InternalEvent event, Processor chain) {
     this.event = event;
     this.chain = chain;
   }
@@ -48,7 +48,7 @@ public class NestedProcessorChain implements NestedProcessor {
    *
    * @param value Value to set
    */
-  public void setEvent(Event value) {
+  public void setEvent(InternalEvent value) {
     this.event = value;
   }
 
@@ -59,19 +59,19 @@ public class NestedProcessorChain implements NestedProcessor {
 
   @Override
   public Object process(Object payload) throws Exception {
-    Event muleEvent = Event.builder(event).message(of(payload)).build();
+    InternalEvent muleEvent = InternalEvent.builder(event).message(of(payload)).build();
     return chain.process(muleEvent).getMessage().getPayload().getValue();
   }
 
   @Override
   public Object processWithExtraProperties(Map<String, Object> properties) throws Exception {
-    Event muleEvent = Event.builder(event).variables(properties).build();
+    InternalEvent muleEvent = InternalEvent.builder(event).variables(properties).build();
     return chain.process(muleEvent).getMessage().getPayload().getValue();
   }
 
   @Override
   public Object process(Object payload, Map<String, Object> properties) throws Exception {
-    Event muleEvent = Event.builder(event).message(of(payload)).variables(properties).build();
+    InternalEvent muleEvent = InternalEvent.builder(event).message(of(payload)).variables(properties).build();
     return chain.process(muleEvent).getMessage().getPayload().getValue();
   }
 

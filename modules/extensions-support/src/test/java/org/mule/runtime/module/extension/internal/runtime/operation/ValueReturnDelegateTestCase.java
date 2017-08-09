@@ -11,7 +11,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getDefaultCursorStreamProviderFactory;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.tck.size.SmallTest;
 
 import org.junit.runner.RunWith;
@@ -27,7 +27,7 @@ public class ValueReturnDelegateTestCase extends ValueReturnDelegateContractTest
   }
 
   @Override
-  protected Message getOutputMessage(Event result) {
+  protected Message getOutputMessage(InternalEvent result) {
     Message message = result.getMessage();
 
     assertThat(message, is(notNullValue()));

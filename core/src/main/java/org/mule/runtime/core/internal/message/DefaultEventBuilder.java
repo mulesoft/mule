@@ -20,11 +20,11 @@ import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.api.security.SecurityContext;
+import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.Event.Builder;
-import org.mule.runtime.core.api.EventContext;
+import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.InternalEvent.Builder;
+import org.mule.runtime.core.api.InternalEventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
@@ -38,6 +38,7 @@ import org.mule.runtime.core.api.session.DefaultMuleSession;
 import org.mule.runtime.core.api.store.DeserializationPostInitialisable;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
+import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.internal.util.CopyOnWriteCaseInsensitiveMap;
 
 import java.io.IOException;
@@ -51,11 +52,11 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DefaultEventBuilder implements Event.Builder {
+public class DefaultEventBuilder implements InternalEvent.Builder {
 
   private static final Logger logger = LoggerFactory.getLogger(DefaultMessageBuilder.class);
 
-  private EventContext context;
+  private InternalEventContext context;
   private Message message;
   private Map<String, TypedValue<?>> flowVariables = new HashMap<>();
   private Map<String, TypedValue<?>> moduleProperties = new HashMap<>();
@@ -69,16 +70,16 @@ public class DefaultEventBuilder implements Event.Builder {
   private ReplyToHandler replyToHandler;
   private Object replyToDestination;
   private MuleSession session = new DefaultMuleSession();
-  private Event originalEvent;
+  private InternalEvent originalEvent;
   private boolean modified;
   private boolean notificationsEnabled = true;
 
-  public DefaultEventBuilder(EventContext messageContext) {
+  public DefaultEventBuilder(InternalEventContext messageContext) {
     this.context = messageContext;
   }
 
-  public DefaultEventBuilder(Event event) {
-    this.context = event.getInternalContext();
+  public DefaultEventBuilder(InternalEvent event) {
+    this.context = event.getContext();
     this.originalEvent = event;
     this.message = event.getMessage();
     this.flow = event.getFlowConstruct();
@@ -97,24 +98,14 @@ public class DefaultEventBuilder implements Event.Builder {
     this.internalParameters.putAll(event.getInternalParameters());
   }
 
-  public DefaultEventBuilder(EventContext messageContext, Event event) {
+  public DefaultEventBuilder(InternalEventContext messageContext, InternalEvent event) {
     this(event);
     this.context = messageContext;
     this.modified = true;
   }
 
   @Override
-  public Builder from(org.mule.runtime.api.event.Event event) {
-    event.getError().ifPresent(this::error);
-    message(event.getMessage());
-    moduleParameters.putAll(event.getParameters());
-    flowVariables.putAll(event.getVariables());
-    moduleProperties.putAll(event.getProperties());
-    return this;
-  }
-
-  @Override
-  public Event.Builder message(Message message) {
+  public InternalEvent.Builder message(Message message) {
     requireNonNull(message);
     this.message = message;
     this.modified = true;
@@ -122,13 +113,13 @@ public class DefaultEventBuilder implements Event.Builder {
   }
 
   @Override
-  public Event.Builder variables(Map<String, ?> flowVariables) {
+  public InternalEvent.Builder variables(Map<String, ?> flowVariables) {
     copyFromTo(flowVariables, this.flowVariables);
     return this;
   }
 
   @Override
-  public Event.Builder addVariable(String key, Object value) {
+  public InternalEvent.Builder addVariable(String key, Object value) {
     flowVariables.put(key, new TypedValue<>(value, DataType.fromObject(value)));
     this.modified = true;
     return this;
@@ -136,32 +127,32 @@ public class DefaultEventBuilder implements Event.Builder {
   }
 
   @Override
-  public Event.Builder addVariable(String key, Object value, DataType dataType) {
+  public InternalEvent.Builder addVariable(String key, Object value, DataType dataType) {
     flowVariables.put(key, new TypedValue<>(value, dataType));
     this.modified = true;
     return this;
   }
 
   @Override
-  public Event.Builder removeVariable(String key) {
+  public InternalEvent.Builder removeVariable(String key) {
     this.modified = flowVariables.remove(key) != null;
     return this;
   }
 
   @Override
-  public Builder properties(Map<String, Object> properties) {
+  public Builder properties(Map<String, ?> properties) {
     copyFromTo(properties, this.moduleProperties);
     return this;
   }
 
   @Override
-  public Builder parameters(Map<String, Object> parameters) {
+  public Builder parameters(Map<String, ?> parameters) {
     copyFromTo(parameters, this.moduleParameters);
     return this;
   }
 
   @Override
-  public Event.Builder addParameter(String key, Object value) {
+  public InternalEvent.Builder addParameter(String key, Object value) {
     moduleParameters.put(key, new TypedValue<>(value, DataType.fromObject(value)));
     this.modified = true;
     return this;
@@ -169,7 +160,7 @@ public class DefaultEventBuilder implements Event.Builder {
   }
 
   @Override
-  public Event.Builder addParameter(String key, Object value, DataType dataType) {
+  public InternalEvent.Builder addParameter(String key, Object value, DataType dataType) {
     moduleParameters.put(key, new TypedValue<>(value, dataType));
     this.modified = true;
     return this;
@@ -182,7 +173,7 @@ public class DefaultEventBuilder implements Event.Builder {
     return this;
   }
 
-  public Event.Builder addInternalParameter(String key, Object value) {
+  public InternalEvent.Builder addInternalParameter(String key, Object value) {
     internalParameters.put(key, value);
     this.modified = true;
     return this;
@@ -196,55 +187,55 @@ public class DefaultEventBuilder implements Event.Builder {
   }
 
   @Override
-  public Event.Builder removeParameter(String key) {
+  public InternalEvent.Builder removeParameter(String key) {
     this.modified = moduleParameters.remove(key) != null;
     return this;
   }
 
   @Override
-  public Event.Builder correlationId(String correlationId) {
+  public InternalEvent.Builder correlationId(String correlationId) {
     legacyCorrelationId = correlationId;
     this.modified = true;
     return this;
   }
 
   @Override
-  public Event.Builder groupCorrelation(Optional<GroupCorrelation> correlation) {
+  public InternalEvent.Builder groupCorrelation(Optional<GroupCorrelation> correlation) {
     this.groupCorrelation = correlation;
     this.modified = true;
     return this;
   }
 
   @Override
-  public Event.Builder error(Error error) {
+  public InternalEvent.Builder error(Error error) {
     this.error = error;
     this.modified = true;
     return this;
   }
 
   @Override
-  public Event.Builder flow(FlowConstruct flow) {
+  public InternalEvent.Builder flow(FlowConstruct flow) {
     this.flow = flow;
     this.modified = true;
     return this;
   }
 
   @Override
-  public Event.Builder replyToHandler(ReplyToHandler replyToHandler) {
+  public InternalEvent.Builder replyToHandler(ReplyToHandler replyToHandler) {
     this.replyToHandler = replyToHandler;
     this.modified = true;
     return this;
   }
 
   @Override
-  public Event.Builder replyToDestination(Object replyToDestination) {
+  public InternalEvent.Builder replyToDestination(Object replyToDestination) {
     this.replyToDestination = replyToDestination;
     this.modified = true;
     return this;
   }
 
   @Override
-  public Event.Builder session(MuleSession session) {
+  public InternalEvent.Builder session(MuleSession session) {
     this.session = session;
     this.modified = true;
     return this;
@@ -258,15 +249,16 @@ public class DefaultEventBuilder implements Event.Builder {
   }
 
   @Override
-  public Event build() {
+  public InternalEvent build() {
     if (originalEvent != null && !modified) {
       return originalEvent;
     } else {
       requireNonNull(message);
 
-      return new EventImplementation(context, message, flowVariables, moduleProperties, moduleParameters, internalParameters,
-                                     flow, session, replyToDestination, replyToHandler,
-                                     flowCallStack, groupCorrelation, error, legacyCorrelationId, notificationsEnabled);
+      return new InternalEventImplementation(context, message, flowVariables, moduleProperties, moduleParameters,
+                                             internalParameters,
+                                             flow, session, replyToDestination, replyToHandler,
+                                             flowCallStack, groupCorrelation, error, legacyCorrelationId, notificationsEnabled);
     }
   }
 
@@ -281,17 +273,17 @@ public class DefaultEventBuilder implements Event.Builder {
    * <code>EventImplementation</code> represents any data event occurring in the Mule environment. All data sent or received
    * within the Mule environment will be passed between components as an MuleEvent.
    * <p>
-   * The {@link Event} holds some data and provides helper methods for obtaining the data in a format that the receiving Mule
-   * component understands. The event can also maintain any number of flowVariables that can be set and retrieved by Mule
+   * The {@link InternalEvent} holds some data and provides helper methods for obtaining the data in a format that the receiving
+   * Mule component understands. The event can also maintain any number of flowVariables that can be set and retrieved by Mule
    * components.
    */
-  public static class EventImplementation implements Event, DeserializationPostInitialisable {
+  public static class InternalEventImplementation implements InternalEvent, DeserializationPostInitialisable {
 
     private static final long serialVersionUID = 1L;
 
     /** Immutable MuleEvent state **/
 
-    private EventContext context;
+    private InternalEventContext context;
     // TODO MULE-10013 make this final
     private Message message;
     private final MuleSession session;
@@ -313,18 +305,17 @@ public class DefaultEventBuilder implements Event.Builder {
     private FlowCallStack flowCallStack = new DefaultFlowCallStack();
     private final String legacyCorrelationId;
     private final Error error;
-    private transient MuleContext muleContext;
 
     // Used in deserialization to obtain instance of flowConstruct via registry lookup.
     private String flowName;
 
     // Use this constructor from the builder
-    private EventImplementation(EventContext context, Message message, Map<String, TypedValue<?>> variables,
-                                Map<String, TypedValue<?>> properties, Map<String, TypedValue<?>> parameters,
-                                Map<String, ?> internalParameters, FlowConstruct flowConstruct, MuleSession session,
-                                Object replyToDestination, ReplyToHandler replyToHandler,
-                                FlowCallStack flowCallStack, Optional<GroupCorrelation> groupCorrelation, Error error,
-                                String legacyCorrelationId, boolean notificationsEnabled) {
+    private InternalEventImplementation(InternalEventContext context, Message message, Map<String, TypedValue<?>> variables,
+                                        Map<String, TypedValue<?>> properties, Map<String, TypedValue<?>> parameters,
+                                        Map<String, ?> internalParameters, FlowConstruct flowConstruct, MuleSession session,
+                                        Object replyToDestination, ReplyToHandler replyToHandler,
+                                        FlowCallStack flowCallStack, Optional<GroupCorrelation> groupCorrelation, Error error,
+                                        String legacyCorrelationId, boolean notificationsEnabled) {
       this.context = context;
       this.flowConstruct = flowConstruct;
       if (flowConstruct != null) {
@@ -350,13 +341,22 @@ public class DefaultEventBuilder implements Event.Builder {
     }
 
     @Override
-    public EventContext getContext() {
+    public InternalEventContext getContext() {
       return context;
     }
 
     @Override
     public Message getMessage() {
       return message;
+    }
+
+    @Override
+    public Optional<Authentication> getAuthentication() {
+      SecurityContext securityContext = session.getSecurityContext();
+      if (securityContext == null) {
+        return empty();
+      }
+      return ofNullable(securityContext.getAuthentication());
     }
 
     @Override
@@ -486,7 +486,8 @@ public class DefaultEventBuilder implements Event.Builder {
         // that instance in order to conserve non-serializable subscribers which in turn reference callbacks. Otherwise use the
         // serialized version with no subscribers.
         if (flowConstruct instanceof Pipeline) {
-          EventContext cachedValue = ((Pipeline) flowConstruct).getSerializationEventContextCache().remove(context.getId());
+          InternalEventContext cachedValue =
+              ((Pipeline) flowConstruct).getSerializationEventContextCache().remove(context.getId());
           context = cachedValue != null ? cachedValue : context;
         }
       }
@@ -563,11 +564,6 @@ public class DefaultEventBuilder implements Event.Builder {
     }
 
     private GroupCorrelation groupCorrelation;
-
-    @Override
-    public EventContext getInternalContext() {
-      return this.getContext();
-    }
 
     @Override
     public Map<String, ?> getInternalParameters() {

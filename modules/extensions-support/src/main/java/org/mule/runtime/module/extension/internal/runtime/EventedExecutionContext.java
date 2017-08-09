@@ -7,11 +7,11 @@
 package org.mule.runtime.module.extension.internal.runtime;
 
 import org.mule.runtime.api.meta.model.ComponentModel;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 
 /**
- * A specialization of {@link ExecutionContext} which contains an {@link Event}
+ * A specialization of {@link ExecutionContext} which contains an {@link InternalEvent}
  *
  * @param <M> the generic type of of the model which represents the component beign executed
  * @since 4.0
@@ -19,7 +19,7 @@ import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 public interface EventedExecutionContext<M extends ComponentModel> extends ExecutionContext<M> {
 
   /**
-   * Returns the {@link Event} on which an operation is to be executed
+   * Returns the {@link InternalEvent} on which an operation is to be executed
    */
-  Event getEvent();
+  InternalEvent getEvent();
 }

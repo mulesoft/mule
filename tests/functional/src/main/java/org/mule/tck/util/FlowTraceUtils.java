@@ -9,7 +9,7 @@ package org.mule.tck.util;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertThat;
 
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
@@ -28,7 +28,7 @@ public class FlowTraceUtils {
     public static FlowCallStack stackToAssert;
 
     @Override
-    public Event process(Event event) throws MuleException {
+    public InternalEvent process(InternalEvent event) throws MuleException {
       stackToAssert = event.getFlowCallStack().clone();
       return event;
     }
@@ -39,7 +39,7 @@ public class FlowTraceUtils {
     public static CountDownLatch latch;
 
     @Override
-    public Event process(Event event) throws MuleException {
+    public InternalEvent process(InternalEvent event) throws MuleException {
       super.process(event);
       latch.countDown();
       return event;

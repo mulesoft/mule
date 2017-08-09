@@ -11,9 +11,8 @@ import static org.mule.runtime.core.api.config.i18n.CoreMessages.authSetButNoCon
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.authorizationDeniedOnEndpoint;
 
 import org.mule.runtime.api.i18n.I18nMessage;
-import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.api.security.ServerSecurityException;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 
 /**
  * <code>NotPermittedException</code> is thrown if the user isn't authorized to perform an action.
@@ -33,7 +32,7 @@ public class NotPermittedException extends ServerSecurityException {
     super(message, cause);
   }
 
-  public NotPermittedException(Event event, SecurityContext context, SecurityFilter filter) {
+  public NotPermittedException(InternalEvent event, SecurityContext context, SecurityFilter filter) {
     super(constructMessage(context,
                            event.getContext().getOriginatingLocation().getComponentIdentifier().getIdentifier().getNamespace(),
                            filter));

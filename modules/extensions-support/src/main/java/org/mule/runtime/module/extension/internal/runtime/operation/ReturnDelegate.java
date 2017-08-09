@@ -6,24 +6,24 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 
 /**
  * A delegate interface to decouple a {@link OperationExecutor}'s return value from how it is transformed
- * into an {@link Event} to be handed back into the pipeline
+ * into an {@link InternalEvent} to be handed back into the pipeline
  *
  * @since 4.0
  */
 interface ReturnDelegate {
 
   /**
-   * Adapts the {@code value} into an {@link Event}
+   * Adapts the {@code value} into an {@link InternalEvent}
    *
    * @param value the value to be returned
    * @param operationContext the {@link ExecutionContextAdapter} on which the operation was executed
-   * @return a {@link Event} carrying the operation's result
+   * @return a {@link InternalEvent} carrying the operation's result
    */
-  Event asReturnValue(Object value, ExecutionContextAdapter operationContext);
+  InternalEvent asReturnValue(Object value, ExecutionContextAdapter operationContext);
 }

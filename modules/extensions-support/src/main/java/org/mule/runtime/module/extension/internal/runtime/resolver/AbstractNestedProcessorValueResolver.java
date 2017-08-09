@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.NestedProcessor;
 import org.mule.runtime.core.api.processor.Processor;
@@ -29,11 +29,11 @@ abstract class AbstractNestedProcessorValueResolver<T> implements ValueResolver<
    * Creates and registers a {@link NestedProcessor} that wraps the given {@code messageProcessor}
    * 
    * @param messageProcessor a {@link Processor}
-   * @param event a {@link Event}
+   * @param event a {@link InternalEvent}
    * @param muleContext the Mule node.
    * @return a {@link NestedProcessor}
    */
-  protected NestedProcessor toNestedProcessor(Processor messageProcessor, Event event, MuleContext muleContext) {
+  protected NestedProcessor toNestedProcessor(Processor messageProcessor, InternalEvent event, MuleContext muleContext) {
     try {
       muleContext.getRegistry().registerObject(new ObjectNameHelper(muleContext).getUniqueName(""), messageProcessor);
     } catch (RegistrationException e) {

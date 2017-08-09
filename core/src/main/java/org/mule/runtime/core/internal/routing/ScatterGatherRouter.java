@@ -26,7 +26,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.util.Preconditions;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
@@ -97,7 +97,7 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
   private reactor.core.scheduler.Scheduler reactorScheduler;
 
   @Override
-  public Event process(Event event) throws MuleException {
+  public InternalEvent process(InternalEvent event) throws MuleException {
     return processToApply(event, this);
   }
 
@@ -108,7 +108,7 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
   }
 
   @Override
-  public Publisher<Event> apply(Publisher<Event> publisher) {
+  public Publisher<InternalEvent> apply(Publisher<InternalEvent> publisher) {
     return from(publisher).doOnNext(checkedConsumer(event -> {
       assertMorethanOneRoute();
       validateMessageIsNotConsumable(event.getMessage());

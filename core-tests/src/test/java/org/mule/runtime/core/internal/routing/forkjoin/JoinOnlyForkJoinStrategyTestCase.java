@@ -16,7 +16,7 @@ import static org.mule.runtime.core.api.routing.ForkJoinStrategy.RoutingPair.of;
 import static reactor.core.publisher.Flux.fromIterable;
 import static reactor.core.publisher.Mono.from;
 
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.ForkJoinStrategy;
 import org.mule.runtime.core.api.routing.ForkJoinStrategy.RoutingPair;
@@ -34,7 +34,7 @@ public class JoinOnlyForkJoinStrategyTestCase extends AbstractForkJoinStrategyTe
   @Test
   public void joinOnly() throws Exception {
 
-    Event original = testEvent();
+    InternalEvent original = testEvent();
 
     Processor processor1 = createEchoProcessorSpy();
     Processor processor2 = createEchoProcessorSpy();
@@ -44,13 +44,13 @@ public class JoinOnlyForkJoinStrategyTestCase extends AbstractForkJoinStrategyTe
     RoutingPair pair2 = of(testEvent(), processor2);
     RoutingPair pair3 = of(testEvent(), processor3);
 
-    Event result =
+    InternalEvent result =
         from(strategy.forkJoin(original, fromIterable(asList(pair1, pair2, pair3)), processingStrategy, 3, true)).block();
 
     assertThat(result, is(original));
-    verify(processor1, times(1)).process(any(Event.class));
-    verify(processor2, times(1)).process(any(Event.class));
-    verify(processor2, times(1)).process(any(Event.class));
+    verify(processor1, times(1)).process(any(InternalEvent.class));
+    verify(processor2, times(1)).process(any(InternalEvent.class));
+    verify(processor2, times(1)).process(any(InternalEvent.class));
   }
 
 }

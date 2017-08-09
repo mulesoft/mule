@@ -29,9 +29,8 @@ import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.store.ObjectStoreNotAvailableException;
 import org.mule.runtime.api.store.ObjectStoreSettings;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
@@ -94,11 +93,11 @@ public class IdempotentMessageValidator extends AbstractAnnotatedObject
         .build());
   }
 
-  protected String getValueForEvent(Event event) throws MessagingException {
+  protected String getValueForEvent(InternalEvent event) throws MessagingException {
     return (String) muleContext.getExpressionManager().evaluate(valueExpression, STRING, NULL_BINDING_CONTEXT, event).getValue();
   }
 
-  protected String getIdForEvent(Event event) throws MuleException {
+  protected String getIdForEvent(InternalEvent event) throws MuleException {
     return (String) muleContext.getExpressionManager().evaluate(idExpression, STRING, NULL_BINDING_CONTEXT, event).getValue();
   }
 
@@ -118,7 +117,7 @@ public class IdempotentMessageValidator extends AbstractAnnotatedObject
     this.store = store;
   }
 
-  private boolean accept(Event event) {
+  private boolean accept(InternalEvent event) {
     if (event != null && isNewMessage(event)) {
       try {
         String id = getIdForEvent(event);
@@ -145,7 +144,7 @@ public class IdempotentMessageValidator extends AbstractAnnotatedObject
   }
 
   @Override
-  public final Event process(Event event) throws MuleException {
+  public final InternalEvent process(InternalEvent event) throws MuleException {
     if (accept(event)) {
       return event;
     } else {
@@ -153,7 +152,7 @@ public class IdempotentMessageValidator extends AbstractAnnotatedObject
     }
   }
 
-  protected boolean isNewMessage(Event event) {
+  protected boolean isNewMessage(InternalEvent event) {
     try {
       String id = this.getIdForEvent(event);
       if (store == null) {

@@ -14,8 +14,8 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.DefaultEventContext;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.EventContext;
+import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.InternalEventContext;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.DefaultMultiPartPayload;
@@ -55,7 +55,7 @@ public class TestEventBuilder {
   private ReplyToHandler replyToHandler;
 
   private Function<Message, Message> spyMessage = input -> input;
-  private Function<Event, Event> spyEvent = input -> input;
+  private Function<InternalEvent, InternalEvent> spyEvent = input -> input;
 
   private Publisher<Void> externalCompletionCallback = null;
 
@@ -73,7 +73,7 @@ public class TestEventBuilder {
 
 
   /**
-   * Prepares the given data to be sent as the mediaType of the payload of the {@link Event} to the configured flow.
+   * Prepares the given data to be sent as the mediaType of the payload of the {@link InternalEvent} to the configured flow.
    *
    * @param mediaType the mediaType to use in the message
    * @return this {@link FlowRunner}
@@ -170,7 +170,7 @@ public class TestEventBuilder {
   }
 
   /**
-   * Configures the product event to have the provided {@code sourceCorrelationId}. See {@link Event#getCorrelationId()}.
+   * Configures the product event to have the provided {@code sourceCorrelationId}. See {@link InternalEvent#getCorrelationId()}.
    *
    * @return this {@link TestEventBuilder}
    */
@@ -181,7 +181,7 @@ public class TestEventBuilder {
   }
 
   /**
-   * Configures the product event to have the provided {@code correlation}. See {@link Event#getGroupCorrelation()}.
+   * Configures the product event to have the provided {@code correlation}. See {@link InternalEvent#getGroupCorrelation()}.
    *
    * @return this {@link TestEventBuilder}
    */
@@ -232,7 +232,7 @@ public class TestEventBuilder {
   }
 
   /**
-   * Will spy the built {@link Message} and {@link Event}. See {@link Mockito#spy(Object) spy}.
+   * Will spy the built {@link Message} and {@link InternalEvent}. See {@link Mockito#spy(Object) spy}.
    *
    * @return this {@link TestEventBuilder}
    */
@@ -254,7 +254,7 @@ public class TestEventBuilder {
    * @param flow the recipient for the event to be built.
    * @return an event with the specified configuration.
    */
-  public Event build(FlowConstruct flow) {
+  public InternalEvent build(FlowConstruct flow) {
     final Message.Builder messageBuilder;
 
     messageBuilder = Message.builder().value(payload).mediaType(mediaType);
@@ -267,7 +267,7 @@ public class TestEventBuilder {
     }
     final Message muleMessage = messageBuilder.build();
 
-    EventContext eventContext;
+    InternalEventContext eventContext;
     if (externalCompletionCallback != null) {
       eventContext =
           DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION, sourceCorrelationId, externalCompletionCallback);
@@ -275,13 +275,13 @@ public class TestEventBuilder {
       eventContext = DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION, sourceCorrelationId);
     }
 
-    Event.Builder builder = Event.builder(eventContext)
+    InternalEvent.Builder builder = InternalEvent.builder(eventContext)
         .message(spyMessage.apply(muleMessage)).groupCorrelation(ofNullable(groupCorrelation))
         .flow(flow).replyToHandler(replyToHandler);
     for (Entry<String, TypedValue> variableEntry : variables.entrySet()) {
       builder.addVariable(variableEntry.getKey(), variableEntry.getValue().getValue(), variableEntry.getValue().getDataType());
     }
-    Event event = builder.build();
+    InternalEvent event = builder.build();
 
     for (Entry<String, Attachment> outboundAttachmentEntry : outboundAttachments.entrySet()) {
       event = outboundAttachmentEntry.getValue().addOutboundTo(event, outboundAttachmentEntry.getKey());
@@ -314,6 +314,6 @@ public class TestEventBuilder {
 
   private interface Attachment {
 
-    Event addOutboundTo(Event event, String key);
+    InternalEvent addOutboundTo(InternalEvent event, String key);
   }
 }

@@ -29,7 +29,7 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.util.LazyValue;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.util.Pair;
@@ -317,7 +317,7 @@ public class DefaultExtensionsOAuthManager implements Initialisable, Startable, 
                                                                    danceRequest.getState().orElse(null),
                                                                    config.getCallbackConfig().getExternalCallbackUrl());
 
-      Event event = runFlow(flow, createEvent(request, config, flow), config, "before");
+      InternalEvent event = runFlow(flow, createEvent(request, config, flow), config, "before");
       return paramKey -> DANCE_CALLBACK_EVENT_KEY.equals(paramKey) ? of(event) : empty();
     };
   }
@@ -326,20 +326,20 @@ public class DefaultExtensionsOAuthManager implements Initialisable, Startable, 
                                                                                                      Flow flow) {
     return (callbackContext, oauthContext) -> {
       AuthorizationCodeState state = toAuthorizationCodeState(config, oauthContext);
-      Event event = (Event) callbackContext.getParameter(DANCE_CALLBACK_EVENT_KEY)
+      InternalEvent event = (InternalEvent) callbackContext.getParameter(DANCE_CALLBACK_EVENT_KEY)
           .orElseGet(() -> createEvent(state, config, flow));
 
-      event = Event.builder(event).message(Message.builder().value(state).build()).build();
+      event = InternalEvent.builder(event).message(Message.builder().value(state).build()).build();
       runFlow(flow, event, config, "after");
     };
   }
 
-  private Event createEvent(Object payload, OAuthConfig config, Flow flow) {
-    return Event.builder(create(flow, fromSingleComponent(config.getOwnerConfigName())))
+  private InternalEvent createEvent(Object payload, OAuthConfig config, Flow flow) {
+    return InternalEvent.builder(create(flow, fromSingleComponent(config.getOwnerConfigName())))
         .message(Message.builder().value(payload).build()).build();
   }
 
-  private Event runFlow(Flow flow, Event event, OAuthConfig config, String callbackType) {
+  private InternalEvent runFlow(Flow flow, InternalEvent event, OAuthConfig config, String callbackType) {
     try {
       return flow.process(event);
     } catch (MuleException e) {

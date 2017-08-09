@@ -10,7 +10,7 @@ package org.mule.runtime.core.internal.routing.forkjoin;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.message.Message.of;
 
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 
 import java.util.List;
 import java.util.function.Function;
@@ -21,7 +21,7 @@ import java.util.function.Function;
  * <li>Performs parallel execution of route pairs subject to {@code maxConcurrency}.
  * <li>Merges variables using a last-wins strategy.
  * <li>Waits for the completion of all routes before emitting a result event, with an optional timeout.
- * <li>Collects results into a result {@link Event} with a {@link java.util.Map<String, org.mule.runtime.api.message.Message>}
+ * <li>Collects results into a result {@link InternalEvent} with a {@link java.util.Map<String, org.mule.runtime.api.message.Message>}
  * payload where the {@link java.util.Map} key is a string representation of the sequence number of the
  * {@link org.mule.runtime.core.api.routing.ForkJoinStrategy.RoutingPair}.
  * <li>Will processor all routes, regardless of errors, and propagating a composite exception where there were one or more errors.
@@ -38,7 +38,8 @@ public class CollectMapForkJoinStrategy extends AbstractForkJoinStrategy {
   }
 
   @Override
-  protected Function<List<Event>, Event> createResultEvent(Event original, Event.Builder resultBuilder) {
+  protected Function<List<InternalEvent>, InternalEvent> createResultEvent(InternalEvent original,
+                                                                           InternalEvent.Builder resultBuilder) {
     return list -> resultBuilder
         .message(of(list.stream().collect(toMap(event -> Integer.toString(event.getGroupCorrelation().get().getSequence()),
                                                 event -> event.getMessage()))))

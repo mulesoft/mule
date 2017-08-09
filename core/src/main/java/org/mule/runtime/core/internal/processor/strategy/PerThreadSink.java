@@ -12,7 +12,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.slf4j.helpers.NOPLogger.NOP_LOGGER;
 
 import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.processor.Sink;
 
 import com.google.common.cache.Cache;
@@ -39,7 +39,7 @@ class PerThreadSink implements Sink, Disposable {
   }
 
   @Override
-  public void accept(Event event) {
+  public void accept(InternalEvent event) {
     try {
       sinkCache.get(currentThread(), () -> sinkSupplier.get()).accept(event);
     } catch (ExecutionException e) {

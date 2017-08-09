@@ -7,7 +7,7 @@
 package org.mule.runtime.core.internal.exception;
 
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -46,8 +46,8 @@ public class RedeliveryExceeded implements Initialisable, ReactiveProcessor {
     }
   }
 
-  public Event process(Event event) throws MuleException {
-    Event result = event;
+  public InternalEvent process(InternalEvent event) throws MuleException {
+    InternalEvent result = event;
     if (!messageProcessors.isEmpty()) {
       result = configuredMessageProcessors.process(event);
     }
@@ -58,7 +58,7 @@ public class RedeliveryExceeded implements Initialisable, ReactiveProcessor {
   }
 
   @Override
-  public Publisher<Event> apply(Publisher<Event> eventPublisher) {
+  public Publisher<InternalEvent> apply(Publisher<InternalEvent> eventPublisher) {
     if (!messageProcessors.isEmpty()) {
       return Flux.from(eventPublisher).transform(configuredMessageProcessors);
     } else {
@@ -66,8 +66,8 @@ public class RedeliveryExceeded implements Initialisable, ReactiveProcessor {
     }
   }
 
-  private Event removeErrorFromEvent(Event result) {
-    return Event.builder(result).error(null)
+  private InternalEvent removeErrorFromEvent(InternalEvent result) {
+    return InternalEvent.builder(result).error(null)
         .message(InternalMessage.builder(result.getMessage()).exceptionPayload(null).build()).build();
   }
 

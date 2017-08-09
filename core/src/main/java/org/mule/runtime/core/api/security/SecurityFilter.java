@@ -11,7 +11,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.api.security.SecurityProviderNotFoundException;
 import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 
 /**
  * <code>SecurityFilter</code> is a base filter for secure filtering of inbound and outbound event flow.
@@ -22,6 +22,7 @@ public interface SecurityFilter extends Initialisable {
 
   String getSecurityProviders();
 
-  Event doFilter(Event event) throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
+  InternalEvent doFilter(InternalEvent event)
+      throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
       SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, InitialisationException;
 }

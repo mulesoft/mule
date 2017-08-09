@@ -23,7 +23,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.exception.MessagingException;
@@ -67,7 +67,7 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Router {
   private Long millisBetweenRetries = DEFAULT_MILLIS_BETWEEN_RETRIES;
   private String failureExpression = DEFAULT_FAILURE_EXPRESSION;
   private MessageProcessorChain nestedChain;
-  private Predicate<Event> shouldRetry;
+  private Predicate<InternalEvent> shouldRetry;
   private SimpleRetryPolicyTemplate policyTemplate;
   private Scheduler timer;
   private FlowConstruct flowConstruct;
@@ -94,12 +94,12 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Router {
   }
 
   @Override
-  public Event process(Event event) throws MuleException {
+  public InternalEvent process(InternalEvent event) throws MuleException {
     return processToApply(event, this);
   }
 
   @Override
-  public Publisher<Event> apply(Publisher<Event> publisher) {
+  public Publisher<InternalEvent> apply(Publisher<InternalEvent> publisher) {
     return from(publisher)
         .flatMap(event -> Mono
             .from(processWithChildContext(event, scheduleRoute(p -> Mono.from(p)
@@ -118,7 +118,7 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Router {
         || (e instanceof MessagingException && shouldRetry.test(((MessagingException) e).getEvent()));
   }
 
-  private Function<Throwable, Throwable> getThrowableFunction(Event event) {
+  private Function<Throwable, Throwable> getThrowableFunction(InternalEvent event) {
     return throwable -> {
       Throwable cause = getMessagingExceptionCause(throwable);
       return new MessagingException(event,

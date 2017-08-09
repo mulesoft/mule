@@ -49,7 +49,7 @@ import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.ParametersResolverProcessor;
@@ -92,7 +92,7 @@ import reactor.core.publisher.Mono;
  * <p>
  * A {@link #operationExecutor} is obtained by testing the {@link OperationModel} for a {@link OperationExecutorModelProperty}
  * through which a {@link OperationExecutorFactory} is obtained. Models with no such property cannot be used with this class. The
- * obtained {@link OperationExecutor} serve all invocations of {@link #process(Event)} on {@code this} instance but will not be
+ * obtained {@link OperationExecutor} serve all invocations of {@link #process(InternalEvent)} on {@code this} instance but will not be
  * shared with other instances of {@link OperationMessageProcessor}. All the {@link Lifecycle} events that {@code this} instance
  * receives will be propagated to the {@link #operationExecutor}.
  * <p>
@@ -144,12 +144,12 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
   }
 
   @Override
-  public Event process(Event event) throws MuleException {
+  public InternalEvent process(InternalEvent event) throws MuleException {
     return processToApply(event, this);
   }
 
   @Override
-  public Publisher<Event> apply(Publisher<Event> publisher) {
+  public Publisher<InternalEvent> apply(Publisher<InternalEvent> publisher) {
     return from(publisher).flatMap(checkedFunction(event -> withContextClassLoader(classLoader, () -> {
       Optional<ConfigurationInstance> configuration;
       OperationExecutionFunction operationExecutionFunction;
@@ -203,11 +203,11 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
     })));
   }
 
-  private PrecalculatedExecutionContextAdapter getPrecalculatedContext(Event event) {
+  private PrecalculatedExecutionContextAdapter getPrecalculatedContext(InternalEvent event) {
     return (PrecalculatedExecutionContextAdapter) (event.getInternalParameters().get(INTERCEPTION_RESOLVED_CONTEXT));
   }
 
-  protected Mono<Event> doProcess(Event event, ExecutionContextAdapter<OperationModel> operationContext) {
+  protected Mono<InternalEvent> doProcess(InternalEvent event, ExecutionContextAdapter<OperationModel> operationContext) {
     return executeOperation(operationContext)
         .map(value -> returnDelegate.asReturnValue(value, operationContext))
         .switchIfEmpty(fromCallable(() -> returnDelegate.asReturnValue(null, operationContext)))
@@ -220,7 +220,7 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
 
   private ExecutionContextAdapter<OperationModel> createExecutionContext(Optional<ConfigurationInstance> configuration,
                                                                          Map<String, Object> resolvedParameters,
-                                                                         Event event)
+                                                                         InternalEvent event)
       throws MuleException {
 
     return new DefaultExecutionContext<>(extensionModel, configuration, resolvedParameters, operationModel, event,
@@ -327,7 +327,7 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
 
   @Override
   protected ParameterValueResolver getParameterValueResolver() {
-    final Event event = getInitialiserEvent(muleContext);
+    final InternalEvent event = getInitialiserEvent(muleContext);
     return new OperationParameterValueResolver(new LazyExecutionContext<>(resolverSet, operationModel, extensionModel,
                                                                           from(event)));
   }
@@ -345,7 +345,7 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
   }
 
   @Override
-  public ParametersResolverProcessorResult resolveParameters(Event event) throws MuleException {
+  public ParametersResolverProcessorResult resolveParameters(InternalEvent event) throws MuleException {
     if (operationExecutor instanceof OperationArgumentResolverFactory) {
       PrecalculatedExecutionContextAdapter executionContext =
           new PrecalculatedExecutionContextAdapter(createExecutionContext(event), operationExecutor);
@@ -388,12 +388,12 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
     mediator.after(executionContext, null, interceptors);
   }
 
-  private ExecutionContextAdapter<OperationModel> createExecutionContext(Event event) throws MuleException {
+  private ExecutionContextAdapter<OperationModel> createExecutionContext(InternalEvent event) throws MuleException {
     Optional<ConfigurationInstance> configuration = getConfiguration(event);
     return createExecutionContext(configuration, getResolutionResult(event, configuration), event);
   }
 
-  private Map<String, Object> getResolutionResult(Event event, Optional<ConfigurationInstance> configuration)
+  private Map<String, Object> getResolutionResult(InternalEvent event, Optional<ConfigurationInstance> configuration)
       throws MuleException {
     return resolverSet.resolve(from(event, configuration)).asMap();
   }

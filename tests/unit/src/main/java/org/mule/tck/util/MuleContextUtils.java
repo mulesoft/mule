@@ -17,8 +17,8 @@ import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR_LOCATION;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.DefaultEventContext;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.Event.Builder;
+import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.InternalEvent.Builder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
@@ -84,7 +84,7 @@ public class MuleContextUtils {
    */
   public static Builder eventBuilder() throws MuleException {
     FlowConstruct flowConstruct = getTestFlow(mockContextWithServices());
-    return Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR_LOCATION));
+    return InternalEvent.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR_LOCATION));
   }
 
 }

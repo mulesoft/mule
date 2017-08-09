@@ -6,27 +6,28 @@
  */
 package org.mule.runtime.core.internal.policy;
 
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.EventContext;
+import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.InternalEventContext;
 
 /**
- * Helper class that creates an {@link Event} maintaining variables from different scopes.
+ * Helper class that creates an {@link InternalEvent} maintaining variables from different scopes.
  * 
  * @since 4.0
  */
 public class PolicyEventConverter {
 
   /**
-   * Creates a new {@link Event} based on a message and another event which is used to get the variables and
-   * {@link org.mule.runtime.core.api.EventContext}
+   * Creates a new {@link InternalEvent} based on a message and another event which is used to get the variables and
+   * {@link InternalEventContext}
    *
    * @param event provider of the message and session parts of the event
    * @param variablesProviderEvent provider of the variables part of the event
    * @return the created event
    */
-  public Event createEvent(Event event, Event variablesProviderEvent) {
-    Event.Builder eventBuilder =
-        Event.builder((EventContext) variablesProviderEvent.getContext()).message(event.getMessage()).session(event.getSession());
+  public InternalEvent createEvent(InternalEvent event, InternalEvent variablesProviderEvent) {
+    InternalEvent.Builder eventBuilder =
+        InternalEvent.builder((InternalEventContext) variablesProviderEvent.getContext()).message(event.getMessage())
+            .session(event.getSession());
     eventBuilder.variables(variablesProviderEvent.getVariables());
     return eventBuilder.build();
   }

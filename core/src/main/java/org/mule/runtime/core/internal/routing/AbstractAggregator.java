@@ -26,7 +26,7 @@ import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.store.ObjectStoreSettings;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.routing.Aggregator;
@@ -146,8 +146,8 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
   protected abstract EventCorrelatorCallback getCorrelatorCallback(MuleContext muleContext);
 
   @Override
-  public Event process(Event event) throws MuleException {
-    Event result = eventCorrelator.process(event);
+  public InternalEvent process(InternalEvent event) throws MuleException {
+    InternalEvent result = eventCorrelator.process(event);
     if (result == null) {
       return null;
     }
@@ -155,7 +155,7 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
   }
 
   @Override
-  public Publisher<Event> apply(Publisher<Event> publisher) {
+  public Publisher<InternalEvent> apply(Publisher<InternalEvent> publisher) {
     return from(publisher).handle(nullSafeMap(checkedFunction(event -> process(event))));
   }
 
@@ -187,7 +187,7 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
         new ProvidedObjectStoreWrapper<>(processedGroupsObjectStore, internalProcessedGroupsObjectStoreFactory());
   }
 
-  public void setEventGroupsObjectStore(PartitionableObjectStore<Event> eventGroupsObjectStore) {
+  public void setEventGroupsObjectStore(PartitionableObjectStore<InternalEvent> eventGroupsObjectStore) {
     this.eventGroupsObjectStore =
         new ProvidedPartitionableObjectStoreWrapper(eventGroupsObjectStore, internalEventsGroupsObjectStoreSupplier());
   }

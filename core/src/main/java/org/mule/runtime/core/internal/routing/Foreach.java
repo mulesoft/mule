@@ -20,8 +20,8 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.Event.Builder;
+import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.InternalEvent.Builder;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
@@ -50,7 +50,7 @@ import reactor.core.publisher.Mono;
  * <p>
  * Defining a groupSize greater than one, allows iterating over collections of elements of the specified size.
  * <p>
- * The {@link Event} sent to the next message processor is the same that arrived to foreach.
+ * The {@link InternalEvent} sent to the next message processor is the same that arrived to foreach.
  */
 public class Foreach extends AbstractMessageProcessorOwner implements Initialisable, Scope {
 
@@ -69,7 +69,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
   private String ignoreErrorType = null;
 
   @Override
-  public Event process(Event event) throws MuleException {
+  public InternalEvent process(InternalEvent event) throws MuleException {
     String parentMessageProp = rootMessageVariableName != null ? rootMessageVariableName : ROOT_MESSAGE_PROPERTY;
     Object previousCounterVar = null;
     Object previousRootMessageVar = null;
@@ -80,7 +80,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
       previousRootMessageVar = event.getVariables().get(parentMessageProp).getValue();
     }
     Message message = event.getMessage();
-    final Builder requestBuilder = Event.builder(event);
+    final Builder requestBuilder = InternalEvent.builder(event);
     boolean transformed = false;
     if (xpathCollection) {
       Message transformedMessage = transformPayloadIfNeeded(message);
@@ -91,7 +91,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
       }
     }
     requestBuilder.addVariable(parentMessageProp, message);
-    final Builder responseBuilder = Event.builder(doProcess(requestBuilder.build()));
+    final Builder responseBuilder = InternalEvent.builder(doProcess(requestBuilder.build()));
     if (transformed) {
       responseBuilder.message(transformBack(message));
     } else {
@@ -110,7 +110,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     return responseBuilder.build();
   }
 
-  protected Event doProcess(Event event) throws MuleException {
+  protected InternalEvent doProcess(InternalEvent event) throws MuleException {
     try {
       // TODO MULE-13052 Migrate Splitter and Foreach implementation to non-blocking
       return Mono.just(event)
@@ -159,7 +159,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     splitter = new Splitter(expressionConfig, ignoreErrorType) {
 
       @Override
-      protected void propagateFlowVars(Event previousResult, final Builder builder) {
+      protected void propagateFlowVars(InternalEvent previousResult, final Builder builder) {
         for (String flowVarName : resolvePropagatedFlowVars(previousResult).keySet()) {
           builder.addVariable(flowVarName, previousResult.getVariables().get(flowVarName).getValue(),
                               previousResult.getVariables().get(flowVarName).getDataType());
@@ -167,7 +167,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
       }
 
       @Override
-      protected Map<String, TypedValue<?>> resolvePropagatedFlowVars(Event previousResult) {
+      protected Map<String, TypedValue<?>> resolvePropagatedFlowVars(InternalEvent previousResult) {
         return previousResult != null ? previousResult.getVariables() : emptyMap();
       }
 

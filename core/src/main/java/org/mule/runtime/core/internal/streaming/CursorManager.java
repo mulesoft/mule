@@ -13,8 +13,8 @@ import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.EventContext;
+import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.InternalEventContext;
 import org.mule.runtime.core.internal.streaming.bytes.ManagedCursorStreamProvider;
 import org.mule.runtime.core.internal.streaming.object.ManagedCursorIteratorProvider;
 
@@ -68,8 +68,8 @@ public class CursorManager {
    * @param creatorEvent the event that created the provider
    * @return a {@link CursorContext}
    */
-  public CursorProvider manage(CursorProvider provider, Event creatorEvent) {
-    final EventContext ownerContext = getRoot(creatorEvent.getInternalContext());
+  public CursorProvider manage(CursorProvider provider, InternalEvent creatorEvent) {
+    final InternalEventContext ownerContext = getRoot(creatorEvent.getContext());
     registerEventContext(ownerContext);
     registry.getUnchecked(ownerContext.getId()).addProvider(provider);
 
@@ -111,7 +111,7 @@ public class CursorManager {
     }
   }
 
-  private void terminated(EventContext rootContext) {
+  private void terminated(InternalEventContext rootContext) {
     EventStreamingState state = registry.getIfPresent(rootContext.getId());
     if (state != null) {
       state.dispose();
@@ -125,12 +125,12 @@ public class CursorManager {
    * invocation will literally be no-ops. This is preferred to introducing contention here given multiple thread may be opening
    * cursors concurrently.
    */
-  private void registerEventContext(EventContext eventContext) {
+  private void registerEventContext(InternalEventContext eventContext) {
     from(eventContext.getCompletionPublisher()).subscribe(null, null, () -> terminated(eventContext));
   }
 
-  private EventContext getRoot(EventContext eventContext) {
-    return eventContext.getInternalParentContext()
+  private InternalEventContext getRoot(InternalEventContext eventContext) {
+    return eventContext.getParentContext()
         .map(this::getRoot)
         .orElse(eventContext);
   }

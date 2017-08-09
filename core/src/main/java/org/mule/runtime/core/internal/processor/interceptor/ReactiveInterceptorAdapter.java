@@ -24,7 +24,7 @@ import org.mule.runtime.api.interception.ProcessorInterceptor;
 import org.mule.runtime.api.interception.ProcessorInterceptorFactory;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.exception.MessagingException;
@@ -112,10 +112,10 @@ public class ReactiveInterceptorAdapter
     }
   }
 
-  private Function<Event, Event> doBefore(ProcessorInterceptor interceptor, Processor component,
-                                          Map<String, String> dslParameters) {
+  private Function<InternalEvent, InternalEvent> doBefore(ProcessorInterceptor interceptor, Processor component,
+                                                          Map<String, String> dslParameters) {
     return event -> {
-      final Event eventWithResolvedParams =
+      final InternalEvent eventWithResolvedParams =
           addResolvedParameters(event, component, dslParameters);
 
       DefaultInterceptionEvent interceptionEvent = new DefaultInterceptionEvent(eventWithResolvedParams);
@@ -125,9 +125,10 @@ public class ReactiveInterceptorAdapter
     };
   }
 
-  private CompletableFuture<Event> doAround(Event event, ProcessorInterceptor interceptor,
-                                            Processor component, Map<String, String> dslParameters, ReactiveProcessor next) {
-    final Event eventWithResolvedParams =
+  private CompletableFuture<InternalEvent> doAround(InternalEvent event, ProcessorInterceptor interceptor,
+                                                    Processor component, Map<String, String> dslParameters,
+                                                    ReactiveProcessor next) {
+    final InternalEvent eventWithResolvedParams =
         addResolvedParameters(event, component, dslParameters);
 
     DefaultInterceptionEvent interceptionEvent = new DefaultInterceptionEvent(eventWithResolvedParams);
@@ -148,14 +149,14 @@ public class ReactiveInterceptorAdapter
         .thenApply(interceptedEvent -> ((DefaultInterceptionEvent) interceptedEvent).resolve());
   }
 
-  private Map<String, Object> getResolvedParams(final Event eventWithResolvedParams) {
+  private Map<String, Object> getResolvedParams(final InternalEvent eventWithResolvedParams) {
     return (Map<String, Object>) eventWithResolvedParams.getInternalParameters().get(INTERCEPTION_RESOLVED_PARAMS);
   }
 
-  private Function<Event, Event> doAfter(ComponentLocation componentLocation, ProcessorInterceptor interceptor,
-                                         Optional<Throwable> thrown) {
+  private Function<InternalEvent, InternalEvent> doAfter(ComponentLocation componentLocation, ProcessorInterceptor interceptor,
+                                                         Optional<Throwable> thrown) {
     return event -> {
-      final Event eventWithResolvedParams = removeResolvedParameters(event);
+      final InternalEvent eventWithResolvedParams = removeResolvedParameters(event);
 
       DefaultInterceptionEvent interceptionEvent = new DefaultInterceptionEvent(eventWithResolvedParams);
       interceptor.after(componentLocation, interceptionEvent, thrown);
@@ -175,7 +176,7 @@ public class ReactiveInterceptorAdapter
 
   }
 
-  private Event addResolvedParameters(Event event, Processor component, Map<String, String> dslParameters) {
+  private InternalEvent addResolvedParameters(InternalEvent event, Processor component, Map<String, String> dslParameters) {
     boolean sameComponent = event.getInternalParameters().containsKey(INTERCEPTION_COMPONENT)
         ? component.equals(event.getInternalParameters().get(INTERCEPTION_COMPONENT)) : false;
 
@@ -186,7 +187,7 @@ public class ReactiveInterceptorAdapter
     }
   }
 
-  private Event removeResolvedParameters(Event event) {
+  private InternalEvent removeResolvedParameters(InternalEvent event) {
     if (event.getInternalParameters().containsKey(INTERCEPTION_RESOLVED_CONTEXT)) {
       Processor processor = (Processor) event.getInternalParameters().get(INTERCEPTION_COMPONENT);
 
@@ -197,14 +198,14 @@ public class ReactiveInterceptorAdapter
       }
     }
 
-    return Event.builder(event)
+    return InternalEvent.builder(event)
         .removeInternalParameter(INTERCEPTION_RESOLVED_PARAMS)
         .removeInternalParameter(INTERCEPTION_COMPONENT)
         .removeInternalParameter(INTERCEPTION_RESOLVED_CONTEXT)
         .build();
   }
 
-  private Event resolveParameters(Event event, Processor processor, Map<String, String> parameters) {
+  private InternalEvent resolveParameters(InternalEvent event, Processor processor, Map<String, String> parameters) {
     Map<String, Object> resolvedParameters = new HashMap<>();
     for (Map.Entry<String, String> entry : parameters.entrySet()) {
       Object value;
@@ -233,6 +234,6 @@ public class ReactiveInterceptorAdapter
     interceptionEventParams.put(INTERCEPTION_RESOLVED_PARAMS, resolvedParameters);
     interceptionEventParams.put(INTERCEPTION_COMPONENT, processor);
 
-    return Event.builder(event).internalParameters(interceptionEventParams).build();
+    return InternalEvent.builder(event).internalParameters(interceptionEventParams).build();
   }
 }

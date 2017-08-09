@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.processor.chain;
 
 import static java.util.Optional.empty;
 import static reactor.core.publisher.Flux.from;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
@@ -43,16 +43,16 @@ public class SubflowMessageProcessorChainBuilder extends ExplicitMessageProcesso
       this.subFlowName = name;
     }
 
-    private Consumer<Event> pushSubFlowFlowStackElement() {
+    private Consumer<InternalEvent> pushSubFlowFlowStackElement() {
       return event -> ((DefaultFlowCallStack) event.getFlowCallStack()).push(new FlowStackElement(subFlowName, null));
     }
 
-    private Consumer<Event> popSubFlowFlowStackElement() {
+    private Consumer<InternalEvent> popSubFlowFlowStackElement() {
       return event -> ((DefaultFlowCallStack) event.getFlowCallStack()).pop();
     }
 
     @Override
-    public Publisher<Event> apply(Publisher<Event> publisher) {
+    public Publisher<InternalEvent> apply(Publisher<InternalEvent> publisher) {
       return from(publisher).concatMap(event -> Mono.just(event).doOnNext(pushSubFlowFlowStackElement())
           .transform(s -> super.apply(s)).doOnTerminate((event1, throwable) -> popSubFlowFlowStackElement().accept(event)));
     }

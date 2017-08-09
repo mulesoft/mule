@@ -31,7 +31,7 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.message.Message.Builder;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
@@ -93,7 +93,7 @@ public class FunctionalTestProcessor extends AbstractAnnotatedObject implements 
    * Keeps a list of any messages received on this service. Note that only references to the messages (objects) are stored, so any
    * subsequent changes to the objects will change the history.
    */
-  private List<Event> messageHistory;
+  private List<InternalEvent> messageHistory;
 
 
   @Override
@@ -149,7 +149,7 @@ public class FunctionalTestProcessor extends AbstractAnnotatedObject implements 
   }
 
   @Override
-  public Event process(Event event) throws MuleException {
+  public InternalEvent process(InternalEvent event) throws MuleException {
     try {
       if (isThrowException()) {
         throwException();
@@ -191,18 +191,18 @@ public class FunctionalTestProcessor extends AbstractAnnotatedObject implements 
    * @param event the current event
    * @return a concatenated string of the current payload and the appendString
    */
-  protected String append(String contents, Event event) {
+  protected String append(String contents, InternalEvent event) {
     return contents + expressionManager.parse(appendString, event, getLocation());
   }
 
   /**
    * The service method that implements the test component logic.
    *
-   * @param event the current {@link Event}
+   * @param event the current {@link InternalEvent}
    * @return a new message payload according to the configuration of the component
    * @throws Exception if there is a general failure or if {@link #isThrowException()} is true.
    */
-  protected Event doProcess(Event event) throws Exception {
+  protected InternalEvent doProcess(InternalEvent event) throws Exception {
     if (enableMessageHistory) {
       messageHistory.add(event);
     }
@@ -246,7 +246,7 @@ public class FunctionalTestProcessor extends AbstractAnnotatedObject implements 
         replyBuilder = replyBuilder.value(append(event.getMessageAsString(muleContext), event));
       }
     }
-    Event replyMessage = Event.builder(event).message(replyBuilder.build()).build();
+    InternalEvent replyMessage = InternalEvent.builder(event).message(replyBuilder.build()).build();
 
     if (isEnableNotifications()) {
       notificationFirer
@@ -366,8 +366,8 @@ public class FunctionalTestProcessor extends AbstractAnnotatedObject implements 
    * getReceivedMessage(1) returns the first message received by the service, getReceivedMessage(2) returns the second message
    * received by the service, etc.
    */
-  public Event getReceivedMessage(int number) {
-    Event message = null;
+  public InternalEvent getReceivedMessage(int number) {
+    InternalEvent message = null;
     if (messageHistory != null) {
       if (number <= messageHistory.size()) {
         message = messageHistory.get(number - 1);
@@ -379,7 +379,7 @@ public class FunctionalTestProcessor extends AbstractAnnotatedObject implements 
   /**
    * If enableMessageHistory = true, returns the last message received by the service in chronological order.
    */
-  public Event getLastReceivedMessage() {
+  public InternalEvent getLastReceivedMessage() {
     if (messageHistory != null) {
       return messageHistory.get(messageHistory.size() - 1);
     } else {

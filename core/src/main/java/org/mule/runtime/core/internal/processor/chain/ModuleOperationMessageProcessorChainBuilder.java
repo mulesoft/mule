@@ -25,7 +25,7 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
@@ -40,10 +40,10 @@ import java.util.Optional;
 
 /**
  * Creates a chain for any operation, where it parametrizes two type of values (parameter and property) to the inner processors
- * through the {@link Event}.
+ * through the {@link InternalEvent}.
  *
  * <p>
- * Both parameter and property could be simple literals or expressions that will be evaluated before passing the new {@link Event}
+ * Both parameter and property could be simple literals or expressions that will be evaluated before passing the new {@link InternalEvent}
  * to the child processors.
  *
  * <p>
@@ -126,12 +126,12 @@ public class ModuleOperationMessageProcessorChainBuilder extends ExplicitMessage
     }
 
     /**
-     * To properly feed the {@link ExpressionManager#evaluate(String, DataType, BindingContext, Event)} we need to store the
+     * To properly feed the {@link ExpressionManager#evaluate(String, DataType, BindingContext, InternalEvent)} we need to store the
      * {@link MetadataType} per parameter, so that the {@link DataType} can be generated.
      * 
      * @param parameters list of parameters taken from the XML
      * @param parameterModels collection of elements taken from the matching {@link ExtensionModel}
-     * @return a collection of parameters to be later consumed in {@link #getEvaluatedValue(Event, String, MetadataType)}
+     * @return a collection of parameters to be later consumed in {@link #getEvaluatedValue(InternalEvent, String, MetadataType)}
      */
     private Map<String, Pair<String, MetadataType>> parseParameters(Map<String, String> parameters,
                                                                     List<ParameterModel> parameterModels) {
@@ -152,7 +152,7 @@ public class ModuleOperationMessageProcessorChainBuilder extends ExplicitMessage
      * this class to provide scoping for the inner list of processors.
      */
     @Override
-    public Publisher<Event> apply(Publisher<Event> publisher) {
+    public Publisher<InternalEvent> apply(Publisher<InternalEvent> publisher) {
       return from(publisher)
           .concatMap(request -> just(request)
               .map(this::createEventWithParameters)
@@ -160,15 +160,15 @@ public class ModuleOperationMessageProcessorChainBuilder extends ExplicitMessage
               .map(eventResult -> processResult(request, eventResult)));
     }
 
-    private Event processResult(Event originalEvent, Event chainEvent) {
+    private InternalEvent processResult(InternalEvent originalEvent, InternalEvent chainEvent) {
       if (!returnsVoid) {
         originalEvent = createNewEventFromJustMessage(originalEvent, chainEvent);
       }
       return originalEvent;
     }
 
-    private Event createNewEventFromJustMessage(Event request, Event response) {
-      final Event.Builder builder = Event.builder(request);
+    private InternalEvent createNewEventFromJustMessage(InternalEvent request, InternalEvent response) {
+      final InternalEvent.Builder builder = InternalEvent.builder(request);
       if (target.isPresent()) {
         builder.addVariable(target.get(), response.getMessage());
       } else {
@@ -177,15 +177,15 @@ public class ModuleOperationMessageProcessorChainBuilder extends ExplicitMessage
       return builder.build();
     }
 
-    private Event createEventWithParameters(Event event) {
-      Event.Builder builder = Event.builder(event.getInternalContext());
+    private InternalEvent createEventWithParameters(InternalEvent event) {
+      InternalEvent.Builder builder = InternalEvent.builder(event.getContext());
       builder.message(builder().nullValue().build());
       builder.parameters(evaluateParameters(event, parameters));
       builder.properties(evaluateParameters(event, properties));
       return builder.build();
     }
 
-    private Map<String, Object> evaluateParameters(Event event, Map<String, Pair<String, MetadataType>> unevaluatedMap) {
+    private Map<String, Object> evaluateParameters(InternalEvent event, Map<String, Pair<String, MetadataType>> unevaluatedMap) {
       return unevaluatedMap.entrySet().stream()
           .collect(toMap(Map.Entry::getKey,
                          entry -> expressionManager.isExpression(entry.getValue().getFirst())
@@ -193,7 +193,7 @@ public class ModuleOperationMessageProcessorChainBuilder extends ExplicitMessage
                              : entry.getValue().getFirst()));
     }
 
-    private Object getEvaluatedValue(Event event, String value, MetadataType metadataType) {
+    private Object getEvaluatedValue(InternalEvent event, String value, MetadataType metadataType) {
       ComponentLocation headLocation = null;
       final Processor head = getProcessorsToExecute().get(0);
       if (head instanceof AnnotatedObject) {

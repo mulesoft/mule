@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.policy;
 
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
 
@@ -26,7 +26,7 @@ public class FlowExecutionException extends MessagingException {
    * @param cause the cause of the failure
    * @param failingMessageProcessor the message processor that failed
    */
-  public FlowExecutionException(Event event, Throwable cause, Processor failingMessageProcessor) {
+  public FlowExecutionException(InternalEvent event, Throwable cause, Processor failingMessageProcessor) {
     super(event, cause, failingMessageProcessor);
   }
 }

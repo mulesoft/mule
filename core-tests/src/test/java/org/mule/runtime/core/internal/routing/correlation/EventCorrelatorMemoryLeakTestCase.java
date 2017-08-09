@@ -22,7 +22,7 @@ import org.mule.runtime.api.store.ObjectDoesNotExistException;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.PartitionableObjectStore;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -59,7 +59,7 @@ public class EventCorrelatorMemoryLeakTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testEventGroupFreedInRoutingException() throws Exception {
-    Event event = mock(Event.class);
+    InternalEvent event = mock(InternalEvent.class);
     try {
       eventCorrelator.process(event);
       fail("Routing Exception must be catched.");
@@ -74,7 +74,7 @@ public class EventCorrelatorMemoryLeakTestCase extends AbstractMuleTestCase {
     when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
     when(partitionableObjectStore.retrieve(any(String.class), any(String.class)))
         .thenThrow(ObjectDoesNotExistException.class);
-    when(eventCorrelatorCallback.createEventGroup(any(Event.class), any(Object.class))).thenReturn(eventGroup);
+    when(eventCorrelatorCallback.createEventGroup(any(InternalEvent.class), any(Object.class))).thenReturn(eventGroup);
     when(eventCorrelatorCallback.aggregateEvents(any(EventGroup.class))).thenThrow(RoutingException.class);
     when(eventCorrelatorCallback.shouldAggregateEvents(any(EventGroup.class))).thenReturn(true);
   }

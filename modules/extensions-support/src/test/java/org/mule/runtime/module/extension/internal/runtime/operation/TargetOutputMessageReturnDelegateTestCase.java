@@ -20,7 +20,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.TargetType;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
@@ -50,7 +50,7 @@ public class TargetOutputMessageReturnDelegateTestCase extends AbstractMuleTestC
   @Mock(answer = RETURNS_DEEP_STUBS)
   protected ComponentModel componentModel;
 
-  protected Event event;
+  protected InternalEvent event;
 
   @Mock
   protected Object attributes;
@@ -73,7 +73,7 @@ public class TargetOutputMessageReturnDelegateTestCase extends AbstractMuleTestC
   public void operationTargetMessage() {
     delegate = createDelegate(MESSAGE);
 
-    Event result = delegate.asReturnValue(payload, operationContext);
+    InternalEvent result = delegate.asReturnValue(payload, operationContext);
     assertMessage(result.getMessage());
     assertThat(result.getVariables().get(TARGET).getValue(), is(instanceOf(Message.class)));
     Message message = (Message) result.getVariables().get(TARGET).getValue();
@@ -83,7 +83,7 @@ public class TargetOutputMessageReturnDelegateTestCase extends AbstractMuleTestC
   @Test
   public void operationTargetPayload() {
     delegate = createDelegate(PAYLOAD);
-    Event result = delegate.asReturnValue(payload, operationContext);
+    InternalEvent result = delegate.asReturnValue(payload, operationContext);
     assertMessage(result.getMessage());
     assertThat(result.getVariables().get(TARGET).getValue(), is(payload));
   }
@@ -92,7 +92,8 @@ public class TargetOutputMessageReturnDelegateTestCase extends AbstractMuleTestC
   public void operationTargetPayloadWithResult() {
     delegate = createDelegate(PAYLOAD);
     MediaType mediaType = MediaType.APPLICATION_JSON.withCharset(Charset.defaultCharset());
-    Event result = delegate.asReturnValue(Result.builder().output(payload).mediaType(mediaType).build(), operationContext);
+    InternalEvent result =
+        delegate.asReturnValue(Result.builder().output(payload).mediaType(mediaType).build(), operationContext);
     assertMessage(result.getMessage());
     assertThat(result.getVariables().get(TARGET).getValue(), is(payload));
     assertThat(result.getVariables().get(TARGET).getDataType().getMediaType(), is(mediaType));

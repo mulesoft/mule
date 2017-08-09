@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.policy;
 
 import static java.util.Optional.ofNullable;
 
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.policy.PolicyStateHandler;
 import org.mule.runtime.core.api.policy.PolicyStateId;
 import org.mule.runtime.core.api.processor.Processor;
@@ -23,7 +23,7 @@ import org.apache.commons.collections.map.MultiValueMap;
 public class DefaultPolicyStateHandler implements PolicyStateHandler {
 
   private MultiValueMap policyStateIdsByExecutionIdentifier = new MultiValueMap();
-  private Map<PolicyStateId, Event> stateMap = new HashMap<>();
+  private Map<PolicyStateId, InternalEvent> stateMap = new HashMap<>();
   private Map<String, Processor> nextOperationMap = new HashMap<>();
 
   public void updateNextOperation(String identifier, Processor nextOperation) {
@@ -34,11 +34,11 @@ public class DefaultPolicyStateHandler implements PolicyStateHandler {
     return nextOperationMap.get(identifier);
   }
 
-  public Optional<Event> getLatestState(PolicyStateId identifier) {
+  public Optional<InternalEvent> getLatestState(PolicyStateId identifier) {
     return ofNullable(stateMap.get(identifier));
   }
 
-  public void updateState(PolicyStateId identifier, Event lastStateEvent) {
+  public void updateState(PolicyStateId identifier, InternalEvent lastStateEvent) {
     stateMap.put(identifier, lastStateEvent);
     policyStateIdsByExecutionIdentifier.put(identifier.getExecutionIdentifier(), identifier);
   }

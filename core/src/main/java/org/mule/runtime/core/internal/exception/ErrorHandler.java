@@ -16,7 +16,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.message.Error;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.GlobalNameableObject;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
@@ -58,7 +58,7 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
   }
 
   @Override
-  public Event handleException(MessagingException exception, Event event) {
+  public InternalEvent handleException(MessagingException exception, InternalEvent event) {
     event = addExceptionPayload(exception, event);
     if (isCriticalException(exception)) {
       return event;
@@ -72,11 +72,11 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
   }
 
   @Override
-  public Publisher<Event> apply(MessagingException exception) {
+  public Publisher<InternalEvent> apply(MessagingException exception) {
     if (isCriticalException(exception)) {
       return error(exception);
     } else {
-      Event event = addExceptionPayload(exception, exception.getEvent());
+      InternalEvent event = addExceptionPayload(exception, exception.getEvent());
       exception.setProcessedEvent(event);
       for (MessagingExceptionHandlerAcceptor exceptionListener : exceptionListeners) {
         if (exceptionListener.accept(event)) {
@@ -87,8 +87,8 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
     }
   }
 
-  private Event addExceptionPayload(MessagingException exception, Event event) {
-    return Event.builder(event)
+  private InternalEvent addExceptionPayload(MessagingException exception, InternalEvent event) {
+    return InternalEvent.builder(event)
         .message(InternalMessage.builder(event.getMessage()).exceptionPayload(new DefaultExceptionPayload(exception)).build())
         .build();
   }
@@ -156,7 +156,7 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
   }
 
   @Override
-  public boolean accept(Event event) {
+  public boolean accept(InternalEvent event) {
     return true;
   }
 

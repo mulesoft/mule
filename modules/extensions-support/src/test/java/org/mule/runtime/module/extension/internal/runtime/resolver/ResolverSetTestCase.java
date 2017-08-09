@@ -13,7 +13,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getParameter;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -41,7 +41,7 @@ public class ResolverSetTestCase extends AbstractMuleTestCase {
   private Map<ParameterModel, ValueResolver> mapping;
 
   @Mock
-  private Event event;
+  private InternalEvent event;
 
   @Mock
   private ValueResolvingContext resolvingContext;

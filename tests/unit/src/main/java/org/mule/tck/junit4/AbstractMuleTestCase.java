@@ -12,18 +12,17 @@ import static java.lang.Thread.getAllStackTraces;
 import static java.util.Collections.sort;
 import static org.junit.Assume.assumeThat;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.api.Event.setCurrentEvent;
+import static org.mule.runtime.core.api.InternalEvent.setCurrentEvent;
 import static org.mule.runtime.core.api.util.StringMessageUtils.getBoilerPlate;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.core.api.util.SystemUtils.parsePropertyDefinitions;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
-import static org.mule.tck.junit4.AbstractMuleContextTestCase.muleContext;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.api.util.SystemUtils;
 import org.mule.tck.junit4.rule.WarningTimeout;
@@ -256,16 +255,16 @@ public abstract class AbstractMuleTestCase {
     }
   }
 
-  private Event _testEvent;
-  private Event _nullPayloadEvent;
+  private InternalEvent _testEvent;
+  private InternalEvent _nullPayloadEvent;
 
   /**
-   * Creates and caches a test {@link Event} instance for the scope of the current test method.
+   * Creates and caches a test {@link InternalEvent} instance for the scope of the current test method.
    *
    * @return test event.
    * @throws MuleException
    */
-  protected Event testEvent() throws MuleException {
+  protected InternalEvent testEvent() throws MuleException {
     if (_testEvent == null) {
       _testEvent = newEvent();
     }
@@ -273,13 +272,13 @@ public abstract class AbstractMuleTestCase {
   }
 
   /**
-   * Create a new {@link Event} for each invocation. Useful if multiple distinct event instances are needed in a single test
+   * Create a new {@link InternalEvent} for each invocation. Useful if multiple distinct event instances are needed in a single test
    * method.
    * 
    * @return new test event.
    * @throws MuleException
    */
-  protected Event newEvent() throws MuleException {
+  protected InternalEvent newEvent() throws MuleException {
     return getEventBuilder().message(of(TEST_PAYLOAD)).build();
   }
 
@@ -289,11 +288,11 @@ public abstract class AbstractMuleTestCase {
    * @return a event builder to use to build a test event
    * @throws MuleException
    */
-  protected Event.Builder getEventBuilder() throws MuleException {
+  protected InternalEvent.Builder getEventBuilder() throws MuleException {
     return eventBuilder();
   }
 
-  protected Event nullPayloadEvent() throws MuleException {
+  protected InternalEvent nullPayloadEvent() throws MuleException {
     if (_nullPayloadEvent == null) {
       _nullPayloadEvent = eventBuilder().message(of(null)).build();
     }

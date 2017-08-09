@@ -11,8 +11,8 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.DefaultEventContext;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.Event.Builder;
+import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.InternalEvent.Builder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
@@ -30,10 +30,10 @@ public class EventBenchmark extends AbstractBenchmark {
 
   private MuleContext muleContext;
   private Flow flow;
-  private Event event;
-  private Event eventWith10VariablesProperties;
-  private Event eventWith50VariablesProperties;
-  private Event eventWith100VariablesProperties;
+  private InternalEvent event;
+  private InternalEvent eventWith10VariablesProperties;
+  private InternalEvent eventWith50VariablesProperties;
+  private InternalEvent eventWith100VariablesProperties;
 
   @Setup
   public void setup() throws Exception {
@@ -42,8 +42,8 @@ public class EventBenchmark extends AbstractBenchmark {
     flow = createFlow(muleContext);
     muleContext.getRegistry().registerFlowConstruct(flow);
     Message.Builder messageBuilder = Message.builder().value(PAYLOAD);
-    Event.Builder eventBuilder =
-        Event.builder(DefaultEventContext.create(flow, CONNECTOR_LOCATION)).message(messageBuilder.build());
+    InternalEvent.Builder eventBuilder =
+        InternalEvent.builder(DefaultEventContext.create(flow, CONNECTOR_LOCATION)).message(messageBuilder.build());
     event = eventBuilder.build();
     eventWith10VariablesProperties = createMuleEventWithFlowVarsAndProperties(10);
     eventWith50VariablesProperties = createMuleEventWithFlowVarsAndProperties(50);
@@ -57,72 +57,72 @@ public class EventBenchmark extends AbstractBenchmark {
   }
 
   @Benchmark
-  public Event createEvent() {
-    return Event.builder(DefaultEventContext.create(flow, CONNECTOR_LOCATION)).message(of(PAYLOAD)).build();
+  public InternalEvent createEvent() {
+    return InternalEvent.builder(DefaultEventContext.create(flow, CONNECTOR_LOCATION)).message(of(PAYLOAD)).build();
   }
 
   @Benchmark
-  public Event copyEvent() {
-    return Event.builder(event).build();
+  public InternalEvent copyEvent() {
+    return InternalEvent.builder(event).build();
   }
 
   @Benchmark
-  public Event copyEventWith20VariablesProperties() {
-    return Event.builder(eventWith10VariablesProperties).build();
+  public InternalEvent copyEventWith20VariablesProperties() {
+    return InternalEvent.builder(eventWith10VariablesProperties).build();
   }
 
   @Benchmark
-  public Event copyEventWith100VariablesProperties() {
-    return Event.builder(eventWith100VariablesProperties).build();
+  public InternalEvent copyEventWith100VariablesProperties() {
+    return InternalEvent.builder(eventWith100VariablesProperties).build();
   }
 
   @Benchmark
-  public Event deepCopyEvent() {
-    return Event.builder(event).message(Message.builder(event.getMessage()).build()).build();
+  public InternalEvent deepCopyEvent() {
+    return InternalEvent.builder(event).message(Message.builder(event.getMessage()).build()).build();
   }
 
   @Benchmark
-  public Event deepCopyEventWith20VariablesProperties() {
-    return Event.builder(eventWith10VariablesProperties)
+  public InternalEvent deepCopyEventWith20VariablesProperties() {
+    return InternalEvent.builder(eventWith10VariablesProperties)
         .message(Message.builder(eventWith10VariablesProperties.getMessage()).build()).build();
   }
 
   @Benchmark
-  public Event deepCopyEventWith50VariablesProperties() {
-    return Event.builder(eventWith50VariablesProperties)
+  public InternalEvent deepCopyEventWith50VariablesProperties() {
+    return InternalEvent.builder(eventWith50VariablesProperties)
         .message(Message.builder(eventWith50VariablesProperties.getMessage()).build()).build();
   }
 
   @Benchmark
-  public Event deepCopyEventWith100VariablesProperties() {
-    return Event.builder(eventWith100VariablesProperties)
+  public InternalEvent deepCopyEventWith100VariablesProperties() {
+    return InternalEvent.builder(eventWith100VariablesProperties)
         .message(Message.builder(eventWith100VariablesProperties.getMessage()).build()).build();
   }
 
   @Benchmark
-  public Event addEventVariable() {
-    return Event.builder(event).addVariable(KEY, VALUE).build();
+  public InternalEvent addEventVariable() {
+    return InternalEvent.builder(event).addVariable(KEY, VALUE).build();
   }
 
   @Benchmark
-  public Event addEventVariableEventWith20VariablesProperties() {
-    return Event.builder(eventWith10VariablesProperties).addVariable(KEY, VALUE).build();
+  public InternalEvent addEventVariableEventWith20VariablesProperties() {
+    return InternalEvent.builder(eventWith10VariablesProperties).addVariable(KEY, VALUE).build();
   }
 
   @Benchmark
-  public Event addEventVariableEventWith50VariablesProperties() {
-    return Event.builder(eventWith50VariablesProperties).addVariable(KEY, VALUE).build();
+  public InternalEvent addEventVariableEventWith50VariablesProperties() {
+    return InternalEvent.builder(eventWith50VariablesProperties).addVariable(KEY, VALUE).build();
   }
 
   @Benchmark
-  public Event addEventVariableEventWith100VariablesProperties() {
-    return Event.builder(eventWith100VariablesProperties).addVariable(KEY, VALUE).build();
+  public InternalEvent addEventVariableEventWith100VariablesProperties() {
+    return InternalEvent.builder(eventWith100VariablesProperties).addVariable(KEY, VALUE).build();
   }
 
 
   @Benchmark
-  public Event copyWith10FlowVarsAnd10PropertiesWrite1OfEach() throws Exception {
-    return Event.builder(eventWith10VariablesProperties)
+  public InternalEvent copyWith10FlowVarsAnd10PropertiesWrite1OfEach() throws Exception {
+    return InternalEvent.builder(eventWith10VariablesProperties)
         .session(new DefaultMuleSession(eventWith10VariablesProperties.getSession()))
         .addVariable("newKey", "val")
         .message(InternalMessage.builder(eventWith10VariablesProperties.getMessage()).addInboundProperty("newKey", "val")
@@ -131,8 +131,8 @@ public class EventBenchmark extends AbstractBenchmark {
   }
 
   @Benchmark
-  public Event copyWith10FlowVarsAnd10PropertiesWrite5OfEach() throws Exception {
-    final Builder eventBuilder = Event.builder(eventWith50VariablesProperties);
+  public InternalEvent copyWith10FlowVarsAnd10PropertiesWrite5OfEach() throws Exception {
+    final Builder eventBuilder = InternalEvent.builder(eventWith50VariablesProperties);
     eventBuilder.session(new DefaultMuleSession(eventWith50VariablesProperties.getSession())).build();
     InternalMessage.Builder builder = InternalMessage.builder(eventWith50VariablesProperties.getMessage());
     for (int j = 1; j <= 5; j++) {
@@ -143,8 +143,8 @@ public class EventBenchmark extends AbstractBenchmark {
   }
 
   @Benchmark
-  public Event copyWith50FlowVarsAnd50PropertiesWrite1OfEach() throws Exception {
-    return Event.builder(eventWith50VariablesProperties)
+  public InternalEvent copyWith50FlowVarsAnd50PropertiesWrite1OfEach() throws Exception {
+    return InternalEvent.builder(eventWith50VariablesProperties)
         .session(new DefaultMuleSession(eventWith50VariablesProperties.getSession()))
         .addVariable("newKey", "val")
         .message(InternalMessage.builder(eventWith50VariablesProperties.getMessage()).addInboundProperty("newKey", "val")
@@ -153,8 +153,8 @@ public class EventBenchmark extends AbstractBenchmark {
   }
 
   @Benchmark
-  public Event copyWith100FlowVarsAndPropertiesWrite25OfEach() throws Exception {
-    final Builder eventBuilder = Event.builder(eventWith100VariablesProperties);
+  public InternalEvent copyWith100FlowVarsAndPropertiesWrite25OfEach() throws Exception {
+    final Builder eventBuilder = InternalEvent.builder(eventWith100VariablesProperties);
     eventBuilder.session(new DefaultMuleSession(eventWith100VariablesProperties.getSession())).build();
     InternalMessage.Builder builder = InternalMessage.builder(eventWith100VariablesProperties.getMessage());
     for (int j = 1; j <= 25; j++) {
@@ -164,10 +164,10 @@ public class EventBenchmark extends AbstractBenchmark {
     return eventBuilder.message(builder.build()).build();
   }
 
-  private Event createMuleEvent(Message message, int numProperties) {
+  private InternalEvent createMuleEvent(Message message, int numProperties) {
     final Builder builder;
     try {
-      builder = Event.builder(DefaultEventContext.create(flow, CONNECTOR_LOCATION)).message(message);
+      builder = InternalEvent.builder(DefaultEventContext.create(flow, CONNECTOR_LOCATION)).message(message);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
@@ -177,13 +177,13 @@ public class EventBenchmark extends AbstractBenchmark {
     return builder.build();
   }
 
-  private Event createMuleEventWithFlowVarsAndProperties(int numProperties) {
+  private InternalEvent createMuleEventWithFlowVarsAndProperties(int numProperties) {
     InternalMessage.Builder builder = InternalMessage.builder().value(PAYLOAD);
     for (int i = 1; i <= numProperties; i++) {
       builder.addInboundProperty("InBoUnDpRoPeRtYkEy" + i, "val");
     }
     Message message = builder.build();
-    Event event = createMuleEvent(message, numProperties);
+    InternalEvent event = createMuleEvent(message, numProperties);
     return event;
   }
 

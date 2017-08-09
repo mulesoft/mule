@@ -21,7 +21,7 @@ import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.exception.ErrorTypeLocator;
 import org.mule.runtime.core.api.exception.MessagingException;
@@ -45,7 +45,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class ExtensionSourceExceptionCallbackTestCase extends AbstractMuleTestCase {
 
   @Mock(answer = RETURNS_DEEP_STUBS)
-  private Event event;
+  private InternalEvent event;
 
   @Mock
   private MessageProcessContext messageProcessContext;
@@ -87,12 +87,12 @@ public class ExtensionSourceExceptionCallbackTestCase extends AbstractMuleTestCa
       public boolean matches(Object o) {
         return o instanceof MessagingException && ((MessagingException) o).getRootCause().equals(exception);
       }
-    }), argThat(new ArgumentMatcher<Event>() {
+    }), argThat(new ArgumentMatcher<InternalEvent>() {
 
       @Override
       public boolean matches(Object o) {
-        return o instanceof Event && ((Event) o).getError().isPresent()
-            && ((Event) o).getError().get().getErrorType().equals(errorType);
+        return o instanceof InternalEvent && ((InternalEvent) o).getError().isPresent()
+            && ((InternalEvent) o).getError().get().getErrorType().equals(errorType);
       }
     }));
   }

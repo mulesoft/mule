@@ -25,7 +25,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.util.Pair;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
@@ -108,16 +108,17 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
   @Override
   public ConfigurationInstance get(Object event) {
     return withContextClassLoader(getExtensionClassLoader(), () -> {
-      ResolverSetResult result = resolverSet.resolve(from((Event) event));
+      ResolverSetResult result = resolverSet.resolve(from((InternalEvent) event));
       ResolverSetResult providerResult = null;
       if (connectionProviderResolver.getResolverSet().isPresent()) {
-        providerResult = ((ResolverSet) connectionProviderResolver.getResolverSet().get()).resolve(from((Event) event));
+        providerResult = ((ResolverSet) connectionProviderResolver.getResolverSet().get()).resolve(from((InternalEvent) event));
       }
-      return getConfiguration(new Pair<>(result, providerResult), (Event) event);
+      return getConfiguration(new Pair<>(result, providerResult), (InternalEvent) event);
     });
   }
 
-  private ConfigurationInstance getConfiguration(Pair<ResolverSetResult, ResolverSetResult> resolverSetResult, Event event)
+  private ConfigurationInstance getConfiguration(Pair<ResolverSetResult, ResolverSetResult> resolverSetResult,
+                                                 InternalEvent event)
       throws Exception {
     ConfigurationInstance configuration;
     cacheReadLock.lock();
@@ -154,7 +155,7 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
     stats.updateLastUsed();
   }
 
-  private ConfigurationInstance createConfiguration(Pair<ResolverSetResult, ResolverSetResult> values, Event event)
+  private ConfigurationInstance createConfiguration(Pair<ResolverSetResult, ResolverSetResult> values, InternalEvent event)
       throws MuleException {
 
     ConfigurationInstance configuration;

@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.processor.simple;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.privileged.processor.simple.SimpleMessageProcessor;
@@ -47,16 +47,16 @@ public class ParseTemplateProcessor extends SimpleMessageProcessor {
   }
 
   @Override
-  public Event process(Event event) {
+  public InternalEvent process(InternalEvent event) {
     if (content == null) {
       throw new IllegalArgumentException("Template content cannot be null");
     }
     Object result = muleContext.getExpressionManager().parse(content, event, null);
     Message resultMessage = Message.builder(event.getMessage()).value(result).nullAttributesValue().build();
     if (target == null) {
-      return Event.builder(event).message(resultMessage).build();
+      return InternalEvent.builder(event).message(resultMessage).build();
     } else {
-      return Event.builder(event).addVariable(target, resultMessage).build();
+      return InternalEvent.builder(event).addVariable(target, resultMessage).build();
     }
   }
 

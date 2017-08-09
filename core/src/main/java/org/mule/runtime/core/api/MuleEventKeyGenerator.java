@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api;
 
 /**
- * Defines a way to generate cache keys for {@link Event} instances.
+ * Defines a way to generate cache keys for {@link InternalEvent} instances.
  */
 public interface MuleEventKeyGenerator {
 
@@ -20,5 +20,5 @@ public interface MuleEventKeyGenerator {
    * @return the generated key
    * @throws IllegalStateException if the generated key is not a String
    */
-  String generateKey(Event event);
+  String generateKey(InternalEvent event);
 }

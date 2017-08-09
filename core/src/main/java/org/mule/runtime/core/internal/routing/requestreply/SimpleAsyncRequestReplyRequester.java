@@ -14,7 +14,7 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.DefaultReplyToHandler;
@@ -31,8 +31,8 @@ public class SimpleAsyncRequestReplyRequester extends AbstractAsyncRequestReplyR
   protected Processor requestMessageProcessor;
 
   @Override
-  protected void sendAsyncRequest(Event event) throws MuleException {
-    event = Event.builder(event)
+  protected void sendAsyncRequest(InternalEvent event) throws MuleException {
+    event = InternalEvent.builder(event)
         .message(InternalMessage.builder(event.getMessage()).addOutboundProperty(MULE_REPLY_TO_PROPERTY, getReplyTo())
             .addOutboundProperty(MULE_REPLY_TO_REQUESTOR_PROPERTY, getLocation().getRootContainerName())
             .build())
@@ -113,7 +113,7 @@ public class SimpleAsyncRequestReplyRequester extends AbstractAsyncRequestReplyR
     }
 
     @Override
-    protected boolean shouldProcessEvent(Event event) {
+    protected boolean shouldProcessEvent(InternalEvent event) {
       // Only process ReplyToHandler is running one-way and standard ReplyToHandler is being used.
       MessageExchangePattern mep = REQUEST_RESPONSE;
       if (source instanceof LegacyImmutableEndpoint) {

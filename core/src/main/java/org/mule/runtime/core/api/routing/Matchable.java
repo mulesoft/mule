@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.routing;
 
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.api.exception.MuleException;
 
 /**
@@ -22,5 +22,5 @@ public interface Matchable {
    * @return true if the event should be processed by this router
    * @throws MuleException if the event cannot be evaluated
    */
-  boolean isMatch(Event event, Event.Builder builder) throws MuleException;
+  boolean isMatch(InternalEvent event, InternalEvent.Builder builder) throws MuleException;
 }

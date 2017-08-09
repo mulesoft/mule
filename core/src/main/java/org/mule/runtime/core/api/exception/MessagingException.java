@@ -15,7 +15,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.message.ErrorBuilder;
 import org.mule.runtime.core.api.processor.Processor;
@@ -49,9 +49,9 @@ public class MessagingException extends MuleException {
   /**
    * The MuleEvent being processed when the error occurred
    */
-  protected final transient Event event;
+  protected final transient InternalEvent event;
 
-  protected transient Event processedEvent;
+  protected transient InternalEvent processedEvent;
 
   private boolean causeRollback;
   private boolean handled;
@@ -69,14 +69,14 @@ public class MessagingException extends MuleException {
     setMessage(generateMessage(message, context));
   }
 
-  public MessagingException(I18nMessage message, Event event) {
+  public MessagingException(I18nMessage message, InternalEvent event) {
     super(message);
     this.event = event;
     extractMuleMessage(event);
     setMessage(generateMessage(message, null));
   }
 
-  public MessagingException(I18nMessage message, Event event, Processor failingMessageProcessor) {
+  public MessagingException(I18nMessage message, InternalEvent event, Processor failingMessageProcessor) {
     super(message);
     this.event = event;
     extractMuleMessage(event);
@@ -95,14 +95,14 @@ public class MessagingException extends MuleException {
     setMessage(generateMessage(message, context));
   }
 
-  public MessagingException(I18nMessage message, Event event, Throwable cause) {
+  public MessagingException(I18nMessage message, InternalEvent event, Throwable cause) {
     super(message, cause instanceof TypedException ? cause.getCause() : cause);
     this.event = cause instanceof TypedException ? eventWithError(event, cause) : event;
     extractMuleMessage(event);
     setMessage(generateMessage(message, null));
   }
 
-  public MessagingException(I18nMessage message, Event event, Throwable cause, Processor failingMessageProcessor) {
+  public MessagingException(I18nMessage message, InternalEvent event, Throwable cause, Processor failingMessageProcessor) {
     super(message, cause instanceof TypedException ? cause.getCause() : cause);
     this.event = cause instanceof TypedException ? eventWithError(event, cause) : event;
     extractMuleMessage(event);
@@ -110,14 +110,14 @@ public class MessagingException extends MuleException {
     setMessage(generateMessage(message, null));
   }
 
-  public MessagingException(Event event, Throwable cause) {
+  public MessagingException(InternalEvent event, Throwable cause) {
     super(cause instanceof TypedException ? cause.getCause() : cause);
     this.event = cause instanceof TypedException ? eventWithError(event, cause) : event;
     extractMuleMessage(event);
     setMessage(generateMessage(getI18nMessage(), null));
   }
 
-  public MessagingException(Event event, MessagingException original) {
+  public MessagingException(InternalEvent event, MessagingException original) {
     super(original.getI18nMessage(),
           original.getCause() instanceof TypedException ? original.getCause().getCause() : original.getCause());
     this.event = original.getCause() instanceof TypedException ? eventWithError(event, original.getCause()) : event;
@@ -129,7 +129,7 @@ public class MessagingException extends MuleException {
     setMessage(original.getMessage());
   }
 
-  public MessagingException(Event event, Throwable cause, Processor failingMessageProcessor) {
+  public MessagingException(InternalEvent event, Throwable cause, Processor failingMessageProcessor) {
     super(cause instanceof TypedException ? cause.getCause() : cause);
     this.event = cause instanceof TypedException ? eventWithError(event, cause) : event;
     extractMuleMessage(event);
@@ -137,8 +137,8 @@ public class MessagingException extends MuleException {
     setMessage(generateMessage(getI18nMessage(), null));
   }
 
-  private Event eventWithError(Event event, Throwable cause) {
-    return Event.builder(event)
+  private InternalEvent eventWithError(InternalEvent event, Throwable cause) {
+    return InternalEvent.builder(event)
         .error(ErrorBuilder.builder(cause.getCause()).errorType(((TypedException) cause).getErrorType()).build()).build();
   }
 
@@ -197,7 +197,7 @@ public class MessagingException extends MuleException {
   /**
    * @return event associated with the exception
    */
-  public Event getEvent() {
+  public InternalEvent getEvent() {
     return processedEvent != null ? processedEvent : event;
   }
 
@@ -206,7 +206,7 @@ public class MessagingException extends MuleException {
    * 
    * @param processedEvent event bounded to the exception
    */
-  public void setProcessedEvent(Event processedEvent) {
+  public void setProcessedEvent(InternalEvent processedEvent) {
     if (processedEvent != null) {
       this.processedEvent = processedEvent;
       extractMuleMessage(processedEvent);
@@ -349,7 +349,7 @@ public class MessagingException extends MuleException {
     return failingMessageProcessor;
   }
 
-  protected void extractMuleMessage(Event event) {
+  protected void extractMuleMessage(InternalEvent event) {
     this.muleMessage = event == null ? null : event.getMessage();
   }
 

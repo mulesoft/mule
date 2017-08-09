@@ -13,7 +13,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingStory.OBJECT_STREAMING;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -56,7 +56,7 @@ public class ObjectStreamingExtensionTestCase extends AbstractStreamingExtension
   @Test
   @Description("Stores an object stream in a variable leaving without modifying the original payload")
   public void getObjectStreamWithTargetVariable() throws Exception {
-    Event event = flowRunner("getStreamWithTarget").withPayload(data).run();
+    InternalEvent event = flowRunner("getStreamWithTarget").withPayload(data).run();
     assertThat(event.getVariables().get(MY_STREAM_VAR).getValue(), is(instanceOf(Iterator.class)));
     assertThat(IteratorUtils.toList((Iterator) event.getVariables().get(MY_STREAM_VAR).getValue()), equalTo(data));
     assertThat(event.getMessage().getPayload().getValue(), is(instanceOf(List.class)));
@@ -88,7 +88,7 @@ public class ObjectStreamingExtensionTestCase extends AbstractStreamingExtension
   }
 
   private List<String> getStream(String flowName) throws Exception {
-    Event result = flowRunner(flowName)
+    InternalEvent result = flowRunner(flowName)
         .withPayload(data)
         .run();
 

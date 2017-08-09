@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api.processor;
 
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 
@@ -17,12 +17,12 @@ import java.util.function.Function;
 import org.reactivestreams.Publisher;
 
 /**
- * Processes streams of {@link Event}'s using a functional approach based on <a href="http://www.reactive-streams.org/">Reactive
- * Streams<a/> where {@link Event} processing is defined via stream functions.
+ * Processes streams of {@link InternalEvent}'s using a functional approach based on <a href="http://www.reactive-streams.org/">Reactive
+ * Streams<a/> where {@link InternalEvent} processing is defined via stream functions.
  *
  * @since 4.0
  */
-public interface ReactiveProcessor extends Function<Publisher<Event>, Publisher<Event>> {
+public interface ReactiveProcessor extends Function<Publisher<InternalEvent>, Publisher<InternalEvent>> {
 
   /**
    * In order for Mule to determine the best way to execute different processors based on the chosen {@link ProcessingStrategy} it

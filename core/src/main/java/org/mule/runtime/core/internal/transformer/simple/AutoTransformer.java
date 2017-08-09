@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.transformer.simple;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.transformer.AbstractMessageTransformer;
@@ -37,7 +37,7 @@ public class AutoTransformer extends AbstractMessageTransformer {
   }
 
   @Override
-  public Object transformMessage(Event event, Charset outputEncoding) throws TransformerException {
+  public Object transformMessage(InternalEvent event, Charset outputEncoding) throws TransformerException {
     return muleContext.getTransformationService()
         .internalTransform(event.getMessage(), DataType.fromType(getReturnDataType().getType()))
         .getPayload().getValue();

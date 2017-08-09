@@ -14,8 +14,8 @@ import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 import static reactor.core.publisher.Mono.when;
 
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.EventContext;
+import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.InternalEventContext;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 
@@ -30,19 +30,19 @@ import reactor.core.publisher.Mono;
 import reactor.core.publisher.MonoProcessor;
 
 /**
- * Base class for implementations of {@link EventContext}
+ * Base class for implementations of {@link InternalEventContext}
  *
  * @since 4.0
  */
-abstract class AbstractEventContext implements EventContext {
+abstract class AbstractEventContext implements InternalEventContext {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AbstractEventContext.class);
 
-  private transient MonoProcessor<Event> beforeResponseProcessor;
-  private transient MonoProcessor<Event> responseProcessor;
+  private transient MonoProcessor<InternalEvent> beforeResponseProcessor;
+  private transient MonoProcessor<InternalEvent> responseProcessor;
   private transient MonoProcessor<Void> completionProcessor;
   private transient Disposable completionSubscriberDisposable;
-  private transient final List<EventContext> childContexts = new LinkedList<>();
+  private transient final List<InternalEventContext> childContexts = new LinkedList<>();
   private transient Mono<Void> completionCallback = empty();
   private transient MessagingExceptionHandler exceptionHandler;
 
@@ -76,7 +76,7 @@ abstract class AbstractEventContext implements EventContext {
         .doOnEach(s -> s.accept(completionProcessor)).subscribe();
   }
 
-  void addChildContext(EventContext childContext) {
+  void addChildContext(InternalEventContext childContext) {
     synchronized (this) {
       childContexts.add(childContext);
       updateCompletionPublisher();
@@ -119,7 +119,7 @@ abstract class AbstractEventContext implements EventContext {
    * {@inheritDoc}
    */
   @Override
-  public final void success(Event event) {
+  public final void success(InternalEvent event) {
     synchronized (this) {
       if (responseProcessor.isTerminated()) {
         LOGGER.info(this + " response was already completed, ignoring.");
@@ -168,12 +168,12 @@ abstract class AbstractEventContext implements EventContext {
   }
 
   @Override
-  public Publisher<Event> getBeforeResponsePublisher() {
+  public Publisher<InternalEvent> getBeforeResponsePublisher() {
     return beforeResponseProcessor;
   }
 
   @Override
-  public Publisher<Event> getResponsePublisher() {
+  public Publisher<InternalEvent> getResponsePublisher() {
     return responseProcessor;
   }
 

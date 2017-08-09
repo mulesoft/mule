@@ -30,7 +30,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.exception.MessagingException;
@@ -63,7 +63,7 @@ public class ErrorHandlerTestCase extends AbstractMuleTestCase {
   private DefaultMessagingExceptionHandlerAcceptor defaultMessagingExceptionHandler =
       spy(new DefaultMessagingExceptionHandlerAcceptor());
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-  private Event mockMuleEvent;
+  private InternalEvent mockMuleEvent;
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private MuleContext mockMuleContext;
   @Mock
@@ -78,10 +78,10 @@ public class ErrorHandlerTestCase extends AbstractMuleTestCase {
     when(mockError.getErrorType()).thenReturn(mockErrorType);
     when(mockMuleEvent.getError()).thenReturn(of(mockError));
     mockException = new MessagingException(mockMuleEvent, new Exception());
-    Event handledEvent = testEvent();
-    when(mockTestExceptionStrategy1.accept(any(Event.class))).thenReturn(true);
+    InternalEvent handledEvent = testEvent();
+    when(mockTestExceptionStrategy1.accept(any(InternalEvent.class))).thenReturn(true);
     when(mockTestExceptionStrategy1.apply(any(MessagingException.class))).thenReturn(just(handledEvent));
-    when(mockTestExceptionStrategy2.accept(any(Event.class))).thenReturn(true);
+    when(mockTestExceptionStrategy2.accept(any(InternalEvent.class))).thenReturn(true);
     when(mockTestExceptionStrategy2.apply(any(MessagingException.class))).thenReturn(just(handledEvent));
   }
 
@@ -92,12 +92,12 @@ public class ErrorHandlerTestCase extends AbstractMuleTestCase {
     errorHandler.setExceptionListeners(new ArrayList<>(asList(mockTestExceptionStrategy1, mockTestExceptionStrategy2)));
     errorHandler.setMuleContext(mockMuleContext);
     errorHandler.initialise();
-    when(mockTestExceptionStrategy1.accept(any(Event.class))).thenReturn(false);
-    when(mockTestExceptionStrategy2.accept(any(Event.class))).thenReturn(false);
+    when(mockTestExceptionStrategy1.accept(any(InternalEvent.class))).thenReturn(false);
+    when(mockTestExceptionStrategy2.accept(any(InternalEvent.class))).thenReturn(false);
     errorHandler.handleException(mockException, mockMuleEvent);
     verify(mockTestExceptionStrategy1, times(0)).apply(any(MessagingException.class));
     verify(mockTestExceptionStrategy2, times(0)).apply(any(MessagingException.class));
-    verify(defaultMessagingExceptionHandler, times(1)).handleException(eq(mockException), any(Event.class));
+    verify(defaultMessagingExceptionHandler, times(1)).handleException(eq(mockException), any(InternalEvent.class));
   }
 
   @Test
@@ -107,11 +107,11 @@ public class ErrorHandlerTestCase extends AbstractMuleTestCase {
     when(mockMuleContext.getDefaultErrorHandler()).thenReturn(defaultMessagingExceptionHandler);
     errorHandler.setMuleContext(mockMuleContext);
     errorHandler.initialise();
-    when(mockTestExceptionStrategy1.accept(any(Event.class))).thenReturn(false);
+    when(mockTestExceptionStrategy1.accept(any(InternalEvent.class))).thenReturn(false);
     errorHandler.handleException(mockException, mockMuleEvent);
     verify(mockTestExceptionStrategy1, times(0)).apply(any(MessagingException.class));
     verify(defaultMessagingExceptionHandler, times(0)).apply(any(MessagingException.class));
-    verify(mockTestExceptionStrategy2, times(1)).handleException(eq(mockException), any(Event.class));
+    verify(mockTestExceptionStrategy2, times(1)).handleException(eq(mockException), any(InternalEvent.class));
   }
 
   @Test(expected = MuleRuntimeException.class)
@@ -149,7 +149,7 @@ public class ErrorHandlerTestCase extends AbstractMuleTestCase {
   class DefaultMessagingExceptionHandlerAcceptor implements MessagingExceptionHandlerAcceptor {
 
     @Override
-    public boolean accept(Event event) {
+    public boolean accept(InternalEvent event) {
       return true;
     }
 
@@ -159,7 +159,7 @@ public class ErrorHandlerTestCase extends AbstractMuleTestCase {
     }
 
     @Override
-    public Event handleException(MessagingException exception, Event event) {
+    public InternalEvent handleException(MessagingException exception, InternalEvent event) {
       exception.setHandled(true);
       return event;
     }

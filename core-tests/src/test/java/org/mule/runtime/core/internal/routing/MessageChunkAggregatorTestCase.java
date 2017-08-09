@@ -13,8 +13,8 @@ import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.DefaultEventContext;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.EventContext;
+import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.InternalEventContext;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.message.GroupCorrelation;
@@ -45,16 +45,17 @@ public class MessageChunkAggregatorTestCase extends AbstractMuleContextTestCase 
     Message message2 = of("test event B");
     Message message3 = of("test event C");
 
-    EventContext context = DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION, "foo");
+    InternalEventContext context = DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION, "foo");
 
-    Event event1 = Event.builder(context).message(message1).groupCorrelation(Optional.of(GroupCorrelation.of(0, 3))).flow(flow)
-        .session(session).build();
-    Event event2 = Event.builder(context).message(message2).flow(flow).session(session).build();
-    Event event3 = Event.builder(context).message(message3).flow(flow).session(session).build();
+    InternalEvent event1 =
+        InternalEvent.builder(context).message(message1).groupCorrelation(Optional.of(GroupCorrelation.of(0, 3))).flow(flow)
+            .session(session).build();
+    InternalEvent event2 = InternalEvent.builder(context).message(message2).flow(flow).session(session).build();
+    InternalEvent event3 = InternalEvent.builder(context).message(message3).flow(flow).session(session).build();
 
     assertNull(router.process(event1));
     assertNull(router.process(event2));
-    Event resultEvent = router.process(event3);
+    InternalEvent resultEvent = router.process(event3);
     assertNotNull(resultEvent);
     Message resultMessage = resultEvent.getMessage();
     assertNotNull(resultMessage);

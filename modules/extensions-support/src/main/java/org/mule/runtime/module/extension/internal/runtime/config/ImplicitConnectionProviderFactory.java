@@ -9,8 +9,8 @@ package org.mule.runtime.module.extension.internal.runtime.config;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.util.Pair;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 
@@ -28,13 +28,13 @@ public interface ImplicitConnectionProviderFactory {
    * and {@code configurationModel}
    *
    * @param configName the name of the configuration that will own the returned {@link ConnectionProvider}
-   * @param event the {@link Event} that will be used to evaluate any default parameters that requires resolving an expression
+   * @param event the {@link InternalEvent} that will be used to evaluate any default parameters that requires resolving an expression
    * @param <T> the generic type of the connections that the returned provider produces
    * @return a {@link ConnectionProvider}
    * @throws IllegalArgumentException if the {@code extensionModel} doesn't have any {@link ConnectionProviderModel} which can be
    *         used implicitly
    */
-  <T> Pair<ConnectionProvider<T>, ResolverSetResult> createImplicitConnectionProvider(String configName, Event event);
+  <T> Pair<ConnectionProvider<T>, ResolverSetResult> createImplicitConnectionProvider(String configName, InternalEvent event);
 
   /**
    * @return whether the {@link ResolverSet} used for resolving the {@link ConnectionProvider} is dynamic or not.

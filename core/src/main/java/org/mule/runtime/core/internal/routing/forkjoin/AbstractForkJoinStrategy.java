@@ -11,13 +11,13 @@ import static java.lang.Long.MAX_VALUE;
 import static java.lang.String.format;
 import static java.time.Duration.ofMillis;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.Event.builder;
+import static org.mule.runtime.core.api.InternalEvent.builder;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContext;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrapCompositeException;
 import static reactor.core.publisher.Flux.from;
 import static reactor.util.concurrent.QueueSupplier.XS_BUFFER_SIZE;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
@@ -61,10 +61,10 @@ public abstract class AbstractForkJoinStrategy implements ForkJoinStrategy {
   }
 
   @Override
-  public Publisher<Event> forkJoin(Event original, Publisher<RoutingPair> forkPairs,
-                                   ProcessingStrategy processingStrategy, int maxConcurrency, boolean delayErrors) {
+  public Publisher<InternalEvent> forkJoin(InternalEvent original, Publisher<RoutingPair> forkPairs,
+                                           ProcessingStrategy processingStrategy, int maxConcurrency, boolean delayErrors) {
     final AtomicInteger count = new AtomicInteger();
-    final Event.Builder resultBuilder = Event.builder(original);
+    final InternalEvent.Builder resultBuilder = InternalEvent.builder(original);
 
 
     return from(forkPairs)
@@ -80,7 +80,8 @@ public abstract class AbstractForkJoinStrategy implements ForkJoinStrategy {
         .onErrorMap(handleErrors(original, count, delayErrors));
   }
 
-  protected abstract Function<List<Event>, Event> createResultEvent(Event original, Event.Builder resultBuilder);
+  protected abstract Function<List<InternalEvent>, InternalEvent> createResultEvent(InternalEvent original,
+                                                                                    InternalEvent.Builder resultBuilder);
 
   private ReactiveProcessor applyProcessingStrategy(ProcessingStrategy processingStrategy, RoutingPair pair, int maxConcurrency) {
     if (maxConcurrency > 1) {
@@ -90,7 +91,7 @@ public abstract class AbstractForkJoinStrategy implements ForkJoinStrategy {
     }
   }
 
-  private Function<Throwable, Throwable> handleErrors(Event original, AtomicInteger count, boolean delayErrors) {
+  private Function<Throwable, Throwable> handleErrors(InternalEvent original, AtomicInteger count, boolean delayErrors) {
     return throwable -> {
       if (throwable instanceof TimeoutException) {
         return new MessagingException(original,
@@ -109,7 +110,7 @@ public abstract class AbstractForkJoinStrategy implements ForkJoinStrategy {
   private CompositeRoutingException createCompositeRoutingException(Throwable throwable) {
     Map<String, Throwable> map = new HashMap<>();
     for (Throwable t : unwrapCompositeException(throwable)) {
-      Event event = ((MessagingException) t).getEvent();
+      InternalEvent event = ((MessagingException) t).getEvent();
       map.put(Integer.toString(event.getGroupCorrelation().get().getSequence()).toString(),
               t instanceof MessagingException ? t.getCause() : t);
     }
@@ -117,7 +118,7 @@ public abstract class AbstractForkJoinStrategy implements ForkJoinStrategy {
   }
 
 
-  private Consumer<List<Event>> copyVars(Event.Builder result) {
+  private Consumer<List<InternalEvent>> copyVars(InternalEvent.Builder result) {
     return list -> list.stream()
         .forEach(event -> event.getVariables().forEach((key, value) -> {
           result.addVariable(key, value);
@@ -126,7 +127,7 @@ public abstract class AbstractForkJoinStrategy implements ForkJoinStrategy {
 
 
 
-  protected Event addSequence(Event event, AtomicInteger atomicLong) {
+  protected InternalEvent addSequence(InternalEvent event, AtomicInteger atomicLong) {
     return builder(event).groupCorrelation(Optional.of(GroupCorrelation.of(atomicLong.getAndIncrement()))).build();
   }
 

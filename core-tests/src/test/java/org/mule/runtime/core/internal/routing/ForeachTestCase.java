@@ -18,7 +18,7 @@ import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.api.message.Message.of;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.processor.Processor;
@@ -42,7 +42,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
 
   protected Foreach simpleForeach;
   protected Foreach nestedForeach;
-  protected ArrayList<Event> processedEvents;
+  protected ArrayList<InternalEvent> processedEvents;
 
   private static String ERR_NUMBER_MESSAGES = "Not a correct number of messages processed";
   private static String ERR_PAYLOAD_TYPE = "Type error on processed payloads";
@@ -66,7 +66,8 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
     List<Processor> lmp = new ArrayList<>();
     lmp.add(event -> {
       String payload = event.getMessage().getPayload().getValue().toString();
-      event = Event.builder(event).message(InternalMessage.builder(event.getMessage()).value(payload + ":foo").build()).build();
+      event = InternalEvent.builder(event).message(InternalMessage.builder(event.getMessage()).value(payload + ":foo").build())
+          .build();
       return event;
     });
     lmp.add(innerProcessor);
@@ -126,7 +127,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
   @Test
   public void iterablePayload() throws Exception {
     Iterable<String> iterable = new DummySimpleIterableClass();
-    final Event testEvent = eventBuilder().message(of(iterable)).build();
+    final InternalEvent testEvent = eventBuilder().message(of(iterable)).build();
     process(simpleForeach, testEvent);
 
     assertSimpleProcessedMessages();

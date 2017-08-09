@@ -17,7 +17,7 @@ import static org.mule.runtime.internal.el.BindingContextUtils.NULL_BINDING_CONT
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 
 import java.io.InputStream;
@@ -39,7 +39,7 @@ public class AttributeEvaluator {
 
   private String attributeValue;
   private ExtendedExpressionManager expressionManager;
-  private Function<Event, TypedValue> expressionResolver;
+  private Function<InternalEvent, TypedValue> expressionResolver;
 
   /**
    * Creates a new Attribute Evaluator instance with a given attribute value
@@ -111,11 +111,11 @@ public class AttributeEvaluator {
     return remainingString.contains(DEFAULT_EXPRESSION_POSTFIX);
   }
 
-  public <T> TypedValue<T> resolveTypedValue(Event event) {
+  public <T> TypedValue<T> resolveTypedValue(InternalEvent event) {
     return expressionResolver.apply(event);
   }
 
-  public <T> T resolveValue(Event event) {
+  public <T> T resolveValue(InternalEvent event) {
     final TypedValue<T> resolveTypedValue = resolveTypedValue(event);
     return resolveTypedValue.getValue();
   }

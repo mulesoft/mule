@@ -15,7 +15,7 @@ import static org.mule.runtime.core.api.context.notification.SecurityNotificatio
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.security.SecurityException;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.GlobalNameableObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.ExceptionNotification;
@@ -108,7 +108,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
     logger.info("Initialising exception listener: " + toString());
   }
 
-  protected void fireNotification(Exception ex, Event event) {
+  protected void fireNotification(Exception ex, InternalEvent event) {
     if (enableNotifications) {
       if (ex.getCause() != null && getCause(ex) instanceof SecurityException) {
         fireNotification(new SecurityNotification((SecurityException) getCause(ex), SECURITY_AUTHENTICATION_FAILED));
@@ -138,7 +138,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
    * @param event The MuleEvent currently being processed
    * @param t the fatal exception to log
    */
-  protected void logFatal(Event event, Throwable t) {
+  protected void logFatal(InternalEvent event, Throwable t) {
     if (statistics != null && statistics.isEnabled()) {
       statistics.incFatalError();
     }

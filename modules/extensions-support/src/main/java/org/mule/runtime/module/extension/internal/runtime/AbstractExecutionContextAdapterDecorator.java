@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
@@ -32,7 +32,7 @@ public abstract class AbstractExecutionContextAdapterDecorator<M extends Compone
   }
 
   @Override
-  public Event getEvent() {
+  public InternalEvent getEvent() {
     return decorated.getEvent();
   }
 

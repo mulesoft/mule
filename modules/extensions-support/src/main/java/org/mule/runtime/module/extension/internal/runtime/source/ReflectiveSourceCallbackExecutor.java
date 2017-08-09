@@ -16,7 +16,7 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
@@ -98,7 +98,7 @@ class ReflectiveSourceCallbackExecutor implements SourceCallbackExecutor {
    * {@inheritDoc}
    */
   @Override
-  public Publisher<Void> execute(Event event, Map<String, Object> parameters, SourceCallbackContext context) {
+  public Publisher<Void> execute(InternalEvent event, Map<String, Object> parameters, SourceCallbackContext context) {
     if (async) {
       return create(sink -> {
         final ExecutionContext<SourceModel> executionContext =
@@ -119,7 +119,7 @@ class ReflectiveSourceCallbackExecutor implements SourceCallbackExecutor {
     }
   }
 
-  private ExecutionContext<SourceModel> createExecutionContext(Event event,
+  private ExecutionContext<SourceModel> createExecutionContext(InternalEvent event,
                                                                Map<String, Object> parameters,
                                                                SourceCallbackContext callbackContext,
                                                                SourceCompletionCallback sourceCompletionCallback) {

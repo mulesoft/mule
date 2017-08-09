@@ -8,12 +8,12 @@
 package org.foo;
 
 import org.mule.functional.api.component.EventCallback;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 
 public class EchoTest implements EventCallback {
 
-  public void eventReceived(Event event, Object component, MuleContext muleContext) throws Exception {
+  public void eventReceived(InternalEvent event, Object component, MuleContext muleContext) throws Exception {
     // Nothing to do
   }
 

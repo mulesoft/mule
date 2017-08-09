@@ -8,17 +8,17 @@ package org.mule.tck;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.util.concurrent.Latch;
 
 public class SensingNullReplyToHandler implements ReplyToHandler {
 
-  public Event event;
+  public InternalEvent event;
   public Latch latch = new Latch();
 
   @Override
-  public Event processReplyTo(Event event, Message returnMessage, Object replyTo) throws MuleException {
+  public InternalEvent processReplyTo(InternalEvent event, Message returnMessage, Object replyTo) throws MuleException {
     this.event = event;
     latch.countDown();
     return event;

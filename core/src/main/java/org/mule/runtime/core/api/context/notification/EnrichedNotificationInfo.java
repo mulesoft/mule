@@ -6,14 +6,11 @@
  */
 package org.mule.runtime.core.api.context.notification;
 
-import static java.util.Optional.empty;
-import static java.util.Optional.ofNullable;
-
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
 
@@ -37,7 +34,7 @@ public class EnrichedNotificationInfo {
   private FlowCallStack flowCallStack;
 
   // TODO: MULE-12626: remove when Studio uses interception API
-  Event internalEvent;
+  InternalEvent internalEvent;
 
   /**
    * Extract information from the event and exception to provide notification data.
@@ -47,7 +44,7 @@ public class EnrichedNotificationInfo {
    * @param component the component (processor, source, etc) that triggered the notification
    * @return
    */
-  public static EnrichedNotificationInfo createInfo(Event event, Exception e, Object component) {
+  public static EnrichedNotificationInfo createInfo(InternalEvent event, Exception e, Object component) {
     EnrichedNotificationInfo notificationInfo;
 
     if (event != null) {
@@ -87,7 +84,7 @@ public class EnrichedNotificationInfo {
     return null;
   }
 
-  public EnrichedNotificationInfo(Event event, Object component, Exception exception, FlowCallStack flowCallStack) {
+  public EnrichedNotificationInfo(InternalEvent event, Object component, Exception exception, FlowCallStack flowCallStack) {
     this.event = event;
     this.component = component;
     this.exception = exception;

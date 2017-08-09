@@ -21,7 +21,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
@@ -50,7 +50,7 @@ public abstract class AbstractRemoveVariablePropertyProcessorTestCase extends Ab
   public static final String NULL_EXPRESSION_VALUE = null;
 
   private Message message;
-  private Event event;
+  private InternalEvent event;
   private MuleContext mockMuleContext = mock(MuleContext.class);
   private ExtendedExpressionManager mockExpressionManager = mock(ExtendedExpressionManager.class);
   private TypedValue<String> typedValue;
@@ -72,7 +72,7 @@ public abstract class AbstractRemoveVariablePropertyProcessorTestCase extends Ab
     removeVariableProcessor.setMuleContext(mockMuleContext);
   }
 
-  protected Event createTestEvent(final Message message) throws MuleException {
+  protected InternalEvent createTestEvent(final Message message) throws MuleException {
     return eventBuilder().message(message).build();
   }
 
@@ -121,10 +121,10 @@ public abstract class AbstractRemoveVariablePropertyProcessorTestCase extends Ab
     verifyNotRemoved(event, "SomeVar");
   }
 
-  protected abstract void addMockedPropeerties(Event event, Set<String> properties);
+  protected abstract void addMockedPropeerties(InternalEvent event, Set<String> properties);
 
-  protected abstract void verifyRemoved(Event mockEvent, String key);
+  protected abstract void verifyRemoved(InternalEvent mockEvent, String key);
 
-  protected abstract void verifyNotRemoved(Event mockEvent, String somevar);
+  protected abstract void verifyNotRemoved(InternalEvent mockEvent, String somevar);
 
 }

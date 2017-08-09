@@ -8,7 +8,6 @@ package org.mule.runtime.core.privileged.processor.objectfactory;
 
 import static java.lang.String.format;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.Processor;
@@ -19,7 +18,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-public class MessageProcessorChainObjectFactory extends AbstractAnnotatedObjectFactory {
+public class MessageProcessorChainObjectFactory extends AbstractAnnotatedObjectFactory<MessageProcessorChain> {
 
   @Inject
   protected MuleContext muleContext;
@@ -32,13 +31,11 @@ public class MessageProcessorChainObjectFactory extends AbstractAnnotatedObjectF
   }
 
   @Override
-  public Object doGetObject() throws Exception {
+  public MessageProcessorChain doGetObject() throws Exception {
     MessageProcessorChainBuilder builder = getBuilderInstance();
     for (Object processor : processors) {
       if (processor instanceof Processor) {
         builder.chain((Processor) processor);
-      } else if (processor instanceof MessageProcessorBuilder) {
-        builder.chain((MessageProcessorBuilder) processor);
       } else {
         throw new IllegalArgumentException(format("MessageProcessorBuilder should only have MessageProcessor's or MessageProcessorBuilder's configured. Found a %s",
                                                   processor.getClass().getName()));

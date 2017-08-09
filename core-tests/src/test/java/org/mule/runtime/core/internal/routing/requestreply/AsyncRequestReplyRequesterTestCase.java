@@ -27,7 +27,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.message.GroupCorrelation;
@@ -96,7 +96,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     asyncReplyMP.setReplySource(target.getMessageSource());
     asyncReplyMP.setMuleContext(muleContext);
 
-    Event resultEvent = asyncReplyMP.process(testEvent());
+    InternalEvent resultEvent = asyncReplyMP.process(testEvent());
 
     // Can't assert same because we copy event when we receive async reply
     assertEquals(testEvent().getMessageAsString(muleContext), resultEvent.getMessageAsString(muleContext));
@@ -113,7 +113,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     asyncReplyMP.setReplySource(target.getMessageSource());
     asyncReplyMP.setMuleContext(muleContext);
 
-    Event resultEvent = asyncReplyMP.process(testEvent());
+    InternalEvent resultEvent = asyncReplyMP.process(testEvent());
 
     // Can't assert same because we copy event for async and also on async reply currently
     assertEquals(testEvent().getMessageAsString(muleContext), resultEvent.getMessageAsString(muleContext));
@@ -132,7 +132,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     asyncReplyMP.setReplySource(target.getMessageSource());
     asyncReplyMP.setMuleContext(muleContext);
 
-    Event event = eventBuilder().message(of(TEST_MESSAGE)).build();
+    InternalEvent event = eventBuilder().message(of(TEST_MESSAGE)).build();
 
     try {
       asyncReplyMP.process(event);
@@ -204,7 +204,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     for (int i = 0; i < 500; i++) {
       scheduler.execute(() -> {
         try {
-          Event resultEvent = asyncReplyMP.process(testEvent());
+          InternalEvent resultEvent = asyncReplyMP.process(testEvent());
 
           // Can't assert same because we copy event for async currently
           assertEquals(testEvent().getMessageAsString(muleContext), resultEvent.getMessageAsString(muleContext));
@@ -227,7 +227,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     RelaxedAsyncReplyMP mp = new RelaxedAsyncReplyMP(muleContext);
 
     try {
-      Event event =
+      InternalEvent event =
           eventBuilder().message(of("message1")).groupCorrelation(Optional.of(GroupCorrelation.of(0, 3))).build();
 
       SensingNullMessageProcessor listener = getSensingNullMessageProcessor();
@@ -236,7 +236,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
 
       mp.process(event);
 
-      Map<String, Event> responseEvents = mp.getResponseEvents();
+      Map<String, InternalEvent> responseEvents = mp.getResponseEvents();
       assertThat(responseEvents.entrySet(), empty());
     } finally {
       mp.stop();
@@ -287,7 +287,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
       start();
     }
 
-    public Map<String, Event> getResponseEvents() {
+    public Map<String, InternalEvent> getResponseEvents() {
       return responseEvents;
     }
   }

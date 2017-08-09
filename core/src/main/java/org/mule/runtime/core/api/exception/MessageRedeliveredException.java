@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api.exception;
 
 import org.mule.runtime.api.i18n.I18nMessage;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.processor.Processor;
 
@@ -22,7 +22,7 @@ public class MessageRedeliveredException extends MessagingException {
   int redeliveryCount;
   int maxRedelivery;
 
-  protected MessageRedeliveredException(String messageId, int redeliveryCount, int maxRedelivery, Event event,
+  protected MessageRedeliveredException(String messageId, int redeliveryCount, int maxRedelivery, InternalEvent event,
                                         I18nMessage message) {
     super(message, event);
     this.messageId = messageId;
@@ -30,7 +30,7 @@ public class MessageRedeliveredException extends MessagingException {
     this.maxRedelivery = maxRedelivery;
   }
 
-  public MessageRedeliveredException(String messageId, int redeliveryCount, int maxRedelivery, Event event,
+  public MessageRedeliveredException(String messageId, int redeliveryCount, int maxRedelivery, InternalEvent event,
                                      I18nMessage message,
                                      Processor failingMessageProcessor) {
     super(message, event, failingMessageProcessor);
@@ -39,7 +39,7 @@ public class MessageRedeliveredException extends MessagingException {
     this.maxRedelivery = maxRedelivery;
   }
 
-  public MessageRedeliveredException(String messageId, int redeliveryCount, int maxRedelivery, Event event,
+  public MessageRedeliveredException(String messageId, int redeliveryCount, int maxRedelivery, InternalEvent event,
                                      Processor failingMessageProcessor) {
     this(messageId, redeliveryCount, maxRedelivery, event,
          CoreMessages.createStaticMessage("Maximum redelivery attempts reached"), failingMessageProcessor);

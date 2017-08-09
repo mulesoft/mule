@@ -21,7 +21,7 @@ import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.expression.InvalidExpressionException;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
@@ -63,7 +63,7 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
   }
 
   @Override
-  public Event process(Event event) throws MuleException {
+  public InternalEvent process(InternalEvent event) throws MuleException {
     if (event == null) {
       return null;
     }
@@ -71,8 +71,8 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
   }
 
   @Override
-  public Publisher<Event> apply(Publisher<Event> publisher) {
-    Flux<Event> flux = from(publisher).map(event -> {
+  public Publisher<InternalEvent> apply(Publisher<InternalEvent> publisher) {
+    Flux<InternalEvent> flux = from(publisher).map(event -> {
       try {
         return processRequest(event);
       } catch (MuleException e) {
@@ -89,7 +89,7 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
     });
   }
 
-  private Event processRequest(Event event) throws MuleException {
+  private InternalEvent processRequest(InternalEvent event) throws MuleException {
     if (taskTokenInThread.get() != null) {
       requestTaskToken = taskTokenInThread.get();
     } else {
@@ -99,7 +99,7 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
     return super.process(event);
   }
 
-  private Event processResponse(Event event) throws MuleException {
+  private InternalEvent processResponse(InternalEvent event) throws MuleException {
     if (event == null) {
       return event;
     }
@@ -120,7 +120,7 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
     return currentThread().getName() + " - " + new UUID().toString();
   }
 
-  private Event processNext(Event event) throws MuleException {
+  private InternalEvent processNext(InternalEvent event) throws MuleException {
     if (event != null) {
       return next.process(event);
     } else {

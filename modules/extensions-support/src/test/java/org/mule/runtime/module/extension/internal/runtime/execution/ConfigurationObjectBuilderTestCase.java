@@ -18,7 +18,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.g
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockConfigurationInstance;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.config.ConfigurationObjectBuilder;
@@ -56,7 +56,7 @@ public class ConfigurationObjectBuilderTestCase extends AbstractMuleTestCase {
   private ConfigurationModel configurationModel;
 
   @Mock
-  private Event event;
+  private InternalEvent event;
 
   private ConfigurationObjectBuilder<TestConfig> configurationObjectBuilder;
   private ResolverSet resolverSet;

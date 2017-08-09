@@ -10,7 +10,7 @@ package org.mule.runtime.core.el.mvel.datatype;
 import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.SESSION_VARS;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 
 /**
  * Resolves data type for session var when sessionVars['x'] syntax is used
@@ -23,7 +23,7 @@ public class SessionVarExpressionDataTypeResolver extends AbstractVariableExpres
   }
 
   @Override
-  protected DataType getVariableDataType(Event event, String propertyName) {
+  protected DataType getVariableDataType(InternalEvent event, String propertyName) {
     return event.getSession().getPropertyDataType(propertyName);
   }
 

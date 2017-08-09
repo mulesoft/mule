@@ -6,7 +6,8 @@
  */
 package org.mule.runtime.core.internal.util.rx;
 
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.InternalEventContext;
 
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -26,19 +27,19 @@ public final class Operators {
   /**
    * Custom function to be used with {@link reactor.core.publisher.Flux#handle(BiConsumer)} when a map function may return
    * {@code null} and this should be interpreted as empty rather than causing an error. If null is return by the function then the
-   * {@link org.mule.runtime.core.api.EventContext} is also completed.
+   * {@link InternalEventContext} is also completed.
    * 
    * @param mapper map function
    * @return custom operator {@link BiConsumer} to be used with {@link reactor.core.publisher.Flux#handle(BiConsumer)}.
    */
-  public static BiConsumer<Event, SynchronousSink<Event>> nullSafeMap(Function<Event, Event> mapper) {
+  public static BiConsumer<InternalEvent, SynchronousSink<InternalEvent>> nullSafeMap(Function<InternalEvent, InternalEvent> mapper) {
     return (event, sink) -> {
       if (event != null) {
-        Event result = mapper.apply(event);
+        InternalEvent result = mapper.apply(event);
         if (result != null) {
           sink.next(result);
         } else {
-          event.getInternalContext().success();
+          event.getContext().success();
         }
       }
     };

@@ -17,7 +17,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -71,12 +71,12 @@ public class DefaultPolicyInstance extends AbstractAnnotatedObject
     return new MessagingExceptionHandler() {
 
       @Override
-      public Event handleException(MessagingException exception, Event event) {
+      public InternalEvent handleException(MessagingException exception, InternalEvent event) {
         return null;
       }
 
       @Override
-      public Publisher<Event> apply(MessagingException exception) {
+      public Publisher<InternalEvent> apply(MessagingException exception) {
         return error(exception);
       }
     };

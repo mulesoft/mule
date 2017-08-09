@@ -16,7 +16,7 @@ import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.builder;
 import static org.mule.runtime.api.metadata.DataType.fromObject;
 import static org.mule.runtime.api.metadata.TypedValue.of;
-import static org.mule.runtime.core.api.Event.getCurrentEvent;
+import static org.mule.runtime.core.api.InternalEvent.getCurrentEvent;
 import static org.mule.runtime.core.api.util.ObjectUtils.getBoolean;
 import static org.mule.runtime.core.api.util.ObjectUtils.getByte;
 import static org.mule.runtime.core.api.util.ObjectUtils.getDouble;

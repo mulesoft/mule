@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -23,7 +23,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class StaticValueResolverTestCase extends AbstractMuleTestCase {
 
   @Mock
-  private Event event;
+  private InternalEvent event;
 
   private ValueResolver resolver;
 

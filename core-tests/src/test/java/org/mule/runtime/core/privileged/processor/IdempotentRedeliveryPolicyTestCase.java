@@ -31,10 +31,9 @@ import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.store.TemplateObjectStore;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.concurrent.Latch;
 import org.mule.runtime.core.internal.lock.MuleLockFactory;
@@ -68,7 +67,7 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
   private Processor mockFailingMessageProcessor = mock(Processor.class, RETURNS_DEEP_STUBS.get());
   private Processor mockWaitingMessageProcessor = mock(Processor.class, RETURNS_DEEP_STUBS.get());
   private InternalMessage message = mock(InternalMessage.class, RETURNS_DEEP_STUBS.get());
-  private Event event;
+  private InternalEvent event;
   private Latch waitLatch = new Latch();
   private CountDownLatch waitingMessageProcessorExecutionLatch = new CountDownLatch(2);
   private final IdempotentRedeliveryPolicy irp = new IdempotentRedeliveryPolicy();
@@ -82,7 +81,7 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
         .thenAnswer(invocation -> error(new RuntimeException("failing"))
             .doOnError(e -> count.getAndIncrement()));
     when(mockWaitingMessageProcessor.apply(any(Publisher.class))).thenAnswer(invocationOnMock -> {
-      Mono<Event> mono = from(invocationOnMock.getArgumentAt(0, Publisher.class));
+      Mono<InternalEvent> mono = from(invocationOnMock.getArgumentAt(0, Publisher.class));
       return mono.doOnNext(checkedConsumer(event1 -> {
         waitingMessageProcessorExecutionLatch.countDown();
         waitLatch.await(2000, MILLISECONDS);
@@ -113,7 +112,7 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
   public void messageDigestFailure() throws Exception {
     when(message.getPayload()).thenReturn(new TypedValue<>(new Object(), OBJECT));
     irp.initialise();
-    Event process = irp.process(event);
+    InternalEvent process = irp.process(event);
     assertThat(process, nullValue());
   }
 

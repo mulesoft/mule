@@ -21,7 +21,7 @@ import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Processor;
@@ -62,7 +62,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
   @Test
   public void testFailureExpression() throws Exception {
     Processor intSetter =
-        event -> Event.builder(event).message(Message.builder(event.getMessage()).value(Integer.valueOf(1)).build())
+        event -> InternalEvent.builder(event).message(Message.builder(event.getMessage()).value(Integer.valueOf(1)).build())
             .build();
 
     FirstSuccessful fs = createFirstSuccessfulRouter(intSetter, new StringAppendTransformer("abc"));
@@ -85,7 +85,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void testRouteReturnsNullMessage() throws Exception {
-    Processor nullEventMp = event -> Event.builder(event).message(null).build();
+    Processor nullEventMp = event -> InternalEvent.builder(event).message(null).build();
     FirstSuccessful fs = createFirstSuccessfulRouter(nullEventMp);
     fs.setAnnotations(getAppleFlowComponentLocationAnnotations());
     fs.initialise();
@@ -114,7 +114,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
   private String getPayload(Processor mp, MuleSession session, String message) throws Exception {
     Message msg = of(message);
     try {
-      Event event = mp.process(eventBuilder().message(msg).session(session).build());
+      InternalEvent event = mp.process(eventBuilder().message(msg).session(session).build());
       Message returnedMessage = event.getMessage();
       if (event.getError().isPresent()) {
         return EXCEPTION_SEEN;
@@ -135,7 +135,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
     }
 
     @Override
-    public Event process(Event event) throws MuleException {
+    public InternalEvent process(InternalEvent event) throws MuleException {
       try {
         Message msg;
         Error error = null;
@@ -149,7 +149,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
         } else {
           msg = of("No " + rejectIfMatches);
         }
-        Event muleEvent = eventBuilder().message(msg).error(error).build();
+        InternalEvent muleEvent = eventBuilder().message(msg).error(error).build();
         return muleEvent;
       } catch (Exception e) {
         throw new DefaultMuleException(e);

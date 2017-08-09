@@ -11,7 +11,7 @@ import static org.mule.runtime.core.api.processor.MessageProcessors.processToApp
 import static reactor.core.publisher.Flux.from;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -56,7 +56,7 @@ public abstract class AbstractInterceptingMessageProcessorBase extends AbstractA
 
   protected Processor next;
 
-  protected Event processNext(Event event) throws MuleException {
+  protected InternalEvent processNext(InternalEvent event) throws MuleException {
     if (next == null) {
       return event;
     } else if (event == null) {
@@ -81,7 +81,7 @@ public abstract class AbstractInterceptingMessageProcessorBase extends AbstractA
     return ObjectUtils.toString(this);
   }
 
-  protected boolean isEventValid(Event event) {
+  protected boolean isEventValid(InternalEvent event) {
     return event != null;
   }
 

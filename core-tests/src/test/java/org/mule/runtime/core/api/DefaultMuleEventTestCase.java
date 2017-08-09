@@ -12,7 +12,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_XML;
-import static org.mule.runtime.core.api.Event.builder;
+import static org.mule.runtime.core.api.InternalEvent.builder;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 import org.mule.runtime.api.message.Message;
@@ -42,8 +42,8 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
 
   private Message muleMessage = of("test-data");
   private Flow flow;
-  private EventContext messageContext;
-  private Event muleEvent;
+  private InternalEventContext messageContext;
+  private InternalEvent muleEvent;
 
   @Before
   public void before() throws Exception {
@@ -54,7 +54,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void setFlowVariableDefaultDataType() throws Exception {
-    muleEvent = Event.builder(muleEvent).addVariable(PROPERTY_NAME, PROPERTY_VALUE).build();
+    muleEvent = InternalEvent.builder(muleEvent).addVariable(PROPERTY_NAME, PROPERTY_VALUE).build();
 
     DataType dataType = muleEvent.getVariables().get(PROPERTY_NAME).getDataType();
     assertThat(dataType, like(String.class, MediaType.ANY, null));
@@ -64,7 +64,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
   public void setFlowVariableCustomDataType() throws Exception {
     DataType dataType = DataType.builder().type(String.class).mediaType(APPLICATION_XML).charset(CUSTOM_ENCODING).build();
 
-    muleEvent = Event.builder(muleEvent).addVariable(PROPERTY_NAME, PROPERTY_VALUE, dataType).build();
+    muleEvent = InternalEvent.builder(muleEvent).addVariable(PROPERTY_NAME, PROPERTY_VALUE, dataType).build();
 
     DataType actualDataType = muleEvent.getVariables().get(PROPERTY_NAME).getDataType();
     assertThat(actualDataType, like(String.class, APPLICATION_XML, CUSTOM_ENCODING));

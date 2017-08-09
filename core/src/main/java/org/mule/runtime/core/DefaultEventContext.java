@@ -14,8 +14,8 @@ import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.api.util.ExceptionUtils.NULL_ERROR_HANDLER;
 import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.EventContext;
+import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.InternalEventContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.runtime.core.api.exception.MessagingException;
@@ -32,7 +32,7 @@ import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 /**
- * Default immutable implementation of {@link EventContext}.
+ * Default immutable implementation of {@link InternalEventContext}.
  *
  * @since 4.0
  */
@@ -46,7 +46,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
    * @param flow the flow that processes events of this context.
    * @param location the location of the component that received the first message for this context.
    */
-  public static EventContext create(FlowConstruct flow, ComponentLocation location) {
+  public static InternalEventContext create(FlowConstruct flow, ComponentLocation location) {
     return create(flow, location, null);
   }
 
@@ -55,9 +55,9 @@ public final class DefaultEventContext extends AbstractEventContext implements S
    *
    * @param flow the flow that processes events of this context.
    * @param location the location of the component that received the first message for this context.
-   * @param correlationId See {@link EventContext#getCorrelationId()}.
+   * @param correlationId See {@link InternalEventContext#getCorrelationId()}.
    */
-  public static EventContext create(FlowConstruct flow, ComponentLocation location, String correlationId) {
+  public static InternalEventContext create(FlowConstruct flow, ComponentLocation location, String correlationId) {
     return create(flow, location, correlationId, Mono.empty());
   }
 
@@ -68,7 +68,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
    * @param serverId the id of the running mule server
    * @param location the location of the component that received the first message for this context.
    */
-  public static EventContext create(String id, String serverId, ComponentLocation location) {
+  public static InternalEventContext create(String id, String serverId, ComponentLocation location) {
     return create(id, serverId, location, null);
   }
 
@@ -78,9 +78,9 @@ public final class DefaultEventContext extends AbstractEventContext implements S
    * @param id the unique id for this event context.
    * @param serverId the id of the running mule server
    * @param location the location of the component that received the first message for this context.
-   * @param correlationId See {@link EventContext#getCorrelationId()}.
+   * @param correlationId See {@link InternalEventContext#getCorrelationId()}.
    */
-  public static EventContext create(String id, String serverId, ComponentLocation location, String correlationId) {
+  public static InternalEventContext create(String id, String serverId, ComponentLocation location, String correlationId) {
     return create(id, serverId, location, correlationId, Mono.empty());
   }
 
@@ -89,12 +89,12 @@ public final class DefaultEventContext extends AbstractEventContext implements S
    *
    * @param flow the flow that processes events of this context.
    * @param location the location of the component that received the first message for this context.
-   * @param correlationId See {@link EventContext#getCorrelationId()}.
+   * @param correlationId See {@link InternalEventContext#getCorrelationId()}.
    * @param externalCompletionPublisher void publisher that completes when source completes enabling completion of
-   *        {@link EventContext} to depend on completion of source.
+   *        {@link InternalEventContext} to depend on completion of source.
    */
-  public static EventContext create(FlowConstruct flow, ComponentLocation location, String correlationId,
-                                    Publisher<Void> externalCompletionPublisher) {
+  public static InternalEventContext create(FlowConstruct flow, ComponentLocation location, String correlationId,
+                                            Publisher<Void> externalCompletionPublisher) {
     return new DefaultEventContext(flow, location, correlationId, externalCompletionPublisher);
   }
 
@@ -103,12 +103,12 @@ public final class DefaultEventContext extends AbstractEventContext implements S
    *
    * @param id the unique id for this event context.
    * @param location the location of the component that received the first message for this context.
-   * @param correlationId See {@link EventContext#getCorrelationId()}.
+   * @param correlationId See {@link InternalEventContext#getCorrelationId()}.
    * @param externalCompletionPublisher void publisher that completes when source completes enabling completion of
-   *        {@link EventContext} to depend on completion of source.
+   *        {@link InternalEventContext} to depend on completion of source.
    */
-  public static EventContext create(String id, String serverId, ComponentLocation location, String correlationId,
-                                    Publisher<Void> externalCompletionPublisher) {
+  public static InternalEventContext create(String id, String serverId, ComponentLocation location, String correlationId,
+                                            Publisher<Void> externalCompletionPublisher) {
     return new DefaultEventContext(id, serverId, location, correlationId, externalCompletionPublisher);
   }
 
@@ -122,7 +122,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
    * @param componentLocation he location of the component that creates the child context and operates on result if available.
    * @return a new child context
    */
-  public static EventContext child(EventContext parent, Optional<ComponentLocation> componentLocation) {
+  public static InternalEventContext child(InternalEventContext parent, Optional<ComponentLocation> componentLocation) {
     return child(parent, componentLocation, NULL_ERROR_HANDLER);
   }
 
@@ -139,15 +139,16 @@ public final class DefaultEventContext extends AbstractEventContext implements S
    * @param componentLocation he location of the component that creates the child context and operates on result if available.
    * @return a new child context
    */
-  public static EventContext fireAndForgetChild(EventContext parent, Optional<ComponentLocation> componentLocation) {
-    EventContext context = parent;
+  public static InternalEventContext fireAndForgetChild(InternalEventContext parent,
+                                                        Optional<ComponentLocation> componentLocation) {
+    InternalEventContext context = parent;
     MessagingExceptionHandler exceptionHandler = NULL_ERROR_HANDLER;
 
     while (context != null && exceptionHandler == NULL_ERROR_HANDLER) {
       exceptionHandler =
           context instanceof AbstractEventContext ? ((AbstractEventContext) context).getExceptionHandler()
               : NULL_ERROR_HANDLER;
-      context = context.getInternalParentContext().orElse(null);
+      context = context.getParentContext().orElse(null);
     }
     return child(parent, componentLocation, exceptionHandler);
   }
@@ -163,9 +164,9 @@ public final class DefaultEventContext extends AbstractEventContext implements S
    * @param exceptionHandler used to handle {@link MessagingException}'s.
    * @return a new child context
    */
-  public static EventContext child(EventContext parent, Optional<ComponentLocation> componentLocation,
-                                   MessagingExceptionHandler exceptionHandler) {
-    EventContext child = new ChildEventContext(parent, componentLocation.orElse(null), exceptionHandler);
+  public static InternalEventContext child(InternalEventContext parent, Optional<ComponentLocation> componentLocation,
+                                           MessagingExceptionHandler exceptionHandler) {
+    InternalEventContext child = new ChildEventContext(parent, componentLocation.orElse(null), exceptionHandler);
     if (parent instanceof AbstractEventContext) {
       ((AbstractEventContext) parent).addChildContext(child);
     }
@@ -219,12 +220,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
   }
 
   @Override
-  public Optional<org.mule.runtime.api.event.EventContext> getParentContext() {
-    return empty();
-  }
-
-  @Override
-  public Optional<EventContext> getInternalParentContext() {
+  public Optional<InternalEventContext> getParentContext() {
     return empty();
   }
 
@@ -233,10 +229,10 @@ public final class DefaultEventContext extends AbstractEventContext implements S
    *
    * @param flow the flow that processes events of this context.
    * @param location the location of the component that received the first message for this context.
-   * @param correlationId the correlation id that was set by the {@link MessageSource} for the first {@link Event} of this
+   * @param correlationId the correlation id that was set by the {@link MessageSource} for the first {@link InternalEvent} of this
    *        context, if available.
    * @param externalCompletionPublisher void publisher that completes when source completes enabling completion of
-   *        {@link EventContext} to depend on completion of source.
+   *        {@link InternalEventContext} to depend on completion of source.
    */
   private DefaultEventContext(FlowConstruct flow, ComponentLocation location,
                               String correlationId,
@@ -255,10 +251,10 @@ public final class DefaultEventContext extends AbstractEventContext implements S
    * @param id the unique id for this event context.
    * @param serverId the id of the running mule server
    * @param location the location of the component that received the first message for this context.
-   * @param correlationId the correlation id that was set by the {@link MessageSource} for the first {@link Event} of this
+   * @param correlationId the correlation id that was set by the {@link MessageSource} for the first {@link InternalEvent} of this
    *        context, if available.
    * @param externalCompletionPublisher void publisher that completes when source completes enabling completion of
-   *        {@link EventContext} to depend on completion of source.
+   *        {@link InternalEventContext} to depend on completion of source.
    */
   private DefaultEventContext(String id, String serverId, ComponentLocation location, String correlationId,
                               Publisher<Void> externalCompletionPublisher) {
@@ -280,11 +276,11 @@ public final class DefaultEventContext extends AbstractEventContext implements S
 
     private static final long serialVersionUID = 1054412872901205234L;
 
-    private final EventContext parent;
+    private final InternalEventContext parent;
     private final ComponentLocation componentLocation;
     private final String id;
 
-    private ChildEventContext(EventContext parent, ComponentLocation componentLocation,
+    private ChildEventContext(InternalEventContext parent, ComponentLocation componentLocation,
                               MessagingExceptionHandler messagingExceptionHandler) {
       super(messagingExceptionHandler, Mono.empty());
       this.parent = parent;
@@ -335,12 +331,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     }
 
     @Override
-    public Optional<org.mule.runtime.api.event.EventContext> getParentContext() {
-      return of(parent);
-    }
-
-    @Override
-    public Optional<EventContext> getInternalParentContext() {
+    public Optional<InternalEventContext> getParentContext() {
       return of(parent);
     }
 

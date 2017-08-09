@@ -11,7 +11,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.DefaultTransformationService;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.transformer.Converter;
@@ -129,10 +129,10 @@ public class CompositeConverter extends AbstractAnnotatedObject implements Conve
   }
 
   @Override
-  public Event process(Event event) throws MuleException {
+  public InternalEvent process(InternalEvent event) throws MuleException {
     if (event != null && event.getMessage() != null) {
       try {
-        event = Event.builder(event)
+        event = InternalEvent.builder(event)
             .message(muleContext.getTransformationService().applyTransformers(event.getMessage(), event, this)).build();
       } catch (Exception e) {
         throw new MessageTransformerException(this, e);

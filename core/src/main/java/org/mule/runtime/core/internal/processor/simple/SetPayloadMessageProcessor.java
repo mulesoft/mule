@@ -13,7 +13,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.util.AttributeEvaluator;
 import org.mule.runtime.core.privileged.processor.simple.SimpleMessageProcessor;
 
@@ -27,9 +27,9 @@ public class SetPayloadMessageProcessor extends SimpleMessageProcessor {
   private AttributeEvaluator valueEvaluator;
 
   @Override
-  public Event process(Event event) throws MuleException {
+  public InternalEvent process(InternalEvent event) throws MuleException {
     final Message.Builder builder = Message.builder(event.getMessage());
-    final org.mule.runtime.core.api.Event.Builder eventBuilder = Event.builder(event);
+    final InternalEvent.Builder eventBuilder = InternalEvent.builder(event);
 
     if (dataType == null) {
       final TypedValue typedValue = resolveTypedValue(event);
@@ -44,7 +44,7 @@ public class SetPayloadMessageProcessor extends SimpleMessageProcessor {
     return eventBuilder.message(builder.build()).build();
   }
 
-  private Object resolveValue(Event event) {
+  private Object resolveValue(InternalEvent event) {
     Object value;
     if (valueEvaluator.getRawValue() == null) {
       value = null;
@@ -54,7 +54,7 @@ public class SetPayloadMessageProcessor extends SimpleMessageProcessor {
     return value;
   }
 
-  private TypedValue resolveTypedValue(Event event) {
+  private TypedValue resolveTypedValue(InternalEvent event) {
     if (valueEvaluator.getRawValue() == null) {
       return new TypedValue(null, DataType.OBJECT);
     } else {

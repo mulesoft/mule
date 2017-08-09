@@ -32,7 +32,7 @@ import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
@@ -64,19 +64,19 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
   private DefaultFlowBuilder.DefaultFlow flow;
   private DefaultFlowBuilder.DefaultFlow stoppedFlow;
   private SensingNullMessageProcessor sensingMessageProcessor;
-  private BiFunction<Processor, Event, Event> triggerFunction;
+  private BiFunction<Processor, InternalEvent, InternalEvent> triggerFunction;
 
   @Rule
   public ExpectedException expectedException = none();
 
-  public DefaultFlowTestCase(BiFunction<Processor, Event, Event> triggerFunction) {
+  public DefaultFlowTestCase(BiFunction<Processor, InternalEvent, InternalEvent> triggerFunction) {
     this.triggerFunction = triggerFunction;
   }
 
   @Parameters
   public static Collection<Object[]> parameters() {
-    BiFunction<Processor, Event, Event> blocking = (listener, event) -> just(event).transform(listener).block();
-    BiFunction<Processor, Event, Event> async = (listener, event) -> {
+    BiFunction<Processor, InternalEvent, InternalEvent> blocking = (listener, event) -> just(event).transform(listener).block();
+    BiFunction<Processor, InternalEvent, InternalEvent> async = (listener, event) -> {
       try {
         return listener.process(event);
       } catch (MuleException e) {
@@ -99,7 +99,7 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
     processors.add(new StringAppendTransformer("a"));
     processors.add(new StringAppendTransformer("b"));
     processors.add(new StringAppendTransformer("c"));
-    processors.add(event -> Event.builder(event).addVariable("thread", currentThread()).build());
+    processors.add(event -> InternalEvent.builder(event).addVariable("thread", currentThread()).build());
     processors.add(sensingMessageProcessor);
 
     flow = (DefaultFlow) Flow.builder(FLOW_NAME, muleContext)
@@ -143,10 +143,10 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
   public void testProcessOneWayEndpoint() throws Exception {
     flow.initialise();
     flow.start();
-    Event event = eventBuilder()
+    InternalEvent event = eventBuilder()
         .message(of(TEST_PAYLOAD))
         .build();
-    Event response = triggerFunction.apply(directInboundMessageSource.getListener(), event);
+    InternalEvent response = triggerFunction.apply(directInboundMessageSource.getListener(), event);
 
     assertSucessfulProcessing(response);
   }
@@ -155,12 +155,12 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
   public void testProcessRequestResponseEndpoint() throws Exception {
     flow.initialise();
     flow.start();
-    Event response = triggerFunction.apply(directInboundMessageSource.getListener(), testEvent());
+    InternalEvent response = triggerFunction.apply(directInboundMessageSource.getListener(), testEvent());
 
     assertSucessfulProcessing(response);
   }
 
-  private void assertSucessfulProcessing(Event response) throws MuleException {
+  private void assertSucessfulProcessing(InternalEvent response) throws MuleException {
     assertThat(response.getMessageAsString(muleContext), equalTo(TEST_PAYLOAD + "abcdef"));
     assertThat(response.getVariables().get("thread").getValue(), not(sameInstance(currentThread())));
 
@@ -195,7 +195,7 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
     flow.stop();
     flow.start();
 
-    Event response = triggerFunction.apply(directInboundMessageSource.getListener(), testEvent());
+    InternalEvent response = triggerFunction.apply(directInboundMessageSource.getListener(), testEvent());
     assertThat(response, not(nullValue()));
   }
 

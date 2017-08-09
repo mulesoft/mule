@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.core.internal.routing.outbound;
 
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 
 import java.util.Iterator;
 import java.util.List;
 
 /**
- * Implementations must provide a way to wrap each element in a {@link Event}.
+ * Implementations must provide a way to wrap each element in a {@link InternalEvent}.
  *
  * @since 4.0
  */

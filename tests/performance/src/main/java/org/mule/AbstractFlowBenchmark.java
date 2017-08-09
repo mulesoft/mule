@@ -15,7 +15,7 @@ import static org.openjdk.jmh.infra.Blackhole.consumeCPU;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.DefaultEventContext;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.processor.Processor;
@@ -50,7 +50,7 @@ public abstract class AbstractFlowBenchmark extends AbstractBenchmark {
   static final Processor cpuIntensiveProcessor = new Processor() {
 
     @Override
-    public Event process(Event event) throws MuleException {
+    public InternalEvent process(InternalEvent event) throws MuleException {
       // Roughly 5mS on modern CPU.
       consumeCPU(2500000);
       return event;
@@ -65,7 +65,7 @@ public abstract class AbstractFlowBenchmark extends AbstractBenchmark {
   static final Processor blockingProcessor = new Processor() {
 
     @Override
-    public Event process(Event event) throws MuleException {
+    public InternalEvent process(InternalEvent event) throws MuleException {
       try {
         sleep(20);
       } catch (InterruptedException e) {
@@ -139,8 +139,8 @@ public abstract class AbstractFlowBenchmark extends AbstractBenchmark {
   }
 
   @Benchmark
-  public Event processSourceBlocking() throws MuleException {
-    return source.trigger(Event.builder(DefaultEventContext.create(flow, CONNECTOR_LOCATION))
+  public InternalEvent processSourceBlocking() throws MuleException {
+    return source.trigger(InternalEvent.builder(DefaultEventContext.create(flow, CONNECTOR_LOCATION))
         .message(of(PAYLOAD)).build());
   }
 
@@ -148,7 +148,7 @@ public abstract class AbstractFlowBenchmark extends AbstractBenchmark {
   public CountDownLatch processSourceStream() throws MuleException, InterruptedException {
     CountDownLatch latch = new CountDownLatch(getStreamIterations());
     for (int i = 0; i < getStreamIterations(); i++) {
-      Mono.just(Event.builder(DefaultEventContext.create(flow, CONNECTOR_LOCATION))
+      Mono.just(InternalEvent.builder(DefaultEventContext.create(flow, CONNECTOR_LOCATION))
           .message(of(PAYLOAD)).build()).transform(source.getListener()).doOnNext(event -> latch.countDown())
           .subscribe();
     }

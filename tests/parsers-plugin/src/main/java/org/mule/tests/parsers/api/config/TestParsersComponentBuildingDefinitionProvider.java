@@ -15,11 +15,11 @@ import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fro
 import static org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair.newBuilder;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromMapEntryType;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
+import org.mule.runtime.core.privileged.processor.CompositeProcessorChainRouter;
 import org.mule.runtime.core.privileged.processor.ProcessorChainRouter;
 import org.mule.runtime.core.privileged.processor.objectfactory.MessageProcessorChainObjectFactory;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
-import org.mule.tests.parsers.api.CustomCompositeProcessorChainRouter;
 import org.mule.tests.parsers.api.LifecycleSensingMessageProcessor;
 import org.mule.tests.parsers.api.LifecycleSensingObjectFactory;
 import org.mule.tests.parsers.api.ParameterAndChildElement;
@@ -190,7 +190,7 @@ public class TestParsersComponentBuildingDefinitionProvider implements Component
         .withTypeDefinition(fromType(TestObject.class)).build());
 
     definitions.add(baseBuilder.withIdentifier("composite-processor-chain-router")
-        .withTypeDefinition(fromType(CustomCompositeProcessorChainRouter.class))
+        .withTypeDefinition(fromType(CompositeProcessorChainRouter.class))
         .withSetterParameterDefinition("processorChains", fromChildCollectionConfiguration(Object.class).build())
         .build());
 
