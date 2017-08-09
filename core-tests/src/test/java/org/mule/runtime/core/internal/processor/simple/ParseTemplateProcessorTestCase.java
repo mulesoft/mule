@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.processor.simple;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -139,7 +140,7 @@ public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
 
     when(mockMuleMessage.getPayload()).thenReturn(TypedValue.of(payload));
     when(mockMuleMessage.getAttributes()).thenReturn(TypedValue.of(new HashMap<>()));
-    when(mockExpressionManager.parse(template, mockMuleEvent, null)).thenReturn("Parsed");
+    when(mockExpressionManager.parse(any(), any(), any())).thenReturn("Parsed");
 
     InternalEvent response = parseTemplateProcessor.process(mockMuleEvent);
     assertNotNull(response);

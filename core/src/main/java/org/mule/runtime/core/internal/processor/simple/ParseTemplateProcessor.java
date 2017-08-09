@@ -22,6 +22,7 @@ public class ParseTemplateProcessor extends SimpleMessageProcessor {
   private String content;
   private String target;
   private String location;
+  private String targetValue;
 
   @Override
   public void initialise() throws InitialisationException {
@@ -46,17 +47,34 @@ public class ParseTemplateProcessor extends SimpleMessageProcessor {
     }
   }
 
-  @Override
-  public InternalEvent process(InternalEvent event) {
+  private void evaluateCorrectArguments() {
     if (content == null) {
       throw new IllegalArgumentException("Template content cannot be null");
     }
+    if (targetValue != null && target == null) {
+      throw new IllegalArgumentException("Can't define a targetValue with no target");
+    }
+
+  }
+
+  @Override
+  public InternalEvent process(InternalEvent event) {
+    evaluateCorrectArguments();
     Object result = muleContext.getExpressionManager().parse(content, event, null);
     Message resultMessage = Message.builder(event.getMessage()).value(result).nullAttributesValue().build();
     if (target == null) {
       return InternalEvent.builder(event).message(resultMessage).build();
     } else {
-      return InternalEvent.builder(event).addVariable(target, resultMessage).build();
+      if (targetValue == null) { //Return the whole message
+        return InternalEvent.builder(event).addVariable(target, resultMessage).build();
+      } else { //typeValue was defined by the user
+        return InternalEvent.builder(event).addVariable(target,
+                                                        muleContext.getExpressionManager()
+                                                            .evaluate(targetValue, InternalEvent.builder(event)
+                                                                .message(resultMessage).build()))
+            .build();
+      }
+
     }
   }
 
@@ -70,6 +88,10 @@ public class ParseTemplateProcessor extends SimpleMessageProcessor {
 
   public void setLocation(String location) {
     this.location = location;
+  }
+
+  public void setTargetValue(String targetValue) {
+    this.targetValue = targetValue;
   }
 
 }

@@ -18,6 +18,7 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
@@ -39,6 +40,7 @@ import static org.mule.runtime.internal.el.BindingContextUtils.ATTRIBUTES;
 import static org.mule.runtime.internal.el.BindingContextUtils.AUTHENTICATION;
 import static org.mule.runtime.internal.el.BindingContextUtils.DATA_TYPE;
 import static org.mule.runtime.internal.el.BindingContextUtils.ERROR;
+import static org.mule.runtime.internal.el.BindingContextUtils.MESSAGE;
 import static org.mule.runtime.internal.el.BindingContextUtils.PARAMETERS;
 import static org.mule.runtime.internal.el.BindingContextUtils.PAYLOAD;
 import static org.mule.runtime.internal.el.BindingContextUtils.PROPERTIES;
@@ -321,6 +323,14 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
     assertThat(result.getValue(), is(instanceOf(Map.class)));
     assertThat((Map<String, TypedValue>) result.getValue(), hasEntry(var1, varValue));
     assertThat((Map<String, TypedValue>) result.getValue(), hasEntry(var2, varValue));
+  }
+
+  @Test
+  public void messageBinding() throws Exception {
+    InternalEvent event = testEvent();
+    TypedValue result = expressionLanguage.evaluate(MESSAGE, event, BindingContext.builder().build());
+    assertThat(result.getValue(), is(instanceOf(Message.class)));
+    assertEquals(((Message) result.getValue()).getPayload(), event.getMessage().getPayload());
   }
 
   @Test

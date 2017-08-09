@@ -816,6 +816,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("content", fromChildConfiguration(String.class).withIdentifier("content").build())
         .withSetterParameterDefinition("target", fromSimpleParameter("target").build())
         .withSetterParameterDefinition("location", fromSimpleParameter("location").build())
+        .withSetterParameterDefinition("targetValue", fromSimpleParameter("targetValue").build())
         .build());
     transformerComponentBuildingDefinitions.add(getCoreMuleMessageTransformerBaseBuilder()
         .withIdentifier("content").withTypeDefinition(fromType(String.class)).build());
