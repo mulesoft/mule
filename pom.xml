@@ -215,7 +215,7 @@
         <muleDslApiVersion>1.0.0-rc.cyborg</muleDslApiVersion>
         <muleExtensionsApiVersion>1.0.0-rc.cyborg</muleExtensionsApiVersion>
         <muleHttpPolicyApiVersion>1.0.0-rc.cyborg</muleHttpPolicyApiVersion>
-        <muleMavenClientApi>1.0.0-SNAPSHOT</muleMavenClientApi>
+        <muleMavenClientApi>1.0.0-rc.cyborg</muleMavenClientApi>
         <muleMavenClientImpl>1.0.0-SNAPSHOT</muleMavenClientImpl>
         <muleMavenClientTest>1.0.0-SNAPSHOT</muleMavenClientTest>
         <mulePolicyApiVersion>1.0.0-rc.cyborg</mulePolicyApiVersion>
