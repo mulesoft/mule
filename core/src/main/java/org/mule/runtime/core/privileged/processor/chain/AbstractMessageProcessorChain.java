@@ -175,7 +175,14 @@ abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObject imp
                                                                     processor, muleContext)))
                            .then(Mono.empty()))
         .onErrorResume(MessagingException.class,
-                       throwable -> Mono.from(event.getContext().error(throwable)).then(Mono.empty()))));
+                       throwable -> {
+                         if (!throwable.getEvent().getError().isPresent()) {
+                           // just in case anything in processor chain itself fails. We still have to create Error earlier on
+                           // though, so it's available in interceptors.
+                           throwable = updateMessagingException(processor).apply(throwable);
+                         }
+                         return Mono.from(event.getContext().error(throwable)).then(Mono.empty());
+                       })));
 
     return interceptors;
   }

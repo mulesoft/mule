@@ -7,18 +7,20 @@
 
 package org.mule.runtime.core.api.routing;
 
+import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 
 import org.reactivestreams.Publisher;
 
 /**
- * Strategy that defines how a set of {@link RoutingPair}'s each consisting of a {@link Processor} and {@link Event} will be
- * processed and a single result {@link Event} returned. This will normally be used for:
+ * Strategy that defines how a set of {@link RoutingPair}'s each consisting of a {@link MessageProcessorChain} and {@link Event}
+ * will be processed and a single result {@link Event} returned. This will normally be used for:
  * <ul>
- * <li>Routing {@code n} {@link Event}'s to the same {@link Processor}.
- * <li>Routing a single {@link Event} to {@code n} {@link Processor}'s.
+ * <li>Routing {@code n} {@link Event}'s to the same {@link MessageProcessorChain}.
+ * <li>Routing a single {@link Event} to {@code n} {@link MessageProcessorChain}'s.
  * </ul>
  * <p>
  * Implementations will typically implement parallel behavior where the invocation of each route is independent and then results
@@ -34,24 +36,23 @@ import org.reactivestreams.Publisher;
  */
 public interface ForkJoinStrategy {
 
-  Publisher<Event> forkJoin(Event original, Publisher<RoutingPair> routingPairs, ProcessingStrategy processingStrategy,
-                            int maxConcurrency, boolean delayErrors);
+  Publisher<Event> forkJoin(Event original, Publisher<RoutingPair> routingPairs);
 
   final class RoutingPair {
 
-    private Processor processor;
+    private MessageProcessorChain processor;
     private Event event;
 
-    public static RoutingPair of(Event event, Processor route) {
+    public static RoutingPair of(Event event, MessageProcessorChain route) {
       return new RoutingPair(event, route);
     }
 
-    private RoutingPair(Event event, Processor route) {
+    private RoutingPair(Event event, MessageProcessorChain route) {
       this.event = event;
       this.processor = route;
     }
 
-    public Processor getProcessor() {
+    public MessageProcessorChain getRoute() {
       return processor;
     }
 

@@ -83,7 +83,6 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
 
   private static final Logger LOGGER = getLogger(AbstractMuleContextTestCase.class);
   public static final String WORKING_DIRECTORY_SYSTEM_PROPERTY_KEY = "workingDirectory";
-  public static final String REACTOR_BLOCK_TIMEOUT_EXCEPTION_MESSAGE = "Timeout on Mono blocking read";
 
   public TestServicesConfigurationBuilder testServicesConfigurationBuilder;
   public Supplier<TestServicesConfigurationBuilder> testServicesConfigurationBuilderSupplier =

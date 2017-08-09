@@ -12,40 +12,47 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mule.runtime.core.api.routing.ForkJoinStrategy.RoutingPair.of;
-import static reactor.core.publisher.Flux.fromIterable;
-import static reactor.core.publisher.Mono.from;
+import static org.mule.runtime.api.message.Message.of;
+import static org.mule.test.allure.AllureConstants.ForkJoinStrategiesFeature.ForkJoinStrategiesStory.JOIN_ONLY;
+
+import io.qameta.allure.Story;
+import org.junit.Test;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.routing.ForkJoinStrategy;
 import org.mule.runtime.core.api.routing.ForkJoinStrategy.RoutingPair;
 
-import org.junit.Test;
+import io.qameta.allure.Description;
 
-
+@Story(JOIN_ONLY)
 public class JoinOnlyForkJoinStrategyTestCase extends AbstractForkJoinStrategyTestCase {
 
   @Override
-  protected ForkJoinStrategy createStrategy(long timeout) {
-    return new JoinOnlyForkJoinStrategy(timeout);
+  protected ForkJoinStrategy createStrategy(ProcessingStrategy processingStrategy, int concurrency, boolean delayErrors,
+                                            long timeout) {
+    return new JoinOnlyForkJoinStrategyFactory().createForkJoinStrategy(processingStrategy, concurrency, delayErrors, timeout,
+                                                                        scheduler,
+                                                                        timeoutErrorType);
   }
 
   @Test
-  public void joinOnly() throws Exception {
+  @Description("This strategy waits for all routes to return and then returns the original event.")
+  public void joinOnly() throws Throwable {
 
     Event original = testEvent();
 
-    Processor processor1 = createEchoProcessorSpy();
-    Processor processor2 = createEchoProcessorSpy();
-    Processor processor3 = createEchoProcessorSpy();
+    Processor processor1 = createProcessorSpy(of(1));
+    Processor processor2 = createProcessorSpy(of(2));
+    Processor processor3 = createProcessorSpy(of(3));
 
-    RoutingPair pair1 = of(testEvent(), processor1);
-    RoutingPair pair2 = of(testEvent(), processor2);
-    RoutingPair pair3 = of(testEvent(), processor3);
+    RoutingPair pair1 = createRoutingPair(processor1);
+    RoutingPair pair2 = createRoutingPair(processor2);
+    RoutingPair pair3 = createRoutingPair(processor3);
 
-    Event result =
-        from(strategy.forkJoin(original, fromIterable(asList(pair1, pair2, pair3)), processingStrategy, 3, true)).block();
+
+    Event result = invokeStrategyBlocking(strategy, original, asList(pair1, pair2, pair3));
 
     assertThat(result, is(original));
     verify(processor1, times(1)).process(any(Event.class));

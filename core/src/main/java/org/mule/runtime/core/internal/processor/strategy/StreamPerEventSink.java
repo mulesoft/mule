@@ -10,8 +10,12 @@ import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -23,7 +27,7 @@ import reactor.core.publisher.Mono;
  */
 public class StreamPerEventSink implements Sink {
 
-  private Function<Publisher<Event>, Publisher<Event>> processor;
+  private ReactiveProcessor processor;
   private Consumer<Event> eventConsumer;
 
   /**
@@ -33,16 +37,21 @@ public class StreamPerEventSink implements Sink {
    *        pipeline.
    * @param eventConsumer event consumer called just before {@link Event}'s emission.
    */
-  public StreamPerEventSink(Function<Publisher<Event>, Publisher<Event>> processor, Consumer<Event> eventConsumer) {
+  public StreamPerEventSink(ReactiveProcessor processor, Consumer<Event> eventConsumer) {
     this.processor = processor;
     this.eventConsumer = eventConsumer;
   }
 
   @Override
-  public void accept(Event event) {
+  public void accept(Event event) throws RejectedExecutionException {
+    eventConsumer.accept(event);
+    AtomicReference<Throwable> rejected = new AtomicReference();
     just(event)
-        .doOnNext(request -> eventConsumer.accept(request))
         .transform(processor)
+        .doOnError(RejectedExecutionException.class, rejected::set)
         .subscribe(requestUnbounded());
+    if (rejected.get() instanceof RejectedExecutionException) {
+      throw (RejectedExecutionException) rejected.get();
+    }
   }
 }

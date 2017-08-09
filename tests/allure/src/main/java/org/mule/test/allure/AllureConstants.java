@@ -229,6 +229,19 @@ public interface AllureConstants {
 
   }
 
+  interface ForkJoinStrategiesFeature {
+
+    String FORK_JOIN_STRATEGIES = "Fork/Join Strategies used by scatter-gather and foreach routers";
+
+    interface ForkJoinStrategiesStory {
+
+      String COLLECT_LIST = "Collect List";
+      String COLLECT_MAP = "Collect Map";
+      String JOIN_ONLY = "Join Only";
+    }
+
+  }
+
   interface SocketsFeature {
 
     String SOCKETS_EXTENSION = "Sockets Extension";
