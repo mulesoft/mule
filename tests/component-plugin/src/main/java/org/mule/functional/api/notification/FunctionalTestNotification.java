@@ -7,6 +7,7 @@
 package org.mule.functional.api.notification;
 
 import org.mule.functional.api.component.FunctionalTestProcessor;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.CustomNotification;
@@ -42,21 +43,21 @@ public class FunctionalTestNotification extends CustomNotification {
   }
 
   private final Object replyMessage;
-  private final InternalEvent event;
+  private final Message message;
 
-  public FunctionalTestNotification(InternalEvent event, String flowName, Object replyMessage, int action)
+  public FunctionalTestNotification(Message message, String flowName, Object replyMessage, int action)
       throws TransformerException {
-    super(event.getMessage().getPayload().getValue(), action);
+    super(message.getPayload().getValue(), action);
     resourceIdentifier = flowName;
     this.replyMessage = replyMessage;
-    this.event = event;
+    this.message = message;
   }
 
   public Object getReplyMessage() {
     return replyMessage;
   }
 
-  public InternalEvent getEvent() {
-    return event;
+  public Message getMessage() {
+    return message;
   }
 }

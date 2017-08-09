@@ -10,7 +10,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toMap;
-import static org.mule.runtime.internal.el.BindingContextUtils.NULL_BINDING_CONTEXT;
+import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.core.internal.message.InternalMessage.builder;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static reactor.core.publisher.Flux.from;

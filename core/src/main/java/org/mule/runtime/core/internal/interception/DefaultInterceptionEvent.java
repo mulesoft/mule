@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.core.internal.interception;
 
-import static org.mule.runtime.internal.el.BindingContextUtils.NULL_BINDING_CONTEXT;
-import static org.mule.runtime.internal.el.BindingContextUtils.addEventBindings;
+import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
+import static org.mule.runtime.api.el.BindingContextUtils.addEventBindings;
+
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.message.Error;

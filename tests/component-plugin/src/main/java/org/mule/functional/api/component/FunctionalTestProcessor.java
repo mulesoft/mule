@@ -250,7 +250,8 @@ public class FunctionalTestProcessor extends AbstractAnnotatedObject implements 
 
     if (isEnableNotifications()) {
       notificationFirer
-          .dispatch(new FunctionalTestNotification(event, getLocation().getRootContainerName(), replyMessage, EVENT_RECEIVED));
+          .dispatch(new FunctionalTestNotification(message, getLocation().getRootContainerName(), replyMessage,
+                                                   EVENT_RECEIVED));
     }
 
     // Time to wait before returning
