@@ -213,7 +213,7 @@
 
         <!-- Mule Snapshot Dependencies -->
         <muleDslApiVersion>1.0.0-rc.cyborg</muleDslApiVersion>
-        <muleExtensionsApiVersion>1.0.0-rc.cyborg</muleExtensionsApiVersion>
+        <muleExtensionsApiVersion>1.0.0-rc.cyborg-SNAPSHOT</muleExtensionsApiVersion>
         <muleHttpPolicyApiVersion>1.0.0-rc.cyborg</muleHttpPolicyApiVersion>
         <muleMavenClientApi>1.0.0-rc.cyborg</muleMavenClientApi>
         <muleMavenClientImpl>1.0.0-rc.cyborg</muleMavenClientImpl>
