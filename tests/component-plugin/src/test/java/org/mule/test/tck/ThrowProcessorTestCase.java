@@ -8,8 +8,8 @@ package org.mule.test.tck;
 
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.mockito.Mockito.mock;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.EXPRESSION;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.SECURITY;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.EXPRESSION;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SECURITY;
 
 import org.mule.functional.api.component.ThrowProcessor;
 import org.mule.runtime.api.component.ComponentIdentifier;

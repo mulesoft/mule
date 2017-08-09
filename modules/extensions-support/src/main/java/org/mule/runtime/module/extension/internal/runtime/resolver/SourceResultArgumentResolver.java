@@ -8,8 +8,8 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static java.util.stream.Collectors.toSet;
 import static java.util.stream.Stream.of;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.SOURCE_ERROR_RESPONSE_GENERATE;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.SOURCE_RESPONSE_GENERATE;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE_ERROR_RESPONSE_GENERATE;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE_RESPONSE_GENERATE;
 import static org.mule.runtime.extension.api.runtime.source.SourceResult.invocationError;
 import static org.mule.runtime.extension.api.runtime.source.SourceResult.responseError;
 import static org.mule.runtime.extension.api.runtime.source.SourceResult.success;
