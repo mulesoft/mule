@@ -5,14 +5,22 @@
       xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
-    <file:connector name="fileConnector" fileAge="${fileAgeConnector}"/>
+    <file:connector name="fileConnector" fileAge="${fileAgeConnector}" autoDelete="true" streaming="false" pollingFrequency="500"/>
+    <file:connector name="fileConnectorWithAbsentFileAge" autoDelete="true" streaming="false" pollingFrequency="500"/>
 
-    <flow name="testageFlow">
-        <file:inbound-endpoint path="src/main/resources/Dir1" connector-ref="fileConnector"/>
+    <flow name="fileAgeInheritedFromConnectorHonorsFlow">
+        <file:inbound-endpoint path="${workingDirectory}/test" connector-ref="fileConnector"/>
         <echo-component/>
     </flow>
-    <flow name="testageFlow1">
-        <file:inbound-endpoint path="src/main/resources/Dir2"  fileAge="${fileAgeEndpoint}"/>
+
+    <flow name="overrodeFileAgeInEndpointIsHonoredFlow">
+        <file:inbound-endpoint path="${workingDirectory}/test2"  connector-ref="fileConnector" fileAge="${fileAgeEndpoint}"/>
         <echo-component/>
     </flow>
+
+    <flow name="fileAgeInEndpointIsHonoredWhenAbsentInReferredConnectorFlow">
+        <file:inbound-endpoint path="${workingDirectory}/test3"  connector-ref="fileConnectorWithAbsentFileAge" fileAge="${fileAgeEndpoint}"/>
+        <echo-component/>
+    </flow>
+
 </mule>
