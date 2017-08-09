@@ -108,7 +108,7 @@ public abstract class Errors {
     public static final String NOT_PERMITTED_ERROR_IDENTIFIER = "NOT_PERMITTED";
 
     /**
-     * Indicates that a timeout during processing.
+     * Indicates that a timeout occurred during processing.
      */
     public static final String TIMEOUT_ERROR_IDENTIFIER = "TIMEOUT";
 

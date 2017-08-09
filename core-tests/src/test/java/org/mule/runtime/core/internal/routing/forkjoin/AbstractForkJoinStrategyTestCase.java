@@ -35,6 +35,9 @@ import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.TI
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.api.routing.ForkJoinStrategy.RoutingPair.of;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
+import static org.mule.test.allure.AllureConstants.ForkJoinStrategiesFeature.FORK_JOIN_STRATEGIES;
+import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
+import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.REACTOR;
 import static reactor.core.publisher.Flux.fromIterable;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
@@ -69,7 +72,10 @@ import org.mule.runtime.core.internal.routing.CompositeRoutingException;
 import org.mule.runtime.core.internal.routing.RoutingResult;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
 
+@Feature(FORK_JOIN_STRATEGIES)
 public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleContextTestCase {
 
   @Rule
@@ -101,20 +107,21 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
                                                      long timeout);
 
   @Test
+  @Description("When a route timeout occurs a CompositeRoutingException is thrown with details of timeout error in RoutingResult.")
   public void timeout() throws Throwable {
     strategy = createStrategy(processingStrategy, 2, true, 10);
 
-    expectedException.expect(instanceOf(MessagingException.class));
-    expectedException.expectCause(instanceOf(CompositeRoutingException.class));
+    expectedException.expect(instanceOf(CompositeRoutingException.class));
 
     invokeStrategyBlocking(strategy, testEvent(), asList(createRoutingPairWithSleep(of(1), 20)), throwable -> {
       CompositeRoutingException compositeRoutingException = assertCompositeRoutingException(throwable, 1);
       RoutingResult routingResult = assertRoutingResult(compositeRoutingException, 0, 1);
-      assertThat(routingResult.getFailures().get(Integer.toString(0)).getCause(), instanceOf(TimeoutException.class));
+      assertThat(routingResult.getFailures().get("0").getCause(), instanceOf(TimeoutException.class));
     });
   }
 
   @Test
+  @Description("When a route timeout occurs all routes are still executed and  a CompositeRoutingException is thrown with details of timeout error and successful routes in RoutingResult.")
   public void timeoutDelayed() throws Throwable {
     strategy = createStrategy(processingStrategy, 2, true, 10);
 
@@ -122,21 +129,21 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
     Processor pair2Processor = createProcessorSpy(pair2Result);
     RoutingPair pair2 = of(testEvent(), createChain(pair2Processor));
 
-    expectedException.expect(instanceOf(MessagingException.class));
-    expectedException.expectCause(instanceOf(CompositeRoutingException.class));
+    expectedException.expect(instanceOf(CompositeRoutingException.class));
 
     invokeStrategyBlocking(strategy, testEvent(), asList(createRoutingPairWithSleep(of(1), 20), pair2),
                            throwable -> {
                              verify(pair2Processor, times(1)).process(any(Event.class));
                              CompositeRoutingException compositeRoutingException = assertCompositeRoutingException(throwable, 1);
                              RoutingResult routingResult = assertRoutingResult(compositeRoutingException, 1, 1);
-                             assertThat(routingResult.getFailures().get(Integer.toString(0)).getCause(),
+                             assertThat(routingResult.getFailures().get("0").getCause(),
                                         instanceOf(TimeoutException.class));
-                             assertThat(routingResult.getResults().get(Integer.toString(1)), is(pair2Result));
+                             assertThat(routingResult.getResults().get("1"), is(pair2Result));
                            });
   }
 
   @Test
+  @Description("When configured with delayErrors='false' the first timeout causes strategy to throw a TimeoutException.")
   public void timeoutEager() throws Throwable {
     strategy = createStrategy(processingStrategy, 1, false, 10);
 
@@ -153,17 +160,18 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
   }
 
   @Test
+  @Description("Route timeouts can occur concurrently and are still collated into RoutingResult and thrown via the use of a CompositeRoutingException.")
   public void timeoutConcurrent() throws Throwable {
     setupConcurrentProcessingStrategy();
-    strategy = createStrategy(processingStrategy, 1, true, 10);
+    strategy = createStrategy(processingStrategy, 4, true, 10);
 
-    expectedException.expect(instanceOf(MessagingException.class));
-    expectedException.expectCause(instanceOf(CompositeRoutingException.class));
+    expectedException.expect(instanceOf(CompositeRoutingException.class));
     invokeStrategyBlocking(strategy, testEvent(), createRoutingPairs(10, 20),
                            throwable -> assertCompositeRoutingException(throwable, 10));
   }
 
   @Test
+  @Description("When executed sequentially the timeout is implemented per-route.")
   public void timeoutSequential() throws Throwable {
     strategy = createStrategy(processingStrategy, 1, true, 110);
 
@@ -171,21 +179,22 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
   }
 
   @Test
+  @Description("Errors are thrown via CompositeRoutingException with RoutingResult containing details of failures.")
   public void error() throws Throwable {
     RuntimeException exception = new IllegalStateException();
     RoutingPair failingPair = of(testEvent(), createFailingRoutingPair(exception));
 
-    expectedException.expect(instanceOf(MessagingException.class));
-    expectedException.expectCause(instanceOf(CompositeRoutingException.class));
+    expectedException.expect(instanceOf(CompositeRoutingException.class));
 
     invokeStrategyBlocking(strategy, testEvent(), asList(failingPair), throwable -> {
       CompositeRoutingException compositeRoutingException = assertCompositeRoutingException(throwable, 1);
       RoutingResult routingResult = assertRoutingResult(compositeRoutingException, 0, 1);
-      assertThat(routingResult.getFailures().get(Integer.toString(0)).getCause(), is(exception));
+      assertThat(routingResult.getFailures().get("0").getCause(), is(exception));
     });
   }
 
   @Test
+  @Description("When an error occurs all routes are executed regardless and a CompositeRoutingException is thrown containing a RoutingResult with details of both failures and successes.")
   public void errorDelayed() throws Throwable {
     Processor processorSpy = createProcessorSpy(testEvent().getMessage());
 
@@ -197,22 +206,21 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
     RoutingPair failingPair3 = of(testEvent(), createFailingRoutingPair(exception3));
     RoutingPair okPair = of(testEvent(), createChain(processorSpy));
 
-    expectedException.expect(instanceOf(MessagingException.class));
-    expectedException.expectCause(instanceOf(CompositeRoutingException.class));
+    expectedException.expect(instanceOf(CompositeRoutingException.class));
 
     invokeStrategyBlocking(strategy, testEvent(), asList(failingPair1, failingPair2, failingPair3, okPair), throwable -> {
       verify(processorSpy, times(1)).process(any(Event.class));
       CompositeRoutingException compositeRoutingException = assertCompositeRoutingException(throwable, 3);
       RoutingResult routingResult = assertRoutingResult(compositeRoutingException, 1, 3);
-      assertThat(routingResult.getFailures().get(Integer.toString(0)).getCause(), is(exception1));
-      assertThat(routingResult.getFailures().get(Integer.toString(1)).getCause(), is(exception2));
-      assertThat(routingResult.getFailures().get(Integer.toString(2)).getCause(), is(exception3));
-      assertThat(routingResult.getFailures().get(Integer.toString(3)), is(nullValue()));
+      assertThat(routingResult.getFailures().get("0").getCause(), is(exception1));
+      assertThat(routingResult.getFailures().get("1").getCause(), is(exception2));
+      assertThat(routingResult.getFailures().get("2").getCause(), is(exception3));
+      assertThat(routingResult.getFailures().get("3"), is(nullValue()));
     });
-
   }
 
   @Test
+  @Description("When configured with delayErrors='false' the first errors causes strategy to throw this exception.")
   public void errorEager() throws Throwable {
     strategy = createStrategy(processingStrategy, 2, false, MAX_VALUE);
 
@@ -230,6 +238,7 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
   }
 
   @Test
+  @Description("When configured with delayErrors='false' the first errors causes strategy to throw this exception. Other routes may or may not be executed depending on concurrency.")
   public void errorEagerConcurrent() throws Throwable {
     setupConcurrentProcessingStrategy();
     strategy = createStrategy(processingStrategy, 4, false, MAX_VALUE);
@@ -256,6 +265,7 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
   }
 
   @Test
+  @Description("After successful completion of all routes the variables from each route are merged into the result event using a last-wins policy.")
   public void flowVarsMerged() throws Throwable {
     String beforeVarName = "before";
     String fooVarName = "foo";
@@ -273,6 +283,7 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
   }
 
   @Test
+  @Description("When the strategy uses a processing strategy that supports concurrent execution the total processing time is less that sequential processing.")
   public void concurrent() throws Throwable {
     setupConcurrentProcessingStrategy();
     strategy = createStrategy(processingStrategy, Integer.MAX_VALUE, true, MAX_VALUE);
@@ -288,6 +299,7 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
   }
 
   @Test
+  @Description("When executing concurrently the strategy will throw a RejectedExceptionException if the scheduler being used throws a RejectedExceptionException.")
   public void concurrentRejectedExecution() throws Throwable {
     when(scheduler.submit(any(Runnable.class))).thenThrow(new RejectedExecutionException());
     setupConcurrentProcessingStrategy();
@@ -298,6 +310,7 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
   }
 
   @Test
+  @Description("When concurrency is limited to '1' routes execute sequentially and the total processing time is the sum of processing each route, regardless of if the processing strategy supports concurrency.")
   public void sequential() throws Throwable {
     setupConcurrentProcessingStrategy();
     strategy = createStrategy(processingStrategy, 1, true, MAX_VALUE);
@@ -320,7 +333,8 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
   }
 
   private CompositeRoutingException assertCompositeRoutingException(Throwable throwable, int errors) {
-    CompositeRoutingException compositeRoutingException = (CompositeRoutingException) throwable.getCause();
+    assertThat(throwable, instanceOf(CompositeRoutingException.class));
+    CompositeRoutingException compositeRoutingException = (CompositeRoutingException) throwable;
     assertThat(compositeRoutingException.getErrors().size(), is(errors));
     return compositeRoutingException;
   }

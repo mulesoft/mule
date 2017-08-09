@@ -77,7 +77,7 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
           .collectList()
           .doOnNext(checkedConsumer(list -> {
             if (list.stream().anyMatch(event -> event.getError().isPresent())) {
-              throw new MessagingException(original, createCompositeRoutingException(list));
+              throw createCompositeRoutingException(list);
             }
           }))
           .doOnNext(copyVars(resultBuilder))

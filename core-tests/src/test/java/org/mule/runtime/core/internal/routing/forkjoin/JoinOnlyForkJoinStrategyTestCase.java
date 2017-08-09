@@ -13,7 +13,9 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.test.allure.AllureConstants.ForkJoinStrategiesFeature.ForkJoinStrategiesStory.JOIN_ONLY;
 
+import io.qameta.allure.Story;
 import org.junit.Test;
 
 import org.mule.runtime.core.api.Event;
@@ -22,7 +24,9 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.routing.ForkJoinStrategy;
 import org.mule.runtime.core.api.routing.ForkJoinStrategy.RoutingPair;
 
+import io.qameta.allure.Description;
 
+@Story(JOIN_ONLY)
 public class JoinOnlyForkJoinStrategyTestCase extends AbstractForkJoinStrategyTestCase {
 
   @Override
@@ -34,6 +38,7 @@ public class JoinOnlyForkJoinStrategyTestCase extends AbstractForkJoinStrategyTe
   }
 
   @Test
+  @Description("This strategy waits for all routes to return and then returns the original event.")
   public void joinOnly() throws Throwable {
 
     Event original = testEvent();

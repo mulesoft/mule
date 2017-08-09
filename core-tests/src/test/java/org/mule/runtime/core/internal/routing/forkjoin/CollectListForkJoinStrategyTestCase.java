@@ -12,6 +12,7 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.test.allure.AllureConstants.ForkJoinStrategiesFeature.ForkJoinStrategiesStory.COLLECT_LIST;
 
 import java.util.List;
 
@@ -23,6 +24,10 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.routing.ForkJoinStrategy;
 import org.mule.runtime.core.api.routing.ForkJoinStrategy.RoutingPair;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Story;
+
+@Story(COLLECT_LIST)
 public class CollectListForkJoinStrategyTestCase extends AbstractForkJoinStrategyTestCase {
 
   @Override
@@ -34,6 +39,7 @@ public class CollectListForkJoinStrategyTestCase extends AbstractForkJoinStrateg
   }
 
   @Test
+  @Description("This strategy waits for all routes to return and then collects results into a list.")
   public void collectList() throws Throwable {
 
     Event original = testEvent();

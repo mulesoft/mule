@@ -12,9 +12,11 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.test.allure.AllureConstants.ForkJoinStrategiesFeature.ForkJoinStrategiesStory.COLLECT_MAP;
 
 import java.util.Map;
 
+import io.qameta.allure.Story;
 import org.junit.Test;
 
 import org.mule.runtime.api.message.Message;
@@ -23,7 +25,9 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.routing.ForkJoinStrategy;
 import org.mule.runtime.core.api.routing.ForkJoinStrategy.RoutingPair;
 
+import io.qameta.allure.Description;
 
+@Story(COLLECT_MAP)
 public class CollectMapForkJoinStrategyTestCase extends AbstractForkJoinStrategyTestCase {
 
 
@@ -36,6 +40,7 @@ public class CollectMapForkJoinStrategyTestCase extends AbstractForkJoinStrategy
   }
 
   @Test
+  @Description("This strategy waits for all routes to return and then collects results into a map where the key of each entry is the string representation of the index of the routing pair.")
   public void collectMap() throws Throwable {
 
     Event original = testEvent();
