@@ -6,6 +6,7 @@
  */
 package org.mule.functional.api.component;
 
+import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.junit.Assert.fail;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.RECEIVE_TIMEOUT;
@@ -77,14 +78,18 @@ public class AssertionMessageProcessor extends AbstractAnnotatedObject implement
   @Override
   public void verify() throws InterruptedException {
     if (countFailOrNullEvent()) {
-      fail(failureMessagePrefix() + "No message received or if count attribute was " + "set then it was no matched.");
+      if (needToMatchCount) {
+        fail(format("%sExpected count of %d but got %d.", failureMessagePrefix(), count, invocationCount));
+      } else {
+        fail(format("%sNo event was received.", failureMessagePrefix(), count));
+      }
     } else if (expressionFailed()) {
       fail(failureMessagePrefix() + "Expression " + expression + " evaluated false.");
     }
   }
 
   protected String failureMessagePrefix() {
-    String processorPath = "?";
+    String processorPath = this.getLocation().getLocation();
     return "Flow assertion '" + message + "' failed @ '" + processorPath + "'. ";
   }
 
@@ -113,8 +118,10 @@ public class AssertionMessageProcessor extends AbstractAnnotatedObject implement
   }
 
   /**
-   * The semantics of the count are as follows: - count was set & count processes were done => ok - count was set & count
-   * processes were not done => fail - count was not set & at least one processing were done => ok
+   * The semantics of the count are as follows:
+   * - count was set & count processes were done => ok
+   * - count was set & count processes were not done => fail
+   * - count was not set & at least one processing were done => ok
    * 
    * @return
    * @throws InterruptedException
