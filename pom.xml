@@ -221,7 +221,6 @@
         <mulePolicyApiVersion>1.0.0-rc.cyborg-SNAPSHOT</mulePolicyApiVersion>
         <muleApiVersion>1.0.0-rc.cyborg-SNAPSHOT</muleApiVersion>
         <muleMetadataModelVersion>1.0.0-rc.cyborg-SNAPSHOT</muleMetadataModelVersion>
-        <metadataModelApiVersion>1.0.0-SNAPSHOT</metadataModelApiVersion>
         <metadataModelApiVersion>${muleMetadataModelVersion}</metadataModelApiVersion>
 
         <muleSpringModuleTestVersion>1.0.0-SNAPSHOT</muleSpringModuleTestVersion>
