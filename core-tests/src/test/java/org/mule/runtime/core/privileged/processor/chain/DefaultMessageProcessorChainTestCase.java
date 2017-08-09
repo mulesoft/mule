@@ -56,20 +56,20 @@ import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.strategy.DirectProcessingStrategyFactory;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.util.ObjectUtils;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.processor.ResponseMessageProcessorAdapter;
 import org.mule.runtime.core.internal.processor.strategy.BlockingProcessingStrategyFactory;
-import org.mule.runtime.core.api.processor.strategy.DirectProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.ProactorStreamProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.ReactorProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.TransactionAwareWorkQueueProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.WorkQueueProcessingStrategyFactory;
-import org.mule.runtime.core.privileged.processor.AbstractInterceptingMessageProcessor;
 import org.mule.runtime.core.internal.routing.ChoiceRouter;
 import org.mule.runtime.core.internal.routing.ScatterGatherRouter;
+import org.mule.runtime.core.privileged.processor.AbstractInterceptingMessageProcessor;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -1001,6 +1001,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     when(event.getError()).thenReturn(empty());
     when(event.getContext()).thenReturn(eventContext);
     when(event.getContext()).thenReturn(eventContext);
+    when(event.getAuthentication()).thenReturn(empty());
     return event;
   }
 

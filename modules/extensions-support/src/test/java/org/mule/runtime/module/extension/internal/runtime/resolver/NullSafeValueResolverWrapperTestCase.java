@@ -47,6 +47,7 @@ public class NullSafeValueResolverWrapperTestCase extends AbstractMuleContextTes
   public void setUp() {
     when(event.getFlowCallStack().clone()).thenReturn(mock(FlowCallStack.class));
     when(event.getError()).thenReturn(java.util.Optional.empty());
+    when(event.getAuthentication()).thenReturn(java.util.Optional.empty());
     when(event.getMessage()).thenReturn(of(null));
   }
 
