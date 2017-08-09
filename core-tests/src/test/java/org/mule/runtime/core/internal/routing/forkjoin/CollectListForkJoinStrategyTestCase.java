@@ -12,10 +12,10 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.api.Event.builder;
-import static org.mule.runtime.core.api.routing.ForkJoinStrategy.RoutingPair.of;
-import static reactor.core.publisher.Flux.fromIterable;
-import static reactor.core.publisher.Mono.from;
+
+import java.util.List;
+
+import org.junit.Test;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
@@ -23,16 +23,13 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.routing.ForkJoinStrategy;
 import org.mule.runtime.core.api.routing.ForkJoinStrategy.RoutingPair;
 
-import java.util.List;
-
-import org.junit.Test;
-
 public class CollectListForkJoinStrategyTestCase extends AbstractForkJoinStrategyTestCase {
 
   @Override
   protected ForkJoinStrategy createStrategy(ProcessingStrategy processingStrategy, int concurrency, boolean delayErrors,
                                             long timeout) {
     return new CollectListForkJoinStrategyFactory().createForkJoinStrategy(processingStrategy, concurrency, delayErrors, timeout,
+                                                                           scheduler,
                                                                            timeoutErrorType);
   }
 
@@ -40,13 +37,13 @@ public class CollectListForkJoinStrategyTestCase extends AbstractForkJoinStrateg
   public void collectList() throws Throwable {
 
     Event original = testEvent();
-    Message route1Result = of("1");
-    Message route2Result = of("2");
-    Message route3Result = of("3");
+    Message route1Result = of(1);
+    Message route2Result = of(2);
+    Message route3Result = of(3);
 
-    RoutingPair pair1 = of(testEvent(), createChain(event -> builder(event).message(route1Result).build()));
-    RoutingPair pair2 = of(testEvent(), createChain(event -> builder(event).message(route2Result).build()));
-    RoutingPair pair3 = of(testEvent(), createChain(event -> builder(event).message(route3Result).build()));
+    RoutingPair pair1 = createRoutingPair(route1Result);
+    RoutingPair pair2 = createRoutingPair(route2Result);
+    RoutingPair pair3 = createRoutingPair(route3Result);
 
     Event result = invokeStrategyBlocking(strategy, original, asList(pair1, pair2, pair3));
 

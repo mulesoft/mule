@@ -266,9 +266,9 @@ public class DefaultMuleContext implements MuleContext {
       }
     });
 
-    // Log dropped events/errors rather than blow up which causes cryptic timeouts and stack traces.
-    Hooks.onErrorDropped(error -> logger.error("ERROR DROPPED UNEXPECTEDLY " + error));
-    Hooks.onNextDropped(event -> logger.error("EVENT DROPPED UNEXPECTEDLY " + event));
+    // Log dropped events/errors
+    Hooks.onErrorDropped(error -> logger.debug("ERROR DROPPED " + error));
+    Hooks.onNextDropped(event -> logger.debug("EVENT DROPPED " + event));
   }
 
   public DefaultMuleContext() {
@@ -302,7 +302,7 @@ public class DefaultMuleContext implements MuleContext {
 
       getNotificationManager().initialise();
 
-      //refresh object serializer reference in case a default one was redefined in the config.
+      // refresh object serializer reference in case a default one was redefined in the config.
       objectSerializer = registryBroker.get(DEFAULT_OBJECT_SERIALIZER_NAME);
     } catch (InitialisationException e) {
       dispose();

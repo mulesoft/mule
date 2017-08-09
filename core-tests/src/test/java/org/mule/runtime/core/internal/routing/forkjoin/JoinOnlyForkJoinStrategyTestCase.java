@@ -12,17 +12,15 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mule.runtime.core.api.routing.ForkJoinStrategy.RoutingPair.of;
-import static reactor.core.publisher.Flux.fromIterable;
-import static reactor.core.publisher.Mono.from;
+import static org.mule.runtime.api.message.Message.of;
+
+import org.junit.Test;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.routing.ForkJoinStrategy;
 import org.mule.runtime.core.api.routing.ForkJoinStrategy.RoutingPair;
-
-import org.junit.Test;
 
 
 public class JoinOnlyForkJoinStrategyTestCase extends AbstractForkJoinStrategyTestCase {
@@ -31,6 +29,7 @@ public class JoinOnlyForkJoinStrategyTestCase extends AbstractForkJoinStrategyTe
   protected ForkJoinStrategy createStrategy(ProcessingStrategy processingStrategy, int concurrency, boolean delayErrors,
                                             long timeout) {
     return new JoinOnlyForkJoinStrategyFactory().createForkJoinStrategy(processingStrategy, concurrency, delayErrors, timeout,
+                                                                        scheduler,
                                                                         timeoutErrorType);
   }
 
@@ -39,13 +38,14 @@ public class JoinOnlyForkJoinStrategyTestCase extends AbstractForkJoinStrategyTe
 
     Event original = testEvent();
 
-    Processor processor1 = createEchoProcessorSpy();
-    Processor processor2 = createEchoProcessorSpy();
-    Processor processor3 = createEchoProcessorSpy();
+    Processor processor1 = createProcessorSpy(of(1));
+    Processor processor2 = createProcessorSpy(of(2));
+    Processor processor3 = createProcessorSpy(of(3));
 
-    RoutingPair pair1 = of(testEvent(), createChain(processor1));
-    RoutingPair pair2 = of(testEvent(), createChain(processor2));
-    RoutingPair pair3 = of(testEvent(), createChain(processor3));
+    RoutingPair pair1 = createRoutingPair(processor1);
+    RoutingPair pair2 = createRoutingPair(processor2);
+    RoutingPair pair3 = createRoutingPair(processor3);
+
 
     Event result = invokeStrategyBlocking(strategy, original, asList(pair1, pair2, pair3));
 

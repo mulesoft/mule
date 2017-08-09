@@ -73,8 +73,7 @@ public class CompositeRoutingException extends MuleException implements Composed
     StringBuilder builder = new StringBuilder();
     for (Entry<String, Error> routeResult : routingResult.getFailures().entrySet()) {
       Throwable routeException = routeResult.getValue().getCause();
-      builder.append(lineSeparator() + "\t").append(routeResult.getKey()).append(": ")
-          .append(routeException.getCause() != null ? routeException.getCause().getMessage() : routeException.getMessage());
+      builder.append(lineSeparator() + "\t").append(routeResult.getKey()).append(": ").append(routeException);
     }
 
     builder.insert(0, MESSAGE_TITLE);

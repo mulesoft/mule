@@ -26,7 +26,7 @@ import java.util.function.Function;
  * </ul>
  */
 public class CollectListForkJoinStrategyFactory extends AbstractForkJoinStrategyFactory {
-  
+
   @Override
   protected Function<List<Event>, Event> createResultEvent(Event original, Event.Builder resultBuilder) {
     return list -> resultBuilder.message(of(list.stream().map(event -> event.getMessage()).collect(toList()))).build();

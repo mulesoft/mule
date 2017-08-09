@@ -74,7 +74,7 @@ public class ReactorProcessingStrategyFactory extends AbstractProcessingStrategy
 
     @Override
     public ReactiveProcessor onPipeline(ReactiveProcessor pipeline) {
-      return publisher -> from(publisher).publishOn(fromExecutorService(decorateScheduler(cpuLightScheduler)))
+      return publisher -> from(publisher).subscribeOn(fromExecutorService(decorateScheduler(cpuLightScheduler)))
           .transform(pipeline);
     }
 

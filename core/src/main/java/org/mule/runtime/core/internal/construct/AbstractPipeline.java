@@ -114,8 +114,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
   /**
    * A fallback method for creating a {@link ProcessingStrategyFactory} to be used in case the user hasn't specified one through
-   * either , through {@link MuleConfiguration#getDefaultProcessingStrategyFactory()} or the
-   * {@link ProcessingStrategyFactory} class name system property
+   * either , through {@link MuleConfiguration#getDefaultProcessingStrategyFactory()} or the {@link ProcessingStrategyFactory}
+   * class name system property
    *
    * @return a {@link DirectProcessingStrategyFactory}
    */
@@ -201,14 +201,14 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     injectFlowConstructMuleContext(pipeline);
     initialiseIfInitialisable(source);
     initialiseIfInitialisable(pipeline);
-
   }
 
   protected ReactiveProcessor processFlowFunction() {
     return stream -> from(stream)
         .transform(processingStrategy.onPipeline(pipeline))
         .doOnNext(response -> response.getContext().success(response))
-        .doOnError(throwable -> LOGGER.error("Unhandled exception in Flow ", throwable));
+        .doOnError(throwable -> !(throwable instanceof RejectedExecutionException),
+                   throwable -> LOGGER.error("Unhandled exception in Flow ", throwable));
   }
 
   protected void configureMessageProcessors(MessageProcessorChainBuilder builder) throws MuleException {

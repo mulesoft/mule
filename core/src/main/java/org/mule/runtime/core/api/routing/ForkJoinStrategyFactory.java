@@ -8,21 +8,25 @@
 package org.mule.runtime.core.api.routing;
 
 import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.internal.routing.CompositeRoutingException;
 
 
 public interface ForkJoinStrategyFactory {
 
   /**
+   * Create instance of {@link ForkJoinStrategy}
    *
-   * @param processingStrategy
-   * @param maxConcurrency
-   * @param delayErrors
-   * @param timeoutErrorType
-   * @return
+   * @param processingStrategy processing strategy to use
+   * @param maxConcurrency maximum number of routes/parts to be processed in parallel.
+   * @param delayErrors if all routers/parts should be processed regardless of errors and a {@link CompositeRoutingException}
+   *        thrown or not.
+   * @param timeoutErrorType the timeout error type.
+   * @return new instance of {@link ForkJoinStrategy}
    */
   ForkJoinStrategy createForkJoinStrategy(ProcessingStrategy processingStrategy, int maxConcurrency, boolean delayErrors,
-                                          long timeout,
+                                          long timeout, Scheduler timeoutScheduler,
                                           ErrorType timeoutErrorType);
 
 }

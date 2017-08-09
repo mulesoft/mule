@@ -205,7 +205,7 @@ public abstract class Errors {
     public static final ComponentIdentifier OVERLOAD =
         builder().namespace(CORE_NAMESPACE_NAME).name(OVERLOAD_ERROR_IDENTIFIER).build();
     public static final ComponentIdentifier TIMEOUT =
-            builder().namespace(CORE_NAMESPACE_NAME).name(TIMEOUT_ERROR_IDENTIFIER).build();
+        builder().namespace(CORE_NAMESPACE_NAME).name(TIMEOUT_ERROR_IDENTIFIER).build();
 
 
     public static final ComponentIdentifier SOURCE =

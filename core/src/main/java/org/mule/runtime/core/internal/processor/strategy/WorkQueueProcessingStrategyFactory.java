@@ -61,7 +61,7 @@ public class WorkQueueProcessingStrategyFactory extends AbstractProcessingStrate
 
     @Override
     public ReactiveProcessor onPipeline(ReactiveProcessor pipeline) {
-      return publisher -> from(publisher).publishOn(fromExecutorService(decorateScheduler(ioScheduler))).transform(pipeline);
+      return publisher -> from(publisher).subscribeOn(fromExecutorService(decorateScheduler(ioScheduler))).transform(pipeline);
     }
 
     @Override

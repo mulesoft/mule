@@ -8,16 +8,18 @@ package org.mule.runtime.core.internal.routing.forkjoin;
 
 
 import static java.lang.Integer.MAX_VALUE;
+import static java.lang.System.currentTimeMillis;
 import static java.lang.Thread.sleep;
 import static java.util.Arrays.asList;
-import static java.util.concurrent.Executors.newCachedThreadPool;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.lessThan;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.atMost;
@@ -27,6 +29,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.Event.builder;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.TIMEOUT;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
@@ -35,6 +38,17 @@ import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException
 import static reactor.core.publisher.Flux.fromIterable;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
+
+import java.util.List;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.TimeoutException;
+import java.util.function.Function;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.ErrorType;
@@ -55,17 +69,6 @@ import org.mule.runtime.core.internal.routing.CompositeRoutingException;
 import org.mule.runtime.core.internal.routing.RoutingResult;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeoutException;
-import java.util.function.Function;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-
 
 public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleContextTestCase {
 
@@ -74,27 +77,24 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
 
   protected ForkJoinStrategy strategy;
   protected ProcessingStrategy processingStrategy;
-  private Scheduler ioScheduler;
-  private Flow flow;
+  protected Scheduler scheduler;
   protected ErrorType timeoutErrorType;
+  private Flow flow;
 
   @Before
   public void setup() {
     processingStrategy = mock(ProcessingStrategy.class);
-
-    Function<ReactiveProcessor, ReactiveProcessor> scheduleFunction =
-        processor -> publisher -> from(publisher).publishOn(fromExecutorService(ioScheduler)).transform(processor);
     when(processingStrategy.onPipeline(any(ReactiveProcessor.class)))
-        .thenAnswer(invocation -> scheduleFunction.apply(invocation.getArgumentAt(0, ReactiveProcessor.class)));
-    ioScheduler = muleContext.getSchedulerService().ioScheduler();
+        .thenAnswer(invocation -> invocation.getArgumentAt(0, ReactiveProcessor.class));
+    scheduler = muleContext.getSchedulerService().ioScheduler();
     flow = mock(Flow.class);
     timeoutErrorType = muleContext.getErrorTypeRepository().getErrorType(TIMEOUT).get();
     strategy = createStrategy(processingStrategy, Integer.MAX_VALUE, true, MAX_VALUE);
   }
 
   @After
-  public void tearown() {
-    ioScheduler.stop();
+  public void teardown() {
+    scheduler.stop();
   }
 
   protected abstract ForkJoinStrategy createStrategy(ProcessingStrategy processingStrategy, int concurrency, boolean delayErrors,
@@ -102,59 +102,73 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
 
   @Test
   public void timeout() throws Throwable {
-    Event original = testEvent();
-
-    RoutingPair timeoutPair = createSleepingRoutingPair(Message.of("1"), 100);
+    strategy = createStrategy(processingStrategy, 2, true, 10);
 
     expectedException.expect(instanceOf(MessagingException.class));
     expectedException.expectCause(instanceOf(CompositeRoutingException.class));
 
-    invokeStrategyBlocking(createStrategy(processingStrategy, 2, true, 50), original, asList(timeoutPair),
-                           throwable -> {
-                             CompositeRoutingException compositeRoutingException = assertCompositeRoutingException(throwable, 1);
-                             RoutingResult routingResult = assertRoutingResult(compositeRoutingException, 0, 1);
-                             assertThat(routingResult.getFailures().get(Integer.toString(0)).getCause(),
-                                        instanceOf(TimeoutException.class));
-                           });
+    invokeStrategyBlocking(strategy, testEvent(), asList(createRoutingPairWithSleep(of(1), 20)), throwable -> {
+      CompositeRoutingException compositeRoutingException = assertCompositeRoutingException(throwable, 1);
+      RoutingResult routingResult = assertRoutingResult(compositeRoutingException, 0, 1);
+      assertThat(routingResult.getFailures().get(Integer.toString(0)).getCause(), instanceOf(TimeoutException.class));
+    });
   }
 
   @Test
   public void timeoutDelayed() throws Throwable {
-    Event original = testEvent();
-    Message route1Result = Message.of("1");
-    Message route2Result = Message.of("2");
+    strategy = createStrategy(processingStrategy, 2, true, 10);
 
-    RoutingPair timeoutPair = createSleepingRoutingPair(route1Result, 100);
-    RoutingPair otherPair = of(testEvent(), createChain(event -> Event.builder(event).message(route2Result).build()));
+    Message pair2Result = of(2);
+    Processor pair2Processor = createProcessorSpy(pair2Result);
+    RoutingPair pair2 = of(testEvent(), createChain(pair2Processor));
 
     expectedException.expect(instanceOf(MessagingException.class));
     expectedException.expectCause(instanceOf(CompositeRoutingException.class));
 
-    invokeStrategyBlocking(createStrategy(processingStrategy, 2, true, 50), original, asList(timeoutPair, otherPair),
+    invokeStrategyBlocking(strategy, testEvent(), asList(createRoutingPairWithSleep(of(1), 20), pair2),
                            throwable -> {
+                             verify(pair2Processor, times(1)).process(any(Event.class));
                              CompositeRoutingException compositeRoutingException = assertCompositeRoutingException(throwable, 1);
                              RoutingResult routingResult = assertRoutingResult(compositeRoutingException, 1, 1);
                              assertThat(routingResult.getFailures().get(Integer.toString(0)).getCause(),
                                         instanceOf(TimeoutException.class));
-                             assertThat(routingResult.getResults().get(Integer.toString(1)), is(route2Result));
+                             assertThat(routingResult.getResults().get(Integer.toString(1)), is(pair2Result));
                            });
   }
 
   @Test
   public void timeoutEager() throws Throwable {
-    Event original = testEvent();
-    Message route1Result = Message.of("1");
-    Message route2Result = Message.of("2");
+    strategy = createStrategy(processingStrategy, 1, false, 10);
 
-    RoutingPair timeoutPair = createSleepingRoutingPair(route1Result, 100);
-    RoutingPair otherPair = of(testEvent(), createChain(event -> Event.builder(event).message(route2Result).build()));
+    Message pair2Result = of(2);
+    Processor pair2Processor = createProcessorSpy(pair2Result);
+    RoutingPair pair2 = of(testEvent(), createChain(pair2Processor));
 
     expectedException.expect(instanceOf(DefaultMuleException.class));
     expectedException.expectCause(instanceOf(TimeoutException.class));
 
-    invokeStrategyBlocking(createStrategy(processingStrategy, 2, false, 50), original, asList(timeoutPair, otherPair));
+    invokeStrategyBlocking(strategy, testEvent(),
+                           asList(createRoutingPairWithSleep(of(1), 20), pair2),
+                           throwable -> verify(pair2Processor, never()).process(any(Event.class)));
   }
 
+  @Test
+  public void timeoutConcurrent() throws Throwable {
+    setupConcurrentProcessingStrategy();
+    strategy = createStrategy(processingStrategy, 1, true, 10);
+
+    expectedException.expect(instanceOf(MessagingException.class));
+    expectedException.expectCause(instanceOf(CompositeRoutingException.class));
+    invokeStrategyBlocking(strategy, testEvent(), createRoutingPairs(10, 20),
+                           throwable -> assertCompositeRoutingException(throwable, 10));
+  }
+
+  @Test
+  public void timeoutSequential() throws Throwable {
+    strategy = createStrategy(processingStrategy, 1, true, 110);
+
+    invokeStrategyBlocking(strategy, testEvent(), createRoutingPairs(5, 100));
+  }
 
   @Test
   public void error() throws Throwable {
@@ -173,7 +187,7 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
 
   @Test
   public void errorDelayed() throws Throwable {
-    Processor processorSpy = createEchoProcessorSpy();
+    Processor processorSpy = createProcessorSpy(testEvent().getMessage());
 
     RuntimeException exception1 = new IllegalStateException();
     RoutingPair failingPair1 = of(testEvent(), createFailingRoutingPair(exception1));
@@ -200,7 +214,9 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
 
   @Test
   public void errorEager() throws Throwable {
-    Processor processorSpy = createEchoProcessorSpy();
+    strategy = createStrategy(processingStrategy, 2, false, MAX_VALUE);
+
+    Processor processorSpy = createProcessorSpy(of(1));
 
     RuntimeException exception = new IllegalStateException();
     RoutingPair failingPair = of(testEvent(), createFailingRoutingPair(exception));
@@ -209,15 +225,18 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
     expectedException.expect(instanceOf(MessagingException.class));
     expectedException.expectCause(is(exception));
 
-    invokeStrategyBlocking(createStrategy(processingStrategy, 2, false, MAX_VALUE), testEvent(), asList(failingPair, okPair),
+    invokeStrategyBlocking(strategy, testEvent(), asList(failingPair, okPair),
                            throwable -> verify(processorSpy, never()).process(any(Event.class)));
   }
 
   @Test
   public void errorEagerConcurrent() throws Throwable {
-    Processor processorSpy = createEchoProcessorSpy();
-    Processor processorSpy2 = createEchoProcessorSpy();
-    Processor processorSpy3 = createEchoProcessorSpy();
+    setupConcurrentProcessingStrategy();
+    strategy = createStrategy(processingStrategy, 4, false, MAX_VALUE);
+
+    Processor processorSpy = createProcessorSpy(of(1));
+    Processor processorSpy2 = createProcessorSpy(of(2));
+    Processor processorSpy3 = createProcessorSpy(of(3));
 
     Event orignial = testEvent();
     RuntimeException exception = new IllegalStateException();
@@ -229,12 +248,11 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
     expectedException.expect(instanceOf(MessagingException.class));
     expectedException.expectCause(is(exception));
 
-    invokeStrategyBlocking(createStrategy(processingStrategy, 4, false, MAX_VALUE), testEvent(),
-                           asList(failingPair, okPair, okPair2, okPair3), throwable -> {
-                             verify(processorSpy, atMost(1)).process(any(Event.class));
-                             verify(processorSpy2, atMost(1)).process(any(Event.class));
-                             verify(processorSpy3, atMost(1)).process(any(Event.class));
-                           });
+    invokeStrategyBlocking(strategy, testEvent(), asList(failingPair, okPair, okPair2, okPair3), throwable -> {
+      verify(processorSpy, atMost(1)).process(any(Event.class));
+      verify(processorSpy2, atMost(1)).process(any(Event.class));
+      verify(processorSpy3, atMost(1)).process(any(Event.class));
+    });
   }
 
   @Test
@@ -256,25 +274,49 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
 
   @Test
   public void concurrent() throws Throwable {
-    when(processingStrategy.onPipeline(any(ReactiveProcessor.class)))
-        .thenReturn(publisher -> from(publisher).publishOn(fromExecutorService(ioScheduler)));
+    setupConcurrentProcessingStrategy();
+    strategy = createStrategy(processingStrategy, Integer.MAX_VALUE, true, MAX_VALUE);
 
     int pairs = 10;
+    int processorSleep = 20;
+    final long before = currentTimeMillis();
+    invokeStrategyBlocking(strategy, testEvent(), createRoutingPairs(pairs, processorSleep));
 
-    invokeStrategyBlocking(createStrategy(processingStrategy, 2, true, MAX_VALUE), testEvent(), getRoutingPairs(pairs));
+    // Running with concurrently strategy must take < (pairs * sleep) to complete
+    assertThat(currentTimeMillis(), is(lessThan(before + (pairs * processorSleep))));
+    verify(scheduler, times(pairs)).submit(any(Runnable.class));
+  }
 
-    verify(ioScheduler, times(pairs)).submit(any(Runnable.class));
+  @Test
+  public void concurrentRejectedExecution() throws Throwable {
+    when(scheduler.submit(any(Runnable.class))).thenThrow(new RejectedExecutionException());
+    setupConcurrentProcessingStrategy();
+    strategy = createStrategy(processingStrategy, 4, true, MAX_VALUE);
+
+    expectedException.expect(instanceOf(RejectedExecutionException.class));
+    invokeStrategyBlocking(strategy, testEvent(), createRoutingPairs(1));
   }
 
   @Test
   public void sequential() throws Throwable {
-    ExecutorService executorService = spy(newCachedThreadPool());
+    setupConcurrentProcessingStrategy();
+    strategy = createStrategy(processingStrategy, 1, true, MAX_VALUE);
+
+    int pairs = 10;
+    int processorSleep = 20;
+    final long before = currentTimeMillis();
+    invokeStrategyBlocking(strategy, testEvent(), createRoutingPairs(pairs, processorSleep));
+
+    // Running sequentially strategy must take >= (pairs * sleep) to complete
+    assertThat(currentTimeMillis(), is(greaterThanOrEqualTo(before + pairs * processorSleep)));
+    verify(scheduler, never()).submit(any(Runnable.class));
+  }
+
+  private void setupConcurrentProcessingStrategy() {
+    Function<ReactiveProcessor, ReactiveProcessor> scheduleFunction =
+        processor -> publisher -> from(publisher).publishOn(fromExecutorService(scheduler)).transform(processor);
     when(processingStrategy.onPipeline(any(ReactiveProcessor.class)))
-        .thenReturn(publisher -> from(publisher).publishOn(fromExecutorService(executorService)));
-
-    invokeStrategyBlocking(createStrategy(processingStrategy, 1, true, MAX_VALUE), testEvent(), getRoutingPairs(10));
-
-    verify(executorService, never()).submit(any(Runnable.class));
+        .thenAnswer(invocation -> scheduleFunction.apply(invocation.getArgumentAt(0, ReactiveProcessor.class)));
   }
 
   private CompositeRoutingException assertCompositeRoutingException(Throwable throwable, int errors) {
@@ -306,19 +348,7 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
       throwable = rxExceptionToMuleException(throwable);
       verifyOnError.accept(throwable);
       throw throwable;
-    } finally {
-
     }
-  }
-
-  private List<RoutingPair> getRoutingPairs(int number) {
-    return range(0, number).mapToObj(i -> {
-      try {
-        return of(testEvent(), createChain(event -> event));
-      } catch (MuleException e) {
-        throw new RuntimeException(e);
-      }
-    }).collect(toList());
   }
 
   private MessageProcessorChain createFailingRoutingPair(RuntimeException exception) throws MuleException {
@@ -327,18 +357,26 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
     });
   }
 
-  protected Processor createEchoProcessorSpy() throws MuleException {
+  protected Processor createProcessorSpy(Message result) throws MuleException {
     // Mockito does not support lambda
     return spy(new Processor() {
 
       @Override
       public Event process(Event event) throws MuleException {
-        return event;
+        return Event.builder(event).message(result).build();
       }
     });
   }
 
-  private RoutingPair createSleepingRoutingPair(Message result, long sleep) throws MuleException {
+  protected RoutingPair createRoutingPair(Processor processor) throws MuleException {
+    return of(testEvent(), createChain(processor));
+  }
+
+  protected RoutingPair createRoutingPair(Message result) throws MuleException {
+    return createRoutingPairWithSleep(result, 0);
+  }
+
+  private RoutingPair createRoutingPairWithSleep(Message result, long sleep) throws MuleException {
     return of(testEvent(), createChain(event -> {
       try {
         sleep(sleep);
@@ -349,7 +387,21 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
     }));
   }
 
-  protected MessageProcessorChain createChain(Processor processor) throws MuleException {
+  private List<RoutingPair> createRoutingPairs(int number) {
+    return createRoutingPairs(number, 0);
+  }
+
+  private List<RoutingPair> createRoutingPairs(int number, int sleep) {
+    return range(0, number).mapToObj(i -> {
+      try {
+        return createRoutingPairWithSleep(of(1), sleep);
+      } catch (MuleException e) {
+        throw new RuntimeException(e);
+      }
+    }).collect(toList());
+  }
+
+  private MessageProcessorChain createChain(Processor processor) throws MuleException {
     MessageProcessorChain chain = newChain(processor);
     chain.setMuleContext(muleContext);
     chain.setFlowConstruct(flow);

@@ -31,6 +31,7 @@ import java.util.function.Function;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.message.ErrorBuilder;
@@ -44,6 +45,7 @@ import org.mule.runtime.core.internal.routing.CompositeRoutingException;
 import org.mule.runtime.core.internal.routing.RoutingResult;
 
 import org.reactivestreams.Publisher;
+import reactor.core.scheduler.Schedulers;
 
 /**
  * Abstract {@link org.mule.runtime.core.api.routing.ForkJoinStrategy} that provides the base behavior for strategies that will
@@ -62,14 +64,16 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
 
   @Override
   public ForkJoinStrategy createForkJoinStrategy(ProcessingStrategy processingStrategy, int maxConcurrency, boolean delayErrors,
-                                                 long timeout, ErrorType timeoutErrorType) {
+                                                 long timeout, Scheduler timeoutScheduler, ErrorType timeoutErrorType) {
+    reactor.core.scheduler.Scheduler reatorTimeoutScheduler = Schedulers.fromExecutorService(timeoutScheduler);
     return (original, routingPairs) -> {
       final AtomicInteger count = new AtomicInteger();
       final Event.Builder resultBuilder = Event.builder(original);
       return from(routingPairs)
           .map(addSequence(count))
-          .flatMapSequential(processRoutePair(processingStrategy, maxConcurrency, delayErrors, timeout, timeoutErrorType),
-                             maxConcurrency)
+          .flatMap(processRoutePair(processingStrategy, maxConcurrency, delayErrors, timeout, reatorTimeoutScheduler,
+                                    timeoutErrorType),
+                   maxConcurrency)
           .collectList()
           .doOnNext(checkedConsumer(list -> {
             if (list.stream().anyMatch(event -> event.getError().isPresent())) {
@@ -99,6 +103,7 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
   private Function<RoutingPair, Publisher<? extends Event>> processRoutePair(ProcessingStrategy processingStrategy,
                                                                              int maxConcurrency,
                                                                              boolean delayErrors, long timeout,
+                                                                             reactor.core.scheduler.Scheduler timeoutScheduler,
                                                                              ErrorType timeoutErrorType) {
 
     return pair -> {
@@ -107,7 +112,8 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
           .timeout(ofMillis(timeout),
                    defer(() -> delayErrors ? just(createTimeoutErrorEvent(timeoutErrorType, pair))
                        : error(new TimeoutException(TIMEOUT_EXCEPTION_DETAILED_DESCRIPTION_PREFIX + " '"
-                           + pair.getEvent().getGroupCorrelation().get().getSequence() + "'"))));
+                           + pair.getEvent().getGroupCorrelation().get().getSequence() + "'"))),
+                   timeoutScheduler);
       return from(processWithChildContext(pair.getEvent(),
                                           applyProcessingStrategy(processingStrategy, route, maxConcurrency), empty()))
                                               .onErrorResume(MessagingException.class,
