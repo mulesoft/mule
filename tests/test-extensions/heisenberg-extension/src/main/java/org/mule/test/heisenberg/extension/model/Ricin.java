@@ -6,10 +6,10 @@
  */
 package org.mule.test.heisenberg.extension.model;
 
-import org.mule.runtime.extension.api.annotation.dsl.xml.TypeXmlHints;
+import org.mule.runtime.extension.api.annotation.dsl.xml.TypeDsl;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
-@TypeXmlHints(allowTopLevelDefinition = true)
+@TypeDsl(allowTopLevelDefinition = true)
 public class Ricin implements Weapon {
 
   public static final String RICIN_KILL_MESSAGE = "You have been killed with Ricin";

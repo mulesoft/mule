@@ -9,7 +9,7 @@ package org.mule.test.subtypes.extension;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
-import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
+import org.mule.runtime.extension.api.annotation.dsl.xml.ParameterDsl;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -41,11 +41,11 @@ public class SubTypesTestOperations {
   public List<Object> subtypedAndConcreteParameters(@Optional ParentShape baseShape, @Optional Door door,
                                                     @Optional FinalPojo finalPojo, @Optional VeganCookBook cookBook,
                                                     @Optional ParentShape squareShape, @Optional ParentShape triangle,
-                                                    @Optional @XmlHints(allowReferences = false) NoReferencePojo noRef) {
+                                                    @Optional @ParameterDsl(allowReferences = false) NoReferencePojo noRef) {
     return asList(baseShape, door, finalPojo, cookBook, squareShape, triangle, noRef);
   }
 
-  public NoGlobalPojo noGlobalPojo(@XmlHints(allowInlineDefinition = false) NoGlobalPojo noGlobalPojo) {
+  public NoGlobalPojo noGlobalPojo(@ParameterDsl(allowInlineDefinition = false) NoGlobalPojo noGlobalPojo) {
     return noGlobalPojo;
   }
 

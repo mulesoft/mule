@@ -19,7 +19,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class XmlHintsFunctionalTestCase extends AbstractExtensionFunctionalTestCase {
+public class ParameterDslFunctionalTestCase extends AbstractExtensionFunctionalTestCase {
 
   private static final String MEAT = "Nice, juicy and tasty meat";
   @Rule

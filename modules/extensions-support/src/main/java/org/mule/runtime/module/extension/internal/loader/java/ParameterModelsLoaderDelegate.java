@@ -31,7 +31,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclarer;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.RestrictedTo;
-import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
+import org.mule.runtime.extension.api.annotation.dsl.xml.ParameterDsl;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.ConfigOverride;
@@ -335,7 +335,7 @@ public final class ParameterModelsLoaderDelegate {
   }
 
   private void parseXmlHints(ExtensionParameter extensionParameter, ParameterDeclarer parameter) {
-    extensionParameter.getAnnotation(XmlHints.class).ifPresent(
+    extensionParameter.getAnnotation(ParameterDsl.class).ifPresent(
                                                                hints -> parameter.withDsl(ParameterDslConfiguration.builder()
                                                                    .allowsInlineDefinition(hints.allowInlineDefinition())
                                                                    .allowsReferences(hints.allowReferences())

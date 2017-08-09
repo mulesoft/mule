@@ -6,10 +6,10 @@
  */
 package org.mule.test.substitutiongroup.extension;
 
-import org.mule.runtime.extension.api.annotation.dsl.xml.TypeXmlHints;
+import org.mule.runtime.extension.api.annotation.dsl.xml.TypeDsl;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
-@TypeXmlHints(substitutionGroup = "mule:abstract-shared-extension")
+@TypeDsl(substitutionGroup = "mule:abstract-shared-extension")
 public class MuleSGPojo {
 
   @Parameter

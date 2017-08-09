@@ -6,7 +6,7 @@
  */
 package org.mule.test.vegan.extension;
 
-import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
+import org.mule.runtime.extension.api.annotation.dsl.xml.ParameterDsl;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
@@ -20,8 +20,8 @@ import java.util.Map;
 
 public class VeganFidelityOperation {
 
-  public String tryEat(@XmlHints(allowReferences = false) Object food,
-                       @Optional @XmlHints(allowInlineDefinition = false) Map<String, Integer> menu) {
+  public String tryEat(@ParameterDsl(allowReferences = false) Object food,
+                       @Optional @ParameterDsl(allowInlineDefinition = false) Map<String, Integer> menu) {
     if (food instanceof Fruit) {
       return "tasty " + food.getClass().getSimpleName();
     }

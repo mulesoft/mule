@@ -32,8 +32,7 @@ import org.mule.runtime.api.meta.model.SubTypesModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.extension.api.declaration.type.TypeUtils;
-import org.mule.runtime.extension.api.declaration.type.annotation.BaseType;
-import org.mule.runtime.extension.api.declaration.type.annotation.SubstitutionGroup;
+import org.mule.runtime.extension.api.declaration.type.annotation.DslBaseType;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.model.parameter.ImmutableParameterModel;
@@ -292,7 +291,7 @@ final class ObjectTypeSchemaDelegate {
     if (baseDsl.isPresent()) {
       return new QName(baseDsl.get().getNamespace(), getBaseTypeName(baseType), baseDsl.get().getPrefix());
     }
-    Optional<BaseType> base = TypeUtils.getBaseType(type);
+    Optional<DslBaseType> base = TypeUtils.getBaseType(type);
     if (base.isPresent()) { //means that the baseType was defined by the user
       return new QName(builder.getNamespaceUri(base.get().getPrefix()), base.get().getType(), base.get().getPrefix());
     }
