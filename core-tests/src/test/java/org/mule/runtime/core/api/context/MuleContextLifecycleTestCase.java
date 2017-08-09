@@ -57,7 +57,7 @@ public class MuleContextLifecycleTestCase extends AbstractMuleTestCase {
   private MuleContextBuilder ctxBuilder;
   private SensingLifecycleManager lifecycleManager;
   private MuleContext ctx;
-  private NotificationListenerRegistry notificationRegistrer;
+  private NotificationListenerRegistry notificationListenerRegistry;
   @Rule
   public TestServicesConfigurationBuilder testServicesConfigurationBuilder = new TestServicesConfigurationBuilder();
 
@@ -68,8 +68,8 @@ public class MuleContextLifecycleTestCase extends AbstractMuleTestCase {
     ctxBuilder.setLifecycleManager(lifecycleManager);
     ctx = ctxBuilder.buildMuleContext();
 
-    notificationRegistrer = new DefaultNotificationListenerRegistry();
-    ctx.getRegistry().registerObject(OBJECT_NOTIFICATION_LISTENER_REGISTRY, notificationRegistrer);
+    notificationListenerRegistry = new DefaultNotificationListenerRegistry();
+    ctx.getRegistry().registerObject(OBJECT_NOTIFICATION_LISTENER_REGISTRY, notificationListenerRegistry);
     testServicesConfigurationBuilder.configure(ctx);
   }
 
@@ -154,7 +154,7 @@ public class MuleContextLifecycleTestCase extends AbstractMuleTestCase {
 
     new DefaultsConfigurationBuilder().configure(ctx);
     NotificationListener listener = new NotificationListener();
-    notificationRegistrer.registerListener(listener);
+    notificationListenerRegistry.registerListener(listener);
     ctx.start();
 
     assertTrue(ctx.isInitialised());
@@ -173,7 +173,7 @@ public class MuleContextLifecycleTestCase extends AbstractMuleTestCase {
 
     new DefaultsConfigurationBuilder().configure(ctx);
     NotificationListener listener = new NotificationListener();
-    notificationRegistrer.registerListener(listener);
+    notificationListenerRegistry.registerListener(listener);
     ctx.start();
 
     assertTrue("CONTEXT_STARTING notification never fired", listener.startingNotificationFired);
@@ -288,7 +288,7 @@ public class MuleContextLifecycleTestCase extends AbstractMuleTestCase {
     ctx.initialise();
     new DefaultsConfigurationBuilder().configure(ctx);
     final NotificationListener listener = new NotificationListener();
-    notificationRegistrer.registerListener(listener);
+    notificationListenerRegistry.registerListener(listener);
 
     ctx.start();
     ctx.dispose();
@@ -342,7 +342,7 @@ public class MuleContextLifecycleTestCase extends AbstractMuleTestCase {
           contextFromNotification.set(notification.getMuleContext());
           resourceId.set(notification.getResourceIdentifier());
         };
-    notificationRegistrer.registerListener(listener);
+    notificationListenerRegistry.registerListener(listener);
     ctx.start();
 
     assertNotNull(contextFromNotification.get());

@@ -24,17 +24,17 @@ public class PrimaryNodeLifecycleNotificationListener implements ClusterNodeNoti
 
   protected transient Logger logger = LoggerFactory.getLogger(getClass());
   private Startable startMeOnPrimaryNodeNotification;
-  private NotificationListenerRegistry notificationsRegister;
+  private NotificationListenerRegistry notificationListenerRegistry;
 
   public PrimaryNodeLifecycleNotificationListener(Startable startMeOnPrimaryNodeNotification,
-                                                  NotificationListenerRegistry notificationsRegister) {
+                                                  NotificationListenerRegistry notificationListenerRegistry) {
     this.startMeOnPrimaryNodeNotification = startMeOnPrimaryNodeNotification;
-    this.notificationsRegister = notificationsRegister;
+    this.notificationListenerRegistry = notificationListenerRegistry;
   }
 
   public void register() {
-    if (notificationsRegister != null) {
-      notificationsRegister.registerListener(this);
+    if (notificationListenerRegistry != null) {
+      notificationListenerRegistry.registerListener(this);
     }
   }
 
@@ -68,6 +68,6 @@ public class PrimaryNodeLifecycleNotificationListener implements ClusterNodeNoti
   }
 
   public void unregister() {
-    notificationsRegister.unregisterListener(this);
+    notificationListenerRegistry.unregisterListener(this);
   }
 }
