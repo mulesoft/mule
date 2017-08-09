@@ -217,7 +217,7 @@
         <muleHttpPolicyApiVersion>1.0.0-rc.cyborg</muleHttpPolicyApiVersion>
         <muleMavenClientApi>1.0.0-rc.cyborg</muleMavenClientApi>
         <muleMavenClientImpl>1.0.0-rc.cyborg</muleMavenClientImpl>
-        <muleMavenClientTest>1.0.0-SNAPSHOT</muleMavenClientTest>
+        <muleMavenClientTest>1.0.0-rc.cyborg-SNAPSHOT</muleMavenClientTest>
         <mulePolicyApiVersion>1.0.0-rc.cyborg</mulePolicyApiVersion>
         <muleApiVersion>1.0.0-rc.cyborg</muleApiVersion>
         <muleMetadataModelVersion>1.0.0-rc.cyborg</muleMetadataModelVersion>
@@ -236,12 +236,12 @@
         <muleSchedulerServiceTestVersion>1.0.0-SNAPSHOT</muleSchedulerServiceTestVersion>
 
         <!-- Test Extensions -->
-        <muleMetadataExtensionTestVersion>4.0.0-SNAPSHOT</muleMetadataExtensionTestVersion>
-        <muleVeganExtensionTestVersion>4.0.0-SNAPSHOT</muleVeganExtensionTestVersion>
-        <muleHeisenbergExtensionTestVersion>4.0.0-SNAPSHOT</muleHeisenbergExtensionTestVersion>
-        <muleMarvelExtensionTestVersion>4.0.0-SNAPSHOT</muleMarvelExtensionTestVersion>
-        <mulePetstoreExtensionTestVersion>4.0.0-SNAPSHOT</mulePetstoreExtensionTestVersion>
-        <muleSubtypesExtensionTestVersion>4.0.0-SNAPSHOT</muleSubtypesExtensionTestVersion>
+        <muleMetadataExtensionTestVersion>4.0.0-rc.cyborg-SNAPSHOT</muleMetadataExtensionTestVersion>
+        <muleVeganExtensionTestVersion>4.0.0-rc.cyborg-SNAPSHOT</muleVeganExtensionTestVersion>
+        <muleHeisenbergExtensionTestVersion>4.0.0-rc.cyborg-SNAPSHOT</muleHeisenbergExtensionTestVersion>
+        <muleMarvelExtensionTestVersion>4.0.0-rc.cyborg-SNAPSHOT</muleMarvelExtensionTestVersion>
+        <mulePetstoreExtensionTestVersion>4.0.0-rc.cyborg-SNAPSHOT</mulePetstoreExtensionTestVersion>
+        <muleSubtypesExtensionTestVersion>4.0.0-rc.cyborg-SNAPSHOT</muleSubtypesExtensionTestVersion>
 
         <!--Maven plugins versions-->
         <dependency.plugin.version>2.10</dependency.plugin.version>
@@ -273,9 +273,9 @@
         <maven.surefire.plugin.version>2.19.1</maven.surefire.plugin.version>
         <maven.enforcer.plugin.version>1.4.1</maven.enforcer.plugin.version>
 
-        <mule.module.maven.plugin.version>1.0.0-SNAPSHOT</mule.module.maven.plugin.version>
-        <mule.extensions.maven.plugin.version>1.0.0-SNAPSHOT</mule.extensions.maven.plugin.version>
-        <mule.app.plugins.maven.plugin.version>1.0.0-SNAPSHOT</mule.app.plugins.maven.plugin.version>
+        <mule.module.maven.plugin.version>1.0.0-rc.cyborg-SNAPSHOT</mule.module.maven.plugin.version>
+        <mule.extensions.maven.plugin.version>1.0.0-rc.cyborg-SNAPSHOT</mule.extensions.maven.plugin.version>
+        <mule.app.plugins.maven.plugin.version>1.0.0-rc.cyborg-SNAPSHOT</mule.app.plugins.maven.plugin.version>
         <mule.jmh.elasticsearch.maven.plugin.version>1.0.0-SNAPSHOT</mule.jmh.elasticsearch.maven.plugin.version>
         <mule.packager.version>3.0.0-SNAPSHOT</mule.packager.version>
         <maven.replacer.plugin>1.5.3</maven.replacer.plugin>
