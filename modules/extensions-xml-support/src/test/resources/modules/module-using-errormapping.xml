@@ -22,9 +22,9 @@
         <parameters>
             <parameter name="petNames" type="string"/>
             <parameter name="errorMappingTargetType" type="string" defaultValue="A_DEFAULT_TARGET"/>
-            <parameter name="errorMappingSourceType" type="string" defaultValue="A_DEFAULT_SOURCE"/>
+            <parameter name="errorMappingSourceType" type="string" defaultValue="ANY"/>
             <parameter name="secondErrorMappingTargetType" type="string" defaultValue="ANOTHER_DEFAULT_TARGET"/>
-            <parameter name="secondErrorMappingSourceType" type="string" defaultValue="ANOTHER_DEFAULT_SOURCE"/>
+            <parameter name="secondErrorMappingSourceType" type="string" defaultValue="ANY"/>
         </parameters>
         <body>
             <petstore:fail petNames="#[parameters.petNames]">
