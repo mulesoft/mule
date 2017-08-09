@@ -19,8 +19,7 @@ import java.net.URL;
 public class PGPKeyRingTestCase extends AbstractEncryptionStrategyTestCase
 {
     @Test
-    public void testClientKey()
-    {
+    public void testClientKey() throws Exception {
         PGPPublicKey clientKey = keyManager.getPublicKey("Mule client <mule_client@mule.com>");
         assertNotNull(clientKey);
     }

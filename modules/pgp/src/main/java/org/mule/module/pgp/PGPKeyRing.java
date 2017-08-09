@@ -20,7 +20,7 @@ public interface PGPKeyRing
      */
     PGPSecretKey getConfiguredSecretKey() throws Exception;
 
-    PGPPublicKey getPublicKey(String principalId);
+    PGPPublicKey getPublicKey(String principalId) throws Exception;
 
     /**
      * @return all the secretKeys found in the secretKeyFile.

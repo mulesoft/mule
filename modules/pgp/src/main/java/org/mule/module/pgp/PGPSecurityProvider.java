@@ -39,7 +39,12 @@ public class PGPSecurityProvider extends AbstractSecurityProvider
             throw new UnauthorisedException(CoreMessages.objectIsNull("UserId"));
         }
 
-        PGPPublicKey publicKey = keyManager.getPublicKey(userId);
+        final PGPPublicKey publicKey;
+        try {
+            publicKey = keyManager.getPublicKey(userId);
+        } catch (final Exception e) {
+            throw new UnauthorisedException(PGPMessages.noPublicKeyForUser(userId));
+        }
 
         if (publicKey == null)
         {

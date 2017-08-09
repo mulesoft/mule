@@ -21,17 +21,16 @@ public class PGPKeyRingValidationsTestCase
     private PGPKeyRingImpl pgpKeyRing = new PGPKeyRingImpl();
 
     @Test
-    public void testInvalidPublicKeyRingFileName()
-    {
+    public void testInvalidPublicKeyRingFileName() throws Exception {
         pgpKeyRing.setPublicKeyRingFileName("incorrectPath");
         try
         {
-            pgpKeyRing.initialise();
+            pgpKeyRing.getPublicKey("xx");
             fail("InitialisationException should be triggered because public key file doesn't exist");
         }
-        catch (InitialisationException initialisationException)
+        catch (MissingPGPKeyException missingPGPKeyException)
         {
-            assertThat(initialisationException.getMessage(), is(noFileKeyFound("incorrectPath").getMessage()));
+            assertThat(missingPGPKeyException.getMessage(), is(noFileKeyFound("incorrectPath").getMessage()));
         }
     }
 

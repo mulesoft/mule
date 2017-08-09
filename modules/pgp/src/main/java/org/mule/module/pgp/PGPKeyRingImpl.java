@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.security.Security;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -60,16 +61,8 @@ public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
         {
             if (!SecurityUtils.isFipsSecurityModel())
             {
-                java.security.Security.addProvider(new BouncyCastleProvider());
+                Security.addProvider(new BouncyCastleProvider());
             }
-
-            principalsKeyBundleMap = new HashMap<String, PGPPublicKey>();
-
-            readPublicKeyRing();
-        }
-        catch (MissingPGPKeyException exception)
-        {
-            throw new InitialisationException(exception, this);
         }
         catch (Exception e)
         {
@@ -80,26 +73,28 @@ public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
 
     private void readPublicKeyRing() throws Exception
     {
-        InputStream inputStream = IOUtils.getResourceAsStream(getPublicKeyRingFileName(), getClass());
-        validateNotNull(inputStream, noFileKeyFound(getPublicKeyRingFileName()));
-        PGPPublicKeyRingCollection collection = new PGPPublicKeyRingCollection(inputStream, KEY_FINGERPRINT_CALCULATOR);
-        inputStream.close();
+        final String publicKeyRingFileName = getPublicKeyRingFileName();
+        // TODO Just ignoring when file name is not provided. Should we throw an exception?
+        principalsKeyBundleMap = new HashMap<String, PGPPublicKey>();
+        if (publicKeyRingFileName != null) {
+            InputStream inputStream = IOUtils.getResourceAsStream(publicKeyRingFileName, getClass());
+            validateNotNull(inputStream, noFileKeyFound(publicKeyRingFileName));
+            PGPPublicKeyRingCollection collection = new PGPPublicKeyRingCollection(inputStream, KEY_FINGERPRINT_CALCULATOR);
+            inputStream.close();
 
-        Iterator keyRingsIterator = collection.getKeyRings();
-        while (keyRingsIterator.hasNext())
-        {
-            PGPPublicKeyRing ring = (PGPPublicKeyRing) keyRingsIterator.next();
-            String userID = "";
-            Iterator publicKeysIterator = ring.getPublicKeys();
-            while (publicKeysIterator.hasNext())
-            {
-                PGPPublicKey publicKey = (PGPPublicKey) publicKeysIterator.next();
-                Iterator userIDs = publicKey.getUserIDs();
-                if (userIDs.hasNext())
-                {
-                    userID = (String) userIDs.next();
+            Iterator keyRingsIterator = collection.getKeyRings();
+            while (keyRingsIterator.hasNext()) {
+                PGPPublicKeyRing ring = (PGPPublicKeyRing) keyRingsIterator.next();
+                String userID = "";
+                Iterator publicKeysIterator = ring.getPublicKeys();
+                while (publicKeysIterator.hasNext()) {
+                    PGPPublicKey publicKey = (PGPPublicKey) publicKeysIterator.next();
+                    Iterator userIDs = publicKey.getUserIDs();
+                    if (userIDs.hasNext()) {
+                        userID = (String) userIDs.next();
+                    }
+                    principalsKeyBundleMap.put(userID, publicKey);
                 }
-                principalsKeyBundleMap.put(userID, publicKey);
             }
         }
     }
@@ -187,8 +182,11 @@ public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
         this.publicKeyRingFileName = value;
     }
 
-    public PGPPublicKey getPublicKey(String principalId)
+    public PGPPublicKey getPublicKey(String principalId) throws Exception
     {
+        if (principalsKeyBundleMap == null) {
+            readPublicKeyRing();
+        }
         return principalsKeyBundleMap.get(principalId);
     }
 }
