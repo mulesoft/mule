@@ -121,7 +121,7 @@ public final class ParameterModelsLoaderDelegate {
       addTypeRestrictions(extensionParameter, parameter);
       parseLayout(extensionParameter, parameter);
       addImplementingTypeModelProperty(extensionParameter, parameter);
-      parseXmlHints(extensionParameter, parameter);
+      parseParameterDsl(extensionParameter, parameter);
       contributors.forEach(contributor -> contributor.contribute(extensionParameter, parameter, declarationContext));
       declarerList.add(parameter);
     }
@@ -334,11 +334,11 @@ public final class ParameterModelsLoaderDelegate {
         .ifPresent(parameter::withLayout);
   }
 
-  private void parseXmlHints(ExtensionParameter extensionParameter, ParameterDeclarer parameter) {
+  private void parseParameterDsl(ExtensionParameter extensionParameter, ParameterDeclarer parameter) {
     extensionParameter.getAnnotation(ParameterDsl.class).ifPresent(
-                                                               hints -> parameter.withDsl(ParameterDslConfiguration.builder()
-                                                                   .allowsInlineDefinition(hints.allowInlineDefinition())
-                                                                   .allowsReferences(hints.allowReferences())
+                                                               parameterDsl -> parameter.withDsl(ParameterDslConfiguration.builder()
+                                                                   .allowsInlineDefinition(parameterDsl.allowInlineDefinition())
+                                                                   .allowsReferences(parameterDsl.allowReferences())
                                                                    .build()));
   }
 
