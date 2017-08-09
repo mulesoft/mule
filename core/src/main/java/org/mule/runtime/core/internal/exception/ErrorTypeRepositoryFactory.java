@@ -24,6 +24,7 @@ import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.SO
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.SOURCE_RESPONSE_GENERATE;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.SOURCE_RESPONSE_SEND;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.STREAM_MAXIMUM_SIZE_EXCEEDED;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.TIMEOUT;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.TRANSFORMATION;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.VALIDATION;
 import org.mule.runtime.api.message.ErrorType;
@@ -62,6 +63,7 @@ public class ErrorTypeRepositoryFactory {
     errorTypeRepository.addInternalErrorType(OVERLOAD, errorTypeRepository.getCriticalErrorType());
     errorTypeRepository.addErrorType(STREAM_MAXIMUM_SIZE_EXCEEDED, errorTypeRepository.getAnyErrorType());
     errorTypeRepository.addInternalErrorType(FATAL, errorTypeRepository.getCriticalErrorType());
+    errorTypeRepository.addErrorType(TIMEOUT, errorTypeRepository.getAnyErrorType());
 
     final ErrorType sourceErrorType = errorTypeRepository.getSourceErrorType();
     errorTypeRepository.addErrorType(SOURCE_RESPONSE_GENERATE, errorTypeRepository.getSourceResponseErrorType());

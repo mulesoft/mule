@@ -28,6 +28,7 @@ import static org.mule.runtime.core.api.exception.Errors.Identifiers.SOURCE_RESP
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.SOURCE_RESPONSE_GENERATE_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.SOURCE_RESPONSE_SEND_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.STREAM_MAXIMUM_SIZE_EXCEEDED_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.api.exception.Errors.Identifiers.TIMEOUT_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.TRANSFORMATION_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.VALIDATION_ERROR_IDENTIFIER;
@@ -105,6 +106,11 @@ public abstract class Errors {
      * Indicates a security restriction enforced by a filter
      */
     public static final String NOT_PERMITTED_ERROR_IDENTIFIER = "NOT_PERMITTED";
+
+    /**
+     * Indicates that a timeout occurred during processing.
+     */
+    public static final String TIMEOUT_ERROR_IDENTIFIER = "TIMEOUT";
 
     /**
      * Indicates that an error occurred in the source of the flow processing a successful response.
@@ -198,6 +204,9 @@ public abstract class Errors {
         builder().namespace(CORE_NAMESPACE_NAME).name(NOT_PERMITTED_ERROR_IDENTIFIER).build();
     public static final ComponentIdentifier OVERLOAD =
         builder().namespace(CORE_NAMESPACE_NAME).name(OVERLOAD_ERROR_IDENTIFIER).build();
+    public static final ComponentIdentifier TIMEOUT =
+        builder().namespace(CORE_NAMESPACE_NAME).name(TIMEOUT_ERROR_IDENTIFIER).build();
+
 
     public static final ComponentIdentifier SOURCE =
         builder().namespace(CORE_NAMESPACE_NAME).name(SOURCE_ERROR_IDENTIFIER).build();

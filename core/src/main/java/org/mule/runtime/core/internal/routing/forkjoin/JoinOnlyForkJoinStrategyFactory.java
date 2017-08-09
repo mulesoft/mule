@@ -22,16 +22,7 @@ import java.util.function.Function;
  * <li>Will processor all routes, regardless of errors, and propagating a composite exception where there were one or more errors.
  * </ul>
  */
-public class JoinOnlyForkJoinStrategy extends AbstractForkJoinStrategy {
-
-
-  public JoinOnlyForkJoinStrategy() {
-    super();
-  }
-
-  public JoinOnlyForkJoinStrategy(long timeout) {
-    super(timeout);
-  }
+public class JoinOnlyForkJoinStrategyFactory extends AbstractForkJoinStrategyFactory {
 
   @Override
   protected Function<List<InternalEvent>, InternalEvent> createResultEvent(InternalEvent original,

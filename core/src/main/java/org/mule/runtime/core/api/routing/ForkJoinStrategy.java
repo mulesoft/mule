@@ -7,52 +7,50 @@
 
 package org.mule.runtime.core.api.routing;
 
+import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 
 import org.reactivestreams.Publisher;
 
 /**
- * Strategy that defines how a set of {@link RoutingPair}'s each consisting of a {@link Processor} and {@link InternalEvent} will be
- * processed and a single result {@link InternalEvent} returned. This will normally be used for:
+ * Strategy that defines how a set of {@link RoutingPair}'s each consisting of a {@link Processor} and {@link InternalEvent} will
+ * be processed and a single result {@link InternalEvent} returned. This will normally be used for:
  * <ul>
- * <li>Routing {@code n} {@link InternalEvent}'s to the same {@link Processor}.
- * <li>Routing a single {@link InternalEvent} to {@code n} {@link Processor}'s.
+ * <li>Routing {@code n} {@link InternalEvent}'s to the same {@link MessageProcessorChain}.
+ * <li>Routing a single {@link InternalEvent} to {@code n} {@link MessageProcessorChain}'s.
  * </ul>
  * <p>
  * Implementations will typically implement parallel behavior where the invocation of each route is independent and then results
  * are aggregated, but other implements such as strict sequential invocation or even the use of a shared context between
  * invocations are possible.
  * <p>
- * While the result of this strategy is a single {@link InternalEvent} implementations are free to decide if the event should be emitted
- * only once all results are available, or if it emits the event immediately and then makes the results available via an
- * {@link java.util.Iterator} or {@link Publisher< InternalEvent >} payload. Implementations may also return the original {@link InternalEvent}
- * therefore performing a simple join with no aggregation.
+ * While the result of this strategy is a single {@link InternalEvent} implementations are free to decide if the event should be
+ * emitted only once all results are available, or if it emits the event immediately and then makes the results available via an
+ * {@link java.util.Iterator} or {@link Publisher< InternalEvent >} payload. Implementations may also return the original
+ * {@link InternalEvent} therefore performing a simple join with no aggregation.
  * 
  * @since 4.0
  */
 public interface ForkJoinStrategy {
 
-  Publisher<InternalEvent> forkJoin(InternalEvent original, Publisher<RoutingPair> routingPairs,
-                                    ProcessingStrategy processingStrategy,
-                                    int maxConcurrency, boolean delayErrors);
+  Publisher<InternalEvent> forkJoin(InternalEvent original, Publisher<RoutingPair> routingPairs);
 
   final class RoutingPair {
 
-    private Processor processor;
+    private MessageProcessorChain processor;
     private InternalEvent event;
 
-    public static RoutingPair of(InternalEvent event, Processor route) {
+    public static RoutingPair of(InternalEvent event, MessageProcessorChain route) {
       return new RoutingPair(event, route);
     }
 
-    private RoutingPair(InternalEvent event, Processor route) {
+    private RoutingPair(InternalEvent event, MessageProcessorChain route) {
       this.event = event;
       this.processor = route;
     }
 
-    public Processor getProcessor() {
+    public MessageProcessorChain getRoute() {
       return processor;
     }
 
