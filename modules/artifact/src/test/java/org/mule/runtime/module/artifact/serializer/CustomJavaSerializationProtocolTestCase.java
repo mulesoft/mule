@@ -17,7 +17,7 @@ import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.module.artifact.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.api.serialization.SerializationException;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
@@ -89,7 +89,7 @@ public class CustomJavaSerializationProtocolTestCase extends AbstractSerializerP
     final Object payload = echoTestClass.newInstance();
     setObjectName(payload);
 
-    Event event = eventBuilder().message(of(payload)).build();
+    InternalEvent event = eventBuilder().message(of(payload)).build();
     byte[] bytes = serializationProtocol.serialize(event.getMessage());
 
     InternalMessage message = serializationProtocol.deserialize(bytes);

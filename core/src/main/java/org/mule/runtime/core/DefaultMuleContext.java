@@ -66,7 +66,7 @@ import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.DefaultTransformationService;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
@@ -260,9 +260,9 @@ public class DefaultMuleContext implements MuleContext {
       // Unwrap all throwables to be consistent with reactor default hook.
       throwable = unwrap(throwable);
       // Only apply hook for Event signals.
-      if (signal instanceof Event) {
+      if (signal instanceof InternalEvent) {
         return throwable instanceof MessagingException ? throwable
-            : new MessagingException((Event) signal, getRootCauseException(throwable));
+            : new MessagingException((InternalEvent) signal, getRootCauseException(throwable));
       } else {
         return throwable;
       }

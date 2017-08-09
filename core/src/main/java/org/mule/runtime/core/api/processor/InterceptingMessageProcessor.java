@@ -6,11 +6,11 @@
  */
 package org.mule.runtime.core.api.processor;
 
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 
 /**
  * <p>
- * Processes {@link Event}'s intercepting another listener {@link Processor}. It is the InterceptingMessageProcessor's
+ * Processes {@link InternalEvent}'s intercepting another listener {@link Processor}. It is the InterceptingMessageProcessor's
  * responsibility to invoke the next {@link Processor}.
  * </p>
  * Although not normal, it is valid for the <i>listener</i> MessageProcessor to be <i>null</i> and implementations should handle

@@ -12,7 +12,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
@@ -54,14 +54,14 @@ public class LoggerMessageProcessor extends AbstractAnnotatedObject implements P
   }
 
   @Override
-  public Event process(Event event) throws MuleException {
+  public InternalEvent process(InternalEvent event) throws MuleException {
     return withCursoredEvent(event, cursored -> {
       log(cursored);
       return event;
     });
   }
 
-  protected void log(Event event) {
+  protected void log(InternalEvent event) {
     if (event == null) {
       logWithLevel(null);
     } else {

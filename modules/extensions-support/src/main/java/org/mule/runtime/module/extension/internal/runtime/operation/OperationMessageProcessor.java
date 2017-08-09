@@ -49,7 +49,7 @@ import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.ParametersResolverProcessor;
@@ -92,7 +92,7 @@ import reactor.core.publisher.Mono;
  * <p>
  * A {@link #operationExecutor} is obtained by testing the {@link OperationModel} for a {@link OperationExecutorModelProperty}
  * through which a {@link OperationExecutorFactory} is obtained. Models with no such property cannot be used with this class. The
- * obtained {@link OperationExecutor} serve all invocations of {@link #process(Event)} on {@code this} instance but will not be
+ * obtained {@link OperationExecutor} serve all invocations of {@link #process(InternalEvent)} on {@code this} instance but will not be
  * shared with other instances of {@link OperationMessageProcessor}. All the {@link Lifecycle} events that {@code this} instance
  * receives will be propagated to the {@link #operationExecutor}.
  * <p>
@@ -110,7 +110,7 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
 
   private static final Logger LOGGER = getLogger(OperationMessageProcessor.class);
   static final String INVALID_TARGET_MESSAGE =
-      "Flow '%s' defines an invalid usage of operation '%s' which uses %s as target";
+      "Root component '%s' defines an invalid usage of operation '%s' which uses %s as target";
 
   private final ExtensionModel extensionModel;
   private final OperationModel operationModel;
@@ -144,17 +144,17 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
   }
 
   @Override
-  public Event process(Event event) throws MuleException {
+  public InternalEvent process(InternalEvent event) throws MuleException {
     return processToApply(event, this);
   }
 
   @Override
-  public Publisher<Event> apply(Publisher<Event> publisher) {
+  public Publisher<InternalEvent> apply(Publisher<InternalEvent> publisher) {
     return from(publisher).flatMap(checkedFunction(event -> withContextClassLoader(classLoader, () -> {
       Optional<ConfigurationInstance> configuration;
       OperationExecutionFunction operationExecutionFunction;
 
-      if (event.getParameters().containsKey(INTERCEPTION_RESOLVED_CONTEXT)) {
+      if (event.getInternalParameters().containsKey(INTERCEPTION_RESOLVED_CONTEXT)) {
         // If the event already contains an execution context, use that one.
         ExecutionContextAdapter<OperationModel> operationContext = getPrecalculatedContext(event);
         configuration = operationContext.getConfiguration();
@@ -203,11 +203,11 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
     })));
   }
 
-  private PrecalculatedExecutionContextAdapter getPrecalculatedContext(Event event) {
-    return (PrecalculatedExecutionContextAdapter) (event.getParameters().get(INTERCEPTION_RESOLVED_CONTEXT).getValue());
+  private PrecalculatedExecutionContextAdapter getPrecalculatedContext(InternalEvent event) {
+    return (PrecalculatedExecutionContextAdapter) (event.getInternalParameters().get(INTERCEPTION_RESOLVED_CONTEXT));
   }
 
-  protected Mono<Event> doProcess(Event event, ExecutionContextAdapter<OperationModel> operationContext) {
+  protected Mono<InternalEvent> doProcess(InternalEvent event, ExecutionContextAdapter<OperationModel> operationContext) {
     return executeOperation(operationContext)
         .map(value -> returnDelegate.asReturnValue(value, operationContext))
         .switchIfEmpty(fromCallable(() -> returnDelegate.asReturnValue(null, operationContext)))
@@ -220,7 +220,7 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
 
   private ExecutionContextAdapter<OperationModel> createExecutionContext(Optional<ConfigurationInstance> configuration,
                                                                          Map<String, Object> resolvedParameters,
-                                                                         Event event)
+                                                                         InternalEvent event)
       throws MuleException {
 
     return new DefaultExecutionContext<>(extensionModel, configuration, resolvedParameters, operationModel, event,
@@ -252,10 +252,12 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
     }
 
     if (target.startsWith(FLOW_VARS)) {
-      throw new IllegalOperationException(format(INVALID_TARGET_MESSAGE, flowConstruct.getName(), operationModel.getName(),
+      throw new IllegalOperationException(format(INVALID_TARGET_MESSAGE, getLocation().getRootContainerName(),
+                                                 operationModel.getName(),
                                                  format("the '%s' prefix", FLOW_VARS)));
     } else if (muleContext.getExpressionManager().isExpression(target)) {
-      throw new IllegalOperationException(format(INVALID_TARGET_MESSAGE, flowConstruct.getName(), operationModel.getName(),
+      throw new IllegalOperationException(format(INVALID_TARGET_MESSAGE, getLocation().getRootContainerName(),
+                                                 operationModel.getName(),
                                                  "an expression"));
     }
 
@@ -316,16 +318,16 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
     if (!configurationModel.getOperationModel(operationModel.getName()).isPresent() &&
         !configurationProvider.getExtensionModel().getOperationModel(operationModel.getName()).isPresent()) {
       throw new IllegalOperationException(format(
-                                                 "Flow '%s' defines an usage of operation '%s' which points to configuration '%s'. "
+                                                 "Root component '%s' defines an usage of operation '%s' which points to configuration '%s'. "
                                                      + "The selected config does not support that operation.",
-                                                 flowConstruct.getName(), operationModel.getName(),
+                                                 getLocation().getRootContainerName(), operationModel.getName(),
                                                  configurationProvider.getName()));
     }
   }
 
   @Override
   protected ParameterValueResolver getParameterValueResolver() {
-    final Event event = getInitialiserEvent(muleContext);
+    final InternalEvent event = getInitialiserEvent(muleContext);
     return new OperationParameterValueResolver(new LazyExecutionContext<>(resolverSet, operationModel, extensionModel,
                                                                           from(event)));
   }
@@ -343,7 +345,7 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
   }
 
   @Override
-  public ParametersResolverProcessorResult resolveParameters(Event event) throws MuleException {
+  public ParametersResolverProcessorResult resolveParameters(InternalEvent event) throws MuleException {
     if (operationExecutor instanceof OperationArgumentResolverFactory) {
       PrecalculatedExecutionContextAdapter executionContext =
           new PrecalculatedExecutionContextAdapter(createExecutionContext(event), operationExecutor);
@@ -386,12 +388,12 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
     mediator.after(executionContext, null, interceptors);
   }
 
-  private ExecutionContextAdapter<OperationModel> createExecutionContext(Event event) throws MuleException {
+  private ExecutionContextAdapter<OperationModel> createExecutionContext(InternalEvent event) throws MuleException {
     Optional<ConfigurationInstance> configuration = getConfiguration(event);
     return createExecutionContext(configuration, getResolutionResult(event, configuration), event);
   }
 
-  private Map<String, Object> getResolutionResult(Event event, Optional<ConfigurationInstance> configuration)
+  private Map<String, Object> getResolutionResult(InternalEvent event, Optional<ConfigurationInstance> configuration)
       throws MuleException {
     return resolverSet.resolve(from(event, configuration)).asMap();
   }

@@ -13,7 +13,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.exception.ErrorTypeRepository;
@@ -38,7 +38,7 @@ public class ThrowProcessor implements Processor {
   private MuleContext muleContext;
 
   @Override
-  public Event process(Event event) throws MuleException {
+  public InternalEvent process(InternalEvent event) throws MuleException {
     if (count == -1 || count-- > 0) {
       try {
         Throwable instantiatedException = exception.newInstance();

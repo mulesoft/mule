@@ -7,12 +7,12 @@
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import org.mule.runtime.api.message.Error;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 
 /**
- * {@link ArgumentResolver} which returns the {@link Error} in the {@link Event}
+ * {@link ArgumentResolver} which returns the {@link Error} in the {@link InternalEvent}
  * associated to the given {@link ExecutionContext}.
  * <p>
  * Notice that such {@link Error} could be {@code null}

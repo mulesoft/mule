@@ -12,7 +12,6 @@ import static org.mule.runtime.core.api.config.i18n.CoreMessages.errorInvokingMe
 import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createScopeTransactionalExecutionTemplate;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setFlowConstructIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
@@ -25,7 +24,7 @@ import static reactor.core.publisher.Flux.from;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
@@ -56,15 +55,15 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
   private MessagingExceptionHandler messagingExceptionHandler;
 
   @Override
-  public Event process(final Event event) throws MuleException {
+  public InternalEvent process(final InternalEvent event) throws MuleException {
     if (nestedChain == null) {
       return event;
     } else {
-      ExecutionTemplate<Event> executionTemplate =
+      ExecutionTemplate<InternalEvent> executionTemplate =
           createScopeTransactionalExecutionTemplate(muleContext, transactionConfig);
-      ExecutionCallback<Event> processingCallback = () -> {
+      ExecutionCallback<InternalEvent> processingCallback = () -> {
         try {
-          Event e = processToApply(event, p -> from(p)
+          InternalEvent e = processToApply(event, p -> from(p)
               .flatMap(request -> processWithChildContext(request, nestedChain, ofNullable(getLocation()),
                                                           messagingExceptionHandler)));
           return e;
@@ -84,7 +83,7 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
   }
 
   @Override
-  public Publisher<Event> apply(Publisher<Event> publisher) {
+  public Publisher<InternalEvent> apply(Publisher<InternalEvent> publisher) {
     if (nestedChain == null) {
       return publisher;
     } else if (isTransactionActive() || transactionConfig.getAction() != ACTION_INDIFFERENT) {
@@ -136,7 +135,6 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
     if (messagingExceptionHandler == null) {
       messagingExceptionHandler = muleContext.getDefaultErrorHandler();
     }
-    setFlowConstructIfNeeded(messagingExceptionHandler, flowConstruct);
     initialiseIfNeeded(messagingExceptionHandler, true, muleContext);
     super.initialise();
   }

@@ -7,7 +7,7 @@
 package org.mule.runtime.core.internal.routing.correlation;
 
 import static org.mule.runtime.api.message.Message.of;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.core.internal.routing.AggregationException;
@@ -43,10 +43,10 @@ public class ResequenceMessagesCorrelatorCallback extends CollectionCorrelatorCa
    *         is removed and passed to the exception handler for this componenet
    */
   @Override
-  public Event aggregateEvents(EventGroup events) throws AggregationException {
-    Event[] results;
+  public InternalEvent aggregateEvents(EventGroup events) throws AggregationException {
+    InternalEvent[] results;
     try {
-      results = (events == null) ? new Event[0] : events.toArray(false);
+      results = (events == null) ? new InternalEvent[0] : events.toArray(false);
     } catch (ObjectStoreException e) {
       throw new AggregationException(events, null, e);
     }
@@ -54,9 +54,9 @@ public class ResequenceMessagesCorrelatorCallback extends CollectionCorrelatorCa
     // This is a bit of a hack since we return a collection of events on one
     // message
     for (int i = 0; i < results.length; i++) {
-      results[i] = Event.builder(results[i]).build();
+      results[i] = InternalEvent.builder(results[i]).build();
     }
-    return Event.builder(results[0]).message(of(results)).build();
+    return InternalEvent.builder(results[0]).message(of(results)).build();
   }
 
 }

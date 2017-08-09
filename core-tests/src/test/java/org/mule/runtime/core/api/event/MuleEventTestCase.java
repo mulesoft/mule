@@ -17,20 +17,19 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.api.Event.setCurrentEvent;
+import static org.mule.runtime.core.api.InternalEvent.setCurrentEvent;
 import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static reactor.core.publisher.Mono.from;
-
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.transformer.AbstractTransformer;
+import org.mule.runtime.core.internal.util.SerializationUtils;
 import org.mule.runtime.core.privileged.transformer.simple.ByteArrayToObject;
 import org.mule.runtime.core.privileged.transformer.simple.SerializableToByteArray;
-import org.mule.runtime.core.internal.util.SerializationUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.ByteArrayInputStream;
@@ -38,7 +37,6 @@ import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -62,7 +60,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     assertNotNull(serialized);
     ByteArrayToObject trans = new ByteArrayToObject();
     trans.setMuleContext(muleContext);
-    Event deserialized = (Event) trans.transform(serialized);
+    InternalEvent deserialized = (InternalEvent) trans.transform(serialized);
 
     // Assert that deserialized event is not null
     assertNotNull(deserialized);
@@ -81,7 +79,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
   @Test
   public void testEventSerializationRestart() throws Exception {
     // Create and register artifacts
-    Event event = createEventToSerialize();
+    InternalEvent event = createEventToSerialize();
 
     // Serialize
     Serializable serialized = (Serializable) createSerializableToByteArrayTransformer().transform(event);
@@ -98,7 +96,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     createAndRegisterTransformersEndpointBuilderService();
 
     // Deserialize
-    Event deserialized = (Event) trans.transform(serialized);
+    InternalEvent deserialized = (InternalEvent) trans.transform(serialized);
 
     // Assert that deserialized event is not null
     assertNotNull(deserialized);
@@ -107,7 +105,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     assertNotNull(deserialized.getSession());
   }
 
-  private Event createEventToSerialize() throws Exception {
+  private InternalEvent createEventToSerialize() throws Exception {
     createAndRegisterTransformersEndpointBuilderService();
     return testEvent();
   }
@@ -119,7 +117,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     for (int i = 0; i < 108; i++) {
       payload.append("1234567890");
     }
-    Event testEvent = eventBuilder().message(of(new ByteArrayInputStream(payload.toString().getBytes()))).build();
+    InternalEvent testEvent = eventBuilder().message(of(new ByteArrayInputStream(payload.toString().getBytes()))).build();
     setCurrentEvent(testEvent);
     byte[] serializedEvent = muleContext.getObjectSerializer().getExternalProtocol().serialize(testEvent);
     testEvent = muleContext.getObjectSerializer().getExternalProtocol().deserialize(serializedEvent);
@@ -144,61 +142,52 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
 
   @Test(expected = UnsupportedOperationException.class)
   public void testFlowVarNamesAddImmutable() throws Exception {
-    Event event = eventBuilder()
+    InternalEvent event = eventBuilder()
         .message(of("whatever"))
         .addVariable("test", "val")
         .build();
-    event.getVariableNames().add("other");
+    event.getVariables().keySet().add("other");
   }
 
   public void testFlowVarNamesRemoveMutable() throws Exception {
-    Event event = eventBuilder()
+    InternalEvent event = eventBuilder()
         .message(of("whatever"))
         .addVariable("test", "val")
         .build();
-    event = Event.builder(event).addVariable("test", "val").build();
-    event.getVariableNames().remove("test");
-    assertNull(event.getVariable("test").getValue());
+    event = InternalEvent.builder(event).addVariable("test", "val").build();
+    event.getVariables().keySet().remove("test");
+    assertNull(event.getVariables().get("test").getValue());
   }
 
   @Test
   public void testFlowVarsNotShared() throws Exception {
-    Event event = eventBuilder()
+    InternalEvent event = eventBuilder()
         .message(of("whatever"))
         .addVariable("foo", "bar")
         .build();
-    event = Event.builder(event).addVariable("foo", "bar").build();
+    event = InternalEvent.builder(event).addVariable("foo", "bar").build();
 
-    Event copy = Event.builder(event).build();
+    InternalEvent copy = InternalEvent.builder(event).build();
 
-    copy = Event.builder(copy).addVariable("foo", "bar2").build();
+    copy = InternalEvent.builder(copy).addVariable("foo", "bar2").build();
 
-    assertEquals("bar", event.getVariable("foo").getValue());
+    assertEquals("bar", event.getVariables().get("foo").getValue());
 
-    assertEquals("bar2", copy.getVariable("foo").getValue());
-  }
-
-  @Test(expected = NoSuchElementException.class)
-  public void testGetFlowVarNonexistent() throws Exception {
-    testEvent().getVariable("foo").getValue();
-  }
-
-  @Test(expected = NoSuchElementException.class)
-  public void testGetFlowVarDataTypeNonexistent() throws Exception {
-    testEvent().getVariable("foo").getDataType();
+    assertEquals("bar2", copy.getVariables().get("foo").getValue());
   }
 
   @Test
   public void eventContextSerializationNoPipelinePublisherLost() throws Exception {
 
-    Event result = testEvent();
-    Event before = testEvent();
+    InternalEvent result = testEvent();
+    InternalEvent before = testEvent();
 
     // Remove Flow to simulate deserialization when Flow is not available
     muleContext.getRegistry().unregisterObject(APPLE_FLOW);
 
-    Event after =
-        (Event) SerializationUtils.deserialize(org.apache.commons.lang3.SerializationUtils.serialize(before), muleContext);
+    InternalEvent after =
+        (InternalEvent) SerializationUtils.deserialize(org.apache.commons.lang3.SerializationUtils.serialize(before),
+                                                       muleContext);
 
     after.getContext().success(result);
 
@@ -215,7 +204,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
   public void eventContextSerializationEventContextGarbageCollected() throws Exception {
 
     Flow flow = getTestFlow(muleContext);
-    Event before = eventBuilder().message(of(null)).flow(flow).build();
+    InternalEvent before = eventBuilder().message(of(null)).flow(flow).build();
     String beforeId = before.getContext().getId();
 
     byte[] bytes = org.apache.commons.lang3.SerializationUtils.serialize(before);
@@ -228,11 +217,12 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void eventContextSerializationPublisherConserved() throws Exception {
-    Event result = testEvent();
-    Event before = eventBuilder().message(of(null)).flow(getTestFlow(muleContext)).build();
+    InternalEvent result = testEvent();
+    InternalEvent before = eventBuilder().message(of(null)).flow(getTestFlow(muleContext)).build();
 
-    Event after =
-        (Event) SerializationUtils.deserialize(org.apache.commons.lang3.SerializationUtils.serialize(before), muleContext);
+    InternalEvent after =
+        (InternalEvent) SerializationUtils.deserialize(org.apache.commons.lang3.SerializationUtils.serialize(before),
+                                                       muleContext);
 
     after.getContext().success(result);
 

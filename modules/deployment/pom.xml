@@ -101,6 +101,12 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-runner</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.mule.tests.plugin</groupId>
             <artifactId>mule-tests-component-plugin</artifactId>
             <version>${project.version}</version>

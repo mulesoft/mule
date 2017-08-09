@@ -15,14 +15,14 @@ import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.api.security.SecurityProviderNotFoundException;
 import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.security.DefaultMuleAuthentication;
 import org.mule.runtime.core.api.security.DefaultMuleCredentials;
-import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.security.UnauthorisedException;
 import org.mule.runtime.core.api.security.AbstractAuthenticationFilter;
+import org.mule.runtime.core.api.security.SecurityContext;
 
 /**
  * Performs authentication based on a username and password. The username and password are retrieved from the {@link Message}
@@ -41,7 +41,7 @@ public class UsernamePasswordAuthenticationFilter extends AbstractAuthentication
    * @throws SecurityException if authentication fails
    */
   @Override
-  public Event authenticate(Event event)
+  public InternalEvent authenticate(InternalEvent event)
       throws SecurityException, SecurityProviderNotFoundException, UnknownAuthenticationTypeException {
     Authentication authentication = getAuthenticationToken(event);
     Authentication authResult;
@@ -61,13 +61,12 @@ public class UsernamePasswordAuthenticationFilter extends AbstractAuthentication
     }
 
     SecurityContext context = getSecurityManager().createSecurityContext(authResult);
-    context.setAuthentication(authResult);
     event.getSession().setSecurityContext(context);
 
     return event;
   }
 
-  protected Authentication getAuthenticationToken(Event event) throws UnauthorisedException {
+  protected Authentication getAuthenticationToken(InternalEvent event) throws UnauthorisedException {
     ExpressionManager expressionManager = (ExpressionManager) registry.lookupByName(OBJECT_EXPRESSION_MANAGER).get();
 
     Object usernameEval = expressionManager.evaluate(username, event).getValue();

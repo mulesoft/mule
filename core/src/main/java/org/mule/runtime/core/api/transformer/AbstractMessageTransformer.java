@@ -13,7 +13,7 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.client.MuleClientFlowConstruct;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.util.ClassUtils;
@@ -76,12 +76,12 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
   }
 
   @Override
-  public Object transform(Object src, Event event) throws MessageTransformerException {
+  public Object transform(Object src, InternalEvent event) throws MessageTransformerException {
     return transform(src, resolveEncoding(src), event);
   }
 
   @Override
-  public final Object transform(Object src, Charset enc, Event event) throws MessageTransformerException {
+  public final Object transform(Object src, Charset enc, InternalEvent event) throws MessageTransformerException {
     DataType sourceType = DataType.fromType(src.getClass());
     if (!isSourceDataTypeSupported(sourceType)) {
       if (isIgnoreBadInput()) {
@@ -104,8 +104,8 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
       message = (Message) src;
     }
     // TODO MULE-9342 Clean up transformer vs message transformer confusion
-    else if (src instanceof Event) {
-      event = (Event) src;
+    else if (src instanceof InternalEvent) {
+      event = (InternalEvent) src;
       message = event.getMessage();
     } else if (muleContext.getConfiguration().isAutoWrapMessageAwareTransform()) {
       message = of(src);
@@ -122,7 +122,7 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
       MuleClientFlowConstruct flowConstruct =
           new MuleClientFlowConstruct(muleContext);
       ComponentLocation location = getLocation() != null ? getLocation() : fromSingleComponent("AbstractMessageTransformer");
-      event = Event.builder(create(flowConstruct, location)).message(message).flow(flowConstruct).build();
+      event = InternalEvent.builder(create(flowConstruct, location)).message(message).flow(flowConstruct).build();
     }
     try {
       result = transformMessage(event, enc);
@@ -141,7 +141,7 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
   /**
    * Check if the return class is supported by this transformer
    */
-  protected Object checkReturnClass(Object object, Event event) throws MessageTransformerException {
+  protected Object checkReturnClass(Object object, InternalEvent event) throws MessageTransformerException {
 
     // Null is a valid return type
     if (object == null && isAllowNullReturn()) {
@@ -165,5 +165,5 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
   /**
    * Transform the message
    */
-  public abstract Object transformMessage(Event event, Charset outputEncoding) throws TransformerException;
+  public abstract Object transformMessage(InternalEvent event, Charset outputEncoding) throws TransformerException;
 }

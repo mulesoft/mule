@@ -18,7 +18,7 @@ import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 import org.mule.mvel2.ParserContext;
 import org.mule.mvel2.compiler.CompiledExpression;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -50,8 +50,9 @@ public class PayloadExpressionDataTypeResolverTestCase extends AbstractMuleConte
     final CompiledExpression compiledExpression =
         (CompiledExpression) compileExpression(expression, new ParserContext(expressionLanguage.getParserConfiguration()));
 
-    Event event = Event.builder(testEvent()).message(InternalMessage.builder(testEvent().getMessage()).value(TEST_MESSAGE)
-        .mediaType(expectedDataType.getMediaType()).build()).build();
+    InternalEvent event =
+        InternalEvent.builder(testEvent()).message(InternalMessage.builder(testEvent().getMessage()).value(TEST_MESSAGE)
+            .mediaType(expectedDataType.getMediaType()).build()).build();
     assertThat(dataTypeResolver.resolve(event, compiledExpression), like(String.class, JSON, CUSTOM_ENCODING));
   }
 }

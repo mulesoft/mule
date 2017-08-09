@@ -7,13 +7,11 @@
 package org.mule.runtime.core.internal.exception;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessageRedeliveredException;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
@@ -23,7 +21,6 @@ import java.util.List;
 import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
-import reactor.core.publisher.Mono;
 
 //TODO: MULE-9307 re-write junits for rollback exception strategy
 
@@ -62,7 +59,7 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
   }
 
   @Override
-  protected Function<Event, Event> beforeRouting(MessagingException exception) {
+  protected Function<InternalEvent, InternalEvent> beforeRouting(MessagingException exception) {
     return event -> {
       event = super.beforeRouting(exception).apply(event);
       if (!isRedeliveryExhausted(exception)) {
@@ -88,7 +85,7 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
   }
 
   @Override
-  protected Function<Event, Publisher<Event>> route(MessagingException exception) {
+  protected Function<InternalEvent, Publisher<InternalEvent>> route(MessagingException exception) {
     if (isRedeliveryExhausted(exception)) {
       if (redeliveryExceeded != null) {
         markExceptionAsHandled(exception);
@@ -103,7 +100,7 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
   }
 
   @Override
-  protected Event processReplyTo(Event event, Exception e) {
+  protected InternalEvent processReplyTo(InternalEvent event, Exception e) {
     if (isRedeliveryExhausted(e)) {
       return super.processReplyTo(event, e);
     } else {
@@ -111,11 +108,4 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
     }
   }
 
-  @Override
-  public void setFlowConstruct(FlowConstruct flowConstruct) {
-    super.setFlowConstruct(flowConstruct);
-    if (redeliveryExceeded != null) {
-      redeliveryExceeded.setFlowConstruct(flowConstruct);
-    }
-  }
 }

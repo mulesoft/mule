@@ -7,12 +7,10 @@
 package org.mule.runtime.core.internal.processor;
 
 import static java.util.Optional.ofNullable;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setFlowConstructIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContext;
 import static reactor.core.publisher.Flux.from;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -20,10 +18,8 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.privileged.processor.AbstractInterceptingMessageProcessor;
@@ -31,7 +27,7 @@ import org.mule.runtime.core.privileged.processor.AbstractInterceptingMessagePro
 import org.reactivestreams.Publisher;
 
 public class ResponseMessageProcessorAdapter extends AbstractInterceptingMessageProcessor
-    implements Lifecycle, FlowConstructAware {
+    implements Lifecycle {
 
   protected Processor responseProcessor;
 
@@ -50,12 +46,12 @@ public class ResponseMessageProcessorAdapter extends AbstractInterceptingMessage
 
 
   @Override
-  public Event process(Event event) throws MuleException {
+  public InternalEvent process(InternalEvent event) throws MuleException {
     return processToApply(event, this);
   }
 
   @Override
-  public Publisher<Event> apply(Publisher<Event> publisher) {
+  public Publisher<InternalEvent> apply(Publisher<InternalEvent> publisher) {
     if (responseProcessor == null) {
       return publisher;
     } else {
@@ -71,9 +67,6 @@ public class ResponseMessageProcessorAdapter extends AbstractInterceptingMessage
   public void initialise() throws InitialisationException {
     if (responseProcessor instanceof MuleContextAware) {
       ((MuleContextAware) responseProcessor).setMuleContext(muleContext);
-    }
-    if (responseProcessor instanceof FlowConstructAware) {
-      ((FlowConstructAware) responseProcessor).setFlowConstruct(flowConstruct);
     }
     if (responseProcessor instanceof Initialisable) {
       ((Initialisable) responseProcessor).initialise();
@@ -99,12 +92,6 @@ public class ResponseMessageProcessorAdapter extends AbstractInterceptingMessage
     if (responseProcessor instanceof Disposable) {
       ((Disposable) responseProcessor).dispose();
     }
-  }
-
-  @Override
-  public void setFlowConstruct(FlowConstruct flowConstruct) {
-    super.setFlowConstruct(flowConstruct);
-    setFlowConstructIfNeeded(responseProcessor, flowConstruct);
   }
 
   @Override

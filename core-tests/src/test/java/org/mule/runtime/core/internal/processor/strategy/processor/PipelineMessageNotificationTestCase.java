@@ -32,8 +32,8 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.DefaultTransformationService;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.EventContext;
+import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.InternalEventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.context.notification.AsyncMessageNotification;
@@ -68,12 +68,12 @@ import org.mockito.ArgumentMatcher;
 @RunWith(Parameterized.class)
 public class PipelineMessageNotificationTestCase extends AbstractReactiveProcessorTestCase {
 
-  private Event event;
+  private InternalEvent event;
   private NotificationDispatcher notificationFirer;
   private TestPipeline pipeline;
   private final String pipelineName = "testPipeline";
 
-  private EventContext context;
+  private InternalEventContext context;
 
   @Rule
   public ExpectedException thrown = none();
@@ -120,7 +120,7 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
     pipeline.initialise();
     pipeline.start();
 
-    event = Event.builder(context).message(of("request")).flow(pipeline).build();
+    event = InternalEvent.builder(context).message(of("request")).flow(pipeline).build();
 
     process(pipeline, event);
 
@@ -135,7 +135,7 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
     pipeline.initialise();
     pipeline.start();
 
-    event = Event.builder(context).message(of("request")).flow(pipeline).build();
+    event = InternalEvent.builder(context).message(of("request")).flow(pipeline).build();
 
     thrown.expect(instanceOf(MessagingException.class));
     thrown.expectCause(instanceOf(IllegalStateException.class));
@@ -178,7 +178,7 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
     public TestPipeline(String name, MuleContext muleContext, MessageSource messageSource, List<Processor> messageProcessors,
                         ErrorHandler errorHandler) {
       super(name, muleContext, messageSource, messageProcessors, ofNullable(errorHandler), empty(), INITIAL_STATE_STARTED,
-            DEFAULT_MAX_CONCURRENCY);
+            DEFAULT_MAX_CONCURRENCY, createFlowStatistics(name, muleContext));
     }
 
     @Override
@@ -210,9 +210,9 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
 
     private int expectedAction;
     private boolean exceptionExpected;
-    private Event event;
+    private InternalEvent event;
 
-    public PipelineMessageNotificiationArgumentMatcher(int expectedAction, boolean exceptionExpected, Event event) {
+    public PipelineMessageNotificiationArgumentMatcher(int expectedAction, boolean exceptionExpected, InternalEvent event) {
       this.expectedAction = expectedAction;
       this.exceptionExpected = exceptionExpected;
       this.event = event;
@@ -232,11 +232,13 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
       }
 
       if (exceptionExpected) {
-        return expectedAction == notification.getAction().getActionId() && exception != null && notification.getMessage() != null
-            && (this.event == null || this.event.getMessage().equals(notification.getMessage()));
+        return expectedAction == notification.getAction().getActionId() && exception != null && notification.getEvent() != null
+            && notification.getEvent().getMessage() != null
+            && (this.event == null || this.event.getMessage().equals(notification.getEvent().getMessage()));
       } else {
-        return expectedAction == notification.getAction().getActionId() && exception == null && notification.getMessage() != null
-            && (this.event == null || this.event.getMessage().equals(notification.getMessage()));
+        return expectedAction == notification.getAction().getActionId() && exception == null && notification.getEvent() != null
+            && notification.getEvent().getMessage() != null
+            && (this.event == null || this.event.getMessage().equals(notification.getEvent().getMessage()));
       }
     }
   }
@@ -244,7 +246,7 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
   public static class ExceptionThrowingMessageProcessor implements Processor {
 
     @Override
-    public Event process(Event event) throws MuleException {
+    public InternalEvent process(InternalEvent event) throws MuleException {
       throw new IllegalStateException();
     }
   }

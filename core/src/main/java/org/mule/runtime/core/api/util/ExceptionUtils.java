@@ -28,7 +28,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.AnnotatedObject;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo;
 import org.mule.runtime.core.api.exception.ErrorTypeLocator;
@@ -65,12 +65,12 @@ public class ExceptionUtils {
   public static final MessagingExceptionHandler NULL_ERROR_HANDLER = new MessagingExceptionHandler() {
 
     @Override
-    public Event handleException(MessagingException exception, Event event) {
+    public InternalEvent handleException(MessagingException exception, InternalEvent event) {
       throw new RuntimeException(exception);
     }
 
     @Override
-    public Publisher<Event> apply(MessagingException exception) {
+    public Publisher<InternalEvent> apply(MessagingException exception) {
       return error(exception);
     }
   };
@@ -248,7 +248,7 @@ public class ExceptionUtils {
   }
 
   public static MessagingException putContext(MessagingException messagingException, Processor failingMessageProcessor,
-                                              Event event, MuleContext muleContext) {
+                                              InternalEvent event, MuleContext muleContext) {
     EnrichedNotificationInfo notificationInfo =
         createInfo(event, messagingException, null);
     for (ExceptionContextProvider exceptionContextProvider : muleContext.getExceptionContextProviders()) {
@@ -263,16 +263,17 @@ public class ExceptionUtils {
   }
 
   /**
-   * Create new {@link Event} with {@link org.mule.runtime.api.message.Error} instance set.
+   * Create new {@link InternalEvent} with {@link org.mule.runtime.api.message.Error} instance set.
    *
    * @param currentEvent event when error occured.
    * @param annotatedObject message processor/source.
    * @param messagingException messaging exception.
    * @param errorTypeLocator the mule context.
-   * @return new {@link Event} with relevant {@link org.mule.runtime.api.message.Error} set.
+   * @return new {@link InternalEvent} with relevant {@link org.mule.runtime.api.message.Error} set.
    */
-  public static Event createErrorEvent(Event currentEvent, Object annotatedObject, MessagingException messagingException,
-                                       ErrorTypeLocator errorTypeLocator) {
+  public static InternalEvent createErrorEvent(InternalEvent currentEvent, Object annotatedObject,
+                                               MessagingException messagingException,
+                                               ErrorTypeLocator errorTypeLocator) {
     // TODO: MULE-10970/MULE-10971 - Change signature to AnnotatedObject once every processor and source is one
     Throwable causeException = messagingException.getCause() != null ? messagingException.getCause() : messagingException;
 
@@ -287,7 +288,7 @@ public class ExceptionUtils {
             || messagingException.causedExactlyBy(error.getCause().getClass()))
         .isPresent()) {
       Error newError = getErrorFromFailingProcessor(annotatedObject, causeException, errorTypeLocator);
-      Event event = Event.builder(messagingException.getEvent()).error(newError).build();
+      InternalEvent event = InternalEvent.builder(messagingException.getEvent()).error(newError).build();
       messagingException.setProcessedEvent(event);
       return event;
     } else {
@@ -305,7 +306,7 @@ public class ExceptionUtils {
    * @param errorTypeLocator the error type locator
    * @param errorTypeRepository the error type repository
    * @param muleContext the context of the artifact
-   * @return a {@link MessagingException} with the proper {@link Error} associated to it's {@link Event}
+   * @return a {@link MessagingException} with the proper {@link Error} associated to it's {@link InternalEvent}
    */
   public static MessagingException updateMessagingException(Logger logger, Processor processor, MessagingException exception,
                                                             ErrorTypeLocator errorTypeLocator,
@@ -351,12 +352,12 @@ public class ExceptionUtils {
   }
 
   /**
-   * Searches for the root {@link Exception} to use to generate the {@link Error} inside the {@link Event}.
+   * Searches for the root {@link Exception} to use to generate the {@link Error} inside the {@link InternalEvent}.
    * <p>
    * If such exception exists, then it's because the exception is wrapping an exception that already has an error. For instance, a
    * streaming error. Or it may also be that there's a wrapper but just for throwing a more specific for details exception.
    * <p>
-   * If there's already a {@link MessagingException} with an {@link Event} that contains a non empty {@link Error} then that
+   * If there's already a {@link MessagingException} with an {@link InternalEvent} that contains a non empty {@link Error} then that
    * exception will be returned since it means that the whole process of creating the error was already executed.
    *
    * @param exception the exception to search in all it's causes for a {@link MessagingException} with an {@link Error}

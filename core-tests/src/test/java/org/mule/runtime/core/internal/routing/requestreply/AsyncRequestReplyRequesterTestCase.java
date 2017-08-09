@@ -7,7 +7,6 @@
 package org.mule.runtime.core.internal.routing.requestreply;
 
 import static java.util.Collections.singletonMap;
-import static java.util.OptionalInt.of;
 import static junit.framework.Assert.assertNull;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
@@ -18,7 +17,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
@@ -29,7 +27,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.message.GroupCorrelation;
@@ -49,7 +47,6 @@ import org.mule.tck.probe.PollingProber;
 import java.beans.ExceptionListener;
 import java.util.Map;
 import java.util.Optional;
-import java.util.OptionalInt;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -99,7 +96,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     asyncReplyMP.setReplySource(target.getMessageSource());
     asyncReplyMP.setMuleContext(muleContext);
 
-    Event resultEvent = asyncReplyMP.process(testEvent());
+    InternalEvent resultEvent = asyncReplyMP.process(testEvent());
 
     // Can't assert same because we copy event when we receive async reply
     assertEquals(testEvent().getMessageAsString(muleContext), resultEvent.getMessageAsString(muleContext));
@@ -110,14 +107,13 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     asyncReplyMP = new TestAsyncRequestReplyRequester(muleContext);
     SensingNullMessageProcessor target = getSensingNullMessageProcessor();
     AsyncDelegateMessageProcessor asyncMP = createAsyncMessageProcessor(target);
-    asyncMP.setFlowConstruct(flow);
     initialiseIfNeeded(asyncMP, true, muleContext);
     asyncMP.start();
     asyncReplyMP.setListener(asyncMP);
     asyncReplyMP.setReplySource(target.getMessageSource());
     asyncReplyMP.setMuleContext(muleContext);
 
-    Event resultEvent = asyncReplyMP.process(testEvent());
+    InternalEvent resultEvent = asyncReplyMP.process(testEvent());
 
     // Can't assert same because we copy event for async and also on async reply currently
     assertEquals(testEvent().getMessageAsString(muleContext), resultEvent.getMessageAsString(muleContext));
@@ -130,14 +126,13 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     SensingNullMessageProcessor target = getSensingNullMessageProcessor();
     target.setWaitTime(30000);
     AsyncDelegateMessageProcessor asyncMP = createAsyncMessageProcessor(target);
-    asyncMP.setFlowConstruct(flow);
     initialiseIfNeeded(asyncMP, true, muleContext);
     asyncMP.start();
     asyncReplyMP.setListener(asyncMP);
     asyncReplyMP.setReplySource(target.getMessageSource());
     asyncReplyMP.setMuleContext(muleContext);
 
-    Event event = eventBuilder().message(of(TEST_MESSAGE)).build();
+    InternalEvent event = eventBuilder().message(of(TEST_MESSAGE)).build();
 
     try {
       asyncReplyMP.process(event);
@@ -209,7 +204,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     for (int i = 0; i < 500; i++) {
       scheduler.execute(() -> {
         try {
-          Event resultEvent = asyncReplyMP.process(testEvent());
+          InternalEvent resultEvent = asyncReplyMP.process(testEvent());
 
           // Can't assert same because we copy event for async currently
           assertEquals(testEvent().getMessageAsString(muleContext), resultEvent.getMessageAsString(muleContext));
@@ -232,7 +227,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     RelaxedAsyncReplyMP mp = new RelaxedAsyncReplyMP(muleContext);
 
     try {
-      Event event =
+      InternalEvent event =
           eventBuilder().message(of("message1")).groupCorrelation(Optional.of(GroupCorrelation.of(0, 3))).build();
 
       SensingNullMessageProcessor listener = getSensingNullMessageProcessor();
@@ -241,7 +236,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
 
       mp.process(event);
 
-      Map<String, Event> responseEvents = mp.getResponseEvents();
+      Map<String, InternalEvent> responseEvents = mp.getResponseEvents();
       assertThat(responseEvents.entrySet(), empty());
     } finally {
       mp.stop();
@@ -259,7 +254,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
   protected AsyncDelegateMessageProcessor createAsyncMessageProcessor(SensingNullMessageProcessor target)
       throws InitialisationException {
     asyncMP = new AsyncDelegateMessageProcessor(newChain(target));
-    asyncMP.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
+    asyncMP.setAnnotations(getAppleFlowComponentLocationAnnotations());
     initialiseIfNeeded(asyncMP, true, muleContext);
     return asyncMP;
   }
@@ -292,7 +287,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
       start();
     }
 
-    public Map<String, Event> getResponseEvents() {
+    public Map<String, InternalEvent> getResponseEvents() {
       return responseEvents;
     }
   }

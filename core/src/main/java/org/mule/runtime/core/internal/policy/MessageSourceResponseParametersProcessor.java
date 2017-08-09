@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.core.internal.policy;
 
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
 
 import java.util.Map;
 
 /**
- * Implementation of this interfaces must provide functions to convert and {@link Event} to the response parameters of the success
+ * Implementation of this interfaces must provide functions to convert and {@link InternalEvent} to the response parameters of the success
  * and failure response functions.
  *
  * @since 4.0
@@ -26,7 +26,7 @@ public interface MessageSourceResponseParametersProcessor {
    *
    * @return a function to resolve the response function parameters.
    */
-  CheckedFunction<Event, Map<String, Object>> getSuccessfulExecutionResponseParametersFunction();
+  CheckedFunction<InternalEvent, Map<String, Object>> getSuccessfulExecutionResponseParametersFunction();
 
   /**
    * Generates the failure response function parameters. This function is later used to generate the response parameters and use
@@ -34,5 +34,5 @@ public interface MessageSourceResponseParametersProcessor {
    *
    * @return a function to resolve the failure response function parameters.
    */
-  CheckedFunction<Event, Map<String, Object>> getFailedExecutionResponseParametersFunction();
+  CheckedFunction<InternalEvent, Map<String, Object>> getFailedExecutionResponseParametersFunction();
 }

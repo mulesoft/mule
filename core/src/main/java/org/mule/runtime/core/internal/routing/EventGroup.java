@@ -11,7 +11,7 @@ import static org.mule.runtime.core.api.message.GroupCorrelation.NOT_SET;
 import static org.mule.runtime.core.api.util.StringUtils.DASH;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.config.MuleProperties;
@@ -42,12 +42,12 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
    */
   private static final long serialVersionUID = 953739659615692697L;
 
-  public static final Event[] EMPTY_EVENTS_ARRAY = new Event[0];
+  public static final InternalEvent[] EMPTY_EVENTS_ARRAY = new InternalEvent[0];
 
   public static final String MULE_ARRIVAL_ORDER_PROPERTY = MuleProperties.PROPERTY_PREFIX + "ARRIVAL_ORDER";
 
   private final Object groupId;
-  private transient PartitionableObjectStore<Event> eventsObjectStore;
+  private transient PartitionableObjectStore<InternalEvent> eventsObjectStore;
   private final String storePrefix;
   private final String eventsPartitionKey;
   private final long created;
@@ -138,28 +138,28 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
 
   /**
    * Returns an iterator over a snapshot copy of this group's collected events sorted by their arrival time. If you need to
-   * iterate over the group and e.g. remove select events, do so via {@link #removeEvent(Event)}. If you need to do so atomically
+   * iterate over the group and e.g. remove select events, do so via {@link #removeEvent(InternalEvent)}. If you need to do so atomically
    * in order to prevent e.g. concurrent reception/aggregation of the group during iteration, wrap the iteration in a synchronized
    * block on the group instance.
    *
-   * @return an iterator over collected {@link Event}s.
+   * @return an iterator over collected {@link InternalEvent}s.
    * @throws ObjectStoreException
    */
-  public Iterator<Event> iterator() throws ObjectStoreException {
+  public Iterator<InternalEvent> iterator() throws ObjectStoreException {
     return iterator(true);
   }
 
   /**
    * Returns an iterator over a snapshot copy of this group's collected events., optionally sorted by arrival order. If you need
-   * to iterate over the group and e.g. remove select events, do so via {@link #removeEvent(Event)}. If you need to do so
+   * to iterate over the group and e.g. remove select events, do so via {@link #removeEvent(InternalEvent)}. If you need to do so
    * atomically in order to prevent e.g. concurrent reception/aggregation of the group during iteration, wrap the iteration in a
    * synchronized block on the group instance.
    *
-   * @return an iterator over collected {@link Event}s.
+   * @return an iterator over collected {@link InternalEvent}s.
    * @throws ObjectStoreException
    */
   @SuppressWarnings("unchecked")
-  public Iterator<Event> iterator(boolean sortByArrival) throws ObjectStoreException {
+  public Iterator<InternalEvent> iterator(boolean sortByArrival) throws ObjectStoreException {
     synchronized (this) {
       if (eventsObjectStore.allKeys(eventsPartitionKey).isEmpty()) {
         return IteratorUtils.emptyIterator();
@@ -173,26 +173,26 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
   /**
    * Returns a snapshot of collected events in this group sorted by their arrival time.
    *
-   * @return an array of collected {@link Event}s.
+   * @return an array of collected {@link InternalEvent}s.
    * @throws ObjectStoreException
    */
-  public Event[] toArray() throws ObjectStoreException {
+  public InternalEvent[] toArray() throws ObjectStoreException {
     return toArray(true);
   }
 
   /**
    * Returns a snapshot of collected events in this group, optionally sorted by their arrival time.
    *
-   * @return an array of collected {@link Event}s.
+   * @return an array of collected {@link InternalEvent}s.
    * @throws ObjectStoreException
    */
-  public Event[] toArray(boolean sortByArrival) throws ObjectStoreException {
+  public InternalEvent[] toArray(boolean sortByArrival) throws ObjectStoreException {
     synchronized (this) {
       if (eventsObjectStore.allKeys(eventsPartitionKey).isEmpty()) {
         return EMPTY_EVENTS_ARRAY;
       }
       List<String> keys = eventsObjectStore.allKeys(eventsPartitionKey);
-      Event[] eventArray = new Event[keys.size()];
+      InternalEvent[] eventArray = new InternalEvent[keys.size()];
       for (int i = 0; i < keys.size(); i++) {
         eventArray[i] = eventsObjectStore.retrieve(keys.get(i), eventsPartitionKey);
       }
@@ -209,9 +209,9 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
    * @param event the event to add
    * @throws ObjectStoreException
    */
-  public void addEvent(Event event) throws ObjectStoreException {
+  public void addEvent(InternalEvent event) throws ObjectStoreException {
     synchronized (this) {
-      event = Event.builder(event).addVariable(MULE_ARRIVAL_ORDER_PROPERTY, ++arrivalOrderCounter).build();
+      event = InternalEvent.builder(event).addVariable(MULE_ARRIVAL_ORDER_PROPERTY, ++arrivalOrderCounter).build();
       // Using both event ID and CorrelationSequence since in certain instances
       // when an event is split up, the same event IDs are used.
       String key = getEventKey(event);
@@ -219,7 +219,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
     }
   }
 
-  private String getEventKey(Event event) {
+  private String getEventKey(InternalEvent event) {
     StringBuilder stringBuilder = new StringBuilder();
     event.getGroupCorrelation().ifPresent(v -> stringBuilder.append(v.getSequence() + DASH));
     stringBuilder.append(event.hashCode());
@@ -312,17 +312,18 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
     return buf.toString();
   }
 
-  public Event getMessageCollectionEvent() {
+  public InternalEvent getMessageCollectionEvent() {
     try {
       if (size() > 0) {
 
-        Event[] muleEvents = toArray(true);
-        Event lastEvent = muleEvents[muleEvents.length - 1];
+        InternalEvent[] muleEvents = toArray(true);
+        InternalEvent lastEvent = muleEvents[muleEvents.length - 1];
 
         List<Message> messageList = Arrays.stream(muleEvents).map(event -> event.getMessage()).collect(toList());
 
         final Message.Builder builder = Message.builder().collectionValue(messageList, Message.class);
-        Event muleEvent = Event.builder(lastEvent).message(builder.build()).session(getMergedSession(muleEvents)).build();
+        InternalEvent muleEvent =
+            InternalEvent.builder(lastEvent).message(builder.build()).session(getMergedSession(muleEvents)).build();
         return muleEvent;
       } else {
         return null;
@@ -333,7 +334,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
     }
   }
 
-  protected MuleSession getMergedSession(Event[] events) throws ObjectStoreException {
+  protected MuleSession getMergedSession(InternalEvent[] events) throws ObjectStoreException {
     MuleSession session = new DefaultMuleSession(events[0].getSession());
     for (int i = 1; i < events.length - 1; i++) {
       addAndOverrideSessionProperties(session, events[i]);
@@ -342,7 +343,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
     return session;
   }
 
-  private void addAndOverrideSessionProperties(MuleSession session, Event event) {
+  private void addAndOverrideSessionProperties(MuleSession session, InternalEvent event) {
     for (String name : event.getSession().getPropertyNamesAsSet()) {
       session.setProperty(name, event.getSession().getProperty(name));
     }
@@ -352,7 +353,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
     this.muleContext = context;
   }
 
-  public void initEventsStore(PartitionableObjectStore<Event> events) throws ObjectStoreException {
+  public void initEventsStore(PartitionableObjectStore<InternalEvent> events) throws ObjectStoreException {
     this.eventsObjectStore = events;
     events.open(eventsPartitionKey);
   }
@@ -361,15 +362,15 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
     return muleContext != null;
   }
 
-  public final class ArrivalOrderEventComparator implements Comparator<Event> {
+  public final class ArrivalOrderEventComparator implements Comparator<InternalEvent> {
 
     @Override
-    public int compare(Event event1, Event event2) {
+    public int compare(InternalEvent event1, InternalEvent event2) {
       return getEventOrder(event1) - getEventOrder(event2);
     }
 
-    private int getEventOrder(Event event) {
-      Integer orderVariable = (Integer) event.getVariable(MULE_ARRIVAL_ORDER_PROPERTY).getValue();
+    private int getEventOrder(InternalEvent event) {
+      Integer orderVariable = (Integer) event.getVariables().get(MULE_ARRIVAL_ORDER_PROPERTY).getValue();
       return orderVariable != null ? orderVariable : -1;
     }
   }

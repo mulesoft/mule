@@ -34,8 +34,8 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.EventContext;
+import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.InternalEventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.exception.ErrorTypeLocator;
@@ -171,10 +171,10 @@ public class ExceptionUtilsTestCase extends AbstractMuleTestCase {
     MuleContext muleContextMock = mock(MuleContext.class);
     ErrorTypeLocator errorTypeLocatorMock = mock(ErrorTypeLocator.class);
 
-    Event eventMock = mock(Event.class);
+    InternalEvent eventMock = mock(InternalEvent.class);
     FlowCallStack flowCallStackMock = mock(FlowCallStack.class);
     Message messageMock = mock(Message.class);
-    EventContext eventContextMock = mock(EventContext.class);
+    InternalEventContext eventContextMock = mock(InternalEventContext.class);
     when(eventContextMock.getOriginatingLocation()).thenReturn(TEST_CONNECTOR_LOCATION);
 
     Optional<Error> errorOptional = Optional.ofNullable(null);
@@ -195,7 +195,7 @@ public class ExceptionUtilsTestCase extends AbstractMuleTestCase {
 
     updateMessagingExceptionWithError(messagingExceptionMock, processorMock, muleContextMock);
 
-    verify(messagingExceptionMock, atLeast(1)).setProcessedEvent(any(Event.class));
+    verify(messagingExceptionMock, atLeast(1)).setProcessedEvent(any(InternalEvent.class));
   }
 
   @Test
@@ -205,10 +205,10 @@ public class ExceptionUtilsTestCase extends AbstractMuleTestCase {
     MuleContext muleContextMock = mock(MuleContext.class);
     ErrorTypeLocator errorTypeLocatorMock = mock(ErrorTypeLocator.class);
 
-    Event eventMock = mock(Event.class);
+    InternalEvent eventMock = mock(InternalEvent.class);
     FlowCallStack flowCallStackMock = mock(FlowCallStack.class);
     Message messageMock = mock(Message.class);
-    EventContext eventContextMock = mock(EventContext.class);
+    InternalEventContext eventContextMock = mock(InternalEventContext.class);
     when(eventContextMock.getOriginatingLocation()).thenReturn(TEST_CONNECTOR_LOCATION);
 
     Error errorMock = mock(Error.class);
@@ -230,6 +230,6 @@ public class ExceptionUtilsTestCase extends AbstractMuleTestCase {
 
     updateMessagingExceptionWithError(messagingExceptionMock, processorMock, muleContextMock);
 
-    verify(messagingExceptionMock, times(0)).setProcessedEvent(any(Event.class));
+    verify(messagingExceptionMock, times(0)).setProcessedEvent(any(InternalEvent.class));
   }
 }

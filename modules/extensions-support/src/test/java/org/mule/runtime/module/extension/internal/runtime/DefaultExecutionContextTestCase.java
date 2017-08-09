@@ -18,7 +18,7 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
@@ -61,7 +61,7 @@ public class DefaultExecutionContextTestCase extends AbstractMuleTestCase {
   private ResolverSetResult resolverSetResult;
 
   @Mock
-  private Event event;
+  private InternalEvent event;
 
   @Mock
   private MuleContext muleContext;
@@ -144,4 +144,5 @@ public class DefaultExecutionContextTestCase extends AbstractMuleTestCase {
   public void removeNullValueVariable() {
     operationContext.removeVariable(null);
   }
+
 }

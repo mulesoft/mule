@@ -13,10 +13,8 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.AbstractProcessor;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
@@ -32,11 +30,10 @@ import org.slf4j.LoggerFactory;
  * metadata is related to the <processor> element it self and not to the referenced object.
  */
 public class ReferenceProcessor extends AbstractProcessor
-    implements InterceptingMessageProcessor, FlowConstructAware, MuleContextAware, Lifecycle {
+    implements InterceptingMessageProcessor, MuleContextAware, Lifecycle {
 
   private static final Logger logger = LoggerFactory.getLogger(ReferenceProcessor.class);
   private final Processor referencedProcessor;
-  private FlowConstruct flowConstruct;
   private MuleContext muleContext;
 
   public ReferenceProcessor(Processor processor) {
@@ -44,22 +41,17 @@ public class ReferenceProcessor extends AbstractProcessor
   }
 
   @Override
-  public Event process(Event event) throws MuleException {
+  public InternalEvent process(InternalEvent event) throws MuleException {
     return referencedProcessor.process(event);
   }
 
   @Override
-  public Publisher<Event> apply(Publisher<Event> publisher) {
+  public Publisher<InternalEvent> apply(Publisher<InternalEvent> publisher) {
     return referencedProcessor.apply(publisher);
   }
 
   public Processor getReferencedProcessor() {
     return referencedProcessor;
-  }
-
-  @Override
-  public void setFlowConstruct(FlowConstruct flowConstruct) {
-    this.flowConstruct = flowConstruct;
   }
 
   @Override
@@ -84,7 +76,7 @@ public class ReferenceProcessor extends AbstractProcessor
 
   @Override
   public void initialise() throws InitialisationException {
-    initialiseIfNeeded(referencedProcessor, muleContext, flowConstruct);
+    initialiseIfNeeded(referencedProcessor, muleContext);
   }
 
   @Override

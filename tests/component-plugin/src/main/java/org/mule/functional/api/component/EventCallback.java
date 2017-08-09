@@ -6,7 +6,7 @@
  */
 package org.mule.functional.api.component;
 
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 
 /**
@@ -18,5 +18,5 @@ import org.mule.runtime.core.api.MuleContext;
  */
 public interface EventCallback {
 
-  void eventReceived(Event event, Object component, MuleContext muleContext) throws Exception;
+  void eventReceived(InternalEvent event, Object component, MuleContext muleContext) throws Exception;
 }

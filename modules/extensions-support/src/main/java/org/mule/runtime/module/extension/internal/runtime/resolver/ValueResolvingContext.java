@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
+import org.mule.runtime.core.api.InternalEvent;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -20,26 +20,26 @@ import java.util.Optional;
  */
 public class ValueResolvingContext {
 
-  private final Event event;
+  private final InternalEvent event;
   private final ConfigurationInstance config;
 
-  private ValueResolvingContext(Event event, ConfigurationInstance config) {
+  private ValueResolvingContext(InternalEvent event, ConfigurationInstance config) {
     this.event = event;
     this.config = config;
   }
 
-  public static ValueResolvingContext from(Event event) {
+  public static ValueResolvingContext from(InternalEvent event) {
     return new ValueResolvingContext(event, null);
   }
 
-  public static ValueResolvingContext from(Event event, Optional<ConfigurationInstance> config) {
+  public static ValueResolvingContext from(InternalEvent event, Optional<ConfigurationInstance> config) {
     return new ValueResolvingContext(event, config.orElse(null));
   }
 
   /**
-   * @return the {@link Event} of the current resolution context
+   * @return the {@link InternalEvent} of the current resolution context
    */
-  public Event getEvent() {
+  public InternalEvent getEvent() {
     return event;
   }
 

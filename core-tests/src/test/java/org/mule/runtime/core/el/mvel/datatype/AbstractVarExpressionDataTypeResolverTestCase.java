@@ -18,7 +18,7 @@ import org.mule.mvel2.ParserContext;
 import org.mule.mvel2.compiler.CompiledExpression;
 import org.mule.mvel2.integration.impl.CachedMapVariableResolverFactory;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.el.mvel.DelegateVariableResolverFactory;
 import org.mule.runtime.core.el.mvel.GlobalVariableResolverFactory;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
@@ -67,7 +67,7 @@ public abstract class AbstractVarExpressionDataTypeResolverTestCase extends Abst
   protected void doVarDataTypeTest(String expression) throws Exception {
     DataType expectedDataType = DataType.builder().type(String.class).mediaType(JSON).charset(CUSTOM_ENCODING).build();
 
-    Event event = setVariable(testEvent(), EXPRESSION_VALUE, expectedDataType);
+    InternalEvent event = setVariable(testEvent(), EXPRESSION_VALUE, expectedDataType);
 
     final ParserConfiguration parserConfiguration = MVELExpressionLanguage.createParserConfiguration(Collections.EMPTY_MAP);
     final MVELExpressionLanguageContext context = createMvelExpressionLanguageContext(event, parserConfiguration);
@@ -80,7 +80,7 @@ public abstract class AbstractVarExpressionDataTypeResolverTestCase extends Abst
     assertThat(expressionDataTypeResolver.resolve(event, compiledExpression), like(String.class, JSON, CUSTOM_ENCODING));
   }
 
-  protected MVELExpressionLanguageContext createMvelExpressionLanguageContext(Event testEvent,
+  protected MVELExpressionLanguageContext createMvelExpressionLanguageContext(InternalEvent testEvent,
                                                                               ParserConfiguration parserConfiguration) {
     final MVELExpressionLanguageContext context = new MVELExpressionLanguageContext(parserConfiguration, muleContext);
     final StaticVariableResolverFactory staticContext = new StaticVariableResolverFactory(parserConfiguration, muleContext);
@@ -90,15 +90,15 @@ public abstract class AbstractVarExpressionDataTypeResolverTestCase extends Abst
     final DelegateVariableResolverFactory innerDelegate =
         new DelegateVariableResolverFactory(globalContext,
                                             new VariableVariableResolverFactory(parserConfiguration, muleContext, testEvent,
-                                                                                Event.builder(testEvent)));
+                                                                                InternalEvent.builder(testEvent)));
     final DelegateVariableResolverFactory delegate =
         new DelegateVariableResolverFactory(staticContext, new MessageVariableResolverFactory(parserConfiguration, muleContext,
                                                                                               testEvent,
-                                                                                              Event.builder(testEvent),
+                                                                                              InternalEvent.builder(testEvent),
                                                                                               innerDelegate));
     context.setNextFactory(new CachedMapVariableResolverFactory(Collections.EMPTY_MAP, delegate));
     return context;
   }
 
-  protected abstract Event setVariable(Event testEvent, Object propertyValue, DataType expectedDataType);
+  protected abstract InternalEvent setVariable(InternalEvent testEvent, Object propertyValue, DataType expectedDataType);
 }

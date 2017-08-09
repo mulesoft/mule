@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 
@@ -14,7 +14,7 @@ import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapte
  * An implementation of {@link ReturnDelegate} intended for operations which return {@link Void} and that were executed with a
  * {@link ExecutionContextAdapter}
  * <p/>
- * It returns the {@link Event} that {@link ExecutionContextAdapter} provides. Notices that this class will fail if used with any
+ * It returns the {@link InternalEvent} that {@link ExecutionContextAdapter} provides. Notices that this class will fail if used with any
  * other type of {@link ExecutionContext}
  * <p/>
  * This class is intended to be used as a singleton, use the {@link #INSTANCE} attribute to access the instance
@@ -33,7 +33,7 @@ final class VoidReturnDelegate implements ReturnDelegate {
    * @return {@link ExecutionContextAdapter#getEvent()}
    */
   @Override
-  public Event asReturnValue(Object value, ExecutionContextAdapter operationContext) {
+  public InternalEvent asReturnValue(Object value, ExecutionContextAdapter operationContext) {
     return operationContext.getEvent();
   }
 }

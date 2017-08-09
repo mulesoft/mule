@@ -18,7 +18,7 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.config.builders.BasicRuntimeServicesConfigurationBuilder;
 import org.mule.runtime.core.DefaultEventContext;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.construct.Flow;
@@ -80,13 +80,13 @@ public class AbstractBenchmark {
     return builder(FLOW_NAME, muleContext).build();
   }
 
-  public Event createEvent(Flow flow) {
+  public InternalEvent createEvent(Flow flow) {
     return createEvent(flow, PAYLOAD);
   }
 
-  public Event createEvent(Flow flow, Object payload) {
+  public InternalEvent createEvent(Flow flow, Object payload) {
     try {
-      return Event.builder(DefaultEventContext.create(flow, CONNECTOR_LOCATION)).message(of(payload)).build();
+      return InternalEvent.builder(DefaultEventContext.create(flow, CONNECTOR_LOCATION)).message(of(payload)).build();
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

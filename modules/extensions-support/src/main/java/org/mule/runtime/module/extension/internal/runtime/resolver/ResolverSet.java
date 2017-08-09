@@ -15,7 +15,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
@@ -46,7 +46,7 @@ public class ResolverSet implements ValueResolver<ResolverSetResult>, Initialisa
   private Map<String, ValueResolver<?>> resolvers = new LinkedHashMap<>();
   private boolean dynamic = false;
   private final MuleContext muleContext;
-  private Function<Event, Optional<ConfigurationInstance>> configProvider;
+  private Function<InternalEvent, Optional<ConfigurationInstance>> configProvider;
 
   public ResolverSet(MuleContext muleContext) {
     this.muleContext = muleContext;

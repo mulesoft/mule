@@ -7,7 +7,7 @@
 package org.mule.runtime.core.internal.execution;
 
 import static org.junit.Assert.assertThat;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.Transaction;
@@ -54,7 +54,7 @@ public class ValidateTransactionalStateInterceptorTestCase extends AbstractMuleT
       new HashMap<Boolean, Map<MuleTransactionConfig, Boolean>>();
   private boolean hasTransactionInContext;
   private TransactionConfig transactionConfig;
-  private Event mockMuleEvent = Mockito.mock(Event.class);
+  private InternalEvent mockMuleEvent = Mockito.mock(InternalEvent.class);
   private Transaction mockTransaction = Mockito.mock(Transaction.class);
 
   @Parameterized.Parameters
@@ -105,17 +105,18 @@ public class ValidateTransactionalStateInterceptorTestCase extends AbstractMuleT
   public void testTransactionalState() throws Exception {
     boolean shouldThrowException = resultMap.get(hasTransactionInContext).get(transactionConfig);
     Exception thrownException = null;
-    Event result = null;
+    InternalEvent result = null;
     if (hasTransactionInContext) {
       TransactionCoordination.getInstance().bindTransaction(mockTransaction);
     }
-    ValidateTransactionalStateInterceptor<Event> interceptor =
-        new ValidateTransactionalStateInterceptor<Event>(new ExecuteCallbackInterceptor<Event>(), transactionConfig);
+    ValidateTransactionalStateInterceptor<InternalEvent> interceptor =
+        new ValidateTransactionalStateInterceptor<InternalEvent>(new ExecuteCallbackInterceptor<InternalEvent>(),
+                                                                 transactionConfig);
     try {
-      result = interceptor.execute(new ExecutionCallback<Event>() {
+      result = interceptor.execute(new ExecutionCallback<InternalEvent>() {
 
         @Override
-        public Event process() throws Exception {
+        public InternalEvent process() throws Exception {
           return mockMuleEvent;
         }
       }, new ExecutionContext());

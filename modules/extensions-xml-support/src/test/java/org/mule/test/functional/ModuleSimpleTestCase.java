@@ -16,7 +16,7 @@ import org.junit.Test;
 import org.junit.runners.Parameterized;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.test.runner.RunnerDelegateTo;
 
 import java.util.Collection;
@@ -33,9 +33,9 @@ public class ModuleSimpleTestCase extends AbstractXmlExtensionMuleArtifactFuncti
   @Parameterized.Parameters(name = "{index}: Running tests for {0} ")
   public static Collection<Object[]> data() {
     return asList(new Object[][] {
-        //simple scenario
+        // simple scenario
         {"flows/flows-using-module-simple.xml", new String[] {"modules/module-simple.xml"}},
-        //nested modules scenario
+        // nested modules scenario
         {"flows/nested/flows-using-module-simple-proxy.xml",
             new String[] {"modules/module-simple.xml", "modules/nested/module-simple-proxy.xml"}}
     });
@@ -53,65 +53,65 @@ public class ModuleSimpleTestCase extends AbstractXmlExtensionMuleArtifactFuncti
 
   @Test
   public void testSetPayloadHardcodedFlow() throws Exception {
-    Event event = flowRunner("testSetPayloadHardcodedFlow").run();
+    InternalEvent event = flowRunner("testSetPayloadHardcodedFlow").run();
     assertThat(event.getMessage().getPayload().getValue(), is("hardcoded value"));
   }
 
   @Test
   public void testSetPayloadParamFlow() throws Exception {
-    Event muleEvent = flowRunner("testSetPayloadParamFlow").run();
+    InternalEvent muleEvent = flowRunner("testSetPayloadParamFlow").run();
     assertThat(muleEvent.getMessage().getPayload().getValue(), is("new payload"));
   }
 
   @Test
   public void testSetPayloadParamDefaultFlow() throws Exception {
-    Event muleEvent = flowRunner("testSetPayloadParamDefaultFlow").run();
+    InternalEvent muleEvent = flowRunner("testSetPayloadParamDefaultFlow").run();
     assertThat(muleEvent.getMessage().getPayload().getValue(), is("15"));
   }
 
   @Test
   public void testSetPayloadParamDefaultUseOptionalFlow() throws Exception {
-    Event muleEvent = flowRunner("testSetPayloadParamDefaultUseOptionalFlow").run();
+    InternalEvent muleEvent = flowRunner("testSetPayloadParamDefaultUseOptionalFlow").run();
     assertThat(muleEvent.getMessage().getPayload().getValue(), is("15"));
   }
 
   @Test
   public void testSetPayloadNoSideEffectFlowVariable() throws Exception {
-    Event muleEvent = flowRunner("testSetPayloadNoSideEffectFlowVariable").run();
+    InternalEvent muleEvent = flowRunner("testSetPayloadNoSideEffectFlowVariable").run();
     assertThat(muleEvent.getMessage().getPayload().getValue(), is("10"));
-    assertThat(muleEvent.getVariable("testVar").getValue(), is("unchanged value"));
+    assertThat(muleEvent.getVariables().get("testVar").getValue(), is("unchanged value"));
   }
 
   @Test
   public void testDoNothingFlow() throws Exception {
-    Event muleEvent = flowRunner("testDoNothingFlow").run();
+    InternalEvent muleEvent = flowRunner("testDoNothingFlow").run();
     assertThat(muleEvent.getMessage().getPayload().getValue(), is("before calling"));
-    assertThat(muleEvent.getVariable("variableBeforeCalling").getValue(), is("value of flowvar before calling"));
+    assertThat(muleEvent.getVariables().get("variableBeforeCalling").getValue(), is("value of flowvar before calling"));
   }
 
   @Test
   public void testSetPayloadParamValueAppender() throws Exception {
-    Event muleEvent = flowRunner("testSetPayloadParamValueAppender").run();
+    InternalEvent muleEvent = flowRunner("testSetPayloadParamValueAppender").run();
     assertThat(muleEvent.getMessage().getPayload().getValue(), is("new payload from module"));
   }
 
   @Test
   public void testSetPayloadConcatParamsValues() throws Exception {
-    Event muleEvent = flowRunner("testSetPayloadConcatParamsValues").run();
+    InternalEvent muleEvent = flowRunner("testSetPayloadConcatParamsValues").run();
     assertThat(muleEvent.getMessage().getPayload().getValue(), is("105"));
   }
 
   @Test
   public void testSetPayloadUsingUndefinedParam() throws Exception {
-    Event muleEvent = flowRunner("testSetPayloadUsingUndefinedParam").run();
+    InternalEvent muleEvent = flowRunner("testSetPayloadUsingUndefinedParam").run();
     assertThat(muleEvent.getMessage().getPayload().getValue(), is(nullValue()));
   }
 
   @Test
   public void testSetPayloadHardcodedFlowWithTarget() throws Exception {
-    Event event = flowRunner("testSetPayloadHardcodedFlowWithTarget").run();
+    InternalEvent event = flowRunner("testSetPayloadHardcodedFlowWithTarget").run();
     assertThat(event.getMessage().getPayload().getValue(), nullValue());
-    final TypedValue<Object> targetVariable = event.getVariable("target-variable");
+    final TypedValue<?> targetVariable = event.getVariables().get("target-variable");
     assertThat(targetVariable, notNullValue());
     assertThat(targetVariable.getValue(), instanceOf(Message.class));
     Message targetMessage = (Message) targetVariable.getValue();
@@ -120,9 +120,9 @@ public class ModuleSimpleTestCase extends AbstractXmlExtensionMuleArtifactFuncti
 
   @Test
   public void testSetPayloadHardcodedFlowWithTargetOverridingAnExistingVariable() throws Exception {
-    Event event = flowRunner("testSetPayloadHardcodedFlowWithTargetOverridingAnExistingVariable").run();
+    InternalEvent event = flowRunner("testSetPayloadHardcodedFlowWithTargetOverridingAnExistingVariable").run();
     assertThat(event.getMessage().getPayload().getValue(), nullValue());
-    final TypedValue<Object> targetVariable = event.getVariable("existing-variable");
+    final TypedValue<?> targetVariable = event.getVariables().get("existing-variable");
     assertThat(targetVariable, notNullValue());
     assertThat(targetVariable.getValue(), instanceOf(Message.class));
     Message targetMessage = (Message) targetVariable.getValue();
@@ -131,13 +131,13 @@ public class ModuleSimpleTestCase extends AbstractXmlExtensionMuleArtifactFuncti
 
   @Test
   public void testSetPayloadUsingOptionalParam() throws Exception {
-    Event muleEvent = flowRunner("testSetPayloadUsingOptionalParam").run();
+    InternalEvent muleEvent = flowRunner("testSetPayloadUsingOptionalParam").run();
     assertThat(muleEvent.getMessage().getPayload().getValue(), is(nullValue()));
   }
 
   @Test
   public void testSetPayloadUsingParamValueMoreThanOnceFlow() throws Exception {
-    Event muleEvent = flowRunner("testSetPayloadUsingParamValueMoreThanOnceFlow").run();
+    InternalEvent muleEvent = flowRunner("testSetPayloadUsingParamValueMoreThanOnceFlow").run();
     assertThat(muleEvent.getMessage().getPayload().getValue(),
                is("a payload written 2 or more times in the same operation using the same parameter"));
   }

@@ -10,7 +10,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.TargetType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.rx.Exceptions;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
@@ -54,10 +54,10 @@ public class PagedOperationMessageProcessor extends OperationMessageProcessor {
   }
 
   @Override
-  protected Mono<Event> doProcess(Event event, ExecutionContextAdapter<OperationModel> operationContext) {
+  protected Mono<InternalEvent> doProcess(InternalEvent event, ExecutionContextAdapter<OperationModel> operationContext) {
     return super.doProcess(event, operationContext).map(resultEvent -> {
       PagingProvider<?, ?> pagingProvider = getTarget()
-          .map(target -> getPagingProvider(resultEvent.getVariable(target).getValue()))
+          .map(target -> getPagingProvider(resultEvent.getVariables().get(target).getValue()))
           .orElseGet(() -> getPagingProvider(resultEvent.getMessage()));
 
       if (pagingProvider == null) {

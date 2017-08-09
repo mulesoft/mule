@@ -10,7 +10,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.api.security.SecurityProviderNotFoundException;
 import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 
 /**
  * <code>AbstractEndpointSecurityFilter</code> provides a framework to perform inbound or outbound authentication for messages.
@@ -24,13 +24,14 @@ public abstract class AbstractAuthenticationFilter extends AbstractSecurityFilte
   }
 
   @Override
-  public Event doFilter(Event event) throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
+  public InternalEvent doFilter(InternalEvent event)
+      throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
       SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, InitialisationException {
     return authenticate(event);
   }
 
   @Override
-  public abstract Event authenticate(Event event) throws SecurityException, UnknownAuthenticationTypeException,
+  public abstract InternalEvent authenticate(InternalEvent event) throws SecurityException, UnknownAuthenticationTypeException,
       CryptoFailureException, SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, InitialisationException;
 
 }

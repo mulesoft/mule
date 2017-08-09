@@ -7,7 +7,6 @@
 package org.mule.runtime.core.el.context;
 
 import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
@@ -26,20 +25,19 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.DefaultTransformationService;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.message.InternalMessage;
 
 import java.util.Optional;
-import java.util.OptionalInt;
 
 import org.junit.Before;
 import org.junit.Test;
 
 public class MessageContextTestCase extends AbstractELTestCase {
 
-  private Event event;
+  private InternalEvent event;
   private Message message;
 
   public MessageContextTestCase(String mvelOptimizer) {
@@ -48,7 +46,7 @@ public class MessageContextTestCase extends AbstractELTestCase {
 
   @Before
   public void setup() {
-    event = mock(Event.class, RETURNS_DEEP_STUBS);
+    event = mock(InternalEvent.class, RETURNS_DEEP_STUBS);
     when(event.getFlowCallStack()).thenReturn(new DefaultFlowCallStack());
     when(event.getError()).thenReturn(empty());
     message = spy(Message.of(null));
@@ -58,14 +56,14 @@ public class MessageContextTestCase extends AbstractELTestCase {
 
   @Test
   public void message() throws Exception {
-    Event event = Event.builder(context).message(Message.of("foo")).build();
+    InternalEvent event = InternalEvent.builder(context).message(Message.of("foo")).build();
     assertTrue(evaluate("message", event) instanceof MessageContext);
     assertEquals("foo", evaluate("message.payload", event));
   }
 
   @Test
   public void assignToMessage() throws Exception {
-    Event event = Event.builder(context).message(Message.of("")).build();
+    InternalEvent event = InternalEvent.builder(context).message(Message.of("")).build();
     assertImmutableVariable("message='foo'", event);
   }
 
@@ -109,7 +107,7 @@ public class MessageContextTestCase extends AbstractELTestCase {
   @Test
   public void assignPayload() throws Exception {
     message = Message.of("");
-    Event.Builder eventBuilder = Event.builder(event);
+    InternalEvent.Builder eventBuilder = InternalEvent.builder(event);
     evaluate("message.payload = 'foo'", event, eventBuilder);
     assertThat(eventBuilder.build().getMessage().getPayload().getValue(), equalTo("foo"));
   }

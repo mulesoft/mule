@@ -12,13 +12,13 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.api.Event.builder;
+import static org.mule.runtime.core.api.InternalEvent.builder;
 import static org.mule.runtime.core.api.routing.ForkJoinStrategy.RoutingPair.of;
 import static reactor.core.publisher.Flux.fromIterable;
 import static reactor.core.publisher.Mono.from;
 
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.routing.ForkJoinStrategy;
 import org.mule.runtime.core.api.routing.ForkJoinStrategy.RoutingPair;
 
@@ -36,7 +36,7 @@ public class CollectListForkJoinStrategyTestCase extends AbstractForkJoinStrateg
   @Test
   public void collectList() throws Exception {
 
-    Event original = testEvent();
+    InternalEvent original = testEvent();
     Message route1Result = of("1");
     Message route2Result = of("2");
     Message route3Result = of("3");
@@ -45,7 +45,7 @@ public class CollectListForkJoinStrategyTestCase extends AbstractForkJoinStrateg
     RoutingPair pair2 = of(testEvent(), event -> builder(event).message(route2Result).build());
     RoutingPair pair3 = of(testEvent(), event -> builder(event).message(route3Result).build());
 
-    Event result =
+    InternalEvent result =
         from(strategy.forkJoin(original, fromIterable(asList(pair1, pair2, pair3)),
                                processingStrategy, 1, true)).block();
 

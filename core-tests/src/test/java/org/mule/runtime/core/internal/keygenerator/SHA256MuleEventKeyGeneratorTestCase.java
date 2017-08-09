@@ -15,7 +15,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.Message.of;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -48,7 +48,7 @@ public class SHA256MuleEventKeyGeneratorTestCase extends AbstractMuleContextTest
 
   @Test
   public void failsToGenerateKeyWhenCannotReadPayload() throws Exception {
-    Event event = mock(Event.class);
+    InternalEvent event = mock(InternalEvent.class);
     final DefaultMuleException fail = new DefaultMuleException("Fail");
     when(event.getMessageAsBytes(muleContext)).thenThrow(fail);
     expectedException.expect(MuleRuntimeException.class);

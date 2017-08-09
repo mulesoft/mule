@@ -18,11 +18,9 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.DispatchException;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
@@ -72,9 +70,10 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
   private Cache<Processor, MessageProcessorChain> processorChainCache = newBuilder().build();
 
   @Override
-  public Event process(final Event event) throws MuleException {
-    ExecutionTemplate<Event> executionTemplate = createTransactionalExecutionTemplate(muleContext, getTransactionConfig());
-    ExecutionCallback<Event> processingCallback = () -> {
+  public InternalEvent process(final InternalEvent event) throws MuleException {
+    ExecutionTemplate<InternalEvent> executionTemplate =
+        createTransactionalExecutionTemplate(muleContext, getTransactionConfig());
+    ExecutionCallback<InternalEvent> processingCallback = () -> {
       try {
         return route(event);
       } catch (RoutingException e1) {
@@ -92,10 +91,11 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
     }
   }
 
-  protected abstract Event route(Event event) throws MuleException;
+  protected abstract InternalEvent route(InternalEvent event) throws MuleException;
 
-  protected final Event sendRequest(final Event event, final Processor route, boolean awaitResponse) throws MuleException {
-    Event result;
+  protected final InternalEvent sendRequest(final InternalEvent event, final Processor route, boolean awaitResponse)
+      throws MuleException {
+    InternalEvent result;
     try {
       result = sendRequestEvent(event, route, awaitResponse);
     } catch (MessagingException me) {
@@ -165,9 +165,6 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
     if (route instanceof MuleContextAware) {
       ((MuleContextAware) route).setMuleContext(muleContext);
     }
-    if (route instanceof FlowConstructAware) {
-      ((FlowConstructAware) route).setFlowConstruct(flowConstruct);
-    }
     if (route instanceof Initialisable) {
       ((Initialisable) route).initialise();
     }
@@ -193,14 +190,14 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
   /**
    * Send message event to destination.
    */
-  protected Event sendRequestEvent(Event event, Processor route, boolean awaitResponse) throws MuleException {
+  protected InternalEvent sendRequestEvent(InternalEvent event, Processor route, boolean awaitResponse) throws MuleException {
     if (route == null) {
       throw new DispatchException(objectIsNull("connector operation"), null);
     }
     return doProcessRoute(route, event);
   }
 
-  protected Event doProcessRoute(Processor route, Event event) throws MuleException {
+  protected InternalEvent doProcessRoute(Processor route, InternalEvent event) throws MuleException {
     if (route instanceof MessageProcessorChain) {
       return route.process(event);
     } else {
@@ -271,11 +268,6 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
   @Override
   public void setMuleContext(MuleContext context) {
     super.setMuleContext(context);
-  }
-
-  @Override
-  public void setFlowConstruct(FlowConstruct flowConstruct) {
-    super.setFlowConstruct(flowConstruct);
   }
 
 }

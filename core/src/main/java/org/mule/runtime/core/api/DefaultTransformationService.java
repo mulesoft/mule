@@ -100,7 +100,7 @@ public class DefaultTransformationService implements TransformationService {
    * @throws TransformerException if a transformation error occurs or one or more of the transformers passed in a are incompatible
    *         with the message payload
    */
-  public Message applyTransformers(final Message message, final Event event,
+  public Message applyTransformers(final Message message, final InternalEvent event,
                                    final List<? extends Transformer> transformers)
       throws MuleException {
     return applyAllTransformers(message, event, transformers);
@@ -119,7 +119,7 @@ public class DefaultTransformationService implements TransformationService {
    * @throws TransformerException if a transformation error occurs or one or more of the transformers passed in a are incompatible
    *         with the message payload
    */
-  public Message applyTransformers(final Message message, final Event event, final Transformer... transformers)
+  public Message applyTransformers(final Message message, final InternalEvent event, final Transformer... transformers)
       throws MuleException {
     return applyAllTransformers(message, event, asList(transformers));
   }
@@ -191,7 +191,7 @@ public class DefaultTransformationService implements TransformationService {
     return "Payload is a stream of type: " + dataType.getType();
   }
 
-  private Message applyAllTransformers(final Message message, final Event event,
+  private Message applyAllTransformers(final Message message, final InternalEvent event,
                                        final List<? extends Transformer> transformers)
       throws MuleException {
     Message result = message;
@@ -260,7 +260,7 @@ public class DefaultTransformationService implements TransformationService {
     return skipConverter;
   }
 
-  private Message transformMessage(final Message message, final Event event, final Transformer transformer)
+  private Message transformMessage(final Message message, final InternalEvent event, final Transformer transformer)
       throws MessageTransformerException, TransformerException {
     Object result;
 

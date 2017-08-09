@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.streaming.object.factory;
 
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.streaming.object.CursorIterator;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.internal.streaming.CursorManager;
 import org.mule.runtime.core.api.streaming.iterator.StreamingIterator;
 import org.mule.runtime.core.api.streaming.StreamingManager;
@@ -37,7 +37,7 @@ public abstract class AbstractCursorIteratorProviderFactory implements CursorIte
    * {@inheritDoc}
    */
   @Override
-  public final Object of(Event event, Iterator iterator) {
+  public final Object of(InternalEvent event, Iterator iterator) {
     if (iterator instanceof CursorIterator) {
       return streamingManager.manage(((CursorIterator) iterator).getProvider(), event);
     }
@@ -56,7 +56,7 @@ public abstract class AbstractCursorIteratorProviderFactory implements CursorIte
    * @param iterator the streaming iterator
    * @param event    the event on which streaming is happening
    */
-  protected abstract Object resolve(Iterator iterator, Event event);
+  protected abstract Object resolve(Iterator iterator, InternalEvent event);
 
   /**
    * {@inheritDoc}

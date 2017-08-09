@@ -13,7 +13,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.ATTRIBUTES;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.internal.message.InternalMessage;
 
 import org.junit.Before;
@@ -21,7 +21,7 @@ import org.junit.Test;
 
 public class AttributesTestCase extends AbstractELTestCase {
 
-  private Event event;
+  private InternalEvent event;
   private InternalMessage message;
 
   public AttributesTestCase(String mvelOptimizer) {
@@ -31,7 +31,7 @@ public class AttributesTestCase extends AbstractELTestCase {
   @Before
   public void setup() {
     message = mock(InternalMessage.class);
-    event = Event.builder(context).message(message).build();
+    event = InternalEvent.builder(context).message(message).build();
   }
 
   @Test

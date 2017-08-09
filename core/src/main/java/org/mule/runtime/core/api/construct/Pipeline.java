@@ -7,11 +7,10 @@
 package org.mule.runtime.core.api.construct;
 
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.EventContext;
+import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.InternalEventContext;
 import org.mule.runtime.core.api.processor.ProcessingDescriptor;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.source.MessageSource;
 
 import java.util.List;
@@ -39,13 +38,13 @@ public interface Pipeline extends FlowConstruct, ProcessingDescriptor {
   int getMaxConcurrency();
 
   /**
-   * Map of current {@link EventContext} instances for {@link Event}'s that have been serialized. Entries will be removed on
+   * Map of current {@link InternalEventContext} instances for {@link InternalEvent}'s that have been serialized. Entries will be removed on
    * deserialization or in the last resort purged through garbage collection when there are no longer any hard references to the
-   * {@link EventContext} left. {@link EventContext}'s for {@link Event}'s that are not serialized will never be added to this
+   * {@link InternalEventContext} left. {@link InternalEventContext}'s for {@link InternalEvent}'s that are not serialized will never be added to this
    * cache.
    *
-   * @return map of event context keyed by their id as obtained from {@link EventContext#getId()}
+   * @return map of event context keyed by their id as obtained from {@link InternalEventContext#getId()}
    */
-  Map<String, EventContext> getSerializationEventContextCache();
+  Map<String, InternalEventContext> getSerializationEventContextCache();
 
 }

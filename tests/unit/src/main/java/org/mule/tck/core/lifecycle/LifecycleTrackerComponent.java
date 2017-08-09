@@ -7,19 +7,15 @@
 package org.mule.tck.core.lifecycle;
 
 import static org.mockito.Mockito.mock;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.component.Component;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.management.stats.ComponentStatistics;
 
 /**
  * @author David Dossot (david@dossot.net)
  */
-public class LifecycleTrackerComponent extends AbstractLifecycleTracker implements FlowConstructAware, Component {
-
-  private FlowConstruct flowConstruct;
+public class LifecycleTrackerComponent extends AbstractLifecycleTracker implements Component {
 
   public void springInitialize() {
     getTracker().add("springInitialize");
@@ -30,24 +26,12 @@ public class LifecycleTrackerComponent extends AbstractLifecycleTracker implemen
   }
 
   @Override
-  public void setFlowConstruct(final FlowConstruct flowConstruct) {
-    if (this.flowConstruct != flowConstruct) {
-      getTracker().add("setService");
-      this.flowConstruct = flowConstruct;
-    }
-  }
-
-  public FlowConstruct getFlowConstruct() {
-    return flowConstruct;
-  }
-
-  @Override
   public ComponentStatistics getStatistics() {
     return mock(ComponentStatistics.class);
   }
 
   @Override
-  public Event process(Event event) throws MuleException {
+  public InternalEvent process(InternalEvent event) throws MuleException {
     return event;
   }
 }

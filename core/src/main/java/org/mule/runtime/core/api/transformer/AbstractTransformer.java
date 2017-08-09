@@ -15,7 +15,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.util.ClassUtils;
@@ -76,10 +76,10 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
   }
 
   @Override
-  public Event process(Event event) throws MuleException {
+  public InternalEvent process(InternalEvent event) throws MuleException {
     if (event != null && event.getMessage() != null) {
       try {
-        return Event.builder(event)
+        return InternalEvent.builder(event)
             .message(muleContext.getTransformationService().applyTransformers(event.getMessage(), event, this)).build();
       } catch (Exception e) {
         throw new MessageTransformerException(this, e);

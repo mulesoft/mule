@@ -8,13 +8,12 @@ package org.mule.runtime.core.api.component;
 
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.management.stats.ComponentStatistics;
 import org.mule.runtime.core.api.processor.Processor;
 
 /**
- * A <code>Component</code> component processes a {@link Event} by invoking the component instance that has been configured,
+ * A <code>Component</code> component processes a {@link InternalEvent} by invoking the component instance that has been configured,
  * optionally returning a result.
  * <p/>
  * Implementations of <code>Component</code> can use different types of component implementation, implement component instance
@@ -23,7 +22,7 @@ import org.mule.runtime.core.api.processor.Processor;
  * @deprecated Transport infrastructure is deprecated.
  */
 @Deprecated
-public interface Component extends Processor, FlowConstructAware {
+public interface Component extends Processor {
 
   /**
    * Component statistics are used to gather component statistics such as sync/async invocation counts and total and average

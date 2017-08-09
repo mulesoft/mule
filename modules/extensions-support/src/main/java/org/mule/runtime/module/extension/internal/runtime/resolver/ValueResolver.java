@@ -7,10 +7,10 @@
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 
 /**
- * Provides a value which is dependant on a {@link Event}
+ * Provides a value which is dependant on a {@link InternalEvent}
  *
  * @since 3.7.0
  */

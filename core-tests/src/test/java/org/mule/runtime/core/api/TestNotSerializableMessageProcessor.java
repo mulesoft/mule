@@ -17,7 +17,7 @@ public class TestNotSerializableMessageProcessor implements Processor {
   }
 
   @Override
-  public Event process(Event event) throws MuleException {
+  public InternalEvent process(InternalEvent event) throws MuleException {
     return event;
   }
 }

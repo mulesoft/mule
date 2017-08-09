@@ -33,10 +33,10 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.functional.Either;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.extension.api.annotation.param.Config;
@@ -178,7 +178,7 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable 
     }
 
     @Override
-    public Publisher<Void> onCompletion(Event event, Map<String, Object> parameters) {
+    public Publisher<Void> onCompletion(InternalEvent event, Map<String, Object> parameters) {
       return from(onSuccessExecutor.execute(event, parameters, context)).doOnSuccess(v -> commit());
     }
 
@@ -189,8 +189,8 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable 
     }
 
     @Override
-    public void onTerminate(Either<MessagingException, Event> result) throws Exception {
-      Event event = result.isRight() ? result.getRight() : result.getLeft().getEvent();
+    public void onTerminate(Either<MessagingException, InternalEvent> result) throws Exception {
+      InternalEvent event = result.isRight() ? result.getRight() : result.getLeft().getEvent();
       from(onTerminateExecutor.execute(event, emptyMap(), context))
           .doAfterTerminate((v, e) -> context.releaseConnection())
           .subscribe();
@@ -219,7 +219,7 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable 
     }
 
     @Override
-    public Map<String, Object> createResponseParameters(Event event) throws MessagingException {
+    public Map<String, Object> createResponseParameters(InternalEvent event) throws MessagingException {
       try {
         ResolverSetResult parameters = SourceAdapter.this.successCallbackParameters.resolve(from(event, configurationInstance));
         return parameters.asMap();
@@ -229,7 +229,7 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable 
     }
 
     @Override
-    public Map<String, Object> createFailureResponseParameters(Event event) throws MessagingException {
+    public Map<String, Object> createFailureResponseParameters(InternalEvent event) throws MessagingException {
       try {
         ResolverSetResult parameters = SourceAdapter.this.errorCallbackParameters.resolve(from(event, configurationInstance));
         return parameters.asMap();
@@ -285,14 +285,14 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable 
 
     FieldSetter<Object, ConnectionProvider> setter = connectionSetter.get();
     ConfigurationInstance config = configurationInstance.orElseThrow(() -> new DefaultMuleException(createStaticMessage(
-                                                                                                                        "Message Source on Flow '%s' requires a connection but it doesn't point to any configuration. Please review your "
+                                                                                                                        "Message Source on root component '%s' requires a connection but it doesn't point to any configuration. Please review your "
                                                                                                                             + "application",
                                                                                                                         componentLocation
                                                                                                                             .getRootContainerName())));
 
     if (!config.getConnectionProvider().isPresent()) {
       throw new DefaultMuleException(createStaticMessage(format(
-                                                                "Message Source on Flow '%s' requires a connection, but points to config '%s' which doesn't specify any. "
+                                                                "Message Source on root component '%s' requires a connection, but points to config '%s' which doesn't specify any. "
                                                                     + "Please review your application",
                                                                 componentLocation.getRootContainerName(), config.getName())));
     }

@@ -18,7 +18,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.util.Pair;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
@@ -71,7 +71,8 @@ public final class DefaultImplicitConnectionProviderFactory<T> implements Implic
    * {@inheritDoc}
    */
   @Override
-  public <T> Pair<ConnectionProvider<T>, ResolverSetResult> createImplicitConnectionProvider(String configName, Event event) {
+  public <T> Pair<ConnectionProvider<T>, ResolverSetResult> createImplicitConnectionProvider(String configName,
+                                                                                             InternalEvent event) {
     ResolverSet resolverSet = resolverSetProvider.get();
     ConnectionProviderObjectBuilder<T> builder =
         new DefaultConnectionProviderObjectBuilder<>(connectionProviderModel, resolverSet, getConnectionManager(muleContext),

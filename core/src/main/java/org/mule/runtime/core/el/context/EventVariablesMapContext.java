@@ -7,9 +7,8 @@
 package org.mule.runtime.core.el.context;
 
 import static java.util.Collections.emptyMap;
-import static org.mule.runtime.core.api.Event.getVariableValueOrNull;
-
-import org.mule.runtime.core.api.Event;
+import static org.mule.runtime.core.api.InternalEvent.getVariableValueOrNull;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.el.ExtendedExpressionLanguageAdaptor;
 
 import java.util.HashMap;
@@ -21,11 +20,11 @@ import java.util.Set;
  */
 public class EventVariablesMapContext extends AbstractMapContext<Object> {
 
-  private Event event;
-  private Event.Builder eventBuider;
+  private InternalEvent event;
+  private InternalEvent.Builder eventBuider;
 
   // TODO MULE-10471 Immutable event used in MEL/Scripting should be shared for consistency
-  public EventVariablesMapContext(Event event, Event.Builder eventBuider) {
+  public EventVariablesMapContext(InternalEvent event, InternalEvent.Builder eventBuider) {
     this.event = event;
     this.eventBuider = eventBuider;
   }
@@ -49,7 +48,7 @@ public class EventVariablesMapContext extends AbstractMapContext<Object> {
 
   @Override
   public Set<String> keySet() {
-    return event.getVariableNames();
+    return event.getVariables().keySet();
   }
 
   @Override
@@ -61,10 +60,10 @@ public class EventVariablesMapContext extends AbstractMapContext<Object> {
   @Override
   public String toString() {
     Map<String, Object> map = new HashMap<>();
-    for (String key : event.getVariableNames()) {
-      Object value = event.getVariable(key) != null ? event.getVariable(key).getValue() : null;
-      map.put(key, value);
-    }
+    event.getVariables().forEach((key, value) -> {
+      Object object = value != null ? value.getValue() : null;
+      map.put(key, object);
+    });
     return map.toString();
   }
 }

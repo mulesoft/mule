@@ -44,7 +44,7 @@ import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.registry.MuleRegistry;
@@ -139,7 +139,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
   private OperationExecutor executor;
 
   @Mock(answer = RETURNS_DEEP_STUBS)
-  private Event event;
+  private InternalEvent event;
 
   private ClassLoader classLoader;
 

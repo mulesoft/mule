@@ -7,14 +7,14 @@
 package org.mule.runtime.core.internal.security.filter;
 
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.authFailedForUser;
-
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.api.security.Credentials;
+import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.api.security.SecurityProviderNotFoundException;
 import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.security.CredentialsAccessor;
 import org.mule.runtime.core.api.security.CredentialsNotSetException;
@@ -23,7 +23,6 @@ import org.mule.runtime.core.api.security.DefaultMuleAuthentication;
 import org.mule.runtime.core.api.security.DefaultMuleCredentials;
 import org.mule.runtime.core.api.security.EncryptionStrategy;
 import org.mule.runtime.core.api.security.EncryptionStrategyNotFoundException;
-import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.security.UnauthorisedException;
 import org.mule.runtime.core.internal.security.MuleHeaderCredentialsAccessor;
 
@@ -41,7 +40,7 @@ public class MuleEncryptionEndpointSecurityFilter extends AbstractOperationSecur
   }
 
   @Override
-  protected Event authenticateInbound(Event event) throws SecurityException, SecurityProviderNotFoundException,
+  protected InternalEvent authenticateInbound(InternalEvent event) throws SecurityException, SecurityProviderNotFoundException,
       CryptoFailureException, EncryptionStrategyNotFoundException, UnknownAuthenticationTypeException {
     String userHeader = (String) credentialsAccessor.getCredentials(event);
     if (userHeader == null) {
@@ -67,7 +66,6 @@ public class MuleEncryptionEndpointSecurityFilter extends AbstractOperationSecur
     }
 
     SecurityContext context = getSecurityManager().createSecurityContext(authentication);
-    context.setAuthentication(authentication);
     event.getSession().setSecurityContext(context);
     return event;
   }

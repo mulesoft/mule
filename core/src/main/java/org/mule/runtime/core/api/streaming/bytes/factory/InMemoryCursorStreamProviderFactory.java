@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.streaming.bytes.factory;
 
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.streaming.bytes.ByteBufferManager;
 import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamProvider;
@@ -45,7 +45,7 @@ public class InMemoryCursorStreamProviderFactory extends AbstractCursorStreamPro
    * @return a new {@link InMemoryCursorStreamProvider} wrapped in an {@link Either}
    */
   @Override
-  protected Object resolve(InputStream inputStream, Event event) {
+  protected Object resolve(InputStream inputStream, InternalEvent event) {
     return new InMemoryCursorStreamProvider(inputStream, config, getBufferManager());
   }
 }

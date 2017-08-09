@@ -8,14 +8,14 @@ package org.mule.runtime.core.privileged.processor.simple;
 
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.processor.Processor;
 
 /**
  * Base class for {@link Processor}s that change the event or message. Implementations will return a new instance of the event
- * with the updated data, since the {@link Event} and {@link Message} objects are immutable.
+ * with the updated data, since the {@link InternalEvent} and {@link Message} objects are immutable.
  *
  * @since 4.0
  */

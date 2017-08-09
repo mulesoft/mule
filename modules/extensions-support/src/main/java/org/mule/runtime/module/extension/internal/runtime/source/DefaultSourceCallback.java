@@ -13,7 +13,6 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.execution.MessageProcessContext;
 import org.mule.runtime.core.api.execution.MessageProcessingManager;
 import org.mule.runtime.core.api.processor.Processor;
@@ -30,8 +29,7 @@ import org.mule.runtime.module.extension.internal.runtime.transaction.Transactio
 import java.util.function.Supplier;
 
 /**
- * Default implementation of {@link SourceCallback}.
- * Instances are to be created through the {@link #builder()} method.
+ * Default implementation of {@link SourceCallback}. Instances are to be created through the {@link #builder()} method.
  *
  * @param <T> the generic type of the output values of the generated results
  * @param <A> the generic type of the attributes of the generated results
@@ -82,11 +80,6 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
       return this;
     }
 
-    public Builder<T, A> setFlowConstruct(FlowConstruct flowConstruct) {
-      product.flowConstruct = flowConstruct;
-      return this;
-    }
-
     public Builder<T, A> setExceptionCallback(ExceptionCallback exceptionCallback) {
       product.exceptionCallback = exceptionCallback;
       return this;
@@ -114,7 +107,6 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
 
     public SourceCallback<T, A> build() {
       checkArgument(product.listener, "listener");
-      checkArgument(product.flowConstruct, "flowConstruct");
       checkArgument(product.exceptionCallback, "exceptionCallback");
       checkArgument(product.messageProcessingManager, "messageProcessingManager");
       checkArgument(product.processContextSupplier, "processContextSupplier");
@@ -148,7 +140,6 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
   private Processor listener;
   private MuleContext muleContext;
   private ExtensionMessageSource messageSource;
-  private FlowConstruct flowConstruct;
   private ExceptionCallback exceptionCallback;
   private MessageProcessingManager messageProcessingManager;
   private Supplier<MessageProcessContext> processContextSupplier;

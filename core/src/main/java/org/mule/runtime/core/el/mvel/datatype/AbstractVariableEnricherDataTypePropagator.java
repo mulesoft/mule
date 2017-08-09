@@ -17,7 +17,7 @@ import org.mule.mvel2.optimizers.impl.refl.nodes.MapAccessor;
 import org.mule.mvel2.optimizers.impl.refl.nodes.MapAccessorNest;
 import org.mule.mvel2.optimizers.impl.refl.nodes.VariableAccessor;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 
 import java.lang.reflect.Field;
 
@@ -45,7 +45,7 @@ public abstract class AbstractVariableEnricherDataTypePropagator extends Abstrac
   }
 
   @Override
-  protected boolean doPropagate(Event event, Event.Builder builder, TypedValue typedValue, ASTNode node) {
+  protected boolean doPropagate(InternalEvent event, InternalEvent.Builder builder, TypedValue typedValue, ASTNode node) {
     if (isAssignmentNode(node)) {
       CompiledAccExpression compiledAccExpression = getCompiledAccExpression(node);
 
@@ -78,9 +78,10 @@ public abstract class AbstractVariableEnricherDataTypePropagator extends Abstrac
     return false;
   }
 
-  protected abstract void addVariable(Event event, Event.Builder builder, TypedValue typedValue, String propertyName);
+  protected abstract void addVariable(InternalEvent event, InternalEvent.Builder builder, TypedValue typedValue,
+                                      String propertyName);
 
-  protected abstract boolean containsVariable(Event event, String propertyName);
+  protected abstract boolean containsVariable(InternalEvent event, String propertyName);
 
   private String getUnescapedPropertyName(String propertyName) {
     if (propertyName.startsWith("'") && propertyName.endsWith("'")) {

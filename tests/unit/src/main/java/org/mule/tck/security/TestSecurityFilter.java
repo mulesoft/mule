@@ -7,7 +7,7 @@
 package org.mule.tck.security;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.security.CryptoFailureException;
 import org.mule.runtime.core.api.security.EncryptionStrategyNotFoundException;
@@ -29,7 +29,7 @@ public class TestSecurityFilter extends AbstractAuthenticationFilter {
   }
 
   @Override
-  public Event authenticate(Event event)
+  public InternalEvent authenticate(InternalEvent event)
       throws SecurityException, CryptoFailureException, SecurityProviderNotFoundException,
       EncryptionStrategyNotFoundException, UnknownAuthenticationTypeException {
     called = true;

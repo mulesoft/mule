@@ -17,8 +17,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.Event.Builder;
+import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.InternalEvent.Builder;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.session.DefaultMuleSession;
@@ -121,7 +121,7 @@ public class SplitterTestCase extends AbstractMuleContextTestCase {
     Splitter splitter = new Splitter();
     splitter.setMuleContext(muleContext);
     splitter.initialise();
-    Event event = eventBuilder().message(toSplit).session(session).build();
+    InternalEvent event = eventBuilder().message(toSplit).session(session).build();
     assertSame(event, splitter.process(event));
   }
 
@@ -165,10 +165,10 @@ public class SplitterTestCase extends AbstractMuleContextTestCase {
     for (Map.Entry<String, Object> entry : invocationProps.entrySet()) {
       eventBuilder.addVariable(entry.getKey(), entry.getValue());
     }
-    Event event = eventBuilder.build();
+    InternalEvent event = eventBuilder.build();
 
     splitter.process(event);
-    List<Event> splits = grabber.getEvents();
+    List<InternalEvent> splits = grabber.getEvents();
     assertEquals(count, splits.size());
 
     Set<Object> actualSequences = new HashSet<>();
@@ -178,8 +178,8 @@ public class SplitterTestCase extends AbstractMuleContextTestCase {
 
   private void assertSplitParts(int count, boolean counted, Map<String, Serializable> inboundProps,
                                 Map<String, Serializable> outboundProps, Map<String, Object> invocationProps,
-                                List<Event> splits, Set<Object> actualSequences) {
-    for (Event event : splits) {
+                                List<InternalEvent> splits, Set<Object> actualSequences) {
+    for (InternalEvent event : splits) {
       Message msg = event.getMessage();
       assertTrue(msg.getPayload().getValue() instanceof String);
       if (counted) {
@@ -197,22 +197,22 @@ public class SplitterTestCase extends AbstractMuleContextTestCase {
         assertEquals(((InternalMessage) msg).getOutboundProperty(key), outboundProps.get(key));
       }
       for (String key : invocationProps.keySet()) {
-        assertEquals(event.getVariable(key).getValue(), invocationProps.get(key));
+        assertEquals(event.getVariables().get(key).getValue(), invocationProps.get(key));
       }
     }
   }
 
   private static class Grabber implements Processor {
 
-    private List<Event> events = new ArrayList<>();
+    private List<InternalEvent> events = new ArrayList<>();
 
     @Override
-    public Event process(Event event) throws MuleException {
+    public InternalEvent process(InternalEvent event) throws MuleException {
       events.add(event);
       return null;
     }
 
-    public List<Event> getEvents() {
+    public List<InternalEvent> getEvents() {
       return events;
     }
   }

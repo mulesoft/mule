@@ -12,11 +12,10 @@ import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.defaultString;
 import static org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.core.api.context.notification.SecurityNotification.SECURITY_AUTHENTICATION_FAILED;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.security.SecurityException;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.GlobalNameableObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.ExceptionNotification;
@@ -63,6 +62,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
   protected String logException = TRUE.toString();
 
   protected String globalName;
+  protected FlowConstructStatistics statistics;
 
   @Override
   public String getGlobalName() {
@@ -108,7 +108,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
     logger.info("Initialising exception listener: " + toString());
   }
 
-  protected void fireNotification(Exception ex, Event event) {
+  protected void fireNotification(Exception ex, InternalEvent event) {
     if (enableNotifications) {
       if (ex.getCause() != null && getCause(ex) instanceof SecurityException) {
         fireNotification(new SecurityNotification((SecurityException) getCause(ex), SECURITY_AUTHENTICATION_FAILED));
@@ -138,8 +138,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
    * @param event The MuleEvent currently being processed
    * @param t the fatal exception to log
    */
-  protected void logFatal(Event event, Throwable t) {
-    FlowConstructStatistics statistics = flowConstruct.getStatistics();
+  protected void logFatal(InternalEvent event, Throwable t) {
     if (statistics != null && statistics.isEnabled()) {
       statistics.incFatalError();
     }
@@ -200,5 +199,9 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
 
   public void setNotificationFirer(NotificationDispatcher notificationFirer) {
     this.notificationFirer = notificationFirer;
+  }
+
+  public void setStatistics(FlowConstructStatistics statistics) {
+    this.statistics = statistics;
   }
 }

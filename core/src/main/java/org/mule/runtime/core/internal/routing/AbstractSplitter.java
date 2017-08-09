@@ -7,7 +7,7 @@
 package org.mule.runtime.core.internal.routing;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.routing.MessageSequence;
 import org.mule.runtime.core.internal.routing.outbound.AbstractMessageSequenceSplitter;
 import org.mule.runtime.core.internal.routing.outbound.CollectionMessageSequence;
@@ -16,7 +16,7 @@ import java.util.List;
 
 /**
  * Splits a message invoking the next message processor one for each split part. Implementations must implement
- * {@link #splitMessage(Event)} and determine how the message is split.
+ * {@link #splitMessage(InternalEvent)} and determine how the message is split.
  * <p>
  * <b>EIP Reference:</b> <a href="http://www.eaipatterns.com/Sequencer.html">http://www .eaipatterns.com/Sequencer.html</a>
  */
@@ -25,7 +25,7 @@ public abstract class AbstractSplitter extends AbstractMessageSequenceSplitter {
 
   @Override
   @SuppressWarnings("unchecked")
-  protected MessageSequence<?> splitMessageIntoSequence(Event event) throws MuleException {
+  protected MessageSequence<?> splitMessageIntoSequence(InternalEvent event) throws MuleException {
     return new CollectionMessageSequence(splitMessage(event));
   }
 
@@ -36,6 +36,6 @@ public abstract class AbstractSplitter extends AbstractMessageSequenceSplitter {
    * @return a list of values with the result of the split.
    * @throws MuleException if an error occurs doing splitting.
    */
-  protected abstract List<?> splitMessage(Event event) throws MuleException;
+  protected abstract List<?> splitMessage(InternalEvent event) throws MuleException;
 
 }

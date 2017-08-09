@@ -17,12 +17,12 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
 
 import org.reactivestreams.Publisher;
 
@@ -30,7 +30,8 @@ import org.reactivestreams.Publisher;
  * Test async non-blocking {@link Processor} implementation that will return control to the Flow in a custom {@link Scheduler}
  * thread in the same way as, for example, a HTTP requester would.
  */
-public class TestNonBlockingProcessor implements Processor, Initialisable, Disposable, MuleContextAware {
+public class TestNonBlockingProcessor extends AbstractAnnotatedObject
+    implements Processor, Initialisable, Disposable, MuleContextAware {
 
   private static int MAX_THREADS = 8;
   private MuleContext muleContext;
@@ -45,12 +46,12 @@ public class TestNonBlockingProcessor implements Processor, Initialisable, Dispo
   }
 
   @Override
-  public Event process(final Event event) throws MuleException {
+  public InternalEvent process(final InternalEvent event) throws MuleException {
     return event;
   }
 
   @Override
-  public Publisher<Event> apply(Publisher<Event> publisher) {
+  public Publisher<InternalEvent> apply(Publisher<InternalEvent> publisher) {
     return from(publisher).flatMap(event -> {
       if (isTransactionActive()) {
         return publisher;

@@ -13,7 +13,7 @@ import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.streaming.Cursor;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.exception.MessagingException;
@@ -38,9 +38,9 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> implements Dispo
 
   private String flowName;
 
-  private ExecutionTemplate<Event> txExecutionTemplate = callback -> callback.process();
+  private ExecutionTemplate<InternalEvent> txExecutionTemplate = callback -> callback.process();
 
-  private Function<Event, Event> responseEventTransformer = input -> input;
+  private Function<InternalEvent, InternalEvent> responseEventTransformer = input -> input;
 
   private Scheduler scheduler;
 
@@ -105,7 +105,7 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> implements Dispo
    * @return the resulting <code>MuleEvent</code>
    * @throws Exception
    */
-  public Event run() throws Exception {
+  public InternalEvent run() throws Exception {
     return runAndVerify(flowName);
   }
 
@@ -118,7 +118,7 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> implements Dispo
    * @return the resulting <code>MuleEvent</code>
    * @throws Exception
    */
-  public Event runNoVerify() throws Exception {
+  public InternalEvent runNoVerify() throws Exception {
     return runAndVerify(new String[] {});
   }
 
@@ -133,9 +133,9 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> implements Dispo
    * @return the resulting <code>MuleEvent</code>
    * @throws Exception
    */
-  public Event runAndVerify(String... flowNamesToVerify) throws Exception {
+  public InternalEvent runAndVerify(String... flowNamesToVerify) throws Exception {
     Flow flow = (Flow) getFlowConstruct();
-    Event response;
+    InternalEvent response;
     if (scheduler == null) {
       response = txExecutionTemplate.execute(getFlowRunCallback(flow));
     } else {
@@ -192,12 +192,12 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> implements Dispo
     FlowAssert.verify(flowName);
   }
 
-  private ExecutionCallback<Event> getFlowRunCallback(final Flow flow) {
+  private ExecutionCallback<InternalEvent> getFlowRunCallback(final Flow flow) {
     // TODO MULE-13053 Update and improve FlowRunner to support non-blocking flow execution and assertions.
     return () -> flow.process(getOrBuildEvent());
   }
 
-  private ExecutionCallback<Event> getFlowDispatchCallback(final Flow flow) {
+  private ExecutionCallback<InternalEvent> getFlowDispatchCallback(final Flow flow) {
     return () -> {
       // TODO MULE-13053 Update and improve FlowRunner to support non-blocking flow execution and assertions.
       flow.process(getOrBuildEvent());

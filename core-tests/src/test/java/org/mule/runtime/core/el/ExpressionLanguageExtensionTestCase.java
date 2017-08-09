@@ -17,7 +17,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.Message.of;
 import org.mule.mvel2.compiler.AbstractParser;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -110,23 +110,23 @@ public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase {
 
   @Test
   public void testVariableAlias() throws Exception {
-    Event event = Event.builder(context).message(of("foo")).build();
+    InternalEvent event = InternalEvent.builder(context).message(of("foo")).build();
 
     assertThat(evaluate("p", event), is("foo"));
   }
 
   @Test
   public void testAssignValueToVariableAlias() throws Exception {
-    Event event = Event.builder(context).message(of("")).build();
+    InternalEvent event = InternalEvent.builder(context).message(of("")).build();
 
-    Event.Builder eventBuilder = Event.builder(event);
+    InternalEvent.Builder eventBuilder = InternalEvent.builder(event);
     evaluate("p='bar'", event, eventBuilder);
     assertThat(eventBuilder.build().getMessage().getPayload().getValue(), is("bar"));
   }
 
   @Test
   public void testMuleMessageAvailableAsVariable() throws Exception {
-    Event event = Event.builder(context).message(of("")).build();
+    InternalEvent event = InternalEvent.builder(context).message(of("")).build();
     evaluate("p=m.uniqueId", event);
   }
 
@@ -143,7 +143,7 @@ public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase {
 
   @Test
   public void testMuleMessageAvailableInFunction() throws RegistrationException, InitialisationException {
-    Event event = mock(Event.class, RETURNS_DEEP_STUBS);
+    InternalEvent event = mock(InternalEvent.class, RETURNS_DEEP_STUBS);
     when(event.getFlowCallStack()).thenReturn(new DefaultFlowCallStack());
 
     when(event.getError()).thenReturn(empty());

@@ -17,7 +17,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.expression.InvalidExpressionException;
 import org.mule.runtime.core.api.processor.Processor;
@@ -52,11 +52,11 @@ public class AssertionMessageProcessor extends AbstractAnnotatedObject implement
       throw new InvalidExpressionException(expression, result.errorMessage().orElse("Invalid exception"));
     }
     latch = new CountDownLatch(count);
-    addAssertion(getLocation().getRootContainerName(), this);
+    addAssertion(getRootContainerName(), this);
   }
 
   @Override
-  public Event process(Event event) throws MuleException {
+  public InternalEvent process(InternalEvent event) throws MuleException {
     if (event == null) {
       return null;
     }
@@ -72,7 +72,7 @@ public class AssertionMessageProcessor extends AbstractAnnotatedObject implement
    * <li>count was set & count processes were done => ok</li>
    * <li>count was set & count processes were not done => fail</li>
    * <li>count was not set & at least one processing were done => ok</li>
-   * 
+   *
    * @throws InterruptedException
    */
   @Override

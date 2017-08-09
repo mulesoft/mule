@@ -8,7 +8,7 @@ package org.mule.runtime.core.api.processor;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 
 import java.util.Map;
@@ -30,13 +30,13 @@ public interface ParametersResolverProcessor {
    *         {@link ExecutionContext} of the operation.
    * @throws MuleException for any excpetion that occurs while resolving the parameters
    */
-  ParametersResolverProcessorResult resolveParameters(Event event) throws MuleException;
+  ParametersResolverProcessorResult resolveParameters(InternalEvent event) throws MuleException;
 
   /**
    * Perform the required cleanup a the parameters in an {@link ExecutionContext} resolved by calling
-   * {@link #resolveParameters(Event)}.
+   * {@link #resolveParameters(InternalEvent)}.
    * <p>
-   * It is mandatory to call this when the parameters are no longer needed when using {@link #resolveParameters(Event)}.
+   * It is mandatory to call this when the parameters are no longer needed when using {@link #resolveParameters(InternalEvent)}.
    * 
    * @param executionContext the context that contains the resolved parameters
    */

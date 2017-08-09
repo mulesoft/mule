@@ -12,13 +12,12 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.config.spring.api.dsl.model.ApplicationModel.NAME_ATTRIBUTE;
-import static org.mule.runtime.core.el.BindingContextUtils.PARAMETERS;
-import static org.mule.runtime.core.el.BindingContextUtils.PROPERTIES;
 import static org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder.MODULE_CONFIG_GLOBAL_ELEMENT_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
-
+import static org.mule.runtime.internal.el.BindingContextUtils.PARAMETERS;
+import static org.mule.runtime.internal.el.BindingContextUtils.PROPERTIES;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -28,7 +27,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
 import org.mule.runtime.config.spring.api.dsl.model.ApplicationModel;
 import org.mule.runtime.config.spring.api.dsl.model.ComponentModel;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.ArrayList;
@@ -295,7 +294,7 @@ public class MacroExpansionModuleModel {
    * @param name of the parameter (either a <property> or a <parameter>)
    * @param prefix binding to append for the expression to be replaced in the <module>'s code
    * @return the expression that access a variable through a direct binding (aka: a "static expression", as it doesn't use the
-   *         {@link Event})
+   *         {@link InternalEvent})
    */
   private String getReplaceableExpression(String name, String prefix) {
     return "#[" + prefix + "." + name + "]";

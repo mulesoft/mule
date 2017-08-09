@@ -15,8 +15,8 @@ import static org.mule.runtime.api.message.Message.of;
 import static reactor.core.Exceptions.unwrap;
 import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.EventContext;
+import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.InternalEventContext;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MuleFatalException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -35,9 +35,9 @@ import reactor.core.publisher.Mono;
 public class MapProcessorTestCase extends AbstractMuleContextTestCase {
 
   @Mock
-  private EventContext eventContext;
+  private InternalEventContext eventContext;
 
-  private Event event = Event.builder(eventContext).message(Message.of(TEST_PAYLOAD)).build();
+  private InternalEvent event = InternalEvent.builder(eventContext).message(Message.of(TEST_PAYLOAD)).build();
 
   private RuntimeException exception = new RuntimeException() {};
 
@@ -46,8 +46,8 @@ public class MapProcessorTestCase extends AbstractMuleContextTestCase {
   @Rule
   public ExpectedException thrown = ExpectedException.none();
 
-  private Processor testProcessor = event -> Event.builder(eventContext).message(of(TEST_PAYLOAD)).build();
-  private Processor testProcessorReturnsNull = event -> Event.builder(eventContext).message(of(null)).build();
+  private Processor testProcessor = event -> InternalEvent.builder(eventContext).message(of(TEST_PAYLOAD)).build();
+  private Processor testProcessorReturnsNull = event -> InternalEvent.builder(eventContext).message(of(null)).build();
   private Processor testProcessorThrowsException = event -> {
     throw exception;
   };
@@ -57,37 +57,37 @@ public class MapProcessorTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void mapBlocking() throws Exception {
-    Event result = testProcessor.process(event);
+    InternalEvent result = testProcessor.process(event);
     assertThat(result.getMessage().getPayload().getValue(), equalTo(TEST_PAYLOAD));
   }
 
   @Test
   public void mapStreamBlockingGet() {
-    Event result = just(event).transform(testProcessor).block();
+    InternalEvent result = just(event).transform(testProcessor).block();
     assertThat(result.getMessage().getPayload().getValue(), equalTo(TEST_PAYLOAD));
   }
 
   @Test
   public void mapStreamSubscribe() throws Exception {
-    Event result = just(event).transform(testProcessor).block();
+    InternalEvent result = just(event).transform(testProcessor).block();
     assertThat(result.getMessage().getPayload().getValue(), equalTo(TEST_PAYLOAD));
   }
 
   @Test
   public void mapBlockingNullResult() throws Exception {
-    Event result = testProcessorReturnsNull.process(event);
+    InternalEvent result = testProcessorReturnsNull.process(event);
     assertThat(result.getMessage().getPayload().getValue(), is(nullValue()));
   }
 
   @Test
   public void mapStreamBlockingGetNullResult() {
-    Event result = just(event).transform(testProcessorReturnsNull).block();
+    InternalEvent result = just(event).transform(testProcessorReturnsNull).block();
     assertThat(result.getMessage().getPayload().getValue(), is(nullValue()));
   }
 
   @Test
   public void mapStreamSubscribeNullResult() throws Exception {
-    Event result = just(event).transform(testProcessorReturnsNull).block();
+    InternalEvent result = just(event).transform(testProcessorReturnsNull).block();
     assertThat(result.getMessage().getPayload().getValue(), is(nullValue()));
   }
 
@@ -101,7 +101,7 @@ public class MapProcessorTestCase extends AbstractMuleContextTestCase {
   public void mapStreamBlockingGetExceptionThrown() throws Throwable {
     thrown.expect(is(instanceOf(MessagingException.class)));
     thrown.expectCause(is(exception));
-    Event result;
+    InternalEvent result;
     try {
       result = just(event).transform(testProcessorThrowsException).block();
     } catch (Exception e) {
@@ -129,7 +129,7 @@ public class MapProcessorTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void mapStreamBlockingGetErrorThrown() throws Throwable {
-    Event result = null;
+    InternalEvent result = null;
     try {
       result = just(event).transform(testProcessorThrowsError).block();
     } catch (Exception e) {

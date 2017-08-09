@@ -75,7 +75,7 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
   @Mock
   private MuleContext mockContext;
 
-  private Event testEvent;
+  private InternalEvent testEvent;
 
   @Mock
   private FlowConstruct flowConstruct;
@@ -337,7 +337,7 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
   public void payloadInfoNonConsumable() throws Exception {
     MuleException.verboseExceptions = true;
 
-    Event testEvent = mock(Event.class);
+    InternalEvent testEvent = mock(InternalEvent.class);
     Object payload = mock(Object.class);
     // This has to be done this way since mockito doesn't allow to verify toString()
     when(payload.toString()).then(new FailAnswer("toString() expected not to be called."));
@@ -354,7 +354,7 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
   public void payloadInfoConsumable() throws Exception {
     MuleException.verboseExceptions = true;
 
-    Event testEvent = mock(Event.class);
+    InternalEvent testEvent = mock(InternalEvent.class);
     final ByteArrayInputStream payload = new ByteArrayInputStream(new byte[] {});
     Message muleMessage = of(payload);
     when(testEvent.getMessage()).thenReturn(muleMessage);
@@ -370,7 +370,7 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
   public void payloadInfoException() throws Exception {
     MuleException.verboseExceptions = true;
 
-    Event testEvent = mock(Event.class);
+    InternalEvent testEvent = mock(InternalEvent.class);
     Object payload = mock(Object.class);
     // This has to be done this way since mockito doesn't allow to verify toString()
     when(payload.toString()).then(new FailAnswer("toString() expected not to be called."));
@@ -389,7 +389,7 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
   public void payloadInfoNonVerbose() throws Exception {
     MuleException.verboseExceptions = false;
 
-    Event testEvent = mock(Event.class);
+    InternalEvent testEvent = mock(InternalEvent.class);
     Message muleMessage = spy(of(""));
     when(testEvent.getMessage()).thenReturn(muleMessage);
     MessagingException e = new MessagingException(I18nMessageFactory.createStaticMessage(message), testEvent);

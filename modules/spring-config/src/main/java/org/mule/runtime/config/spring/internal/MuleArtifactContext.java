@@ -15,12 +15,15 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.ArrayUtils.addAll;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.meta.AbstractAnnotatedObject.ROOT_CONTAINER_NAME_KEY;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.config.spring.api.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
 import static org.mule.runtime.config.spring.api.dsl.model.ApplicationModel.CONFIGURATION_IDENTIFIER;
 import static org.mule.runtime.config.spring.api.dsl.model.ApplicationModel.IMPORT_ELEMENT;
 import static org.mule.runtime.config.spring.api.dsl.model.ApplicationModel.MULE_IDENTIFIER;
 import static org.mule.runtime.config.spring.internal.dsl.spring.BeanDefinitionFactory.SPRING_SINGLETON_OBJECT;
+import static org.mule.runtime.config.spring.internal.dsl.spring.ComponentModelHelper.updateAnnotationValue;
 import static org.mule.runtime.config.spring.internal.parsers.generic.AutoIdUtils.uniqueValue;
 import static org.mule.runtime.config.spring.internal.util.ComponentBuildingDefinitionUtils.registerComponentBuildingDefinitions;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
@@ -94,14 +97,18 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.config.ConstructorArgumentValues;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.CglibSubclassingInstantiationStrategy;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
+import org.springframework.beans.factory.support.ManagedList;
+import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.context.annotation.ConfigurationClassPostProcessor;
 import org.springframework.context.annotation.ContextAnnotationAutowireCandidateResolver;
@@ -198,7 +205,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
         new BeanDefinitionFactory(componentBuildingDefinitionRegistry, muleContext.getErrorTypeRepository());
 
     createApplicationModel();
-    determineIfOnlyNewParsingMechanismCanBeUsed();
+    validateAllConfigElementHaveParsers();
   }
 
   private static Optional<Set<ExtensionModel>> getExtensionModels(ExtensionManager extensionManager) {
@@ -220,7 +227,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
     return new XmlApplicationParser(customRegistry, pluginsClassLoaders);
   }
 
-  private void determineIfOnlyNewParsingMechanismCanBeUsed() {
+  private void validateAllConfigElementHaveParsers() {
     applicationModel.executeOnEveryComponentTree(componentModel -> {
       Optional<ComponentIdentifier> parentIdentifierOptional = ofNullable(componentModel.getParent())
           .flatMap(parentComponentModel -> ofNullable(parentComponentModel.getIdentifier()));
@@ -598,6 +605,49 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
         new MinimalApplicationModelGenerator(this.applicationModel, componentBuildingDefinitionRegistry);
     ApplicationModel minimalApplicationModel = minimalApplicationModelGenerator.getMinimalModel(location);
     createApplicationComponents((DefaultListableBeanFactory) this.getBeanFactory(), minimalApplicationModel, false);
+  }
+
+  /**
+   * Returns a prototype chain of processors mutating the root container name of the set of beans created from that prototype
+   * object.
+   * 
+   * @param name the bean name
+   * @param rootContainerName the new root container name.
+   */
+  public synchronized void getPrototypeBeanWithRootContainer(String name, String rootContainerName) {
+    BeanDefinition beanDefinition = getBeanFactory().getBeanDefinition(name);
+    checkState(beanDefinition.isPrototype(), format("Bean with name %s is not a prototype", name));
+    updateBeanDefinitionRootContainerName(rootContainerName, beanDefinition);
+  }
+
+  private void updateBeanDefinitionRootContainerName(String rootContainerName, BeanDefinition beanDefinition) {
+    updateAnnotationValue(ROOT_CONTAINER_NAME_KEY, rootContainerName, beanDefinition);
+    for (PropertyValue propertyValue : beanDefinition.getPropertyValues().getPropertyValueList()) {
+      Object value = propertyValue.getValue();
+      processBeanValue(rootContainerName, value);
+    }
+
+    for (ConstructorArgumentValues.ValueHolder valueHolder : beanDefinition.getConstructorArgumentValues()
+        .getGenericArgumentValues()) {
+      processBeanValue(rootContainerName, valueHolder.getValue());
+    }
+  }
+
+  private void processBeanValue(String rootContainerName, Object value) {
+    if (value instanceof BeanDefinition) {
+      updateBeanDefinitionRootContainerName(rootContainerName, (BeanDefinition) value);
+    } else if (value instanceof ManagedList) {
+      ManagedList managedList = (ManagedList) value;
+      for (int i = 0; i < managedList.size(); i++) {
+        Object itemValue = managedList.get(i);
+        if (itemValue instanceof BeanDefinition) {
+          updateBeanDefinitionRootContainerName(rootContainerName, (BeanDefinition) itemValue);
+        }
+      }
+    } else if (value instanceof ManagedMap) {
+      ManagedMap managedMap = (ManagedMap) value;
+      managedMap.forEach((key, mapValue) -> processBeanValue(rootContainerName, mapValue));
+    }
   }
 
 }

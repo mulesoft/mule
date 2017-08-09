@@ -13,8 +13,8 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 
 import org.mule.AbstractBenchmark;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.EventContext;
+import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.InternalEventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 
@@ -25,14 +25,14 @@ public class ExpressionBenchmark extends AbstractBenchmark {
 
 
   private MuleContext muleContext;
-  private Event event;
-  private EventContext context;
+  private InternalEvent event;
+  private InternalEventContext context;
 
   @Setup
   public void setup() throws MuleException {
     muleContext = createMuleContextWithServices();
     context = create(createFlow(muleContext), CONNECTOR_LOCATION);
-    event = Event.builder(context).message(of(PAYLOAD)).addVariable("foo", "bar").build();
+    event = InternalEvent.builder(context).message(of(PAYLOAD)).addVariable("foo", "bar").build();
   }
 
   @TearDown

@@ -14,7 +14,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.TargetType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
@@ -67,7 +67,7 @@ public class OAuthOperationMessageProcessor extends OperationMessageProcessor {
   }
 
   @Override
-  protected Mono<Event> doProcess(Event event, ExecutionContextAdapter<OperationModel> operationContext) {
+  protected Mono<InternalEvent> doProcess(InternalEvent event, ExecutionContextAdapter<OperationModel> operationContext) {
     Optional<OAuthConnectionProviderWrapper> connectionProvider = operationContext.getConfiguration()
         .flatMap(c -> c.getConnectionProvider())
         .filter(cp -> cp instanceof OAuthConnectionProviderWrapper)
@@ -81,9 +81,10 @@ public class OAuthOperationMessageProcessor extends OperationMessageProcessor {
     }
   }
 
-  private Mono<Event> executeWithOAuthSupport(Event event, ExecutionContextAdapter<OperationModel> operationContext,
-                                              OAuthConnectionProviderWrapper connectionProvider) {
-    Mono<Event> result = super.doProcess(event, operationContext);
+  private Mono<InternalEvent> executeWithOAuthSupport(InternalEvent event,
+                                                      ExecutionContextAdapter<OperationModel> operationContext,
+                                                      OAuthConnectionProviderWrapper connectionProvider) {
+    Mono<InternalEvent> result = super.doProcess(event, operationContext);
     try {
       //TODO: MULE-12355 - Should not block like this
       return Mono.just(result.block());

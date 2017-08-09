@@ -21,11 +21,10 @@ import static org.mule.runtime.core.api.processor.MessageProcessors.processWithC
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.ErrorHandlerNotification;
 import org.mule.runtime.core.api.exception.DisjunctiveErrorTypeMatcher;
@@ -34,7 +33,6 @@ import org.mule.runtime.core.api.exception.ErrorTypeRepository;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
-import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
@@ -62,7 +60,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   protected ErrorTypeMatcher errorTypeMatcher = null;
 
   @Override
-  final public Event handleException(MessagingException exception, Event event) {
+  final public InternalEvent handleException(MessagingException exception, InternalEvent event) {
     try {
       return from(applyInternal(exception, event)).block();
     } catch (Throwable throwable) {
@@ -71,17 +69,17 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   }
 
   @Override
-  public Publisher<Event> apply(final MessagingException exception) {
+  public Publisher<InternalEvent> apply(final MessagingException exception) {
     return applyInternal(exception, exception.getEvent());
   }
 
-  private Publisher<Event> applyInternal(final MessagingException exception, Event event) {
+  private Publisher<InternalEvent> applyInternal(final MessagingException exception, InternalEvent event) {
     return just(event)
         .map(beforeRouting(exception))
         .flatMapMany(route(exception)).last()
         .map(afterRouting(exception))
         .doOnError(MessagingException.class, onRoutingError())
-        .<Event>handle((result, sink) -> {
+        .<InternalEvent>handle((result, sink) -> {
           if (exception.handled()) {
             sink.next(result);
           } else {
@@ -106,19 +104,19 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     };
   }
 
-  private void fireEndNotification(Event event, Event result, Throwable throwable) {
+  private void fireEndNotification(InternalEvent event, InternalEvent result, Throwable throwable) {
     notificationFirer.dispatch(new ErrorHandlerNotification(createInfo(result != null ? result
         : event, throwable instanceof MessagingException ? (MessagingException) throwable : null,
                                                                        configuredMessageProcessors),
                                                             getLocation(), PROCESS_END));
   }
 
-  protected Function<Event, Publisher<Event>> route(MessagingException exception) {
+  protected Function<InternalEvent, Publisher<InternalEvent>> route(MessagingException exception) {
     return event -> {
       if (getMessageProcessors().isEmpty()) {
         return just(event);
       } else {
-        event = Event.builder(event)
+        event = InternalEvent.builder(event)
             .message(InternalMessage.builder(event.getMessage()).exceptionPayload(new DefaultExceptionPayload(exception)).build())
             .build();
       }
@@ -151,7 +149,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     }
   }
 
-  protected Event processReplyTo(Event event, Exception e) {
+  protected InternalEvent processReplyTo(InternalEvent event, Exception e) {
     try {
       return replyToMessageProcessor.process(event);
     } catch (MuleException ex) {
@@ -160,9 +158,10 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     }
   }
 
-  protected Event nullifyExceptionPayloadIfRequired(Event event) {
+  protected InternalEvent nullifyExceptionPayloadIfRequired(InternalEvent event) {
     if (this.handleException) {
-      return Event.builder(event).error(null).message(InternalMessage.builder(event.getMessage()).exceptionPayload(null).build())
+      return InternalEvent.builder(event).error(null)
+          .message(InternalMessage.builder(event.getMessage()).exceptionPayload(null).build())
           .build();
     } else {
       return event;
@@ -170,7 +169,6 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   }
 
   private void processStatistics() {
-    FlowConstructStatistics statistics = flowConstruct.getStatistics();
     if (statistics != null && statistics.isEnabled()) {
       statistics.incExecutionError();
     }
@@ -181,7 +179,6 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     super.doInitialise(muleContext);
 
     if (configuredMessageProcessors != null) {
-      configuredMessageProcessors.setFlowConstruct(flowConstruct);
       configuredMessageProcessors.setMuleContext(muleContext);
     }
 
@@ -208,13 +205,13 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
 
 
   @Override
-  public boolean accept(Event event) {
+  public boolean accept(InternalEvent event) {
     return acceptsAll() || acceptsErrorType(event) || (when != null
         && muleContext.getExpressionManager().evaluateBoolean(when, event, getLocation()));
   }
 
 
-  private boolean acceptsErrorType(Event event) {
+  private boolean acceptsErrorType(InternalEvent event) {
     return errorTypeMatcher != null && errorTypeMatcher.match(event.getError().get().getErrorType());
   }
 
@@ -223,7 +220,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     return errorTypeMatcher == null && when == null;
   }
 
-  protected Function<Event, Event> afterRouting(MessagingException exception) {
+  protected Function<InternalEvent, InternalEvent> afterRouting(MessagingException exception) {
     return event -> {
       if (event != null) {
         event = processReplyTo(event, exception);
@@ -233,7 +230,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     };
   }
 
-  protected Function<Event, Event> beforeRouting(MessagingException exception) {
+  protected Function<InternalEvent, InternalEvent> beforeRouting(MessagingException exception) {
     return event -> {
       notificationFirer.dispatch(new ErrorHandlerNotification(createInfo(event, exception, configuredMessageProcessors),
                                                               getLocation(), PROCESS_START));
@@ -252,7 +249,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
    *
    * @param t the exception thrown
    */
-  protected void logException(Throwable t, Event event) {
+  protected void logException(Throwable t, InternalEvent event) {
     if (TRUE.toString().equals(logException)
         || this.muleContext.getExpressionManager().evaluateBoolean(logException, event, getLocation(), true, true)) {
       doLogException(t);

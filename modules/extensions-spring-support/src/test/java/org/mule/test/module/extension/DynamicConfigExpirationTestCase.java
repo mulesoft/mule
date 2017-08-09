@@ -10,7 +10,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 import org.mule.functional.api.flow.FlowRunner;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
@@ -29,7 +29,7 @@ public class DynamicConfigExpirationTestCase extends AbstractExtensionFunctional
     final String myName = "Walt";
     FlowRunner runner = flowRunner("dynamic").withPayload(myName);
 
-    final Event event = runner.buildEvent();
+    final InternalEvent event = runner.buildEvent();
     String returnedName = getPayloadAsString(runner.run().getMessage());
 
     HeisenbergExtension config =

@@ -8,15 +8,15 @@ package org.mule.runtime.core.api.processor;
 
 import static java.util.Optional.empty;
 import static org.mule.runtime.core.DefaultEventContext.child;
-import static org.mule.runtime.core.api.Event.builder;
+import static org.mule.runtime.core.api.InternalEvent.builder;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.EventContext;
+import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.InternalEventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingException;
@@ -104,11 +104,11 @@ public class MessageProcessors {
 
   /**
    * Adapt a {@link ReactiveProcessor} used via non-blocking API {@link ReactiveProcessor#apply(Object)} by blocking and waiting
-   * for response {@link Event} or throwing an {@link MuleException} in the case of an error.
+   * for response {@link InternalEvent} or throwing an {@link MuleException} in the case of an error.
    * <p/>
    * If the {@link ReactiveProcessor} drops the event due to an error or stop action, then the result of returned will be that of
-   * the {@link EventContext} completion. Attempting to adapt a processor implementation that filters events and does not complete
-   * the {@link EventContext} will cause this method to never return.
+   * the {@link InternalEventContext} completion. Attempting to adapt a processor implementation that filters events and does not complete
+   * the {@link InternalEventContext} will cause this method to never return.
    *
    * TODO MULE-13054 Remove blocking processor API
    *
@@ -117,7 +117,7 @@ public class MessageProcessors {
    * @return result event
    * @throws MuleException
    */
-  public static Event processToApply(Event event, ReactiveProcessor processor) throws MuleException {
+  public static InternalEvent processToApply(InternalEvent event, ReactiveProcessor processor) throws MuleException {
     try {
       return just(event).transform(processor).switchIfEmpty(from(event.getContext().getResponsePublisher())).block();
     } catch (Throwable e) {
@@ -127,11 +127,11 @@ public class MessageProcessors {
 
   /**
    * Adapt a {@link ReactiveProcessor} used via non-blocking API {@link ReactiveProcessor#apply(Object)} by blocking and waiting
-   * for response {@link Event} or throwing an {@link MuleException} in the case of an error.
+   * for response {@link InternalEvent} or throwing an {@link MuleException} in the case of an error.
    * <p/>
    * If the {@link ReactiveProcessor} drops the event due to an error or stop action, then the result of returned will be that of
-   * the {@link EventContext} completion. Attempting to adapt a processor implementation that filters events and does not complete
-   * the {@link EventContext} will cause this method to never return.
+   * the {@link InternalEventContext} completion. Attempting to adapt a processor implementation that filters events and does not complete
+   * the {@link InternalEventContext} will cause this method to never return.
    * 
    * This method uses a child context so that if processing occurs using non-blocking further down the chain this will not
    * interfere with current context.
@@ -143,7 +143,8 @@ public class MessageProcessors {
    * @return result event
    * @throws MuleException
    */
-  public static Event processToApplyWithChildContext(Event event, ReactiveProcessor processor) throws MuleException {
+  public static InternalEvent processToApplyWithChildContext(InternalEvent event, ReactiveProcessor processor)
+      throws MuleException {
     try {
       return just(event)
           .transform(publisher -> from(publisher).then(request -> Mono
@@ -155,7 +156,7 @@ public class MessageProcessors {
   }
 
   /**
-   * Process a {@link ReactiveProcessor} using a child {@link EventContext}. This is useful if it is necessary to perform
+   * Process a {@link ReactiveProcessor} using a child {@link InternalEventContext}. This is useful if it is necessary to perform
    * processing in a scope and handle an empty result or error locally rather than complete the response for the whole Flow.
    * <p>
    * No error-handling will be performed when errors occur.
@@ -165,13 +166,13 @@ public class MessageProcessors {
    * @param componentLocation
    * @return the future result of processing processor.
    */
-  public static Publisher<Event> processWithChildContext(Event event, ReactiveProcessor processor,
-                                                         Optional<ComponentLocation> componentLocation) {
+  public static Publisher<InternalEvent> processWithChildContext(InternalEvent event, ReactiveProcessor processor,
+                                                                 Optional<ComponentLocation> componentLocation) {
     return internalProcessWithChildContext(event, processor, child(event.getContext(), componentLocation), true);
   }
 
   /**
-   * Process a {@link ReactiveProcessor} using a child {@link EventContext}. This is useful if it is necessary to perform
+   * Process a {@link ReactiveProcessor} using a child {@link InternalEventContext}. This is useful if it is necessary to perform
    * processing in a scope and handle an empty result or error locally rather than complete the response for the whole Flow.
    * <p>
    * The {@link MessagingExceptionHandler} configured on {@link MessageProcessorChain} or {@link FlowConstruct} will be used to
@@ -183,15 +184,17 @@ public class MessageProcessors {
    * @param exceptionHandler used to handle {@link MessagingException}'s.
    * @return the future result of processing processor.
    */
-  public static Publisher<Event> processWithChildContext(Event event, ReactiveProcessor processor,
-                                                         Optional<ComponentLocation> componentLocation,
-                                                         MessagingExceptionHandler exceptionHandler) {
-    return internalProcessWithChildContext(event, processor, child(event.getContext(), componentLocation, exceptionHandler),
+  public static Publisher<InternalEvent> processWithChildContext(InternalEvent event, ReactiveProcessor processor,
+                                                                 Optional<ComponentLocation> componentLocation,
+                                                                 MessagingExceptionHandler exceptionHandler) {
+    return internalProcessWithChildContext(event, processor,
+                                           child(event.getContext(), componentLocation, exceptionHandler),
                                            true);
   }
 
-  private static Publisher<Event> internalProcessWithChildContext(Event event, ReactiveProcessor processor, EventContext child,
-                                                                  boolean completeParentOnEmpty) {
+  private static Publisher<InternalEvent> internalProcessWithChildContext(InternalEvent event, ReactiveProcessor processor,
+                                                                          InternalEventContext child,
+                                                                          boolean completeParentOnEmpty) {
     return just(builder(child, event).build())
         .transform(processor)
         .doOnNext(result -> {
@@ -201,7 +204,8 @@ public class MessageProcessors {
         })
         .switchIfEmpty(from(child.getResponsePublisher()))
         .map(result -> builder(event.getContext(), result).build())
-        .doOnError(MessagingException.class, me -> me.setProcessedEvent(builder(event.getContext(), me.getEvent()).build()))
+        .doOnError(MessagingException.class,
+                   me -> me.setProcessedEvent(builder(event.getContext(), me.getEvent()).build()))
         .doOnSuccess(result -> {
           if (result == null && completeParentOnEmpty) {
             event.getContext().success();

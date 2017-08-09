@@ -7,7 +7,7 @@
 package org.mule.runtime.core.internal.transformer.simple;
 
 import static org.mule.runtime.api.metadata.DataType.fromType;
-import static org.mule.runtime.core.api.Event.getCurrentEvent;
+import static org.mule.runtime.core.api.InternalEvent.getCurrentEvent;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.transformer.TransformerException;

@@ -7,7 +7,7 @@
 package org.mule.runtime.core.privileged.transformer;
 
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.transformer.AbstractMessageTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 
@@ -23,7 +23,7 @@ public class TransformerTemplate extends AbstractMessageTransformer {
   }
 
   @Override
-  public Object transformMessage(Event event, Charset outputEncoding) throws TransformerException {
+  public Object transformMessage(InternalEvent event, Charset outputEncoding) throws TransformerException {
     try {
       return callback.doTransform(event.getMessage());
     } catch (TransformerException e) {

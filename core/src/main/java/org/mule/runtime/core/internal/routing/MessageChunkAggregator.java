@@ -10,7 +10,7 @@ import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.serialization.SerializationException;
 import org.mule.runtime.api.store.ObjectStoreException;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.internal.routing.correlation.CollectionCorrelatorCallback;
 import org.mule.runtime.core.internal.routing.correlation.CorrelationSequenceComparator;
@@ -46,19 +46,19 @@ public class MessageChunkAggregator extends AbstractAggregator {
        *         group is removed and passed to the exception handler for this componenet
        */
       @Override
-      public Event aggregateEvents(EventGroup events) throws AggregationException {
-        Event[] collectedEvents;
+      public InternalEvent aggregateEvents(EventGroup events) throws AggregationException {
+        InternalEvent[] collectedEvents;
         try {
           collectedEvents = events.toArray(false);
         } catch (ObjectStoreException e) {
           throw new AggregationException(events, MessageChunkAggregator.this, e);
         }
-        Event firstEvent = collectedEvents[0];
+        InternalEvent firstEvent = collectedEvents[0];
         Arrays.sort(collectedEvents, eventComparator);
         ByteArrayOutputStream baos = new ByteArrayOutputStream(DEFAULT_BUFFER_SIZE);
 
         try {
-          for (Event event : collectedEvents) {
+          for (InternalEvent event : collectedEvents) {
             baos.write(event.getMessageAsBytes(muleContext));
           }
 
@@ -72,7 +72,7 @@ public class MessageChunkAggregator extends AbstractAggregator {
           }
 
           // Use last event, that hasn't been completed yet, for continued processing.
-          return Event.builder(collectedEvents[collectedEvents.length - 1]).message(builder.build())
+          return InternalEvent.builder(collectedEvents[collectedEvents.length - 1]).message(builder.build())
               .session(getMergedSession(events.toArray())).build();
         } catch (Exception e) {
           throw new AggregationException(events, MessageChunkAggregator.this, e);

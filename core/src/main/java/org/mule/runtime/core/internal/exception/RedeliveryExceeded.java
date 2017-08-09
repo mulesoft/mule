@@ -7,10 +7,8 @@
 package org.mule.runtime.core.internal.exception;
 
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.internal.message.InternalMessage;
@@ -25,11 +23,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 
-public class RedeliveryExceeded implements FlowConstructAware, Initialisable, ReactiveProcessor {
+public class RedeliveryExceeded implements Initialisable, ReactiveProcessor {
 
   private List<Processor> messageProcessors = new CopyOnWriteArrayList<>();
   private MessageProcessorChain configuredMessageProcessors;
-  private FlowConstruct flowConstruct;
 
   @Override
   public void initialise() throws InitialisationException {
@@ -49,8 +46,8 @@ public class RedeliveryExceeded implements FlowConstructAware, Initialisable, Re
     }
   }
 
-  public Event process(Event event) throws MuleException {
-    Event result = event;
+  public InternalEvent process(InternalEvent event) throws MuleException {
+    InternalEvent result = event;
     if (!messageProcessors.isEmpty()) {
       result = configuredMessageProcessors.process(event);
     }
@@ -61,7 +58,7 @@ public class RedeliveryExceeded implements FlowConstructAware, Initialisable, Re
   }
 
   @Override
-  public Publisher<Event> apply(Publisher<Event> eventPublisher) {
+  public Publisher<InternalEvent> apply(Publisher<InternalEvent> eventPublisher) {
     if (!messageProcessors.isEmpty()) {
       return Flux.from(eventPublisher).transform(configuredMessageProcessors);
     } else {
@@ -69,13 +66,9 @@ public class RedeliveryExceeded implements FlowConstructAware, Initialisable, Re
     }
   }
 
-  private Event removeErrorFromEvent(Event result) {
-    return Event.builder(result).error(null)
+  private InternalEvent removeErrorFromEvent(InternalEvent result) {
+    return InternalEvent.builder(result).error(null)
         .message(InternalMessage.builder(result.getMessage()).exceptionPayload(null).build()).build();
   }
 
-  @Override
-  public void setFlowConstruct(FlowConstruct flowConstruct) {
-    this.flowConstruct = flowConstruct;
-  }
 }

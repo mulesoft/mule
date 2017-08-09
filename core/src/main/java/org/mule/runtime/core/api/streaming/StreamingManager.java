@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api.streaming;
 
 import org.mule.runtime.api.streaming.CursorProvider;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.internal.streaming.CursorContext;
 import org.mule.runtime.core.api.streaming.bytes.ByteStreamingManager;
 import org.mule.runtime.core.api.streaming.object.ObjectStreamingManager;
@@ -43,6 +43,6 @@ public interface StreamingManager {
    * @param creatorEvent the event that created the provider
    * @return a {@link CursorContext}
    */
-  CursorProvider manage(CursorProvider provider, Event creatorEvent);
+  CursorProvider manage(CursorProvider provider, InternalEvent creatorEvent);
 
 }

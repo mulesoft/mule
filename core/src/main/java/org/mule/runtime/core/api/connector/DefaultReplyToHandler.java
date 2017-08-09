@@ -10,11 +10,10 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_REMOTE_SYNC_P
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.api.store.DeserializationPostInitialisable;
+import org.mule.runtime.core.internal.message.InternalMessage;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -41,26 +40,16 @@ public class DefaultReplyToHandler implements ReplyToHandler, Serializable, Dese
    * logger used by this class
    */
   protected transient Logger logger = LoggerFactory.getLogger(getClass());
-
-  protected transient FlowConstruct flowConstruct;
   protected transient Map<String, Object> serializedData = null;
-  private String flowName;
-
-  public DefaultReplyToHandler(FlowConstruct flowConstruct) {
-    this.flowConstruct = flowConstruct;
-    if (flowConstruct != null) {
-      this.flowName = flowConstruct.getName();
-    }
-  }
 
   @Override
-  public Event processReplyTo(final Event event, final Message returnMessage, final Object replyTo)
+  public InternalEvent processReplyTo(final InternalEvent event, final Message returnMessage, final Object replyTo)
       throws MuleException {
     if (logger.isDebugEnabled()) {
       logger.debug("sending reply to: " + replyTo);
     }
 
-    return Event.builder(event)
+    return InternalEvent.builder(event)
         // make sure remove the replyTo property as not cause a a forever replyto loop
         .removeVariable(MULE_REPLY_TO_PROPERTY)
         // MULE-4617. This is fixed with MULE-4620, but lets remove this property anyway as it should never be true from a replyTo
@@ -77,10 +66,6 @@ public class DefaultReplyToHandler implements ReplyToHandler, Serializable, Dese
     if (serializedData == null) {
       return;
     }
-    if (flowName != null) {
-      flowConstruct = context.getRegistry().lookupFlowConstruct(flowName);
-    }
-
     logger = LoggerFactory.getLogger(getClass());
     serializedData = null;
   }

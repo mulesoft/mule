@@ -21,7 +21,7 @@ import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Processor;
@@ -62,20 +62,22 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
   @Test
   public void testFailureExpression() throws Exception {
     Processor intSetter =
-        event -> Event.builder(event).message(Message.builder(event.getMessage()).value(Integer.valueOf(1)).build())
+        event -> InternalEvent.builder(event).message(Message.builder(event.getMessage()).value(Integer.valueOf(1)).build())
             .build();
 
     FirstSuccessful fs = createFirstSuccessfulRouter(intSetter, new StringAppendTransformer("abc"));
     fs.setFailureExpression("#[mel:payload is Integer]");
     fs.initialise();
 
-    assertThat(fs.process(eventBuilder().message(of("")).build()).getMessageAsString(muleContext), is("abc"));
+    assertThat(fs.process(eventBuilder().message(of("")).build()).getMessageAsString(muleContext),
+               is("abc"));
   }
 
   @Test
   public void testRouteReturnsNullEvent() throws Exception {
     Processor nullReturningMp = event -> null;
     FirstSuccessful fs = createFirstSuccessfulRouter(nullReturningMp);
+    fs.setAnnotations(getAppleFlowComponentLocationAnnotations());
     fs.initialise();
 
     assertThat(fs.process(testEvent()), nullValue());
@@ -83,8 +85,9 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void testRouteReturnsNullMessage() throws Exception {
-    Processor nullEventMp = event -> Event.builder(event).message(null).build();
+    Processor nullEventMp = event -> InternalEvent.builder(event).message(null).build();
     FirstSuccessful fs = createFirstSuccessfulRouter(nullEventMp);
+    fs.setAnnotations(getAppleFlowComponentLocationAnnotations());
     fs.initialise();
 
     try {
@@ -97,10 +100,10 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
 
   private FirstSuccessful createFirstSuccessfulRouter(Processor... processors) throws Exception {
     FirstSuccessful fs = new FirstSuccessful();
+    fs.setAnnotations(getAppleFlowComponentLocationAnnotations());
     final FlowConstruct flow = mock(FlowConstruct.class, withSettings().extraInterfaces(AnnotatedObject.class));
     when(flow.getMuleContext()).thenReturn(muleContext);
     when(((AnnotatedObject) flow).getLocation()).thenReturn(TEST_CONNECTOR_LOCATION);
-    fs.setFlowConstruct(flow);
     fs.setMuleContext(muleContext);
 
     fs.setRoutes(asList(processors));
@@ -111,7 +114,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
   private String getPayload(Processor mp, MuleSession session, String message) throws Exception {
     Message msg = of(message);
     try {
-      Event event = mp.process(eventBuilder().message(msg).session(session).build());
+      InternalEvent event = mp.process(eventBuilder().message(msg).session(session).build());
       Message returnedMessage = event.getMessage();
       if (event.getError().isPresent()) {
         return EXCEPTION_SEEN;
@@ -132,7 +135,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
     }
 
     @Override
-    public Event process(Event event) throws MuleException {
+    public InternalEvent process(InternalEvent event) throws MuleException {
       try {
         Message msg;
         Error error = null;
@@ -146,7 +149,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
         } else {
           msg = of("No " + rejectIfMatches);
         }
-        Event muleEvent = eventBuilder().message(msg).error(error).build();
+        InternalEvent muleEvent = eventBuilder().message(msg).error(error).build();
         return muleEvent;
       } catch (Exception e) {
         throw new DefaultMuleException(e);

@@ -12,27 +12,30 @@ import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.api.Event.setCurrentEvent;
+import static org.mule.runtime.core.api.InternalEvent.setCurrentEvent;
 import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STARTED;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static org.mule.runtime.core.api.util.ExceptionUtils.updateMessagingExceptionWithError;
+import static org.mule.runtime.core.internal.construct.AbstractFlowConstruct.createFlowStatistics;
 import static reactor.core.publisher.Flux.from;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.Flow.Builder;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.construct.processor.FlowConstructStatisticsMessageProcessor;
+import org.mule.runtime.core.internal.exception.AbstractExceptionListener;
 import org.mule.runtime.core.internal.processor.strategy.TransactionAwareWorkQueueProcessingStrategyFactory;
 import org.mule.runtime.core.internal.routing.requestreply.SimpleAsyncRequestReplyRequester.AsyncReplyToPropertyRequestReplyReplier;
 
@@ -175,8 +178,13 @@ public class DefaultFlowBuilder implements Builder {
   public Flow build() {
     checkImmutable();
 
+    FlowConstructStatistics flowStatistics = createFlowStatistics(name, muleContext);
+    if (exceptionListener instanceof AbstractExceptionListener) {
+      ((AbstractExceptionListener) exceptionListener).setStatistics(flowStatistics);
+    }
     flow = new DefaultFlow(name, muleContext, source, processors,
-                           ofNullable(exceptionListener), ofNullable(processingStrategyFactory), initialState, maxConcurrency);
+                           ofNullable(exceptionListener), ofNullable(processingStrategyFactory), initialState, maxConcurrency,
+                           flowStatistics);
     return flow;
   }
 
@@ -194,21 +202,23 @@ public class DefaultFlowBuilder implements Builder {
     protected DefaultFlow(String name, MuleContext muleContext, MessageSource source, List<Processor> processors,
                           Optional<MessagingExceptionHandler> exceptionListener,
                           Optional<ProcessingStrategyFactory> processingStrategyFactory, String initialState,
-                          int maxConcurrency) {
-      super(name, muleContext, source, processors, exceptionListener, processingStrategyFactory, initialState, maxConcurrency);
+                          int maxConcurrency, FlowConstructStatistics flowConstructStatistics) {
+      super(name, muleContext, source, processors, exceptionListener, processingStrategyFactory, initialState, maxConcurrency,
+            flowConstructStatistics);
     }
 
     @Override
-    public Event process(final Event event) throws MuleException {
+    public InternalEvent process(final InternalEvent event) throws MuleException {
       return processToApply(event, this);
     }
 
     @Override
-    public Publisher<Event> apply(Publisher<Event> publisher) {
+    public Publisher<InternalEvent> apply(Publisher<InternalEvent> publisher) {
       return from(publisher)
           .doOnNext(assertStarted())
           .flatMap(event -> {
-            Event request = createMuleEventForCurrentFlow(event, event.getReplyToDestination(), event.getReplyToHandler());
+            InternalEvent request =
+                createMuleEventForCurrentFlow(event, event.getReplyToDestination(), event.getReplyToHandler());
             // Use sink and potentially shared stream in Flow by dispatching incoming event via sink and then using
             // response publisher to operate of the result of flow processing before returning
             try {
@@ -219,7 +229,7 @@ public class DefaultFlowBuilder implements Builder {
             }
             return Mono.from(request.getContext().getResponsePublisher())
                 .map(r -> {
-                  Event result = createReturnEventForParentFlowConstruct(r, event);
+                  InternalEvent result = createReturnEventForParentFlowConstruct(r, event);
                   return result;
                 })
                 .onErrorMap(MessagingException.class, me -> {
@@ -229,24 +239,26 @@ public class DefaultFlowBuilder implements Builder {
           });
     }
 
-    private Event createMuleEventForCurrentFlow(Event event, Object replyToDestination, ReplyToHandler replyToHandler) {
+    private InternalEvent createMuleEventForCurrentFlow(InternalEvent event, Object replyToDestination,
+                                                        ReplyToHandler replyToHandler) {
       // DefaultReplyToHandler is used differently and should only be invoked by the first flow and not any
       // referenced flows. If it is passed on they two replyTo responses are sent.
       replyToHandler = null;
 
       // TODO MULE-10013
       // Create new event for current flow with current flowConstruct, replyToHandler etc.
-      event = Event.builder(event).flow(this).replyToHandler(replyToHandler).replyToDestination(replyToDestination).build();
+      event =
+          InternalEvent.builder(event).flow(this).replyToHandler(replyToHandler).replyToDestination(replyToDestination).build();
       resetRequestContextEvent(event);
       return event;
     }
 
-    private Event createReturnEventForParentFlowConstruct(Event result, Event original) {
+    private InternalEvent createReturnEventForParentFlowConstruct(InternalEvent result, InternalEvent original) {
       if (result != null) {
         Optional<Error> errorOptional = result.getError();
         // TODO MULE-10013
         // Create new event with original FlowConstruct, ReplyToHandler and synchronous
-        result = Event.builder(result).flow(original.getFlowConstruct())
+        result = InternalEvent.builder(result).flow(original.getFlowConstruct())
             .replyToHandler(original.getReplyToHandler())
             .replyToDestination(original.getReplyToDestination())
             .error(errorOptional.orElse(null)).build();
@@ -255,7 +267,7 @@ public class DefaultFlowBuilder implements Builder {
       return result;
     }
 
-    private void resetRequestContextEvent(Event event) {
+    private void resetRequestContextEvent(InternalEvent event) {
       // Update RequestContext ThreadLocal for backwards compatibility
       setCurrentEvent(event);
     }
@@ -263,12 +275,12 @@ public class DefaultFlowBuilder implements Builder {
     @Override
     protected void configurePreProcessors(MessageProcessorChainBuilder builder) throws MuleException {
       super.configurePreProcessors(builder);
-      builder.chain(new FlowConstructStatisticsMessageProcessor());
+      builder.chain(new FlowConstructStatisticsMessageProcessor(getStatistics()));
     }
 
     @Override
     protected void configurePostProcessors(MessageProcessorChainBuilder builder) throws MuleException {
-      builder.chain(new AsyncReplyToPropertyRequestReplyReplier());
+      builder.chain(new AsyncReplyToPropertyRequestReplyReplier(getSource()));
       super.configurePostProcessors(builder);
     }
 

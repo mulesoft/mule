@@ -7,7 +7,7 @@
 package org.mule.runtime.core.internal.util.message;
 
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
@@ -32,7 +32,7 @@ public final class ResultsToMessageList extends ResultsToMessageCollection imple
 
   public ResultsToMessageList(List<Object> delegate,
                               CursorProviderFactory cursorProviderFactory,
-                              Event event) {
+                              InternalEvent event) {
     super(delegate, cursorProviderFactory, event);
     this.delegate = delegate;
   }

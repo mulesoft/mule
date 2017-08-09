@@ -22,7 +22,7 @@ import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.store.PartitionableObjectStore;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Processor;
@@ -76,7 +76,7 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase {
   private InternalMessage mockMessageCollection;
 
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-  private Event mockMuleEvent;
+  private InternalEvent mockMuleEvent;
 
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private FlowConstruct mockFlowConstruct;
@@ -177,7 +177,7 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase {
     when(mockMuleContext.getRegistry().get(OBJECT_STORE_MANAGER)).thenReturn(mockObjectStoreManager);
     memoryObjectStore.store(TEST_GROUP_ID, mockEventGroup, "prefix.eventGroups");
     when(mockEventGroup.getGroupId()).thenReturn(TEST_GROUP_ID);
-    when(mockEventGroup.getMessageCollectionEvent()).thenReturn(mock(Event.class));
+    when(mockEventGroup.getMessageCollectionEvent()).thenReturn(mock(InternalEvent.class));
     when(mockFlowConstruct.getName()).thenReturn("flowName");
     return new EventCorrelator(mockEventCorrelatorCallback, mockTimeoutMessageProcessor, mockMuleContext, mockFlowConstruct,
                                memoryObjectStore, "prefix", mockProcessedGroups);

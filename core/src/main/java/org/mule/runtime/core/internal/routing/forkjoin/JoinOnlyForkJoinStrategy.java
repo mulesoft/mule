@@ -7,7 +7,7 @@
 
 package org.mule.runtime.core.internal.routing.forkjoin;
 
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 
 import java.util.List;
 import java.util.function.Function;
@@ -18,7 +18,7 @@ import java.util.function.Function;
  * <li>Performs parallel execution of route pairs subject to {@code maxConcurrency}.
  * <li>Merges variables using a last-wins strategy.
  * <li>Waits for the completion of all routes, with an optional timeout.
- * <li>Emits the same the original input {@link Event} to the router.
+ * <li>Emits the same the original input {@link InternalEvent} to the router.
  * <li>Will processor all routes, regardless of errors, and propagating a composite exception where there were one or more errors.
  * </ul>
  */
@@ -34,7 +34,8 @@ public class JoinOnlyForkJoinStrategy extends AbstractForkJoinStrategy {
   }
 
   @Override
-  protected Function<List<Event>, Event> createResultEvent(Event original, Event.Builder resultBuilder) {
+  protected Function<List<InternalEvent>, InternalEvent> createResultEvent(InternalEvent original,
+                                                                           InternalEvent.Builder resultBuilder) {
     return list -> resultBuilder.build();
   }
 }

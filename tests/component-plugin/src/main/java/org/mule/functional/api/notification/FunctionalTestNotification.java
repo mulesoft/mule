@@ -7,7 +7,7 @@
 package org.mule.functional.api.notification;
 
 import org.mule.functional.api.component.FunctionalTestProcessor;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.CustomNotification;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -17,7 +17,7 @@ import org.mule.runtime.core.api.transformer.TransformerException;
  * can register a {@link FunctionalTestNotificationListener} with Mule to receive these notifications and make assertions about
  * the number of messages received or the content of the message.
  * <p/>
- * This Notification contains the current {@link Event}, {@link FlowConstruct} and reply message. The resource Identifier for this
+ * This Notification contains the current {@link InternalEvent}, {@link FlowConstruct} and reply message. The resource Identifier for this
  * event is the service name that received the message. This means you can register to listen to Notifications from a selected
  * {@link FunctionalTestProcessor}. i.e. <code>
  * muleContext.registerListener(this, "*JmsTestCompoennt");
@@ -42,9 +42,9 @@ public class FunctionalTestNotification extends CustomNotification {
   }
 
   private final Object replyMessage;
-  private final Event event;
+  private final InternalEvent event;
 
-  public FunctionalTestNotification(Event event, String flowName, Object replyMessage, int action)
+  public FunctionalTestNotification(InternalEvent event, String flowName, Object replyMessage, int action)
       throws TransformerException {
     super(event.getMessage().getPayload().getValue(), action);
     resourceIdentifier = flowName;
@@ -56,7 +56,7 @@ public class FunctionalTestNotification extends CustomNotification {
     return replyMessage;
   }
 
-  public Event getEvent() {
+  public InternalEvent getEvent() {
     return event;
   }
 }

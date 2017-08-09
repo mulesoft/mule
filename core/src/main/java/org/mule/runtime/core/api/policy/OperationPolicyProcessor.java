@@ -11,7 +11,7 @@ import static org.mule.runtime.core.api.processor.MessageProcessors.processToApp
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.policy.PolicyEventConverter;
 
@@ -29,9 +29,9 @@ import reactor.core.publisher.Mono;
  * {@link Processor}.
  * <p>
  * This class enforces the scoping of variables between the actual behaviour and the policy that may be applied to it. To enforce
- * such scoping of variables it uses {@link PolicyStateHandler} so the last {@link Event} modified by the policy behaviour can be
- * stored and retrieve for later usages. It also uses {@link PolicyEventConverter} as a helper class to convert an {@link Event}
- * from the policy to the next operation {@link Event} or from the next operation result to the {@link Event} that must continue
+ * such scoping of variables it uses {@link PolicyStateHandler} so the last {@link InternalEvent} modified by the policy behaviour can be
+ * stored and retrieve for later usages. It also uses {@link PolicyEventConverter} as a helper class to convert an {@link InternalEvent}
+ * from the policy to the next operation {@link InternalEvent} or from the next operation result to the {@link InternalEvent} that must continue
  * the execution of the policy.
  * <p>
  */
@@ -59,41 +59,42 @@ public class OperationPolicyProcessor implements Processor {
    * @throws MuleException
    */
   @Override
-  public Event process(Event operationEvent) throws MuleException {
+  public InternalEvent process(InternalEvent operationEvent) throws MuleException {
     return processToApply(operationEvent, this);
   }
 
   @Override
-  public Publisher<Event> apply(Publisher<Event> publisher) {
+  public Publisher<InternalEvent> apply(Publisher<InternalEvent> publisher) {
     return from(publisher).then(operationEvent -> {
       PolicyStateId policyStateId = new PolicyStateId(operationEvent.getContext().getCorrelationId(), policy.getPolicyId());
-      Optional<Event> latestPolicyState = policyStateHandler.getLatestState(policyStateId);
-      Event variablesProviderEvent =
-          latestPolicyState.orElseGet(() -> Event.builder(operationEvent.getContext()).message(of(null)).build());
+      Optional<InternalEvent> latestPolicyState = policyStateHandler.getLatestState(policyStateId);
+      InternalEvent variablesProviderEvent =
+          latestPolicyState.orElseGet(() -> InternalEvent.builder(operationEvent.getContext()).message(of(null)).build());
       policyStateHandler.updateState(policyStateId, variablesProviderEvent);
-      Event policyEvent = policyEventConverter.createEvent(operationEvent, variablesProviderEvent);
+      InternalEvent policyEvent = policyEventConverter.createEvent(operationEvent, variablesProviderEvent);
       Processor operationCall = buildOperationExecutionWithPolicyFunction(nextProcessor, operationEvent);
       policyStateHandler.updateNextOperation(policyStateId.getExecutionIdentifier(), operationCall);
       return executePolicyChain(operationEvent, policyStateId, policyEvent);
     });
   }
 
-  private Mono<Event> executePolicyChain(Event operationEvent, PolicyStateId policyStateId, Event policyEvent) {
+  private Mono<InternalEvent> executePolicyChain(InternalEvent operationEvent, PolicyStateId policyStateId,
+                                                 InternalEvent policyEvent) {
     return just(policyEvent).transform(policy.getPolicyChain())
         .doOnNext(policyChainResult -> policyStateHandler.updateState(policyStateId, policyChainResult))
         .map(policyChainResult -> policyEventConverter.createEvent(policyChainResult, operationEvent));
   }
 
-  private Processor buildOperationExecutionWithPolicyFunction(Processor nextOperation, Event operationEvent) {
+  private Processor buildOperationExecutionWithPolicyFunction(Processor nextOperation, InternalEvent operationEvent) {
     return new Processor() {
 
       @Override
-      public Event process(Event event) throws MuleException {
+      public InternalEvent process(InternalEvent event) throws MuleException {
         return processToApply(event, this);
       }
 
       @Override
-      public Publisher<Event> apply(Publisher<Event> publisher) {
+      public Publisher<InternalEvent> apply(Publisher<InternalEvent> publisher) {
         return from(publisher).then(policyExecuteNextEvent -> {
           PolicyStateId policyStateId = new PolicyStateId(policyExecuteNextEvent.getContext().getId(), policy.getPolicyId());
           policyStateHandler.updateState(policyStateId, policyExecuteNextEvent);

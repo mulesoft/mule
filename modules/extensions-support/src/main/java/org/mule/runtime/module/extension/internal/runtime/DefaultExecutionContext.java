@@ -17,7 +17,7 @@ import org.mule.runtime.api.meta.model.ExecutableComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.util.LazyValue;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
@@ -49,7 +49,7 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
   private final Map<String, Object> variables = new HashMap<>();
   private final M componentModel;
   private final MuleContext muleContext;
-  private final Event event;
+  private final InternalEvent event;
   private final CursorProviderFactory cursorProviderFactory;
   private final StreamingManager streamingManager;
   private final LazyValue<Optional<TransactionConfig>> transactionConfig;
@@ -58,10 +58,10 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
   /**
    * Creates a new instance with the given state
    *
-   * @param configuration         the {@link ConfigurationInstance} that the operation will use
-   * @param parameters            the parameters that the operation will use
-   * @param componentModel        the {@link ComponentModel} for the component being executed
-   * @param event                 the current {@link Event}
+   * @param configuration the {@link ConfigurationInstance} that the operation will use
+   * @param parameters the parameters that the operation will use
+   * @param componentModel the {@link ComponentModel} for the component being executed
+   * @param event the current {@link InternalEvent}
    * @param cursorProviderFactory the {@link CursorProviderFactory} that was configured on the executed component
    * @param streamingManager      the application's {@link StreamingManager}
    * @param location              the {@link ComponentLocation location} of the executing component
@@ -71,7 +71,7 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
                                  Optional<ConfigurationInstance> configuration,
                                  Map<String, Object> parameters,
                                  M componentModel,
-                                 Event event,
+                                 InternalEvent event,
                                  CursorProviderFactory cursorProviderFactory,
                                  StreamingManager streamingManager,
                                  ComponentLocation location,
@@ -151,7 +151,7 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
    * {@inheritDoc}
    */
   @Override
-  public Event getEvent() {
+  public InternalEvent getEvent() {
     return event;
   }
 

@@ -13,7 +13,7 @@ import static org.mule.runtime.core.api.config.DefaultMuleConfiguration.isFlowTr
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.EventContext;
+import org.mule.runtime.core.api.InternalEventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -112,7 +112,7 @@ public class MessageProcessingFlowTraceManager extends LocationExecutionContextP
         resolveProcessorRepresentation(muleContext.getConfiguration().getId(),
                                        notification.getComponent().getLocation().getLocation(),
                                        notification.getProcessor());
-    EventContext eventContext = notification.getEventContext();
+    InternalEventContext eventContext = notification.getEventContext();
     if (eventContext != null) {
       ((DefaultProcessorsTrace) eventContext.getProcessorsTrace())
           .addExecutedProcessors(resolveProcessorRepresentation);

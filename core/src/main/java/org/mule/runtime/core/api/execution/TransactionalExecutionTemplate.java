@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.execution;
 
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
@@ -52,7 +52,7 @@ public class TransactionalExecutionTemplate<T> implements ExecutionTemplate<T> {
       transactionConfig = new MuleTransactionConfig();
     }
     final boolean processTransactionOnException = true;
-    ExecutionInterceptor<Event> tempExecutionInterceptor = new ExecuteCallbackInterceptor<>();
+    ExecutionInterceptor<InternalEvent> tempExecutionInterceptor = new ExecuteCallbackInterceptor<>();
     tempExecutionInterceptor =
         new BeginAndResolveTransactionInterceptor<>(tempExecutionInterceptor, transactionConfig, muleContext,
                                                     processTransactionOnException, resolveAnyTransaction);

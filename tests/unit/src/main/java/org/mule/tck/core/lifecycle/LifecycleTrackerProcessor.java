@@ -7,20 +7,22 @@
 package org.mule.tck.core.lifecycle;
 
 import static org.mockito.Mockito.mock;
-
+import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.management.stats.ComponentStatistics;
 import org.mule.runtime.core.api.processor.Processor;
 
-public class LifecycleTrackerProcessor extends AbstractLifecycleTracker implements FlowConstructAware, Processor {
+import javax.inject.Inject;
+
+public class LifecycleTrackerProcessor extends AbstractLifecycleTracker implements Processor {
 
   public static String LIFECYCLE_TRACKER_PROCESSOR_PROPERTY = "lifecycle";
   public static String FLOW_CONSRUCT_PROPERTY = "flowConstruct";
 
-  private FlowConstruct flowConstruct;
+  @Inject
+  private ConfigurationComponentLocator componentLocator;
 
   public void springInitialize() {
     getTracker().add("springInitialize");
@@ -30,27 +32,15 @@ public class LifecycleTrackerProcessor extends AbstractLifecycleTracker implemen
     getTracker().add("springDestroy");
   }
 
-  @Override
-  public void setFlowConstruct(final FlowConstruct flowConstruct) {
-    if (this.flowConstruct != flowConstruct) {
-      getTracker().add("setService");
-      this.flowConstruct = flowConstruct;
-    }
-  }
-
-  public FlowConstruct getFlowConstruct() {
-    return flowConstruct;
-  }
-
   public ComponentStatistics getStatistics() {
     return mock(ComponentStatistics.class);
   }
 
   @Override
-  public Event process(Event event) throws MuleException {
-    event = Event.builder(event)
+  public InternalEvent process(InternalEvent event) throws MuleException {
+    event = InternalEvent.builder(event)
         .addVariable(LIFECYCLE_TRACKER_PROCESSOR_PROPERTY, getTracker().toString())
-        .addVariable(FLOW_CONSRUCT_PROPERTY, flowConstruct).build();
+        .addVariable(FLOW_CONSRUCT_PROPERTY, FlowConstruct.getFromAnnotatedObject(componentLocator, this)).build();
     return event;
   }
 }

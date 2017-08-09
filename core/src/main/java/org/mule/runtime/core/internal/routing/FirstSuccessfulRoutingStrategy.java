@@ -9,22 +9,25 @@ package org.mule.runtime.core.internal.routing;
 import static java.util.Optional.empty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.DefaultEventContext.child;
-import static org.mule.runtime.core.api.Event.builder;
+import static org.mule.runtime.core.api.InternalEvent.builder;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotCopyStreamPayload;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.api.util.StringMessageUtils.truncate;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.DefaultTransformationService;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.connector.DispatchException;
-import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.RoutingException;
 
 import java.util.List;
+
+import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,23 +41,27 @@ import org.slf4j.LoggerFactory;
  */
 public class FirstSuccessfulRoutingStrategy implements RoutingStrategy {
 
+  @Inject
+  private DefaultTransformationService transformationService;
+
   /**
    * logger used by this class
    */
   protected static transient Logger logger = LoggerFactory.getLogger(FirstSuccessfulRoutingStrategy.class);
-  private final MuleContext muleContext;
-  private FlowConstruct flowConstruct;
-  private String failureExpression;
-  private RouteProcessor processor;
+  private final ExpressionManager expressionManager;
+  private final ComponentLocation componentLocation;
+  private final String failureExpression;
+  private final RouteProcessor processor;
 
   /**
-   * @param flowConstruct
    * @param failureExpression Mule expression that validates if a {@link Processor} execution was successful or not.
    */
-  public FirstSuccessfulRoutingStrategy(final FlowConstruct flowConstruct, final String failureExpression,
-                                        RouteProcessor processor) {
-    this.muleContext = flowConstruct.getMuleContext();
-    this.flowConstruct = flowConstruct;
+  public FirstSuccessfulRoutingStrategy(ExpressionManager expressionManager,
+                                        final String failureExpression,
+                                        RouteProcessor processor,
+                                        ComponentLocation componentLocation) {
+    this.expressionManager = expressionManager;
+    this.componentLocation = componentLocation;
     this.failureExpression = failureExpression;
     this.processor = processor;
   }
@@ -74,8 +81,8 @@ public class FirstSuccessfulRoutingStrategy implements RoutingStrategy {
   }
 
   @Override
-  public Event route(Event event, List<Processor> messageProcessors) throws MuleException {
-    Event returnEvent = null;
+  public InternalEvent route(InternalEvent event, List<Processor> messageProcessors) throws MuleException {
+    InternalEvent returnEvent = null;
 
     boolean failed = true;
     Exception failExceptionCause = null;
@@ -91,8 +98,8 @@ public class FirstSuccessfulRoutingStrategy implements RoutingStrategy {
         } else if (returnEvent.getMessage() == null) {
           failed = true;
         } else {
-          failed = getMuleContext().getExpressionManager()
-              .evaluateBoolean(failureExpression, returnEvent, ((AnnotatedObject) flowConstruct).getLocation(), false, true);
+          failed = expressionManager.evaluateBoolean(failureExpression, returnEvent,
+                                                     fromSingleComponent(componentLocation.getRootContainerName()), false, true);
         }
       } catch (Exception ex) {
         failed = true;
@@ -127,10 +134,10 @@ public class FirstSuccessfulRoutingStrategy implements RoutingStrategy {
    * @return
    * @throws MuleException
    */
-  protected final Event sendRequest(final Event routedEvent, final Message message, final Processor route,
-                                    boolean awaitResponse)
+  protected final InternalEvent sendRequest(final InternalEvent routedEvent, final Message message, final Processor route,
+                                            boolean awaitResponse)
       throws MuleException {
-    Event result;
+    InternalEvent result;
     try {
       result = sendRequestEvent(routedEvent, message, route, awaitResponse);
     } catch (MuleException me) {
@@ -145,7 +152,7 @@ public class FirstSuccessfulRoutingStrategy implements RoutingStrategy {
         if (resultMessage != null) {
           try {
             logger.trace("Response payload: \n"
-                + truncate(muleContext.getTransformationService().getPayloadForLogging(resultMessage), 100, false));
+                + truncate(transformationService.getPayloadForLogging(resultMessage), 100, false));
           } catch (Exception e) {
             logger.trace("Response payload: \n(unable to retrieve payload: " + e.getMessage());
           }
@@ -155,7 +162,7 @@ public class FirstSuccessfulRoutingStrategy implements RoutingStrategy {
     return result;
   }
 
-  private Event sendRequestEvent(Event routedEvent, Message message, Processor route, boolean awaitResponse)
+  private InternalEvent sendRequestEvent(InternalEvent routedEvent, Message message, Processor route, boolean awaitResponse)
       throws MuleException {
     if (route == null) {
       throw new DispatchException(objectIsNull("route"), null);
@@ -164,12 +171,8 @@ public class FirstSuccessfulRoutingStrategy implements RoutingStrategy {
     return route.process(routedEvent);
   }
 
-  protected MuleContext getMuleContext() {
-    return muleContext;
-  }
-
   interface RouteProcessor {
 
-    Event processRoute(Processor route, Event event) throws MuleException;
+    InternalEvent processRoute(Processor route, InternalEvent event) throws MuleException;
   }
 }

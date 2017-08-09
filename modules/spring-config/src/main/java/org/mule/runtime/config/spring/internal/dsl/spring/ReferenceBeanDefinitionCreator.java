@@ -6,15 +6,11 @@
  */
 package org.mule.runtime.config.spring.internal.dsl.spring;
 
-import static org.mule.runtime.config.spring.api.dsl.model.ApplicationModel.PROCESSOR_IDENTIFIER;
 import static org.mule.runtime.config.spring.api.dsl.model.ApplicationModel.TRANSFORMER_IDENTIFIER;
-import static org.springframework.beans.factory.support.BeanDefinitionBuilder.rootBeanDefinition;
-
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.config.spring.api.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.spring.internal.dsl.processor.ObjectTypeVisitor;
-import org.mule.runtime.core.internal.processor.ReferenceProcessor;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -46,20 +42,8 @@ class ReferenceBeanDefinitionCreator extends BeanDefinitionCreator {
   private static final String REF_ATTRIBUTE = "ref";
   private ImmutableMap<ComponentIdentifier, Consumer<CreateBeanDefinitionRequest>> referenceConsumers =
       new ImmutableMap.Builder()
-          .put(PROCESSOR_IDENTIFIER, getProcessorConsumer())
           .put(TRANSFORMER_IDENTIFIER, getConsumer())
           .build();
-
-  private Consumer<CreateBeanDefinitionRequest> getProcessorConsumer() {
-    return (beanDefinitionRequest) -> {
-      SpringComponentModel componentModel = beanDefinitionRequest.getComponentModel();
-      componentModel.setBeanDefinition(rootBeanDefinition(ReferenceProcessor.class)
-          .addConstructorArgReference(componentModel.getParameters().get(REF_ATTRIBUTE)).getBeanDefinition());
-      ObjectTypeVisitor objectTypeVisitor = new ObjectTypeVisitor(componentModel);
-      beanDefinitionRequest.getComponentBuildingDefinition().getTypeDefinition().visit(objectTypeVisitor);
-      componentModel.setType(objectTypeVisitor.getType());
-    };
-  }
 
   private Consumer<CreateBeanDefinitionRequest> getConsumer() {
     return (beanDefinitionRequest) -> {

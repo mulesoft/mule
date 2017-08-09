@@ -22,7 +22,7 @@ import org.mule.runtime.api.component.location.LocationPart;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.source.MessageSource;
@@ -50,7 +50,7 @@ public class NotificationHelperTestCase extends AbstractMuleTestCase {
   private ServerNotificationManager eventNotificationHandler;
 
   @Mock(answer = RETURNS_DEEP_STUBS)
-  private Event event;
+  private InternalEvent event;
 
   @Mock(answer = RETURNS_DEEP_STUBS)
   private MuleContext muleContext;

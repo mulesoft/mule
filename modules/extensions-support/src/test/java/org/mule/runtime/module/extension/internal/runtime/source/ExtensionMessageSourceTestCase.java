@@ -252,7 +252,6 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
     messageSource = getNewExtensionMessageSourceInstance();
 
     sourceCallback = spy(DefaultSourceCallback.builder()
-        .setFlowConstruct(flowConstruct)
         .setSourceModel(sourceModel)
         .setProcessingManager(messageProcessingManager)
         .setListener(messageProcessor)
@@ -501,7 +500,7 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
         new ExtensionMessageSource(extensionModel, sourceModel, sourceAdapterFactory, configurationProvider,
                                    retryPolicyTemplate, cursorStreamProviderFactory, extensionManager);
     messageSource.setListener(messageProcessor);
-    messageSource.setFlowConstruct(flowConstruct);
+    messageSource.setAnnotations(getAppleFlowComponentLocationAnnotations());
     muleContext.getInjector().inject(messageSource);
     return messageSource;
   }

@@ -18,7 +18,7 @@ import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import javax.servlet.ServletException;
@@ -58,7 +58,7 @@ public abstract class AbstractModuleWithHttpTestCase extends AbstractXmlExtensio
    * @param username to validate after hitting the HTTP endpoint
    */
   protected void assertFlowForUsername(String flowName, String username) throws Exception {
-    Event muleEvent = flowRunner(flowName).run();
+    InternalEvent muleEvent = flowRunner(flowName).run();
     assertThat(muleEvent.getMessage().getPayload().getValue(), is("success with basic-authentication for user: " + username));
   }
 
