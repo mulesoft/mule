@@ -63,7 +63,7 @@ public class EnrichedNotificationInfo {
           return createInfo(messagingException.getEvent(), e, componentFromException(e));
         }
       } else {
-        notificationInfo = new EnrichedNotificationInfo(null, e, null, null);
+        notificationInfo = new EnrichedNotificationInfo(null, null, e, null);
         notificationInfo.event = event;
         return notificationInfo;
       }
