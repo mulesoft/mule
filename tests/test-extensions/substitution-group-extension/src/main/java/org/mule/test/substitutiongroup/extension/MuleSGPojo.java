@@ -4,18 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.test.heisenberg.extension.model;
+package org.mule.test.substitutiongroup.extension;
 
 import org.mule.runtime.extension.api.annotation.dsl.xml.TypeDsl;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
-@TypeDsl(allowTopLevelDefinition = true)
-public class CarWash extends Investment {
+@TypeDsl(substitutionGroup = "mule:abstract-shared-extension")
+public class MuleSGPojo {
 
   @Parameter
-  private int carsPerMinute;
+  boolean innerParameter;
 
-  public int getCarsPerMinute() {
-    return carsPerMinute;
-  }
 }

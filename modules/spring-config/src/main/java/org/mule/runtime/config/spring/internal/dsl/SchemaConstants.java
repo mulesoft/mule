@@ -23,6 +23,7 @@ public final class SchemaConstants {
   public static final String SPRING_FRAMEWORK_SCHEMA_LOCATION =
       "http://www.springframework.org/schema/beans/spring-beans-3.0.xsd";
   public static final String MULE_SCHEMA_LOCATION = "http://www.mulesoft.org/schema/mule/core/current/mule.xsd";
+  public static final String EE_SCHEMA_LOCATION = "http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd";
 
   public static final String MULE_EXTENSION_NAMESPACE = format(DEFAULT_NAMESPACE_URI_MASK, "extension");
   public static final String MULE_EXTENSION_PREFIX = "extension";

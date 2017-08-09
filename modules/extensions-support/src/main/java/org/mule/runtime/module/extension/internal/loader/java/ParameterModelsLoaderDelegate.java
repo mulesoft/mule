@@ -31,7 +31,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclarer;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.RestrictedTo;
-import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
+import org.mule.runtime.extension.api.annotation.dsl.xml.ParameterDsl;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.ConfigOverride;
@@ -121,7 +121,7 @@ public final class ParameterModelsLoaderDelegate {
       addTypeRestrictions(extensionParameter, parameter);
       parseLayout(extensionParameter, parameter);
       addImplementingTypeModelProperty(extensionParameter, parameter);
-      parseXmlHints(extensionParameter, parameter);
+      parseParameterDsl(extensionParameter, parameter);
       contributors.forEach(contributor -> contributor.contribute(extensionParameter, parameter, declarationContext));
       declarerList.add(parameter);
     }
@@ -334,13 +334,14 @@ public final class ParameterModelsLoaderDelegate {
         .ifPresent(parameter::withLayout);
   }
 
-  private void parseXmlHints(ExtensionParameter extensionParameter, ParameterDeclarer parameter) {
-    extensionParameter.getAnnotation(XmlHints.class).ifPresent(
-                                                               hints -> parameter.withDsl(ParameterDslConfiguration.builder()
-                                                                   .allowsInlineDefinition(hints.allowInlineDefinition())
-                                                                   .allowsReferences(hints.allowReferences())
-                                                                   .allowTopLevelDefinition(hints.allowTopLevelDefinition())
-                                                                   .build()));
+  private void parseParameterDsl(ExtensionParameter extensionParameter, ParameterDeclarer parameter) {
+    extensionParameter.getAnnotation(ParameterDsl.class).ifPresent(
+                                                                   parameterDsl -> parameter
+                                                                       .withDsl(ParameterDslConfiguration.builder()
+                                                                           .allowsInlineDefinition(parameterDsl
+                                                                               .allowInlineDefinition())
+                                                                           .allowsReferences(parameterDsl.allowReferences())
+                                                                           .build()));
   }
 
   private void checkAnnotationsNotUsedMoreThanOnce(List<? extends ExtensionParameter> parameters,

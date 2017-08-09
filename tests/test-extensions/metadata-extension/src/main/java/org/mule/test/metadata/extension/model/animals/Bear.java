@@ -7,9 +7,9 @@
 package org.mule.test.metadata.extension.model.animals;
 
 import static org.mule.test.metadata.extension.model.animals.AnimalClade.MAMMAL;
-import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
+import org.mule.runtime.extension.api.annotation.dsl.xml.TypeDsl;
 
-@XmlHints(allowTopLevelDefinition = true)
+@TypeDsl(allowTopLevelDefinition = true)
 public class Bear extends Animal {
 
   private String bearName;

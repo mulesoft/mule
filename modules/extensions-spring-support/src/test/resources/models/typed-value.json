@@ -3776,10 +3776,9 @@
           "parent": "",
           "genericTypes": []
         },
-        "xmlHints": {
+        "typeDsl": {
           "allowInlineDefinition": true,
-          "allowTopLevelDefinition": true,
-          "allowReferences": true
+          "allowTopLevelDefinition": true
         },
         "typeAlias": {
           "value": "DifferedKnockableDoor"
@@ -3860,10 +3859,9 @@
           "parent": "",
           "genericTypes": []
         },
-        "xmlHints": {
+        "typeDsl": {
           "allowInlineDefinition": true,
-          "allowTopLevelDefinition": true,
-          "allowReferences": true
+          "allowTopLevelDefinition": true
         },
         "typeAlias": {
           "value": "door"
@@ -4043,10 +4041,9 @@
                 "parent": "",
                 "genericTypes": []
               },
-              "xmlHints": {
+              "typeDsl": {
                 "allowInlineDefinition": true,
-                "allowTopLevelDefinition": true,
-                "allowReferences": true
+                "allowTopLevelDefinition": true
               },
               "typeAlias": {
                 "value": "DifferedKnockableDoor"

@@ -6,11 +6,11 @@
  */
 package org.mule.test.metadata.extension.model.attribute;
 
-import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
+import org.mule.runtime.extension.api.annotation.dsl.xml.TypeDsl;
 
 import java.io.Serializable;
 
-@XmlHints(allowTopLevelDefinition = true)
+@TypeDsl(allowTopLevelDefinition = true)
 public class ShapeOutputAttributes implements Serializable, AbstractOutputAttributes {
 
   private String outputId = "ShapesOutputAttributes";

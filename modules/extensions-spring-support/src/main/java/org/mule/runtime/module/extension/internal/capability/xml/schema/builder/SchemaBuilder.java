@@ -15,6 +15,7 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.api.meta.TargetType.PAYLOAD;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.EE_SCHEMA_LOCATION;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.ENUM_TYPE_SUFFIX;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MAX_ONE;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE;
@@ -39,6 +40,10 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isM
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
 import static org.mule.runtime.extension.api.util.NameUtils.sanitizeName;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.internal.dsl.DslConstants.EE_DOMAIN_NAMESPACE;
+import static org.mule.runtime.internal.dsl.DslConstants.EE_NAMESPACE;
+import static org.mule.runtime.internal.dsl.DslConstants.EE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.capability.xml.schema.builder.ObjectTypeSchemaDelegate.getAbstractElementName;
@@ -67,6 +72,7 @@ import org.mule.runtime.api.meta.type.TypeCatalog;
 import org.mule.runtime.config.spring.internal.dsl.SchemaConstants;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.api.declaration.type.annotation.SubstitutionGroup;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
@@ -101,7 +107,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
@@ -136,7 +141,6 @@ public final class SchemaBuilder {
 
   public static SchemaBuilder newSchema(ExtensionModel extensionModel, XmlDslModel xmlDslModel,
                                         DslResolvingContext dslContext) {
-
     SchemaBuilder builder = new SchemaBuilder();
     builder.extensionModel = extensionModel;
     builder.schema = new Schema();
@@ -219,10 +223,28 @@ public final class SchemaBuilder {
     return this;
   }
 
-  private SchemaBuilder importMuleNamespace() {
+  private Import createMuleImport() {
     Import muleSchemaImport = new Import();
     muleSchemaImport.setNamespace(CORE_NAMESPACE);
     muleSchemaImport.setSchemaLocation(MULE_SCHEMA_LOCATION);
+    return muleSchemaImport;
+  }
+
+  private SchemaBuilder importMuleNamespace() {
+    Import muleSchemaImport = createMuleImport();
+    schema.getIncludeOrImportOrRedefine().add(muleSchemaImport);
+    return this;
+  }
+
+  private Import createMuleEEImport() {
+    Import muleSchemaImport = new Import();
+    muleSchemaImport.setNamespace(EE_NAMESPACE);
+    muleSchemaImport.setSchemaLocation(EE_SCHEMA_LOCATION);
+    return muleSchemaImport;
+  }
+
+  private SchemaBuilder importMuleEENamespace() {
+    Import muleSchemaImport = createMuleEEImport();
     schema.getIncludeOrImportOrRedefine().add(muleSchemaImport);
     return this;
   }
@@ -234,6 +256,12 @@ public final class SchemaBuilder {
     schema.getIncludeOrImportOrRedefine().add(muleExtensionImport);
 
     return this;
+  }
+
+  private void importIfNotImported(Import newImport) {
+    if (!schema.getIncludeOrImportOrRedefine().contains(newImport)) {
+      schema.getIncludeOrImportOrRedefine().add(newImport);
+    }
   }
 
   private SchemaBuilder importTlsNamespace() {
@@ -710,5 +738,31 @@ public final class SchemaBuilder {
 
     complexType.getComplexContent().getExtension().setSequence(groupSequence);
     parentSequence.getParticle().add(objectFactory.createElement(groupElement));
+  }
+
+
+  QName resolveSubstitutionGroup(SubstitutionGroup userConfiguredSubstitutionGroup) {
+    String namespaceUri = getNamespaceUri(userConfiguredSubstitutionGroup.getPrefix());
+    return new QName(namespaceUri, userConfiguredSubstitutionGroup.getElement(), userConfiguredSubstitutionGroup.getPrefix());
+  }
+
+  String getNamespaceUri(String prefix) {
+    if (prefix.equals(CORE_PREFIX)) {
+      importIfNotImported(createMuleImport());
+      return CORE_NAMESPACE;
+    }
+    if (prefix.equals(EE_PREFIX)) {
+      importIfNotImported(createMuleEEImport());
+      return EE_NAMESPACE;
+    }
+    Optional<ExtensionModel> extensionModelFromPrefix = dslContext.getExtensions().stream()
+        .filter((extensionModel) -> prefix.equals(extensionModel.getXmlDslModel().getPrefix())).findFirst();
+    if (extensionModelFromPrefix.isPresent()) {
+      registerExtensionImport(extensionModelFromPrefix.get());
+      return extensionModelFromPrefix.get().getXmlDslModel().getNamespace();
+    }
+    throw new IllegalArgumentException(String
+        .format("prefix: %s inside substitutionGroup does not exist. It does not relate to any imported namespaces",
+                prefix));
   }
 }

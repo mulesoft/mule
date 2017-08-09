@@ -31,6 +31,8 @@ import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.SubTypesModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.tls.TlsContextFactory;
+import org.mule.runtime.extension.api.declaration.type.TypeUtils;
+import org.mule.runtime.extension.api.declaration.type.annotation.DslBaseType;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.model.parameter.ImmutableParameterModel;
@@ -89,7 +91,10 @@ final class ObjectTypeSchemaDelegate {
       if (builder.isImported(type)) {
         addImportedTypeElement(paramSyntax, description, type, all, required);
       } else {
-        if (paramSyntax.isWrapped()) {
+        if (TypeUtils.getSubstitutionGroup(type).isPresent()) {
+          declareRefToType(type, paramSyntax, description, all, required);
+          registerAbstractElement(type, paramSyntax);
+        } else if (paramSyntax.isWrapped()) {
           declareRefToType(type, paramSyntax, description, all, required);
         } else {
           declareTypeInline(type, paramSyntax, description, all, required);
@@ -261,7 +266,7 @@ final class ObjectTypeSchemaDelegate {
       return registeredComplexTypesHolders.get(typeId).getComplexType();
     }
 
-    QName base = getComplexTypeBase(baseType);
+    QName base = getComplexTypeBase(type, baseType);
     Collection<ObjectFieldType> fields;
     if (baseType == null) {
       fields = type.getFields();
@@ -281,13 +286,16 @@ final class ObjectTypeSchemaDelegate {
   /**
    * @return the {@link QName} of the {@code base} type for which the new {@link ComplexType} declares an {@code extension}
    */
-  private QName getComplexTypeBase(ObjectType baseType) {
+  private QName getComplexTypeBase(ObjectType type, ObjectType baseType) {
     Optional<DslElementSyntax> baseDsl = builder.getDslResolver().resolve(baseType);
-    if (!baseDsl.isPresent()) {
-      return MULE_ABSTRACT_EXTENSION_TYPE;
+    if (baseDsl.isPresent()) {
+      return new QName(baseDsl.get().getNamespace(), getBaseTypeName(baseType), baseDsl.get().getPrefix());
     }
-
-    return new QName(baseDsl.get().getNamespace(), getBaseTypeName(baseType), baseDsl.get().getPrefix());
+    Optional<DslBaseType> base = TypeUtils.getBaseType(type);
+    if (base.isPresent()) { //means that the baseType was defined by the user
+      return new QName(builder.getNamespaceUri(base.get().getPrefix()), base.get().getType(), base.get().getPrefix());
+    }
+    return MULE_ABSTRACT_EXTENSION_TYPE;
   }
 
   private ComplexType declarePojoAsType(ObjectType metadataType, QName base, String description,
@@ -379,7 +387,12 @@ final class ObjectTypeSchemaDelegate {
   }
 
   TopLevelElement registerAbstractElement(MetadataType type, DslElementSyntax typeDsl) {
-    return registerAbstractElement(getTypeQName(typeDsl, type), typeDsl, null);
+    QName typeQName = getTypeQName(typeDsl, type);
+    TopLevelElement abstractElement = registerAbstractElement(typeQName, typeDsl, null);
+    TypeUtils.getSubstitutionGroup(type)
+        .ifPresent((substitutionGroup) -> abstractElement
+            .setSubstitutionGroup(builder.resolveSubstitutionGroup(substitutionGroup)));
+    return abstractElement;
   }
 
   private TopLevelElement registerAbstractElement(QName typeQName, DslElementSyntax typeDsl, ObjectType baseType) {

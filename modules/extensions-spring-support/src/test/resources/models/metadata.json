@@ -10784,10 +10784,9 @@
           "parent": "org.mule.test.metadata.extension.model.animals.Animal",
           "genericTypes": []
         },
-        "xmlHints": {
+        "typeDsl": {
           "allowInlineDefinition": true,
-          "allowTopLevelDefinition": true,
-          "allowReferences": true
+          "allowTopLevelDefinition": true
         },
         "typeAlias": {
           "value": "Bear"
@@ -10848,10 +10847,9 @@
           "parent": "",
           "genericTypes": []
         },
-        "xmlHints": {
+        "typeDsl": {
           "allowInlineDefinition": true,
-          "allowTopLevelDefinition": true,
-          "allowReferences": true
+          "allowTopLevelDefinition": true
         },
         "typeAlias": {
           "value": "AnimalsOutputAttributes"
@@ -10903,10 +10901,9 @@
           "parent": "",
           "genericTypes": []
         },
-        "xmlHints": {
+        "typeDsl": {
           "allowInlineDefinition": true,
-          "allowTopLevelDefinition": true,
-          "allowReferences": true
+          "allowTopLevelDefinition": true
         },
         "typeAlias": {
           "value": "ShapeOutputAttributes"

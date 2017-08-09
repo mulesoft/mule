@@ -11,7 +11,7 @@ import org.mule.runtime.api.security.SecurityProviderNotFoundException;
 import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.api.util.concurrent.Latch;
-import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
+import org.mule.runtime.extension.api.annotation.dsl.xml.ParameterDsl;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.DefaultEncoding;
@@ -46,7 +46,7 @@ public class PetStoreOperations {
     return builder.toString();
   }
 
-  public String describeSerializedAnimal(@XmlHints(allowReferences = false) Serializable animal) {
+  public String describeSerializedAnimal(@ParameterDsl(allowReferences = false) Serializable animal) {
     if (animal instanceof byte[]) {
       return new String((byte[]) animal);
     }

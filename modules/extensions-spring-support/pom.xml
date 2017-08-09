@@ -208,6 +208,13 @@
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
+            <artifactId>mule-substitution-group-extension</artifactId>
+            <version>${project.version}</version>
+            <classifier>mule-plugin</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.tests</groupId>
             <artifactId>mule-test-oauth-extension</artifactId>
             <version>${project.version}</version>
             <classifier>mule-plugin</classifier>
