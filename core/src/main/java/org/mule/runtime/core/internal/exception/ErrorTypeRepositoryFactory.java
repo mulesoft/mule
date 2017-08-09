@@ -61,8 +61,9 @@ public class ErrorTypeRepositoryFactory {
     errorTypeRepository.addErrorType(CLIENT_SECURITY, errorTypeRepository.getErrorType(SECURITY).get());
     errorTypeRepository.addErrorType(SERVER_SECURITY, errorTypeRepository.getErrorType(SECURITY).get());
     errorTypeRepository.addErrorType(NOT_PERMITTED, errorTypeRepository.getErrorType(SERVER_SECURITY).get());
-    errorTypeRepository.addInternalErrorType(OVERLOAD, errorTypeRepository.getCriticalErrorType());
     errorTypeRepository.addErrorType(STREAM_MAXIMUM_SIZE_EXCEEDED, errorTypeRepository.getAnyErrorType());
+
+    errorTypeRepository.addInternalErrorType(OVERLOAD, errorTypeRepository.getCriticalErrorType());
     errorTypeRepository.addInternalErrorType(FATAL, errorTypeRepository.getCriticalErrorType());
     errorTypeRepository.addErrorType(TIMEOUT, errorTypeRepository.getAnyErrorType());
     errorTypeRepository.addErrorType(COMPOSITE_ROUTING, errorTypeRepository.getErrorType(ROUTING).get());

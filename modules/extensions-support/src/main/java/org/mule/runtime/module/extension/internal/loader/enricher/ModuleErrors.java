@@ -26,12 +26,5 @@ public enum ModuleErrors implements ErrorTypeDefinition<ModuleErrors> {
     public Optional<ErrorTypeDefinition<? extends Enum<?>>> getParent() {
       return Optional.of(MuleErrors.RETRY_EXHAUSTED);
     }
-  },
-  ANY {
-
-    @Override
-    public Optional<ErrorTypeDefinition<? extends Enum<?>>> getParent() {
-      return Optional.of(MuleErrors.ANY);
-    }
   }
 }

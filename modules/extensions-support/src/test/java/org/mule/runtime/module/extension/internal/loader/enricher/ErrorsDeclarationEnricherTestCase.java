@@ -102,13 +102,8 @@ public class ErrorsDeclarationEnricherTestCase extends AbstractMuleTestCase {
 
     Optional<ErrorModel> anyExtensionError = errorModel.getParent();
     assertThat(anyExtensionError.isPresent(), is(true));
-    assertThat(anyExtensionError.get().getType(), is(ModuleErrors.ANY.getType()));
-    assertThat(anyExtensionError.get().getNamespace(), is(HEISENBERG));
-
-    Optional<ErrorModel> muleAnyError = anyExtensionError.get().getParent();
-    assertThat(muleAnyError.isPresent(), is(true));
-    assertThat(muleAnyError.get().getType(), is(ANY.getType()));
-    assertThat(muleAnyError.get().getNamespace(), is(MULE_NAMESPACE));
+    assertThat(anyExtensionError.get().getType(), is(ANY.getType()));
+    assertThat(anyExtensionError.get().getNamespace(), is(MULE_NAMESPACE));
   }
 
   @Test

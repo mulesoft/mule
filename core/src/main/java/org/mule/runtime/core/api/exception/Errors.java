@@ -48,6 +48,11 @@ public abstract class Errors {
     // HANDLEABLE
 
     /**
+     * Wild card that matches with any error and is on top of the error hierarchy for those that allow handling
+     */
+    public static final String ANY_IDENTIFIER = "ANY";
+
+    /**
      * Indicates that a problem occurred when transforming a value
      */
     public static final String TRANSFORMATION_ERROR_IDENTIFIER = "TRANSFORMATION";
@@ -87,6 +92,11 @@ public abstract class Errors {
      * Indicates that a problem occurred and a connection could not be established
      */
     public static final String CONNECTIVITY_ERROR_IDENTIFIER = "CONNECTIVITY";
+
+    /**
+     * Indicates that the maximum size allowed for a stream has been exceeded.
+     */
+    public static final String STREAM_MAXIMUM_SIZE_EXCEEDED_ERROR_IDENTIFIER = "STREAM_MAXIMUM_SIZE_EXCEEDED";
 
     /**
      * Indicates a security type problem occurred, eg: invalid credentials, expired token, etc.
@@ -133,22 +143,10 @@ public abstract class Errors {
      */
     public static final String SOURCE_RESPONSE_GENERATE_ERROR_IDENTIFIER = "SOURCE_RESPONSE_GENERATE";
 
-    /**
-     * Wild card that matches with any error
-     */
-    public static final String ANY_IDENTIFIER = "ANY";
-
-    public static final String STREAM_MAXIMUM_SIZE_EXCEEDED_ERROR_IDENTIFIER = "STREAM_MAXIMUM_SIZE_EXCEEDED";
-
-    // UNHANDLEABLE
+    // UNHANDLEABLE BUT AVAILABLE
 
     /**
-     * Indicates that an unknown and unexpected error occurred. Cannot be handled directly, only through ANY.
-     */
-    public static final String UNKNOWN_ERROR_IDENTIFIER = "UNKNOWN";
-
-    /**
-     * Indicates that an error occurred in the source of the flow.
+     * Indicates that an error occurred in the source of a flow.
      */
     public static final String SOURCE_ERROR_IDENTIFIER = "SOURCE";
 
@@ -163,7 +161,14 @@ public abstract class Errors {
     public static final String SOURCE_ERROR_RESPONSE_GENERATE_ERROR_IDENTIFIER = "SOURCE_ERROR_RESPONSE_GENERATE";
 
     /**
-     * Indicates that a severe error occurred. Cannot be handled. Other unhandleable errors should go under it.
+     * Indicates that an unknown and unexpected error occurred. Cannot be handled directly, only through ANY.
+     */
+    public static final String UNKNOWN_ERROR_IDENTIFIER = "UNKNOWN";
+
+    // UNHANDLEABLE
+
+    /**
+     * Indicates that a severe error occurred. Cannot be handled. Top of the error hierarchy for those that do not allow handling.
      */
     public static final String CRITICAL_IDENTIFIER = "CRITICAL";
 
@@ -208,8 +213,8 @@ public abstract class Errors {
         builder().namespace(CORE_NAMESPACE_NAME).name(SERVER_SECURITY_ERROR_IDENTIFIER).build();
     public static final ComponentIdentifier NOT_PERMITTED =
         builder().namespace(CORE_NAMESPACE_NAME).name(NOT_PERMITTED_ERROR_IDENTIFIER).build();
-    public static final ComponentIdentifier OVERLOAD =
-        builder().namespace(CORE_NAMESPACE_NAME).name(OVERLOAD_ERROR_IDENTIFIER).build();
+    public static final ComponentIdentifier STREAM_MAXIMUM_SIZE_EXCEEDED =
+        builder().namespace(CORE_NAMESPACE_NAME).name(STREAM_MAXIMUM_SIZE_EXCEEDED_ERROR_IDENTIFIER).build();
     public static final ComponentIdentifier TIMEOUT =
         builder().namespace(CORE_NAMESPACE_NAME).name(TIMEOUT_ERROR_IDENTIFIER).build();
     public static final ComponentIdentifier COMPOSITE_ROUTING =
@@ -228,13 +233,13 @@ public abstract class Errors {
     public static final ComponentIdentifier SOURCE_ERROR_RESPONSE_SEND =
         builder().namespace(CORE_NAMESPACE_NAME).name(SOURCE_ERROR_RESPONSE_SEND_ERROR_IDENTIFIER).build();
 
-    public static final ComponentIdentifier STREAM_MAXIMUM_SIZE_EXCEEDED =
-        builder().namespace(CORE_NAMESPACE_NAME).name(STREAM_MAXIMUM_SIZE_EXCEEDED_ERROR_IDENTIFIER).build();
-    public static final ComponentIdentifier FATAL =
-        builder().namespace(CORE_NAMESPACE_NAME).name(FATAL_ERROR_IDENTIFIER).build();
-
     public static final ComponentIdentifier UNKNOWN =
         builder().namespace(CORE_NAMESPACE_NAME).name(UNKNOWN_ERROR_IDENTIFIER).build();
+
+    public static final ComponentIdentifier OVERLOAD =
+        builder().namespace(CORE_NAMESPACE_NAME).name(OVERLOAD_ERROR_IDENTIFIER).build();
+    public static final ComponentIdentifier FATAL =
+        builder().namespace(CORE_NAMESPACE_NAME).name(FATAL_ERROR_IDENTIFIER).build();
 
   }
 }
