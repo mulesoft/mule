@@ -6,6 +6,7 @@
  */
 package org.mule.test.module.extension;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -17,7 +18,6 @@ import static org.mule.runtime.core.api.exception.Errors.Identifiers.CONNECTIVIT
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.test.heisenberg.extension.HeisenbergErrors.HEALTH;
-
 import org.mule.functional.junit4.rules.ExpectedError;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.core.api.construct.Pipeline;
@@ -43,7 +43,8 @@ public class OperationErrorHandlingTestCase extends AbstractExtensionFunctionalT
 
   @Test
   public void heisenbergThrowsAHealthErrorFromHeisenbergException() throws Exception {
-    expectedError.expectErrorType(HEISENBERG, HEALTH.getType()).expectCause(instanceOf(HeisenbergException.class));
+    expectedError.expectErrorType(HEISENBERG, HEALTH.getType()).expectCause(instanceOf(HeisenbergException.class))
+        .expectMessage(containsString("Walter Jr"));
     flowRunner("cureCancer").run();
   }
 

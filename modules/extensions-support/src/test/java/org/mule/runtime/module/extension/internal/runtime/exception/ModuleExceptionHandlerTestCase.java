@@ -6,6 +6,22 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.exception;
 
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.XmlDslModel;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.core.api.exception.ErrorTypeRepository;
+import org.mule.runtime.core.api.exception.TypedException;
+import org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory;
+import org.mule.runtime.extension.api.exception.ModuleException;
+import org.mule.tck.size.SmallTest;
+
 import static java.util.Collections.singleton;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -17,22 +33,6 @@ import static org.mule.runtime.api.meta.model.error.ErrorModelBuilder.newError;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.TRANSFORMATION_ERROR_IDENTIFIER;
 import static org.mule.runtime.extension.api.error.MuleErrors.CONNECTIVITY;
-import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.meta.model.XmlDslModel;
-import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.core.api.exception.ErrorTypeRepository;
-import org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory;
-import org.mule.runtime.core.api.exception.TypedException;
-import org.mule.runtime.extension.api.exception.ModuleException;
-import org.mule.tck.size.SmallTest;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -103,5 +103,6 @@ public class ModuleExceptionHandlerTestCase {
     ErrorType errorType = ((TypedException) exception).getErrorType();
     assertThat(errorType.getIdentifier(), is(CONNECTIVITY_ERROR_IDENTIFIER));
     assertThat(errorType.getNamespace(), is(ERROR_NAMESPACE));
+    assertThat(exception.getMessage(), is(moduleException.getMessage()));
   }
 }

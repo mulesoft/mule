@@ -6,9 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.exception;
 
-import static org.mule.runtime.api.component.ComponentIdentifier.builder;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getExtensionsErrorNamespace;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -21,6 +18,10 @@ import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 import org.mule.runtime.extension.api.exception.ModuleException;
 
 import java.util.Set;
+
+import static org.mule.runtime.api.component.ComponentIdentifier.builder;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getExtensionsErrorNamespace;
 
 /**
  * Handler of {@link ModuleException ModuleExceptions}, which given a {@link Throwable} checks whether the exceptions is
@@ -67,6 +68,7 @@ public class ModuleExceptionHandler {
   }
 
   private Throwable handleTypedException(final Throwable exception, ErrorTypeDefinition errorDefinition) {
+    Throwable unwrappedException = getExceptionCause(exception);
     if (!isAllowedError(errorDefinition)) {
       throw new MuleRuntimeException(createStaticMessage("The component '%s' from the connector '%s' attempted to throw '%s', but"
           + " only %s errors are allowed.", componentModel.getName(), extensionModel.getName(),
@@ -81,9 +83,9 @@ public class ModuleExceptionHandler {
         .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("The component '%s' from the connector '%s' attempted to throw '%s', but it was not registered "
             + "in the Error Repository", componentModel.getName(), extensionModel.getName(),
                                                                         extensionNamespace + ":" + errorDefinition),
-                                                    getExceptionCause(exception)));
+                                                    unwrappedException));
 
-    return new TypedException(getExceptionCause(exception), errorType);
+    return new TypedException(unwrappedException, errorType, exception.getMessage());
   }
 
 
