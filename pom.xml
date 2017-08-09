@@ -212,7 +212,7 @@
         <allureReportVersion>2.3.1</allureReportVersion>
 
         <!-- Mule Snapshot Dependencies -->
-        <muleDslApiVersion>1.0.0-SNAPSHOT</muleDslApiVersion>
+        <muleDslApiVersion>1.0.0-rc.cyborg</muleDslApiVersion>
         <muleExtensionsApiVersion>1.0.0-rc.cyborg</muleExtensionsApiVersion>
         <muleHttpPolicyApiVersion>1.0.0-SNAPSHOT</muleHttpPolicyApiVersion>
         <muleMavenClientApi>1.0.0-SNAPSHOT</muleMavenClientApi>
