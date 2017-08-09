@@ -20,20 +20,22 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.GlobalNameableObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.ExceptionNotification;
+import org.mule.runtime.core.api.context.notification.Notification;
+import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.context.notification.SecurityNotification;
-import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.exception.MessagingException;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.TypedException;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
+import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.config.ExceptionHelper;
-import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +51,9 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
   protected static final String NOT_SET = "<not set>";
 
   protected transient Logger logger = LoggerFactory.getLogger(getClass());
+
+  @Inject
+  protected NotificationDispatcher notificationFirer;
 
   protected List<Processor> messageProcessors = new CopyOnWriteArrayList<>();
 
@@ -158,9 +163,9 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
    *
    * @param notification the notification to fire.
    */
-  protected void fireNotification(ServerNotification notification) {
+  protected void fireNotification(Notification notification) {
     if (muleContext != null) {
-      muleContext.fireNotification(notification);
+      notificationFirer.dispatch(notification);
     } else if (logger.isWarnEnabled()) {
       logger.debug("MuleContext is not yet available for firing notifications, ignoring event: " + notification);
     }
@@ -193,4 +198,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
     }
   }
 
+  public void setNotificationFirer(NotificationDispatcher notificationFirer) {
+    this.notificationFirer = notificationFirer;
+  }
 }

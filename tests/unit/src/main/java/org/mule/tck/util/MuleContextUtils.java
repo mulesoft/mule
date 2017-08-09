@@ -15,16 +15,19 @@ import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR_LOCATION;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
+import org.mule.runtime.core.api.context.notification.NotificationListenerRegistry;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.util.UUID;
+import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 
 /**
@@ -61,7 +64,17 @@ public class MuleContextUtils {
   public static MuleContext mockContextWithServices() {
     final MuleContext muleContext = mockMuleContext();
     when(muleContext.getSchedulerService()).thenReturn(spy(new SimpleUnitTestSupportSchedulerService()));
+    mockNotificationsHandling(muleContext.getRegistry());
     return muleContext;
+  }
+
+  public static void mockNotificationsHandling(final MuleRegistry registry) {
+    try {
+      when(registry.lookupObject(NotificationDispatcher.class)).thenReturn(mock(NotificationDispatcher.class));
+      when(registry.lookupObject(NotificationListenerRegistry.class)).thenReturn(mock(NotificationListenerRegistry.class));
+    } catch (RegistrationException e) {
+      throw new MuleRuntimeException(e);
+    }
   }
 
   /**

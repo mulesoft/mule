@@ -25,9 +25,9 @@ import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationInstanceNotification;
 import org.mule.runtime.core.api.connector.ConnectionManager;
+import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.retry.RetryCallback;
 import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
@@ -81,13 +81,13 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
   private TimeSupplier timeSupplier;
 
   @Inject
-  private MuleContext muleContext;
-
-  @Inject
   private LockFactory lockFactory;
 
   @Inject
   private SchedulerService schedulerService;
+
+  @Inject
+  private NotificationDispatcher notificationFirer;
 
   @Inject
   private ConnectionManagerAdapter connectionManager;
@@ -249,7 +249,7 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
         }
         super.stop();
       } finally {
-        muleContext.fireNotification(new ConfigurationInstanceNotification(this, CONFIGURATION_STOPPED));
+        notificationFirer.dispatch(new ConfigurationInstanceNotification(this, CONFIGURATION_STOPPED));
       }
     }
   }

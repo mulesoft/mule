@@ -9,10 +9,13 @@ package org.mule.runtime.core.internal.lifecycle;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.lifecycle.HasLifecycleInterceptor;
 import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
 import org.mule.runtime.core.api.lifecycle.LifecycleInterceptor;
@@ -27,7 +30,6 @@ import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * An implementation of {@link LifecycleCallback} for applying {@link Registry} lifecycles
@@ -36,7 +38,7 @@ import org.slf4j.LoggerFactory;
  */
 public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>, HasLifecycleInterceptor {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(RegistryLifecycleCallback.class);
+  private static final Logger LOGGER = getLogger(RegistryLifecycleCallback.class);
 
   protected final RegistryLifecycleManager registryLifecycleManager;
   private LifecycleInterceptor interceptor = new NullLifecycleInterceptor();
@@ -63,13 +65,15 @@ public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>, HasLi
     // and clear it when the phase is fully applied
     Set<Object> duplicates = new HashSet<>();
 
+    final NotificationDispatcher notificationFirer =
+        registryLifecycleManager.muleContext.getRegistry().lookupObject(NotificationDispatcher.class);
     for (LifecycleObject lifecycleObject : phase.getOrderedLifecycleObjects()) {
-      lifecycleObject.firePreNotification(registryLifecycleManager.muleContext);
+      lifecycleObject.firePreNotification(notificationFirer);
 
       // TODO Collection -> List API refactoring
       Collection<?> targetsObj = lookupObjectsForLifecycle(lifecycleObject);
       doApplyLifecycle(phase, duplicates, lifecycleObject, targetsObj);
-      lifecycleObject.firePostNotification(registryLifecycleManager.muleContext);
+      lifecycleObject.firePostNotification(notificationFirer);
     }
 
     interceptor.onPhaseCompleted(phase);

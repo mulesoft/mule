@@ -7,20 +7,21 @@
 package org.mule.functional.listener;
 
 import static java.lang.String.format;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.notification.ExceptionNotificationListener;
 import org.mule.runtime.core.api.context.notification.ExceptionNotification;
-import org.mule.runtime.core.api.context.notification.NotificationException;
+import org.mule.runtime.core.api.context.notification.ExceptionNotificationListener;
+import org.mule.runtime.core.api.context.notification.NotificationListenerRegistry;
+import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.util.concurrent.Latch;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -38,22 +39,19 @@ public class ExceptionListener {
    */
   public ExceptionListener(MuleContext muleContext) {
     try {
-      muleContext.registerListener(new ExceptionNotificationListener<ExceptionNotification>() {
-
-        @Override
-        public void onNotification(ExceptionNotification notification) {
-          exceptionNotifications.add(notification);
-          exceptionThrownLatch.countDown();
-        }
-      });
-    } catch (NotificationException e) {
+      muleContext.getRegistry().lookupObject(NotificationListenerRegistry.class)
+          .registerListener((ExceptionNotificationListener) notification -> {
+            exceptionNotifications.add(notification);
+            exceptionThrownLatch.countDown();
+          });
+    } catch (RegistrationException e) {
       throw new RuntimeException(e);
     }
   }
 
   public ExceptionListener waitUntilAllNotificationsAreReceived() {
     try {
-      if (!exceptionThrownLatch.await(timeout, TimeUnit.MILLISECONDS)) {
+      if (!exceptionThrownLatch.await(timeout, MILLISECONDS)) {
         fail("There was no exception notification");
       }
     } catch (InterruptedException e) {

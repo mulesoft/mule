@@ -14,13 +14,12 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.component.Component;
 import org.mule.runtime.core.api.config.Config;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.lifecycle.LifecycleObject;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.registry.Registry;
 import org.mule.runtime.core.api.routing.OutboundRouter;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transport.LegacyConnector;
-import org.mule.runtime.core.api.lifecycle.LifecycleObject;
-import org.mule.runtime.core.internal.lifecycle.NotificationLifecycleObject;
 import org.mule.runtime.core.api.util.queue.QueueManager;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 
@@ -57,12 +56,12 @@ public class MuleContextStopPhase extends DefaultLifecyclePhase {
 
     Set<LifecycleObject> stopOrderedObjects = new LinkedHashSet<LifecycleObject>();
     // Stop in the opposite order to start
-    stopOrderedObjects.add(new NotificationLifecycleObject(FlowConstruct.class));
-    stopOrderedObjects.add(new NotificationLifecycleObject(LegacyConnector.class));
-    stopOrderedObjects.add(new NotificationLifecycleObject(ConfigurationProvider.class));
-    stopOrderedObjects.add(new NotificationLifecycleObject(Config.class));
-    stopOrderedObjects.add(new NotificationLifecycleObject(QueueManager.class));
-    stopOrderedObjects.add(new NotificationLifecycleObject(Stoppable.class));
+    stopOrderedObjects.add(new LifecycleObject(FlowConstruct.class));
+    stopOrderedObjects.add(new LifecycleObject(LegacyConnector.class));
+    stopOrderedObjects.add(new LifecycleObject(ConfigurationProvider.class));
+    stopOrderedObjects.add(new LifecycleObject(Config.class));
+    stopOrderedObjects.add(new LifecycleObject(QueueManager.class));
+    stopOrderedObjects.add(new LifecycleObject(Stoppable.class));
 
     setIgnoredObjectTypes(ignorredObjects);
     setOrderedLifecycleObjects(stopOrderedObjects);

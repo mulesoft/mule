@@ -7,7 +7,6 @@
 package org.mule.runtime.core.api.context.notification;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.util.ClassUtils;
 
 import java.util.EventObject;
@@ -15,10 +14,10 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * <code>ServerNotification</code> is an event triggered by something happening in the Server itself such as the server starting
- * or a service being registered.
+ * <code>AbstractServerNotification</code> is an event triggered by something happening in the Server itself such as the server
+ * starting or a service being registered.
  */
-public abstract class ServerNotification extends EventObject implements MuleContextAware {
+public abstract class AbstractServerNotification extends EventObject implements Notification {
 
   public static final int NO_ACTION_ID = Integer.MIN_VALUE;
   public static final String NO_ACTION_NAME = "none";
@@ -75,25 +74,24 @@ public abstract class ServerNotification extends EventObject implements MuleCont
 
   protected transient MuleContext muleContext;
 
-  public ServerNotification(Object message, int action) {
+  public AbstractServerNotification(Object message, int action) {
     this(message, action, null);
   }
 
-  public ServerNotification(Object message, int action, String resourceIdentifier) {
+  public AbstractServerNotification(Object message, int action, String resourceIdentifier) {
     super((message == null ? NULL_MESSAGE : message));
     this.action = action;
     this.resourceIdentifier = resourceIdentifier;
     timestamp = System.currentTimeMillis();
   }
 
-  @Override
-  public void setMuleContext(MuleContext context) {
-    muleContext = context;
-    serverId = context.getId();
+  public void setServerId(String serverId) {
+    this.serverId = serverId;
   }
 
-  public int getAction() {
-    return action;
+  @Override
+  public IntegerAction getAction() {
+    return new IntegerAction(action);
   }
 
   public String getServerId() {

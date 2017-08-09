@@ -12,7 +12,7 @@ import org.mule.runtime.core.api.exception.MessagingException;
 /**
  * <code>PipelineMessageNotification</code> is fired at key steps in the processing of {@link Pipeline}
  */
-public class PipelineMessageNotification extends EnrichedServerNotification implements SynchronousServerEvent {
+public class PipelineMessageNotification extends EnrichedServerNotification {
 
   private static final long serialVersionUID = 6065691696506216248L;
 
@@ -38,4 +38,8 @@ public class PipelineMessageNotification extends EnrichedServerNotification impl
     return (MessagingException) super.getException();
   }
 
+  @Override
+  public boolean isSynchronous() {
+    return true;
+  }
 }

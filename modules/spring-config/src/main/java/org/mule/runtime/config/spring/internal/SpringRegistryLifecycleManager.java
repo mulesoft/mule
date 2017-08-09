@@ -37,7 +37,6 @@ import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transport.LegacyConnector;
 import org.mule.runtime.core.api.util.queue.QueueManager;
 import org.mule.runtime.core.internal.lifecycle.EmptyLifecycleCallback;
-import org.mule.runtime.core.internal.lifecycle.NotificationLifecycleObject;
 import org.mule.runtime.core.internal.lifecycle.RegistryLifecycleManager;
 import org.mule.runtime.core.internal.lifecycle.phases.MuleContextDisposePhase;
 import org.mule.runtime.core.internal.lifecycle.phases.MuleContextInitialisePhase;
@@ -77,17 +76,17 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
       super();
 
       Set<LifecycleObject> initOrderedObjects = new LinkedHashSet<>();
-      initOrderedObjects.add(new NotificationLifecycleObject(ObjectStoreManager.class));
-      initOrderedObjects.add(new NotificationLifecycleObject(ExpressionLanguageExtension.class));
-      initOrderedObjects.add(new NotificationLifecycleObject(ExtendedExpressionLanguageAdaptor.class));
-      initOrderedObjects.add(new NotificationLifecycleObject(QueueManager.class));
-      initOrderedObjects.add(new NotificationLifecycleObject(StreamingManager.class));
-      initOrderedObjects.add(new NotificationLifecycleObject(ConfigurationProvider.class));
-      initOrderedObjects.add(new NotificationLifecycleObject(Config.class));
-      initOrderedObjects.add(new NotificationLifecycleObject(LegacyConnector.class));
-      initOrderedObjects.add(new NotificationLifecycleObject(SecurityManager.class));
-      initOrderedObjects.add(new NotificationLifecycleObject(FlowConstruct.class));
-      initOrderedObjects.add(new NotificationLifecycleObject(Initialisable.class));
+      initOrderedObjects.add(new LifecycleObject(ObjectStoreManager.class));
+      initOrderedObjects.add(new LifecycleObject(ExpressionLanguageExtension.class));
+      initOrderedObjects.add(new LifecycleObject(ExtendedExpressionLanguageAdaptor.class));
+      initOrderedObjects.add(new LifecycleObject(QueueManager.class));
+      initOrderedObjects.add(new LifecycleObject(StreamingManager.class));
+      initOrderedObjects.add(new LifecycleObject(ConfigurationProvider.class));
+      initOrderedObjects.add(new LifecycleObject(Config.class));
+      initOrderedObjects.add(new LifecycleObject(LegacyConnector.class));
+      initOrderedObjects.add(new LifecycleObject(SecurityManager.class));
+      initOrderedObjects.add(new LifecycleObject(FlowConstruct.class));
+      initOrderedObjects.add(new LifecycleObject(Initialisable.class));
       setOrderedLifecycleObjects(initOrderedObjects);
 
       setIgnoredObjectTypes(new Class[] {ExtensionManager.class, SpringRegistry.class, SpringRegistryBootstrap.class,

@@ -6,19 +6,24 @@
  */
 package org.mule.runtime.core.internal.construct;
 
+import static org.mule.runtime.core.api.context.notification.FlowConstructNotification.FLOW_CONSTRUCT_DISPOSED;
+import static org.mule.runtime.core.api.context.notification.FlowConstructNotification.FLOW_CONSTRUCT_INITIALISED;
+import static org.mule.runtime.core.api.context.notification.FlowConstructNotification.FLOW_CONSTRUCT_STARTED;
+import static org.mule.runtime.core.api.context.notification.FlowConstructNotification.FLOW_CONSTRUCT_STOPPED;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
 import org.mule.runtime.core.api.context.notification.FlowConstructNotification;
+import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
+import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
 import org.mule.runtime.core.api.lifecycle.SimpleLifecycleManager;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The lifecycle manager responsible for managing lifecycle transitions for a Mule service. The Mule service adds some additional
@@ -29,13 +34,12 @@ public class FlowConstructLifecycleManager extends SimpleLifecycleManager<FlowCo
   /**
    * logger used by this class
    */
-  protected transient final Logger logger = LoggerFactory.getLogger(FlowConstructLifecycleManager.class);
-  protected MuleContext muleContext;
+  private static final Logger logger = getLogger(FlowConstructLifecycleManager.class);
+  private NotificationDispatcher notificationFirer;
 
-
-  public FlowConstructLifecycleManager(FlowConstruct flowConstruct, MuleContext muleContext) {
+  public FlowConstructLifecycleManager(FlowConstruct flowConstruct, NotificationDispatcher notificationFirer) {
     super(flowConstruct.getName(), flowConstruct);
-    this.muleContext = muleContext;
+    this.notificationFirer = notificationFirer;
   }
 
   @Override
@@ -46,7 +50,7 @@ public class FlowConstructLifecycleManager extends SimpleLifecycleManager<FlowCo
       logger.info("Initialising flow: " + getLifecycleObject().getName());
     }
     invokePhase(Initialisable.PHASE_NAME, getLifecycleObject(), callback);
-    fireNotification(FlowConstructNotification.FLOW_CONSTRUCT_INITIALISED);
+    fireNotification(FLOW_CONSTRUCT_INITIALISED);
   }
 
 
@@ -58,7 +62,7 @@ public class FlowConstructLifecycleManager extends SimpleLifecycleManager<FlowCo
     }
     // TODO No pre notification
     invokePhase(Startable.PHASE_NAME, getLifecycleObject(), callback);
-    fireNotification(FlowConstructNotification.FLOW_CONSTRUCT_STARTED);
+    fireNotification(FLOW_CONSTRUCT_STARTED);
   }
 
 
@@ -70,7 +74,7 @@ public class FlowConstructLifecycleManager extends SimpleLifecycleManager<FlowCo
     }
     // TODO No pre notification
     invokePhase(Stoppable.PHASE_NAME, getLifecycleObject(), callback);
-    fireNotification(FlowConstructNotification.FLOW_CONSTRUCT_STOPPED);
+    fireNotification(FLOW_CONSTRUCT_STOPPED);
   }
 
   @Override
@@ -81,10 +85,10 @@ public class FlowConstructLifecycleManager extends SimpleLifecycleManager<FlowCo
     }
     // TODO No pre notification
     invokePhase(Disposable.PHASE_NAME, getLifecycleObject(), callback);
-    fireNotification(FlowConstructNotification.FLOW_CONSTRUCT_DISPOSED);
+    fireNotification(FLOW_CONSTRUCT_DISPOSED);
   }
 
   protected void fireNotification(int action) {
-    muleContext.fireNotification(new FlowConstructNotification(getLifecycleObject(), action));
+    notificationFirer.dispatch(new FlowConstructNotification(getLifecycleObject(), action));
   }
 }

@@ -11,7 +11,7 @@ import org.mule.runtime.api.security.SecurityException;
 /**
  * <code>SecurityNotification</code> is fired when a request for authorisation failed.
  */
-public class SecurityNotification extends ServerNotification {
+public class SecurityNotification extends AbstractServerNotification {
 
   /**
    * Serial version

@@ -13,7 +13,7 @@ import org.mule.runtime.core.api.processor.Processor;
 /**
  * <code>AsyncMessageNotification</code> when async work is scheduled and completed for a given flow
  */
-public class AsyncMessageNotification extends EnrichedServerNotification implements SynchronousServerEvent {
+public class AsyncMessageNotification extends EnrichedServerNotification {
 
   private static final long serialVersionUID = 6065691696506216248L;
 
@@ -36,5 +36,10 @@ public class AsyncMessageNotification extends EnrichedServerNotification impleme
   @Override
   public MessagingException getException() {
     return (MessagingException) super.getException();
+  }
+
+  @Override
+  public boolean isSynchronous() {
+    return true;
   }
 }

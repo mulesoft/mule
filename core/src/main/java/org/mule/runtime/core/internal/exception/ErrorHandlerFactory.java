@@ -8,6 +8,8 @@ package org.mule.runtime.core.internal.exception;
 
 import static java.util.Collections.singletonList;
 
+import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
+
 /**
  * Factory object for {@link ErrorHandler}.
  *
@@ -15,9 +17,11 @@ import static java.util.Collections.singletonList;
  */
 public class ErrorHandlerFactory {
 
-  public ErrorHandler createDefault() {
+  public ErrorHandler createDefault(NotificationDispatcher notificationFirer) {
     ErrorHandler errorHandler = new ErrorHandler();
-    errorHandler.setExceptionListeners(singletonList(new OnErrorPropagateHandler()));
+    final OnErrorPropagateHandler propagate = new OnErrorPropagateHandler();
+    propagate.setNotificationFirer(notificationFirer);
+    errorHandler.setExceptionListeners(singletonList(propagate));
     return errorHandler;
   }
 }

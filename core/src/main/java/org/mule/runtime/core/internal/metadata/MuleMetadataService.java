@@ -13,6 +13,8 @@ import static org.mule.runtime.api.metadata.resolving.FailureCode.COMPONENT_NOT_
 import static org.mule.runtime.api.metadata.resolving.FailureCode.NO_DYNAMIC_METADATA_AVAILABLE;
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
+import static org.mule.runtime.core.api.config.ConfigurationInstanceNotification.CONFIGURATION_STOPPED;
+
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -35,7 +37,7 @@ import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationInstanceNotification;
 import org.mule.runtime.core.api.context.notification.CustomNotificationListener;
-import org.mule.runtime.core.api.context.notification.NotificationException;
+import org.mule.runtime.core.api.context.notification.NotificationListenerRegistry;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -64,7 +66,7 @@ public class MuleMetadataService implements MetadataService, Initialisable {
   private static final String EXCEPTION_RESOLVING_METADATA_KEYS = "An exception occurred while resolving Component MetadataKeys";
 
   @Inject
-  private MuleContext muleContext;
+  private NotificationListenerRegistry notificationRegistrer;
 
   @Inject
   private ConfigurationComponentLocator componentLocator;
@@ -88,20 +90,16 @@ public class MuleMetadataService implements MetadataService, Initialisable {
    */
   @Override
   public void initialise() throws InitialisationException {
-    try {
-      muleContext.registerListener((CustomNotificationListener<ConfigurationInstanceNotification>) notification -> {
-        try {
-          if (notification.getAction() == ConfigurationInstanceNotification.CONFIGURATION_STOPPED) {
-            String name = ((ConfigurationInstanceNotification) notification).getConfigurationInstance().getName();
-            disposeCache(name);
-          }
-        } catch (Exception e) {
-          throw new RuntimeException("Error while looking for the MetadataManager in the registry", e);
+    notificationRegistrer.registerListener((CustomNotificationListener<ConfigurationInstanceNotification>) notification -> {
+      try {
+        if (notification.getAction().getActionId() == CONFIGURATION_STOPPED) {
+          String name = ((ConfigurationInstanceNotification) notification).getConfigurationInstance().getName();
+          disposeCache(name);
         }
-      });
-    } catch (NotificationException e) {
-      throw new InitialisationException(createStaticMessage("Could not register ConfigurationInstanceListener"), e, this);
-    }
+      } catch (Exception e) {
+        throw new RuntimeException("Error while looking for the MetadataManager in the registry", e);
+      }
+    });
   }
 
   /**

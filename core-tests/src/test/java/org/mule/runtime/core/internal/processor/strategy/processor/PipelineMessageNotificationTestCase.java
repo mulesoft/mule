@@ -26,6 +26,7 @@ import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.UN
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.ErrorType;
@@ -38,8 +39,8 @@ import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.context.notification.AsyncMessageNotification;
 import org.mule.runtime.core.api.context.notification.EnrichedServerNotification;
 import org.mule.runtime.core.api.context.notification.ErrorHandlerNotification;
+import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.context.notification.PipelineMessageNotification;
-import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.exception.ErrorTypeLocator;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.management.stats.AllStatistics;
@@ -68,7 +69,7 @@ import org.mockito.ArgumentMatcher;
 public class PipelineMessageNotificationTestCase extends AbstractReactiveProcessorTestCase {
 
   private Event event;
-  private ServerNotificationManager notificationManager;
+  private NotificationDispatcher notificationFirer;
   private TestPipeline pipeline;
   private final String pipelineName = "testPipeline";
 
@@ -87,9 +88,9 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
     muleContext = mockContextWithServices();
     when(muleContext.getStatistics()).thenReturn(new AllStatistics());
     when(muleContext.getConfiguration()).thenReturn(new DefaultMuleConfiguration());
-    when(muleContext.getDefaultErrorHandler()).thenReturn(new ErrorHandlerFactory().createDefault());
-    notificationManager = mock(ServerNotificationManager.class);
-    when(muleContext.getNotificationManager()).thenReturn(notificationManager);
+    notificationFirer = muleContext.getRegistry().lookupObject(NotificationDispatcher.class);
+    when(muleContext.getDefaultErrorHandler()).thenReturn(new ErrorHandlerFactory().createDefault(notificationFirer));
+    when(muleContext.getRegistry().lookupObject(NotificationDispatcher.class)).thenReturn(notificationFirer);
     ErrorTypeLocator errorTypeLocator = mock(ErrorTypeLocator.class);
     ErrorType errorType = mock(ErrorType.class);
     when(errorTypeLocator.lookupErrorType(any(Throwable.class))).thenReturn(errorType);
@@ -128,7 +129,8 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
 
   @Test
   public void requestResponseException() throws Exception {
-    createTestPipeline(singletonList(new ExceptionThrowingMessageProcessor()), new ErrorHandlerFactory().createDefault());
+    createTestPipeline(singletonList(new ExceptionThrowingMessageProcessor()),
+                       new ErrorHandlerFactory().createDefault(notificationFirer));
 
     pipeline.initialise();
     pipeline.start();
@@ -145,27 +147,28 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
   }
 
   private void verifySucess() {
-    verify(notificationManager, times(1))
-        .fireNotification(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_START, false, event)));
-    verify(notificationManager, times(1))
-        .fireNotification(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_END, false, event)));
-    verify(notificationManager, times(1))
-        .fireNotification(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_COMPLETE, false, event)));
-    verify(notificationManager, times(3)).fireNotification(any(PipelineMessageNotification.class));
+    verify(notificationFirer, times(1))
+        .dispatch(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_START, false, event)));
+    verify(notificationFirer, times(1))
+        .dispatch(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_END, false, event)));
+    verify(notificationFirer, times(1))
+        .dispatch(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_COMPLETE, false, event)));
+    verify(notificationFirer, times(3)).dispatch(argThat(instanceOf(PipelineMessageNotification.class)));
   }
 
   private void verifyException() {
-    verify(notificationManager, times(1))
-        .fireNotification(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_START, false, event)));
-    verify(notificationManager, times(1))
-        .fireNotification(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_COMPLETE, true, null)));
-    verify(notificationManager, times(1))
-        .fireNotification(argThat(new PipelineMessageNotificiationArgumentMatcher(ErrorHandlerNotification.PROCESS_START,
-                                                                                  false, null)));
-    verify(notificationManager, times(1))
-        .fireNotification(argThat(new PipelineMessageNotificiationArgumentMatcher(ErrorHandlerNotification.PROCESS_END,
-                                                                                  false, null)));
-    verify(notificationManager, times(4)).fireNotification(any(PipelineMessageNotification.class));
+    verify(notificationFirer, times(1))
+        .dispatch(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_START, false, event)));
+    verify(notificationFirer, times(1))
+        .dispatch(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_COMPLETE, true, null)));
+    verify(notificationFirer, times(1))
+        .dispatch(argThat(new PipelineMessageNotificiationArgumentMatcher(ErrorHandlerNotification.PROCESS_START,
+                                                                          false, null)));
+    verify(notificationFirer, times(1))
+        .dispatch(argThat(new PipelineMessageNotificiationArgumentMatcher(ErrorHandlerNotification.PROCESS_END,
+                                                                          false, null)));
+    verify(notificationFirer, times(2)).dispatch(argThat(instanceOf(PipelineMessageNotification.class)));
+    verify(notificationFirer, times(2)).dispatch(argThat(instanceOf(ErrorHandlerNotification.class)));
   }
 
   private class TestPipeline extends DefaultFlow {
@@ -217,6 +220,9 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
 
     @Override
     public boolean matches(Object argument) {
+      if (!(argument instanceof PipelineMessageNotification || argument instanceof ErrorHandlerNotification)) {
+        return false;
+      }
       EnrichedServerNotification notification = (EnrichedServerNotification) argument;
       MessagingException exception = null;
       if (notification instanceof PipelineMessageNotification) {
@@ -226,10 +232,10 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
       }
 
       if (exceptionExpected) {
-        return expectedAction == notification.getAction() && exception != null && notification.getMessage() != null
+        return expectedAction == notification.getAction().getActionId() && exception != null && notification.getMessage() != null
             && (this.event == null || this.event.getMessage().equals(notification.getMessage()));
       } else {
-        return expectedAction == notification.getAction() && exception == null && notification.getMessage() != null
+        return expectedAction == notification.getAction().getActionId() && exception == null && notification.getMessage() != null
             && (this.event == null || this.event.getMessage().equals(notification.getMessage()));
       }
     }

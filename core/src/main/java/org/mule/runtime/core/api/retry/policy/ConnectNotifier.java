@@ -6,10 +6,13 @@
  */
 package org.mule.runtime.core.api.retry.policy;
 
+import static org.mule.runtime.core.api.context.notification.ConnectionNotification.CONNECTION_CONNECTED;
+import static org.mule.runtime.core.api.context.notification.ConnectionNotification.CONNECTION_FAILED;
+
+import org.mule.runtime.core.api.context.notification.ConnectionNotification;
 import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.retry.RetryNotifier;
 import org.mule.runtime.core.internal.config.ExceptionHelper;
-import org.mule.runtime.core.api.context.notification.ConnectionNotification;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,12 +30,12 @@ public class ConnectNotifier implements RetryNotifier {
       logger.debug("Successfully connected to " + context.getDescription());
     }
 
-    fireConnectNotification(ConnectionNotification.CONNECTION_CONNECTED, context.getDescription(), context);
+    fireConnectNotification(CONNECTION_CONNECTED, context.getDescription(), context);
   }
 
   @Override
   public void onFailure(RetryContext context, Throwable e) {
-    fireConnectNotification(ConnectionNotification.CONNECTION_FAILED, context.getDescription(), context);
+    fireConnectNotification(CONNECTION_FAILED, context.getDescription(), context);
 
     if (logger.isErrorEnabled()) {
       StringBuilder msg = new StringBuilder(512);
@@ -47,6 +50,6 @@ public class ConnectNotifier implements RetryNotifier {
   }
 
   protected void fireConnectNotification(int action, String description, RetryContext context) {
-    context.getMuleContext().fireNotification(new ConnectionNotification(null, description, action));
+    context.getNotificationFirer().dispatch(new ConnectionNotification(null, description, action));
   }
 }

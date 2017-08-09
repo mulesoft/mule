@@ -14,13 +14,12 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.component.Component;
 import org.mule.runtime.core.api.config.Config;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.lifecycle.LifecycleObject;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.registry.Registry;
 import org.mule.runtime.core.api.routing.OutboundRouter;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transport.LegacyConnector;
-import org.mule.runtime.core.api.lifecycle.LifecycleObject;
-import org.mule.runtime.core.internal.lifecycle.NotificationLifecycleObject;
 import org.mule.runtime.core.api.util.queue.QueueManager;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 
@@ -54,12 +53,12 @@ public class MuleContextStartPhase extends DefaultLifecyclePhase {
     super(Startable.PHASE_NAME, Startable.class, Stoppable.PHASE_NAME);
 
     Set<LifecycleObject> startOrderedObjects = new LinkedHashSet<>();
-    startOrderedObjects.add(new NotificationLifecycleObject(QueueManager.class));
-    startOrderedObjects.add(new NotificationLifecycleObject(ConfigurationProvider.class));
-    startOrderedObjects.add(new NotificationLifecycleObject(Config.class));
-    startOrderedObjects.add(new NotificationLifecycleObject(LegacyConnector.class));
-    startOrderedObjects.add(new NotificationLifecycleObject(FlowConstruct.class));
-    startOrderedObjects.add(new NotificationLifecycleObject(Startable.class));
+    startOrderedObjects.add(new LifecycleObject(QueueManager.class));
+    startOrderedObjects.add(new LifecycleObject(ConfigurationProvider.class));
+    startOrderedObjects.add(new LifecycleObject(Config.class));
+    startOrderedObjects.add(new LifecycleObject(LegacyConnector.class));
+    startOrderedObjects.add(new LifecycleObject(FlowConstruct.class));
+    startOrderedObjects.add(new LifecycleObject(Startable.class));
 
     setIgnoredObjectTypes(ignoredObjects);
     setOrderedLifecycleObjects(startOrderedObjects);

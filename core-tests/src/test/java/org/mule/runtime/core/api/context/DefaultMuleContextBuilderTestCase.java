@@ -10,6 +10,7 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.context.notification.AsyncMessageNotification;
@@ -26,6 +27,8 @@ import org.mule.runtime.core.api.context.notification.ManagementNotification;
 import org.mule.runtime.core.api.context.notification.ManagementNotificationListener;
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
+import org.mule.runtime.core.api.context.notification.Notification;
+import org.mule.runtime.core.api.context.notification.NotificationListener;
 import org.mule.runtime.core.api.context.notification.PipelineMessageNotification;
 import org.mule.runtime.core.api.context.notification.PipelineMessageNotificationListener;
 import org.mule.runtime.core.api.context.notification.RegistryNotification;
@@ -34,8 +37,6 @@ import org.mule.runtime.core.api.context.notification.RoutingNotification;
 import org.mule.runtime.core.api.context.notification.RoutingNotificationListener;
 import org.mule.runtime.core.api.context.notification.SecurityNotification;
 import org.mule.runtime.core.api.context.notification.SecurityNotificationListener;
-import org.mule.runtime.core.api.context.notification.ServerNotification;
-import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.context.notification.TransactionNotification;
 import org.mule.runtime.core.api.context.notification.TransactionNotificationListener;
@@ -86,7 +87,7 @@ public class DefaultMuleContextBuilderTestCase extends AbstractMuleTestCase {
     builder.setLifecycleManager(new MyLifeCycleManager());
     MuleContext muleContext = builder.buildMuleContext();
 
-    Map<Class<? extends ServerNotificationListener>, Set<Class<? extends ServerNotification>>> interfaces =
+    Map<Class<? extends NotificationListener>, Set<Class<? extends Notification>>> interfaces =
         muleContext.getNotificationManager().getInterfaceToTypes();
 
     assertEquals(MuleContextNotification.class, interfaces.get(MuleContextNotificationListener.class).toArray()[0]);

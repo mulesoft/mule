@@ -9,12 +9,12 @@ package org.mule.runtime.core.api.transaction.xa;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transaction.Transaction;
-import org.mule.runtime.core.api.transaction.xa.XaTransactionFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import javax.transaction.TransactionManager;
@@ -29,7 +29,7 @@ public class XaTransactionFactoryTestCase extends AbstractMuleTestCase {
     final XaTransactionFactory transactionFactory = new XaTransactionFactory();
     transactionFactory.setTimeout(timeout);
 
-    final MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
+    final MuleContext muleContext = mockContextWithServices();
 
     final TransactionManager transactionManager = mock(TransactionManager.class);
     when(muleContext.getTransactionManager()).thenReturn(transactionManager);

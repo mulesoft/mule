@@ -19,6 +19,8 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.core.DefaultEventContext.create;
 import static org.mule.runtime.core.api.construct.Flow.builder;
+import static org.mule.runtime.core.api.context.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE;
+import static org.mule.runtime.core.api.context.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.OVERLOAD_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
@@ -37,6 +39,7 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.Flow.Builder;
+import org.mule.runtime.core.api.context.notification.IntegerAction;
 import org.mule.runtime.core.api.context.notification.MessageProcessorNotification;
 import org.mule.runtime.core.api.context.notification.MessageProcessorNotificationListener;
 import org.mule.runtime.core.api.exception.MessagingException;
@@ -437,9 +440,9 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
     muleContext.getNotificationManager().addInterfaceToType(MessageProcessorNotificationListener.class,
                                                             MessageProcessorNotification.class);
     muleContext.getNotificationManager().addListener((MessageProcessorNotificationListener) notification -> {
-      if (notification.getAction() == MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE) {
+      if (new IntegerAction(MESSAGE_PROCESSOR_PRE_INVOKE).equals(notification.getAction())) {
         beforeThread.set(currentThread());
-      } else if (notification.getAction() == MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE) {
+      } else if (new IntegerAction(MESSAGE_PROCESSOR_POST_INVOKE).equals(notification.getAction())) {
         afterThread.set(currentThread());
       }
     });

@@ -6,15 +6,21 @@
  */
 package org.mule.runtime.core.api.transaction;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.junit.Assert.assertEquals;
+import static org.mule.runtime.core.api.context.notification.TransactionNotification.TRANSACTION_BEGAN;
+import static org.mule.runtime.core.api.context.notification.TransactionNotification.TRANSACTION_COMMITTED;
+import static org.mule.runtime.core.api.context.notification.TransactionNotification.TRANSACTION_ROLLEDBACK;
+
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.notification.IntegerAction;
+import org.mule.runtime.core.api.context.notification.NotificationListenerRegistry;
 import org.mule.runtime.core.api.context.notification.TransactionNotification;
 import org.mule.runtime.core.api.context.notification.TransactionNotificationListener;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
@@ -28,31 +34,28 @@ public class TransactionNotificationsTestCase extends AbstractMuleContextTestCas
     // a global TransactionCoordination instance, which binds it to the current thread.
     Transaction transaction = new DummyTransaction(muleContext);
 
-    muleContext.registerListener(new TransactionNotificationListener<TransactionNotification>() {
+    muleContext.getRegistry().lookupObject(NotificationListenerRegistry.class)
+        .registerListener(new TransactionNotificationListener<TransactionNotification>() {
 
-      @Override
-      public boolean isBlocking() {
-        return false;
-      }
+          @Override
+          public boolean isBlocking() {
+            return false;
+          }
 
-      @Override
-      public void onNotification(TransactionNotification notification) {
-        if (notification.getAction() == TransactionNotification.TRANSACTION_BEGAN) {
-          assertEquals("begin", notification.getActionName());
-          latch.countDown();
-        } else {
-          if (notification.getAction() == TransactionNotification.TRANSACTION_COMMITTED) {
-            assertEquals("commit", notification.getActionName());
-            latch.countDown();
-          } else {
-            if (notification.getAction() == TransactionNotification.TRANSACTION_ROLLEDBACK) {
+          @Override
+          public void onNotification(TransactionNotification notification) {
+            if (new IntegerAction(TRANSACTION_BEGAN).equals(notification.getAction())) {
+              assertEquals("begin", notification.getActionName());
+              latch.countDown();
+            } else if (new IntegerAction(TRANSACTION_COMMITTED).equals(notification.getAction())) {
+              assertEquals("commit", notification.getActionName());
+              latch.countDown();
+            } else if (new IntegerAction(TRANSACTION_ROLLEDBACK).equals(notification.getAction())) {
               assertEquals("rollback", notification.getActionName());
               latch.countDown();
             }
           }
-        }
-      }
-    }, transaction.getId());
+        }, notification -> transaction.getId().equals(notification.getResourceIdentifier()));
 
 
     transaction.begin();
@@ -60,7 +63,8 @@ public class TransactionNotificationsTestCase extends AbstractMuleContextTestCas
     transaction.rollback();
 
     // Wait for the notifcation event to be fired as they are queued
-    latch.await(2000, TimeUnit.MILLISECONDS);
+    latch.await(2000, MILLISECONDS);
+
     assertEquals("There are still some notifications left unfired.", 0, latch.getCount());
   }
 

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.context.notification;
 
+import static com.google.common.cache.CacheBuilder.newBuilder;
 import static org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo.createInfo;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -15,7 +16,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.privileged.context.notification.OptimisedNotificationHandler;
 
-import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
@@ -34,11 +34,11 @@ public class NotificationHelper {
 
   private static final Logger logger = LoggerFactory.getLogger(NotificationHelper.class);
 
-  private final Class<? extends ServerNotification> notificationClass;
+  private final Class<? extends Notification> notificationClass;
   private final boolean dynamicNotifications;
   private final ServerNotificationHandler defaultNotificationHandler;
   private final LoadingCache<MuleContext, ServerNotificationHandler> serverNotificationHandlers =
-      CacheBuilder.newBuilder().build(new CacheLoader<MuleContext, ServerNotificationHandler>() {
+      newBuilder().build(new CacheLoader<MuleContext, ServerNotificationHandler>() {
 
         @Override
         public ServerNotificationHandler load(MuleContext muleContext) throws Exception {
@@ -58,7 +58,7 @@ public class NotificationHelper {
    *        creation time
    */
   public NotificationHelper(ServerNotificationHandler defaultNotificationHandler,
-                            Class<? extends ServerNotification> notificationClass, boolean dynamicNotifications) {
+                            Class<? extends Notification> notificationClass, boolean dynamicNotifications) {
     this.notificationClass = notificationClass;
     this.dynamicNotifications = dynamicNotifications;
     this.defaultNotificationHandler = adaptNotificationHandler(defaultNotificationHandler);
@@ -124,21 +124,21 @@ public class NotificationHelper {
   /**
    * Fires the given {@code notification} using the {@link #defaultNotificationHandler}. Use this method when the
    * {@code notification} is not related to any {@link Event} (for example, connect/disconnect/etc). Otherwise, use
-   * {@link #fireNotification(ServerNotification, Event)} instead
+   * {@link #fireNotification(Notification, Event)} instead
    *
-   * @param notification a {@link ServerNotification}
+   * @param notification a {@link Notification}
    */
-  public void fireNotification(ServerNotification notification) {
+  public void fireNotification(Notification notification) {
     defaultNotificationHandler.fireNotification(notification);
   }
 
   /**
    * Fires the given {@code notification} using the {@link ServerNotificationHandler} that corresponds to the given {@code event}
    *
-   * @param notification a {@link ServerNotification}
+   * @param notification a {@link Notification}
    * @param muleContext the Mule node.
    */
-  public void fireNotification(ServerNotification notification, MuleContext muleContext) {
+  public void fireNotification(Notification notification, MuleContext muleContext) {
     getNotificationHandler(muleContext).fireNotification(notification);
   }
 

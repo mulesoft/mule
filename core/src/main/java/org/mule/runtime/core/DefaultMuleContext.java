@@ -48,6 +48,7 @@ import static org.mule.runtime.core.api.util.ExceptionUtils.getRootCauseExceptio
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.core.internal.util.JdkVersionUtils.getSupportedJdks;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
@@ -73,16 +74,14 @@ import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.config.bootstrap.BootstrapServiceDiscoverer;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.connector.ConnectException;
 import org.mule.runtime.core.api.connector.SchedulerController;
 import org.mule.runtime.core.api.construct.Pipeline;
+import org.mule.runtime.core.api.context.notification.AbstractServerNotification;
 import org.mule.runtime.core.api.context.notification.CustomNotification;
 import org.mule.runtime.core.api.context.notification.FlowTraceManager;
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
-import org.mule.runtime.core.api.context.notification.NotificationException;
-import org.mule.runtime.core.api.context.notification.ServerNotification;
-import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
+import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.exception.ErrorTypeLocator;
@@ -137,6 +136,7 @@ import javax.transaction.TransactionManager;
 import javax.xml.namespace.QName;
 
 import org.slf4j.Logger;
+
 import reactor.core.publisher.Hooks;
 
 public class DefaultMuleContext implements MuleContext {
@@ -184,7 +184,7 @@ public class DefaultMuleContext implements MuleContext {
    */
   private MuleContextLifecycleManager lifecycleManager;
 
-  protected ServerNotificationManager notificationManager;
+  private ServerNotificationManager notificationManager;
 
   private MuleConfiguration config;
 
@@ -298,11 +298,11 @@ public class DefaultMuleContext implements MuleContext {
       getLifecycleManager().fireLifecycle(Initialisable.PHASE_NAME);
       fireNotification(new MuleContextNotification(this, CONTEXT_INITIALISED));
 
-      initialiseIfNeeded(getExceptionListener(), this);
+      initialiseIfNeeded(getExceptionListener(), true, this);
 
       getNotificationManager().initialise();
 
-      //refresh object serializer reference in case a default one was redefined in the config.
+      // refresh object serializer reference in case a default one was redefined in the config.
       objectSerializer = registryBroker.get(DEFAULT_OBJECT_SERIALIZER_NAME);
     } catch (InitialisationException e) {
       dispose();
@@ -505,28 +505,6 @@ public class DefaultMuleContext implements MuleContext {
     return stats;
   }
 
-  @Override
-  public void registerListener(ServerNotificationListener l) throws NotificationException {
-    registerListener(l, null);
-  }
-
-  @Override
-  public void registerListener(ServerNotificationListener l, String resourceIdentifier) throws NotificationException {
-    ServerNotificationManager notificationManager = getNotificationManager();
-    if (notificationManager == null) {
-      throw new MuleRuntimeException(CoreMessages.serverNotificationManagerNotEnabled());
-    }
-    notificationManager.addListenerSubscription(l, resourceIdentifier);
-  }
-
-  @Override
-  public void unregisterListener(ServerNotificationListener l) {
-    ServerNotificationManager notificationManager = getNotificationManager();
-    if (notificationManager != null) {
-      notificationManager.removeListener(l);
-    }
-  }
-
   /**
    * Fires a server notification to all registered
    * {@link org.mule.runtime.core.api.context.notification.CustomNotificationListener} notificationManager.
@@ -535,8 +513,7 @@ public class DefaultMuleContext implements MuleContext {
    *        thrown.
    * @throws UnsupportedOperationException if the notification fired is not a {@link CustomNotification}
    */
-  @Override
-  public void fireNotification(ServerNotification notification) {
+  private void fireNotification(AbstractServerNotification notification) {
     ServerNotificationManager notificationManager = getNotificationManager();
     if (notificationManager != null) {
       notificationManager.fireNotification(notification);
@@ -569,13 +546,13 @@ public class DefaultMuleContext implements MuleContext {
   public SecurityManager getSecurityManager() {
     SecurityManager securityManager = registryBroker.lookupObject(OBJECT_SECURITY_MANAGER);
     if (securityManager == null) {
-      Collection temp = registryBroker.lookupObjects(SecurityManager.class);
+      Collection<SecurityManager> temp = registryBroker.lookupObjects(SecurityManager.class);
       if (temp.size() > 0) {
-        securityManager = ((SecurityManager) temp.iterator().next());
+        securityManager = (temp.iterator().next());
       }
     }
     if (securityManager == null) {
-      throw new MuleRuntimeException(CoreMessages.objectIsNull("securityManager"));
+      throw new MuleRuntimeException(objectIsNull("securityManager"));
     }
     return securityManager;
   }
@@ -859,7 +836,11 @@ public class DefaultMuleContext implements MuleContext {
                                                                   config.getDefaultErrorHandlerName())));
       }
     } else {
-      defaultErrorHandler = new ErrorHandlerFactory().createDefault();
+      try {
+        defaultErrorHandler = new ErrorHandlerFactory().createDefault(getRegistry().lookupObject(NotificationDispatcher.class));
+      } catch (RegistrationException e) {
+        throw new MuleRuntimeException(e);
+      }
     }
     return defaultErrorHandler;
   }

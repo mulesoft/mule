@@ -6,9 +6,10 @@
  */
 package org.mule.runtime.core.api.context.notification;
 
-public class DummyListener implements ServerNotificationListener {
+public class DummyListener implements NotificationListener {
 
-  public void onNotification(ServerNotification notification) {
+  @Override
+  public void onNotification(Notification notification) {
     // empty
   }
 

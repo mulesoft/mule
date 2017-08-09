@@ -7,5 +7,5 @@
 package org.mule.runtime.core.api.context.notification;
 
 public interface AsyncMessageNotificationListener<T extends AsyncMessageNotification>
-    extends ServerNotificationListener<AsyncMessageNotification> {
+    extends NotificationListener<AsyncMessageNotification> {
 }

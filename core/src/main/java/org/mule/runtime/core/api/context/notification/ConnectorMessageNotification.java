@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Used to notify that a message was received or sent through a Connector
  */
-public class ConnectorMessageNotification extends EnrichedServerNotification implements SynchronousServerEvent {
+public class ConnectorMessageNotification extends EnrichedServerNotification {
 
   /**
    * Serial version
@@ -57,5 +57,10 @@ public class ConnectorMessageNotification extends EnrichedServerNotification imp
   @Override
   public String getType() {
     return TYPE_TRACE;
+  }
+
+  @Override
+  public boolean isSynchronous() {
+    return true;
   }
 }

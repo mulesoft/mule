@@ -9,6 +9,7 @@ package org.mule.runtime.core.api.context.notification;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
@@ -23,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Predicate;
 
 import org.slf4j.Logger;
 
@@ -87,11 +89,12 @@ public class ServerNotificationManager implements ServerNotificationHandler, Mul
     notificationsIoScheduler = muleContext.getSchedulerService().ioScheduler();
   }
 
-  public void addInterfaceToType(Class<? extends ServerNotificationListener> iface, Class<? extends ServerNotification> event) {
+  public void addInterfaceToType(Class<? extends NotificationListener> iface,
+                                 Class<? extends Notification> event) {
     configuration.addInterfaceToType(iface, event);
   }
 
-  public void setInterfaceToTypes(Map<Class<? extends ServerNotificationListener>, Set<Class<? extends ServerNotification>>> interfaceToEvents)
+  public void setInterfaceToTypes(Map<Class<? extends NotificationListener>, Set<Class<? extends Notification>>> interfaceToEvents)
       throws ClassNotFoundException {
     configuration.addAllInterfaceToTypes(interfaceToEvents);
   }
@@ -100,36 +103,37 @@ public class ServerNotificationManager implements ServerNotificationHandler, Mul
     configuration.addListenerSubscriptionPair(pair);
   }
 
-  public void addListener(ServerNotificationListener<?> listener) {
+  public void addListener(NotificationListener<?> listener) {
     configuration.addListenerSubscriptionPair(new ListenerSubscriptionPair(listener));
   }
 
-  public void addListenerSubscription(ServerNotificationListener<?> listener, String subscription) {
-    configuration.addListenerSubscriptionPair(new ListenerSubscriptionPair(listener, subscription));
+  public <N extends Notification> void addListenerSubscription(NotificationListener<N> listener,
+                                                               Predicate<N> selector) {
+    configuration.addListenerSubscriptionPair(new ListenerSubscriptionPair(listener, selector));
   }
 
   /**
    * This removes *all* registrations that reference this listener
    */
-  public void removeListener(ServerNotificationListener<?> listener) {
+  public void removeListener(NotificationListener<?> listener) {
     configuration.removeListener(listener);
   }
 
-  public void disableInterface(Class<? extends ServerNotificationListener> iface) {
+  public void disableInterface(Class<? extends NotificationListener> iface) {
     configuration.disableInterface(iface);
   }
 
-  public void setDisabledInterfaces(Collection<Class<? extends ServerNotificationListener>> interfaces)
+  public void setDisabledInterfaces(Collection<Class<? extends NotificationListener>> interfaces)
       throws ClassNotFoundException {
     configuration.disabledAllInterfaces(interfaces);
   }
 
-  public void disableType(Class<? extends ServerNotification> type) {
+  public void disableType(Class<? extends Notification> type) {
     configuration.disableType(type);
   }
 
   @Override
-  public boolean isListenerRegistered(ServerNotificationListener listener) {
+  public boolean isListenerRegistered(NotificationListener listener) {
     for (ListenerSubscriptionPair pair : configuration.getListeners()) {
       if (pair.getListener().equals(listener)) {
         return true;
@@ -139,7 +143,7 @@ public class ServerNotificationManager implements ServerNotificationHandler, Mul
   }
 
   @Override
-  public void fireNotification(ServerNotification notification) {
+  public void fireNotification(Notification notification) {
     disposeLock.readLock().lock();
     try {
       if (disposed.get()) {
@@ -147,8 +151,10 @@ public class ServerNotificationManager implements ServerNotificationHandler, Mul
         return;
       }
 
-      notification.setMuleContext(muleContext);
-      if (notification instanceof SynchronousServerEvent) {
+      if (notification instanceof AbstractServerNotification) {
+        ((AbstractServerNotification) notification).setServerId(muleContext.getId());
+      }
+      if (notification.isSynchronous()) {
         notifyListeners(notification, (listener, nfn) -> listener.onNotification(nfn));
       } else {
         notifyListeners(notification, (listener, nfn) -> {
@@ -164,12 +170,12 @@ public class ServerNotificationManager implements ServerNotificationHandler, Mul
     }
   }
 
-  protected void notifyListeners(ServerNotification notification, NotifierCallback notifier) {
+  protected void notifyListeners(Notification notification, NotifierCallback notifier) {
     configuration.getPolicy().dispatch(notification, notifier);
   }
 
   @Override
-  public boolean isNotificationEnabled(Class<? extends ServerNotification> type) {
+  public boolean isNotificationEnabled(Class<? extends Notification> type) {
     boolean enabled = false;
     if (configuration != null) {
       Policy policy = configuration.getPolicy();
@@ -225,7 +231,7 @@ public class ServerNotificationManager implements ServerNotificationHandler, Mul
     return configuration.getPolicy();
   }
 
-  public Map<Class<? extends ServerNotificationListener>, Set<Class<? extends ServerNotification>>> getInterfaceToTypes() {
+  public Map<Class<? extends NotificationListener>, Set<Class<? extends Notification>>> getInterfaceToTypes() {
     return unmodifiableMap(configuration.getInterfaceToTypes());
   }
 

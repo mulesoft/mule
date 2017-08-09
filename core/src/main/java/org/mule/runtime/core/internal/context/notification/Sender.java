@@ -7,25 +7,23 @@
 package org.mule.runtime.core.internal.context.notification;
 
 import org.mule.runtime.core.api.context.notification.ListenerSubscriptionPair;
+import org.mule.runtime.core.api.context.notification.Notification;
 import org.mule.runtime.core.api.context.notification.NotifierCallback;
-import org.mule.runtime.core.api.context.notification.ServerNotification;
 
 /**
  * This does the work necessary to deliver events to a particular listener. It is generated for a particular {@link Configuration}
  * and stored in a {@link Policy}.
  */
-public class Sender {
+public class Sender<N extends Notification> {
 
-  private ListenerSubscriptionPair pair;
+  private ListenerSubscriptionPair<N> pair;
 
-  Sender(ListenerSubscriptionPair pair) {
+  Sender(ListenerSubscriptionPair<N> pair) {
     this.pair = pair;
   }
 
-  public void dispatch(ServerNotification notification, NotifierCallback notifier) {
-    if (!pair.getSubscription().isPresent()
-        || (null != notification.getResourceIdentifier()
-            && pair.getSubscription().get().equalsIgnoreCase(notification.getResourceIdentifier()))) {
+  public void dispatch(N notification, NotifierCallback notifier) {
+    if (pair.getSelector().test(notification)) {
       try {
         notifier.notify(pair.getListener(), notification);
       } catch (Exception e) {

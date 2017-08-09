@@ -6,19 +6,23 @@
  */
 package org.mule.functional.listener;
 
+import static java.lang.String.format;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.junit.Assert.fail;
+import static org.mule.runtime.core.api.context.notification.PipelineMessageNotification.PROCESS_COMPLETE;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo;
-import org.mule.runtime.core.api.context.notification.PipelineMessageNotificationListener;
-import org.mule.runtime.core.api.context.notification.NotificationException;
+import org.mule.runtime.core.api.context.notification.IntegerAction;
+import org.mule.runtime.core.api.context.notification.NotificationListenerRegistry;
 import org.mule.runtime.core.api.context.notification.PipelineMessageNotification;
+import org.mule.runtime.core.api.context.notification.PipelineMessageNotificationListener;
+import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.util.concurrent.Latch;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Listener for flow execution complete action.
@@ -47,26 +51,27 @@ public class FlowExecutionListener {
 
   private void createFlowExecutionListener(MuleContext muleContext) {
     try {
-      muleContext.registerListener((PipelineMessageNotificationListener<PipelineMessageNotification>) notification -> {
-        if (flowName != null && !notification.getResourceIdentifier().equals(flowName)) {
-          return;
-        }
-        if (notification.getAction() == PipelineMessageNotification.PROCESS_COMPLETE) {
-          for (Callback<EnrichedNotificationInfo> callback : callbacks) {
-            callback.execute(notification.getInfo());
-          }
-          flowExecutedLatch.countDown();
-        }
-      });
-    } catch (NotificationException e) {
+      muleContext.getRegistry().lookupObject(NotificationListenerRegistry.class)
+          .registerListener((PipelineMessageNotificationListener<PipelineMessageNotification>) notification -> {
+            if (flowName != null && !notification.getResourceIdentifier().equals(flowName)) {
+              return;
+            }
+            if (new IntegerAction(PROCESS_COMPLETE).equals(notification.getAction())) {
+              for (Callback<EnrichedNotificationInfo> callback : callbacks) {
+                callback.execute(notification.getInfo());
+              }
+              flowExecutedLatch.countDown();
+            }
+          });
+    } catch (RegistrationException e) {
       throw new RuntimeException(e);
     }
   }
 
   public void waitUntilFlowIsComplete() {
     try {
-      if (!flowExecutedLatch.await(timeout, TimeUnit.MILLISECONDS)) {
-        fail(String.format("Flow %s never completed an execution", (flowName == null ? "ANY FLOW" : flowName)));
+      if (!flowExecutedLatch.await(timeout, MILLISECONDS)) {
+        fail(format("Flow %s never completed an execution", (flowName == null ? "ANY FLOW" : flowName)));
       }
     } catch (InterruptedException e) {
       throw new RuntimeException(e);

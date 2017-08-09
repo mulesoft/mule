@@ -12,7 +12,6 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -24,6 +23,7 @@ import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.ON_ERROR_CONTINUE;
+
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.DefaultEventContext;
@@ -32,13 +32,14 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.MuleRegistry;
+import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.message.InternalMessage;
-import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
@@ -50,6 +51,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
+
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 
@@ -96,6 +98,8 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
     onErrorContinueHandler = new OnErrorContinueHandler();
     onErrorContinueHandler.setMuleContext(mockMuleContext);
     onErrorContinueHandler.setFlowConstruct(flow);
+    onErrorContinueHandler.setNotificationFirer(mock(NotificationDispatcher.class));
+
     final MuleRegistry registry = mockMuleContext.getRegistry();
     doReturn(mockStreamingManager).when(registry).lookupObject(StreamingManager.class);
 

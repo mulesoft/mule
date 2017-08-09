@@ -12,7 +12,7 @@ import org.mule.runtime.api.message.Message;
  * Is fired by routers. Currently only Async-Reply routers use this when an event is received for an event group that has already
  * been processed.
  */
-public class RoutingNotification extends ServerNotification {
+public class RoutingNotification extends AbstractServerNotification {
 
   /**
    * Serial version

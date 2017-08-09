@@ -6,18 +6,18 @@
  */
 package org.mule.runtime.core.internal.retry.async;
 
-import java.util.Map;
-
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.retry.async.AsynchronousRetryTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 
+import java.util.Map;
+
 /**
- * An implementation of {@link RetryContext} to be used when a {@link RetryPolicyTemplate} is
- * executed in a separate thread via the {@link AsynchronousRetryTemplate}. A FutureRetryContext is a proxy to a real
- * {@link RetryContext} and provides access to the real context once it becomes available.
+ * An implementation of {@link RetryContext} to be used when a {@link RetryPolicyTemplate} is executed in a separate thread via
+ * the {@link AsynchronousRetryTemplate}. A FutureRetryContext is a proxy to a real {@link RetryContext} and provides access to
+ * the real context once it becomes available.
  */
 public class FutureRetryContext implements RetryContext {
 
@@ -37,58 +37,70 @@ public class FutureRetryContext implements RetryContext {
     }
   }
 
+  @Override
   public void addReturnMessage(Message result) {
     checkState();
     delegate.addReturnMessage(result);
   }
 
+  @Override
   public String getDescription() {
     checkState();
     return delegate.getDescription();
   }
 
+  @Override
   public Message getFirstReturnMessage() {
     checkState();
     return delegate.getFirstReturnMessage();
   }
 
+  @Override
   public Map<Object, Object> getMetaInfo() {
     checkState();
     return delegate.getMetaInfo();
   }
 
+  @Override
   public Message[] getReturnMessages() {
     checkState();
     return delegate.getReturnMessages();
   }
 
+  @Override
   public void setReturnMessages(Message[] returnMessages) {
     checkState();
     delegate.setReturnMessages(returnMessages);
   }
 
+  @Override
   public Throwable getLastFailure() {
     checkState();
     return delegate.getLastFailure();
   }
 
+  @Override
   public void setOk() {
     checkState();
     delegate.setOk();
   }
 
+  @Override
   public void setFailed(Throwable lastFailure) {
     checkState();
     delegate.setFailed(lastFailure);
   }
 
+  @Override
   public boolean isOk() {
     checkState();
     return delegate.isOk();
   }
 
-  public MuleContext getMuleContext() {
+  @Override
+  public NotificationDispatcher getNotificationFirer() {
     checkState();
-    return delegate.getMuleContext();
+    return delegate.getNotificationFirer();
   }
+
 }

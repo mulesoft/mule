@@ -10,6 +10,6 @@ package org.mule.runtime.core.api.context.notification;
  * Observer interface to receive notifications about messages being sent and received from connectors
  */
 public interface ConnectorMessageNotificationListener<T extends ConnectorMessageNotification>
-    extends ServerNotificationListener<ConnectorMessageNotification> {
+    extends NotificationListener<ConnectorMessageNotification> {
   // no methods
 }

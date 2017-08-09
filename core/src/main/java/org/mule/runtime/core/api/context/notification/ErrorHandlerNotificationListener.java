@@ -7,5 +7,5 @@
 package org.mule.runtime.core.api.context.notification;
 
 public interface ErrorHandlerNotificationListener<T extends ErrorHandlerNotification>
-    extends ServerNotificationListener<ErrorHandlerNotification> {
+    extends NotificationListener<ErrorHandlerNotification> {
 }

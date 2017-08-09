@@ -12,16 +12,15 @@ import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.component.Component;
 import org.mule.runtime.core.api.config.Config;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.lifecycle.LifecycleObject;
 import org.mule.runtime.core.api.lifecycle.LifecyclePhase;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.routing.OutboundRouter;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transport.LegacyConnector;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
-import org.mule.runtime.core.api.lifecycle.LifecycleObject;
-import org.mule.runtime.core.internal.lifecycle.NotificationLifecycleObject;
 import org.mule.runtime.core.privileged.util.annotation.AnnotationMetaData;
 import org.mule.runtime.core.privileged.util.annotation.AnnotationUtils;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
@@ -60,12 +59,12 @@ public class MuleContextDisposePhase extends DefaultLifecyclePhase {
 
     Set<LifecycleObject> orderedObjects = new LinkedHashSet<>();
     // Stop in the opposite order to start
-    orderedObjects.add(new NotificationLifecycleObject(FlowConstruct.class));
-    orderedObjects.add(new NotificationLifecycleObject(LegacyConnector.class));
-    orderedObjects.add(new NotificationLifecycleObject(ConfigurationProvider.class));
-    orderedObjects.add(new NotificationLifecycleObject(Config.class));
-    orderedObjects.add(new NotificationLifecycleObject(Disposable.class));
-    orderedObjects.add(new NotificationLifecycleObject(Object.class));
+    orderedObjects.add(new LifecycleObject(FlowConstruct.class));
+    orderedObjects.add(new LifecycleObject(LegacyConnector.class));
+    orderedObjects.add(new LifecycleObject(ConfigurationProvider.class));
+    orderedObjects.add(new LifecycleObject(Config.class));
+    orderedObjects.add(new LifecycleObject(Disposable.class));
+    orderedObjects.add(new LifecycleObject(Object.class));
 
     // Can call dispose from all lifecycle Phases
     registerSupportedPhase(LifecyclePhase.ALL_PHASES);

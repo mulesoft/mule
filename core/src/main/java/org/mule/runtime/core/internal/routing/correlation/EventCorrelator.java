@@ -11,11 +11,16 @@ import static java.lang.System.currentTimeMillis;
 import static java.util.concurrent.TimeUnit.DAYS;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.MINUTES;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.correlationTimedOut;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.api.context.notification.RoutingNotification.CORRELATION_TIMEOUT;
 import static org.mule.runtime.core.api.context.notification.RoutingNotification.MISSED_AGGREGATION_GROUP_EVENT;
 import static org.mule.runtime.core.api.message.GroupCorrelation.NOT_SET;
 import static org.mule.runtime.core.api.util.StringMessageUtils.truncate;
+
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
@@ -28,11 +33,12 @@ import org.mule.runtime.api.store.PartitionableObjectStore;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.context.notification.RoutingNotification;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.api.store.DeserializationPostInitialisable;
 import org.mule.runtime.core.api.util.StringMessageUtils;
@@ -69,6 +75,8 @@ public class EventCorrelator implements Startable, Stoppable {
 
   private MuleContext muleContext;
 
+  private NotificationDispatcher notificationFirer;
+
   private EventCorrelatorCallback callback;
 
   private Processor timeoutMessageProcessor;
@@ -90,13 +98,18 @@ public class EventCorrelator implements Startable, Stoppable {
                          FlowConstruct flowConstruct, PartitionableObjectStore correlatorStore, String storePrefix,
                          ObjectStore<Long> processedGroups) {
     if (callback == null) {
-      throw new IllegalArgumentException(CoreMessages.objectIsNull("EventCorrelatorCallback").getMessage());
+      throw new IllegalArgumentException(objectIsNull("EventCorrelatorCallback").getMessage());
     }
     if (muleContext == null) {
-      throw new IllegalArgumentException(CoreMessages.objectIsNull("MuleContext").getMessage());
+      throw new IllegalArgumentException(objectIsNull("MuleContext").getMessage());
     }
     this.callback = callback;
     this.muleContext = muleContext;
+    try {
+      this.notificationFirer = muleContext.getRegistry().lookupObject(NotificationDispatcher.class);
+    } catch (RegistrationException e) {
+      throw new MuleRuntimeException(e);
+    }
     this.timeoutMessageProcessor = timeoutMessageProcessor;
     name = format("%s.event.correlator", flowConstruct.getName());
     this.flowConstruct = flowConstruct;
@@ -142,10 +155,9 @@ public class EventCorrelator implements Startable, Stoppable {
                 + "this is probably because the async-reply timed out. GroupCorrelation Id is: " + groupId + ". Dropping event");
           }
           // Fire a notification to say we received this message
-          muleContext
-              .fireNotification(new RoutingNotification(event.getMessage(), event.getContext().getOriginatingLocation()
-                  .getComponentIdentifier().getIdentifier().getNamespace(),
-                                                        MISSED_AGGREGATION_GROUP_EVENT));
+          notificationFirer.dispatch(new RoutingNotification(event.getMessage(), event.getContext().getOriginatingLocation()
+              .getComponentIdentifier().getIdentifier().getNamespace(),
+                                                             MISSED_AGGREGATION_GROUP_EVENT));
           return null;
         }
       } catch (ObjectStoreException e) {
@@ -290,14 +302,14 @@ public class EventCorrelator implements Startable, Stoppable {
 
     if (isFailOnTimeout()) {
       Event messageCollectionEvent = group.getMessageCollectionEvent();
-      muleContext.fireNotification(new RoutingNotification(messageCollectionEvent.getMessage(), null, CORRELATION_TIMEOUT));
+      notificationFirer.dispatch(new RoutingNotification(messageCollectionEvent.getMessage(), null, CORRELATION_TIMEOUT));
       try {
         group.clear();
       } catch (ObjectStoreException e) {
         logger.warn("Failed to clear group with id " + group.getGroupId() + " since underlying ObjectStore threw Exception:"
             + e.getMessage());
       }
-      throw new CorrelationTimeoutException(CoreMessages.correlationTimedOut(group.getGroupId()));
+      throw new CorrelationTimeoutException(correlationTimedOut(group.getGroupId()));
     } else {
       if (logger.isDebugEnabled()) {
         logger.debug(MessageFormat.format(
@@ -318,7 +330,7 @@ public class EventCorrelator implements Startable, Stoppable {
             if (timeoutMessageProcessor != null) {
               timeoutMessageProcessor.process(newEvent);
             } else {
-              throw new MessagingException(CoreMessages.createStaticMessage(MessageFormat
+              throw new MessagingException(createStaticMessage(MessageFormat
                   .format("Group {0} timed out, but no timeout message processor was " + "configured.", group.getGroupId())),
                                            newEvent);
             }

@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api.retry;
 
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
 
 import java.util.Map;
 
@@ -35,7 +35,7 @@ public interface RetryContext {
 
   String getDescription();
 
-  MuleContext getMuleContext();
+  NotificationDispatcher getNotificationFirer();
 
   /**
    * The most recent failure which prevented the context from validating the connection. Note that the method may return null.

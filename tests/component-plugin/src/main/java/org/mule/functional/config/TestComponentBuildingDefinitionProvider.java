@@ -80,8 +80,7 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("enableNotifications", fromSimpleParameter("enableNotifications").build())
         .withSetterParameterDefinition("appendString", fromSimpleParameter("appendString").build())
         .withSetterParameterDefinition("waitTime", fromSimpleParameter("waitTime").build())
-        .withSetterParameterDefinition("id", fromSimpleParameter("id").build())
-        .withSetterParameterDefinition("muleContext", fromReferenceObject(MuleContext.class).build());
+        .withSetterParameterDefinition("id", fromSimpleParameter("id").build());
 
     componentBuildingDefinitions.add(baseComponentDefinition
         .withIdentifier("processor")

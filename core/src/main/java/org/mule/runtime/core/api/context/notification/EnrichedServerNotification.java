@@ -19,7 +19,7 @@ import java.util.Optional;
 /**
  * This notification type includes information about the event, exception and flow where it occurred.
  */
-public abstract class EnrichedServerNotification extends ServerNotification {
+public abstract class EnrichedServerNotification extends AbstractServerNotification {
 
   protected EnrichedNotificationInfo notificationInfo;
 

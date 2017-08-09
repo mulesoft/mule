@@ -44,6 +44,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.m
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockMetadataResolverFactory;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockSubTypes;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.setRequires;
+
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -56,22 +57,21 @@ import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
+import org.mule.runtime.core.api.execution.MessageProcessContext;
+import org.mule.runtime.core.api.execution.MessageProcessingManager;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
-import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
+import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
+import org.mule.runtime.core.api.streaming.StreamingManager;
+import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.util.ExceptionUtils;
 import org.mule.runtime.core.internal.execution.ExceptionCallback;
-import org.mule.runtime.core.api.execution.MessageProcessContext;
-import org.mule.runtime.core.api.execution.MessageProcessingManager;
-import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
-import org.mule.tck.core.streaming.SimpleByteBufferManager;
 import org.mule.runtime.core.internal.streaming.bytes.factory.NullCursorStreamProviderFactory;
-import org.mule.runtime.core.api.streaming.StreamingManager;
-import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
 import org.mule.runtime.extension.api.model.ImmutableOutputModel;
@@ -86,6 +86,7 @@ import org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.SourceCallbackModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.tck.core.streaming.SimpleByteBufferManager;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher;
 import org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver;
@@ -113,7 +114,7 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
   private static final String ERROR_MESSAGE = "ERROR";
   private static final String SOURCE_NAME = "source";
   private static final String METADATA_KEY = "metadataKey";
-  private final RetryPolicyTemplate retryPolicyTemplate = new SimpleRetryPolicyTemplate(0, 2);
+  private final SimpleRetryPolicyTemplate retryPolicyTemplate = new SimpleRetryPolicyTemplate(0, 2);
   private final JavaTypeLoader typeLoader = new JavaTypeLoader(this.getClass().getClassLoader());
   private CursorStreamProviderFactory cursorStreamProviderFactory;
 
@@ -217,6 +218,7 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
     mockExceptionEnricher(extensionModel, null);
     mockClassLoaderModelProperty(extensionModel, getClass().getClassLoader());
 
+    retryPolicyTemplate.setNotificationFirer(muleContext.getRegistry().lookupObject(NotificationDispatcher.class));
     initialiseIfNeeded(retryPolicyTemplate, muleContext);
 
     muleContext.getRegistry().registerObject(OBJECT_EXTENSION_MANAGER, extensionManager);
