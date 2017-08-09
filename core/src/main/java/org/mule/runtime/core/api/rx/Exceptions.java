@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.api.rx;
 
-import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static reactor.core.Exceptions.isBubbling;
 import static reactor.core.Exceptions.propagate;

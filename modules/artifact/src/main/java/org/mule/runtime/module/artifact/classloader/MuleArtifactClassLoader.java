@@ -12,6 +12,7 @@ import static java.lang.System.identityHashCode;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
+
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 
@@ -55,6 +56,8 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
     checkArgument(artifactDescriptor != null, "artifactDescriptor cannot be null");
     this.artifactId = artifactId;
     this.artifactDescriptor = artifactDescriptor;
+
+    configureErrorHooks();
   }
 
   @Override
@@ -105,23 +108,66 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
     shutdownListeners.clear();
   }
 
-  public void setResourceReleaserClassLocation(String resourceReleaserClassLocation) {
-    this.resourceReleaserClassLocation = resourceReleaserClassLocation;
-  }
-
-  protected ResourceReleaser createResourceReleaserInstance() {
+  private <T> T createCustomInstance(String classLocation) {
     InputStream classStream = null;
     try {
-      classStream = this.getClass().getResourceAsStream(resourceReleaserClassLocation);
+      classStream = this.getClass().getResourceAsStream(classLocation);
       byte[] classBytes = IOUtils.toByteArray(classStream);
       classStream.close();
       Class clazz = this.defineClass(null, classBytes, 0, classBytes.length);
-      return (ResourceReleaser) clazz.newInstance();
+      return (T) clazz.newInstance();
     } catch (Exception e) {
-      throw new RuntimeException("Can not create resource releaser instance from resource: " + resourceReleaserClassLocation, e);
+      throw new RuntimeException("Can not create instance from resource: " + classLocation, e);
     } finally {
       closeQuietly(classStream);
     }
+  }
+
+  /**
+   * Creates a {@link ResourceReleaser} using this classloader, only used outside in unit tests.
+   */
+  protected ResourceReleaser createResourceReleaserInstance() {
+    return createCustomInstance(resourceReleaserClassLocation);
+  }
+
+  protected void setResourceReleaserClassLocation(String resourceReleaserClassLocation) {
+    this.resourceReleaserClassLocation = resourceReleaserClassLocation;
+  }
+
+
+  private static String getErrorHooksClassLocation() {
+    return "/org/mule/module/artifact/classloader/ErrorHooksConfiguration.class";
+  }
+
+  /**
+   * Setup reactor-core error hooks, these are required for plugins that end up executing reactive streams.
+   * For instance, compatibility plugin which inherits from transformers that call {@code block()}.
+   */
+  private void configureErrorHooks() {
+    if (getURLs().length == 0 || !isReactorLoaded(this)) {
+      return;
+    }
+
+    try {
+      createCustomInstance(getErrorHooksClassLocation());
+    } catch (Exception e) {
+      logger.error("Cannot configure error hooks", e);
+    }
+  }
+
+  /**
+   * Checks if reactor-core is available, only used outside in unit tests.
+   * Needs to be static because it must be mocked before construction.
+   */
+  private static Boolean isReactorLoaded(MuleArtifactClassLoader cl) {
+    try {
+      Class reactorHooks = cl.loadClass("reactor.core.publisher.Hooks");
+      return reactorHooks.getClassLoader().equals(cl);
+    } catch (ClassNotFoundException e) {
+      // ignore, we don't care if the plugin does not include reactor-core
+    }
+
+    return false;
   }
 
   @Override

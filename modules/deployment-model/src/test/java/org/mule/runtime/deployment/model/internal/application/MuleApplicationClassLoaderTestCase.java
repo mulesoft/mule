@@ -14,10 +14,13 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppClassesFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppLibFolder;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.when;
 
 import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.core.api.util.FileUtils;
@@ -25,12 +28,12 @@ import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.deployment.model.internal.domain.MuleSharedDomainClassLoader;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
+import org.mule.runtime.module.artifact.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.LinkedList;
@@ -41,8 +44,13 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.junit.runner.RunWith;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 @SmallTest
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(MuleArtifactClassLoader.class)
 public class MuleApplicationClassLoaderTestCase extends AbstractMuleTestCase {
 
   private static final String RESOURCE_IN_CLASSES_AND_JAR = "test-resource-1.txt";
@@ -64,7 +72,7 @@ public class MuleApplicationClassLoaderTestCase extends AbstractMuleTestCase {
   private File jarFile;
 
   @Before
-  public void createAppClassLoader() throws IOException, URISyntaxException {
+  public void createAppClassLoader() throws Exception {
     // Create directories structure
     previousMuleHome = System.setProperty(MULE_HOME_DIRECTORY_PROPERTY, tempMuleHome.getRoot().getAbsolutePath());
 
@@ -91,6 +99,9 @@ public class MuleApplicationClassLoaderTestCase extends AbstractMuleTestCase {
     domainDir = MuleFoldersUtil.getDomainFolder(DOMAIN_NAME);
     assertThat(domainDir.mkdirs(), is(true));
     FileUtils.stringToFile(new File(new File(domainDir, "classes"), RESOURCE_JUST_IN_DOMAIN).getAbsolutePath(), "Some text");
+
+    mockStatic(MuleArtifactClassLoader.class);
+    when(MuleArtifactClassLoader.class, "isReactorLoaded", any(MuleArtifactClassLoader.class)).thenReturn(false);
 
     // Create app class loader
     domainCL =
