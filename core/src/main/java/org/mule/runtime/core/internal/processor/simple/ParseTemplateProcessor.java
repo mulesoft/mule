@@ -69,8 +69,9 @@ public class ParseTemplateProcessor extends SimpleMessageProcessor {
         return InternalEvent.builder(event).addVariable(target, resultMessage).build();
       } else { //typeValue was defined by the user
         return InternalEvent.builder(event).addVariable(target,
-                                                muleContext.getExpressionManager()
-                                                    .evaluate(targetValue, InternalEvent.builder(event).message(resultMessage).build()))
+                                                        muleContext.getExpressionManager()
+                                                            .evaluate(targetValue, InternalEvent.builder(event)
+                                                                .message(resultMessage).build()))
             .build();
       }
 
