@@ -61,6 +61,7 @@ import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.ParametersResolverProcessor.ParametersResolverProcessorResult;
 import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
+import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.el.DefaultExpressionManager;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.internal.message.InternalMessage;
@@ -100,7 +101,8 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
   protected OperationMessageProcessor createOperationMessageProcessor() {
     OperationMessageProcessor operationMessageProcessor =
         new OperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetValue, resolverSet,
-                                      cursorStreamProviderFactory, extensionManager, mockPolicyManager);
+                                      cursorStreamProviderFactory, new NoRetryPolicyTemplate(), extensionManager,
+                                      mockPolicyManager);
     operationMessageProcessor.setAnnotations(getFlowComponentLocationAnnotations(FLOW_NAME));
     return operationMessageProcessor;
   }

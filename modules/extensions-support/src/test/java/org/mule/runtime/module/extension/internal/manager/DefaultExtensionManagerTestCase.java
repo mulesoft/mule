@@ -49,7 +49,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.core.internal.transformer.simple.StringToEnum;
@@ -65,11 +64,7 @@ import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapte
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import com.google.common.collect.ImmutableList;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -81,7 +76,11 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import com.google.common.collect.ImmutableList;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -211,7 +210,6 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
     stubRegistryKeys(muleContext, EXTENSION1_CONFIG_INSTANCE_NAME, EXTENSION1_OPERATION_NAME, EXTENSION1_NAME);
 
     ConnectionManagerAdapter connectionManagerAdapter = mock(ConnectionManagerAdapter.class);
-    when(connectionManagerAdapter.getDefaultRetryPolicyTemplate()).thenReturn(new NoRetryPolicyTemplate());
     when(muleContext.getRegistry().lookupObject(OBJECT_CONNECTION_MANAGER))
         .thenReturn(connectionManagerAdapter);
     when(muleContext.getRegistry().lookupObject(MuleMetadataService.class)).thenReturn(mock(MuleMetadataService.class));

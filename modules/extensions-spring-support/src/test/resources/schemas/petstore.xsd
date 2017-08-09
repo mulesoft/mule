@@ -139,7 +139,7 @@
       <xs:complexContent>
         <xs:extension base="extension:abstractConnectionProviderType">
           <xs:sequence minOccurs="0" maxOccurs="1">
-            <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+            <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
             <xs:element xmlns:tls="http://www.mulesoft.org/schema/mule/tls" minOccurs="0" maxOccurs="1" ref="tls:context"></xs:element>
             <xs:element minOccurs="0" maxOccurs="1" name="closed-for-holidays">
               <xs:complexType>
@@ -170,11 +170,6 @@
           <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionDateTime" use="optional" name="openingDate"></xs:attribute>
           <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionList" use="optional" name="closedForHolidays"></xs:attribute>
           <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionList" use="optional" name="discountDates"></xs:attribute>
-          <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:substitutableBoolean" use="optional" name="disableValidation">
-            <xs:annotation>
-              <xs:documentation>Disables connection validation</xs:documentation>
-            </xs:annotation>
-          </xs:attribute>
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>
@@ -184,7 +179,7 @@
       <xs:complexContent>
         <xs:extension base="extension:abstractConnectionProviderType">
           <xs:sequence minOccurs="0" maxOccurs="1">
-            <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+            <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
             <xs:element xmlns:tls="http://www.mulesoft.org/schema/mule/tls" minOccurs="0" maxOccurs="1" ref="tls:context"></xs:element>
             <xs:element minOccurs="0" maxOccurs="1" name="closed-for-holidays">
               <xs:complexType>
@@ -224,7 +219,7 @@
       <xs:complexContent>
         <xs:extension base="extension:abstractConnectionProviderType">
           <xs:sequence minOccurs="0" maxOccurs="1">
-            <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+            <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
             <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:pooling-profile"></xs:element>
             <xs:element xmlns:tls="http://www.mulesoft.org/schema/mule/tls" minOccurs="0" maxOccurs="1" ref="tls:context"></xs:element>
             <xs:element minOccurs="0" maxOccurs="1" name="closed-for-holidays">
@@ -256,11 +251,6 @@
           <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionDateTime" use="optional" name="openingDate"></xs:attribute>
           <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionList" use="optional" name="closedForHolidays"></xs:attribute>
           <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionList" use="optional" name="discountDates"></xs:attribute>
-          <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:substitutableBoolean" use="optional" name="disableValidation">
-            <xs:annotation>
-              <xs:documentation>Disables connection validation</xs:documentation>
-            </xs:annotation>
-          </xs:attribute>
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>
@@ -270,7 +260,7 @@
       <xs:complexContent>
         <xs:extension base="extension:abstractConnectionProviderType">
           <xs:sequence minOccurs="0" maxOccurs="1">
-            <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+            <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
             <xs:element xmlns:tls="http://www.mulesoft.org/schema/mule/tls" minOccurs="0" maxOccurs="1" ref="tls:context"></xs:element>
             <xs:element minOccurs="0" maxOccurs="1" name="closed-for-holidays">
               <xs:complexType>
@@ -310,7 +300,7 @@
       <xs:complexContent>
         <xs:extension base="extension:abstractConnectionProviderType">
           <xs:sequence minOccurs="0" maxOccurs="1">
-            <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+            <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
             <xs:element xmlns:tls="http://www.mulesoft.org/schema/mule/tls" minOccurs="0" maxOccurs="1" ref="tls:context"></xs:element>
             <xs:element minOccurs="0" maxOccurs="1" name="closed-for-holidays">
               <xs:complexType>
@@ -372,7 +362,9 @@
   <xs:complexType name="FailConnectionType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+        </xs:sequence>
         <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
           <xs:annotation>
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -395,7 +387,9 @@
   <xs:complexType name="FailOperationWithExceptionType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+        </xs:sequence>
         <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
           <xs:annotation>
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -418,7 +412,9 @@
   <xs:complexType name="FailOperationWithThrowableType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+        </xs:sequence>
         <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
           <xs:annotation>
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -464,7 +460,9 @@
   <xs:complexType name="GetClientType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+        </xs:sequence>
         <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
           <xs:annotation>
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -487,7 +485,9 @@
   <xs:complexType name="GetClientOnLatchType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+        </xs:sequence>
         <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
           <xs:annotation>
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -512,7 +512,9 @@
   <xs:complexType name="GetPetsType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+        </xs:sequence>
         <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
           <xs:annotation>
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>

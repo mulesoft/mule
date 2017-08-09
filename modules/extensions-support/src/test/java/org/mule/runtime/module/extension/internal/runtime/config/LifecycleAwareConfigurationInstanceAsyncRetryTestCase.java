@@ -114,7 +114,7 @@ public class LifecycleAwareConfigurationInstanceAsyncRetryTestCase extends Lifec
   }
 
   @Test
-  public void stopWhileConnectivityTestingExcecuting() throws Throwable {
+  public void stopWhileConnectivityTestingExecuting() throws Throwable {
     if (connectionProvider.isPresent()) {
       final Latch testConnectivityInvokedLatch = new Latch();
       final Latch interceptableShutdownLatch = new Latch();

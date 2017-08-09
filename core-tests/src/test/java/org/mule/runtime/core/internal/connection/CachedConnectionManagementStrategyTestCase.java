@@ -12,7 +12,6 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
@@ -66,26 +65,5 @@ public class CachedConnectionManagementStrategyTestCase extends AbstractMuleTest
     connectionStrategy.close();
     verify(connectionProvider).disconnect(connection);
 
-  }
-
-  @Test
-  public void failDueToInvalidConnection() throws ConnectionException {
-    String errorMessage = "Invalid username or password";
-    when(connectionProvider.validate(connection)).thenReturn(ConnectionValidationResult
-        .failure(errorMessage, new Exception("401: UNAUTHORIZED")));
-    CachedConnectionHandler connectionHandler = (CachedConnectionHandler) connectionStrategy.getConnectionHandler();
-    ConnectionValidationResult validationResult = connectionHandler.validateConnection(connection);
-
-    assertThat(validationResult.isValid(), is(false));
-    assertThat(validationResult.getMessage(), is(errorMessage));
-  }
-
-  @Test
-  public void failDueToNullConnectionValidationResult() throws ConnectionException {
-    when(connectionProvider.validate(connection)).thenReturn(null);
-    CachedConnectionHandler connectionHandler = (CachedConnectionHandler) connectionStrategy.getConnectionHandler();
-    ConnectionValidationResult validationResult = connectionHandler.validateConnection(connection);
-
-    assertThat(validationResult.isValid(), is(false));
   }
 }

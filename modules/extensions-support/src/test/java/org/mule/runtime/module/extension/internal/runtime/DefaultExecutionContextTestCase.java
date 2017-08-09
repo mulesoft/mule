@@ -12,6 +12,7 @@ import static java.util.Optional.of;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -21,6 +22,7 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
@@ -81,6 +83,9 @@ public class DefaultExecutionContextTestCase extends AbstractMuleTestCase {
   @Mock
   private ConfigurationState configurationState;
 
+  @Mock
+  private RetryPolicyTemplate retryPolicyTemplate;
+
   private Object configurationInstance = new Object();
   private ConfigurationInstance configuration;
   private DefaultExecutionContext<OperationModel> operationContext;
@@ -101,7 +106,8 @@ public class DefaultExecutionContextTestCase extends AbstractMuleTestCase {
 
     operationContext =
         new DefaultExecutionContext<>(extensionModel, of(configuration), resolverSetResult.asMap(), operationModel,
-                                      event, cursorProviderFactory, streamingManager, location, muleContext);
+                                      event, cursorProviderFactory, streamingManager, location, retryPolicyTemplate,
+                                      muleContext);
   }
 
   @Test
@@ -145,4 +151,8 @@ public class DefaultExecutionContextTestCase extends AbstractMuleTestCase {
     operationContext.removeVariable(null);
   }
 
+  @Test
+  public void getRetryPolicyTemplate() {
+    assertThat(operationContext.getRetryPolicyTemplate().get(), is(sameInstance(retryPolicyTemplate)));
+  }
 }

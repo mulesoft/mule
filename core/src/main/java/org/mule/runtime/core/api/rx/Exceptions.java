@@ -6,10 +6,8 @@
  */
 package org.mule.runtime.core.api.rx;
 
-import static java.util.Collections.singletonList;
 import static reactor.core.Exceptions.isBubbling;
 import static reactor.core.Exceptions.propagate;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -21,8 +19,6 @@ import org.mule.runtime.core.api.util.func.CheckedConsumer;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.core.api.util.func.CheckedPredicate;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;

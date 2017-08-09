@@ -15,7 +15,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
+import static org.mule.runtime.core.api.util.FileUtils.stringToFile;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsString;
+import static org.mule.runtime.core.api.util.IOUtils.getResourceAsUrl;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
 import org.mule.runtime.api.dsl.DslResolvingContext;
@@ -43,6 +45,7 @@ import org.mule.test.typed.value.extension.extension.TypedValueExtension;
 import org.mule.test.values.extension.ValuesExtension;
 import org.mule.test.vegan.extension.VeganExtension;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -152,8 +155,24 @@ public class ExtensionModelJsonGeneratorTestCase extends AbstractMuleTestCase {
     try {
       JSONAssert.assertEquals(expectedJson, json, true);
     } catch (AssertionError e) {
-      System.out.println("Expected: \n " + expectedJson);
-      System.out.println("\n\nBut Got: \n " + json);
+      // utility to batch fix input files when severe model changes are introduced. Use carefully, not a mechanism to get away
+      // with anything. First check why the generated json is different and make sure you're not introducing any bugs.
+      // This should never be commited as true
+      boolean fixInputFiles = false;
+
+      if (fixInputFiles) {
+        File root = new File(getResourceAsUrl("models/" + expectedSource, getClass()).toURI()).getParentFile()
+            .getParentFile().getParentFile().getParentFile();
+        File testDir = new File(root, "src/test/resources/models");
+        File target = new File(testDir, expectedSource);
+        stringToFile(target.getAbsolutePath(), json);
+
+        System.out.println(expectedSource + " fixed");
+      } else {
+        System.out.println("Expected: \n " + expectedJson);
+        System.out.println("\n\nBut Got: \n " + json);
+      }
+
       throw e;
     }
   }

@@ -20,6 +20,7 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
@@ -69,7 +70,8 @@ public class OperationDefinitionParser extends ExtensionDefinitionParser {
         .withSetterParameterDefinition(CONFIG_PROVIDER_ATTRIBUTE_NAME,
                                        fromSimpleReferenceParameter(CONFIG_ATTRIBUTE_NAME).build())
         .withSetterParameterDefinition(CURSOR_PROVIDER_FACTORY_FIELD_NAME,
-                                       fromChildConfiguration(CursorProviderFactory.class).build());
+                                       fromChildConfiguration(CursorProviderFactory.class).build())
+        .withSetterParameterDefinition("retryPolicyTemplate", fromChildConfiguration(RetryPolicyTemplate.class).build());
 
     List<ParameterGroupModel> inlineGroups = getInlineGroups(operationModel);
 

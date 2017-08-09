@@ -28,7 +28,7 @@ import static org.mule.runtime.internal.dsl.DslConstants.EE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.EE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.POOLING_PROFILE_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.internal.dsl.DslConstants.RECONNECTION_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_CONTEXT_ELEMENT_IDENTIFIER;
@@ -61,7 +61,7 @@ public class DefaultXmlDslElementModelConverter implements XmlDslElementModelCon
   private static final List<String> INFRASTRUCTURE_NAMES = asList(CONFIG_ATTRIBUTE_NAME,
                                                                   NAME_ATTRIBUTE_NAME,
                                                                   POOLING_PROFILE_ELEMENT_IDENTIFIER,
-                                                                  RECONNECT_ELEMENT_IDENTIFIER,
+                                                                  RECONNECTION_ELEMENT_IDENTIFIER,
                                                                   RECONNECT_FOREVER_ELEMENT_IDENTIFIER,
                                                                   REDELIVERY_POLICY_ELEMENT_IDENTIFIER,
                                                                   TLS_CONTEXT_ELEMENT_IDENTIFIER,

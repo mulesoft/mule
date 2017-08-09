@@ -49,7 +49,7 @@ public class FailingPetStoreSource extends Source<String, Object> {
     if (failOnException) {
       failedDueOnException = true;
       executor = newSingleThreadExecutor();
-      executor.execute(() -> sourceCallback.onSourceException(connectionException));
+      executor.execute(() -> sourceCallback.onConnectionException(connectionException));
     }
   }
 

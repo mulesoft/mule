@@ -1384,6 +1384,28 @@
     </xsd:element>
     <xsd:complexType name="abstractReconnectNotifierType"/>
 
+    <xsd:element name="reconnection" type="reconnectionConfigType">
+        <xsd:annotation>
+            <xsd:documentation>
+                TODO
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="reconnectionConfigType">
+        <xsd:sequence>
+            <xsd:element ref="abstract-reconnection-strategy" minOccurs="0" maxOccurs="1"/>
+        </xsd:sequence>
+        <xsd:attribute name="failsDeployment" type="substitutableBoolean" default="false" use="optional">
+            <xsd:annotation>
+                <xsd:documentation>When the application is deployed, a connectivity test is performed on all connectors. If set to
+                    true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+
+
     <xsd:element name="reconnect" type="reconnectSimpleStrategyType"
                  substitutionGroup="abstract-reconnection-strategy">
         <xsd:annotation>

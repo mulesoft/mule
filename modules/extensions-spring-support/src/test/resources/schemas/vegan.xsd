@@ -174,7 +174,7 @@
       <xs:complexContent>
         <xs:extension base="extension:abstractConnectionProviderType">
           <xs:sequence minOccurs="0" maxOccurs="1">
-            <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+            <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
           </xs:sequence>
         </xs:extension>
       </xs:complexContent>
@@ -276,7 +276,9 @@
   <xs:complexType name="EatAppleType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+        </xs:sequence>
         <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
           <xs:annotation>
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -494,7 +496,7 @@
       <xs:complexContent>
         <xs:extension base="extension:abstractConnectionProviderType">
           <xs:sequence minOccurs="0" maxOccurs="1">
-            <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+            <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
           </xs:sequence>
           <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString" use="optional" default="Ecuador" name="originCountry"></xs:attribute>
         </xs:extension>
@@ -505,7 +507,9 @@
   <xs:complexType name="EatBananaType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+        </xs:sequence>
         <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
           <xs:annotation>
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -611,7 +615,7 @@
       <xs:complexContent>
         <xs:extension base="extension:abstractConnectionProviderType">
           <xs:sequence minOccurs="0" maxOccurs="1">
-            <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+            <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
             <xs:element minOccurs="0" maxOccurs="1" name="vegan-policy">
               <xs:complexType>
                 <xs:complexContent>
@@ -639,7 +643,9 @@
   <xs:complexType name="GrapeOperationType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+        </xs:sequence>
         <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
           <xs:annotation>
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -675,7 +681,7 @@
       <xs:complexContent>
         <xs:extension base="extension:abstractConnectionProviderType">
           <xs:sequence minOccurs="0" maxOccurs="1">
-            <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+            <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
           </xs:sequence>
         </xs:extension>
       </xs:complexContent>
@@ -685,7 +691,9 @@
   <xs:complexType name="EatKiwiType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+        </xs:sequence>
         <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
           <xs:annotation>
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -721,7 +729,7 @@
       <xs:complexContent>
         <xs:extension base="extension:abstractConnectionProviderType">
           <xs:sequence minOccurs="0" maxOccurs="1">
-            <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+            <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
           </xs:sequence>
         </xs:extension>
       </xs:complexContent>

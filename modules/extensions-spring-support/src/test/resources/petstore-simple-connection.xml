@@ -16,7 +16,9 @@
 
     <petstore:config name="petstoreInvalidConnectionWithConnectionValidation" cashierName="jim">
         <petstore:pooled-connection username="john" password="invalid-password">
-            <reconnect blocking="false" />
+            <reconnection>
+                <reconnect />
+            </reconnection>
         </petstore:pooled-connection>
         <petstore:pets>
             <petstore:pet value="Lassie" />
@@ -26,23 +28,17 @@
     </petstore:config>
 
     <petstore:config name="petstoreInvalidConnectionWithDisabledValidation" cashierName="jim">
-        <petstore:pooled-connection disableValidation="true" username="john" password="invalid-password" />
+        <petstore:pooled-connection username="john" password="invalid-password">
+            <reconnection>
+                <reconnect />
+            </reconnection>
+        </petstore:pooled-connection>
         <petstore:pets>
             <petstore:pet value="Lassie" />
             <petstore:pet value="Sapo Pepe" />
             <petstore:pet value="My mother's parrot" />
         </petstore:pets>
     </petstore:config>
-
-    <flow name="getPetsWithInvalidConfigAndDisabledValidation">
-        <petstore:get-pets config-ref="petstoreInvalidConnectionWithDisabledValidation" ownerName="john" />
-    </flow>
-
-    <flow name="getPetsWithInvalidConfigWithConnectionValidation">
-        <petstore:get-pets config-ref="petstoreInvalidConnectionWithConnectionValidation" ownerName="john" />
-        <petstore:get-pets config-ref="petstoreInvalidConnectionWithConnectionValidation" ownerName="john" />
-        <petstore:get-pets config-ref="petstoreInvalidConnectionWithConnectionValidation" ownerName="john" />
-    </flow>
 
     <flow name="getPets">
         <petstore:get-pets config-ref="petstore" ownerName="john" />
@@ -51,6 +47,4 @@
     <flow name="getClient">
         <petstore:get-client config-ref="petstore" />
     </flow>
-
-
 </mule>

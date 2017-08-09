@@ -13,9 +13,8 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.util.Pair;
-import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
+import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ResolverSetBasedObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
@@ -29,8 +28,7 @@ public abstract class ConnectionProviderObjectBuilder<C>
     extends ResolverSetBasedObjectBuilder<Pair<ConnectionProvider<C>, ResolverSetResult>> {
 
   protected final ConnectionProviderModel providerModel;
-  protected final boolean disableValidation;
-  protected final RetryPolicyTemplate retryPolicyTemplate;
+  protected final ReconnectionConfig reconnectionConfig;
   protected final PoolingProfile poolingProfile;
   protected final ExtensionModel extensionModel;
   protected final MuleContext muleContext;
@@ -41,41 +39,43 @@ public abstract class ConnectionProviderObjectBuilder<C>
    *
    * @param providerModel     the {@link ConnectionProviderModel} which describes the instances to be produced
    * @param resolverSet       a {@link ResolverSet} to populate the values
-   * @param connectionManager a {@link ConnectionManagerAdapter} to obtain the default {@link RetryPolicyTemplate} in case of none
-   *                          is provided
    */
   public ConnectionProviderObjectBuilder(ConnectionProviderModel providerModel, ResolverSet resolverSet,
-                                         ConnectionManagerAdapter connectionManager, ExtensionModel extensionModel,
+                                         ExtensionModel extensionModel,
                                          MuleContext muleContext) {
-    this(providerModel, resolverSet, null, false, null, connectionManager, extensionModel, muleContext);
+    this(providerModel, resolverSet, null, null, extensionModel, muleContext);
   }
 
-  public ConnectionProviderObjectBuilder(ConnectionProviderModel providerModel, ResolverSet resolverSet,
-                                         PoolingProfile poolingProfile, boolean disableValidation,
-                                         RetryPolicyTemplate retryPolicyTemplate, ConnectionManagerAdapter connectionManager,
+  public ConnectionProviderObjectBuilder(ConnectionProviderModel providerModel,
+                                         ResolverSet resolverSet,
+                                         PoolingProfile poolingProfile,
+                                         ReconnectionConfig reconnectionConfig,
                                          ExtensionModel extensionModel, MuleContext muleContext) {
     super(getConnectionProviderFactory(providerModel).getObjectType(), providerModel, resolverSet);
     this.providerModel = providerModel;
     this.poolingProfile = poolingProfile;
     this.extensionModel = extensionModel;
     this.muleContext = muleContext;
-    this.retryPolicyTemplate =
-        retryPolicyTemplate != null ? retryPolicyTemplate : connectionManager.getDefaultRetryPolicyTemplate();
-    this.disableValidation = disableValidation;
+    this.reconnectionConfig = computeReconnectionConfig(reconnectionConfig);
   }
 
-  public ConnectionProviderObjectBuilder(ConnectionProviderModel providerModel, Class<?> prototypeClass, ResolverSet resolverSet,
-                                         PoolingProfile poolingProfile, boolean disableValidation,
-                                         RetryPolicyTemplate retryPolicyTemplate, ConnectionManagerAdapter connectionManager,
-                                         ExtensionModel extensionModel, MuleContext muleContext) {
+  private ReconnectionConfig computeReconnectionConfig(ReconnectionConfig reconnectionConfig) {
+    return reconnectionConfig != null ? reconnectionConfig : ReconnectionConfig.getDefault();
+  }
+
+  public ConnectionProviderObjectBuilder(ConnectionProviderModel providerModel,
+                                         Class<?> prototypeClass,
+                                         ResolverSet resolverSet,
+                                         PoolingProfile poolingProfile,
+                                         ReconnectionConfig reconnectionConfig,
+                                         ExtensionModel extensionModel,
+                                         MuleContext muleContext) {
     super(prototypeClass, providerModel, resolverSet);
     this.providerModel = providerModel;
     this.poolingProfile = poolingProfile;
     this.extensionModel = extensionModel;
     this.muleContext = muleContext;
-    this.retryPolicyTemplate =
-        retryPolicyTemplate != null ? retryPolicyTemplate : connectionManager.getDefaultRetryPolicyTemplate();
-    this.disableValidation = disableValidation;
+    this.reconnectionConfig = computeReconnectionConfig(reconnectionConfig);
   }
 
   /**

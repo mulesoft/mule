@@ -7,6 +7,7 @@
 package org.mule.test.transactional;
 
 import static java.util.concurrent.Executors.newFixedThreadPool;
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.annotation.execution.OnError;
@@ -40,8 +41,10 @@ public class TransactionalSource extends Source<TestTransactionalConnection, Obj
         TestTransactionalConnection connection = connectionProvider.connect();
         ctx.bindConnection(connection);
         sourceCallback.handle(Result.<TestTransactionalConnection, Object>builder().output(connection).build(), ctx);
+      } catch (ConnectionException e) {
+        sourceCallback.onConnectionException(e);
       } catch (Exception e) {
-        sourceCallback.onSourceException(e);
+        throw new RuntimeException(e);
       }
     });
   }

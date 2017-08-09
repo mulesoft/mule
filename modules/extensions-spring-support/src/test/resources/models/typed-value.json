@@ -3486,23 +3486,6 @@
                             "value": "How many reconnection attempts to make"
                           }
                         }
-                      },
-                      {
-                        "key": {
-                          "name": "blocking"
-                        },
-                        "model": {
-                          "type": "Boolean",
-                          "annotations": {
-                            "typeId": "java.lang.Boolean",
-                            "default": "true"
-                          }
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
-                          }
-                        }
                       }
                     ]
                   },

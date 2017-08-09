@@ -22,7 +22,9 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
+import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
+
 import org.slf4j.Logger;
 
 /**
@@ -120,16 +122,16 @@ public class CompositeConnectionManager implements ConnectionManager, Lifecycle,
    * {@inheritDoc}
    */
   @Override
-  public RetryPolicyTemplate getDefaultRetryPolicyTemplate() {
-    return childConnectionManager.getDefaultRetryPolicyTemplate();
+  public <C> RetryPolicyTemplate getRetryTemplateFor(ConnectionProvider<C> connectionProvider) {
+    return childConnectionManager.getRetryTemplateFor(connectionProvider);
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public <C> RetryPolicyTemplate getRetryTemplateFor(ConnectionProvider<C> connectionProvider) {
-    return childConnectionManager.getRetryTemplateFor(connectionProvider);
+  public <C> ReconnectionConfig getReconnectionConfigFor(ConnectionProvider<C> connectionProvider) {
+    return childConnectionManager.getReconnectionConfigFor(connectionProvider);
   }
 
   /**

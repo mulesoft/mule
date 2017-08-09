@@ -7,15 +7,13 @@
 package org.mule.runtime.core.internal.connection;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.assertNotStopping;
+import static reactor.core.Exceptions.unwrap;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
-import org.mule.runtime.api.connection.ConnectionValidationResult;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
-
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import org.mule.runtime.api.util.LazyValue;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.util.func.CheckedSupplier;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,12 +32,8 @@ final class CachedConnectionHandler<C> implements ConnectionHandlerAdapter<C> {
   private static final Logger LOGGER = LoggerFactory.getLogger(CachedConnectionHandler.class);
 
   private final ConnectionProvider<C> connectionProvider;
-  private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
-  private final Lock readLock = readWriteLock.readLock();
-  private final Lock writeLock = readWriteLock.writeLock();
   private final MuleContext muleContext;
-
-  private C connection;
+  private LazyValue<C> connection;
 
   /**
    * Creates a new instance
@@ -50,6 +44,7 @@ final class CachedConnectionHandler<C> implements ConnectionHandlerAdapter<C> {
   public CachedConnectionHandler(ConnectionProvider<C> connectionProvider, MuleContext muleContext) {
     this.connectionProvider = connectionProvider;
     this.muleContext = muleContext;
+    lazyConnect();
   }
 
   /**
@@ -64,36 +59,21 @@ final class CachedConnectionHandler<C> implements ConnectionHandlerAdapter<C> {
    */
   @Override
   public C getConnection() throws ConnectionException {
-    C oldConnection;
-    readLock.lock();
     try {
-      if (connection != null && validateConnection(connection).isValid()) {
-        return connection;
+      return connection.get();
+    } catch (Throwable t) {
+      t = unwrap(t);
+      if (t instanceof ConnectionException) {
+        throw (ConnectionException) t;
       }
-      oldConnection = connection;
-    } finally {
-      readLock.unlock();
-    }
-    writeLock.lock();
-    try {
-      // check another thread didn't beat us to it
-      if (connection != null) {
-        if (connection != oldConnection) {
-          return connection;
-        }
-        disconnectAndCleanConnection(connection);
-      }
-      connection = createConnection();
-      return connection;
-    } finally {
-      writeLock.unlock();
+
+      throw new ConnectionException(t.getMessage(), t);
     }
   }
 
   private C createConnection() throws ConnectionException {
     assertNotStopping(muleContext, "Mule is shutting down... Cannot establish new connections");
-    connection = connectionProvider.connect();
-    return connection;
+    return connectionProvider.connect();
   }
 
   /**
@@ -111,43 +91,30 @@ final class CachedConnectionHandler<C> implements ConnectionHandlerAdapter<C> {
    */
   @Override
   public void close() throws MuleException {
-    writeLock.lock();
-    try {
-      if (connectionProvider != null && connection != null) {
-        connectionProvider.disconnect(connection);
+    disconnectAndCleanConnection();
+  }
+
+  @Override
+  public void invalidate() {
+    disconnectAndCleanConnection();
+    lazyConnect();
+  }
+
+  private void disconnectAndCleanConnection() {
+    connection.ifComputed(c -> {
+      try {
+        connectionProvider.disconnect(c);
+      } catch (Exception e) {
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug(String.format("Error disconnecting cached connection %s. %s", c, e.getMessage()), e);
+        }
+      } finally {
+        connection = null;
       }
-    } finally {
-      connection = null;
-      writeLock.unlock();
-    }
+    });
   }
 
-  protected ConnectionValidationResult validateConnection(C connection) {
-    ConnectionValidationResult validationResult = null;
-    try {
-      validationResult = connectionProvider.validate(connection);
-    } catch (Exception e) {
-      validationResult = ConnectionValidationResult.failure(
-                                                            "Error validating connection. Unexpected exception was thrown by the extension when validating the connection",
-                                                            e);
-    }
-
-    if (validationResult == null) {
-      String errorMessage =
-          "Error validating connection. validate() method from the connection provider can not return a null ConnectionValidationResult";
-      validationResult = ConnectionValidationResult.failure(errorMessage, new ConnectionException(errorMessage));
-    }
-
-    return validationResult;
-  }
-
-  private void disconnectAndCleanConnection(C connection) {
-    try {
-      connectionProvider.disconnect(connection);
-    } catch (Exception e) {
-      LOGGER.debug("Error disconnecting the extension's connection", e);
-    } finally {
-      this.connection = null;
-    }
+  private void lazyConnect() {
+    connection = new LazyValue<>((CheckedSupplier<C>) this::createConnection);
   }
 }

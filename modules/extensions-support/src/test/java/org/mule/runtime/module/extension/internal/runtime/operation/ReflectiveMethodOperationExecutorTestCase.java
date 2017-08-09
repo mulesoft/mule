@@ -32,6 +32,7 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.util.ClassUtils;
@@ -97,6 +98,9 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
   @Mock
   private ConfigurationState configurationState;
 
+  @Mock
+  private RetryPolicyTemplate retryPolicyTemplate;
+
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private MuleContext muleContext;
 
@@ -123,7 +127,7 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
     when(operationModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(empty());
     operationContext = new DefaultExecutionContext(extensionModel, of(configurationInstance), parameters.asMap(), operationModel,
                                                    muleEvent, cursorProviderFactory, streamingManager, location,
-                                                   muleContext);
+                                                   retryPolicyTemplate, muleContext);
     operationContext = spy(operationContext);
   }
 

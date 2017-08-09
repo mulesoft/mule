@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
@@ -43,7 +44,7 @@ public interface ExecutionContextAdapter<M extends ComponentModel> extends Event
   /**
    * Sets a variable of the given {@code key} and {@code value}.
    *
-   * @param key the variable's key. Cannot be {@code null}
+   * @param key   the variable's key. Cannot be {@code null}
    * @param value the associated value. Cannot be {@code null}
    * @return the value previously associated with the {@code key} or {@code null} if no such association existed.
    */
@@ -82,4 +83,9 @@ public interface ExecutionContextAdapter<M extends ComponentModel> extends Event
    * @return The {@link ComponentLocation} of the executing component
    */
   ComponentLocation getComponentLocation();
+
+  /**
+   * @return The reconnection strategy to use in case of connectivity problems
+   */
+  Optional<RetryPolicyTemplate> getRetryPolicyTemplate();
 }

@@ -44,7 +44,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class StreamingInterceptorTestCase extends AbstractMuleContextTestCase {
+public class ConnectionInterceptorTestCase extends AbstractMuleContextTestCase {
 
   private static final String USER = "john";
   private static final String PASSWORD = "doe";
@@ -106,13 +106,23 @@ public class StreamingInterceptorTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test
-  public void after() {
+  public void onSuccess() {
     ConnectionHandler connectionHandler = mock(ConnectionHandler.class);
     when(operationContext.removeVariable(CONNECTION_PARAM)).thenReturn(connectionHandler);
 
-    interceptor.after(operationContext, null);
+    interceptor.onSuccess(operationContext, null);
     verify(operationContext).removeVariable(CONNECTION_PARAM);
     verify(connectionHandler).release();
+  }
+
+  @Test
+  public void onError() {
+    ConnectionHandler connectionHandler = mock(ConnectionHandler.class);
+    when(operationContext.removeVariable(CONNECTION_PARAM)).thenReturn(connectionHandler);
+
+    interceptor.onError(operationContext, new Exception());
+    verify(operationContext).removeVariable(CONNECTION_PARAM);
+    verify(connectionHandler).invalidate();
   }
 
   @Test

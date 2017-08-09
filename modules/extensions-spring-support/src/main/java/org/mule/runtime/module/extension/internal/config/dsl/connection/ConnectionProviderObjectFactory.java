@@ -17,6 +17,7 @@ import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
+import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthModelProperty;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
 import org.mule.runtime.module.extension.internal.runtime.config.ConnectionProviderObjectBuilder;
@@ -44,8 +45,7 @@ public class ConnectionProviderObjectFactory extends AbstractExtensionObjectFact
   private final ExtensionsOAuthManager oauthManager;
 
   private PoolingProfile poolingProfile = null;
-  private RetryPolicyTemplate retryPolicyTemplate = null;
-  private boolean disableValidation = false;
+  private ReconnectionConfig reconnectionConfig = ReconnectionConfig.getDefault();
 
   @Inject
   private MuleContext muleContext;
@@ -66,46 +66,32 @@ public class ConnectionProviderObjectFactory extends AbstractExtensionObjectFact
     Callable<ResolverSet> callable = () -> parametersResolver.getParametersAsHashedResolverSet(providerModel, muleContext);
     ResolverSet resolverSet = withContextClassLoader(getClassLoader(extensionModel), callable);
 
-    ConnectionManagerAdapter connectionManager = getConnectionManager();
     ConnectionProviderObjectBuilder builder;
     if (extensionModel.getModelProperty(SoapExtensionModelProperty.class).isPresent()) {
       builder = new SoapConnectionProviderObjectBuilder(providerModel, resolverSet, poolingProfile,
-                                                        disableValidation, retryPolicyTemplate,
-                                                        connectionManager, extensionModel,
+                                                        reconnectionConfig,
+                                                        extensionModel,
                                                         muleContext);
     } else if (providerModel.getModelProperty(OAuthModelProperty.class).isPresent()) {
       builder = new OAuthConnectionProviderObjectBuilder(providerModel, resolverSet, poolingProfile,
-                                                         disableValidation, retryPolicyTemplate,
-                                                         oauthManager, connectionManager, extensionModel,
+                                                         reconnectionConfig,
+                                                         oauthManager, extensionModel,
                                                          muleContext);
     } else {
       builder = new DefaultConnectionProviderObjectBuilder(providerModel, resolverSet, poolingProfile,
-                                                           disableValidation, retryPolicyTemplate,
-                                                           connectionManager, extensionModel,
+                                                           reconnectionConfig,
+                                                           extensionModel,
                                                            muleContext);
     }
 
     return new ConnectionProviderResolver<>(builder, resolverSet, muleContext);
   }
 
-  private ConnectionManagerAdapter getConnectionManager() throws ConfigurationException {
-    try {
-      return muleContext.getRegistry().lookupObject(ConnectionManagerAdapter.class);
-    } catch (RegistrationException e) {
-      throw new ConfigurationException(createStaticMessage("Could not obtain connection manager adapter form registry"), e);
-    }
-  }
-
   public void setPoolingProfile(PoolingProfile poolingProfile) {
     this.poolingProfile = poolingProfile;
   }
 
-  public void setRetryPolicyTemplate(RetryPolicyTemplate retryPolicyTemplate) {
-    this.retryPolicyTemplate = retryPolicyTemplate;
+  public void setReconnectionConfig(ReconnectionConfig reconnectionConfig) {
+    this.reconnectionConfig = reconnectionConfig;
   }
-
-  public void setDisableValidation(boolean disableValidation) {
-    this.disableValidation = disableValidation;
-  }
-
 }

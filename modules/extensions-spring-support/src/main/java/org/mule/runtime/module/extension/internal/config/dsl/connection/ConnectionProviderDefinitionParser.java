@@ -9,14 +9,13 @@ package org.mule.runtime.module.extension.internal.config.dsl.connection;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedValue;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromReferenceObject;
-import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
+import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
@@ -55,9 +54,8 @@ public final class ConnectionProviderDefinitionParser extends ExtensionDefinitio
         .withConstructorParameterDefinition(fromFixedValue(extensionModel).build())
         .withConstructorParameterDefinition(fromReferenceObject(ExtensionsOAuthManager.class).build())
         .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
-        .withSetterParameterDefinition("disableValidation", fromSimpleParameter("disableValidation").build())
-        .withSetterParameterDefinition("retryPolicyTemplate",
-                                       fromChildConfiguration(RetryPolicyTemplate.class).build())
+        .withSetterParameterDefinition("reconnectionConfig",
+                                       fromChildConfiguration(ReconnectionConfig.class).build())
         .withSetterParameterDefinition("poolingProfile", fromChildConfiguration(PoolingProfile.class).build());
 
     parseParameters(providerModel);

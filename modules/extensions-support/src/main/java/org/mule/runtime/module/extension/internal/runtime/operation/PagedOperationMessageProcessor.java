@@ -10,6 +10,7 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.iterator.Consumer;
 import org.mule.runtime.core.api.streaming.iterator.ConsumerStreamingIterator;
@@ -40,11 +41,12 @@ public class PagedOperationMessageProcessor extends OperationMessageProcessor {
                                         String targetValue,
                                         ResolverSet resolverSet,
                                         CursorProviderFactory cursorProviderFactory,
+                                        RetryPolicyTemplate retryPolicyTemplate,
                                         ExtensionManager extensionManager,
                                         PolicyManager policyManager,
                                         ExtensionConnectionSupplier connectionSupplier) {
     super(extensionModel, operationModel, configurationProvider, target, targetValue, resolverSet, cursorProviderFactory,
-          extensionManager, policyManager);
+          retryPolicyTemplate, extensionManager, policyManager);
     this.connectionSupplier = connectionSupplier;
   }
 

@@ -22,8 +22,8 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.CONN
 import static org.mule.runtime.config.spring.api.XmlConfigurationDocumentLoader.noValidationDocumentLoader;
 import static org.mule.runtime.config.spring.internal.dsl.processor.xml.XmlCustomAttributeHandler.IS_CDATA;
 import static org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader.resolveContextArtifactPluginClassLoaders;
-import static org.mule.runtime.extension.api.ExtensionConstants.DISABLE_CONNECTION_VALIDATION_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.POOLING_PROFILE_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_CONFIG_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.REDELIVERY_POLICY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.STREAMING_STRATEGY_PARAMETER_NAME;
@@ -635,6 +635,30 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
                                     final ParameterizedElementDeclarer declarer) {
 
     switch (paramModel.getName()) {
+      case RECONNECTION_CONFIG_PARAMETER_NAME:
+        findAnyMatchingChildById(declaredConfigs, RECONNECTION_CONFIG_PARAMETER_NAME)
+            .ifPresent(config -> {
+              ParameterObjectValue.Builder reconnection = newObjectValue().ofType(config.getIdentifier());
+              copyExplicitAttributes(config.getConfigAttributes(), reconnection);
+              config.getChildren().forEach(child -> {
+                String paramName;
+                if (child.getIdentifier().equals(RECONNECT_ELEMENT_IDENTIFIER)
+                    || child.getIdentifier().equals(RECONNECT_FOREVER_ELEMENT_IDENTIFIER)) {
+                  paramName = RECONNECTION_STRATEGY_PARAMETER_NAME;
+                } else {
+                  paramName = child.getIdentifier();
+                }
+
+                ParameterObjectValue.Builder childBuilder = newObjectValue().ofType(child.getIdentifier());
+                cloneAsDeclaration(child, childBuilder);
+                reconnection.withParameter(paramName, childBuilder.build());
+              });
+              declarer.withParameterGroup(newParameterGroup(CONNECTION)
+                  .withParameter(RECONNECTION_CONFIG_PARAMETER_NAME, reconnection.build())
+                  .getDeclaration());
+            });
+        return;
+
       case RECONNECTION_STRATEGY_PARAMETER_NAME:
 
         findAnyMatchingChildById(declaredConfigs, RECONNECT_ELEMENT_IDENTIFIER, RECONNECT_FOREVER_ELEMENT_IDENTIFIER)
@@ -694,10 +718,6 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
                   .withParameter(TLS_PARAMETER_NAME, tls.build())
                   .getDeclaration());
             });
-        return;
-
-      case DISABLE_CONNECTION_VALIDATION_PARAMETER_NAME:
-        // Nothing to do here, this has to be propagated as an attribute
         return;
     }
   }

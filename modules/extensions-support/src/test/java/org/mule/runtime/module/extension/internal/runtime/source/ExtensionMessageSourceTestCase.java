@@ -210,6 +210,7 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
     when(sourceAdapterFactory.createAdapter(any(), any(), any(), any())).thenReturn(sourceAdapter);
 
     mockExceptionEnricher(sourceModel, null);
+    when(sourceModel.requiresConnection()).thenReturn(true);
     when(sourceModel.getName()).thenReturn(SOURCE_NAME);
     when(sourceModel.getModelProperty(MetadataResolverFactoryModelProperty.class)).thenReturn(empty());
     when(sourceModel.getModelProperty(SourceCallbackModelProperty.class)).thenReturn(empty());
@@ -365,16 +366,6 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
     messageSource.onException(new ConnectionException(ERROR_MESSAGE));
 
     verify(source, times(2)).onStart(sourceCallback);
-    verify(source, times(1)).onStop();
-  }
-
-  @Test
-  public void failOnExceptionWithNonConnectionExceptionAndGetsExhausted() throws Exception {
-    initialise();
-    messageSource.start();
-    messageSource.onException(new RuntimeException(ERROR_MESSAGE));
-
-    verify(source, times(1)).onStart(sourceCallback);
     verify(source, times(1)).onStop();
   }
 

@@ -67,6 +67,7 @@ import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.internal.policy.OperationExecutionFunction;
 import org.mule.runtime.core.internal.policy.OperationPolicy;
 import org.mule.runtime.core.internal.policy.PolicyManager;
+import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
@@ -80,6 +81,7 @@ import org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.InterceptorsModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.QueryParameterModelProperty;
+import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.exception.NullExceptionHandler;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
@@ -171,8 +173,10 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
   @Mock(answer = RETURNS_DEEP_STUBS)
   protected PolicyManager mockPolicyManager;
 
-  protected OperationMessageProcessor messageProcessor;
+  @Mock
+  private ExecutionContextAdapter<OperationModel> executionContext;
 
+  protected OperationMessageProcessor messageProcessor;
   protected CursorStreamProviderFactory cursorStreamProviderFactory;
   protected String configurationName = CONFIG_NAME;
   protected String target = EMPTY;
@@ -269,6 +273,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     when(configurationModel.getOperationModels()).thenReturn(asList(operationModel));
     when(configurationModel.getOperationModel(OPERATION_NAME)).thenReturn(of(operationModel));
 
+    when(connectionProviderWrapper.getReconnectionConfig()).thenReturn(of(ReconnectionConfig.getDefault()));
     when(connectionProviderWrapper.getRetryPolicyTemplate()).thenReturn(new NoRetryPolicyTemplate());
 
     mockSubTypes(extensionModel);
@@ -290,8 +295,8 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
       return mockOperationPolicy;
     });
 
+    when(executionContext.getRetryPolicyTemplate()).thenReturn(empty());
     when(connectionManagerAdapter.getConnection(anyString())).thenReturn(null);
-    when(connectionManagerAdapter.getDefaultRetryPolicyTemplate()).thenReturn(new NoRetryPolicyTemplate());
     messageProcessor = setUpOperationMessageProcessor();
   }
 

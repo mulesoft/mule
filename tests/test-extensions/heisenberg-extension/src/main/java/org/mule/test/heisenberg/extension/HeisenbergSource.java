@@ -18,6 +18,7 @@ import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatu
 import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatus.ERROR_INVOKE;
 import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatus.NONE;
 import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatus.SUCCESS;
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
@@ -110,7 +111,12 @@ public class HeisenbergSource extends Source<String, Object> {
 
     executor = schedulerService.cpuLightScheduler();
     connection = connectionProvider.connect();
-    scheduledFuture = executor.scheduleAtFixedRate(() -> sourceCallback.handle(makeResult(sourceCallback)), 0, 300, MILLISECONDS);
+    scheduledFuture = executor.scheduleAtFixedRate(() -> {
+      final Result<String, Object> result = makeResult(sourceCallback);
+      if (result != null) {
+        sourceCallback.handle(result);
+      }
+    }, 0, 300, MILLISECONDS);
   }
 
   @OnSuccess
@@ -179,7 +185,8 @@ public class HeisenbergSource extends Source<String, Object> {
 
   private Result<String, Object> makeResult(SourceCallback sourceCallback) {
     if (initialBatchNumber < 0) {
-      sourceCallback.onSourceException(new RuntimeException(INITIAL_BATCH_NUMBER_ERROR_MESSAGE));
+      sourceCallback.onConnectionException(new ConnectionException(INITIAL_BATCH_NUMBER_ERROR_MESSAGE));
+      return null;
     }
 
     return Result.<String, Object>builder()
