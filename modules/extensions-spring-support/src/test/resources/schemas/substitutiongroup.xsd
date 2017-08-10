@@ -8,7 +8,7 @@
     <xs:import namespace="http://www.mulesoft.org/schema/mule/heisenberg" schemaLocation="http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd"></xs:import>
     <xs:complexType name="org.mule.test.substitutiongroup.extension.SomeExportedPojo">
         <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" base="heisenberg:org.mule.test.heisenberg.extension.model.Weapon">
                 <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="attribute"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
