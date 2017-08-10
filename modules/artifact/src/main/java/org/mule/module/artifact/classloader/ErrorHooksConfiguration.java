@@ -50,7 +50,11 @@ public class ErrorHooksConfiguration {
 
   private static void logError(String message) {
     if (logger == null) {
-      logger = getLogger(ErrorHooksConfiguration.class);
+      synchronized (ErrorHooksConfiguration.class) {
+        if (logger == null) {
+          logger = getLogger(ErrorHooksConfiguration.class);
+        }
+      }
     }
 
     logger.error(message);
