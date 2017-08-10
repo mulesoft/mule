@@ -12,12 +12,13 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.exception.ErrorTypeRepository;
 import org.mule.runtime.core.api.exception.TypedException;
+import org.mule.runtime.core.api.processor.Processor;
 
 import javax.inject.Inject;
 
@@ -26,7 +27,7 @@ import javax.inject.Inject;
  *
  * @since 4.0
  */
-public class ThrowProcessor implements Processor {
+public class ThrowProcessor extends AbstractAnnotatedObject implements Processor {
 
   private static final String EXCEPTION_ERROR = "If an error is not provided, the provided exception must be a TypedException.";
 

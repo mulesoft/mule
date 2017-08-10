@@ -17,6 +17,7 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.exception.MessagingException;
@@ -78,9 +79,8 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
                                                                                                                                             .apply(flowExecutionResult),
                                                                                                                                         messageSourceResponseParametersProcessor)))
           .onErrorResume(Exception.class, e -> {
-            MessagingException messagingException =
-                e instanceof MessagingException ? (MessagingException) e
-                    : new MessagingException(event, e, flowExecutionProcessor);
+            MessagingException messagingException = e instanceof MessagingException ? (MessagingException) e
+                : new MessagingException(event, e, (AnnotatedObject) flowExecutionProcessor);
             return just(Either
                 .left(new SourcePolicyFailureResult(messagingException, () -> messageSourceResponseParametersProcessor
                     .getFailedExecutionResponseParametersFunction()

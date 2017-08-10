@@ -31,6 +31,7 @@ import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.fromCallable;
 import static reactor.core.publisher.Mono.just;
 import static reactor.core.publisher.Mono.when;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleException;
@@ -38,6 +39,7 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.InternalEvent;
@@ -65,6 +67,7 @@ import java.util.function.Function;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.MonoProcessor;
 
@@ -120,8 +123,11 @@ public class ModuleFlowProcessingPhase
       final Consumer<Either<MessagingException, InternalEvent>> terminateConsumer = getTerminateConsumer(messageSource, template);
       final MonoProcessor<Void> responseCompletion = MonoProcessor.create();
       final InternalEvent templateEvent = createEvent(template, sourceLocation, responseCompletion, flowConstruct);
-      final SourcePolicy policy = policyManager.createSourcePolicyInstance(sourceLocation, templateEvent,
-                                                                           new FlowProcessor(template, templateEvent), template);
+
+      FlowProcessor flowExecutionProcessor = new FlowProcessor(template, templateEvent);
+      flowExecutionProcessor.setAnnotations(flowConstruct.getAnnotations());
+      final SourcePolicy policy =
+          policyManager.createSourcePolicyInstance(sourceLocation, templateEvent, flowExecutionProcessor, template);
       final PhaseContext phaseContext = new PhaseContext(template, messageProcessContext, phaseResultNotifier, terminateConsumer);
 
       just(templateEvent)
@@ -309,7 +315,7 @@ public class ModuleFlowProcessingPhase
     return 0;
   }
 
-  private class FlowProcessor implements Processor {
+  private class FlowProcessor extends AbstractAnnotatedObject implements Processor {
 
     private final ModuleFlowProcessingPhaseTemplate template;
     private final InternalEvent templateEvent;

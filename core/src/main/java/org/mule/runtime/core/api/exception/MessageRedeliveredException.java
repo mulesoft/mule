@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.core.api.exception;
 
-import org.mule.runtime.api.i18n.I18nMessage;
-import org.mule.runtime.core.api.InternalEvent;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
-import org.mule.runtime.core.api.processor.Processor;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
-public class MessageRedeliveredException extends MessagingException {
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.i18n.I18nMessage;
+
+public class MessageRedeliveredException extends MuleException {
 
   /**
    * Serial version
@@ -22,27 +22,15 @@ public class MessageRedeliveredException extends MessagingException {
   int redeliveryCount;
   int maxRedelivery;
 
-  protected MessageRedeliveredException(String messageId, int redeliveryCount, int maxRedelivery, InternalEvent event,
-                                        I18nMessage message) {
-    super(message, event);
+  protected MessageRedeliveredException(String messageId, int redeliveryCount, int maxRedelivery, I18nMessage message) {
+    super(message);
     this.messageId = messageId;
     this.redeliveryCount = redeliveryCount;
     this.maxRedelivery = maxRedelivery;
   }
 
-  public MessageRedeliveredException(String messageId, int redeliveryCount, int maxRedelivery, InternalEvent event,
-                                     I18nMessage message,
-                                     Processor failingMessageProcessor) {
-    super(message, event, failingMessageProcessor);
-    this.messageId = messageId;
-    this.redeliveryCount = redeliveryCount;
-    this.maxRedelivery = maxRedelivery;
-  }
-
-  public MessageRedeliveredException(String messageId, int redeliveryCount, int maxRedelivery, InternalEvent event,
-                                     Processor failingMessageProcessor) {
-    this(messageId, redeliveryCount, maxRedelivery, event,
-         CoreMessages.createStaticMessage("Maximum redelivery attempts reached"), failingMessageProcessor);
+  public MessageRedeliveredException(String messageId, int redeliveryCount, int maxRedelivery) {
+    this(messageId, redeliveryCount, maxRedelivery, createStaticMessage("Maximum redelivery attempts reached"));
   }
 
   public String getMessageId() {

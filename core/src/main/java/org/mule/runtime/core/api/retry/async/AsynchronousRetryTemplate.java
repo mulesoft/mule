@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.retry.async;
 
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.retry.RetryCallback;
 import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.retry.RetryNotifier;
@@ -22,7 +23,7 @@ import java.util.concurrent.Executor;
  * This class is a wrapper for a {@link RetryPolicyTemplate} and will execute any retry work within a separate thread. An optional
  * {@link Latch} can be passed into this template, in which case execution will only occur once the latch is released.
  */
-public class AsynchronousRetryTemplate implements RetryPolicyTemplate {
+public class AsynchronousRetryTemplate extends AbstractAnnotatedObject implements RetryPolicyTemplate {
 
   private final RetryPolicyTemplate delegate;
   private Latch startLatch;

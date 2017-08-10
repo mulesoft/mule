@@ -22,6 +22,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.core.api.util.ExceptionUtils.containsType;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractCauseOfType;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
@@ -34,6 +35,7 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.InternalEventContext;
 import org.mule.runtime.core.api.MuleContext;
@@ -167,7 +169,7 @@ public class ExceptionUtilsTestCase extends AbstractMuleTestCase {
   @Test
   public void updateMessaginExceptionWithErrorWithOutError() {
     MessagingException messagingExceptionMock = mock(MessagingException.class);
-    Processor processorMock = mock(Processor.class);
+    Processor processorMock = mock(Processor.class, withSettings().extraInterfaces(AnnotatedObject.class));
     MuleContext muleContextMock = mock(MuleContext.class);
     ErrorTypeLocator errorTypeLocatorMock = mock(ErrorTypeLocator.class);
 
@@ -193,7 +195,7 @@ public class ExceptionUtilsTestCase extends AbstractMuleTestCase {
     when(errorTypeLocatorMock.lookupErrorType(messagingExceptionMock)).thenReturn(mock(ErrorType.class));
 
 
-    updateMessagingExceptionWithError(messagingExceptionMock, processorMock, muleContextMock);
+    updateMessagingExceptionWithError(messagingExceptionMock, (AnnotatedObject) processorMock, muleContextMock);
 
     verify(messagingExceptionMock, atLeast(1)).setProcessedEvent(any(InternalEvent.class));
   }
@@ -201,7 +203,7 @@ public class ExceptionUtilsTestCase extends AbstractMuleTestCase {
   @Test
   public void updateMessaginExceptionWithError() {
     MessagingException messagingExceptionMock = mock(MessagingException.class);
-    Processor processorMock = mock(Processor.class);
+    Processor processorMock = mock(Processor.class, withSettings().extraInterfaces(AnnotatedObject.class));
     MuleContext muleContextMock = mock(MuleContext.class);
     ErrorTypeLocator errorTypeLocatorMock = mock(ErrorTypeLocator.class);
 
@@ -228,7 +230,7 @@ public class ExceptionUtilsTestCase extends AbstractMuleTestCase {
     when(errorTypeLocatorMock.lookupErrorType(messagingExceptionMock)).thenReturn(mock(ErrorType.class));
 
 
-    updateMessagingExceptionWithError(messagingExceptionMock, processorMock, muleContextMock);
+    updateMessagingExceptionWithError(messagingExceptionMock, (AnnotatedObject) processorMock, muleContextMock);
 
     verify(messagingExceptionMock, times(0)).setProcessedEvent(any(InternalEvent.class));
   }

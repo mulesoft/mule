@@ -47,7 +47,7 @@ public class DefaultTlsContextFactoryObjectFactory extends AbstractAnnotatedObje
 
   @Override
   public DefaultTlsContextFactory doGetObject() throws Exception {
-    DefaultTlsContextFactory tlsContextFactory = new DefaultTlsContextFactory();
+    DefaultTlsContextFactory tlsContextFactory = new DefaultTlsContextFactory(getAnnotations());
 
     tlsContextFactory.setName(name);
     tlsContextFactory.setEnabledProtocols(enabledProtocols);

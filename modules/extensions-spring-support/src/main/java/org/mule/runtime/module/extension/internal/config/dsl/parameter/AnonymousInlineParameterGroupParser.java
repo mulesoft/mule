@@ -49,15 +49,20 @@ public class AnonymousInlineParameterGroupParser extends ParameterGroupParser {
     return finalBuilder;
   }
 
-  public static class AnonymousGroupObjectFactory extends AbstractExtensionObjectFactory<Object> {
+  public static class AnonymousGroupObjectFactory extends AbstractExtensionObjectFactory<Map> {
 
     public AnonymousGroupObjectFactory(MuleContext muleContext) {
       super(muleContext);
     }
 
     @Override
-    public Object doGetObject() throws Exception {
+    public Map getObject() throws Exception {
       return parameters;
+    }
+
+    @Override
+    public Map doGetObject() throws Exception {
+      throw new UnsupportedOperationException("This factory returns a simple Java Map. We can't have annotations on a Map");
     }
   }
 

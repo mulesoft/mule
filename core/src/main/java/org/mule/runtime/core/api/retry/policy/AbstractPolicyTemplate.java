@@ -6,11 +6,16 @@
  */
 package org.mule.runtime.core.api.retry.policy;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.retry.RetryCallback;
 import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.retry.RetryNotifier;
 import org.mule.runtime.core.internal.retry.DefaultRetryContext;
+
+import org.slf4j.Logger;
 
 import java.io.InterruptedIOException;
 import java.util.Map;
@@ -18,13 +23,10 @@ import java.util.concurrent.Executor;
 
 import javax.inject.Inject;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * Base class for RetryPolicyTemplate implementations. Uses ConnectNotifier as RetryNotifier by default.
  */
-public abstract class AbstractPolicyTemplate implements RetryPolicyTemplate {
+public abstract class AbstractPolicyTemplate extends AbstractAnnotatedObject implements RetryPolicyTemplate {
 
   protected RetryNotifier notifier = new ConnectNotifier();
 
@@ -34,7 +36,7 @@ public abstract class AbstractPolicyTemplate implements RetryPolicyTemplate {
   @Inject
   private NotificationDispatcher notificationFirer;
 
-  protected transient final Logger logger = LoggerFactory.getLogger(getClass());
+  private static final Logger LOGGER = getLogger(AbstractPolicyTemplate.class);
 
   @Override
   public RetryContext execute(RetryCallback callback, Executor workManager) throws Exception {
@@ -53,14 +55,14 @@ public abstract class AbstractPolicyTemplate implements RetryPolicyTemplate {
           break;
         } catch (Exception e) {
           cause = e;
-          if (logger.isDebugEnabled()) {
-            logger.debug("Error executing policy", cause);
+          if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Error executing policy", cause);
           }
           if (notifier != null) {
             notifier.onFailure(context, cause);
           }
           if (cause instanceof InterruptedException || cause instanceof InterruptedIOException) {
-            logger.error("Process was interrupted (InterruptedException), ceasing process");
+            LOGGER.error("Process was interrupted (InterruptedException), ceasing process");
             break;
           } else {
             status = policy.applyPolicy(cause);
@@ -76,8 +78,8 @@ public abstract class AbstractPolicyTemplate implements RetryPolicyTemplate {
       }
     } finally {
       if (status != null && status.getThrowable() != null) {
-        if (logger.isDebugEnabled()) {
-          logger.debug("Error executing policy", status.getThrowable());
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug("Error executing policy", status.getThrowable());
         }
       }
     }

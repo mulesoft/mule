@@ -103,7 +103,7 @@ public class CompositeSourcePolicy extends
               .orElse(messagingException.getEvent().getMessage());
           return new FlowExecutionException(InternalEvent.builder(event).message(message).build(),
                                             messagingException.getCause(),
-                                            messagingException.getFailingMessageProcessor());
+                                            messagingException.getFailingComponent());
         });
   }
 

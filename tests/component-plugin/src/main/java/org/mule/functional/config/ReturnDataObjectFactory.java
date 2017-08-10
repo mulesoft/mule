@@ -20,7 +20,7 @@ import java.io.IOException;
  *
  * @since 4.0
  */
-public class ReturnDataObjectFactory extends AbstractAnnotatedObjectFactory<Object> {
+public class ReturnDataObjectFactory extends AbstractAnnotatedObjectFactory<String> {
 
   private String file;
   private String content;
@@ -34,7 +34,7 @@ public class ReturnDataObjectFactory extends AbstractAnnotatedObjectFactory<Obje
   }
 
   @Override
-  public Object doGetObject() throws Exception {
+  public String getObject() throws Exception {
     String returnData = content;
     if (file != null) {
       try {
@@ -45,4 +45,10 @@ public class ReturnDataObjectFactory extends AbstractAnnotatedObjectFactory<Obje
     }
     return returnData;
   }
+
+  @Override
+  public String doGetObject() throws Exception {
+    throw new UnsupportedOperationException("This factory returns a simple Java String. We can't have annotations on a String");
+  }
+
 }

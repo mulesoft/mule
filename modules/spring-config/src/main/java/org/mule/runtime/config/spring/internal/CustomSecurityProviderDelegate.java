@@ -7,6 +7,7 @@
 package org.mule.runtime.config.spring.internal;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
@@ -15,10 +16,10 @@ import org.mule.runtime.core.api.security.SecurityProvider;
 
 /**
  * Delegate for security providers configured inside security-manager
- * 
+ *
  * @since 4.0
  */
-public class CustomSecurityProviderDelegate implements SecurityProvider {
+public class CustomSecurityProviderDelegate extends AbstractAnnotatedObject implements SecurityProvider {
 
   private SecurityProvider delegate;
 

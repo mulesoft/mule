@@ -44,6 +44,7 @@ import org.mule.runtime.core.api.context.notification.PipelineMessageNotificatio
 import org.mule.runtime.core.api.exception.ErrorTypeLocator;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.management.stats.AllStatistics;
+import org.mule.runtime.core.api.processor.InternalProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
@@ -51,10 +52,6 @@ import org.mule.runtime.core.internal.construct.DefaultFlowBuilder.DefaultFlow;
 import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.internal.exception.ErrorHandlerFactory;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.CountDownLatch;
 
 import org.junit.After;
 import org.junit.Before;
@@ -64,6 +61,10 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.mockito.ArgumentMatcher;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
 
 @RunWith(Parameterized.class)
 public class PipelineMessageNotificationTestCase extends AbstractReactiveProcessorTestCase {
@@ -243,7 +244,7 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
     }
   }
 
-  public static class ExceptionThrowingMessageProcessor implements Processor {
+  public static class ExceptionThrowingMessageProcessor implements Processor, InternalProcessor {
 
     @Override
     public InternalEvent process(InternalEvent event) throws MuleException {

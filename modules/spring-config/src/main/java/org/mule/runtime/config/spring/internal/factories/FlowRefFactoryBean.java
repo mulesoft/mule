@@ -7,6 +7,7 @@
 package org.mule.runtime.config.spring.internal.factories;
 
 import static java.util.Optional.ofNullable;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
@@ -17,6 +18,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -28,13 +30,18 @@ import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.config.spring.internal.MuleArtifactContext;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.AnnotatedProcessor;
 import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
+
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -46,11 +53,6 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import reactor.core.publisher.Mono;
 
 public class FlowRefFactoryBean extends AbstractAnnotatedObjectFactory<Processor>
@@ -69,7 +71,7 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObjectFactory<Processor
   @Override
   public Processor doGetObject() throws Exception {
     if (refName.isEmpty()) {
-      throw new MuleRuntimeException(CoreMessages.objectIsNull("flow reference is empty"));
+      throw new MuleRuntimeException(objectIsNull("flow reference is empty"));
     }
 
     return new FlowRefMessageProcessor();
@@ -77,21 +79,20 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObjectFactory<Processor
 
   protected Processor getReferencedFlow(String name) throws MuleException {
     if (name == null) {
-      throw new MuleRuntimeException(CoreMessages.objectIsNull(name));
+      throw new MuleRuntimeException(objectIsNull(name));
     }
 
     Processor referencedFlow = getReferencedProcessor(name);
     if (referencedFlow == null) {
-      throw new MuleRuntimeException(CoreMessages.objectIsNull(name));
+      throw new MuleRuntimeException(objectIsNull(name));
     }
 
     // for subflows, we create a new one so it must be initialised manually
     if (!(referencedFlow instanceof Flow)) {
-      if (referencedFlow instanceof AnnotatedObject) {
-        Map<QName, Object> annotations = new HashMap<>(((AnnotatedObject) referencedFlow).getAnnotations());
-        annotations.put(ROOT_CONTAINER_NAME_KEY, getRootContainerName());
-        ((AnnotatedObject) referencedFlow).setAnnotations(annotations);
-      }
+      Map<QName, Object> annotations = new HashMap<>(((AnnotatedObject) referencedFlow).getAnnotations());
+      annotations.put(ROOT_CONTAINER_NAME_KEY, getRootContainerName());
+      ((AnnotatedObject) referencedFlow).setAnnotations(annotations);
+
       if (referencedFlow instanceof Initialisable) {
         prepareProcessor(referencedFlow);
         if (referencedFlow instanceof MessageProcessorChain) {

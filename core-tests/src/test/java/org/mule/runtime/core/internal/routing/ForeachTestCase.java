@@ -16,20 +16,17 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.api.message.Message.of;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
+import org.mule.runtime.core.api.processor.InternalProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 import org.mule.tck.testmodels.mule.TestMessageProcessor;
-
-import java.nio.BufferOverflowException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
@@ -37,6 +34,11 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import java.nio.BufferOverflowException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
 
@@ -222,7 +224,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
 
     Foreach foreach = createForeach();
     foreach.setMuleContext(muleContext);
-    Processor failingProcessor = event -> {
+    InternalTestProcessor failingProcessor = event -> {
       throw throwable;
     };
     foreach.setMessageProcessors(singletonList(failingProcessor));
@@ -239,7 +241,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
   public void filteredErrors() throws Exception {
     Foreach foreach = createForeach();
     foreach.setMuleContext(muleContext);
-    foreach.setMessageProcessors(singletonList(event -> {
+    foreach.setMessageProcessors(singletonList((InternalTestProcessor) event -> {
       throw new RuntimeException("Expected");
     }));
     foreach.setIgnoreErrorType("ANY");
@@ -373,13 +375,18 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
 
     @Override
     public boolean matches(Object o) {
-      return o instanceof MessagingException && ((MessagingException) o).getFailingMessageProcessor() == expectedFailingProcessor;
+      return o instanceof MessagingException && ((MessagingException) o).getFailingComponent() == expectedFailingProcessor;
     }
 
     @Override
     public void describeTo(Description description) {
       description.appendText("Exception is not a MessagingException or failing processor does not match.");
     }
+  }
+
+  @FunctionalInterface
+  private interface InternalTestProcessor extends Processor, InternalProcessor {
+
   }
 
 }

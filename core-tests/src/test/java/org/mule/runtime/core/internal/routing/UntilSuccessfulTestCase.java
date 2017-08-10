@@ -21,13 +21,11 @@ import static org.mule.runtime.core.api.transaction.TransactionCoordination.getI
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
+import org.mule.runtime.core.api.processor.InternalProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-
-import java.io.ByteArrayInputStream;
-import java.util.Collection;
 
 import org.junit.After;
 import org.junit.Rule;
@@ -36,10 +34,13 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import java.io.ByteArrayInputStream;
+import java.util.Collection;
+
 @RunWith(Parameterized.class)
 public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
 
-  public static class ConfigurableMessageProcessor implements Processor {
+  public static class ConfigurableMessageProcessor implements Processor, InternalProcessor {
 
     private volatile int eventCount;
     private volatile InternalEvent event;

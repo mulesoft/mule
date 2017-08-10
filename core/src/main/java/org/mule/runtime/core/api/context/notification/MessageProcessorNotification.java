@@ -9,6 +9,7 @@ package org.mule.runtime.core.api.context.notification;
 import static org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo.createInfo;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.InternalEventContext;
 import org.mule.runtime.core.api.exception.MessagingException;
@@ -36,8 +37,8 @@ public class MessageProcessorNotification extends EnrichedServerNotification {
   }
 
   public static MessageProcessorNotification createFrom(InternalEvent event, ComponentLocation componentLocation,
-                                                        Processor processor,
-                                                        MessagingException exceptionThrown, int action) {
+                                                        AnnotatedObject processor, MessagingException exceptionThrown,
+                                                        int action) {
     EnrichedNotificationInfo notificationInfo = createInfo(event, exceptionThrown, processor);
     return new MessageProcessorNotification(notificationInfo, componentLocation, event.getContext(), action);
   }

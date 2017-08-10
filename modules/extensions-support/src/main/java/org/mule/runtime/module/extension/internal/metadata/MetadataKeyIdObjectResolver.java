@@ -17,6 +17,7 @@ import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_METADA
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.extension.api.dsql.DsqlParser.isDsqlQuery;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldValue;
+
 import org.mule.metadata.api.model.BooleanType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
@@ -29,7 +30,6 @@ import org.mule.runtime.api.metadata.MetadataKeyBuilder;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.FailureCode;
 import org.mule.runtime.api.util.Reference;
-import org.mule.runtime.core.api.component.Component;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.dsql.DsqlParser;
 import org.mule.runtime.extension.api.dsql.DsqlQuery;
@@ -66,16 +66,15 @@ final class MetadataKeyIdObjectResolver {
   }
 
   /**
-   * Given {@link MetadataKey}, return the populated key in the Type that the {@link Component}
-   * parameter requires.
+   * Given {@link MetadataKey}, return the populated key in the Type that the component parameter requires.
    *
    * @param key the {@link MetadataKey} associated to the {@link MetadataKeyId}
    * @return a new instance of the {@link MetadataKeyId} parameter {@code type} with the values of the passed {@link MetadataKey}
    * @throws MetadataResolvingException if:
-   *                                    <ul>
-   *                                    <li>Parameter types is not instantiable</li>
-   *                                    <li>{@param key} does not provide the required levels</li>
-   *                                    </ul>
+   *         <ul>
+   *         <li>Parameter types is not instantiable</li>
+   *         <li>{@param key} does not provide the required levels</li>
+   *         </ul>
    */
   public Object resolve(MetadataKey key) throws MetadataResolvingException {
     if (isKeyLess()) {
@@ -95,14 +94,14 @@ final class MetadataKeyIdObjectResolver {
   }
 
   /**
-   * Returns the populated key in the Type that the {@link Component} parameter requires by looking for default values, if no
-   * {@link MetadataKeyId} is present an empty value is returned since is a key less {@link Component}.
+   * Returns the populated key in the Type that the component parameter requires by looking for default values, if no
+   * {@link MetadataKeyId} is present an empty value is returned since is a key less component.
    * <p>
    * If a key should be built and there is at least one default value missing an {@link IllegalArgumentException} is thrown.
    *
    * @return a new instance of the {@link MetadataKeyId} parameter {@code type}.
    * @throws MetadataResolvingException if the Parameter type is not instantiable.
-   * @throws IllegalArgumentException   if cannot found the required default values for an specified key.
+   * @throws IllegalArgumentException if cannot found the required default values for an specified key.
    */
   public Object resolve() throws MetadataResolvingException {
 
@@ -139,7 +138,7 @@ final class MetadataKeyIdObjectResolver {
 
   /**
    * Given a {@link Object} representing the resolved value for a {@link MetadataKey}, generates the {@link MetadataKey} object.
-   * 
+   *
    * @param resolvedKey
    * @return {@link MetadataKey} reconstructed from the resolved object key
    * @throws MetadataResolvingException
@@ -190,7 +189,7 @@ final class MetadataKeyIdObjectResolver {
       throws MetadataResolvingException {
     try {
       DefaultObjectBuilder objectBuilder = new DefaultObjectBuilder<>(metadataKeyType);
-      fieldValueMap.forEach((f, v) -> objectBuilder.addPropertyResolver(f.getName(), new StaticValueResolver<String>(v)));
+      fieldValueMap.forEach((f, v) -> objectBuilder.addPropertyResolver(f.getName(), new StaticValueResolver<>(v)));
       return objectBuilder.build(null);
     } catch (Exception e) {
       throw buildException(format("MetadataKey object of type '%s' from the component '%s' could not be instantiated",

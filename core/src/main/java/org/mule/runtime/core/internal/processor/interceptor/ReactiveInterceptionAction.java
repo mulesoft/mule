@@ -15,11 +15,12 @@ import org.mule.runtime.api.interception.InterceptionAction;
 import org.mule.runtime.api.interception.InterceptionEvent;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.interception.DefaultInterceptionEvent;
-import org.mule.runtime.core.api.exception.MessagingException;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -61,11 +62,12 @@ class ReactiveInterceptionAction implements InterceptionAction {
 
   @Override
   public CompletableFuture<InterceptionEvent> fail(Throwable cause) {
-    Error newError = getErrorFromFailingProcessor(processor, cause, muleContext.getErrorTypeLocator());
+    Error newError = getErrorFromFailingProcessor((AnnotatedObject) processor, cause, muleContext.getErrorTypeLocator());
 
     interceptionEvent.setError(newError.getErrorType(), cause);
     CompletableFuture<InterceptionEvent> completableFuture = new CompletableFuture<>();
-    completableFuture.completeExceptionally(new MessagingException(interceptionEvent.resolve(), cause, processor));
+    completableFuture
+        .completeExceptionally(new MessagingException(interceptionEvent.resolve(), cause, (AnnotatedObject) processor));
     return completableFuture;
   }
 
@@ -74,7 +76,8 @@ class ReactiveInterceptionAction implements InterceptionAction {
     Throwable cause = new InterceptionException("");
     interceptionEvent.setError(errorType, cause);
     CompletableFuture<InterceptionEvent> completableFuture = new CompletableFuture<>();
-    completableFuture.completeExceptionally(new MessagingException(interceptionEvent.resolve(), cause, processor));
+    completableFuture
+        .completeExceptionally(new MessagingException(interceptionEvent.resolve(), cause, (AnnotatedObject) processor));
     return completableFuture;
   }
 }

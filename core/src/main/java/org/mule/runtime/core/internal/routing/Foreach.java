@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.internal.routing;
 
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.exception.MuleException.INFO_LOCATION_KEY;
 import static org.mule.runtime.core.api.processor.MessageProcessors.getProcessingStrategy;
@@ -15,6 +13,10 @@ import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContext;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static org.mule.runtime.core.internal.routing.ExpressionSplittingStrategy.DEFAULT_SPIT_EXPRESSION;
+
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.singletonList;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -121,7 +123,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
           .then(request -> Mono
               .from(processWithChildContext(request, ownedMessageProcessor, ofNullable(getLocation()))))
           .onErrorMap(MessagingException.class, e -> {
-            if (splitter.equals(e.getFailingMessageProcessor())) {
+            if (splitter.equals(e.getFailingComponent())) {
               // Make sure the context information for the exception is relative to the ForEach.
               e.getInfo().remove(INFO_LOCATION_KEY);
               return new MessagingException(event, e.getCause(), this);
@@ -219,7 +221,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
    * error.
    * <p>
    * This is useful to use validations inside this component.
-   * 
+   *
    * @param ignoreErrorType A comma separated list of error types that should be ignored when processing an item.
    */
   public void setIgnoreErrorType(String ignoreErrorType) {

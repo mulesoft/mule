@@ -56,7 +56,7 @@ public class OperationErrorHandlingTestCase extends AbstractExtensionFunctionalT
       flowRunner("cureCancer").run();
       fail();
     } catch (MessagingException messagingException) {
-      assertThat(messagingException.getFailingMessageProcessor(), is(operation));
+      assertThat(messagingException.getFailingComponent(), is(operation));
       assertThat(messagingException.getEvent(), notNullValue());
     }
   }

@@ -13,17 +13,18 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.api.exception.MuleException.INFO_LOCATION_KEY;
+
 import org.mule.runtime.api.exception.LocatedMuleException;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
-import javax.xml.namespace.QName;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import javax.xml.namespace.QName;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
@@ -35,7 +36,7 @@ public class LocatedMuleExceptionTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void namedComponent() {
-    NamedObject named = mock(NamedObject.class);
+    NamedObject named = mock(NamedObject.class, withSettings().extraInterfaces(AnnotatedObject.class));
     when(named.getName()).thenReturn("mockComponent");
     LocatedMuleException lme = new LocatedMuleException(named);
     assertThat(lme.getInfo().get(INFO_LOCATION_KEY).toString(), is("/mockComponent @ app"));
@@ -70,7 +71,7 @@ public class LocatedMuleExceptionTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void rawComponent() {
-    Object raw = mock(Object.class);
+    Object raw = mock(Object.class, withSettings().extraInterfaces(AnnotatedObject.class));
     when(raw.toString()).thenReturn("Mock@1");
 
     LocatedMuleException lme = new LocatedMuleException(raw);

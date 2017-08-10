@@ -3584,7 +3584,7 @@
           "isInterface": false,
           "isInstantiable": true,
           "isAbstract": false,
-          "isFinal": true,
+          "isFinal": false,
           "implementedInterfaces": [
             "org.mule.test.heisenberg.extension.model.Weapon"
           ],

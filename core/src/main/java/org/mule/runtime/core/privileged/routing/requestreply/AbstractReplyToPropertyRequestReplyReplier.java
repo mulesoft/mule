@@ -11,14 +11,14 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_REQU
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
-import org.mule.runtime.core.api.processor.InternalMessageProcessor;
+import org.mule.runtime.core.api.processor.InternalProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.RequestReplyReplierMessageProcessor;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.privileged.processor.AbstractInterceptingMessageProcessor;
 
 public abstract class AbstractReplyToPropertyRequestReplyReplier extends AbstractInterceptingMessageProcessor
-    implements RequestReplyReplierMessageProcessor, InternalMessageProcessor {
+    implements RequestReplyReplierMessageProcessor, InternalProcessor {
 
   @Override
   public InternalEvent process(InternalEvent event) throws MuleException {
