@@ -26,6 +26,7 @@ import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.Exp
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ExpressionFunction;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.FunctionParameter;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -129,14 +130,14 @@ public class ExtendedExpressionLanguageAdapterTestCase extends AbstractWeaveExpr
   }
 
   @Test
-  @Description("Verifies that the Message variable still works for MVEL but that it fails for DW.")
+  @Description("Verifies that the Message variable works for MVEL and DW.")
   public void messageCompatibilityVariables() throws MuleException {
     String expression = "message";
     Object mvelFlowResult = expressionLanguageAdapter.evaluate(melify(expression), testEvent(), emptyBindingContext).getValue();
     assertThat(mvelFlowResult, is(instanceOf(MessageContext.class)));
 
-    expectedException.expect(ExpressionRuntimeException.class);
-    expressionLanguageAdapter.evaluate(expression, testEvent(), emptyBindingContext).getValue();
+    Object dwFlowResult = expressionLanguageAdapter.evaluate(expression, testEvent(), emptyBindingContext).getValue();
+    assertThat(dwFlowResult, is(instanceOf(Message.class)));
   }
 
   @Test
