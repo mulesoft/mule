@@ -8,7 +8,6 @@ package org.mule.runtime.core.internal.routing.forkjoin;
 
 
 import static java.lang.Integer.MAX_VALUE;
-import static java.lang.System.currentTimeMillis;
 import static java.lang.Thread.sleep;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
@@ -16,10 +15,8 @@ import static java.util.stream.IntStream.range;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.lessThan;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.atMost;
@@ -158,17 +155,6 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
   }
 
   @Test
-  @Description("Route timeouts can occur concurrently and are still collated into RoutingResult and thrown via the use of a CompositeRoutingException.")
-  public void timeoutConcurrent() throws Throwable {
-    setupConcurrentProcessingStrategy();
-    strategy = createStrategy(processingStrategy, 4, true, 10);
-
-    expectedException.expect(instanceOf(CompositeRoutingException.class));
-    invokeStrategyBlocking(strategy, testEvent(), createRoutingPairs(10, 50),
-                           throwable -> assertCompositeRoutingException(throwable, 10));
-  }
-
-  @Test
   @Description("When executed sequentially the timeout is implemented per-route.")
   public void timeoutSequential() throws Throwable {
     strategy = createStrategy(processingStrategy, 1, true, 100);
@@ -289,11 +275,8 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
 
     int pairs = 10;
     int processorSleep = 50;
-    final long before = currentTimeMillis();
     invokeStrategyBlocking(strategy, testEvent(), createRoutingPairs(pairs, processorSleep));
 
-    // Running with concurrently strategy must take < (pairs * sleep) to complete
-    assertThat(currentTimeMillis(), is(lessThan(before + (pairs * processorSleep))));
     verify(scheduler, times(pairs)).submit(any(Runnable.class));
   }
 
@@ -316,11 +299,8 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
 
     int pairs = 10;
     int processorSleep = 50;
-    final long before = currentTimeMillis();
     invokeStrategyBlocking(strategy, testEvent(), createRoutingPairs(pairs, processorSleep));
 
-    // Running sequentially strategy must take >= (pairs * sleep) to complete
-    assertThat(currentTimeMillis(), is(greaterThanOrEqualTo(before + pairs * processorSleep)));
     verify(scheduler, never()).submit(any(Runnable.class));
   }
 
