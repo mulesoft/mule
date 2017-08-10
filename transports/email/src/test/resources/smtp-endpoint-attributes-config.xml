@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:smtp="http://www.mulesoft.org/schema/mule/smtp"
+       xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/smtp http://www.mulesoft.org/schema/mule/smtp/current/mule-smtp.xsd">
+
+    <smtp:connector name="smtpConnector">
+        <service-overrides dispatcherFactory="org.mule.transport.email.functional.SmtpEndpointAttributesTestCase$TestSmtpServiceDispatcherFactory"/>
+    </smtp:connector>
+
+    <flow name="endpointAttributesFlow">
+        <set-payload value="first-payload"/>
+        <smtp:outbound-endpoint host="localhost" port="${port1}" to="first-to@example.com" cc="first-cc@example.com" bcc="first-bcc@example.com" replyTo="first-reply-to@example.com" subject="first-subject" connector-ref="smtpConnector"/>
+        <set-payload value="second-payload"/>
+        <smtp:outbound-endpoint host="localhost" port="${port1}" to="second-to@example.com" cc="second-cc@example.com" bcc="second-bcc@example.com" replyTo="second-reply-to@example.com" subject="second-subject" connector-ref="smtpConnector"/>
+        <set-payload value="third-payload"/>
+        <smtp:outbound-endpoint host="localhost" port="${port1}" to="third-to@example.com"  connector-ref="smtpConnector"/>
+    </flow>
+    
+</mule>
