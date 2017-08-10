@@ -90,8 +90,8 @@ public class FtpMessageDispatcher extends AbstractMessageDispatcher
         try
         {
             EndpointURI uri = endpoint.getEndpointURI();
-            FTPClient client = connector.getFtp(uri);
-            connector.destroyFtp(uri, client);
+            FTPClient client = connector.getFtp(endpoint);
+            connector.destroyFtp(endpoint, client);
         }
         catch (Exception e)
         {
@@ -122,7 +122,7 @@ public class FtpMessageDispatcher extends AbstractMessageDispatcher
             {
                 if (client != null)
                 {
-                    connector.releaseFtp(endpoint.getEndpointURI(), client);
+                    connector.releaseFtp(endpoint, client);
                 }
             }
             catch (Exception e)

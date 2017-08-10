@@ -20,6 +20,7 @@ public class FtpConnectionFactory implements PoolableObjectFactory
 {
     private EndpointURI uri;
     private int connectionTimeout = 0;
+    private int responseTimeout = 0;
 
     public FtpConnectionFactory(EndpointURI uri)
     {
@@ -29,6 +30,11 @@ public class FtpConnectionFactory implements PoolableObjectFactory
     public void setConnectionTimeout(int connectionTimeout)
     {
         this.connectionTimeout = connectionTimeout;
+    }
+
+    public void setResponseTimeout(int responseTimeout)
+    {
+        this.responseTimeout = responseTimeout;
     }
 
     public Object makeObject() throws Exception
@@ -78,7 +84,7 @@ public class FtpConnectionFactory implements PoolableObjectFactory
         FTPClient client = (FTPClient) obj;
         try
         {
-            client.setSoTimeout(connectionTimeout);
+            client.setSoTimeout(responseTimeout);
             return client.sendNoOp();
         }
         catch (IOException e)

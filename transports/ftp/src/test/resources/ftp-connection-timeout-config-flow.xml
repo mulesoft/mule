@@ -14,11 +14,11 @@
 
     <flow name="flowDispatcher">
         <vm:inbound-endpoint path="in" exchange-pattern="request-response"/>
-        <ftp:outbound-endpoint host="localhost" user="admin" password="admin" port="${port1}" connector-ref="FTP"/>
+        <ftp:outbound-endpoint host="localhost" user="admin" password="admin" port="${port1}" responseTimeout="${connectionTimeout}" connector-ref="FTP"/>
     </flow>
 
     <flow name="flowReceiver">
-        <ftp:inbound-endpoint host="localhost" user="admin" password="admin" port="${port1}" connector-ref="FTP"/>
+        <ftp:inbound-endpoint host="localhost" user="admin" password="admin" port="${port1}" responseTimeout="${connectionTimeout}" connector-ref="FTP"/>
         <echo-component/>
     </flow>
 </mule>

@@ -8,7 +8,7 @@ package org.mule.transport.ftp;
 
 
 import static java.lang.Long.parseLong;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.lang.System.currentTimeMillis;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCause;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
@@ -39,7 +39,6 @@ import org.apache.ftpserver.ftplet.FtpRequest;
 import org.apache.ftpserver.ftplet.FtpSession;
 import org.apache.ftpserver.ftplet.Ftplet;
 import org.apache.ftpserver.ftplet.FtpletResult;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -75,9 +74,9 @@ public class FtpConnectionSocketTimeoutTestCase extends AbstractFtpServerTestCas
 
     private static Exception receiverException;
 
-    public FtpConnectionSocketTimeoutTestCase(ConfigVariant configVariant, String configResource, Ftplet ftpLet, String nameScenario)
+    public FtpConnectionSocketTimeoutTestCase(Ftplet ftpLet, String nameScenario)
     {
-        super(configVariant, configResource);
+        super(FLOW, "ftp-connection-timeout-config-flow.xml");
         setStartContext(false);
         this.ftplet = ftpLet;
         this.nameScenario = nameScenario;
@@ -94,9 +93,9 @@ public class FtpConnectionSocketTimeoutTestCase extends AbstractFtpServerTestCas
     public static Collection<Object[]> data()
     {
         List<Object[]> parameters = new ArrayList<>();
-        parameters.add(new Object[] {FLOW, "ftp-connection-timeout-config-flow.xml", ftpLetOnConnectSleep, "Connection Scenario"});
-        parameters.add(new Object[] {FLOW, "ftp-connection-timeout-config-flow.xml", ftpLetOnCommandSleep, "Connection Commands Scenario"});
-        parameters.add(new Object[] {FLOW, "ftp-connection-timeout-config-flow.xml", ftpLetOnNoOpCommandSleep, "NOOP Commands Scenario"});
+        parameters.add(new Object[] { ftpLetOnConnectSleep, "Connection Scenario"});
+        parameters.add(new Object[] { ftpLetOnCommandSleep, "Connection Commands Scenario"});
+        parameters.add(new Object[] { ftpLetOnNoOpCommandSleep, "NOOP Commands Scenario"});
         return parameters;
     }
 
@@ -161,14 +160,11 @@ public class FtpConnectionSocketTimeoutTestCase extends AbstractFtpServerTestCas
 
     private static void sleep()
     {
-        try
+        long now = currentTimeMillis();
+        long stopTime = now + SERVER_SLEEP;
+        while (now < stopTime)
         {
-            Thread.sleep(SERVER_SLEEP);
-        }
-        catch (InterruptedException e)
-        {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException(e);
+            now = currentTimeMillis();
         }
     }
 

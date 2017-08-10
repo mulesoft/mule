@@ -169,16 +169,16 @@ public class FtpConnector extends AbstractInboundEndpointNameableConnector
         this.connectionFactoryClass = connectionFactoryClass;
     }
 
-    public FTPClient getFtp(EndpointURI uri) throws ConnectException
+    public FTPClient getFtp(ImmutableEndpoint endpoint) throws ConnectException
     {
         FTPClient client;
         if (logger.isDebugEnabled())
         {
-            logger.debug(">>> retrieving client for " + uri);
+            logger.debug(">>> retrieving client for " + endpoint.getEndpointURI());
         }
         try
         {
-            client = (FTPClient) getFtpPool(uri).borrowObject();
+            client = (FTPClient) getFtpPool(endpoint).borrowObject();
         }
         catch(Exception e)
         {
@@ -188,31 +188,31 @@ public class FtpConnector extends AbstractInboundEndpointNameableConnector
         return client;
     }
 
-    public void releaseFtp(EndpointURI uri, FTPClient client) throws Exception
+    public void releaseFtp(ImmutableEndpoint endpoint, FTPClient client) throws Exception
     {
         if (logger.isDebugEnabled())
         {
-            logger.debug("<<< releasing client for " + uri);
+            logger.debug("<<< releasing client for " + endpoint.getEndpointURI());
         }
         if (dispatcherFactory.isCreateDispatcherPerRequest())
         {
-            destroyFtp(uri, client);
+            destroyFtp(endpoint, client);
         }
         else
         {
-            getFtpPool(uri).returnObject(client);
+            getFtpPool(endpoint).returnObject(client);
         }
     }
 
-    public void destroyFtp(EndpointURI uri, FTPClient client) throws Exception
+    public void destroyFtp(ImmutableEndpoint endpoint, FTPClient client) throws Exception
     {
         if (logger.isDebugEnabled())
         {
-            logger.debug("<<< destroying client for " + uri);
+            logger.debug("<<< destroying client for " + endpoint.getEndpointURI());
         }
         try
         {
-            getFtpPool(uri).invalidateObject(client);
+            getFtpPool(endpoint).invalidateObject(client);
         }
         catch (Exception e)
         {
@@ -221,8 +221,9 @@ public class FtpConnector extends AbstractInboundEndpointNameableConnector
         }
     }
 
-    protected synchronized ObjectPool getFtpPool(EndpointURI uri)
+    protected synchronized ObjectPool getFtpPool(ImmutableEndpoint endpoint)
     {
+        EndpointURI uri = endpoint.getEndpointURI();
         if (logger.isDebugEnabled())
         {
             logger.debug("=== get pool for " + uri);
@@ -237,6 +238,7 @@ public class FtpConnector extends AbstractInboundEndpointNameableConnector
                         (FtpConnectionFactory) ClassUtils.instanciateClass(getConnectionFactoryClass(),
                                                                             new Object[] {uri}, getClass());
                 connectionFactory.setConnectionTimeout(connectionTimeout);
+                connectionFactory.setResponseTimeout(endpoint.getResponseTimeout());
                 GenericObjectPool genericPool = createPool(connectionFactory);
                 pools.put(key, genericPool);
                 pool = genericPool;
@@ -593,7 +595,7 @@ public class FtpConnector extends AbstractInboundEndpointNameableConnector
                     RetryContext context = getRetryPolicyTemplate().execute(callbackReconnection, muleContext.getWorkManager());
                     if(client[0] != null)
                     {
-                        return storeFileStream(client[0], filename, uri);
+                        return storeFileStream(client[0], filename, endpoint);
                     }
                     else
                     {
@@ -621,7 +623,7 @@ public class FtpConnector extends AbstractInboundEndpointNameableConnector
         }
     }
 
-    private OutputStream storeFileStream(final FTPClient client, String filename, final EndpointURI uri) throws Exception
+    private OutputStream storeFileStream(final FTPClient client, String filename, final ImmutableEndpoint endpoint) throws Exception
     {
         try
         {
@@ -647,7 +649,7 @@ public class FtpConnector extends AbstractInboundEndpointNameableConnector
                                                     }
                                                     finally
                                                     {
-                                                        releaseFtp(uri, client);
+                                                        releaseFtp(endpoint, client);
                                                     }
                                                 }
                                             });
@@ -655,7 +657,7 @@ public class FtpConnector extends AbstractInboundEndpointNameableConnector
         catch (Exception e)
         {
             logger.debug("Error getting output stream: ", e);
-            releaseFtp(uri, client);
+            releaseFtp(endpoint, client);
             throw e;
         }
     }
@@ -695,7 +697,7 @@ public class FtpConnector extends AbstractInboundEndpointNameableConnector
     protected FTPClient createFtpClient(ImmutableEndpoint endpoint) throws Exception
     {
         EndpointURI uri = endpoint.getEndpointURI();
-        FTPClient client = this.getFtp(uri);
+        FTPClient client = this.getFtp(endpoint);
         client.setDataTimeout(endpoint.getResponseTimeout());
 
         this.enterActiveOrPassiveMode(client, endpoint);

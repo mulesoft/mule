@@ -43,7 +43,6 @@ import org.apache.commons.net.ftp.FTPConnectionClosedException;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPListParseEngine;
 import org.apache.commons.net.ftp.FTPReply;
-import sun.net.ftp.FtpClient;
 
 public class FtpMessageReceiver extends AbstractPollingMessageReceiver
 {
@@ -155,7 +154,7 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
             try
             {
                 RetryContext retryContext = retryTemplate.execute(callbackReconnection, this.connector.getMuleContext().getWorkManager());
-                if(client[0] != null)
+                if (client[0] != null)
                 {
                     return filesToFTPArray(client[0]);
                 }
@@ -228,7 +227,7 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
         {
             if (client != null)
             {
-                connector.releaseFtp(endpoint.getEndpointURI(), client);
+                connector.releaseFtp(endpoint, client);
             }
         }
     }
@@ -301,7 +300,7 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
             {
                 if (client != null)
                 {
-                    connector.releaseFtp(endpoint.getEndpointURI(), client);
+                    connector.releaseFtp(endpoint, client);
                 }
             }
             catch (Exception e)
@@ -396,7 +395,7 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
                     {
                         try
                         {
-                            connector.releaseFtp(endpoint.getEndpointURI(), client);
+                            connector.releaseFtp(endpoint, client);
                         }
                         catch (Exception e)
                         {
