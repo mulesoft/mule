@@ -15,19 +15,37 @@ import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
  *
  * @since 4.0
  */
-public class ConnectionProviderUtils {
+public final class ConnectionProviderUtils {
 
   private ConnectionProviderUtils() {}
 
   /**
-   * Unwraps a given connection provider if necessary
+   * Recursively unwraps a given connection provider if necessary
    *
    * @param connectionProvider connection provider to unwrap
    * @return the wrapped instance when {@code connectionProvider} is a {@link ConnectionProviderWrapper}, the same {@code connectionProvider} otherwise.
    */
   public static ConnectionProvider unwrapProviderWrapper(ConnectionProvider connectionProvider) {
-    return connectionProvider instanceof ConnectionProviderWrapper
-        ? unwrapProviderWrapper(((ConnectionProviderWrapper) connectionProvider).getDelegate())
-        : connectionProvider;
+    return unwrapProviderWrapper(connectionProvider, null);
+  }
+
+  /**
+   * Unwraps a given connection provider if necessary.
+   * <p>
+   * If {@code stopClass} is not {@code null} and the unwrapped value is an instance of such, recursion is stopped
+   * and the value returned, even if such value is actually a {@link ConnectionProviderWrapper}
+   *
+   * @param connectionProvider connection provider to unwrap
+   * @param stopClass          optional stop condition
+   * @return the wrapped instance when {@code connectionProvider} is a {@link ConnectionProviderWrapper}, the same {@code connectionProvider} otherwise.
+   */
+  public static ConnectionProvider unwrapProviderWrapper(ConnectionProvider connectionProvider,
+                                                         Class<? extends ConnectionProvider> stopClass) {
+    if (connectionProvider instanceof ConnectionProviderWrapper) {
+      if (stopClass == null || !stopClass.isInstance(connectionProvider)) {
+        return unwrapProviderWrapper(((ConnectionProviderWrapper) connectionProvider).getDelegate(), stopClass);
+      }
+    }
+    return connectionProvider;
   }
 }
