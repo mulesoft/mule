@@ -111,7 +111,7 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
 
     expectedException.expect(instanceOf(CompositeRoutingException.class));
 
-    invokeStrategyBlocking(strategy, testEvent(), asList(createRoutingPairWithSleep(of(1), 20)), throwable -> {
+    invokeStrategyBlocking(strategy, testEvent(), asList(createRoutingPairWithSleep(of(1), 50)), throwable -> {
       CompositeRoutingException compositeRoutingException = assertCompositeRoutingException(throwable, 1);
       RoutingResult routingResult = assertRoutingResult(compositeRoutingException, 0, 1);
       assertThat(routingResult.getFailures().get("0").getCause(), instanceOf(TimeoutException.class));
@@ -129,7 +129,7 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
 
     expectedException.expect(instanceOf(CompositeRoutingException.class));
 
-    invokeStrategyBlocking(strategy, testEvent(), asList(createRoutingPairWithSleep(of(1), 20), pair2),
+    invokeStrategyBlocking(strategy, testEvent(), asList(createRoutingPairWithSleep(of(1), 50), pair2),
                            throwable -> {
                              verify(pair2Processor, times(1)).process(any(InternalEvent.class));
                              CompositeRoutingException compositeRoutingException = assertCompositeRoutingException(throwable, 1);
@@ -153,7 +153,7 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
     expectedException.expectCause(instanceOf(TimeoutException.class));
 
     invokeStrategyBlocking(strategy, testEvent(),
-                           asList(createRoutingPairWithSleep(of(1), 20), pair2),
+                           asList(createRoutingPairWithSleep(of(1), 50), pair2),
                            throwable -> verify(pair2Processor, never()).process(any(InternalEvent.class)));
   }
 
@@ -164,16 +164,16 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
     strategy = createStrategy(processingStrategy, 4, true, 10);
 
     expectedException.expect(instanceOf(CompositeRoutingException.class));
-    invokeStrategyBlocking(strategy, testEvent(), createRoutingPairs(10, 20),
+    invokeStrategyBlocking(strategy, testEvent(), createRoutingPairs(10, 50),
                            throwable -> assertCompositeRoutingException(throwable, 10));
   }
 
   @Test
   @Description("When executed sequentially the timeout is implemented per-route.")
   public void timeoutSequential() throws Throwable {
-    strategy = createStrategy(processingStrategy, 1, true, 110);
+    strategy = createStrategy(processingStrategy, 1, true, 100);
 
-    invokeStrategyBlocking(strategy, testEvent(), createRoutingPairs(5, 100));
+    invokeStrategyBlocking(strategy, testEvent(), createRoutingPairs(5, 50));
   }
 
   @Test
@@ -288,7 +288,7 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
     strategy = createStrategy(processingStrategy, Integer.MAX_VALUE, true, MAX_VALUE);
 
     int pairs = 10;
-    int processorSleep = 20;
+    int processorSleep = 50;
     final long before = currentTimeMillis();
     invokeStrategyBlocking(strategy, testEvent(), createRoutingPairs(pairs, processorSleep));
 
@@ -315,7 +315,7 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
     strategy = createStrategy(processingStrategy, 1, true, MAX_VALUE);
 
     int pairs = 10;
-    int processorSleep = 20;
+    int processorSleep = 50;
     final long before = currentTimeMillis();
     invokeStrategyBlocking(strategy, testEvent(), createRoutingPairs(pairs, processorSleep));
 

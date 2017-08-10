@@ -213,8 +213,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     return stream -> from(stream)
         .transform(processingStrategy.onPipeline(pipeline))
         .doOnNext(response -> response.getContext().success(response))
-        .doOnError(throwable -> !(throwable instanceof RejectedExecutionException),
-                   throwable -> LOGGER.error("Unhandled exception in Flow ", throwable));
+        .doOnError(throwable -> LOGGER.error("Unhandled exception in Flow ", throwable));
   }
 
   protected void configureMessageProcessors(MessageProcessorChainBuilder builder) throws MuleException {
