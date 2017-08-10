@@ -23,6 +23,8 @@ import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getLayou
 import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getParameterRole;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isFlattenedParameterGroup;
 import static org.mule.runtime.extension.api.util.NameUtils.sanitizeName;
+import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getSubstitutionGroup;
+import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getBaseType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
@@ -30,7 +32,6 @@ import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.SubTypesModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.extension.api.declaration.type.TypeUtils;
 import org.mule.runtime.extension.api.declaration.type.annotation.DslBaseType;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
@@ -91,7 +92,7 @@ final class ObjectTypeSchemaDelegate {
       if (builder.isImported(type)) {
         addImportedTypeElement(paramSyntax, description, type, all, required);
       } else {
-        if (TypeUtils.getSubstitutionGroup(type).isPresent()) {
+        if (getSubstitutionGroup(type).isPresent()) {
           declareRefToType(type, paramSyntax, description, all, required);
           registerAbstractElement(type, paramSyntax);
         } else if (paramSyntax.isWrapped()) {
@@ -248,7 +249,7 @@ final class ObjectTypeSchemaDelegate {
    * @return whether or not the {@code type} requires the declaration of an abstract or concrete {@link TopLevelElement}
    */
   private boolean shouldRegisterTypeAsElement(MetadataType type, DslElementSyntax typeDsl) {
-    return typeDsl.supportsTopLevelDeclaration() || typeDsl.isWrapped() ||
+    return typeDsl.supportsTopLevelDeclaration() || typeDsl.isWrapped() || getSubstitutionGroup(type).isPresent() ||
         (type instanceof ObjectType && !builder.getTypesMapping().getSuperTypes((ObjectType) type).isEmpty());
   }
 
@@ -291,7 +292,7 @@ final class ObjectTypeSchemaDelegate {
     if (baseDsl.isPresent()) {
       return new QName(baseDsl.get().getNamespace(), getBaseTypeName(baseType), baseDsl.get().getPrefix());
     }
-    Optional<DslBaseType> base = TypeUtils.getBaseType(type);
+    Optional<DslBaseType> base = getBaseType(type);
     if (base.isPresent()) { //means that the baseType was defined by the user
       return new QName(builder.getNamespaceUri(base.get().getPrefix()), base.get().getType(), base.get().getPrefix());
     }
@@ -375,7 +376,8 @@ final class ObjectTypeSchemaDelegate {
 
     QName typeQName = getTypeQName(typeDsl, type);
     TopLevelElement abstractElement = registerAbstractElement(type, typeQName, typeDsl, baseType);
-    if (typeDsl.supportsTopLevelDeclaration() || (typeDsl.supportsChildDeclaration() && typeDsl.isWrapped()) ||
+    if (typeDsl.supportsTopLevelDeclaration() || (typeDsl.supportsChildDeclaration() && typeDsl.isWrapped())
+        || getSubstitutionGroup(type).isPresent() ||
         !builder.getTypesMapping().getSuperTypes(type).isEmpty()) {
       registerConcreteGlobalElement(typeDsl, description, abstractElement.getName(), typeQName);
     }
@@ -416,7 +418,7 @@ final class ObjectTypeSchemaDelegate {
       abstractElement.setSubstitutionGroup(substitutionGroup);
     }
     //If user defined, substitutionGroup will be overridden
-    TypeUtils.getSubstitutionGroup(type)
+    getSubstitutionGroup(type)
         .ifPresent((substitutionGroup) -> abstractElement
             .setSubstitutionGroup(builder.resolveSubstitutionGroup(substitutionGroup)));
 

@@ -13,6 +13,7 @@ import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fro
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionXmlNamespaceInfo.EXTENSION_NAMESPACE;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
+import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getSubstitutionGroup;
 
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
@@ -268,7 +269,8 @@ public class DefaultExtensionBuildingDefinitionProvider implements ExtensionBuil
       @Override
       public void visitObject(ObjectType objectType) {
         DslElementSyntax pojoDsl = dslElement.get();
-        if (pojoDsl.supportsTopLevelDeclaration() || (pojoDsl.supportsChildDeclaration() && pojoDsl.isWrapped()) ||
+        if (pojoDsl.supportsTopLevelDeclaration() || (pojoDsl.supportsChildDeclaration() && pojoDsl.isWrapped())
+            || getSubstitutionGroup(objectType).isPresent() ||
             parsingContext.getAllSubTypes().contains(objectType)) {
 
           parseWith(new ObjectTypeParameterParser(definitionBuilder, objectType, extensionClassLoader, dslSyntaxResolver,

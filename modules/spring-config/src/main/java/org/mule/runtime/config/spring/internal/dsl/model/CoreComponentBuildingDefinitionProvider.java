@@ -192,6 +192,7 @@ import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
 import org.mule.runtime.dsl.api.component.TypeConverter;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -526,16 +527,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("expression", fromSimpleParameter("expression").build())
         .withSetterParameterDefinition("timeZone", fromSimpleParameter("timeZone").build()).build());
 
-
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier(REDELIVERY_POLICY_ELEMENT_IDENTIFIER)
-        .withTypeDefinition(fromType(IdempotentRedeliveryPolicy.class))
-        .withSetterParameterDefinition("useSecureHash", fromSimpleParameter("useSecureHash").build())
-        .withSetterParameterDefinition("messageDigestAlgorithm", fromSimpleParameter("messageDigestAlgorithm").build())
-        .withSetterParameterDefinition("maxRedeliveryCount", fromSimpleParameter("maxRedeliveryCount").build())
-        .withSetterParameterDefinition("idExpression", fromSimpleParameter("idExpression").build())
-        .withSetterParameterDefinition("idExpression", fromSimpleParameter("idExpression").build())
-        .withSetterParameterDefinition("objectStore", fromSimpleReferenceParameter("object-store-ref").build()).build());
-
     componentBuildingDefinitions.add(baseDefinition.withIdentifier("configuration")
         .withTypeDefinition(fromType(MuleConfiguration.class)).withObjectFactoryType(MuleConfigurationConfigurator.class)
         .withSetterParameterDefinition("defaultErrorHandlerName",
@@ -648,13 +639,14 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("salt", fromSimpleParameter("salt").build())
         .build());
 
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier("redelivery-policy")
+    componentBuildingDefinitions.add(baseDefinition.withIdentifier(REDELIVERY_POLICY_ELEMENT_IDENTIFIER)
         .withTypeDefinition(fromType(IdempotentRedeliveryPolicy.class))
         .withSetterParameterDefinition("maxRedeliveryCount", fromSimpleParameter("maxRedeliveryCount").build())
         .withSetterParameterDefinition("useSecureHash", fromSimpleParameter("useSecureHash").build())
         .withSetterParameterDefinition("messageDigestAlgorithm", fromSimpleParameter("messageDigestAlgorithm").build())
         .withSetterParameterDefinition("idExpression", fromSimpleParameter("idExpression").build())
-        .withSetterParameterDefinition("objectStore", fromSimpleReferenceParameter("object-store-ref").build())
+        .withSetterParameterDefinition("objectStore", fromSimpleReferenceParameter("objectStore").build())
+        .withSetterParameterDefinition("privateObjectStore", fromChildConfiguration(ValueResolver.class).build())
         .build());
 
     componentBuildingDefinitions.add(baseDefinition.withIdentifier("pooling-profile")
@@ -760,7 +752,8 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("storePrefix", fromSimpleParameter("storePrefix").build())
         .withSetterParameterDefinition("throwOnUnaccepted", fromSimpleParameter("throwOnUnaccepted").build())
         .withSetterParameterDefinition("objectStore", fromSimpleReferenceParameter("objectStore").build())
-        .withSetterParameterDefinition("unacceptedMessageProcessor", fromSimpleReferenceParameter("onUnaccepted").build());
+        .withSetterParameterDefinition("unacceptedMessageProcessor", fromSimpleReferenceParameter("onUnaccepted").build())
+        .withSetterParameterDefinition("privateObjectStore", fromChildConfiguration(ValueResolver.class).build());
 
     definitions.add(baseIdempotentMessageFilterDefinition
         .withIdentifier("idempotent-message-validator")

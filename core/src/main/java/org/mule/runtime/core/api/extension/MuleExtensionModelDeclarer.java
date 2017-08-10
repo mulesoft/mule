@@ -191,6 +191,9 @@ class MuleExtensionModelDeclarer {
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("Defines the prefix of the object store names. This will only be used for the internally built object store.");
 
+    validator.withOptionalComponent("privateObjectStore")
+        .describedAs("Defines a private object store to use instead of the global one for exclusive access");
+
     validator.withErrorModel(duplicateMessageError);
   }
 
