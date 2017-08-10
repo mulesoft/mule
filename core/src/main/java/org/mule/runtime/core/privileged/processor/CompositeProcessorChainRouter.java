@@ -53,6 +53,7 @@ public class CompositeProcessorChainRouter extends AbstractAnnotatedObject imple
     InternalEvent defaultEvent = builder.variables(inputEvent.getVariables())
         .properties(inputEvent.getProperties())
         .parameters(inputEvent.getParameters())
+        .message(inputEvent.getMessage())
         .error(inputEvent.getError().orElse(null)).build();
     for (MessageProcessorChain processorChain : processorChains) {
       defaultEvent = processorChain.process(defaultEvent);
