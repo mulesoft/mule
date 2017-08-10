@@ -33,7 +33,7 @@ public class RegistryBrokerLifecycleManager extends RegistryLifecycleManager {
   }
 
   @Override
-  protected void registerPhases() {
+  protected void registerPhases(Registry registry) {
     RegistryLifecycleCallback callback = new RegistryLifecycleCallback(this);
     LifecycleCallback<AbstractRegistryBroker> emptyCallback = new EmptyLifecycleCallback<>();
     registerPhase(Initialisable.PHASE_NAME, new MuleContextInitialisePhase(), emptyCallback);

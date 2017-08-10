@@ -55,6 +55,7 @@ import org.mule.runtime.config.spring.api.dsl.processor.SimpleConfigAttribute;
 import org.mule.runtime.config.spring.api.dsl.processor.xml.XmlApplicationParser;
 import org.mule.runtime.config.spring.api.dsl.processor.xml.XmlApplicationServiceRegistry;
 import org.mule.runtime.config.spring.internal.dsl.model.ClassLoaderResourceProvider;
+import org.mule.runtime.config.spring.internal.dsl.model.ConfigurationDependencyResolver;
 import org.mule.runtime.config.spring.internal.dsl.model.MinimalApplicationModelGenerator;
 import org.mule.runtime.config.spring.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.spring.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
@@ -83,17 +84,6 @@ import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -118,6 +108,17 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.w3c.dom.Document;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+
 /**
  * <code>MuleArtifactContext</code> is a simple extension application context that allows resources to be loaded from the
  * Classpath of file system using the MuleBeanDefinitionReader.
@@ -136,6 +137,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
   private final XmlConfigurationDocumentLoader xmlConfigurationDocumentLoader;
   private final Optional<ConfigurationProperties> parentConfigurationProperties;
   private final DefaultRegistry serviceDiscoverer;
+  private final ConfigurationDependencyResolver dependencyResolver;
   protected ApplicationModel applicationModel;
   protected MuleContext muleContext;
   private Resource[] artifactConfigResources;
@@ -206,6 +208,8 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
 
     createApplicationModel();
     validateAllConfigElementHaveParsers();
+
+    this.dependencyResolver = new ConfigurationDependencyResolver(applicationModel, componentBuildingDefinitionRegistry);
   }
 
   private static Optional<Set<ExtensionModel>> getExtensionModels(ExtensionManager extensionManager) {
@@ -503,6 +507,13 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
     return createdComponentModels;
   }
 
+  /**
+   * @return a resolver for dependencies between configuration objects
+   */
+  public ConfigurationDependencyResolver getDependencyResolver() {
+    return dependencyResolver;
+  }
+
   @Override
   protected void customizeBeanFactory(DefaultListableBeanFactory beanFactory) {
     super.customizeBeanFactory(beanFactory);
@@ -602,7 +613,8 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
 
   public void initializeComponent(Location location) {
     MinimalApplicationModelGenerator minimalApplicationModelGenerator =
-        new MinimalApplicationModelGenerator(this.applicationModel, componentBuildingDefinitionRegistry);
+        new MinimalApplicationModelGenerator(new ConfigurationDependencyResolver(this.applicationModel,
+                                                                                 componentBuildingDefinitionRegistry));
     ApplicationModel minimalApplicationModel = minimalApplicationModelGenerator.getMinimalModel(location);
     createApplicationComponents((DefaultListableBeanFactory) this.getBeanFactory(), minimalApplicationModel, false);
   }

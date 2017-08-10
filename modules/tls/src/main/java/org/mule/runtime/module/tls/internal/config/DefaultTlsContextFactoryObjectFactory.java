@@ -19,10 +19,15 @@ import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
  */
 public class DefaultTlsContextFactoryObjectFactory extends AbstractAnnotatedObjectFactory<DefaultTlsContextFactory> {
 
+  private String name;
   private TlsContextKeyStoreConfiguration keyStore;
   private TlsContextTrustStoreConfiguration trustStore;
   private String enabledProtocols;
   private String enabledCipherSuites;
+
+  public void setName(String name) {
+    this.name = name;
+  }
 
   public void setKeyStore(TlsContextKeyStoreConfiguration keyStore) {
     this.keyStore = keyStore;
@@ -44,6 +49,7 @@ public class DefaultTlsContextFactoryObjectFactory extends AbstractAnnotatedObje
   public DefaultTlsContextFactory doGetObject() throws Exception {
     DefaultTlsContextFactory tlsContextFactory = new DefaultTlsContextFactory();
 
+    tlsContextFactory.setName(name);
     tlsContextFactory.setEnabledProtocols(enabledProtocols);
     tlsContextFactory.setEnabledCipherSuites(enabledCipherSuites);
 

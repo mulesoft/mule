@@ -7,7 +7,6 @@
 package org.mule.runtime.config.spring.internal;
 
 import static org.mule.runtime.config.spring.internal.MuleArtifactContext.INNER_BEAN_PREFIX;
-
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.LifecycleException;
@@ -29,6 +28,7 @@ import org.mule.runtime.core.api.lifecycle.LifecycleObject;
 import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
+import org.mule.runtime.core.api.registry.Registry;
 import org.mule.runtime.core.api.routing.OutboundRouter;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.source.MessageSource;
@@ -57,10 +57,11 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
   }
 
   @Override
-  protected void registerPhases() {
+  protected void registerPhases(Registry registry) {
     final LifecycleCallback<AbstractRegistryBroker> emptyCallback = new EmptyLifecycleCallback<>();
     registerPhase(NotInLifecyclePhase.PHASE_NAME, new NotInLifecyclePhase(), emptyCallback);
-    registerPhase(Initialisable.PHASE_NAME, new SpringContextInitialisePhase(), new SpringLifecycleCallback(this));
+    registerPhase(Initialisable.PHASE_NAME, new SpringContextInitialisePhase(),
+                  new SpringLifecycleCallback(this, (SpringRegistry) registry));
     registerPhase(Startable.PHASE_NAME, new MuleContextStartPhase(), emptyCallback);
     registerPhase(Stoppable.PHASE_NAME, new MuleContextStopPhase(), emptyCallback);
     registerPhase(Disposable.PHASE_NAME, new SpringContextDisposePhase());

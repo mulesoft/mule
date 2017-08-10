@@ -25,6 +25,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.config.spring.api.XmlConfigurationDocumentLoader;
 import org.mule.runtime.config.spring.api.dsl.model.ApplicationModel;
 import org.mule.runtime.config.spring.api.dsl.model.ComponentModel;
+import org.mule.runtime.config.spring.internal.dsl.model.ConfigurationDependencyResolver;
 import org.mule.runtime.config.spring.internal.dsl.model.MinimalApplicationModelGenerator;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigResource;
@@ -126,11 +127,13 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
   @Override
   public void initializeComponent(Location location) {
     withContextClassLoader(muleContext.getExecutionClassLoader(), () -> {
+      ConfigurationDependencyResolver dependencyResolver = new ConfigurationDependencyResolver(this.applicationModel,
+                                                                                               componentBuildingDefinitionRegistry);
       MinimalApplicationModelGenerator minimalApplicationModelGenerator =
-          new MinimalApplicationModelGenerator(this.applicationModel, componentBuildingDefinitionRegistry);
+          new MinimalApplicationModelGenerator(dependencyResolver);
 
       // First unregister any already initialized/started component
-      unregisterComponents(minimalApplicationModelGenerator.resolveComponentModelDependencies());
+      unregisterComponents(dependencyResolver.resolveComponentModelDependencies());
 
       ApplicationModel minimalApplicationModel = minimalApplicationModelGenerator.getMinimalModel(location);
       createComponents((DefaultListableBeanFactory) this.getBeanFactory(), minimalApplicationModel, false);
