@@ -34,6 +34,7 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.processor.AnnotatedProcessor;
+import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -48,13 +49,12 @@ import javax.xml.namespace.QName;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.FactoryBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import reactor.core.publisher.Mono;
 
-public class FlowRefFactoryBean extends AbstractAnnotatedObject
-    implements FactoryBean<Processor>, ApplicationContextAware, MuleContextAware {
+public class FlowRefFactoryBean extends AbstractAnnotatedObjectFactory<Processor>
+    implements ApplicationContextAware, MuleContextAware {
 
   private static final Logger LOGGER = getLogger(FlowRefFactoryBean.class);
 
@@ -67,7 +67,7 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
   }
 
   @Override
-  public Processor getObject() throws Exception {
+  public Processor doGetObject() throws Exception {
     if (refName.isEmpty()) {
       throw new MuleRuntimeException(CoreMessages.objectIsNull("flow reference is empty"));
     }
@@ -121,16 +121,6 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
     if (p instanceof MuleContextAware) {
       ((MuleContextAware) p).setMuleContext(muleContext);
     }
-  }
-
-  @Override
-  public boolean isSingleton() {
-    return true;
-  }
-
-  @Override
-  public Class<?> getObjectType() {
-    return Processor.class;
   }
 
   @Override
