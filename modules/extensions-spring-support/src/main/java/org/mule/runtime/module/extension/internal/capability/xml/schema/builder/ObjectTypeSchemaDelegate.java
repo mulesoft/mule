@@ -337,7 +337,6 @@ final class ObjectTypeSchemaDelegate {
       childElements.forEach(p -> all.getParticle().add(objectFactory.createElement(p)));
       extension.setSequence(all);
     }
-
     return complexType;
   }
 
@@ -375,7 +374,7 @@ final class ObjectTypeSchemaDelegate {
     }
 
     QName typeQName = getTypeQName(typeDsl, type);
-    TopLevelElement abstractElement = registerAbstractElement(typeQName, typeDsl, baseType);
+    TopLevelElement abstractElement = registerAbstractElement(type, typeQName, typeDsl, baseType);
     if (typeDsl.supportsTopLevelDeclaration() || (typeDsl.supportsChildDeclaration() && typeDsl.isWrapped()) ||
         !builder.getTypesMapping().getSuperTypes(type).isEmpty()) {
       registerConcreteGlobalElement(typeDsl, description, abstractElement.getName(), typeQName);
@@ -388,14 +387,13 @@ final class ObjectTypeSchemaDelegate {
 
   TopLevelElement registerAbstractElement(MetadataType type, DslElementSyntax typeDsl) {
     QName typeQName = getTypeQName(typeDsl, type);
-    TopLevelElement abstractElement = registerAbstractElement(typeQName, typeDsl, null);
-    TypeUtils.getSubstitutionGroup(type)
-        .ifPresent((substitutionGroup) -> abstractElement
-            .setSubstitutionGroup(builder.resolveSubstitutionGroup(substitutionGroup)));
+    TopLevelElement abstractElement = registerAbstractElement(type, typeQName, typeDsl, null);
+
     return abstractElement;
   }
 
-  private TopLevelElement registerAbstractElement(QName typeQName, DslElementSyntax typeDsl, ObjectType baseType) {
+  private TopLevelElement registerAbstractElement(MetadataType type, QName typeQName, DslElementSyntax typeDsl,
+                                                  ObjectType baseType) {
     TopLevelElement element = registeredGlobalElementTypes.get(typeDsl.getPrefix() + getAbstractElementName(typeDsl));
     if (element != null) {
       return element;
@@ -417,6 +415,10 @@ final class ObjectTypeSchemaDelegate {
       QName substitutionGroup = getAbstractElementSubstitutionGroup(typeDsl, baseDsl);
       abstractElement.setSubstitutionGroup(substitutionGroup);
     }
+    //If user defined, substitutionGroup will be overridden
+    TypeUtils.getSubstitutionGroup(type)
+        .ifPresent((substitutionGroup) -> abstractElement
+            .setSubstitutionGroup(builder.resolveSubstitutionGroup(substitutionGroup)));
 
     builder.getSchema().getSimpleTypeOrComplexTypeOrGroup().add(abstractElement);
     registeredGlobalElementTypes.put(typeDsl.getPrefix() + getAbstractElementName(typeDsl), abstractElement);
