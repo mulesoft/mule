@@ -35,4 +35,18 @@
         <output type="string"/>
     </operation>
 
+    <operation name="fail-propagate-same-error">
+        <parameters>
+            <parameter name="petNames" type="string"/>
+        </parameters>
+        <body>
+            <petstore:fail petNames="#[parameters.petNames]"/>
+        </body>
+        <output type="string"/>
+        <errors>
+            <error type="PETSTORE:CONNECTIVITY"/>
+            <error type="PETSTORE:RETRY_EXHAUSTED"/>
+        </errors>
+    </operation>
+
 </module>

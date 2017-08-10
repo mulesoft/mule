@@ -56,6 +56,18 @@
                     </xsd:element>
                     <xsd:element ref="output" minOccurs="0" maxOccurs="1"/>
                     <xsd:element ref="output-attributes" minOccurs="0" maxOccurs="1"/>
+                    <xsd:element name="errors" minOccurs="0" maxOccurs="1">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Collection of errors that might be thrown by the current operation.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element ref="error" minOccurs="1" maxOccurs="unbounded"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
                 </xsd:sequence>
                 <xsd:attribute name="name" use="required">
                     <xsd:annotation>
@@ -64,6 +76,23 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="error" type="errorType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Defined error for the current operation.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="errorType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:annotatedType">
+                <xsd:attribute name="type" type="xsd:string" use="required"/>
+                <xsd:attribute name="parent" type="xsd:string" use="optional"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

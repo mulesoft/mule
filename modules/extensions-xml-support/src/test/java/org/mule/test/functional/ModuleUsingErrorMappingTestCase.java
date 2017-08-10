@@ -36,35 +36,41 @@ public class ModuleUsingErrorMappingTestCase extends AbstractXmlExtensionMuleArt
     return "flows/flows-with-module-using-errormapping.xml";
   }
 
-  @Test
-  @Description("Verifies that an unmapped error is handled as ANY.")
-  public void simpleRequest() throws Exception {
-    verify("noMapping", UNMATCHED_ERROR_MESSAGE);
-  }
+//  @Test
+//  @Description("Verifies that an unmapped error is handled as ANY.")
+//  public void simpleRequest() throws Exception {
+//    verify("noMapping", UNMATCHED_ERROR_MESSAGE);
+//  }
+//
+//  @Test
+//  @Description("Verifies that a mapped error via wildcard is handled.")
+//  public void mappedRequest() throws Exception {
+//    verify("simpleMapping", CONNECT_ERROR_MESSAGE);
+//  }
+//
+//  @Test
+//  @Description("Verifies that a mapped error via a custom matcher is handled. ")
+//  public void matchingMappedRequest() throws Exception {
+//    verify("complexMapping", CONNECT_ERROR_MESSAGE);
+//  }
+//
+//  @Test
+//  @Description("Verifies that an unmapped error is handled as ANY.")
+//  public void noMatchingMappedRequest() throws Exception {
+//    verify("complexMapping", UNMATCHED_ERROR_MESSAGE, new Object());
+//  }
+//
+//  @Test
+//  @Description("Verifies that each error is correctly handled given an operation with multiple mappings.")
+//  public void multipleMappingsRequest() throws Exception {
+//    verify("multipleMappings", EXPRESSION_ERROR_MESSAGE, new Object());
+//    verify("multipleMappings", CONNECT_ERROR_MESSAGE);
+//  }
 
   @Test
   @Description("Verifies that a mapped error via wildcard is handled.")
   public void mappedRequest() throws Exception {
     verify("simpleMapping", CONNECT_ERROR_MESSAGE);
-  }
-
-  @Test
-  @Description("Verifies that a mapped error via a custom matcher is handled. ")
-  public void matchingMappedRequest() throws Exception {
-    verify("complexMapping", CONNECT_ERROR_MESSAGE);
-  }
-
-  @Test
-  @Description("Verifies that an unmapped error is handled as ANY.")
-  public void noMatchingMappedRequest() throws Exception {
-    verify("complexMapping", UNMATCHED_ERROR_MESSAGE, new Object());
-  }
-
-  @Test
-  @Description("Verifies that each error is correctly handled given an operation with multiple mappings.")
-  public void multipleMappingsRequest() throws Exception {
-    verify("multipleMappings", EXPRESSION_ERROR_MESSAGE, new Object());
-    verify("multipleMappings", CONNECT_ERROR_MESSAGE);
   }
 
   private void verify(String flowName, String expectedPayload) throws Exception {

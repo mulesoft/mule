@@ -47,6 +47,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclarer;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
+import org.mule.runtime.api.meta.model.error.ErrorModelBuilder;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
 import org.mule.runtime.config.spring.api.XmlConfigurationDocumentLoader;
 import org.mule.runtime.config.spring.api.dsl.model.ComponentModel;
@@ -148,6 +149,10 @@ public final class XmlExtensionLoaderDelegate {
       ComponentIdentifier.builder().namespace(MODULE_NAMESPACE_NAME).name("output").build();
   private static final ComponentIdentifier OPERATION_OUTPUT_ATTRIBUTES_IDENTIFIER =
       ComponentIdentifier.builder().namespace(MODULE_NAMESPACE_NAME).name("output-attributes").build();
+  private static final ComponentIdentifier OPERATION_ERRORS_IDENTIFIER =
+      ComponentIdentifier.builder().namespace(MODULE_NAMESPACE_NAME).name("errors").build();
+  private static final ComponentIdentifier OPERATION_ERROR_IDENTIFIER =
+      ComponentIdentifier.builder().namespace(MODULE_NAMESPACE_NAME).name("error").build();
   private static final ComponentIdentifier MODULE_IDENTIFIER =
       ComponentIdentifier.builder().namespace(MODULE_NAMESPACE_NAME).name(MODULE_NAMESPACE_NAME)
           .build();
@@ -343,6 +348,48 @@ public final class XmlExtensionLoaderDelegate {
     extractOperationParameters(operationDeclarer, operationModel);
     extractOutputType(operationDeclarer.withOutput(), OPERATION_OUTPUT_IDENTIFIER, operationModel);
     extractOutputType(operationDeclarer.withOutputAttributes(), OPERATION_OUTPUT_ATTRIBUTES_IDENTIFIER, operationModel);
+
+
+    Optional<ComponentModel> optionalParametersComponentModel = operationModel.getInnerComponents()
+      .stream()
+      .filter(child -> child.getIdentifier().equals(OPERATION_ERRORS_IDENTIFIER)).findAny();
+    if (optionalParametersComponentModel.isPresent()) {
+      optionalParametersComponentModel.get().getInnerComponents()
+        .stream()
+        .filter(child -> child.getIdentifier().equals(OPERATION_ERROR_IDENTIFIER))
+        .forEach(param -> {
+          final String type = param.getParameters().get("type");
+
+          final String[] split = type.split(":");
+          final String namespace = split.length == 2 ? split[0]: "CURRENTNAMSPACE".toUpperCase();
+          final String typeName = split.length == 2 ? split[1]: split[0];
+
+          final ErrorModelBuilder errorModelBuilder = ErrorModelBuilder.newError(typeName, namespace);
+
+          final String parent= param.getParameters().get("parent");
+          if (StringUtils.isNotBlank(parent)){
+            final String[] split2 = type.split(":");
+            final String namespace2 = split.length == 2 ? split2[0]: "CURRENTNAMSPACE".toUpperCase();
+            final String typeName2 = split.length == 2 ? split2[1]: split2[0];
+            errorModelBuilder.withParent(ErrorModelBuilder.newError(typeName2, namespace2).build());
+          }
+
+          operationDeclarer.withErrorModel(errorModelBuilder.build());
+        });
+    }
+
+//
+//    operationDeclarer.withErrorModel(ErrorModelBuilder
+//        .newError("typeNamePete", "namespacePete")
+//        .withParent(
+//                    ErrorModelBuilder.newError(Errors.ComponentIdentifiers.ANY)
+//                        .build())
+//        .build());
+//    operationDeclarer.withErrorModel(ErrorModelBuilder.newError("typeNamePete", "namespacePete").build());
+//    operationDeclarer.withErrorModel(ErrorModelBuilder.newError("typeNamePete", "namespacePete").build());
+//    operationDeclarer.withErrorModel(ErrorModelBuilder.newError("typeNamePete", "namespacePete").build());
+//    operationDeclarer.withErrorModel(ErrorModelBuilder.newError("typeNamePete", "namespacePete").build());
+//    operationDeclarer.withErrorModel(ErrorModelBuilder.newError("typeNamePete", "namespacePete").build());
   }
 
   // TODO MULE-12619: until the internals of ExtensionModel doesn't validate or corrects the name, this is the custom validation
