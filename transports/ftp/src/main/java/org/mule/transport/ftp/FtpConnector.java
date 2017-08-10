@@ -593,7 +593,7 @@ public class FtpConnector extends AbstractInboundEndpointNameableConnector
                 try
                 {
                     RetryContext context = getRetryPolicyTemplate().execute(callbackReconnection, muleContext.getWorkManager());
-                    if(client[0] != null)
+                    if (client[0] != null)
                     {
                         return storeFileStream(client[0], filename, endpoint);
                     }
