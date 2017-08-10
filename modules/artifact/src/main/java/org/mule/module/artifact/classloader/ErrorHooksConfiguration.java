@@ -12,7 +12,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
-import org.mule.runtime.core.api.rx.Exceptions;
 
 import org.slf4j.Logger;
 import reactor.core.publisher.Hooks;
@@ -28,7 +27,7 @@ import reactor.core.publisher.Hooks;
  */
 public class ErrorHooksConfiguration {
 
-  private static Logger logger = getLogger(Exceptions.class);
+  private static Logger logger;
 
   static {
     // Ensure reactor operatorError hook is always registered.
@@ -45,7 +44,15 @@ public class ErrorHooksConfiguration {
     });
 
     // Log dropped events/errors rather than blow up which causes cryptic timeouts and stack traces.
-    Hooks.onErrorDropped(error -> logger.error("ERROR DROPPED UNEXPECTEDLY " + error));
-    Hooks.onNextDropped(event -> logger.error("EVENT DROPPED UNEXPECTEDLY " + event));
+    Hooks.onErrorDropped(error -> logError("ERROR DROPPED UNEXPECTEDLY " + error));
+    Hooks.onNextDropped(event -> logError("EVENT DROPPED UNEXPECTEDLY " + event));
+  }
+
+  private static void logError(String message) {
+    if (logger == null) {
+      logger = getLogger(ErrorHooksConfiguration.class);
+    }
+
+    logger.error(message);
   }
 }
