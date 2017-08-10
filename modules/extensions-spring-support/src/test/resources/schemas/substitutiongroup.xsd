@@ -13,7 +13,7 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-shared-extension" abstract="true" name="abstract-some-exported-pojo"></xs:element>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" substitutionGroup="heisenberg:global-abstract-weapon" abstract="true" name="abstract-some-exported-pojo"></xs:element>
     <xs:element xmlns:sg="http://www.mulesoft.org/schema/mule/sg" substitutionGroup="sg:abstract-some-exported-pojo" name="some-exported-pojo">
         <xs:complexType>
             <xs:complexContent>
