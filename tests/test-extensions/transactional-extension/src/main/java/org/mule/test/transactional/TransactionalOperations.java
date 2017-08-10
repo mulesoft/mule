@@ -74,7 +74,7 @@ public class TransactionalOperations {
       }
 
       @Override
-      public void close() throws IOException {
+      public void close(TestTransactionalConnection connection) throws IOException {
 
       }
 

@@ -340,14 +340,21 @@
                     "format": "java",
                     "type": "String",
                     "annotations": {
-                      "typeId": "java.lang.String"
+                      "typeId": "org.mule.runtime.api.meta.TargetType",
+                      "enum": {
+                        "type": "[Ljava.lang.String;",
+                        "values": [
+                          "PAYLOAD",
+                          "MESSAGE"
+                        ]
+                      }
                     }
                   },
                   "hasDynamicType": false,
                   "required": false,
                   "isConfigOverride": false,
-                  "expressionSupport": "REQUIRED",
-                  "defaultValue": "#[payload]",
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "PAYLOAD",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": true,
@@ -361,11 +368,11 @@
                     "tabName": "Advanced"
                   },
                   "elementReferences": [],
-                  "name": "targetValue",
+                  "name": "targetType",
                   "displayModel": {
-                    "displayName": "Target Value"
+                    "displayName": "Target Output"
                   },
-                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+                  "description": "The type of the operation\u0027s output that will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -595,14 +602,21 @@
                     "format": "java",
                     "type": "String",
                     "annotations": {
-                      "typeId": "java.lang.String"
+                      "typeId": "org.mule.runtime.api.meta.TargetType",
+                      "enum": {
+                        "type": "[Ljava.lang.String;",
+                        "values": [
+                          "PAYLOAD",
+                          "MESSAGE"
+                        ]
+                      }
                     }
                   },
                   "hasDynamicType": false,
                   "required": false,
                   "isConfigOverride": false,
-                  "expressionSupport": "REQUIRED",
-                  "defaultValue": "#[payload]",
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "PAYLOAD",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": true,
@@ -616,11 +630,11 @@
                     "tabName": "Advanced"
                   },
                   "elementReferences": [],
-                  "name": "targetValue",
+                  "name": "targetType",
                   "displayModel": {
-                    "displayName": "Target Value"
+                    "displayName": "Target Output"
                   },
-                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+                  "description": "The type of the operation\u0027s output that will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -850,14 +864,21 @@
                     "format": "java",
                     "type": "String",
                     "annotations": {
-                      "typeId": "java.lang.String"
+                      "typeId": "org.mule.runtime.api.meta.TargetType",
+                      "enum": {
+                        "type": "[Ljava.lang.String;",
+                        "values": [
+                          "PAYLOAD",
+                          "MESSAGE"
+                        ]
+                      }
                     }
                   },
                   "hasDynamicType": false,
                   "required": false,
                   "isConfigOverride": false,
-                  "expressionSupport": "REQUIRED",
-                  "defaultValue": "#[payload]",
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "PAYLOAD",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": true,
@@ -871,11 +892,11 @@
                     "tabName": "Advanced"
                   },
                   "elementReferences": [],
-                  "name": "targetValue",
+                  "name": "targetType",
                   "displayModel": {
-                    "displayName": "Target Value"
+                    "displayName": "Target Output"
                   },
-                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+                  "description": "The type of the operation\u0027s output that will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -1072,14 +1093,21 @@
                     "format": "java",
                     "type": "String",
                     "annotations": {
-                      "typeId": "java.lang.String"
+                      "typeId": "org.mule.runtime.api.meta.TargetType",
+                      "enum": {
+                        "type": "[Ljava.lang.String;",
+                        "values": [
+                          "PAYLOAD",
+                          "MESSAGE"
+                        ]
+                      }
                     }
                   },
                   "hasDynamicType": false,
                   "required": false,
                   "isConfigOverride": false,
-                  "expressionSupport": "REQUIRED",
-                  "defaultValue": "#[payload]",
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "PAYLOAD",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": true,
@@ -1093,11 +1121,11 @@
                     "tabName": "Advanced"
                   },
                   "elementReferences": [],
-                  "name": "targetValue",
+                  "name": "targetType",
                   "displayModel": {
-                    "displayName": "Target Value"
+                    "displayName": "Target Output"
                   },
-                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+                  "description": "The type of the operation\u0027s output that will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -1316,14 +1344,21 @@
                     "format": "java",
                     "type": "String",
                     "annotations": {
-                      "typeId": "java.lang.String"
+                      "typeId": "org.mule.runtime.api.meta.TargetType",
+                      "enum": {
+                        "type": "[Ljava.lang.String;",
+                        "values": [
+                          "PAYLOAD",
+                          "MESSAGE"
+                        ]
+                      }
                     }
                   },
                   "hasDynamicType": false,
                   "required": false,
                   "isConfigOverride": false,
-                  "expressionSupport": "REQUIRED",
-                  "defaultValue": "#[payload]",
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "PAYLOAD",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": true,
@@ -1337,11 +1372,11 @@
                     "tabName": "Advanced"
                   },
                   "elementReferences": [],
-                  "name": "targetValue",
+                  "name": "targetType",
                   "displayModel": {
-                    "displayName": "Target Value"
+                    "displayName": "Target Output"
                   },
-                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+                  "description": "The type of the operation\u0027s output that will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -1538,14 +1573,21 @@
                     "format": "java",
                     "type": "String",
                     "annotations": {
-                      "typeId": "java.lang.String"
+                      "typeId": "org.mule.runtime.api.meta.TargetType",
+                      "enum": {
+                        "type": "[Ljava.lang.String;",
+                        "values": [
+                          "PAYLOAD",
+                          "MESSAGE"
+                        ]
+                      }
                     }
                   },
                   "hasDynamicType": false,
                   "required": false,
                   "isConfigOverride": false,
-                  "expressionSupport": "REQUIRED",
-                  "defaultValue": "#[payload]",
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "PAYLOAD",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": true,
@@ -1559,11 +1601,11 @@
                     "tabName": "Advanced"
                   },
                   "elementReferences": [],
-                  "name": "targetValue",
+                  "name": "targetType",
                   "displayModel": {
-                    "displayName": "Target Value"
+                    "displayName": "Target Output"
                   },
-                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+                  "description": "The type of the operation\u0027s output that will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -1946,14 +1988,21 @@
                     "format": "java",
                     "type": "String",
                     "annotations": {
-                      "typeId": "java.lang.String"
+                      "typeId": "org.mule.runtime.api.meta.TargetType",
+                      "enum": {
+                        "type": "[Ljava.lang.String;",
+                        "values": [
+                          "PAYLOAD",
+                          "MESSAGE"
+                        ]
+                      }
                     }
                   },
                   "hasDynamicType": false,
                   "required": false,
                   "isConfigOverride": false,
-                  "expressionSupport": "REQUIRED",
-                  "defaultValue": "#[payload]",
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "PAYLOAD",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": true,
@@ -1967,11 +2016,11 @@
                     "tabName": "Advanced"
                   },
                   "elementReferences": [],
-                  "name": "targetValue",
+                  "name": "targetType",
                   "displayModel": {
-                    "displayName": "Target Value"
+                    "displayName": "Target Output"
                   },
-                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+                  "description": "The type of the operation\u0027s output that will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -2367,14 +2416,21 @@
                     "format": "java",
                     "type": "String",
                     "annotations": {
-                      "typeId": "java.lang.String"
+                      "typeId": "org.mule.runtime.api.meta.TargetType",
+                      "enum": {
+                        "type": "[Ljava.lang.String;",
+                        "values": [
+                          "PAYLOAD",
+                          "MESSAGE"
+                        ]
+                      }
                     }
                   },
                   "hasDynamicType": false,
                   "required": false,
                   "isConfigOverride": false,
-                  "expressionSupport": "REQUIRED",
-                  "defaultValue": "#[payload]",
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "PAYLOAD",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": true,
@@ -2388,11 +2444,11 @@
                     "tabName": "Advanced"
                   },
                   "elementReferences": [],
-                  "name": "targetValue",
+                  "name": "targetType",
                   "displayModel": {
-                    "displayName": "Target Value"
+                    "displayName": "Target Output"
                   },
-                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+                  "description": "The type of the operation\u0027s output that will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -2630,14 +2686,21 @@
                     "format": "java",
                     "type": "String",
                     "annotations": {
-                      "typeId": "java.lang.String"
+                      "typeId": "org.mule.runtime.api.meta.TargetType",
+                      "enum": {
+                        "type": "[Ljava.lang.String;",
+                        "values": [
+                          "PAYLOAD",
+                          "MESSAGE"
+                        ]
+                      }
                     }
                   },
                   "hasDynamicType": false,
                   "required": false,
                   "isConfigOverride": false,
-                  "expressionSupport": "REQUIRED",
-                  "defaultValue": "#[payload]",
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "PAYLOAD",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": true,
@@ -2651,11 +2714,11 @@
                     "tabName": "Advanced"
                   },
                   "elementReferences": [],
-                  "name": "targetValue",
+                  "name": "targetType",
                   "displayModel": {
-                    "displayName": "Target Value"
+                    "displayName": "Target Output"
                   },
-                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+                  "description": "The type of the operation\u0027s output that will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -2885,14 +2948,21 @@
                     "format": "java",
                     "type": "String",
                     "annotations": {
-                      "typeId": "java.lang.String"
+                      "typeId": "org.mule.runtime.api.meta.TargetType",
+                      "enum": {
+                        "type": "[Ljava.lang.String;",
+                        "values": [
+                          "PAYLOAD",
+                          "MESSAGE"
+                        ]
+                      }
                     }
                   },
                   "hasDynamicType": false,
                   "required": false,
                   "isConfigOverride": false,
-                  "expressionSupport": "REQUIRED",
-                  "defaultValue": "#[payload]",
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "PAYLOAD",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": true,
@@ -2906,11 +2976,11 @@
                     "tabName": "Advanced"
                   },
                   "elementReferences": [],
-                  "name": "targetValue",
+                  "name": "targetType",
                   "displayModel": {
-                    "displayName": "Target Value"
+                    "displayName": "Target Output"
                   },
-                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+                  "description": "The type of the operation\u0027s output that will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -3262,14 +3332,21 @@
                     "format": "java",
                     "type": "String",
                     "annotations": {
-                      "typeId": "java.lang.String"
+                      "typeId": "org.mule.runtime.api.meta.TargetType",
+                      "enum": {
+                        "type": "[Ljava.lang.String;",
+                        "values": [
+                          "PAYLOAD",
+                          "MESSAGE"
+                        ]
+                      }
                     }
                   },
                   "hasDynamicType": false,
                   "required": false,
                   "isConfigOverride": false,
-                  "expressionSupport": "REQUIRED",
-                  "defaultValue": "#[payload]",
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "PAYLOAD",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": true,
@@ -3283,11 +3360,11 @@
                     "tabName": "Advanced"
                   },
                   "elementReferences": [],
-                  "name": "targetValue",
+                  "name": "targetType",
                   "displayModel": {
-                    "displayName": "Target Value"
+                    "displayName": "Target Output"
                   },
-                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+                  "description": "The type of the operation\u0027s output that will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -3474,14 +3551,21 @@
                     "format": "java",
                     "type": "String",
                     "annotations": {
-                      "typeId": "java.lang.String"
+                      "typeId": "org.mule.runtime.api.meta.TargetType",
+                      "enum": {
+                        "type": "[Ljava.lang.String;",
+                        "values": [
+                          "PAYLOAD",
+                          "MESSAGE"
+                        ]
+                      }
                     }
                   },
                   "hasDynamicType": false,
                   "required": false,
                   "isConfigOverride": false,
-                  "expressionSupport": "REQUIRED",
-                  "defaultValue": "#[payload]",
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "PAYLOAD",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": true,
@@ -3495,11 +3579,11 @@
                     "tabName": "Advanced"
                   },
                   "elementReferences": [],
-                  "name": "targetValue",
+                  "name": "targetType",
                   "displayModel": {
-                    "displayName": "Target Value"
+                    "displayName": "Target Output"
                   },
-                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+                  "description": "The type of the operation\u0027s output that will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -3772,14 +3856,21 @@
                     "format": "java",
                     "type": "String",
                     "annotations": {
-                      "typeId": "java.lang.String"
+                      "typeId": "org.mule.runtime.api.meta.TargetType",
+                      "enum": {
+                        "type": "[Ljava.lang.String;",
+                        "values": [
+                          "PAYLOAD",
+                          "MESSAGE"
+                        ]
+                      }
                     }
                   },
                   "hasDynamicType": false,
                   "required": false,
                   "isConfigOverride": false,
-                  "expressionSupport": "REQUIRED",
-                  "defaultValue": "#[payload]",
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "PAYLOAD",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": true,
@@ -3793,11 +3884,11 @@
                     "tabName": "Advanced"
                   },
                   "elementReferences": [],
-                  "name": "targetValue",
+                  "name": "targetType",
                   "displayModel": {
-                    "displayName": "Target Value"
+                    "displayName": "Target Output"
                   },
-                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+                  "description": "The type of the operation\u0027s output that will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -4027,14 +4118,21 @@
                     "format": "java",
                     "type": "String",
                     "annotations": {
-                      "typeId": "java.lang.String"
+                      "typeId": "org.mule.runtime.api.meta.TargetType",
+                      "enum": {
+                        "type": "[Ljava.lang.String;",
+                        "values": [
+                          "PAYLOAD",
+                          "MESSAGE"
+                        ]
+                      }
                     }
                   },
                   "hasDynamicType": false,
                   "required": false,
                   "isConfigOverride": false,
-                  "expressionSupport": "REQUIRED",
-                  "defaultValue": "#[payload]",
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "PAYLOAD",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": true,
@@ -4048,11 +4146,11 @@
                     "tabName": "Advanced"
                   },
                   "elementReferences": [],
-                  "name": "targetValue",
+                  "name": "targetType",
                   "displayModel": {
-                    "displayName": "Target Value"
+                    "displayName": "Target Output"
                   },
-                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+                  "description": "The type of the operation\u0027s output that will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -4249,14 +4347,21 @@
                     "format": "java",
                     "type": "String",
                     "annotations": {
-                      "typeId": "java.lang.String"
+                      "typeId": "org.mule.runtime.api.meta.TargetType",
+                      "enum": {
+                        "type": "[Ljava.lang.String;",
+                        "values": [
+                          "PAYLOAD",
+                          "MESSAGE"
+                        ]
+                      }
                     }
                   },
                   "hasDynamicType": false,
                   "required": false,
                   "isConfigOverride": false,
-                  "expressionSupport": "REQUIRED",
-                  "defaultValue": "#[payload]",
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "PAYLOAD",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": true,
@@ -4270,11 +4375,11 @@
                     "tabName": "Advanced"
                   },
                   "elementReferences": [],
-                  "name": "targetValue",
+                  "name": "targetType",
                   "displayModel": {
-                    "displayName": "Target Value"
+                    "displayName": "Target Output"
                   },
-                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+                  "description": "The type of the operation\u0027s output that will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -4450,14 +4555,21 @@
                     "format": "java",
                     "type": "String",
                     "annotations": {
-                      "typeId": "java.lang.String"
+                      "typeId": "org.mule.runtime.api.meta.TargetType",
+                      "enum": {
+                        "type": "[Ljava.lang.String;",
+                        "values": [
+                          "PAYLOAD",
+                          "MESSAGE"
+                        ]
+                      }
                     }
                   },
                   "hasDynamicType": false,
                   "required": false,
                   "isConfigOverride": false,
-                  "expressionSupport": "REQUIRED",
-                  "defaultValue": "#[payload]",
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "PAYLOAD",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": true,
@@ -4471,11 +4583,11 @@
                     "tabName": "Advanced"
                   },
                   "elementReferences": [],
-                  "name": "targetValue",
+                  "name": "targetType",
                   "displayModel": {
-                    "displayName": "Target Value"
+                    "displayName": "Target Output"
                   },
-                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+                  "description": "The type of the operation\u0027s output that will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -4662,14 +4774,21 @@
                     "format": "java",
                     "type": "String",
                     "annotations": {
-                      "typeId": "java.lang.String"
+                      "typeId": "org.mule.runtime.api.meta.TargetType",
+                      "enum": {
+                        "type": "[Ljava.lang.String;",
+                        "values": [
+                          "PAYLOAD",
+                          "MESSAGE"
+                        ]
+                      }
                     }
                   },
                   "hasDynamicType": false,
                   "required": false,
                   "isConfigOverride": false,
-                  "expressionSupport": "REQUIRED",
-                  "defaultValue": "#[payload]",
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "PAYLOAD",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": true,
@@ -4683,11 +4802,11 @@
                     "tabName": "Advanced"
                   },
                   "elementReferences": [],
-                  "name": "targetValue",
+                  "name": "targetType",
                   "displayModel": {
-                    "displayName": "Target Value"
+                    "displayName": "Target Output"
                   },
-                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+                  "description": "The type of the operation\u0027s output that will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -4699,6 +4818,1168 @@
             }
           ],
           "name": "outputOnlyWithoutContentParam",
+          "description": "",
+          "modelProperties": {
+            "org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty": {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "java.lang.String"
+                }
+              },
+              "parameterName": "type"
+            }
+          },
+          "kind": "operation"
+        },
+        {
+          "blocking": true,
+          "executionType": "BLOCKING",
+          "errors": [],
+          "output": {
+            "type": {
+              "format": "java",
+              "type": "Array",
+              "annotations": {
+                "typeId": "org.mule.runtime.extension.api.runtime.streaming.PagingProvider"
+              },
+              "item": {
+                "type": "@ref:org.mule.test.metadata.extension.model.animals.Animal"
+              }
+            },
+            "hasDynamicType": false,
+            "description": "",
+            "modelProperties": {}
+          },
+          "outputAttributes": {
+            "type": {
+              "format": "java",
+              "type": "Void"
+            },
+            "hasDynamicType": false,
+            "description": "",
+            "modelProperties": {}
+          },
+          "transactional": false,
+          "requiresConnection": true,
+          "supportsStreaming": true,
+          "stereotypes": [
+            {
+              "type": "PROCESSOR",
+              "namespace": "MULE",
+              "parent": {
+                "type": "ANY",
+                "namespace": "MULE"
+              }
+            }
+          ],
+          "nestedComponents": [],
+          "parameterGroupModels": [
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "@ref:org.mule.test.metadata.extension.model.animals.Animal"
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 1
+                  },
+                  "elementReferences": [],
+                  "name": "animal",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Union",
+                    "annotations": {
+                      "typeId": "java.lang.Object",
+                      "typeAlias": {
+                        "value": "StreamingStrategy"
+                      }
+                    },
+                    "of": [
+                      {
+                        "type": "Object",
+                        "annotations": {
+                          "typeId": "java.lang.Object",
+                          "typeAlias": {
+                            "value": "repeatable-in-memory-iterable"
+                          }
+                        },
+                        "fields": [
+                          {
+                            "key": {
+                              "name": "initialBufferSize"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "typeId": "java.lang.Integer",
+                                "default": "100"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "This is the amount of instances that will be initially be allowed to be kept in memory in order to consume the stream and provide random access to it. If the stream contains more data than can fit into this buffer, then it will be expanded according to the bufferSizeIncrement attribute, with an upper limit of maxInMemorySize. Default value is 100 instances."
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "bufferSizeIncrement"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "typeId": "java.lang.Integer",
+                                "default": "100"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "This is by how much will the buffer size by expanded if it exceeds its initial size. Setting a value of zero or lower will mean that the buffer should not expand, meaning that a STREAM_MAXIMUM_SIZE_EXCEEDED error will be raised when the buffer gets full. Default value is 100 instances."
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "maxBufferSize"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "typeId": "java.lang.Integer",
+                                "default": "500"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "This is the maximum amount of memory that will be used. If more than that is used then a STREAM_MAXIMUM_SIZE_EXCEEDED error will be raised. A value lower or equal to zero means no limit."
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Object",
+                        "annotations": {
+                          "typeId": "java.lang.Object",
+                          "typeAlias": {
+                            "value": "repeatable-file-store-iterable"
+                          }
+                        },
+                        "fields": [
+                          {
+                            "key": {
+                              "name": "maxInMemorySize"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "typeId": "java.lang.Integer",
+                                "default": "100"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "This is the maximum amount of instances that will be kept in memory. If more than that is required, then it will start to buffer the content on disk."
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "bufferUnit"
+                            },
+                            "model": {
+                              "type": "String",
+                              "annotations": {
+                                "typeId": "java.lang.String",
+                                "enum": {
+                                  "type": "[Ljava.lang.String;",
+                                  "values": [
+                                    "BYTE",
+                                    "KB",
+                                    "MB",
+                                    "GB"
+                                  ]
+                                },
+                                "default": "KB"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "The unit in which maxInMemorySize is expressed"
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Object",
+                        "annotations": {
+                          "typeId": "java.lang.Object",
+                          "typeAlias": {
+                            "value": "non-repeatable-iterable"
+                          },
+                          "description": {
+                            "value": "This configuration allows the stream to be read only once. It will not allow to seek randomly which will limit the transformations that DW can perform on this stream. Use this option for use cases which just require moving data around from one system to another to get optimum performance."
+                          }
+                        },
+                        "fields": []
+                      }
+                    ]
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "tabName": "Advanced"
+                  },
+                  "elementReferences": [],
+                  "name": "streamingStrategy",
+                  "description": "Configure if repeatable streams should be used and their behaviour",
+                  "modelProperties": {
+                    "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                      "value": {
+                        "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
+                        "localPart": "abstract-object-streaming-strategy",
+                        "prefix": "mule"
+                      }
+                    },
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 2
+                    }
+                  }
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "showInDsl": false,
+              "name": "General",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "tabName": "Advanced"
+                  },
+                  "elementReferences": [],
+                  "name": "target",
+                  "displayModel": {
+                    "displayName": "Target Variable"
+                  },
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "org.mule.runtime.api.meta.TargetType",
+                      "enum": {
+                        "type": "[Ljava.lang.String;",
+                        "values": [
+                          "PAYLOAD",
+                          "MESSAGE"
+                        ]
+                      }
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "PAYLOAD",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "tabName": "Advanced"
+                  },
+                  "elementReferences": [],
+                  "name": "targetType",
+                  "displayModel": {
+                    "displayName": "Target Output"
+                  },
+                  "description": "The type of the operation\u0027s output that will be stored in the target variable",
+                  "modelProperties": {}
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "showInDsl": false,
+              "name": "Output",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "name": "pagedOperationMetadata",
+          "description": "",
+          "modelProperties": {},
+          "kind": "operation"
+        },
+        {
+          "blocking": true,
+          "executionType": "BLOCKING",
+          "errors": [],
+          "output": {
+            "type": {
+              "format": "java",
+              "type": "Array",
+              "annotations": {
+                "typeId": "org.mule.runtime.extension.api.runtime.streaming.PagingProvider"
+              },
+              "item": {
+                "type": "Object",
+                "annotations": {
+                  "typeId": "org.mule.runtime.api.message.Message"
+                },
+                "fields": [
+                  {
+                    "key": {
+                      "name": "payload",
+                      "required": "true"
+                    },
+                    "model": {
+                      "type": "Object",
+                      "annotations": {
+                        "typeId": "java.lang.Object",
+                        "classInformation": {
+                          "hasDefaultConstructor": true,
+                          "isInterface": false,
+                          "isInstantiable": true,
+                          "isAbstract": false,
+                          "isFinal": false,
+                          "implementedInterfaces": [],
+                          "parent": "",
+                          "genericTypes": []
+                        },
+                        "typeAlias": {
+                          "value": "Object"
+                        }
+                      },
+                      "fields": []
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "attributes",
+                      "required": "true"
+                    },
+                    "model": {
+                      "type": "@ref:org.mule.test.metadata.extension.model.animals.Animal"
+                    }
+                  }
+                ]
+              }
+            },
+            "hasDynamicType": true,
+            "description": "",
+            "modelProperties": {}
+          },
+          "outputAttributes": {
+            "type": {
+              "format": "java",
+              "type": "Void"
+            },
+            "hasDynamicType": false,
+            "description": "",
+            "modelProperties": {}
+          },
+          "transactional": false,
+          "requiresConnection": true,
+          "supportsStreaming": true,
+          "stereotypes": [
+            {
+              "type": "PROCESSOR",
+              "namespace": "MULE",
+              "parent": {
+                "type": "ANY",
+                "namespace": "MULE"
+              }
+            }
+          ],
+          "nestedComponents": [],
+          "parameterGroupModels": [
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 1
+                  },
+                  "elementReferences": [],
+                  "name": "type",
+                  "description": "",
+                  "modelProperties": {
+                    "org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty": {
+                      "order": 1
+                    }
+                  }
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Union",
+                    "annotations": {
+                      "typeId": "java.lang.Object",
+                      "typeAlias": {
+                        "value": "StreamingStrategy"
+                      }
+                    },
+                    "of": [
+                      {
+                        "type": "Object",
+                        "annotations": {
+                          "typeId": "java.lang.Object",
+                          "typeAlias": {
+                            "value": "repeatable-in-memory-iterable"
+                          }
+                        },
+                        "fields": [
+                          {
+                            "key": {
+                              "name": "initialBufferSize"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "typeId": "java.lang.Integer",
+                                "default": "100"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "This is the amount of instances that will be initially be allowed to be kept in memory in order to consume the stream and provide random access to it. If the stream contains more data than can fit into this buffer, then it will be expanded according to the bufferSizeIncrement attribute, with an upper limit of maxInMemorySize. Default value is 100 instances."
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "bufferSizeIncrement"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "typeId": "java.lang.Integer",
+                                "default": "100"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "This is by how much will the buffer size by expanded if it exceeds its initial size. Setting a value of zero or lower will mean that the buffer should not expand, meaning that a STREAM_MAXIMUM_SIZE_EXCEEDED error will be raised when the buffer gets full. Default value is 100 instances."
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "maxBufferSize"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "typeId": "java.lang.Integer",
+                                "default": "500"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "This is the maximum amount of memory that will be used. If more than that is used then a STREAM_MAXIMUM_SIZE_EXCEEDED error will be raised. A value lower or equal to zero means no limit."
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Object",
+                        "annotations": {
+                          "typeId": "java.lang.Object",
+                          "typeAlias": {
+                            "value": "repeatable-file-store-iterable"
+                          }
+                        },
+                        "fields": [
+                          {
+                            "key": {
+                              "name": "maxInMemorySize"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "typeId": "java.lang.Integer",
+                                "default": "100"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "This is the maximum amount of instances that will be kept in memory. If more than that is required, then it will start to buffer the content on disk."
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "bufferUnit"
+                            },
+                            "model": {
+                              "type": "String",
+                              "annotations": {
+                                "typeId": "java.lang.String",
+                                "enum": {
+                                  "type": "[Ljava.lang.String;",
+                                  "values": [
+                                    "BYTE",
+                                    "KB",
+                                    "MB",
+                                    "GB"
+                                  ]
+                                },
+                                "default": "KB"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "The unit in which maxInMemorySize is expressed"
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Object",
+                        "annotations": {
+                          "typeId": "java.lang.Object",
+                          "typeAlias": {
+                            "value": "non-repeatable-iterable"
+                          },
+                          "description": {
+                            "value": "This configuration allows the stream to be read only once. It will not allow to seek randomly which will limit the transformations that DW can perform on this stream. Use this option for use cases which just require moving data around from one system to another to get optimum performance."
+                          }
+                        },
+                        "fields": []
+                      }
+                    ]
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "tabName": "Advanced"
+                  },
+                  "elementReferences": [],
+                  "name": "streamingStrategy",
+                  "description": "Configure if repeatable streams should be used and their behaviour",
+                  "modelProperties": {
+                    "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                      "value": {
+                        "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
+                        "localPart": "abstract-object-streaming-strategy",
+                        "prefix": "mule"
+                      }
+                    },
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 2
+                    }
+                  }
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "showInDsl": false,
+              "name": "General",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "tabName": "Advanced"
+                  },
+                  "elementReferences": [],
+                  "name": "target",
+                  "displayModel": {
+                    "displayName": "Target Variable"
+                  },
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "org.mule.runtime.api.meta.TargetType",
+                      "enum": {
+                        "type": "[Ljava.lang.String;",
+                        "values": [
+                          "PAYLOAD",
+                          "MESSAGE"
+                        ]
+                      }
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "PAYLOAD",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "tabName": "Advanced"
+                  },
+                  "elementReferences": [],
+                  "name": "targetType",
+                  "displayModel": {
+                    "displayName": "Target Output"
+                  },
+                  "description": "The type of the operation\u0027s output that will be stored in the target variable",
+                  "modelProperties": {}
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "showInDsl": false,
+              "name": "Output",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "name": "pagedOperationResult",
+          "description": "",
+          "modelProperties": {
+            "org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty": {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "java.lang.String"
+                }
+              },
+              "parameterName": "type"
+            }
+          },
+          "kind": "operation"
+        },
+        {
+          "blocking": true,
+          "executionType": "BLOCKING",
+          "errors": [],
+          "output": {
+            "type": {
+              "format": "java",
+              "type": "Array",
+              "annotations": {
+                "typeId": "org.mule.runtime.extension.api.runtime.streaming.PagingProvider"
+              },
+              "item": {
+                "type": "Object",
+                "annotations": {
+                  "typeId": "org.mule.runtime.api.message.Message"
+                },
+                "fields": [
+                  {
+                    "key": {
+                      "name": "payload",
+                      "required": "true"
+                    },
+                    "model": {
+                      "type": "Object",
+                      "annotations": {
+                        "typeId": "java.lang.Object",
+                        "classInformation": {
+                          "hasDefaultConstructor": true,
+                          "isInterface": false,
+                          "isInstantiable": true,
+                          "isAbstract": false,
+                          "isFinal": false,
+                          "implementedInterfaces": [],
+                          "parent": "",
+                          "genericTypes": []
+                        },
+                        "typeAlias": {
+                          "value": "Object"
+                        }
+                      },
+                      "fields": []
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "attributes",
+                      "required": "true"
+                    },
+                    "model": {
+                      "type": "Object",
+                      "annotations": {
+                        "typeId": "java.lang.Object",
+                        "classInformation": {
+                          "hasDefaultConstructor": true,
+                          "isInterface": false,
+                          "isInstantiable": true,
+                          "isAbstract": false,
+                          "isFinal": false,
+                          "implementedInterfaces": [],
+                          "parent": "",
+                          "genericTypes": []
+                        },
+                        "typeAlias": {
+                          "value": "Object"
+                        }
+                      },
+                      "fields": []
+                    }
+                  }
+                ]
+              }
+            },
+            "hasDynamicType": true,
+            "description": "",
+            "modelProperties": {}
+          },
+          "outputAttributes": {
+            "type": {
+              "format": "java",
+              "type": "Void"
+            },
+            "hasDynamicType": true,
+            "description": "",
+            "modelProperties": {}
+          },
+          "transactional": false,
+          "requiresConnection": true,
+          "supportsStreaming": true,
+          "stereotypes": [
+            {
+              "type": "PROCESSOR",
+              "namespace": "MULE",
+              "parent": {
+                "type": "ANY",
+                "namespace": "MULE"
+              }
+            }
+          ],
+          "nestedComponents": [],
+          "parameterGroupModels": [
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 1
+                  },
+                  "elementReferences": [],
+                  "name": "type",
+                  "description": "",
+                  "modelProperties": {
+                    "org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty": {
+                      "order": 1
+                    }
+                  }
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Union",
+                    "annotations": {
+                      "typeId": "java.lang.Object",
+                      "typeAlias": {
+                        "value": "StreamingStrategy"
+                      }
+                    },
+                    "of": [
+                      {
+                        "type": "Object",
+                        "annotations": {
+                          "typeId": "java.lang.Object",
+                          "typeAlias": {
+                            "value": "repeatable-in-memory-iterable"
+                          }
+                        },
+                        "fields": [
+                          {
+                            "key": {
+                              "name": "initialBufferSize"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "typeId": "java.lang.Integer",
+                                "default": "100"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "This is the amount of instances that will be initially be allowed to be kept in memory in order to consume the stream and provide random access to it. If the stream contains more data than can fit into this buffer, then it will be expanded according to the bufferSizeIncrement attribute, with an upper limit of maxInMemorySize. Default value is 100 instances."
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "bufferSizeIncrement"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "typeId": "java.lang.Integer",
+                                "default": "100"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "This is by how much will the buffer size by expanded if it exceeds its initial size. Setting a value of zero or lower will mean that the buffer should not expand, meaning that a STREAM_MAXIMUM_SIZE_EXCEEDED error will be raised when the buffer gets full. Default value is 100 instances."
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "maxBufferSize"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "typeId": "java.lang.Integer",
+                                "default": "500"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "This is the maximum amount of memory that will be used. If more than that is used then a STREAM_MAXIMUM_SIZE_EXCEEDED error will be raised. A value lower or equal to zero means no limit."
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Object",
+                        "annotations": {
+                          "typeId": "java.lang.Object",
+                          "typeAlias": {
+                            "value": "repeatable-file-store-iterable"
+                          }
+                        },
+                        "fields": [
+                          {
+                            "key": {
+                              "name": "maxInMemorySize"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "typeId": "java.lang.Integer",
+                                "default": "100"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "This is the maximum amount of instances that will be kept in memory. If more than that is required, then it will start to buffer the content on disk."
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "bufferUnit"
+                            },
+                            "model": {
+                              "type": "String",
+                              "annotations": {
+                                "typeId": "java.lang.String",
+                                "enum": {
+                                  "type": "[Ljava.lang.String;",
+                                  "values": [
+                                    "BYTE",
+                                    "KB",
+                                    "MB",
+                                    "GB"
+                                  ]
+                                },
+                                "default": "KB"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "The unit in which maxInMemorySize is expressed"
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Object",
+                        "annotations": {
+                          "typeId": "java.lang.Object",
+                          "typeAlias": {
+                            "value": "non-repeatable-iterable"
+                          },
+                          "description": {
+                            "value": "This configuration allows the stream to be read only once. It will not allow to seek randomly which will limit the transformations that DW can perform on this stream. Use this option for use cases which just require moving data around from one system to another to get optimum performance."
+                          }
+                        },
+                        "fields": []
+                      }
+                    ]
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "tabName": "Advanced"
+                  },
+                  "elementReferences": [],
+                  "name": "streamingStrategy",
+                  "description": "Configure if repeatable streams should be used and their behaviour",
+                  "modelProperties": {
+                    "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                      "value": {
+                        "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
+                        "localPart": "abstract-object-streaming-strategy",
+                        "prefix": "mule"
+                      }
+                    },
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 2
+                    }
+                  }
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "showInDsl": false,
+              "name": "General",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "tabName": "Advanced"
+                  },
+                  "elementReferences": [],
+                  "name": "target",
+                  "displayModel": {
+                    "displayName": "Target Variable"
+                  },
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "org.mule.runtime.api.meta.TargetType",
+                      "enum": {
+                        "type": "[Ljava.lang.String;",
+                        "values": [
+                          "PAYLOAD",
+                          "MESSAGE"
+                        ]
+                      }
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "PAYLOAD",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "tabName": "Advanced"
+                  },
+                  "elementReferences": [],
+                  "name": "targetType",
+                  "displayModel": {
+                    "displayName": "Target Output"
+                  },
+                  "description": "The type of the operation\u0027s output that will be stored in the target variable",
+                  "modelProperties": {}
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "showInDsl": false,
+              "name": "Output",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "name": "pagedOperationResultWithAttributesResolver",
           "description": "",
           "modelProperties": {
             "org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty": {
@@ -5245,14 +6526,21 @@
                     "format": "java",
                     "type": "String",
                     "annotations": {
-                      "typeId": "java.lang.String"
+                      "typeId": "org.mule.runtime.api.meta.TargetType",
+                      "enum": {
+                        "type": "[Ljava.lang.String;",
+                        "values": [
+                          "PAYLOAD",
+                          "MESSAGE"
+                        ]
+                      }
                     }
                   },
                   "hasDynamicType": false,
                   "required": false,
                   "isConfigOverride": false,
-                  "expressionSupport": "REQUIRED",
-                  "defaultValue": "#[payload]",
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "PAYLOAD",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": true,
@@ -5266,11 +6554,11 @@
                     "tabName": "Advanced"
                   },
                   "elementReferences": [],
-                  "name": "targetValue",
+                  "name": "targetType",
                   "displayModel": {
-                    "displayName": "Target Value"
+                    "displayName": "Target Output"
                   },
-                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+                  "description": "The type of the operation\u0027s output that will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -5569,14 +6857,21 @@
                     "format": "java",
                     "type": "String",
                     "annotations": {
-                      "typeId": "java.lang.String"
+                      "typeId": "org.mule.runtime.api.meta.TargetType",
+                      "enum": {
+                        "type": "[Ljava.lang.String;",
+                        "values": [
+                          "PAYLOAD",
+                          "MESSAGE"
+                        ]
+                      }
                     }
                   },
                   "hasDynamicType": false,
                   "required": false,
                   "isConfigOverride": false,
-                  "expressionSupport": "REQUIRED",
-                  "defaultValue": "#[payload]",
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "PAYLOAD",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": true,
@@ -5590,11 +6885,11 @@
                     "tabName": "Advanced"
                   },
                   "elementReferences": [],
-                  "name": "targetValue",
+                  "name": "targetType",
                   "displayModel": {
-                    "displayName": "Target Value"
+                    "displayName": "Target Output"
                   },
-                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+                  "description": "The type of the operation\u0027s output that will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
@@ -6615,14 +7910,21 @@
                 "format": "java",
                 "type": "String",
                 "annotations": {
-                  "typeId": "java.lang.String"
+                  "typeId": "org.mule.runtime.api.meta.TargetType",
+                  "enum": {
+                    "type": "[Ljava.lang.String;",
+                    "values": [
+                      "PAYLOAD",
+                      "MESSAGE"
+                    ]
+                  }
                 }
               },
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
-              "expressionSupport": "REQUIRED",
-              "defaultValue": "#[payload]",
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": "PAYLOAD",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
                 "allowsInlineDefinition": true,
@@ -6636,11 +7938,11 @@
                 "tabName": "Advanced"
               },
               "elementReferences": [],
-              "name": "targetValue",
+              "name": "targetType",
               "displayModel": {
-                "displayName": "Target Value"
+                "displayName": "Target Output"
               },
-              "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+              "description": "The type of the operation\u0027s output that will be stored in the target variable",
               "modelProperties": {}
             }
           ],
@@ -6814,14 +8116,21 @@
                 "format": "java",
                 "type": "String",
                 "annotations": {
-                  "typeId": "java.lang.String"
+                  "typeId": "org.mule.runtime.api.meta.TargetType",
+                  "enum": {
+                    "type": "[Ljava.lang.String;",
+                    "values": [
+                      "PAYLOAD",
+                      "MESSAGE"
+                    ]
+                  }
                 }
               },
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
-              "expressionSupport": "REQUIRED",
-              "defaultValue": "#[payload]",
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": "PAYLOAD",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
                 "allowsInlineDefinition": true,
@@ -6835,11 +8144,11 @@
                 "tabName": "Advanced"
               },
               "elementReferences": [],
-              "name": "targetValue",
+              "name": "targetType",
               "displayModel": {
-                "displayName": "Target Value"
+                "displayName": "Target Output"
               },
-              "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+              "description": "The type of the operation\u0027s output that will be stored in the target variable",
               "modelProperties": {}
             }
           ],
@@ -7007,14 +8316,21 @@
                 "format": "java",
                 "type": "String",
                 "annotations": {
-                  "typeId": "java.lang.String"
+                  "typeId": "org.mule.runtime.api.meta.TargetType",
+                  "enum": {
+                    "type": "[Ljava.lang.String;",
+                    "values": [
+                      "PAYLOAD",
+                      "MESSAGE"
+                    ]
+                  }
                 }
               },
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
-              "expressionSupport": "REQUIRED",
-              "defaultValue": "#[payload]",
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": "PAYLOAD",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
                 "allowsInlineDefinition": true,
@@ -7028,11 +8344,11 @@
                 "tabName": "Advanced"
               },
               "elementReferences": [],
-              "name": "targetValue",
+              "name": "targetType",
               "displayModel": {
-                "displayName": "Target Value"
+                "displayName": "Target Output"
               },
-              "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+              "description": "The type of the operation\u0027s output that will be stored in the target variable",
               "modelProperties": {}
             }
           ],
@@ -7167,14 +8483,21 @@
                 "format": "java",
                 "type": "String",
                 "annotations": {
-                  "typeId": "java.lang.String"
+                  "typeId": "org.mule.runtime.api.meta.TargetType",
+                  "enum": {
+                    "type": "[Ljava.lang.String;",
+                    "values": [
+                      "PAYLOAD",
+                      "MESSAGE"
+                    ]
+                  }
                 }
               },
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
-              "expressionSupport": "REQUIRED",
-              "defaultValue": "#[payload]",
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": "PAYLOAD",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
                 "allowsInlineDefinition": true,
@@ -7188,11 +8511,11 @@
                 "tabName": "Advanced"
               },
               "elementReferences": [],
-              "name": "targetValue",
+              "name": "targetType",
               "displayModel": {
-                "displayName": "Target Value"
+                "displayName": "Target Output"
               },
-              "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+              "description": "The type of the operation\u0027s output that will be stored in the target variable",
               "modelProperties": {}
             }
           ],
@@ -7343,14 +8666,21 @@
                 "format": "java",
                 "type": "String",
                 "annotations": {
-                  "typeId": "java.lang.String"
+                  "typeId": "org.mule.runtime.api.meta.TargetType",
+                  "enum": {
+                    "type": "[Ljava.lang.String;",
+                    "values": [
+                      "PAYLOAD",
+                      "MESSAGE"
+                    ]
+                  }
                 }
               },
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
-              "expressionSupport": "REQUIRED",
-              "defaultValue": "#[payload]",
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": "PAYLOAD",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
                 "allowsInlineDefinition": true,
@@ -7364,11 +8694,11 @@
                 "tabName": "Advanced"
               },
               "elementReferences": [],
-              "name": "targetValue",
+              "name": "targetType",
               "displayModel": {
-                "displayName": "Target Value"
+                "displayName": "Target Output"
               },
-              "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+              "description": "The type of the operation\u0027s output that will be stored in the target variable",
               "modelProperties": {}
             }
           ],
@@ -7471,14 +8801,21 @@
                 "format": "java",
                 "type": "String",
                 "annotations": {
-                  "typeId": "java.lang.String"
+                  "typeId": "org.mule.runtime.api.meta.TargetType",
+                  "enum": {
+                    "type": "[Ljava.lang.String;",
+                    "values": [
+                      "PAYLOAD",
+                      "MESSAGE"
+                    ]
+                  }
                 }
               },
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
-              "expressionSupport": "REQUIRED",
-              "defaultValue": "#[payload]",
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": "PAYLOAD",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
                 "allowsInlineDefinition": true,
@@ -7492,11 +8829,11 @@
                 "tabName": "Advanced"
               },
               "elementReferences": [],
-              "name": "targetValue",
+              "name": "targetType",
               "displayModel": {
-                "displayName": "Target Value"
+                "displayName": "Target Output"
               },
-              "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+              "description": "The type of the operation\u0027s output that will be stored in the target variable",
               "modelProperties": {}
             }
           ],
@@ -7588,14 +8925,21 @@
                 "format": "java",
                 "type": "String",
                 "annotations": {
-                  "typeId": "java.lang.String"
+                  "typeId": "org.mule.runtime.api.meta.TargetType",
+                  "enum": {
+                    "type": "[Ljava.lang.String;",
+                    "values": [
+                      "PAYLOAD",
+                      "MESSAGE"
+                    ]
+                  }
                 }
               },
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
-              "expressionSupport": "REQUIRED",
-              "defaultValue": "#[payload]",
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": "PAYLOAD",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
                 "allowsInlineDefinition": true,
@@ -7609,11 +8953,11 @@
                 "tabName": "Advanced"
               },
               "elementReferences": [],
-              "name": "targetValue",
+              "name": "targetType",
               "displayModel": {
-                "displayName": "Target Value"
+                "displayName": "Target Output"
               },
-              "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+              "description": "The type of the operation\u0027s output that will be stored in the target variable",
               "modelProperties": {}
             }
           ],
@@ -7764,14 +9108,21 @@
                 "format": "java",
                 "type": "String",
                 "annotations": {
-                  "typeId": "java.lang.String"
+                  "typeId": "org.mule.runtime.api.meta.TargetType",
+                  "enum": {
+                    "type": "[Ljava.lang.String;",
+                    "values": [
+                      "PAYLOAD",
+                      "MESSAGE"
+                    ]
+                  }
                 }
               },
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
-              "expressionSupport": "REQUIRED",
-              "defaultValue": "#[payload]",
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": "PAYLOAD",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
                 "allowsInlineDefinition": true,
@@ -7785,11 +9136,11 @@
                 "tabName": "Advanced"
               },
               "elementReferences": [],
-              "name": "targetValue",
+              "name": "targetType",
               "displayModel": {
-                "displayName": "Target Value"
+                "displayName": "Target Output"
               },
-              "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+              "description": "The type of the operation\u0027s output that will be stored in the target variable",
               "modelProperties": {}
             }
           ],
@@ -7801,1147 +9152,6 @@
         }
       ],
       "name": "outputAttributesWithDynamicMetadata",
-      "description": "",
-      "modelProperties": {
-        "org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty": {
-          "type": {
-            "format": "java",
-            "type": "String",
-            "annotations": {
-              "typeId": "java.lang.String"
-            }
-          },
-          "parameterName": "type"
-        }
-      },
-      "kind": "operation"
-    },
-    {
-      "blocking": true,
-      "executionType": "BLOCKING",
-      "errors": [],
-      "output": {
-        "type": {
-          "format": "java",
-          "type": "Array",
-          "annotations": {
-            "typeId": "org.mule.runtime.extension.api.runtime.streaming.PagingProvider"
-          },
-          "item": {
-            "type": "@ref:org.mule.test.metadata.extension.model.animals.Animal"
-          }
-        },
-        "hasDynamicType": false,
-        "description": "",
-        "modelProperties": {}
-      },
-      "outputAttributes": {
-        "type": {
-          "format": "java",
-          "type": "Void"
-        },
-        "hasDynamicType": false,
-        "description": "",
-        "modelProperties": {}
-      },
-      "transactional": false,
-      "requiresConnection": true,
-      "supportsStreaming": true,
-      "stereotypes": [
-        {
-          "type": "PROCESSOR",
-          "namespace": "MULE",
-          "parent": {
-            "type": "ANY",
-            "namespace": "MULE"
-          }
-        }
-      ],
-      "nestedComponents": [],
-      "parameterGroupModels": [
-        {
-          "parameters": [
-            {
-              "type": {
-                "format": "java",
-                "type": "@ref:org.mule.test.metadata.extension.model.animals.Animal"
-              },
-              "hasDynamicType": false,
-              "required": true,
-              "isConfigOverride": false,
-              "expressionSupport": "SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 1
-              },
-              "elementReferences": [],
-              "name": "animal",
-              "description": "",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "Union",
-                "annotations": {
-                  "typeId": "java.lang.Object",
-                  "typeAlias": {
-                    "value": "StreamingStrategy"
-                  }
-                },
-                "of": [
-                  {
-                    "type": "Object",
-                    "annotations": {
-                      "typeId": "java.lang.Object",
-                      "typeAlias": {
-                        "value": "repeatable-in-memory-iterable"
-                      }
-                    },
-                    "fields": [
-                      {
-                        "key": {
-                          "name": "initialBufferSize"
-                        },
-                        "model": {
-                          "type": "Number",
-                          "annotations": {
-                            "int": {},
-                            "typeId": "java.lang.Integer",
-                            "default": "100"
-                          }
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "This is the amount of instances that will be initially be allowed to be kept in memory in order to consume the stream and provide random access to it. If the stream contains more data than can fit into this buffer, then it will be expanded according to the bufferSizeIncrement attribute, with an upper limit of maxInMemorySize. Default value is 100 instances."
-                          }
-                        }
-                      },
-                      {
-                        "key": {
-                          "name": "bufferSizeIncrement"
-                        },
-                        "model": {
-                          "type": "Number",
-                          "annotations": {
-                            "int": {},
-                            "typeId": "java.lang.Integer",
-                            "default": "100"
-                          }
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "This is by how much will the buffer size by expanded if it exceeds its initial size. Setting a value of zero or lower will mean that the buffer should not expand, meaning that a STREAM_MAXIMUM_SIZE_EXCEEDED error will be raised when the buffer gets full. Default value is 100 instances."
-                          }
-                        }
-                      },
-                      {
-                        "key": {
-                          "name": "maxBufferSize"
-                        },
-                        "model": {
-                          "type": "Number",
-                          "annotations": {
-                            "int": {},
-                            "typeId": "java.lang.Integer",
-                            "default": "500"
-                          }
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "This is the maximum amount of memory that will be used. If more than that is used then a STREAM_MAXIMUM_SIZE_EXCEEDED error will be raised. A value lower or equal to zero means no limit."
-                          }
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "type": "Object",
-                    "annotations": {
-                      "typeId": "java.lang.Object",
-                      "typeAlias": {
-                        "value": "repeatable-file-store-iterable"
-                      }
-                    },
-                    "fields": [
-                      {
-                        "key": {
-                          "name": "maxInMemorySize"
-                        },
-                        "model": {
-                          "type": "Number",
-                          "annotations": {
-                            "int": {},
-                            "typeId": "java.lang.Integer",
-                            "default": "100"
-                          }
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "This is the maximum amount of instances that will be kept in memory. If more than that is required, then it will start to buffer the content on disk."
-                          }
-                        }
-                      },
-                      {
-                        "key": {
-                          "name": "bufferUnit"
-                        },
-                        "model": {
-                          "type": "String",
-                          "annotations": {
-                            "typeId": "java.lang.String",
-                            "enum": {
-                              "type": "[Ljava.lang.String;",
-                              "values": [
-                                "BYTE",
-                                "KB",
-                                "MB",
-                                "GB"
-                              ]
-                            },
-                            "default": "KB"
-                          }
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "The unit in which maxInMemorySize is expressed"
-                          }
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "type": "Object",
-                    "annotations": {
-                      "typeId": "java.lang.Object",
-                      "typeAlias": {
-                        "value": "non-repeatable-iterable"
-                      },
-                      "description": {
-                        "value": "This configuration allows the stream to be read only once. It will not allow to seek randomly which will limit the transformations that DW can perform on this stream. Use this option for use cases which just require moving data around from one system to another to get optimum performance."
-                      }
-                    },
-                    "fields": []
-                  }
-                ]
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "NOT_SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": false,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "tabName": "Advanced"
-              },
-              "elementReferences": [],
-              "name": "streamingStrategy",
-              "description": "Configure if repeatable streams should be used and their behaviour",
-              "modelProperties": {
-                "org.mule.runtime.extension.internal.property.QNameModelProperty": {
-                  "value": {
-                    "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
-                    "localPart": "abstract-object-streaming-strategy",
-                    "prefix": "mule"
-                  }
-                },
-                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
-                  "sequence": 2
-                }
-              }
-            }
-          ],
-          "exclusiveParametersModels": [],
-          "showInDsl": false,
-          "name": "General",
-          "description": "",
-          "modelProperties": {}
-        },
-        {
-          "parameters": [
-            {
-              "type": {
-                "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "NOT_SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "tabName": "Advanced"
-              },
-              "elementReferences": [],
-              "name": "target",
-              "displayModel": {
-                "displayName": "Target Variable"
-              },
-              "description": "The name of a variable on which the operation\u0027s output will be placed",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "REQUIRED",
-              "defaultValue": "#[payload]",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "tabName": "Advanced"
-              },
-              "elementReferences": [],
-              "name": "targetValue",
-              "displayModel": {
-                "displayName": "Target Value"
-              },
-              "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
-              "modelProperties": {}
-            }
-          ],
-          "exclusiveParametersModels": [],
-          "showInDsl": false,
-          "name": "Output",
-          "description": "",
-          "modelProperties": {}
-        }
-      ],
-      "name": "pagedOperationMetadata",
-      "description": "",
-      "modelProperties": {},
-      "kind": "operation"
-    },
-    {
-      "blocking": true,
-      "executionType": "BLOCKING",
-      "errors": [],
-      "output": {
-        "type": {
-          "format": "java",
-          "type": "Array",
-          "annotations": {
-            "typeId": "org.mule.runtime.extension.api.runtime.streaming.PagingProvider"
-          },
-          "item": {
-            "type": "Object",
-            "annotations": {
-              "typeId": "org.mule.runtime.api.message.Message"
-            },
-            "fields": [
-              {
-                "key": {
-                  "name": "payload",
-                  "required": "true"
-                },
-                "model": {
-                  "type": "Object",
-                  "annotations": {
-                    "typeId": "java.lang.Object",
-                    "classInformation": {
-                      "hasDefaultConstructor": true,
-                      "isInterface": false,
-                      "isInstantiable": true,
-                      "isAbstract": false,
-                      "isFinal": false,
-                      "implementedInterfaces": [],
-                      "parent": "",
-                      "genericTypes": []
-                    },
-                    "typeAlias": {
-                      "value": "Object"
-                    }
-                  },
-                  "fields": []
-                }
-              },
-              {
-                "key": {
-                  "name": "attributes",
-                  "required": "true"
-                },
-                "model": {
-                  "type": "@ref:org.mule.test.metadata.extension.model.animals.Animal"
-                }
-              }
-            ]
-          }
-        },
-        "hasDynamicType": true,
-        "description": "",
-        "modelProperties": {}
-      },
-      "outputAttributes": {
-        "type": {
-          "format": "java",
-          "type": "Void"
-        },
-        "hasDynamicType": false,
-        "description": "",
-        "modelProperties": {}
-      },
-      "transactional": false,
-      "requiresConnection": true,
-      "supportsStreaming": true,
-      "stereotypes": [
-        {
-          "type": "PROCESSOR",
-          "namespace": "MULE",
-          "parent": {
-            "type": "ANY",
-            "namespace": "MULE"
-          }
-        }
-      ],
-      "nestedComponents": [],
-      "parameterGroupModels": [
-        {
-          "parameters": [
-            {
-              "type": {
-                "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
-              },
-              "hasDynamicType": false,
-              "required": true,
-              "isConfigOverride": false,
-              "expressionSupport": "SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 1
-              },
-              "elementReferences": [],
-              "name": "type",
-              "description": "",
-              "modelProperties": {
-                "org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty": {
-                  "order": 1
-                }
-              }
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "Union",
-                "annotations": {
-                  "typeId": "java.lang.Object",
-                  "typeAlias": {
-                    "value": "StreamingStrategy"
-                  }
-                },
-                "of": [
-                  {
-                    "type": "Object",
-                    "annotations": {
-                      "typeId": "java.lang.Object",
-                      "typeAlias": {
-                        "value": "repeatable-in-memory-iterable"
-                      }
-                    },
-                    "fields": [
-                      {
-                        "key": {
-                          "name": "initialBufferSize"
-                        },
-                        "model": {
-                          "type": "Number",
-                          "annotations": {
-                            "int": {},
-                            "typeId": "java.lang.Integer",
-                            "default": "100"
-                          }
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "This is the amount of instances that will be initially be allowed to be kept in memory in order to consume the stream and provide random access to it. If the stream contains more data than can fit into this buffer, then it will be expanded according to the bufferSizeIncrement attribute, with an upper limit of maxInMemorySize. Default value is 100 instances."
-                          }
-                        }
-                      },
-                      {
-                        "key": {
-                          "name": "bufferSizeIncrement"
-                        },
-                        "model": {
-                          "type": "Number",
-                          "annotations": {
-                            "int": {},
-                            "typeId": "java.lang.Integer",
-                            "default": "100"
-                          }
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "This is by how much will the buffer size by expanded if it exceeds its initial size. Setting a value of zero or lower will mean that the buffer should not expand, meaning that a STREAM_MAXIMUM_SIZE_EXCEEDED error will be raised when the buffer gets full. Default value is 100 instances."
-                          }
-                        }
-                      },
-                      {
-                        "key": {
-                          "name": "maxBufferSize"
-                        },
-                        "model": {
-                          "type": "Number",
-                          "annotations": {
-                            "int": {},
-                            "typeId": "java.lang.Integer",
-                            "default": "500"
-                          }
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "This is the maximum amount of memory that will be used. If more than that is used then a STREAM_MAXIMUM_SIZE_EXCEEDED error will be raised. A value lower or equal to zero means no limit."
-                          }
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "type": "Object",
-                    "annotations": {
-                      "typeId": "java.lang.Object",
-                      "typeAlias": {
-                        "value": "repeatable-file-store-iterable"
-                      }
-                    },
-                    "fields": [
-                      {
-                        "key": {
-                          "name": "maxInMemorySize"
-                        },
-                        "model": {
-                          "type": "Number",
-                          "annotations": {
-                            "int": {},
-                            "typeId": "java.lang.Integer",
-                            "default": "100"
-                          }
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "This is the maximum amount of instances that will be kept in memory. If more than that is required, then it will start to buffer the content on disk."
-                          }
-                        }
-                      },
-                      {
-                        "key": {
-                          "name": "bufferUnit"
-                        },
-                        "model": {
-                          "type": "String",
-                          "annotations": {
-                            "typeId": "java.lang.String",
-                            "enum": {
-                              "type": "[Ljava.lang.String;",
-                              "values": [
-                                "BYTE",
-                                "KB",
-                                "MB",
-                                "GB"
-                              ]
-                            },
-                            "default": "KB"
-                          }
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "The unit in which maxInMemorySize is expressed"
-                          }
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "type": "Object",
-                    "annotations": {
-                      "typeId": "java.lang.Object",
-                      "typeAlias": {
-                        "value": "non-repeatable-iterable"
-                      },
-                      "description": {
-                        "value": "This configuration allows the stream to be read only once. It will not allow to seek randomly which will limit the transformations that DW can perform on this stream. Use this option for use cases which just require moving data around from one system to another to get optimum performance."
-                      }
-                    },
-                    "fields": []
-                  }
-                ]
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "NOT_SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": false,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "tabName": "Advanced"
-              },
-              "elementReferences": [],
-              "name": "streamingStrategy",
-              "description": "Configure if repeatable streams should be used and their behaviour",
-              "modelProperties": {
-                "org.mule.runtime.extension.internal.property.QNameModelProperty": {
-                  "value": {
-                    "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
-                    "localPart": "abstract-object-streaming-strategy",
-                    "prefix": "mule"
-                  }
-                },
-                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
-                  "sequence": 2
-                }
-              }
-            }
-          ],
-          "exclusiveParametersModels": [],
-          "showInDsl": false,
-          "name": "General",
-          "description": "",
-          "modelProperties": {}
-        },
-        {
-          "parameters": [
-            {
-              "type": {
-                "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "NOT_SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "tabName": "Advanced"
-              },
-              "elementReferences": [],
-              "name": "target",
-              "displayModel": {
-                "displayName": "Target Variable"
-              },
-              "description": "The name of a variable on which the operation\u0027s output will be placed",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "REQUIRED",
-              "defaultValue": "#[payload]",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "tabName": "Advanced"
-              },
-              "elementReferences": [],
-              "name": "targetValue",
-              "displayModel": {
-                "displayName": "Target Value"
-              },
-              "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
-              "modelProperties": {}
-            }
-          ],
-          "exclusiveParametersModels": [],
-          "showInDsl": false,
-          "name": "Output",
-          "description": "",
-          "modelProperties": {}
-        }
-      ],
-      "name": "pagedOperationResult",
-      "description": "",
-      "modelProperties": {
-        "org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty": {
-          "type": {
-            "format": "java",
-            "type": "String",
-            "annotations": {
-              "typeId": "java.lang.String"
-            }
-          },
-          "parameterName": "type"
-        }
-      },
-      "kind": "operation"
-    },
-    {
-      "blocking": true,
-      "executionType": "BLOCKING",
-      "errors": [],
-      "output": {
-        "type": {
-          "format": "java",
-          "type": "Array",
-          "annotations": {
-            "typeId": "org.mule.runtime.extension.api.runtime.streaming.PagingProvider"
-          },
-          "item": {
-            "type": "Object",
-            "annotations": {
-              "typeId": "org.mule.runtime.api.message.Message"
-            },
-            "fields": [
-              {
-                "key": {
-                  "name": "payload",
-                  "required": "true"
-                },
-                "model": {
-                  "type": "Object",
-                  "annotations": {
-                    "typeId": "java.lang.Object",
-                    "classInformation": {
-                      "hasDefaultConstructor": true,
-                      "isInterface": false,
-                      "isInstantiable": true,
-                      "isAbstract": false,
-                      "isFinal": false,
-                      "implementedInterfaces": [],
-                      "parent": "",
-                      "genericTypes": []
-                    },
-                    "typeAlias": {
-                      "value": "Object"
-                    }
-                  },
-                  "fields": []
-                }
-              },
-              {
-                "key": {
-                  "name": "attributes",
-                  "required": "true"
-                },
-                "model": {
-                  "type": "Object",
-                  "annotations": {
-                    "typeId": "java.lang.Object",
-                    "classInformation": {
-                      "hasDefaultConstructor": true,
-                      "isInterface": false,
-                      "isInstantiable": true,
-                      "isAbstract": false,
-                      "isFinal": false,
-                      "implementedInterfaces": [],
-                      "parent": "",
-                      "genericTypes": []
-                    },
-                    "typeAlias": {
-                      "value": "Object"
-                    }
-                  },
-                  "fields": []
-                }
-              }
-            ]
-          }
-        },
-        "hasDynamicType": true,
-        "description": "",
-        "modelProperties": {}
-      },
-      "outputAttributes": {
-        "type": {
-          "format": "java",
-          "type": "Void"
-        },
-        "hasDynamicType": true,
-        "description": "",
-        "modelProperties": {}
-      },
-      "transactional": false,
-      "requiresConnection": true,
-      "supportsStreaming": true,
-      "stereotypes": [
-        {
-          "type": "PROCESSOR",
-          "namespace": "MULE",
-          "parent": {
-            "type": "ANY",
-            "namespace": "MULE"
-          }
-        }
-      ],
-      "nestedComponents": [],
-      "parameterGroupModels": [
-        {
-          "parameters": [
-            {
-              "type": {
-                "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
-              },
-              "hasDynamicType": false,
-              "required": true,
-              "isConfigOverride": false,
-              "expressionSupport": "SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 1
-              },
-              "elementReferences": [],
-              "name": "type",
-              "description": "",
-              "modelProperties": {
-                "org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty": {
-                  "order": 1
-                }
-              }
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "Union",
-                "annotations": {
-                  "typeId": "java.lang.Object",
-                  "typeAlias": {
-                    "value": "StreamingStrategy"
-                  }
-                },
-                "of": [
-                  {
-                    "type": "Object",
-                    "annotations": {
-                      "typeId": "java.lang.Object",
-                      "typeAlias": {
-                        "value": "repeatable-in-memory-iterable"
-                      }
-                    },
-                    "fields": [
-                      {
-                        "key": {
-                          "name": "initialBufferSize"
-                        },
-                        "model": {
-                          "type": "Number",
-                          "annotations": {
-                            "int": {},
-                            "typeId": "java.lang.Integer",
-                            "default": "100"
-                          }
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "This is the amount of instances that will be initially be allowed to be kept in memory in order to consume the stream and provide random access to it. If the stream contains more data than can fit into this buffer, then it will be expanded according to the bufferSizeIncrement attribute, with an upper limit of maxInMemorySize. Default value is 100 instances."
-                          }
-                        }
-                      },
-                      {
-                        "key": {
-                          "name": "bufferSizeIncrement"
-                        },
-                        "model": {
-                          "type": "Number",
-                          "annotations": {
-                            "int": {},
-                            "typeId": "java.lang.Integer",
-                            "default": "100"
-                          }
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "This is by how much will the buffer size by expanded if it exceeds its initial size. Setting a value of zero or lower will mean that the buffer should not expand, meaning that a STREAM_MAXIMUM_SIZE_EXCEEDED error will be raised when the buffer gets full. Default value is 100 instances."
-                          }
-                        }
-                      },
-                      {
-                        "key": {
-                          "name": "maxBufferSize"
-                        },
-                        "model": {
-                          "type": "Number",
-                          "annotations": {
-                            "int": {},
-                            "typeId": "java.lang.Integer",
-                            "default": "500"
-                          }
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "This is the maximum amount of memory that will be used. If more than that is used then a STREAM_MAXIMUM_SIZE_EXCEEDED error will be raised. A value lower or equal to zero means no limit."
-                          }
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "type": "Object",
-                    "annotations": {
-                      "typeId": "java.lang.Object",
-                      "typeAlias": {
-                        "value": "repeatable-file-store-iterable"
-                      }
-                    },
-                    "fields": [
-                      {
-                        "key": {
-                          "name": "maxInMemorySize"
-                        },
-                        "model": {
-                          "type": "Number",
-                          "annotations": {
-                            "int": {},
-                            "typeId": "java.lang.Integer",
-                            "default": "100"
-                          }
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "This is the maximum amount of instances that will be kept in memory. If more than that is required, then it will start to buffer the content on disk."
-                          }
-                        }
-                      },
-                      {
-                        "key": {
-                          "name": "bufferUnit"
-                        },
-                        "model": {
-                          "type": "String",
-                          "annotations": {
-                            "typeId": "java.lang.String",
-                            "enum": {
-                              "type": "[Ljava.lang.String;",
-                              "values": [
-                                "BYTE",
-                                "KB",
-                                "MB",
-                                "GB"
-                              ]
-                            },
-                            "default": "KB"
-                          }
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "The unit in which maxInMemorySize is expressed"
-                          }
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "type": "Object",
-                    "annotations": {
-                      "typeId": "java.lang.Object",
-                      "typeAlias": {
-                        "value": "non-repeatable-iterable"
-                      },
-                      "description": {
-                        "value": "This configuration allows the stream to be read only once. It will not allow to seek randomly which will limit the transformations that DW can perform on this stream. Use this option for use cases which just require moving data around from one system to another to get optimum performance."
-                      }
-                    },
-                    "fields": []
-                  }
-                ]
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "NOT_SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": false,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "tabName": "Advanced"
-              },
-              "elementReferences": [],
-              "name": "streamingStrategy",
-              "description": "Configure if repeatable streams should be used and their behaviour",
-              "modelProperties": {
-                "org.mule.runtime.extension.internal.property.QNameModelProperty": {
-                  "value": {
-                    "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
-                    "localPart": "abstract-object-streaming-strategy",
-                    "prefix": "mule"
-                  }
-                },
-                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
-                  "sequence": 2
-                }
-              }
-            }
-          ],
-          "exclusiveParametersModels": [],
-          "showInDsl": false,
-          "name": "General",
-          "description": "",
-          "modelProperties": {}
-        },
-        {
-          "parameters": [
-            {
-              "type": {
-                "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "NOT_SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "tabName": "Advanced"
-              },
-              "elementReferences": [],
-              "name": "target",
-              "displayModel": {
-                "displayName": "Target Variable"
-              },
-              "description": "The name of a variable on which the operation\u0027s output will be placed",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "REQUIRED",
-              "defaultValue": "#[payload]",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "tabName": "Advanced"
-              },
-              "elementReferences": [],
-              "name": "targetValue",
-              "displayModel": {
-                "displayName": "Target Value"
-              },
-              "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
-              "modelProperties": {}
-            }
-          ],
-          "exclusiveParametersModels": [],
-          "showInDsl": false,
-          "name": "Output",
-          "description": "",
-          "modelProperties": {}
-        }
-      ],
-      "name": "pagedOperationResultWithAttributesResolver",
       "description": "",
       "modelProperties": {
         "org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty": {
@@ -9231,14 +9441,21 @@
                 "format": "java",
                 "type": "String",
                 "annotations": {
-                  "typeId": "java.lang.String"
+                  "typeId": "org.mule.runtime.api.meta.TargetType",
+                  "enum": {
+                    "type": "[Ljava.lang.String;",
+                    "values": [
+                      "PAYLOAD",
+                      "MESSAGE"
+                    ]
+                  }
                 }
               },
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
-              "expressionSupport": "REQUIRED",
-              "defaultValue": "#[payload]",
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": "PAYLOAD",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
                 "allowsInlineDefinition": true,
@@ -9252,11 +9469,11 @@
                 "tabName": "Advanced"
               },
               "elementReferences": [],
-              "name": "targetValue",
+              "name": "targetType",
               "displayModel": {
-                "displayName": "Target Value"
+                "displayName": "Target Output"
               },
-              "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+              "description": "The type of the operation\u0027s output that will be stored in the target variable",
               "modelProperties": {}
             }
           ],
@@ -9434,14 +9651,21 @@
                 "format": "java",
                 "type": "String",
                 "annotations": {
-                  "typeId": "java.lang.String"
+                  "typeId": "org.mule.runtime.api.meta.TargetType",
+                  "enum": {
+                    "type": "[Ljava.lang.String;",
+                    "values": [
+                      "PAYLOAD",
+                      "MESSAGE"
+                    ]
+                  }
                 }
               },
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
-              "expressionSupport": "REQUIRED",
-              "defaultValue": "#[payload]",
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": "PAYLOAD",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
                 "allowsInlineDefinition": true,
@@ -9455,11 +9679,11 @@
                 "tabName": "Advanced"
               },
               "elementReferences": [],
-              "name": "targetValue",
+              "name": "targetType",
               "displayModel": {
-                "displayName": "Target Value"
+                "displayName": "Target Output"
               },
-              "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+              "description": "The type of the operation\u0027s output that will be stored in the target variable",
               "modelProperties": {}
             }
           ],
@@ -9652,14 +9876,21 @@
                 "format": "java",
                 "type": "String",
                 "annotations": {
-                  "typeId": "java.lang.String"
+                  "typeId": "org.mule.runtime.api.meta.TargetType",
+                  "enum": {
+                    "type": "[Ljava.lang.String;",
+                    "values": [
+                      "PAYLOAD",
+                      "MESSAGE"
+                    ]
+                  }
                 }
               },
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
-              "expressionSupport": "REQUIRED",
-              "defaultValue": "#[payload]",
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": "PAYLOAD",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
                 "allowsInlineDefinition": true,
@@ -9673,11 +9904,11 @@
                 "tabName": "Advanced"
               },
               "elementReferences": [],
-              "name": "targetValue",
+              "name": "targetType",
               "displayModel": {
-                "displayName": "Target Value"
+                "displayName": "Target Output"
               },
-              "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+              "description": "The type of the operation\u0027s output that will be stored in the target variable",
               "modelProperties": {}
             }
           ],

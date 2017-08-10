@@ -41,9 +41,9 @@ final class PagingProviderWrapper<C, T> implements PagingProvider<C, T> {
    * {@inheritDoc} Sets the closed flag to true and then delegates into the wrapped instance
    */
   @Override
-  public void close() throws IOException {
+  public void close(C connection) throws IOException {
     closed = true;
-    delegate.close();
+    delegate.close(connection);
   }
 
   private void handleCloseException(Throwable t) {
@@ -72,7 +72,7 @@ final class PagingProviderWrapper<C, T> implements PagingProvider<C, T> {
           LOGGER.debug("Empty page was obtained. Closing delegate since this means that the data source has been consumed");
         }
 
-        close();
+        close(connection);
       } catch (Exception e) {
         handleCloseException(e);
       }

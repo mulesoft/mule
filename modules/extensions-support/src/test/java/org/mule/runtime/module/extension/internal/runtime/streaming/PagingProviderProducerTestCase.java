@@ -107,12 +107,12 @@ public class PagingProviderProducerTestCase {
   @Test
   public void closeQuietly() throws Exception {
     producer.close();
-    verify(delegate).close();
+    verify(delegate).close(any());
   }
 
   @Test(expected = Exception.class)
   public void closeNoisely() throws Exception {
-    doThrow(new DefaultMuleException(new Exception())).when(delegate).close();
+    doThrow(new DefaultMuleException(new Exception())).when(delegate).close(any());
     producer.close();
   }
 }

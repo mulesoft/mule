@@ -96,9 +96,9 @@
             <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+        <xs:attribute type="mule:targetTypeEnumType" use="optional" default="PAYLOAD" name="targetType">
           <xs:annotation>
-            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
+            <xs:documentation>The type of the operation's output that will be stored in the target variable</xs:documentation>
           </xs:annotation>
         </xs:attribute>
       </xs:extension>
@@ -123,9 +123,9 @@
             <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+        <xs:attribute type="mule:targetTypeEnumType" use="optional" default="PAYLOAD" name="targetType">
           <xs:annotation>
-            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
+            <xs:documentation>The type of the operation's output that will be stored in the target variable</xs:documentation>
           </xs:annotation>
         </xs:attribute>
       </xs:extension>
@@ -153,9 +153,9 @@
             <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+        <xs:attribute type="mule:targetTypeEnumType" use="optional" default="PAYLOAD" name="targetType">
           <xs:annotation>
-            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
+            <xs:documentation>The type of the operation's output that will be stored in the target variable</xs:documentation>
           </xs:annotation>
         </xs:attribute>
       </xs:extension>
@@ -189,9 +189,9 @@
             <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+        <xs:attribute type="mule:targetTypeEnumType" use="optional" default="PAYLOAD" name="targetType">
           <xs:annotation>
-            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
+            <xs:documentation>The type of the operation's output that will be stored in the target variable</xs:documentation>
           </xs:annotation>
         </xs:attribute>
       </xs:extension>
@@ -291,9 +291,9 @@
             <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+        <xs:attribute type="mule:targetTypeEnumType" use="optional" default="PAYLOAD" name="targetType">
           <xs:annotation>
-            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
+            <xs:documentation>The type of the operation's output that will be stored in the target variable</xs:documentation>
           </xs:annotation>
         </xs:attribute>
       </xs:extension>
@@ -322,9 +322,9 @@
             <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+        <xs:attribute type="mule:targetTypeEnumType" use="optional" default="PAYLOAD" name="targetType">
           <xs:annotation>
-            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
+            <xs:documentation>The type of the operation's output that will be stored in the target variable</xs:documentation>
           </xs:annotation>
         </xs:attribute>
       </xs:extension>
@@ -342,9 +342,9 @@
             <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+        <xs:attribute type="mule:targetTypeEnumType" use="optional" default="PAYLOAD" name="targetType">
           <xs:annotation>
-            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
+            <xs:documentation>The type of the operation's output that will be stored in the target variable</xs:documentation>
           </xs:annotation>
         </xs:attribute>
       </xs:extension>

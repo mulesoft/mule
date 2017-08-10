@@ -56,7 +56,7 @@ public class StreamingIteratorTestCase {
 
     @Override
     public void close() throws IOException {
-      delegate.close();
+      delegate.close(new Object());
     }
 
     @Override
@@ -113,6 +113,7 @@ public class StreamingIteratorTestCase {
 
     long counter = 0;
 
+    @Override
     public List<String> getPage(Object con) {
       if (counter < TOP) {
         List<String> page = new ArrayList<>(100);
@@ -128,8 +129,10 @@ public class StreamingIteratorTestCase {
       return null;
     }
 
-    public void close() throws IOException {}
+    @Override
+    public void close(Object con) throws IOException {}
 
+    @Override
     public Optional<Integer> getTotalResults(Object con) {
       return Optional.of(TOP);
     }

@@ -12,8 +12,8 @@ import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.LazyValue;
-import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.streaming.iterator.Producer;
+import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
@@ -34,6 +34,7 @@ import java.util.function.Function;
  */
 public final class PagingProviderProducer<T> implements Producer<List<T>> {
 
+  public static final String COULD_NOT_OBTAIN_A_CONNECTION = "Could not obtain a connection for the configuration";
   private PagingProvider<Object, T> delegate;
   private final ConfigurationInstance config;
   private final ExtensionConnectionSupplier connectionSupplier;
@@ -81,7 +82,7 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
       connectionSupplier = connectionSupplierFactory.getConnectionSupplier();
       return function.apply(connectionSupplier.getConnection());
     } catch (MuleException e) {
-      throw new MuleRuntimeException(createStaticMessage("Could not obtain a connection for the configuration"), e);
+      throw new MuleRuntimeException(createStaticMessage(COULD_NOT_OBTAIN_A_CONNECTION), e);
     } finally {
       if (connectionSupplier != null) {
         connectionSupplier.close();
@@ -95,7 +96,10 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
   @Override
   public void close() throws IOException {
     try {
-      this.delegate.close();
+      ConnectionSupplier connectionSupplier = connectionSupplierFactory.getConnectionSupplier();
+      delegate.close(connectionSupplier.getConnection());
+    } catch (Exception e) {
+      throw new MuleRuntimeException(createStaticMessage(COULD_NOT_OBTAIN_A_CONNECTION), e);
     } finally {
       connectionSupplierFactory.dispose();
     }

@@ -252,7 +252,7 @@ public class MetadataOperations {
       }
 
       @Override
-      public void close() throws IOException {}
+      public void close(MetadataConnection connection) throws IOException {}
     };
   }
 
@@ -270,7 +270,7 @@ public class MetadataOperations {
       }
 
       @Override
-      public void close() throws IOException {}
+      public void close(MetadataConnection connection) throws IOException {}
     };
   }
 

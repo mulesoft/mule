@@ -11,16 +11,15 @@ import static java.util.Optional.of;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import static org.mule.test.marvel.drstrange.DrStrangeErrorTypeDefinition.CUSTOM_ERROR;
-
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.runtime.extension.api.annotation.param.reference.FlowReference;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.param.Config;
-import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.reference.FlowReference;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -70,8 +69,7 @@ public class DrStrangeOperations {
   }
 
   public PagingProvider<MysticConnection, String> sayMagicWords(@Content List<String> values,
-                                                                int fetchSize,
-                                                                @Connection MysticConnection connection) {
+                                                                int fetchSize) {
     final AtomicInteger index = new AtomicInteger(0);
 
     return new PagingProvider<MysticConnection, String>() {
@@ -95,7 +93,7 @@ public class DrStrangeOperations {
       }
 
       @Override
-      public void close() throws IOException {
+      public void close(MysticConnection connection) throws IOException {
 
       }
     };

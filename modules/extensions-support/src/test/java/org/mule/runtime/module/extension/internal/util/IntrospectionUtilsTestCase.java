@@ -338,6 +338,6 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
     }
 
     @Override
-    public void close() throws IOException {}
+    public void close(Object connection) throws IOException {}
   }
 }

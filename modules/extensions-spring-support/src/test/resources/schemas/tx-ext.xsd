@@ -112,9 +112,9 @@
             <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+        <xs:attribute type="mule:targetTypeEnumType" use="optional" default="PAYLOAD" name="targetType">
           <xs:annotation>
-            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
+            <xs:documentation>The type of the operation's output that will be stored in the target variable</xs:documentation>
           </xs:annotation>
         </xs:attribute>
       </xs:extension>
@@ -140,9 +140,39 @@
             <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+        <xs:attribute type="mule:targetTypeEnumType" use="optional" default="PAYLOAD" name="targetType">
           <xs:annotation>
-            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
+            <xs:documentation>The type of the operation's output that will be stored in the target variable</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/tx" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="PagedTransactionalOperationType" substitutionGroup="mule:abstract-operator" name="paged-transactional-operation"></xs:element>
+  <xs:complexType name="PagedTransactionalOperationType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-object-streaming-strategy"></xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute xmlns:extension="http://www.mulesoft.org/schema/mule/extension" type="extension:operationTransactionalActionType" use="optional" name="transactionalAction">
+          <xs:annotation>
+            <xs:documentation>The type of joining action that operations can take regarding transactions.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:targetTypeEnumType" use="optional" default="PAYLOAD" name="targetType">
+          <xs:annotation>
+            <xs:documentation>The type of the operation's output that will be stored in the target variable</xs:documentation>
           </xs:annotation>
         </xs:attribute>
       </xs:extension>
@@ -245,36 +275,6 @@
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/tx" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="PagedTransactionalOperationType" substitutionGroup="mule:abstract-operator" name="paged-transactional-operation"></xs:element>
-  <xs:complexType name="PagedTransactionalOperationType">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-object-streaming-strategy"></xs:element>
-        </xs:sequence>
-        <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
-          <xs:annotation>
-            <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute xmlns:extension="http://www.mulesoft.org/schema/mule/extension" type="extension:operationTransactionalActionType" use="optional" name="transactionalAction">
-          <xs:annotation>
-            <xs:documentation>The type of joining action that operations can take regarding transactions.</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="target">
-          <xs:annotation>
-            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
-          <xs:annotation>
-            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>

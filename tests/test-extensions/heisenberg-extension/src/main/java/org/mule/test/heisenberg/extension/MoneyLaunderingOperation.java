@@ -62,7 +62,7 @@ public class MoneyLaunderingOperation {
       }
 
       @Override
-      public void close() throws IOException {}
+      public void close(HeisenbergConnection connection) throws IOException {}
     };
   }
 
@@ -80,7 +80,7 @@ public class MoneyLaunderingOperation {
       }
 
       @Override
-      public void close() throws IOException {}
+      public void close(HeisenbergConnection connection) throws IOException {}
     };
   }
 
@@ -98,7 +98,7 @@ public class MoneyLaunderingOperation {
       }
 
       @Override
-      public void close() throws IOException {}
+      public void close(HeisenbergConnection connection) throws IOException {}
     };
   }
 
@@ -128,7 +128,7 @@ public class MoneyLaunderingOperation {
       }
 
       @Override
-      public void close() throws IOException {
+      public void close(HeisenbergConnection connection) throws IOException {
         index = 0;
       }
     };
@@ -148,7 +148,7 @@ public class MoneyLaunderingOperation {
       }
 
       @Override
-      public void close() throws IOException {
+      public void close(HeisenbergConnection connection) throws IOException {
 
       }
 
