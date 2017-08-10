@@ -15,7 +15,7 @@ public class OverriddenSubstitutionGroupTestCase extends AbstractExtensionFuncti
 
   @Override
   protected String getConfigFile() {
-    return "substitution-group-object-schema-validation.xml";
+    return "substitution-group-schema-validation.xml";
   }
 
   @Test
