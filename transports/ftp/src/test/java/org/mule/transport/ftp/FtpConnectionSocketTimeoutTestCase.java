@@ -8,7 +8,6 @@ package org.mule.transport.ftp;
 
 
 import static java.lang.Long.parseLong;
-import static java.lang.System.currentTimeMillis;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCause;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
@@ -31,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.ftpserver.ftplet.DefaultFtplet;
@@ -39,7 +39,7 @@ import org.apache.ftpserver.ftplet.FtpRequest;
 import org.apache.ftpserver.ftplet.FtpSession;
 import org.apache.ftpserver.ftplet.Ftplet;
 import org.apache.ftpserver.ftplet.FtpletResult;
-import org.junit.Before;
+import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -72,6 +72,8 @@ public class FtpConnectionSocketTimeoutTestCase extends AbstractFtpServerTestCas
 
     private static Latch latch;
 
+    private static Latch serverLatch;
+
     private static Exception receiverException;
 
     public FtpConnectionSocketTimeoutTestCase(Ftplet ftpLet, String nameScenario)
@@ -82,11 +84,13 @@ public class FtpConnectionSocketTimeoutTestCase extends AbstractFtpServerTestCas
         this.nameScenario = nameScenario;
     }
 
-    @Before
-    public void setUp() throws Exception
+    @Override
+    protected void doSetUp() throws Exception
     {
         receiverException = null;
         latch = new Latch();
+        serverLatch = new Latch();
+        super.doSetUp();
     }
 
     @Parameterized.Parameters
@@ -116,6 +120,12 @@ public class FtpConnectionSocketTimeoutTestCase extends AbstractFtpServerTestCas
         muleContext.start();
         latch.await();
         assertException(getRootCause(receiverException));
+    }
+
+    @After
+    public void tearDown() throws Exception
+    {
+        serverLatch.countDown();
     }
 
     private void assertException(Throwable exception)
@@ -160,11 +170,13 @@ public class FtpConnectionSocketTimeoutTestCase extends AbstractFtpServerTestCas
 
     private static void sleep()
     {
-        long now = currentTimeMillis();
-        long stopTime = now + SERVER_SLEEP;
-        while (now < stopTime)
+        try
         {
-            now = currentTimeMillis();
+            serverLatch.await(SERVER_SLEEP, TimeUnit.MILLISECONDS);
+        }
+        catch (InterruptedException e)
+        {
+            throw new RuntimeException("Interrupted exception was triggered", e);
         }
     }
 
