@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.internal.message;
 
-import org.mule.runtime.core.api.message.DefaultMultiPartPayload;
-
 import java.util.Set;
 
 import javax.activation.DataHandler;
@@ -15,7 +13,7 @@ import javax.activation.DataHandler;
 /**
  * Use to obtain message attachments defined in two scopes, inbound and outbound.
  *
- * @deprecated Transport infrastructure is deprecated. Use {@link DefaultMultiPartPayload} instead.
+ * @deprecated Transport infrastructure is deprecated.
  */
 @Deprecated
 public interface MessageAttachments {

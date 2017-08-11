@@ -18,7 +18,6 @@ import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.InternalEventContext;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.message.DefaultMultiPartPayload;
 import org.mule.runtime.core.api.message.GroupCorrelation;
 
 import java.io.Serializable;
@@ -145,7 +144,7 @@ public class TestEventBuilder {
    * @param key the key of the attachment to add
    * @param value the {@link DataHandler} for the attachment to add
    * @return this {@link TestEventBuilder}
-   * @deprecated Transport infrastructure is deprecated. Use {@link DefaultMultiPartPayload} instead.
+   * @deprecated Transport infrastructure is deprecated.
    */
   @Deprecated
   public TestEventBuilder withInboundAttachment(String key, DataHandler value) {

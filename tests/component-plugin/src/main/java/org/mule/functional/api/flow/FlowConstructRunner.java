@@ -9,14 +9,12 @@ package org.mule.functional.api.flow;
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 import static org.junit.Assert.fail;
-
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.message.DefaultMultiPartPayload;
 import org.mule.runtime.core.api.message.GroupCorrelation;
 
 import java.io.Serializable;
@@ -124,7 +122,7 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> {
    * @param key the key of the attachment to add
    * @param value the {@link DataHandler} for the attachment to add
    * @return this {@link FlowRunner}
-   * @deprecated Transport infrastructure is deprecated. Use {@link DefaultMultiPartPayload} instead.
+   * @deprecated Transport infrastructure is deprecated.
    */
   @Deprecated
   public R withInboundAttachment(String key, DataHandler value) {
