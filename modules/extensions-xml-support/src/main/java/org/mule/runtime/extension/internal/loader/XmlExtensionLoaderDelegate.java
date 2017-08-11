@@ -60,6 +60,7 @@ import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.GlobalEle
 import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.OperationComponentModelModelProperty;
 import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.XmlExtensionModelProperty;
 import org.mule.runtime.config.spring.internal.util.NoOpXmlErrorHandler;
+import org.mule.runtime.core.api.exception.Errors;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
@@ -113,8 +114,10 @@ public final class XmlExtensionLoaderDelegate {
   private static final String DISPLAY_NAME_ATTRIBUTE = "displayName";
   private static final String SUMMARY_ATTRIBUTE = "summary";
   private static final String EXAMPLE_ATTRIBUTE = "example";
+  private static final String ERROR_TYPE_ATTRIBUTE = "type";
   private static final String ROLE = "role";
   private static final String ATTRIBUTE_USE = "use";
+  private static final String NAMESPACE_SEPARATOR = ":";
 
   private static final Pattern VALID_XML_NAME = Pattern.compile("[A-Za-z]+[a-zA-Z0-9\\-_]*");
 
@@ -279,19 +282,20 @@ public final class XmlExtensionLoaderDelegate {
     final String category = moduleModel.getParameters().get(CATEGORY);
     final String vendor = moduleModel.getParameters().get(VENDOR);
     final String minMuleVersion = moduleModel.getParameters().get(MIN_MULE_VERSION);
+    final XmlDslModel xmlDslModel = getXmlDslModel(moduleModel, name, version);
     declarer.named(name)
         .describedAs(getDescription(moduleModel))
         .fromVendor(vendor)
         .withMinMuleVersion(new MuleVersion(minMuleVersion))
         .onVersion(version)
         .withCategory(Category.valueOf(category.toUpperCase()))
-        .withXmlDsl(getXmlDslModel(moduleModel, name, version));
+        .withXmlDsl(xmlDslModel);
     declarer.withModelProperty(new XmlExtensionModelProperty());
     final Optional<ConfigurationDeclarer> configurationDeclarer = loadPropertiesFrom(declarer, moduleModel);
     if (configurationDeclarer.isPresent()) {
-      loadOperationsFrom(configurationDeclarer.get(), moduleModel);
+      loadOperationsFrom(configurationDeclarer.get(), moduleModel, xmlDslModel);
     } else {
-      loadOperationsFrom(declarer, moduleModel);
+      loadOperationsFrom(declarer, moduleModel, xmlDslModel);
     }
   }
 
@@ -328,13 +332,13 @@ public final class XmlExtensionLoaderDelegate {
     return empty();
   }
 
-  private void loadOperationsFrom(HasOperationDeclarer declarer, ComponentModel moduleModel) {
+  private void loadOperationsFrom(HasOperationDeclarer declarer, ComponentModel moduleModel, XmlDslModel xmlDslModel) {
     moduleModel.getInnerComponents().stream()
         .filter(child -> child.getIdentifier().equals(OPERATION_IDENTIFIER))
-        .forEach(operationModel -> extractOperationExtension(declarer, operationModel));
+        .forEach(operationModel -> extractOperationExtension(declarer, operationModel, xmlDslModel));
   }
 
-  private void extractOperationExtension(HasOperationDeclarer declarer, ComponentModel operationModel) {
+  private void extractOperationExtension(HasOperationDeclarer declarer, ComponentModel operationModel, XmlDslModel xmlDslModel) {
     String operationName = assertValidName(operationModel.getNameAttribute());
     OperationDeclarer operationDeclarer = declarer.withOperation(operationName);
     ComponentModel bodyComponentModel = operationModel.getInnerComponents()
@@ -348,49 +352,10 @@ public final class XmlExtensionLoaderDelegate {
     extractOperationParameters(operationDeclarer, operationModel);
     extractOutputType(operationDeclarer.withOutput(), OPERATION_OUTPUT_IDENTIFIER, operationModel);
     extractOutputType(operationDeclarer.withOutputAttributes(), OPERATION_OUTPUT_ATTRIBUTES_IDENTIFIER, operationModel);
-
-
-    Optional<ComponentModel> optionalParametersComponentModel = operationModel.getInnerComponents()
-      .stream()
-      .filter(child -> child.getIdentifier().equals(OPERATION_ERRORS_IDENTIFIER)).findAny();
-    if (optionalParametersComponentModel.isPresent()) {
-      optionalParametersComponentModel.get().getInnerComponents()
-        .stream()
-        .filter(child -> child.getIdentifier().equals(OPERATION_ERROR_IDENTIFIER))
-        .forEach(param -> {
-          final String type = param.getParameters().get("type");
-
-          final String[] split = type.split(":");
-          final String namespace = split.length == 2 ? split[0]: "CURRENTNAMSPACE".toUpperCase();
-          final String typeName = split.length == 2 ? split[1]: split[0];
-
-          final ErrorModelBuilder errorModelBuilder = ErrorModelBuilder.newError(typeName, namespace);
-
-          final String parent= param.getParameters().get("parent");
-          if (StringUtils.isNotBlank(parent)){
-            final String[] split2 = type.split(":");
-            final String namespace2 = split.length == 2 ? split2[0]: "CURRENTNAMSPACE".toUpperCase();
-            final String typeName2 = split.length == 2 ? split2[1]: split2[0];
-            errorModelBuilder.withParent(ErrorModelBuilder.newError(typeName2, namespace2).build());
-          }
-
-          operationDeclarer.withErrorModel(errorModelBuilder.build());
-        });
-    }
-
-//
-//    operationDeclarer.withErrorModel(ErrorModelBuilder
-//        .newError("typeNamePete", "namespacePete")
-//        .withParent(
-//                    ErrorModelBuilder.newError(Errors.ComponentIdentifiers.ANY)
-//                        .build())
-//        .build());
-//    operationDeclarer.withErrorModel(ErrorModelBuilder.newError("typeNamePete", "namespacePete").build());
-//    operationDeclarer.withErrorModel(ErrorModelBuilder.newError("typeNamePete", "namespacePete").build());
-//    operationDeclarer.withErrorModel(ErrorModelBuilder.newError("typeNamePete", "namespacePete").build());
-//    operationDeclarer.withErrorModel(ErrorModelBuilder.newError("typeNamePete", "namespacePete").build());
-//    operationDeclarer.withErrorModel(ErrorModelBuilder.newError("typeNamePete", "namespacePete").build());
+    declareErrorModels(operationDeclarer, xmlDslModel, operationName, operationModel);
   }
+
+
 
   // TODO MULE-12619: until the internals of ExtensionModel doesn't validate or corrects the name, this is the custom validation
   private String assertValidName(String name) {
@@ -527,5 +492,31 @@ public final class XmlExtensionLoaderDelegate {
       throw new IllegalParameterModelDefinitionException(errorMessage);
     }
     return metadataType.get();
+  }
+
+  private void declareErrorModels(OperationDeclarer operationDeclarer, XmlDslModel xmlDslModel, String operationName,
+                                  ComponentModel operationModel) {
+    Optional<ComponentModel> optionalParametersComponentModel = operationModel.getInnerComponents()
+        .stream()
+        .filter(child -> child.getIdentifier().equals(OPERATION_ERRORS_IDENTIFIER)).findAny();
+    optionalParametersComponentModel.ifPresent(componentModel -> componentModel.getInnerComponents()
+        .stream()
+        .filter(child -> child.getIdentifier().equals(OPERATION_ERROR_IDENTIFIER))
+        .forEach(param -> {
+          final String namespace = xmlDslModel.getPrefix().toUpperCase();
+          final String typeName = param.getParameters().get(ERROR_TYPE_ATTRIBUTE);
+          if (StringUtils.isBlank(typeName)) {
+            throw new IllegalModelDefinitionException(format("The operation [%s] cannot have an <error> with an empty 'type' attribute",
+                                                             operationName));
+          }
+          if (typeName.contains(NAMESPACE_SEPARATOR)) {
+            throw new IllegalModelDefinitionException(format("The operation [%s] cannot have an <error> [%s] that contains a reserved character [%s]",
+                                                             operationName, typeName,
+                                                             NAMESPACE_SEPARATOR));
+          }
+          operationDeclarer.withErrorModel(ErrorModelBuilder.newError(typeName, namespace)
+              .withParent(ErrorModelBuilder.newError(Errors.ComponentIdentifiers.ANY).build())
+              .build());
+        }));
   }
 }

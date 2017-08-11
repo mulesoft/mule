@@ -18,7 +18,7 @@ import static org.mule.runtime.core.internal.processor.chain.ModuleOperationMess
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
-
+import org.apache.commons.lang3.StringUtils;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -38,8 +38,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * A {@link MacroExpansionModuleModel} works tightly with a {@link ApplicationModel} to go over all the registered
@@ -254,6 +252,8 @@ public class MacroExpansionModuleModel {
       processorChainBuilder.addChildComponentModel(copyComponentModel(bodyProcessor, configRefName, moduleGlobalElementsNames,
                                                                       literalsParameters));
     }
+    copyErrorMappings(operationRefModel, processorChainBuilder);
+
     for (Map.Entry<String, Object> customAttributeEntry : operationRefModel.getCustomAttributes().entrySet()) {
       processorChainBuilder.addCustomAttribute(customAttributeEntry.getKey(), customAttributeEntry.getValue());
     }
@@ -266,6 +266,20 @@ public class MacroExpansionModuleModel {
     operationRefModel.getLineNumber().ifPresent(processorChainBuilder::setLineNumber);
     processorChainBuilder.addCustomAttribute(ORIGINAL_IDENTIFIER, operationRefModel.getIdentifier());
     return processorChainModel;
+  }
+
+  /**
+   * If the current operation contains any {@link ApplicationModel#ERROR_MAPPING} as a child, it will copy them to the macro
+   * expanded <module-operation-chain/> as childs after the list of message processors.
+   *
+   * @param operationRefModel {@link ComponentModel} to look for the possible child elements {@link ApplicationModel#ERROR_MAPPING_IDENTIFIER}
+   * @param processorChainBuilder the <module-operation-chain/> where the errors mappings will be copied to
+   */
+  private void copyErrorMappings(ComponentModel operationRefModel, ComponentModel.Builder processorChainBuilder) {
+    operationRefModel.getInnerComponents().stream()
+        .filter(componentModel -> componentModel.getIdentifier().equals(ApplicationModel.ERROR_MAPPING_IDENTIFIER))
+        .forEach(errorMappingComponentModel -> processorChainBuilder
+            .addChildComponentModel(copyComponentModel(errorMappingComponentModel)));
   }
 
   /**
@@ -428,6 +442,43 @@ public class MacroExpansionModuleModel {
       operationReplacementModel.addChildComponentModel(
                                                        copyComponentModel(operationChildModel, configRefName,
                                                                           moduleGlobalElementsNames, literalsParameters));
+    }
+
+    final String configFileName = modelToCopy.getConfigFileName()
+        .orElseThrow(() -> new IllegalArgumentException("The is no config file name for the component to macro expand"));
+    final Integer lineNumber = modelToCopy.getLineNumber()
+        .orElseThrow(() -> new IllegalArgumentException("The is no line number for the component to macro expand"));
+    operationReplacementModel.setConfigFileName(configFileName);
+    operationReplacementModel.setLineNumber(lineNumber);
+
+    ComponentModel componentModel = operationReplacementModel.build();
+    for (ComponentModel child : componentModel.getInnerComponents()) {
+      child.setParent(componentModel);
+    }
+    return componentModel;
+  }
+
+  /**
+   * Goes over the {@code modelToCopy} by consuming the attributes as they are.
+   *
+   * @param modelToCopy original source of truth that comes from the <module/>
+   * @return a transformed {@link ComponentModel} from the {@code modelToCopy}, where the element's attributes has been
+   *         updated accordingly (both global components updates plus the line number, and so on). If the value for some parameter
+   */
+  private ComponentModel copyComponentModel(ComponentModel modelToCopy) {
+    ComponentModel.Builder operationReplacementModel = new ComponentModel.Builder();
+    operationReplacementModel
+        .setIdentifier(modelToCopy.getIdentifier())
+        .setTextContent(modelToCopy.getTextContent());
+    for (Map.Entry<String, Object> entry : modelToCopy.getCustomAttributes().entrySet()) {
+      operationReplacementModel.addCustomAttribute(entry.getKey(), entry.getValue());
+    }
+    for (Map.Entry<String, String> entry : modelToCopy.getParameters().entrySet()) {
+      operationReplacementModel.addParameter(entry.getKey(), entry.getValue(), false);
+    }
+    for (ComponentModel operationChildModel : modelToCopy.getInnerComponents()) {
+      operationReplacementModel.addChildComponentModel(
+                                                       copyComponentModel(operationChildModel));
     }
 
     final String configFileName = modelToCopy.getConfigFileName()

@@ -7,10 +7,34 @@
 
     <module-using-errormapping:config name="petstoreconfig" />
 
+    <flow name="noMapping">
+        <module-using-errormapping:fail-raise-error config-ref="petstoreconfig" petNames="#[vars.names]"/>
+        <error-handler>
+            <on-error-continue>
+                <set-payload value="Error."/>
+            </on-error-continue>
+        </error-handler>
+    </flow>
+
+    <flow name="multipleMappingsDirectlyFromSmartConnector">
+        <module-using-errormapping:fail-raise-error config-ref="petstoreconfig" petNames="#[vars.names]"/>
+        <error-handler>
+            <on-error-continue type="SMART_CONNECTOR_CUSTOM_ERROR_CONNECTIVITY">
+                <set-payload value="Could not connect."/>
+            </on-error-continue>
+            <on-error-continue type="SMART_CONNECTOR_CUSTOM_ERROR_EXPRESSION">
+                <set-payload value="Bad expression."/>
+            </on-error-continue>
+            <on-error-continue>
+                <set-payload value="Error."/>
+            </on-error-continue>
+        </error-handler>
+    </flow>
+
     <flow name="simpleMapping">
-        <module-using-errormapping:fail-propagate-same-error config-ref="petstoreconfig" petNames="#[vars.names]" >
+        <module-using-errormapping:fail-raise-error config-ref="petstoreconfig" petNames="#[vars.names]">
             <error-mapping targetType="MY_REQUESTER"/>
-        </module-using-errormapping:fail-propagate-same-error>
+        </module-using-errormapping:fail-raise-error>
         <error-handler>
             <on-error-continue type="MY_REQUESTER">
                 <set-payload value="Could not connect."/>
@@ -21,63 +45,79 @@
         </error-handler>
     </flow>
 
-    <!---->
+    <flow name="complexMapping">
+        <module-using-errormapping:fail-raise-error config-ref="petstoreconfig" petNames="#[vars.names]">
+            <error-mapping sourceType="CONNECTIVITY" targetType="MY_REQUESTER"/>
+        </module-using-errormapping:fail-raise-error>
+        <error-handler>
+            <on-error-continue type="MY_REQUESTER">
+                <set-payload value="Could not connect."/>
+            </on-error-continue>
+            <on-error-continue>
+                <set-payload value="Error."/>
+            </on-error-continue>
+        </error-handler>
+    </flow>
 
-    <!--<flow name="noMapping">-->
-        <!--<module-using-errormapping:fail-proxy config-ref="petstoreconfig" petNames="#[vars.names]"/>-->
-        <!--<error-handler>-->
-            <!--<on-error-continue>-->
-                <!--<set-payload value="Error."/>-->
-            <!--</on-error-continue>-->
-        <!--</error-handler>-->
-    <!--</flow>-->
+    <flow name="multipleMappings">
+        <module-using-errormapping:fail-raise-error config-ref="petstoreconfig" petNames="#[vars.names]">
+            <error-mapping sourceType="CONNECTIVITY" targetType="MY_REQUESTER"/>
+            <error-mapping sourceType="EXPRESSION" targetType="MY_OTHER_ERROR"/>
+        </module-using-errormapping:fail-raise-error>
+        <error-handler>
+            <on-error-continue type="MY_REQUESTER">
+                <set-payload value="Could not connect."/>
+            </on-error-continue>
+            <on-error-continue type="MY_OTHER_ERROR">
+                <set-payload value="Bad expression."/>
+            </on-error-continue>
+            <on-error-continue>
+                <set-payload value="Error."/>
+            </on-error-continue>
+        </error-handler>
+    </flow>
 
-    <!--<flow name="simpleMapping">-->
-        <!--<module-using-errormapping:fail-proxy config-ref="petstoreconfig" petNames="#[vars.names]" errorMappingTargetType="MY_REQUESTER">-->
-            <!--<error-mapping targetType="MY_REQUESTER"/>-->
-        <!--</module-using-errormapping:fail-proxy>-->
-        <!--<error-handler>-->
-            <!--<on-error-continue type="MY_REQUESTER">-->
-                <!--<set-payload value="Could not connect."/>-->
-            <!--</on-error-continue>-->
-            <!--<on-error-continue>-->
-                <!--<set-payload value="Error."/>-->
-            <!--</on-error-continue>-->
-        <!--</error-handler>-->
-    <!--</flow>-->
+    <flow name="simpleMappingProxy">
+        <module-using-errormapping:fail-proxy config-ref="petstoreconfig" petNames="#[vars.names]"
+                                              errorMappingTargetType="MY_REQUESTER"/>
+        <error-handler>
+            <on-error-continue type="MY_REQUESTER">
+                <set-payload value="Could not connect."/>
+            </on-error-continue>
+            <on-error-continue>
+                <set-payload value="Error."/>
+            </on-error-continue>
+        </error-handler>
+    </flow>
 
-    <!--<flow name="complexMapping">-->
-        <!--<module-using-errormapping:fail-proxy config-ref="petstoreconfig" petNames="#[vars.names]" errorMappingTargetType="MY_REQUESTER" errorMappingSourceType="CONNECTIVITY">-->
-            <!--<error-mapping sourceType="CONNECTIVITY" targetType="MY_REQUESTER"/>-->
-        <!--</module-using-errormapping:fail-proxy>-->
-        <!--<error-handler>-->
-            <!--<on-error-continue type="MY_REQUESTER">-->
-                <!--<set-payload value="Could not connect."/>-->
-            <!--</on-error-continue>-->
-            <!--<on-error-continue>-->
-                <!--<set-payload value="Error."/>-->
-            <!--</on-error-continue>-->
-        <!--</error-handler>-->
-    <!--</flow>-->
+    <flow name="complexMappingProxy">
+        <module-using-errormapping:fail-proxy config-ref="petstoreconfig" petNames="#[vars.names]"
+                                              errorMappingTargetType="MY_REQUESTER" errorMappingSourceType="CONNECTIVITY"/>
+        <error-handler>
+            <on-error-continue type="MY_REQUESTER">
+                <set-payload value="Could not connect."/>
+            </on-error-continue>
+            <on-error-continue>
+                <set-payload value="Error."/>
+            </on-error-continue>
+        </error-handler>
+    </flow>
 
-    <!--<flow name="multipleMappings">-->
-        <!--<module-using-errormapping:fail-proxy config-ref="petstoreconfig" petNames="#[vars.names]"-->
-                                          <!--errorMappingTargetType="MY_REQUESTER" errorMappingSourceType="CONNECTIVITY"-->
-                                          <!--secondErrorMappingTargetType="MY_OTHER_ERROR" secondErrorMappingSourceType="EXPRESSION">-->
-            <!--<error-mapping sourceType="CONNECTIVITY" targetType="MY_REQUESTER"/>-->
-            <!--<error-mapping sourceType="EXPRESSION" targetType="MY_OTHER_ERROR"/>-->
-        <!--</module-using-errormapping:fail-proxy>-->
-        <!--<error-handler>-->
-            <!--<on-error-continue type="MY_REQUESTER">-->
-                <!--<set-payload value="Could not connect."/>-->
-            <!--</on-error-continue>-->
-            <!--<on-error-continue type="MY_OTHER_ERROR">-->
-                <!--<set-payload value="Bad expression."/>-->
-            <!--</on-error-continue>-->
-            <!--<on-error-continue>-->
-                <!--<set-payload value="Error."/>-->
-            <!--</on-error-continue>-->
-        <!--</error-handler>-->
-    <!--</flow>-->
+    <flow name="multipleMappingsProxy">
+        <module-using-errormapping:fail-proxy config-ref="petstoreconfig" petNames="#[vars.names]"
+                                              errorMappingTargetType="MY_REQUESTER" errorMappingSourceType="CONNECTIVITY"
+                                              secondErrorMappingTargetType="MY_OTHER_ERROR" secondErrorMappingSourceType="EXPRESSION"/>
+        <error-handler>
+            <on-error-continue type="MY_REQUESTER">
+                <set-payload value="Could not connect."/>
+            </on-error-continue>
+            <on-error-continue type="MY_OTHER_ERROR">
+                <set-payload value="Bad expression."/>
+            </on-error-continue>
+            <on-error-continue>
+                <set-payload value="Error."/>
+            </on-error-continue>
+        </error-handler>
+    </flow>
 
 </mule>

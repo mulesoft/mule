@@ -35,17 +35,21 @@
         <output type="string"/>
     </operation>
 
-    <operation name="fail-propagate-same-error">
+    <operation name="fail-raise-error">
         <parameters>
             <parameter name="petNames" type="string"/>
         </parameters>
         <body>
-            <petstore:fail petNames="#[parameters.petNames]"/>
+            <!-- TODO until MULE-13291 is done (Implement "<raise-error>"), the only way to raise a custom error is by remapping it -->
+            <petstore:fail petNames="#[parameters.petNames]">
+                <mule:error-mapping targetType="SMART_CONNECTOR_CUSTOM_ERROR_CONNECTIVITY" sourceType="CONNECTIVITY"/>
+                <mule:error-mapping targetType="SMART_CONNECTOR_CUSTOM_ERROR_EXPRESSION" sourceType="EXPRESSION"/>
+            </petstore:fail>
         </body>
         <output type="string"/>
         <errors>
-            <error type="PETSTORE:CONNECTIVITY"/>
-            <error type="PETSTORE:RETRY_EXHAUSTED"/>
+            <error type="SMART_CONNECTOR_CUSTOM_ERROR_CONNECTIVITY"/>
+            <error type="SMART_CONNECTOR_CUSTOM_ERROR_EXPRESSION"/>
         </errors>
     </operation>
 
