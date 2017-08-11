@@ -191,48 +191,44 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
    * @param processingStrategySupplier a supplier of the processing strategy.
    * @return a lazy processor that will build the chain upon the first request.
    */
-  public static AnnotatedProcessor newLazyProcessorChainBuilder(AbstractMessageProcessorChainBuilder chainBuilder,
-                                                                MuleContext muleContext,
-                                                                Supplier<ProcessingStrategy> processingStrategySupplier) {
-    return new LazyProcessor() {
+  public static MessageProcessorChain newLazyProcessorChainBuilder(AbstractMessageProcessorChainBuilder chainBuilder,
+                                                                   MuleContext muleContext,
+                                                                   Supplier<ProcessingStrategy> processingStrategySupplier) {
+    return new AbstractMessageProcessorChain(chainBuilder.name, null, chainBuilder.processors) {
 
-      private Processor processor;
+      private MessageProcessorChain delegate;
 
       @Override
       public void initialise() throws InitialisationException {
         chainBuilder.setProcessingStrategy(processingStrategySupplier.get());
-        processor = chainBuilder.build();
-        initialiseIfNeeded(processor, muleContext);
+        delegate = chainBuilder.build();
+        initialiseIfNeeded(delegate, muleContext);
       }
 
       @Override
       public void start() throws MuleException {
-        startIfNeeded(processor);
+        startIfNeeded(delegate);
       }
 
       @Override
       public void dispose() {
-        disposeIfNeeded(processor, LOGGER);
+        disposeIfNeeded(delegate, LOGGER);
       }
 
       public void stop() throws MuleException {
-        stopIfNeeded(processor);
+        stopIfNeeded(delegate);
       }
 
       @Override
       public InternalEvent process(InternalEvent event) throws MuleException {
-        return processor.process(event);
+        return delegate.process(event);
       }
 
       @Override
       public Publisher<InternalEvent> apply(Publisher<InternalEvent> publisher) {
-        return from(publisher).transform(processor);
+        return delegate.apply(publisher);
       }
     };
   }
 
-  public static abstract class LazyProcessor extends AbstractAnnotatedObject
-      implements AnnotatedProcessor, Lifecycle {
-
-  }
 }

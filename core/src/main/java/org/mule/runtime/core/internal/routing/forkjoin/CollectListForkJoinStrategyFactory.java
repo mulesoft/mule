@@ -9,7 +9,9 @@ package org.mule.runtime.core.internal.routing.forkjoin;
 
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE_LIST;
 
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.InternalEvent;
 
 import java.util.List;
@@ -31,5 +33,10 @@ public class CollectListForkJoinStrategyFactory extends AbstractForkJoinStrategy
   protected Function<List<InternalEvent>, InternalEvent> createResultEvent(InternalEvent original,
                                                                            InternalEvent.Builder resultBuilder) {
     return list -> resultBuilder.message(of(list.stream().map(event -> event.getMessage()).collect(toList()))).build();
+  }
+
+  @Override
+  public DataType getResultDataType() {
+    return MULE_MESSAGE_LIST;
   }
 }

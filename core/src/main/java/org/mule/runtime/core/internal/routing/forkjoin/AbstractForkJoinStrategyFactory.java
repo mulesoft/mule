@@ -13,11 +13,14 @@ import static org.mule.runtime.core.api.InternalEvent.builder;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContext;
 import static org.mule.runtime.core.api.routing.ForkJoinStrategy.RoutingPair.of;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedConsumer;
+import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.defer;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.just;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +33,9 @@ import java.util.function.Function;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.metadata.CollectionDataType;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
@@ -40,10 +46,12 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.routing.ForkJoinStrategy;
 import org.mule.runtime.core.api.routing.ForkJoinStrategy.RoutingPair;
 import org.mule.runtime.core.api.routing.ForkJoinStrategyFactory;
-import org.mule.runtime.core.internal.routing.CompositeRoutingException;
-import org.mule.runtime.core.internal.routing.RoutingResult;
+import org.mule.runtime.core.api.routing.CompositeRoutingException;
+import org.mule.runtime.core.api.routing.RoutingResult;
 
 import org.reactivestreams.Publisher;
+import reactor.core.Exceptions;
+import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 /**
@@ -64,22 +72,22 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
   @Override
   public ForkJoinStrategy createForkJoinStrategy(ProcessingStrategy processingStrategy, int maxConcurrency, boolean delayErrors,
                                                  long timeout, Scheduler timeoutScheduler, ErrorType timeoutErrorType) {
-    reactor.core.scheduler.Scheduler reatorTimeoutScheduler = Schedulers.fromExecutorService(timeoutScheduler);
+    reactor.core.scheduler.Scheduler reactorTimeoutScheduler = Schedulers.fromExecutorService(timeoutScheduler);
     return (original, routingPairs) -> {
       final AtomicInteger count = new AtomicInteger();
       final InternalEvent.Builder resultBuilder = builder(original);
       return from(routingPairs)
           .map(addSequence(count))
-          .flatMap(processRoutePair(processingStrategy, maxConcurrency, delayErrors, timeout, reatorTimeoutScheduler,
-                                    timeoutErrorType),
-                   maxConcurrency)
+          .flatMapSequential(processRoutePair(processingStrategy, maxConcurrency, delayErrors, timeout, reactorTimeoutScheduler,
+                                              timeoutErrorType),
+                             maxConcurrency)
           .collectList()
-          .doOnNext(checkedConsumer(list -> {
+          .doOnNext(list -> {
             if (list.stream().anyMatch(event -> event.getError().isPresent())) {
-              throw createCompositeRoutingException(list);
+              throw propagate(createCompositeRoutingException(list));
             }
-          }))
-          .doOnNext(copyVars(resultBuilder))
+          })
+          .doOnNext(mergeVariables(original, resultBuilder))
           .map(createResultEvent(original, resultBuilder));
     };
   }
@@ -109,11 +117,7 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
     return pair -> {
       ReactiveProcessor route = publisher -> from(publisher)
           .transform(pair.getRoute())
-          .timeout(ofMillis(timeout),
-                   defer(() -> delayErrors ? just(createTimeoutErrorEvent(timeoutErrorType, pair))
-                       : error(new TimeoutException(TIMEOUT_EXCEPTION_DETAILED_DESCRIPTION_PREFIX + " '"
-                           + pair.getEvent().getGroupCorrelation().get().getSequence() + "'"))),
-                   timeoutScheduler);
+          .timeout(ofMillis(timeout), onTimeout(processingStrategy, delayErrors, timeoutErrorType, pair), timeoutScheduler);
       return from(processWithChildContext(pair.getEvent(),
                                           applyProcessingStrategy(processingStrategy, route, maxConcurrency), empty()))
                                               .onErrorResume(MessagingException.class,
@@ -121,7 +125,13 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
     };
   }
 
-
+  private Mono<InternalEvent> onTimeout(ProcessingStrategy processingStrategy, boolean delayErrors, ErrorType timeoutErrorType,
+                                        RoutingPair pair) {
+    return defer(() -> delayErrors ? just(createTimeoutErrorEvent(timeoutErrorType, pair))
+        : error(new TimeoutException(TIMEOUT_EXCEPTION_DETAILED_DESCRIPTION_PREFIX + " '"
+            + pair.getEvent().getGroupCorrelation().get().getSequence() + "'")))
+                .transform(processingStrategy.onPipeline(p -> p));
+  }
 
   private ReactiveProcessor applyProcessingStrategy(ProcessingStrategy processingStrategy, ReactiveProcessor processor,
                                                     int maxConcurrency) {
@@ -157,10 +167,33 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
     return new CompositeRoutingException(new RoutingResult(successMap, errorMap));
   }
 
-  private Consumer<List<InternalEvent>> copyVars(InternalEvent.Builder result) {
-    return list -> list.stream()
-        .forEach(event -> event.getVariables().entrySet().stream()
-            .forEach(entry -> result.addVariable(entry.getKey(), entry.getValue())));
+  private Consumer<List<InternalEvent>> mergeVariables(InternalEvent original, InternalEvent.Builder result) {
+    return list -> {
+      Map<String, TypedValue> routeVars = new HashMap<>();
+      list.forEach(event -> event.getVariables().forEach((key, value) -> {
+        if (!value.equals(original.getVariables().get(key))) {
+          if (!routeVars.containsKey(key)) {
+            routeVars.put(key, value);
+          } else {
+            if (!(routeVars.get(key).getValue() instanceof List)) {
+              List newList = new ArrayList();
+              newList.add(routeVars.get(key).getValue());
+              routeVars.put(key, new TypedValue(newList, DataType.builder().collectionType(List.class)
+                  .itemType(routeVars.get(key).getDataType().getType()).build()));
+            }
+            List valueList = (List) routeVars.get(key).getValue();
+            valueList.add(value.getValue());
+            if (((CollectionDataType) routeVars.get(key).getDataType()).getItemDataType().isCompatibleWith(value.getDataType())) {
+              routeVars.put(key, new TypedValue(valueList, routeVars.get(key).getDataType()));
+            } else {
+              routeVars.put(key, new TypedValue(valueList, DataType.builder().collectionType(List.class).build()));
+            }
+          }
+        }
+      }));
+      routeVars.forEach((s, typedValue) -> result.addVariable(s, typedValue.getValue(), typedValue.getDataType()));
+    };
   }
+
 
 }

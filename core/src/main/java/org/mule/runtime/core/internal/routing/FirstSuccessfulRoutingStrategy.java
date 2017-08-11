@@ -16,6 +16,7 @@ import static org.mule.runtime.core.api.util.StringMessageUtils.truncate;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.DefaultTransformationService;
@@ -74,9 +75,9 @@ public class FirstSuccessfulRoutingStrategy implements RoutingStrategy {
    * @param message
    * @throws MuleException if the payload is consumable
    */
-  public static void validateMessageIsNotConsumable(Message message) throws MuleException {
+  public static void validateMessageIsNotConsumable(Message message) {
     if (message.getPayload().getDataType().isStreamType()) {
-      throw new DefaultMuleException(cannotCopyStreamPayload(message.getPayload().getDataType().getType().getName()));
+      throw new MuleRuntimeException(cannotCopyStreamPayload(message.getPayload().getDataType().getType().getName()));
     }
   }
 

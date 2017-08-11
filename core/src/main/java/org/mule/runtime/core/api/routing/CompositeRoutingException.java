@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.core.internal.routing;
+package org.mule.runtime.core.api.routing;
 
 import static java.lang.System.lineSeparator;
 import static java.util.stream.Collectors.toList;
@@ -73,7 +73,8 @@ public class CompositeRoutingException extends MuleException implements Composed
     StringBuilder builder = new StringBuilder();
     for (Entry<String, Error> routeResult : routingResult.getFailures().entrySet()) {
       Throwable routeException = routeResult.getValue().getCause();
-      builder.append(lineSeparator() + "\t").append(routeResult.getKey()).append(": ").append(routeException);
+      builder.append(lineSeparator() + "\t").append(routeResult.getKey()).append(": ").append(routeException.getClass().getName())
+          .append(": ").append(routeException.getMessage());
     }
 
     builder.insert(0, MESSAGE_TITLE);

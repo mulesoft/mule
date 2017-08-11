@@ -82,7 +82,6 @@ import org.mule.runtime.config.spring.internal.factories.FlowRefFactoryBean;
 import org.mule.runtime.config.spring.internal.factories.MessageProcessorFilterPairFactoryBean;
 import org.mule.runtime.config.spring.internal.factories.ModuleOperationMessageProcessorChainFactoryBean;
 import org.mule.runtime.config.spring.internal.factories.ResponseMessageProcessorsFactoryBean;
-import org.mule.runtime.config.spring.internal.factories.ScatterGatherRouterFactoryBean;
 import org.mule.runtime.config.spring.internal.factories.SchedulingMessageSourceFactoryBean;
 import org.mule.runtime.config.spring.internal.factories.SubflowMessageProcessorChainFactoryBean;
 import org.mule.runtime.config.spring.internal.factories.TryProcessorFactoryBean;
@@ -106,6 +105,7 @@ import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.RetryNotifier;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
+import org.mule.runtime.core.api.routing.ForkJoinStrategyFactory;
 import org.mule.runtime.core.api.security.EncryptionStrategy;
 import org.mule.runtime.core.api.security.MuleSecurityManagerConfigurator;
 import org.mule.runtime.core.api.security.SecurityManager;
@@ -152,6 +152,7 @@ import org.mule.runtime.core.internal.routing.ScatterGatherRouter;
 import org.mule.runtime.core.internal.routing.SimpleCollectionAggregator;
 import org.mule.runtime.core.internal.routing.Splitter;
 import org.mule.runtime.core.internal.routing.UntilSuccessful;
+import org.mule.runtime.core.internal.routing.forkjoin.CollectListForkJoinStrategyFactory;
 import org.mule.runtime.core.internal.routing.requestreply.SimpleAsyncRequestReplyRequester;
 import org.mule.runtime.core.internal.security.PasswordBasedEncryptionStrategy;
 import org.mule.runtime.core.internal.security.SecretKeyEncryptionStrategy;
@@ -214,6 +215,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   private static final String LOGGER = "logger";
   private static final String PROCESSOR_CHAIN = "processor-chain";
   private static final String ROUTE = "route";
+  private static final String ROUTES = "routes";
   private static final String PROCESSOR = "processor";
   private static final String TRANSFORMER = "transformer";
   private static final String CUSTOM_PROCESSOR = "custom-processor";
@@ -224,6 +226,8 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   private static final String FLOW_REF = "flow-ref";
   private static final String EXCEPTION_LISTENER_ATTRIBUTE = "exceptionListener";
   private static final String SCATTER_GATHER = "scatter-gather";
+  private static final String FORK_JOIN_STRATEGY = "forkJoinStrategyFactory";
+  private static final String COLLECT_LIST = "collect-list";
   private static final String ENRICHER = "enricher";
   private static final String ASYNC = "async";
   private static final String TRY = "try";
@@ -334,7 +338,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
         .asPrototype().build());
     componentBuildingDefinitions.add(baseDefinition.withIdentifier(ROUTE)
-        .withTypeDefinition(fromType(AnnotatedProcessor.class)).withObjectFactoryType(MessageProcessorChainFactoryBean.class)
+        .withTypeDefinition(fromType(MessageProcessorChain.class)).withObjectFactoryType(MessageProcessorChainFactoryBean.class)
         .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
         .asPrototype().build());
     addModuleOperationChainParser(componentBuildingDefinitions);
@@ -375,10 +379,16 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("name", fromSimpleParameter("ref").build())
         .build());
 
+    componentBuildingDefinitions.add(baseDefinition.withIdentifier(COLLECT_LIST)
+        .withTypeDefinition(fromType(CollectListForkJoinStrategyFactory.class))
+        .build());
     componentBuildingDefinitions.add(baseDefinition.withIdentifier(SCATTER_GATHER)
-        .withTypeDefinition(fromType(ScatterGatherRouter.class)).withObjectFactoryType(ScatterGatherRouterFactoryBean.class)
+        .withTypeDefinition(fromType(ScatterGatherRouter.class))
         .withSetterParameterDefinition("timeout", fromSimpleParameter("timeout").build())
-        .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
+        .withSetterParameterDefinition("maxConcurrency", fromSimpleParameter("maxConcurrency").build())
+        .withSetterParameterDefinition("target", fromSimpleParameter("target").build())
+        .withSetterParameterDefinition(ROUTES, fromChildCollectionConfiguration(MessageProcessorChain.class).build())
+        .withSetterParameterDefinition(FORK_JOIN_STRATEGY, fromChildConfiguration(ForkJoinStrategyFactory.class).build())
         .asScope().build());
     componentBuildingDefinitions.add(baseDefinition.withIdentifier(ENRICHER)
         .withObjectFactoryType(MessageEnricherObjectFactory.class).withTypeDefinition(fromType(MessageEnricher.class))

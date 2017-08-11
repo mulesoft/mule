@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.processor.chain;
 
+import static java.util.Optional.ofNullable;
+
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
@@ -20,10 +22,12 @@ import java.util.Optional;
  */
 public class ExplicitMessageProcessorChainBuilder extends DefaultMessageProcessorChainBuilder {
 
-  protected MessageProcessorChain createInterceptingChain(Processor head, Optional<ProcessingStrategy> processingStrategyOptional,
+  @Override
+  protected MessageProcessorChain createInterceptingChain(Processor head,
                                                           List<Processor> processors,
                                                           List<Processor> processorForLifecycle) {
-    return new ExplicitMessageProcessorChain(name, processingStrategyOptional, head, processors, processorForLifecycle);
+    return new ExplicitMessageProcessorChain(name, ofNullable(processingStrategy), head, processors,
+                                             processorForLifecycle);
   }
 
   /**

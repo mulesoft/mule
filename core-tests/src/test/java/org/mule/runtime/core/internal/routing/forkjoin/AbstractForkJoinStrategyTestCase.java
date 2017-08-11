@@ -13,6 +13,7 @@ import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.empty;
 import static java.util.stream.IntStream.range;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -53,6 +54,8 @@ import org.junit.rules.ExpectedException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.InternalEvent;
@@ -65,9 +68,10 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.routing.ForkJoinStrategy;
 import org.mule.runtime.core.api.routing.ForkJoinStrategy.RoutingPair;
 import org.mule.runtime.core.api.util.func.CheckedConsumer;
-import org.mule.runtime.core.internal.routing.CompositeRoutingException;
-import org.mule.runtime.core.internal.routing.RoutingResult;
+import org.mule.runtime.core.api.routing.CompositeRoutingException;
+import org.mule.runtime.core.api.routing.RoutingResult;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.testmodels.fruit.Apple;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
@@ -92,6 +96,7 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
     scheduler = muleContext.getSchedulerService().ioScheduler();
     flow = mock(Flow.class);
     timeoutErrorType = muleContext.getErrorTypeRepository().getErrorType(TIMEOUT).get();
+    setupConcurrentProcessingStrategy();
     strategy = createStrategy(processingStrategy, Integer.MAX_VALUE, true, MAX_VALUE);
   }
 
@@ -226,9 +231,7 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
   @Test
   @Description("When configured with delayErrors='false' the first errors causes strategy to throw this exception. Other routes may or may not be executed depending on concurrency.")
   public void errorEagerConcurrent() throws Throwable {
-    setupConcurrentProcessingStrategy();
     strategy = createStrategy(processingStrategy, 4, false, MAX_VALUE);
-
     Processor processorSpy = createProcessorSpy(of(1));
     Processor processorSpy2 = createProcessorSpy(of(2));
     Processor processorSpy3 = createProcessorSpy(of(3));
@@ -252,29 +255,62 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
   }
 
   @Test
-  @Description("After successful completion of all routes the variables from each route are merged into the result event using a last-wins policy.")
+  @Description("After successful completion of all routes the variables from each route are merged into the result.")
   public void flowVarsMerged() throws Throwable {
-    String beforeVarName = "before";
-    String fooVarName = "foo";
-    String foo2VarName = "foo2";
+    final String beforeVarName = "before";
+    final String beforeVarValue = "beforeValue";
+    final String beforeVar2Name = "before2";
+    final String beforeVar2Value = "before2Value";
+    final String beforeVar2NewValue = "before2NewValue";
+    final String fooVarName = "foo";
+    final String fooVarValue = "fooValue1";
+    final String fooVar2Name = "foo2";
+    final String fooVar2Value1 = "foo2Value1";
+    final String fooVar2Value2 = "foo2Value2";
+    final String fooVar3Name = "foo3";
+    final String fooVar3Value1 = "foo3Value1";
+    final Apple fooVar3Value2 = new Apple();
 
-    InternalEvent original = builder(newEvent()).addVariable(beforeVarName, "value").build();
+    InternalEvent original = builder(newEvent())
+        .addVariable(beforeVarName, beforeVarValue)
+        .addVariable(beforeVar2Name, beforeVar2Value)
+        .build();
 
-    RoutingPair pair1 = of(testEvent(), createChain(event -> builder(event).addVariable(fooVarName, "bar").build()));
-    RoutingPair pair2 = of(testEvent(), createChain(event -> builder(event).addVariable(foo2VarName, "bar2").build()));
+    RoutingPair pair1 = of(original, createChain(event -> builder(event)
+        .addVariable(beforeVar2Name, beforeVar2NewValue)
+        .addVariable(fooVarName, fooVarValue)
+        .addVariable(fooVar2Name, fooVar2Value1)
+        .addVariable(fooVar3Name, fooVar3Value1)
+        .build()));
+    RoutingPair pair2 = of(original, createChain(event -> builder(event)
+        .addVariable(fooVar2Name, fooVar2Value2)
+        .addVariable(fooVar3Name, fooVar3Value2)
+        .build()));
 
     InternalEvent result = invokeStrategyBlocking(strategy, original, asList(pair1, pair2));
 
-    assertThat(result.getVariables().keySet(), hasSize(3));
-    assertThat(result.getVariables().keySet(), hasItems(beforeVarName, fooVarName, foo2VarName));
+    assertThat(result.getVariables().keySet(), hasSize(5));
+
+    assertThat(result.getVariables().keySet(),
+               hasItems(beforeVarName, beforeVar2Name, fooVarName, fooVarName, fooVar2Name, fooVar3Name));
+
+    assertThat(result.getVariables().get(beforeVarName).getValue(), equalTo(beforeVarValue));
+    assertThat(result.getVariables().get(beforeVar2Name).getValue(), equalTo(beforeVar2NewValue));
+
+    assertThat(result.getVariables().get(fooVarName).getValue(), equalTo(fooVarValue));
+
+    TypedValue fooVar2 = result.getVariables().get(fooVar2Name);
+    assertThat(fooVar2.getDataType(), equalTo(DataType.builder().collectionType(List.class).itemType(String.class).build()));
+    assertThat(((List<String>) fooVar2.getValue()), hasItems(fooVar2Value1, fooVar2Value2));
+
+    TypedValue fooVar3 = result.getVariables().get(fooVar3Name);
+    assertThat(fooVar3.getDataType(), equalTo(DataType.builder().collectionType(List.class).itemType(Object.class).build()));
+    assertThat(((List<Object>) fooVar3.getValue()), hasItems(fooVar3Value1, fooVar3Value2));
   }
 
   @Test
   @Description("When the strategy uses a processing strategy that supports concurrent execution the total processing time is less that sequential processing.")
   public void concurrent() throws Throwable {
-    setupConcurrentProcessingStrategy();
-    strategy = createStrategy(processingStrategy, Integer.MAX_VALUE, true, MAX_VALUE);
-
     int pairs = 10;
     int processorSleep = 50;
     invokeStrategyBlocking(strategy, testEvent(), createRoutingPairs(pairs, processorSleep));
