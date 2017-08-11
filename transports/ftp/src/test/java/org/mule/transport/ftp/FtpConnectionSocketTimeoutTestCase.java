@@ -51,9 +51,9 @@ public class FtpConnectionSocketTimeoutTestCase extends AbstractFtpServerTestCas
 
     private static String CONNECTION_TIMEOUT = "1000";
 
-    private static int TEST_DELTA = 2000;
+    private static int TEST_DELTA = 500;
 
-    private static int SERVER_DELTA = 3000;
+    private static int SERVER_DELTA = 1000;
 
     private static long WAIT_TIMEOUT = parseLong(CONNECTION_TIMEOUT) + TEST_DELTA;
 
@@ -172,10 +172,11 @@ public class FtpConnectionSocketTimeoutTestCase extends AbstractFtpServerTestCas
     {
         try
         {
-            serverLatch.await(SERVER_SLEEP, TimeUnit.MILLISECONDS);
+            assertThat("Server Latch must not be released until the end of the test", serverLatch.await(SERVER_SLEEP, TimeUnit.MILLISECONDS), is(false));
         }
         catch (InterruptedException e)
         {
+            Thread.currentThread().interrupt();
             throw new RuntimeException("Interrupted exception was triggered", e);
         }
     }
