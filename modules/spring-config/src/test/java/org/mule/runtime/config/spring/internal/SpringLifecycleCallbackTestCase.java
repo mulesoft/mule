@@ -6,21 +6,19 @@
  */
 package org.mule.runtime.config.spring.internal;
 
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.util.MuleContextUtils.mockNotificationsHandling;
-
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.config.spring.internal.dsl.model.ConfigurationDependencyResolver;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -28,6 +26,9 @@ import org.junit.runner.RunWith;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -48,10 +49,12 @@ public class SpringLifecycleCallbackTestCase extends AbstractMuleTestCase {
     final MuleRegistry registry = mock(MuleRegistry.class);
     mockNotificationsHandling(registry);
     when(muleContext.getRegistry()).thenReturn(registry);
-    springRegistryLifecycleManager = new SpringRegistryLifecycleManager("id", springRegistry, muleContext);
-    springRegistryLifecycleManager.registerPhases();
+    springRegistry = mock(SpringRegistry.class, RETURNS_DEEP_STUBS);
+    springRegistryLifecycleManager =
+        new SpringRegistryLifecycleManager("id", springRegistry, muleContext);
+    springRegistryLifecycleManager.registerPhases(springRegistry);
 
-    callback = new SpringLifecycleCallback(springRegistryLifecycleManager);
+    callback = new SpringLifecycleCallback(springRegistryLifecycleManager, springRegistry);
   }
 
   @Test
@@ -59,7 +62,9 @@ public class SpringLifecycleCallbackTestCase extends AbstractMuleTestCase {
     Map<String, Initialisable> objects = new LinkedHashMap<>();
     for (int i = 1; i <= 5; i++) {
       final String key = String.valueOf(i);
-      objects.put(key, newInitialisable());
+      Initialisable object = newInitialisable();
+      objects.put(key, object);
+      when(springRegistry.get(key)).thenReturn(object);
     }
 
     Map<String, ?> childsOf1 = new LinkedHashMap<>(objects);
@@ -70,6 +75,9 @@ public class SpringLifecycleCallbackTestCase extends AbstractMuleTestCase {
     Map<String, Object> childsOf4 = new LinkedHashMap<>();
     childsOf4.put("5", objects.get("5"));
 
+    when(springRegistry.getBeanDependencyResolver())
+        .thenReturn(new DefaultBeanDependencyResolver(mock(ConfigurationDependencyResolver.class, RETURNS_DEEP_STUBS),
+                                                      springRegistry));
     when(springRegistry.getDependencies("1")).thenReturn((Map<String, Object>) childsOf1);
     when(springRegistry.getDependencies("4")).thenReturn(childsOf4);
     when(springRegistry.lookupEntriesForLifecycle(Initialisable.class)).thenReturn(objects);

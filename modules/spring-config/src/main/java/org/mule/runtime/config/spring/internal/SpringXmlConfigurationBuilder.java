@@ -11,7 +11,6 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader.resolveContextArtifactPluginClassLoaders;
-
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
@@ -27,12 +26,12 @@ import org.mule.runtime.core.api.config.builders.AbstractResourceConfigurationBu
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ConfigurableApplicationContext;
 
 /**
  * <code>SpringXmlConfigurationBuilder</code> enables Mule to be configured from a Spring XML Configuration file used with Mule
@@ -184,7 +183,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     } else if (domainContext != null) {
       createRegistryWithParentContext(muleContext, applicationContext, domainContext);
     } else {
-      registry = new SpringRegistry(applicationContext, muleContext);
+      registry = new SpringRegistry(applicationContext, muleContext, muleArtifactContext.getDependencyResolver());
     }
 
     // Note: The SpringRegistry must be created before
@@ -198,7 +197,8 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
                                                ApplicationContext parentContext)
       throws ConfigurationException {
     if (applicationContext instanceof ConfigurableApplicationContext) {
-      registry = new SpringRegistry((ConfigurableApplicationContext) applicationContext, parentContext, muleContext);
+      ((ConfigurableApplicationContext) applicationContext).setParent(parentContext);
+      registry = new SpringRegistry(applicationContext, muleContext, muleArtifactContext.getDependencyResolver());
     } else {
       throw new ConfigurationException(I18nMessageFactory
           .createStaticMessage("Cannot set a parent context if the ApplicationContext does not implement ConfigurableApplicationContext"));

@@ -59,6 +59,7 @@ public class TlsComponentBuildingDefinitionProvider implements ComponentBuilding
     componentBuildingDefinitions
         .add(baseDefinition.withIdentifier(CONTEXT).withTypeDefinition(fromType(DefaultTlsContextFactory.class))
             .withObjectFactoryType(DefaultTlsContextFactoryObjectFactory.class)
+            .withSetterParameterDefinition("name", fromSimpleParameter("name").build())
             .withSetterParameterDefinition("enabledProtocols", fromSimpleParameter("enabledProtocols").build())
             .withSetterParameterDefinition("enabledCipherSuites", fromSimpleParameter("enabledCipherSuites").build())
             .withSetterParameterDefinition("keyStore", fromChildConfiguration(KeyStoreConfig.class).build())

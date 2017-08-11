@@ -9,11 +9,11 @@ package org.mule.runtime.config.spring.internal;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
+import org.mule.runtime.config.spring.internal.dsl.model.ConfigurationDependencyResolver;
 import org.mule.runtime.config.spring.internal.factories.ConstantFactoryBean;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
@@ -23,12 +23,6 @@ import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.core.internal.registry.AbstractRegistry;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.FatalBeanException;
@@ -43,6 +37,12 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 public class SpringRegistry extends AbstractRegistry implements LifecycleRegistry, Injector {
 
   public static final String REGISTRY_ID = "org.mule.Registry.Spring";
@@ -51,6 +51,7 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
    * Key used to lookup Spring Application Context from SpringRegistry via Mule's Registry interface.
    */
   public static final String SPRING_APPLICATION_CONTEXT = "springApplicationContext";
+  private BeanDependencyResolver beanDependencyResolver;
 
   protected ApplicationContext applicationContext;
 
@@ -65,28 +66,11 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
   // Registered objects before the spring registry has been initialised.
   private final Map<String, BeanDefinition> registeredBeanDefinitionsBeforeInitialization = new HashMap<>();
 
-  public SpringRegistry(ApplicationContext applicationContext, MuleContext muleContext) {
+  public SpringRegistry(ApplicationContext applicationContext, MuleContext muleContext,
+                        ConfigurationDependencyResolver dependencyResolver) {
     super(REGISTRY_ID, muleContext);
     setApplicationContext(applicationContext);
-  }
-
-  public SpringRegistry(String id, ApplicationContext applicationContext, MuleContext muleContext) {
-    super(id, muleContext);
-    setApplicationContext(applicationContext);
-  }
-
-  public SpringRegistry(ConfigurableApplicationContext applicationContext, ApplicationContext parentContext,
-                        MuleContext muleContext) {
-    super(REGISTRY_ID, muleContext);
-    applicationContext.setParent(parentContext);
-    setApplicationContext(applicationContext);
-  }
-
-  public SpringRegistry(String id, ConfigurableApplicationContext applicationContext, ApplicationContext parentContext,
-                        MuleContext muleContext) {
-    super(id, muleContext);
-    applicationContext.setParent(parentContext);
-    setApplicationContext(applicationContext);
+    this.beanDependencyResolver = new DefaultBeanDependencyResolver(dependencyResolver, this);
   }
 
   private void setApplicationContext(ApplicationContext applicationContext) {
@@ -437,6 +421,10 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
         }
       }
     }
+  }
+
+  public BeanDependencyResolver getBeanDependencyResolver() {
+    return beanDependencyResolver;
   }
 
   ////////////////////////////////////////////////////////////////////////////////////
