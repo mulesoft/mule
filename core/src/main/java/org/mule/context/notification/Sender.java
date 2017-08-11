@@ -6,6 +6,8 @@
  */
 package org.mule.context.notification;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.routing.filters.WildcardFilter;
 
@@ -16,6 +18,8 @@ import org.mule.routing.filters.WildcardFilter;
  */
 class Sender
 {
+
+    protected static final Log logger = LogFactory.getLog(Sender.class);
 
     private ListenerSubscriptionPair pair;
     private WildcardFilter subscriptionFilter;
@@ -40,6 +44,7 @@ class Sender
             catch (Exception e)
             {
                 // Exceptions from listeners do not affect the notification processing
+                logger.warn("An exception occurred when processing notification: " + e.getMessage());
             }
         }
     }
