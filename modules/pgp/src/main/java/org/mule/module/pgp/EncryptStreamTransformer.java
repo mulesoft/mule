@@ -6,6 +6,9 @@
  */
 package org.mule.module.pgp;
 
+import static org.mule.module.pgp.config.PGPOutputMode.ARMOR;
+import org.mule.module.pgp.config.PGPOutputMode;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -36,10 +39,11 @@ public class EncryptStreamTransformer implements StreamTransformer
     private OutputStream pgpOutputStream;
     private OutputStream compressedEncryptedOutputStream;
     private OutputStream encryptedOutputStream;
-    private OutputStream armoredOut;
+    private OutputStream originalStream;
     private long bytesWrote;
+    private PGPOutputMode pgpOutputMode;
 
-    public EncryptStreamTransformer(InputStream toBeEncrypted, PGPPublicKey publicKey, Provider provider, int algorithm) throws IOException
+    public EncryptStreamTransformer(InputStream toBeEncrypted, PGPPublicKey publicKey, Provider provider, int algorithm, PGPOutputMode pgpOutputMode) throws IOException
     {
         Validate.notNull(toBeEncrypted, "The toBeEncrypted should not be null");
         Validate.notNull(publicKey, "The publicKey should not be null");
@@ -49,6 +53,7 @@ public class EncryptStreamTransformer implements StreamTransformer
         this.bytesWrote = 0;
         this.provider = provider;
         this.algorithm = algorithm;
+        this.pgpOutputMode = pgpOutputMode;
     }
 
     /**
@@ -57,13 +62,21 @@ public class EncryptStreamTransformer implements StreamTransformer
     @Override
     public void initialize(OutputStream out) throws Exception
     {
-        armoredOut = new ArmoredOutputStream(out);
+        if(pgpOutputMode == ARMOR)
+        {
+            originalStream = new ArmoredOutputStream(out);
+        }
+        else
+        {
+            originalStream = out;
+        }
+
         BcPGPDataEncryptorBuilder encryptorBuilder = new BcPGPDataEncryptorBuilder(algorithm);
         PGPEncryptedDataGenerator encrDataGen = new PGPEncryptedDataGenerator(encryptorBuilder, false);
 
         BcPublicKeyKeyEncryptionMethodGenerator methodGenerator = new BcPublicKeyKeyEncryptionMethodGenerator(this.publicKey);
         encrDataGen.addMethod(methodGenerator);
-        encryptedOutputStream = encrDataGen.open(armoredOut, new byte[1 << 16]);
+        encryptedOutputStream = encrDataGen.open(originalStream, new byte[1 << 16]);
 
         PGPCompressedDataGenerator comprDataGen = new PGPCompressedDataGenerator(PGPCompressedData.ZIP);
         compressedEncryptedOutputStream = comprDataGen.open(encryptedOutputStream);
@@ -93,7 +106,7 @@ public class EncryptStreamTransformer implements StreamTransformer
             pgpOutputStream.close();
             compressedEncryptedOutputStream.close();
             encryptedOutputStream.close();
-            armoredOut.close();
+            originalStream.close();
             toBeEncrypted.close();
             return true;
         }

@@ -13,6 +13,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.security.CredentialsAccessor;
 import org.mule.api.security.CryptoFailureException;
+import org.mule.module.pgp.config.PGPOutputMode;
 import org.mule.module.pgp.exception.MissingPGPKeyException;
 import org.mule.module.pgp.i18n.PGPMessages;
 import org.mule.security.AbstractNamedEncryptionStrategy;
@@ -41,6 +42,7 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
     private Provider provider;
     private String encryptionAlgorithm;
     private int encryptionAlgorithmId;
+    private PGPOutputMode pgpOutputMode;
 
     public void initialise() throws InitialisationException
     {
@@ -71,7 +73,7 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
         {
             PGPCryptInfo pgpCryptInfo = this.safeGetCryptInfo(cryptInfo);
             PGPPublicKey publicKey = pgpCryptInfo.getPublicKey();
-            StreamTransformer transformer = new EncryptStreamTransformer(data, publicKey, provider, encryptionAlgorithmId);
+            StreamTransformer transformer = new EncryptStreamTransformer(data, publicKey, provider, encryptionAlgorithmId, pgpOutputMode);
             return new LazyTransformedInputStream(new TransformContinuouslyPolicy(), transformer);
         }
         catch (Exception e)
@@ -156,6 +158,11 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
     public void setCredentialsAccessor(CredentialsAccessor credentialsAccessor)
     {
         this.credentialsAccessor = credentialsAccessor;
+    }
+
+    public void setPgpOutputMode(PGPOutputMode pgpOutputMode)
+    {
+        this.pgpOutputMode = pgpOutputMode;
     }
 
     public boolean isCheckKeyExpirity()
