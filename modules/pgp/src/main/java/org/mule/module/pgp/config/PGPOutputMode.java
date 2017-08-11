@@ -8,7 +8,7 @@
 package org.mule.module.pgp.config;
 
 
-public enum PGPMode
+public enum PGPOutputMode
 {
     BINARY, ARMOR
 }

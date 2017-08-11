@@ -6,8 +6,8 @@
  */
 package org.mule.module.pgp;
 
-import static org.mule.module.pgp.config.PGPMode.ARMOR;
-import org.mule.module.pgp.config.PGPMode;
+import static org.mule.module.pgp.config.PGPOutputMode.ARMOR;
+import org.mule.module.pgp.config.PGPOutputMode;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,9 +41,9 @@ public class EncryptStreamTransformer implements StreamTransformer
     private OutputStream encryptedOutputStream;
     private OutputStream originalStream;
     private long bytesWrote;
-    private PGPMode pgpMode;
+    private PGPOutputMode pgpOutputMode;
 
-    public EncryptStreamTransformer(InputStream toBeEncrypted, PGPPublicKey publicKey, Provider provider, int algorithm, PGPMode pgpMode) throws IOException
+    public EncryptStreamTransformer(InputStream toBeEncrypted, PGPPublicKey publicKey, Provider provider, int algorithm, PGPOutputMode pgpOutputMode) throws IOException
     {
         Validate.notNull(toBeEncrypted, "The toBeEncrypted should not be null");
         Validate.notNull(publicKey, "The publicKey should not be null");
@@ -53,7 +53,7 @@ public class EncryptStreamTransformer implements StreamTransformer
         this.bytesWrote = 0;
         this.provider = provider;
         this.algorithm = algorithm;
-        this.pgpMode = pgpMode;
+        this.pgpOutputMode = pgpOutputMode;
     }
 
     /**
@@ -62,7 +62,7 @@ public class EncryptStreamTransformer implements StreamTransformer
     @Override
     public void initialize(OutputStream out) throws Exception
     {
-        if(pgpMode == ARMOR)
+        if(pgpOutputMode == ARMOR)
         {
             originalStream = new ArmoredOutputStream(out);
         }
