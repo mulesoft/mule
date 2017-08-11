@@ -6,6 +6,7 @@
  */
 package org.mule.module.pgp;
 
+import org.mule.module.pgp.config.PGPOutputMode;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.net.URL;
@@ -33,6 +34,7 @@ public abstract class AbstractEncryptionStrategyTestCase extends AbstractMuleCon
 
         kbStrategy = new KeyBasedEncryptionStrategy();
         kbStrategy.setKeyManager(keyM);
+        kbStrategy.setPgpOutputMode(PGPOutputMode.ARMOR);
         kbStrategy.setCredentialsAccessor(new FakeCredentialAccessor("Mule server <mule_server@mule.com>"));
 
         keyManager = keyM;
