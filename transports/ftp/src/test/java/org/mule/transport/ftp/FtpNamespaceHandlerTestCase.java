@@ -9,8 +9,11 @@ package org.mule.transport.ftp;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import org.mule.api.endpoint.EndpointException;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.file.DummyFilenameParser;
@@ -55,9 +58,11 @@ public class FtpNamespaceHandlerTestCase extends FunctionalTestCase
     {
         FtpConnector c = (FtpConnector)muleContext.getRegistry().lookupConnector("receiverFtpConnector");
         assertNotNull(c);
-        
+
         MuleEndpointURI uri = new MuleEndpointURI("http://localhost", null);
-        GenericObjectPool objectPool = (GenericObjectPool) c.getFtpPool(uri);
+        ImmutableEndpoint endpoint = mock(ImmutableEndpoint.class);
+        when(endpoint.getEndpointURI()).thenReturn(uri);
+        GenericObjectPool objectPool = (GenericObjectPool) c.getFtpPool(endpoint);
         assertEquals(GenericObjectPool.WHEN_EXHAUSTED_FAIL, objectPool.getWhenExhaustedAction());
     }
 }
