@@ -52,7 +52,7 @@ public abstract class AbstractFtpServerTestCase extends AbstractServiceAndFlowTe
     /**
      * Subclasses can overwrite Ftplet that will be registered when creating the server.
      */
-    protected Ftplet ftplet = new MuleFtplet(this);
+    protected Ftplet ftplet ;
 
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
@@ -97,6 +97,7 @@ public abstract class AbstractFtpServerTestCase extends AbstractServiceAndFlowTe
     @Override
     protected void doSetUp() throws Exception
     {
+        ftplet = createFtpLet();
         super.doSetUp();
         this.ftpPort = dynamicPort.getNumber();
         ftpClient = new FTPTestClient(this.ftpHost, this.ftpPort, this.ftpUser, this.ftpPassword);
@@ -209,5 +210,10 @@ public abstract class AbstractFtpServerTestCase extends AbstractServiceAndFlowTe
         FileUtils.writeStringToFile(target, testMessage, encoding);
 
         return target;
+    }
+
+    protected Ftplet createFtpLet ()
+    {
+        return new MuleFtplet(this);
     }
 }

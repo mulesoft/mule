@@ -100,13 +100,14 @@ public abstract class AbstractPolicyTemplate implements RetryPolicyTemplate, Mul
             }
             while (status.isOk());
 
+            context.setFailed(cause);
+
             if (status == null || status.isOk())
             {
                 return context;
             }
             else
             {
-                context.setFailed(cause);
                 throw new RetryPolicyExhaustedException(cause, callback.getWorkDescription());
             }
         }

@@ -43,7 +43,6 @@ import org.apache.commons.net.ftp.FTPConnectionClosedException;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPListParseEngine;
 import org.apache.commons.net.ftp.FTPReply;
-import sun.net.ftp.FtpClient;
 
 public class FtpMessageReceiver extends AbstractPollingMessageReceiver
 {
@@ -149,12 +148,19 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
         {
             try
             {
-                retryTemplate.execute(callbackReconnection, this.connector.getMuleContext().getWorkManager());
-                return filesToFTPArray(client[0]);
+                RetryContext retryContext = retryTemplate.execute(callbackReconnection, this.connector.getMuleContext().getWorkManager());
+                if (client[0] != null)
+                {
+                    return filesToFTPArray(client[0]);
+                }
+                else
+                {
+                    throw new ConnectException(retryContext.getLastFailure(), this);
+                }
             }
             catch (RetryPolicyExhaustedException retryPolicyExhaustedException)
             {
-                if (retryPolicyExhaustedException.getCause() instanceof java.net.ConnectException)
+                if (retryPolicyExhaustedException.getCause() instanceof ConnectException)
                 {
                     throw new ConnectException(retryPolicyExhaustedException, this.connector);
                 }
@@ -216,7 +222,7 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
         {
             if (client != null)
             {
-                connector.releaseFtp(endpoint.getEndpointURI(), client);
+                connector.releaseFtp(endpoint, client);
             }
         }
     }
@@ -289,7 +295,7 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
             {
                 if (client != null)
                 {
-                    connector.releaseFtp(endpoint.getEndpointURI(), client);
+                    connector.releaseFtp(endpoint, client);
                 }
             }
             catch (Exception e)
@@ -384,7 +390,7 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
                     {
                         try
                         {
-                            connector.releaseFtp(endpoint.getEndpointURI(), client);
+                            connector.releaseFtp(endpoint, client);
                         }
                         catch (Exception e)
                         {

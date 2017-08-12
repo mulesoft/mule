@@ -105,7 +105,7 @@ public class FTPConnectorTestCase extends AbstractInboundEndpointNameableConnect
         // no validate call for simplicity
         connector.setValidateConnections(false);
 
-        ObjectPool pool = connector.getFtpPool(endpointURI);
+        ObjectPool pool = connector.getFtpPool(endpoint);
         Object obj = pool.borrowObject();
         assertEquals("Custom FTP connection factory has been ignored.", testObject, obj);
     }
