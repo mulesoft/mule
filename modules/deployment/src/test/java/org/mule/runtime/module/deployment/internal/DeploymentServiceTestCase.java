@@ -839,6 +839,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     assertAppsDir(NONE, new String[] {incompleteAppFileBuilder.getId()}, true);
     String appId = incompleteAppFileBuilder.getId();
     assertZombieApplication(appId);
+    assertThat(deploymentService.findApplication(appId).getMuleContext(), nullValue());
   }
 
   @Test
@@ -854,6 +855,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     // Maintains app dir created
     assertAppsDir(NONE, new String[] {incompleteAppFileBuilder.getId()}, true);
     assertZombieApplication(incompleteAppFileBuilder.getId());
+    assertThat(deploymentService.findApplication(incompleteAppFileBuilder.getId()).getMuleContext(), nullValue());
   }
 
   @Test

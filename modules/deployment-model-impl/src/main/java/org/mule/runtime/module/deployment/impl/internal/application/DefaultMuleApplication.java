@@ -268,7 +268,7 @@ public class DefaultMuleApplication implements Application {
 
   @Override
   public MuleContext getMuleContext() {
-    return artifactContext.getMuleContext();
+    return artifactContext != null ? artifactContext.getMuleContext() : null;
   }
 
   @Override
