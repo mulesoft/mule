@@ -51,9 +51,8 @@ public class FtpMessageRequester extends AbstractMessageRequester
     {
         try
         {
-            EndpointURI uri = endpoint.getEndpointURI();
-            FTPClient client = connector.getFtp(uri);
-            connector.destroyFtp(uri, client);
+            FTPClient client = connector.getFtp(endpoint);
+            connector.destroyFtp(endpoint, client);
         }
         catch (Exception e)
         {
@@ -106,7 +105,7 @@ public class FtpMessageRequester extends AbstractMessageRequester
         }
         finally
         {
-            connector.releaseFtp(endpoint.getEndpointURI(), client);
+            connector.releaseFtp(endpoint, client);
         }
     }
     
