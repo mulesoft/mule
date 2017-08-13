@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.construct;
 
 import static java.lang.String.format;
+import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STOPPED;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
@@ -76,7 +77,7 @@ public abstract class AbstractFlowConstruct extends AbstractAnnotatedObject impl
                                String initialState, FlowConstructStatistics statistics) {
     this.muleContext = muleContext;
     this.name = name;
-    this.exceptionListener = exceptionListener.orElse(muleContext.getDefaultErrorHandler());
+    this.exceptionListener = exceptionListener.orElse(muleContext.getDefaultErrorHandler(of(name)));
     this.initialState = initialState;
     try {
       this.lifecycleManager =

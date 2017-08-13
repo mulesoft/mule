@@ -12,6 +12,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -24,7 +25,6 @@ import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.ON_ERROR_CONTINUE;
-
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.DefaultEventContext;
@@ -44,8 +44,6 @@ import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -54,6 +52,9 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
 @Feature(ERROR_HANDLING)
 @Story(ON_ERROR_CONTINUE)
@@ -96,11 +97,14 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
     flow = getTestFlow(muleContext);
     flow.initialise();
     onErrorContinueHandler = new OnErrorContinueHandler();
+    onErrorContinueHandler.setAnnotations(getFlowComponentLocationAnnotations(flow.getName()));
     onErrorContinueHandler.setMuleContext(mockMuleContext);
     onErrorContinueHandler.setNotificationFirer(mock(NotificationDispatcher.class));
 
     final MuleRegistry registry = mockMuleContext.getRegistry();
     doReturn(mockStreamingManager).when(registry).lookupObject(StreamingManager.class);
+    when(muleContext.getRegistry().lookupFlowConstruct(anyString()).getProcessingStrategy())
+        .thenReturn(flow.getProcessingStrategy());
 
     context = DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION);
     muleEvent = InternalEvent.builder(context).message(muleMessage).flow(flow).build();
@@ -124,6 +128,7 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
   public void testHandleExceptionWithConfiguredMessageProcessors() throws Exception {
     onErrorContinueHandler
         .setMessageProcessors(asList(createSetStringMessageProcessor("A"), createSetStringMessageProcessor("B")));
+    onErrorContinueHandler.setMuleContext(muleContext);
     onErrorContinueHandler.initialise();
     when(mockException.handled()).thenReturn(true);
     final InternalEvent result = onErrorContinueHandler.handleException(mockException, muleEvent);

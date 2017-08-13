@@ -46,6 +46,7 @@ import org.mule.runtime.core.api.util.queue.QueueManager;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.transaction.TransactionManager;
@@ -241,7 +242,7 @@ public interface MuleContext extends Lifecycle {
    * @return default exception strategy. If no default error handler was configured it returns one with a catch all
    *         <on-error-propagate> element.
    */
-  MessagingExceptionHandler getDefaultErrorHandler();
+  MessagingExceptionHandler getDefaultErrorHandler(Optional<String> rootContainerName);
 
   /**
    * @return single resource transaction factory manager. Used to retrieve a transaction factory for each transactional resource

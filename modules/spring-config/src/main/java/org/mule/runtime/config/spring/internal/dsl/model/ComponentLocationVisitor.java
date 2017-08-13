@@ -11,9 +11,10 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
-import static org.mule.runtime.api.component.TypedComponentIdentifier.builder;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SCOPE;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.UNKNOWN;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.builder;
 import static org.mule.runtime.config.spring.api.dsl.model.ApplicationModel.FLOW_IDENTIFIER;
 import static org.mule.runtime.config.spring.api.dsl.model.ApplicationModel.HTTP_PROXY_OPERATION_IDENTIFIER;
 import static org.mule.runtime.config.spring.api.dsl.model.ApplicationModel.HTTP_PROXY_POLICY_IDENTIFIER;
@@ -32,7 +33,6 @@ import static org.mule.runtime.config.spring.internal.dsl.spring.ComponentModelH
 import static org.mule.runtime.config.spring.internal.dsl.spring.ComponentModelHelper.isRouter;
 import static org.mule.runtime.config.spring.internal.dsl.spring.ComponentModelHelper.isTemplateOnErrorHandler;
 import static org.mule.runtime.config.spring.internal.dsl.spring.ComponentModelHelper.resolveComponentType;
-
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -42,12 +42,12 @@ import org.mule.runtime.config.spring.internal.dsl.spring.ComponentModelHelper;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.DefaultLocationPart;
 
-import com.google.common.collect.ImmutableList;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * Visitor that setups the {@link DefaultComponentLocation} for all mule components in the artifact configuration.
@@ -104,7 +104,12 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
       } else if (isTemplateOnErrorHandler(componentModel)) {
         componentLocation = processOnErrorModel(componentModel, parentComponentLocation, typedComponentIdentifier);
       } else if (parentComponentIsRouter(componentModel)) {
-        if (isProcessor(componentModel)) {
+        if (isRoute(componentModel)) {
+          componentLocation = parentComponentLocation.appendRoutePart()
+              .appendLocationPart(findNonProcessorPath(componentModel), of(TypedComponentIdentifier.builder().type(SCOPE)
+                  .identifier(ROUTE_COMPONENT_IDENTIFIER).build()), componentModel.getConfigFileName(),
+                                  componentModel.getLineNumber());
+        } else if (isProcessor(componentModel)) {
           // this is the case of the routes directly inside the router as with scatter-gather
           componentLocation = parentComponentLocation
               .appendRoutePart()
@@ -143,6 +148,12 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
                                                      componentModel.getConfigFileName(), componentModel.getLineNumber());
     }
     componentModel.setComponentLocation(componentLocation);
+  }
+
+  private boolean isRoute(ComponentModel componentModel) {
+    return componentModel.getIdentifier().equals(buildFromStringRepresentation("mule:route"))
+        || componentModel.getIdentifier().equals(buildFromStringRepresentation("mule:when"))
+        || componentModel.getIdentifier().equals(buildFromStringRepresentation("mule:otherwise"));
   }
 
   private boolean isHttpProxyPart(ComponentModel componentModel) {

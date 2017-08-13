@@ -6,19 +6,23 @@
  */
 package org.mule.runtime.config.spring.internal.factories;
 
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import static org.mule.runtime.core.api.processor.MessageProcessors.getProcessingStrategy;
+import static org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder.newLazyProcessorChainBuilder;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
-import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.internal.routing.MessageProcessorExpressionPair;
+import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
+import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
 
 import java.util.List;
 
-import org.springframework.beans.factory.FactoryBean;
+import javax.inject.Inject;
 
-public class MessageProcessorFilterPairFactoryBean extends AbstractAnnotatedObject
-    implements FactoryBean<MessageProcessorExpressionPair> {
+public class MessageProcessorFilterPairFactoryBean extends AbstractAnnotatedObjectFactory<MessageProcessorExpressionPair> {
+
+  @Inject
+  private MuleContext muleContext;
 
   private String expression = "true";
   private List<Processor> messageProcessors;
@@ -32,8 +36,8 @@ public class MessageProcessorFilterPairFactoryBean extends AbstractAnnotatedObje
   }
 
   @Override
-  public MessageProcessorExpressionPair getObject() throws Exception {
-    MessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
+  public MessageProcessorExpressionPair doGetObject() throws Exception {
+    final DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     for (Object processor : messageProcessors) {
       if (processor instanceof Processor) {
         builder.chain((Processor) processor);
@@ -43,20 +47,13 @@ public class MessageProcessorFilterPairFactoryBean extends AbstractAnnotatedObje
         throw new IllegalArgumentException("MessageProcessorBuilder should only have MessageProcessors or MessageProcessorBuilders configured");
       }
     }
-
-    MessageProcessorExpressionPair filterPair = new MessageProcessorExpressionPair(expression, builder.build());
-    filterPair.setAnnotations(getAnnotations());
+    MessageProcessorExpressionPair filterPair = new MessageProcessorExpressionPair(expression,
+                                                                                   newLazyProcessorChainBuilder(builder,
+                                                                                                                muleContext,
+                                                                                                                () -> getProcessingStrategy(muleContext,
+                                                                                                                                            getRootContainerName())
+                                                                                                                                                .orElse(null)));
     return filterPair;
-  }
-
-  @Override
-  public Class<MessageProcessorExpressionPair> getObjectType() {
-    return MessageProcessorExpressionPair.class;
-  }
-
-  @Override
-  public boolean isSingleton() {
-    return true;
   }
 
 }

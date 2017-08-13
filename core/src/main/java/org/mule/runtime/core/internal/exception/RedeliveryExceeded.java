@@ -6,21 +6,23 @@
  */
 package org.mule.runtime.core.internal.exception;
 
+import static java.util.Optional.empty;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.internal.message.InternalMessage;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.internal.message.InternalMessage;
+
+import org.reactivestreams.Publisher;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 
 public class RedeliveryExceeded implements Initialisable, ReactiveProcessor {
@@ -30,7 +32,7 @@ public class RedeliveryExceeded implements Initialisable, ReactiveProcessor {
 
   @Override
   public void initialise() throws InitialisationException {
-    configuredMessageProcessors = newChain(messageProcessors);
+    configuredMessageProcessors = newChain(empty(), messageProcessors);
   }
 
   public List<Processor> getMessageProcessors() {

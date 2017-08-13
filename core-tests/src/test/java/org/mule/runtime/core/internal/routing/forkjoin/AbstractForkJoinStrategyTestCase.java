@@ -11,6 +11,7 @@ import static java.lang.Integer.MAX_VALUE;
 import static java.lang.Thread.sleep;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.IntStream.empty;
 import static java.util.stream.IntStream.range;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -38,6 +39,7 @@ import static reactor.core.publisher.Mono.from;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
@@ -397,7 +399,7 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
   }
 
   private MessageProcessorChain createChain(Processor processor) throws MuleException {
-    MessageProcessorChain chain = newChain(processor);
+    MessageProcessorChain chain = newChain(Optional.empty(), processor);
     chain.setMuleContext(muleContext);
     return chain;
   }

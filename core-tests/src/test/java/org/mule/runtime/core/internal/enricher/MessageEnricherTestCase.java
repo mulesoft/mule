@@ -44,7 +44,7 @@ public class MessageEnricherTestCase extends AbstractReactiveProcessorTestCase {
 
   @Test
   public void testEnrichHeaderWithPayload() throws Exception {
-    MessageEnricher enricher = baseEnricher();
+    MessageEnricher enricher = createEnricher();
     enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[mel:message.outboundProperties.myHeader]"));
     enricher.setEnrichmentMessageProcessor(event -> InternalEvent.builder(event)
         .message(InternalMessage.builder(event.getMessage()).value(TEST_PAYLOAD).build()).build());
@@ -55,9 +55,15 @@ public class MessageEnricherTestCase extends AbstractReactiveProcessorTestCase {
     assertEquals(TEST_PAYLOAD, result.getPayload().getValue());
   }
 
+  private MessageEnricher createEnricher() {
+    MessageEnricher enricher = baseEnricher();
+    enricher.setAnnotations(getAppleFlowComponentLocationAnnotations());
+    return enricher;
+  }
+
   @Test
   public void testEnrichHeaderWithHeader() throws Exception {
-    MessageEnricher enricher = baseEnricher();
+    MessageEnricher enricher = createEnricher();
     enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[mel:message.outboundProperties.header1]",
                                                               "#[mel:message.outboundProperties.myHeader]"));
     enricher.setEnrichmentMessageProcessor(event -> InternalEvent.builder(event)
@@ -233,7 +239,7 @@ public class MessageEnricherTestCase extends AbstractReactiveProcessorTestCase {
 
   public MessageEnricher baseEnricher() {
     MessageEnricher enricher = new MessageEnricher();
-    enricher.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
+    enricher.setAnnotations(getAppleFlowComponentLocationAnnotations());
     enricher.setMuleContext(muleContext);
     return enricher;
   }

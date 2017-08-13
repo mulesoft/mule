@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.routing;
 
-import org.mule.runtime.core.api.processor.MessageProcessorChain;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.Router;
 
 /**
@@ -18,11 +18,11 @@ import org.mule.runtime.core.api.processor.Router;
  */
 public interface SelectiveRouter extends Router {
 
-  void addRoute(String expression, MessageProcessorChain processor);
+  void addRoute(String expression, Processor processor);
 
-  void updateRoute(String expression, MessageProcessorChain processor);
+  void updateRoute(String expression, Processor processor);
 
-  void removeRoute(MessageProcessorChain processor);
+  void removeRoute(Processor processor);
 
-  void setDefaultRoute(MessageProcessorChain processor);
+  void setDefaultRoute(Processor processor);
 }

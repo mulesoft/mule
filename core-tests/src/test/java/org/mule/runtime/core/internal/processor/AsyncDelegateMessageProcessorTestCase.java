@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.processor;
 
 import static java.lang.Thread.currentThread;
 import static java.time.Duration.ofMillis;
+import static java.util.Optional.of;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -165,7 +166,8 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
 
   private AsyncDelegateMessageProcessor createAsyncDelegateMessageProcessor(Processor listener, FlowConstruct flowConstruct)
       throws Exception {
-    AsyncDelegateMessageProcessor mp = new AsyncDelegateMessageProcessor(newChain(listener), "thread");
+    AsyncDelegateMessageProcessor mp =
+        new AsyncDelegateMessageProcessor(newChain(of(flowConstruct.getProcessingStrategy()), listener), "thread");
     mp.setAnnotations(getAppleFlowComponentLocationAnnotations());
     initialiseIfNeeded(mp, true, muleContext);
     return mp;

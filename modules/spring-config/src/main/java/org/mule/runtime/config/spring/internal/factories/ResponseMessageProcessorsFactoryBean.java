@@ -6,35 +6,42 @@
  */
 package org.mule.runtime.config.spring.internal.factories;
 
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.artifact.Registry;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.processor.ResponseMessageProcessorAdapter;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
+import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
 
 import java.util.List;
 
-import org.springframework.beans.factory.FactoryBean;
+import javax.inject.Inject;
 
-public class ResponseMessageProcessorsFactoryBean extends AbstractAnnotatedObject implements FactoryBean, MuleContextAware {
+public class ResponseMessageProcessorsFactoryBean extends AbstractAnnotatedObjectFactory<ResponseMessageProcessorAdapter> {
 
-  protected List messageProcessors;
+  @Inject
   private MuleContext muleContext;
 
-  @Override
-  public Class getObjectType() {
-    return Processor.class;
-  }
+  @Inject
+  private Registry registry;
+
+  protected List messageProcessors;
 
   public void setMessageProcessors(List messageProcessors) {
     this.messageProcessors = messageProcessors;
   }
 
   @Override
-  public Object getObject() throws Exception {
+  public ResponseMessageProcessorAdapter doGetObject() throws Exception {
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
+    //builder.setProcessingStrategy(flowConstruct.getProcessingStrategy());
     builder.setName("'response' child processor chain");
     for (Object processor : messageProcessors) {
       if (processor instanceof Processor) {
@@ -46,20 +53,32 @@ public class ResponseMessageProcessorsFactoryBean extends AbstractAnnotatedObjec
       }
     }
     ResponseMessageProcessorAdapter responseAdapter = new ResponseMessageProcessorAdapter();
-    responseAdapter.setProcessor(builder.build());
+    responseAdapter.setProcessor(new Processor() {
+
+      private Processor processor;
+
+      @Override
+      public InternalEvent process(InternalEvent event) throws MuleException {
+        if (processor == null) {
+          FlowConstruct flowConstruct = (FlowConstruct) registry.lookupByName(getRootContainerName()).get();
+          builder.setProcessingStrategy(flowConstruct.getProcessingStrategy());
+          processor = builder.build();
+          if (processor instanceof MuleContextAware) {
+            ((MuleContextAware) processor).setMuleContext(muleContext);
+          }
+          if (processor instanceof Initialisable) {
+            ((Initialisable) processor).initialise();
+          }
+          if (processor instanceof Startable) {
+            ((Startable) processor).start();
+          }
+        }
+        return processor.process(event);
+      }
+    });
     responseAdapter.setMuleContext(muleContext);
     responseAdapter.setAnnotations(getAnnotations());
     return responseAdapter;
-  }
-
-  @Override
-  public boolean isSingleton() {
-    return false;
-  }
-
-  @Override
-  public void setMuleContext(MuleContext context) {
-    this.muleContext = context;
   }
 
 }

@@ -46,6 +46,7 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase {
   @Test
   public void testRoundRobin() throws Exception {
     RoundRobin rr = new RoundRobin();
+    rr.setAnnotations(getAppleFlowComponentLocationAnnotations());
     rr.setMuleContext(muleContext);
     MuleSession session = new DefaultMuleSession();
     List<TestProcessor> routes = new ArrayList<>(NUMBER_OF_ROUTES);
@@ -71,6 +72,7 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase {
   @Test
   public void usesFirstRouteOnFirstRequest() throws Exception {
     RoundRobin roundRobin = new RoundRobin();
+    roundRobin.setAnnotations(getAppleFlowComponentLocationAnnotations());
     roundRobin.setMuleContext(muleContext);
     List<Processor> routes = new ArrayList<>(2);
     Processor route1 = mock(Processor.class, "route1");

@@ -10,6 +10,7 @@ import static com.google.common.cache.CacheBuilder.newBuilder;
 import static java.util.Collections.emptyList;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
+import static org.mule.runtime.core.api.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.api.util.StringMessageUtils.truncate;
 import org.mule.runtime.api.exception.MuleException;
@@ -35,14 +36,14 @@ import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.privileged.routing.DefaultRouterResultsHandler;
 
-import com.google.common.cache.Cache;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.google.common.cache.Cache;
 
 /**
  * <code>AbstractOutboundRouter</code> is a base router class that tracks statistics about message processing through the router.
@@ -204,7 +205,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
       // MULE-13028 All routers should use processor chains rather than processors as their routes
       MessageProcessorChain chain = processorChainCache.getIfPresent(route);
       if (chain == null) {
-        chain = newChain(route);
+        chain = newChain(getProcessingStrategy(muleContext, getRootContainerName()), route);
         initialiseObject(chain);
         processorChainCache.put(route, chain);
       }

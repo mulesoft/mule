@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.api.policy;
 
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static reactor.core.publisher.Mono.from;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -22,11 +21,11 @@ import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 
+import org.reactivestreams.Publisher;
+
 import java.util.List;
 
 import javax.inject.Inject;
-
-import org.reactivestreams.Publisher;
 
 /**
  * Policy chain for handling the message processor associated to a policy.
@@ -41,7 +40,6 @@ public class PolicyChain extends AbstractAnnotatedObject
 
   private List<Processor> processors;
   private MessageProcessorChain processorChain;
-  private FlowConstruct flowConstruct;
 
   public void setProcessors(List<Processor> processors) {
     this.processors = processors;
@@ -49,7 +47,6 @@ public class PolicyChain extends AbstractAnnotatedObject
 
   @Override
   public final void initialise() throws InitialisationException {
-    initialiseIfNeeded(processors, muleContext);
     processorChain = new DefaultMessageProcessorChainBuilder().chain(this.processors).build();
     processorChain.setMuleContext(muleContext);
     processorChain.initialise();

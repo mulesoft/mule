@@ -6,6 +6,7 @@
  */
 package org.mule.tck.util;
 
+import static java.util.Optional.empty;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -30,6 +31,8 @@ import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 
+import java.util.Optional;
+
 /**
  * Provides helper methods to handle mock {@link MuleContext}s in unit tests.
  *
@@ -44,7 +47,7 @@ public class MuleContextUtils {
   public static MuleContext mockMuleContext() {
     final MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
     when(muleContext.getUniqueIdString()).thenReturn(UUID.getUUID());
-    when(muleContext.getDefaultErrorHandler()).thenReturn(new OnErrorPropagateHandler());
+    when(muleContext.getDefaultErrorHandler(empty())).thenReturn(new OnErrorPropagateHandler());
     StreamingManager streamingManager = mock(StreamingManager.class, RETURNS_DEEP_STUBS);
     try {
       final MuleRegistry registry = muleContext.getRegistry();

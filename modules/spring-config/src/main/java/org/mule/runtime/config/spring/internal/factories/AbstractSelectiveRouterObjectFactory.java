@@ -6,25 +6,25 @@
  */
 package org.mule.runtime.config.spring.internal.factories;
 
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.processor.MessageProcessorChain;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.routing.AbstractSelectiveRouter;
 import org.mule.runtime.core.internal.routing.MessageProcessorExpressionPair;
+import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
 
 import java.util.Collection;
 
-import org.springframework.beans.factory.FactoryBean;
+import javax.inject.Inject;
 
-public abstract class AbstractSelectiveRouterFactoryBean extends AbstractAnnotatedObject
-    implements FactoryBean<AbstractSelectiveRouter>, MuleContextAware {
+public abstract class AbstractSelectiveRouterObjectFactory extends AbstractAnnotatedObjectFactory<AbstractSelectiveRouter> {
 
-  private MessageProcessorChain defaultProcessor;
-  private Collection<MessageProcessorExpressionPair> conditionalMessageProcessors;
+  @Inject
   private MuleContext muleContext;
 
-  public AbstractSelectiveRouterFactoryBean() {
+  private Processor defaultProcessor;
+  private Collection<MessageProcessorExpressionPair> conditionalMessageProcessors;
+
+  public AbstractSelectiveRouterObjectFactory() {
     super();
   }
 
@@ -37,7 +37,7 @@ public abstract class AbstractSelectiveRouterFactoryBean extends AbstractAnnotat
   }
 
   @Override
-  public AbstractSelectiveRouter getObject() throws Exception {
+  public AbstractSelectiveRouter doGetObject() throws Exception {
     final AbstractSelectiveRouter router = newAbstractSelectiveRouter();
     router.setAnnotations(getAnnotations());
     router.setDefaultRoute(defaultProcessor);
@@ -52,13 +52,4 @@ public abstract class AbstractSelectiveRouterFactoryBean extends AbstractAnnotat
 
   protected abstract AbstractSelectiveRouter newAbstractSelectiveRouter();
 
-  @Override
-  public boolean isSingleton() {
-    return true;
-  }
-
-  @Override
-  public void setMuleContext(MuleContext context) {
-    this.muleContext = context;
-  }
 }

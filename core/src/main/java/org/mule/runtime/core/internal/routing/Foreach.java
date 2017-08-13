@@ -10,6 +10,7 @@ import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.exception.MuleException.INFO_LOCATION_KEY;
+import static org.mule.runtime.core.api.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContext;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
@@ -27,17 +28,20 @@ import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.Scope;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.privileged.expression.ExpressionConfig;
 import org.mule.runtime.core.internal.routing.outbound.AbstractMessageSequenceSplitter;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import org.mule.runtime.core.privileged.expression.ExpressionConfig;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import reactor.core.publisher.Mono;
 
 /**
@@ -181,8 +185,11 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
 
     List<Processor> chainProcessors = new ArrayList<>();
     chainProcessors.add(splitter);
-    chainProcessors.add(newChain(messageProcessors));
-    ownedMessageProcessor = newChain(chainProcessors);
+    Optional<ProcessingStrategy> processingStrategy = getProcessingStrategy(muleContext, getRootContainerName());
+    chainProcessors
+        .add(newChain(processingStrategy,
+                      messageProcessors));
+    ownedMessageProcessor = newChain(processingStrategy, chainProcessors);
 
     super.initialise();
   }

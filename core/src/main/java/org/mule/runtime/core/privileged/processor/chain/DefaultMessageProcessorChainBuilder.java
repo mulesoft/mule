@@ -8,6 +8,17 @@ package org.mule.runtime.core.privileged.processor.chain;
 
 import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
@@ -15,10 +26,14 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.processor.ReferenceProcessor;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 /**
  * <p>
@@ -32,6 +47,8 @@ import java.util.Optional;
  * </p>
  */
 public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcessorChainBuilder {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(DefaultMessageProcessorChainBuilder.class);
 
   /**
    * This builder supports the chaining together of message processors that intercept and also those that don't. While one can
@@ -157,6 +174,55 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
     protected List<Processor> getProcessorsToExecute() {
       return singletonList(head);
     }
+
+  }
+
+
+  /**
+   * Helper method to create a lazy processor from a chain builder so the chain builder can get access to a
+   * {@link FlowConstruct}{@link ProcessingStrategy}.
+   *
+   * @param chainBuilder the chain builder
+   * @param muleContext the context
+   * @param processingStrategySupplier a supplier of the processing strategy.
+   * @return a lazy processor that will build the chain upon the first request.
+   */
+  public static Processor newLazyProcessorChainBuilder(AbstractMessageProcessorChainBuilder chainBuilder, MuleContext muleContext,
+                                                       Supplier<ProcessingStrategy> processingStrategySupplier) {
+    return new LazyProcessor() {
+
+      private Processor processor;
+
+      @Override
+      public void initialise() throws InitialisationException {
+        chainBuilder.setProcessingStrategy(processingStrategySupplier.get());
+        processor = chainBuilder.build();
+        initialiseIfNeeded(processor, muleContext);
+      }
+
+      @Override
+      public void start() throws MuleException {
+        startIfNeeded(processor);
+      }
+
+      @Override
+      public void dispose() {
+        disposeIfNeeded(processor, LOGGER);
+      }
+
+      public void stop() throws MuleException {
+        stopIfNeeded(processor);
+      }
+
+      @Override
+      public InternalEvent process(InternalEvent event) throws MuleException {
+        return processor.process(event);
+      }
+    };
+  }
+
+  public static abstract class LazyProcessor extends AbstractAnnotatedObject
+      implements Processor, Lifecycle {
 
   }
 }

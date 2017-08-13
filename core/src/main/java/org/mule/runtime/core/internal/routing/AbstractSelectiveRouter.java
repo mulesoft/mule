@@ -31,11 +31,12 @@ import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.management.stats.RouterStatistics;
-import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.RoutePathNotFoundException;
 import org.mule.runtime.core.api.routing.RouterStatisticsRecorder;
 import org.mule.runtime.core.api.routing.SelectiveRouter;
+
+import org.reactivestreams.Publisher;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -43,13 +44,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.reactivestreams.Publisher;
-
 public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject implements SelectiveRouter,
     RouterStatisticsRecorder, Lifecycle, MuleContextAware {
 
   private final List<MessageProcessorExpressionPair> conditionalMessageProcessors = new ArrayList<>();
-  private Optional<MessageProcessorChain> defaultProcessor = empty();
+  private Optional<Processor> defaultProcessor = empty();
   private RouterStatistics routerStatistics;
 
   final AtomicBoolean initialised = new AtomicBoolean(false);
@@ -121,7 +120,7 @@ public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject im
   }
 
   @Override
-  public void addRoute(final String expression, final MessageProcessorChain processor) {
+  public void addRoute(final String expression, final Processor processor) {
     synchronized (conditionalMessageProcessors) {
       MessageProcessorExpressionPair addedPair = new MessageProcessorExpressionPair(expression, processor);
       conditionalMessageProcessors.add(transitionLifecycleManagedObjectForAddition(addedPair));
@@ -129,7 +128,7 @@ public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject im
   }
 
   @Override
-  public void removeRoute(final MessageProcessorChain processor) {
+  public void removeRoute(final Processor processor) {
     updateRoute(processor, index -> {
       MessageProcessorExpressionPair removedPair = conditionalMessageProcessors.remove(index);
 
@@ -138,7 +137,7 @@ public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject im
   }
 
   @Override
-  public void updateRoute(final String expression, final MessageProcessorChain processor) {
+  public void updateRoute(final String expression, final Processor processor) {
     updateRoute(processor, index -> {
       MessageProcessorExpressionPair addedPair = new MessageProcessorExpressionPair(expression, processor);
 
@@ -150,7 +149,7 @@ public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject im
   }
 
   @Override
-  public void setDefaultRoute(final MessageProcessorChain processor) {
+  public void setDefaultRoute(final Processor processor) {
     defaultProcessor = ofNullable(processor);
   }
 

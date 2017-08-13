@@ -75,7 +75,7 @@ import org.mule.runtime.config.spring.internal.dsl.processor.EnvironmentProperty
 import org.mule.runtime.config.spring.internal.dsl.processor.RetryPolicyTemplateObjectFactory;
 import org.mule.runtime.config.spring.internal.dsl.processor.factory.MessageEnricherObjectFactory;
 import org.mule.runtime.config.spring.internal.factories.AsyncMessageProcessorsFactoryBean;
-import org.mule.runtime.config.spring.internal.factories.ChoiceRouterFactoryBean;
+import org.mule.runtime.config.spring.internal.factories.ChoiceRouterObjectFactory;
 import org.mule.runtime.config.spring.internal.factories.DefaultFlowFactoryBean;
 import org.mule.runtime.config.spring.internal.factories.FlowRefFactoryBean;
 import org.mule.runtime.config.spring.internal.factories.MessageProcessorFilterPairFactoryBean;
@@ -335,11 +335,11 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
             .checkingThatIsClassOrInheritsFrom(MESSAGE_PROCESSOR_CLASS))
         .asPrototype().build());
     componentBuildingDefinitions.add(baseDefinition.withIdentifier(PROCESSOR_CHAIN)
-        .withTypeDefinition(fromType(Processor.class)).withObjectFactoryType(MessageProcessorChainObjectFactory.class)
+        .withTypeDefinition(fromType(AnnotatedProcessor.class)).withObjectFactoryType(MessageProcessorChainObjectFactory.class)
         .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
         .asPrototype().build());
     componentBuildingDefinitions.add(baseDefinition.withIdentifier(ROUTE)
-        .withTypeDefinition(fromType(Processor.class)).withObjectFactoryType(MessageProcessorChainFactoryBean.class)
+        .withTypeDefinition(fromType(AnnotatedProcessor.class)).withObjectFactoryType(MessageProcessorChainFactoryBean.class)
         .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
         .asPrototype().build());
     addModuleOperationChainParser(componentBuildingDefinitions);
@@ -443,7 +443,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
             .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
             .build());
     componentBuildingDefinitions.add(baseDefinition.withIdentifier(CHOICE).withTypeDefinition(fromType(ChoiceRouter.class))
-        .withObjectFactoryType(ChoiceRouterFactoryBean.class)
+        .withObjectFactoryType(ChoiceRouterObjectFactory.class)
         .withSetterParameterDefinition("routes", fromChildCollectionConfiguration(MessageProcessorExpressionPair.class).build())
         .withSetterParameterDefinition("defaultRoute", fromChildConfiguration(MessageProcessorExpressionPair.class).build())
         .build());
