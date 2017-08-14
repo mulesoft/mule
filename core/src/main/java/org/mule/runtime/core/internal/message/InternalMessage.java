@@ -11,7 +11,6 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.message.ExceptionPayload;
-import org.mule.runtime.core.api.message.DefaultMultiPartPayload;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -174,7 +173,7 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
      * @param key
      * @param value
      * @return
-     * @deprecated Transport infrastructure is deprecated. Use {@link DefaultMultiPartPayload} instead.
+     * @deprecated Transport infrastructure is deprecated. 
      */
     @Deprecated
     Builder addInboundAttachment(String key, DataHandler value);
@@ -183,7 +182,7 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
      * @param key
      * @param value
      * @return
-     * @deprecated Transport infrastructure is deprecated. Use {@link DefaultMultiPartPayload} instead.
+     * @deprecated Transport infrastructure is deprecated. 
      */
     @Deprecated
     Builder addOutboundAttachment(String key, DataHandler value);
@@ -191,7 +190,7 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
     /**
      * @param key
      * @return
-     * @deprecated Transport infrastructure is deprecated. Use {@link DefaultMultiPartPayload} instead.
+     * @deprecated Transport infrastructure is deprecated. 
      */
     @Deprecated
     Builder removeInboundAttachment(String key);
@@ -199,7 +198,7 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
     /**
      * @param key
      * @return
-     * @deprecated Transport infrastructure is deprecated. Use {@link DefaultMultiPartPayload} instead.
+     * @deprecated Transport infrastructure is deprecated. 
      */
     @Deprecated
     Builder removeOutboundAttachment(String key);
@@ -223,7 +222,7 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
     /**
      * @param inboundAttachments
      * @return
-     * @deprecated Transport infrastructure is deprecated. Use {@link DefaultMultiPartPayload} instead.
+     * @deprecated Transport infrastructure is deprecated. 
      */
     @Deprecated
     Builder inboundAttachments(Map<String, DataHandler> inboundAttachments);
@@ -231,7 +230,7 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
     /**
      * @param outbundAttachments
      * @return
-     * @deprecated Transport infrastructure is deprecated. Use {@link DefaultMultiPartPayload} instead.
+     * @deprecated Transport infrastructure is deprecated. 
      */
     @Deprecated
     Builder outboundAttachments(Map<String, DataHandler> outbundAttachments);
