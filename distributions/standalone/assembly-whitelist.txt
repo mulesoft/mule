@@ -163,7 +163,7 @@
 #
 /mule-standalone-${productVersion}/services
 /mule-standalone-${productVersion}/services/mule-service-scheduler-1.0.0-FD.2.zip
-/mule-standalone-${productVersion}/services/mule-service-http-1.0.0-FD.2.zip
+/mule-standalone-${productVersion}/services/mule-service-http-1.0.0-FD.3.zip
 /mule-standalone-${productVersion}/services/mule-service-oauth-1.0.0-FD.2.zip
 /mule-standalone-${productVersion}/services/mule-service-soap-1.0.0-FD.2.zip
 /mule-standalone-${productVersion}/services/mule-service-weave-2.0.0-BETA.4.zip
