@@ -58,6 +58,9 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
 
   private static final String PROCESSORS_PART_NAME = "processors";
   private static final ComponentIdentifier ROUTE_COMPONENT_IDENTIFIER = buildFromStringRepresentation("mule:route");
+  private static final ComponentIdentifier CHOICE_WHEN_COMPONENT_IDENTIFIER = buildFromStringRepresentation("mule:when");
+  private static final ComponentIdentifier CHOICE_OTHERWISE_COMPONENT_IDENTIFIER =
+      buildFromStringRepresentation("mule:otherwise");
 
   /**
    * For every {@link ComponentModel} in the configuration, sets the {@link DefaultComponentLocation} associated within an
@@ -151,9 +154,9 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
   }
 
   private boolean isRoute(ComponentModel componentModel) {
-    return componentModel.getIdentifier().equals(buildFromStringRepresentation("mule:route"))
-        || componentModel.getIdentifier().equals(buildFromStringRepresentation("mule:when"))
-        || componentModel.getIdentifier().equals(buildFromStringRepresentation("mule:otherwise"));
+    return componentModel.getIdentifier().equals(ROUTE_COMPONENT_IDENTIFIER)
+        || componentModel.getIdentifier().equals(CHOICE_WHEN_COMPONENT_IDENTIFIER)
+        || componentModel.getIdentifier().equals(CHOICE_OTHERWISE_COMPONENT_IDENTIFIER);
   }
 
   private boolean isHttpProxyPart(ComponentModel componentModel) {
