@@ -48,7 +48,6 @@ import static org.mule.runtime.core.api.util.ExceptionUtils.getRootCauseExceptio
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.core.internal.util.JdkVersionUtils.getSupportedJdks;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
@@ -66,8 +65,8 @@ import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.DefaultTransformationService;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.Injector;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import org.mule.runtime.core.api.client.MuleClient;
@@ -114,6 +113,7 @@ import org.mule.runtime.core.internal.config.ClusterConfiguration;
 import org.mule.runtime.core.internal.config.DefaultCustomizationService;
 import org.mule.runtime.core.internal.config.NullClusterConfiguration;
 import org.mule.runtime.core.internal.connector.DefaultSchedulerController;
+import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.internal.exception.ErrorHandlerFactory;
 import org.mule.runtime.core.internal.lifecycle.MuleContextLifecycleManager;
 import org.mule.runtime.core.internal.transformer.DynamicDataTypeConversionResolver;
@@ -124,18 +124,19 @@ import org.mule.runtime.core.internal.util.splash.ServerShutdownSplashScreen;
 import org.mule.runtime.core.internal.util.splash.ServerStartupSplashScreen;
 import org.mule.runtime.core.internal.util.splash.SplashScreen;
 
+import org.slf4j.Logger;
+
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.transaction.TransactionManager;
 import javax.xml.namespace.QName;
-
-import org.slf4j.Logger;
 
 import reactor.core.publisher.Hooks;
 
@@ -829,7 +830,7 @@ public class DefaultMuleContext implements MuleContext {
   }
 
   @Override
-  public MessagingExceptionHandler getDefaultErrorHandler() {
+  public MessagingExceptionHandler getDefaultErrorHandler(Optional<String> rootContainerName) {
     MessagingExceptionHandler defaultErrorHandler;
     if (config.getDefaultErrorHandlerName() != null) {
       defaultErrorHandler = getRegistry().lookupObject(config.getDefaultErrorHandlerName());
@@ -843,6 +844,9 @@ public class DefaultMuleContext implements MuleContext {
       } catch (RegistrationException e) {
         throw new MuleRuntimeException(e);
       }
+    }
+    if (rootContainerName.isPresent() && defaultErrorHandler instanceof ErrorHandler) {
+      ((ErrorHandler) defaultErrorHandler).setRootContainerName(rootContainerName.get());
     }
     return defaultErrorHandler;
   }

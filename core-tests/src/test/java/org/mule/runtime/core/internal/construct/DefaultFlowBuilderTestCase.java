@@ -16,6 +16,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
+import static org.hamcrest.core.IsNot.not;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
@@ -37,7 +38,9 @@ import org.mule.tck.size.SmallTest;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
+import org.hamcrest.core.IsNot;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -71,7 +74,7 @@ public class DefaultFlowBuilderTestCase extends AbstractMuleTestCase {
     assertThat(flow.getMuleContext(), is(muleContext));
     assertThat(flow.getProcessors(), is(empty()));
     assertThat(flow.getSource(), is(nullValue()));
-    assertThat(flow.getExceptionListener(), sameInstance(muleContext.getDefaultErrorHandler()));
+    assertThat(flow.getExceptionListener(), not(sameInstance(muleContext.getDefaultErrorHandler(Optional.empty()))));
     assertThat(flow.getProcessingStrategy(), sameInstance(processingStrategy));
   }
 

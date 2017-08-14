@@ -89,7 +89,7 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
     when(muleContext.getStatistics()).thenReturn(new AllStatistics());
     when(muleContext.getConfiguration()).thenReturn(new DefaultMuleConfiguration());
     notificationFirer = muleContext.getRegistry().lookupObject(NotificationDispatcher.class);
-    when(muleContext.getDefaultErrorHandler()).thenReturn(new ErrorHandlerFactory().createDefault(notificationFirer));
+    when(muleContext.getDefaultErrorHandler(empty())).thenReturn(new ErrorHandlerFactory().createDefault(notificationFirer));
     when(muleContext.getRegistry().lookupObject(NotificationDispatcher.class)).thenReturn(notificationFirer);
     ErrorTypeLocator errorTypeLocator = mock(ErrorTypeLocator.class);
     ErrorType errorType = mock(ErrorType.class);

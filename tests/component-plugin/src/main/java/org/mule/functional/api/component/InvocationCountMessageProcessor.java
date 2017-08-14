@@ -50,7 +50,7 @@ public class InvocationCountMessageProcessor implements Processor, Initialisable
     AtomicInteger count = invocationCountPerMessageProcessor.get(componentName);
     if (count == null) {
       throw new IllegalArgumentException("No invocation-counter component registered under name: " + componentName
-          + " + registered components: " + invocationCountPerMessageProcessor.keySet());
+          + ", registered components: " + invocationCountPerMessageProcessor.keySet());
     }
     return count.get();
   }

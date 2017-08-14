@@ -11,7 +11,6 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.ExceptionNotification;
 import org.mule.runtime.core.api.context.notification.ExceptionNotificationListener;
@@ -23,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 
 /**
  * Listener for exception thrown by a message source or flow.
@@ -33,6 +33,7 @@ public class ExceptionListener {
   private int timeout = 10000;
   private List<ExceptionNotification> exceptionNotifications = new ArrayList<>();
   private AtomicInteger numberOfInvocations = new AtomicInteger();
+  private List<java.util.function.Consumer<ExceptionNotification>> listeners = new ArrayList<>();
 
   /**
    * Constructor for creating a listener for any exception thrown within a flow or message source.
@@ -43,6 +44,9 @@ public class ExceptionListener {
           .registerListener((ExceptionNotificationListener) notification -> {
             exceptionNotifications.add(notification);
             exceptionThrownLatch.countDown();
+            for (Consumer<ExceptionNotification> listener : listeners) {
+              listener.accept(notification);
+            }
           });
     } catch (RegistrationException e) {
       throw new RuntimeException(e);
@@ -97,6 +101,10 @@ public class ExceptionListener {
   public ExceptionListener setTimeoutInMillis(int timeout) {
     this.timeout = timeout;
     return this;
+  }
+
+  public void addListener(Consumer<ExceptionNotification> listener) {
+    this.listeners.add(listener);
   }
 
   /**

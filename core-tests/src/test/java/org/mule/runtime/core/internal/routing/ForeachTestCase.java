@@ -80,14 +80,14 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
 
   private List<Processor> getNestedMessageProcessors() throws MuleException {
     List<Processor> lmp = new ArrayList<>();
-    Foreach internalForeach = new Foreach();
+    Foreach internalForeach = createForeach();
     internalForeach.setMessageProcessors(getSimpleMessageProcessors(new TestMessageProcessor("zas")));
     lmp.add(internalForeach);
     return lmp;
   }
 
   private Foreach createForeach(List<Processor> mps) throws MuleException {
-    Foreach foreachMp = new Foreach();
+    Foreach foreachMp = createForeach();
     foreachMp.setMessageProcessors(mps);
     foreachMp.setMuleContext(muleContext);
     foreachMp.initialise();
@@ -220,7 +220,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
   public void failingNestedProcessor() throws Exception {
     RuntimeException throwable = new BufferOverflowException();
 
-    Foreach foreach = new Foreach();
+    Foreach foreach = createForeach();
     foreach.setMuleContext(muleContext);
     Processor failingProcessor = event -> {
       throw throwable;
@@ -237,7 +237,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
 
   @Test
   public void filteredErrors() throws Exception {
-    Foreach foreach = new Foreach();
+    Foreach foreach = createForeach();
     foreach.setMuleContext(muleContext);
     foreach.setMessageProcessors(singletonList(event -> {
       throw new RuntimeException("Expected");
@@ -249,9 +249,15 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
             false);
   }
 
+  private Foreach createForeach() {
+    Foreach foreach = new Foreach();
+    foreach.setAnnotations(getAppleFlowComponentLocationAnnotations());
+    return foreach;
+  }
+
   @Test
   public void failingExpression() throws Exception {
-    Foreach foreach = new Foreach();
+    Foreach foreach = createForeach();
     foreach.setMuleContext(muleContext);
     foreach.setCollectionExpression("!@INVALID");
     foreach.setMessageProcessors(getSimpleMessageProcessors(new TestMessageProcessor("zas")));
@@ -266,7 +272,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
 
   @Test
   public void batchSize() throws Exception {
-    Foreach foreachMp = new Foreach();
+    Foreach foreachMp = createForeach();
     foreachMp.setMuleContext(muleContext);
     List<Processor> processors = getSimpleMessageProcessors(new TestMessageProcessor("zas"));
     foreachMp.setMessageProcessors(processors);
@@ -282,7 +288,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
 
   @Test
   public void batchSizeWithCollectionAttributes() throws Exception {
-    Foreach foreachMp = new Foreach();
+    Foreach foreachMp = createForeach();
     foreachMp.setMuleContext(muleContext);
     List<Processor> processors = getSimpleMessageProcessors(new TestMessageProcessor("zas"));
     foreachMp.setMessageProcessors(processors);

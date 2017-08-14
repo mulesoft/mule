@@ -33,7 +33,7 @@ import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.internal.processor.AnnotatedProcessor;
+import org.mule.runtime.core.api.processor.AnnotatedProcessor;
 import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
 
 import com.google.common.cache.CacheBuilder;

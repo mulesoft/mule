@@ -253,7 +253,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
 
   protected AsyncDelegateMessageProcessor createAsyncMessageProcessor(SensingNullMessageProcessor target)
       throws InitialisationException {
-    asyncMP = new AsyncDelegateMessageProcessor(newChain(target));
+    asyncMP = new AsyncDelegateMessageProcessor(newChain(Optional.empty(), target));
     asyncMP.setAnnotations(getAppleFlowComponentLocationAnnotations());
     initialiseIfNeeded(asyncMP, true, muleContext);
     return asyncMP;

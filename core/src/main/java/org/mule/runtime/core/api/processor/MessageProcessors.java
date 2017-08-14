@@ -6,13 +6,14 @@
  */
 package org.mule.runtime.core.api.processor;
 
+import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.mule.runtime.core.DefaultEventContext.child;
 import static org.mule.runtime.core.api.InternalEvent.builder;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
-
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.InternalEvent;
@@ -21,14 +22,16 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
-import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.processor.chain.ExplicitMessageProcessorChainBuilder;
 import org.mule.runtime.core.internal.processor.chain.ExplicitMessageProcessorChainBuilder.ExplicitMessageProcessorChain;
+import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
+
+import org.reactivestreams.Publisher;
 
 import java.util.List;
 import java.util.Optional;
 
-import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 /**
@@ -41,64 +44,68 @@ public class MessageProcessors {
   }
 
   /**
-   * Creates a new {@link MessageProcessorChain} from one or more {@link Processor}'s. Note that this performs chains construction
-   * but wil not inject {@link MuleContext} or {@link FlowConstruct} or perform any lifecycle.
+   * Creates a new {@link MessageProcessorChain} from a {@link List} of {@link Processor}'s. Note that this performs chains
+   * construction but will not inject {@link MuleContext} or perform any lifecycle.
    *
-   * @param processors processors to construct chains from.
+   * @param processingStrategy the processing strategy to use for configuring the chain. It may be {@link Optional#empty()}.
+   * @param processors list of processors to construct chains from.
    * @return new {@link MessageProcessorChain} instance.
    */
-  public static MessageProcessorChain newChain(Processor... processors) {
-    if (processors.length == 1 && processors[0] instanceof MessageProcessorChain
-        && !(processors[0] instanceof ExplicitMessageProcessorChain)) {
-      return (MessageProcessorChain) processors[0];
+  public static MessageProcessorChain newChain(Optional<ProcessingStrategy> processingStrategy, List<Processor> processors) {
+    if (processors.size() == 1 && processors.get(0) instanceof MessageProcessorChain
+        && !(processors.get(0) instanceof ExplicitMessageProcessorChain)) {
+      return (MessageProcessorChain) processors.get(0);
     } else {
-      return new DefaultMessageProcessorChainBuilder().chain(processors).build();
+      DefaultMessageProcessorChainBuilder defaultMessageProcessorChainBuilder = new DefaultMessageProcessorChainBuilder();
+      processingStrategy.ifPresent(defaultMessageProcessorChainBuilder::setProcessingStrategy);
+      return defaultMessageProcessorChainBuilder.chain(processors).build();
     }
   }
 
   /**
    * Creates a new {@link MessageProcessorChain} from a {@link List} of {@link Processor}'s. Note that this performs chains
-   * construction but wil not inject {@link MuleContext} or {@link FlowConstruct} or perform any lifecycle.
+   * construction but will not inject {@link MuleContext} or perform any lifecycle.
    *
+   * @param processingStrategy the processing strategy to use for configuring the chain. It may be {@link Optional#empty()}.
    * @param processors list of processors to construct chains from.
    * @return new {@link MessageProcessorChain} instance.
    */
-  public static MessageProcessorChain newChain(List<Processor> processors) {
-    if (processors.size() == 1 && processors.get(0) instanceof MessageProcessorChain
-        && !(processors.get(0) instanceof ExplicitMessageProcessorChain)) {
-      return (MessageProcessorChain) processors.get(0);
-    } else {
-      return new DefaultMessageProcessorChainBuilder().chain(processors).build();
-    }
+  public static MessageProcessorChain newChain(Optional<ProcessingStrategy> processingStrategy, Processor... processors) {
+    return newChain(processingStrategy, asList(processors));
   }
 
   /**
    * Creates a new explicit {@link MessageProcessorChain} from one or more {@link Processor}'s. Note that this performs chains
-   * construction but wil not inject {@link MuleContext} or {@link FlowConstruct} or perform any lifecycle.
+   * construction but will not inject {@link MuleContext} or perform any lifecycle.
    *
    * @param processors list of processors to construct chains from.
    * @return new {@link MessageProcessorChain} instance.
    */
-  public static MessageProcessorChain newExplicitChain(Processor... processors) {
+  public static MessageProcessorChain newExplicitChain(Optional<ProcessingStrategy> processingStrategy, Processor... processors) {
     if (processors.length == 1 && processors[0] instanceof ExplicitMessageProcessorChain) {
       return (MessageProcessorChain) processors[0];
     } else {
-      return new ExplicitMessageProcessorChainBuilder().chain(processors).build();
+      ExplicitMessageProcessorChainBuilder explicitMessageProcessorChainBuilder = new ExplicitMessageProcessorChainBuilder();
+      processingStrategy.ifPresent(explicitMessageProcessorChainBuilder::setProcessingStrategy);
+      return explicitMessageProcessorChainBuilder.chain(processors).build();
     }
   }
 
   /**
    * Creates a new explicit {@link MessageProcessorChain} from a {@link List} of {@link Processor}'s. Note that this performs
-   * chains construction but wil not inject {@link MuleContext} or {@link FlowConstruct} or perform any lifecycle.
+   * chains construction but wil not inject {@link MuleContext} or perform any lifecycle.
    *
    * @param processors list of processors to construct chains from.
    * @return new {@link MessageProcessorChain} instance.
    */
-  public static MessageProcessorChain newExplicitChain(List<Processor> processors) {
+  public static MessageProcessorChain newExplicitChain(Optional<ProcessingStrategy> processingStrategy,
+                                                       List<Processor> processors) {
     if (processors.size() == 1 && processors.get(0) instanceof ExplicitMessageProcessorChain) {
       return (MessageProcessorChain) processors.get(0);
     } else {
-      return new ExplicitMessageProcessorChainBuilder().chain(processors).build();
+      ExplicitMessageProcessorChainBuilder explicitMessageProcessorChainBuilder = new ExplicitMessageProcessorChainBuilder();
+      processingStrategy.ifPresent(explicitMessageProcessorChainBuilder::setProcessingStrategy);
+      return explicitMessageProcessorChainBuilder.chain(processors).build();
     }
   }
 
@@ -107,8 +114,8 @@ public class MessageProcessors {
    * for response {@link InternalEvent} or throwing an {@link MuleException} in the case of an error.
    * <p/>
    * If the {@link ReactiveProcessor} drops the event due to an error or stop action, then the result of returned will be that of
-   * the {@link InternalEventContext} completion. Attempting to adapt a processor implementation that filters events and does not complete
-   * the {@link InternalEventContext} will cause this method to never return.
+   * the {@link InternalEventContext} completion. Attempting to adapt a processor implementation that filters events and does not
+   * complete the {@link InternalEventContext} will cause this method to never return.
    *
    * TODO MULE-13054 Remove blocking processor API
    *
@@ -130,8 +137,8 @@ public class MessageProcessors {
    * for response {@link InternalEvent} or throwing an {@link MuleException} in the case of an error.
    * <p/>
    * If the {@link ReactiveProcessor} drops the event due to an error or stop action, then the result of returned will be that of
-   * the {@link InternalEventContext} completion. Attempting to adapt a processor implementation that filters events and does not complete
-   * the {@link InternalEventContext} will cause this method to never return.
+   * the {@link InternalEventContext} completion. Attempting to adapt a processor implementation that filters events and does not
+   * complete the {@link InternalEventContext} will cause this method to never return.
    * 
    * This method uses a child context so that if processing occurs using non-blocking further down the chain this will not
    * interfere with current context.
@@ -211,6 +218,22 @@ public class MessageProcessors {
             event.getContext().success();
           }
         });
+  }
+
+  /**
+   * Helper method to get the {@link ProcessingStrategy} from a component.
+   * 
+   * @param muleContext the context
+   * @param rootContainerName the component root container element
+   * @return the processing strategy of the root component if it was an instance of {@link FlowConstruct}, empty otherwise.
+   */
+  public static Optional<ProcessingStrategy> getProcessingStrategy(MuleContext muleContext, String rootContainerName) {
+    Optional<ProcessingStrategy> processingStrategy = empty();
+    Object object = muleContext.getRegistry().get(rootContainerName);
+    if (object instanceof FlowConstruct) {
+      processingStrategy = of(muleContext.getRegistry().lookupFlowConstruct(rootContainerName).getProcessingStrategy());
+    }
+    return processingStrategy;
   }
 
 }

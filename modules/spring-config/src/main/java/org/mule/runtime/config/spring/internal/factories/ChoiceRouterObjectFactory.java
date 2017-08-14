@@ -9,7 +9,7 @@ package org.mule.runtime.config.spring.internal.factories;
 import org.mule.runtime.core.internal.routing.AbstractSelectiveRouter;
 import org.mule.runtime.core.internal.routing.ChoiceRouter;
 
-public class ChoiceRouterFactoryBean extends AbstractSelectiveRouterFactoryBean {
+public class ChoiceRouterObjectFactory extends AbstractSelectiveRouterObjectFactory {
 
   public Class<?> getObjectType() {
     return ChoiceRouter.class;

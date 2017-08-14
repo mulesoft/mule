@@ -9,13 +9,13 @@ package org.mule.runtime.core.internal.routing;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContext;
 import static org.mule.runtime.core.api.util.ExceptionUtils.getMessagingExceptionCause;
 import static org.mule.runtime.core.privileged.routing.outbound.AbstractOutboundRouter.DEFAULT_FAILURE_EXPRESSION;
 import static reactor.core.publisher.Flux.from;
-
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleException;
@@ -35,15 +35,16 @@ import org.mule.runtime.core.api.processor.Router;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
 
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 import javax.inject.Inject;
 
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
 
 /**
@@ -71,13 +72,16 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Router {
   private SimpleRetryPolicyTemplate policyTemplate;
   private Scheduler timer;
   private FlowConstruct flowConstruct;
+  private List<Processor> processors;
 
   @Override
   public void initialise() throws InitialisationException {
-    if (nestedChain == null) {
+    if (processors == null) {
       throw new InitialisationException(createStaticMessage("One message processor must be configured within 'until-successful'."),
                                         this);
     }
+    this.nestedChain =
+        newChain(getProcessingStrategy(muleContext, getRootContainerName()), processors);
     super.initialise();
     timer = muleContext.getSchedulerService().cpuLightScheduler();
     policyTemplate =
@@ -187,7 +191,7 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Router {
    * @param processors
    */
   public void setMessageProcessors(List<Processor> processors) {
-    this.nestedChain = newChain(processors);
+    this.processors = processors;
   }
 
   @Override

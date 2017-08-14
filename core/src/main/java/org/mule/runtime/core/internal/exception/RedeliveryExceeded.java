@@ -6,31 +6,41 @@
  */
 package org.mule.runtime.core.internal.exception;
 
+import static org.mule.runtime.core.api.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.internal.message.InternalMessage;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.internal.message.InternalMessage;
+
+import org.reactivestreams.Publisher;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.reactivestreams.Publisher;
+import javax.inject.Inject;
+
 import reactor.core.publisher.Flux;
 
-public class RedeliveryExceeded implements Initialisable, ReactiveProcessor {
+public class RedeliveryExceeded extends AbstractAnnotatedObject implements Initialisable, ReactiveProcessor {
+
+  @Inject
+  private MuleContext muleContext;
 
   private List<Processor> messageProcessors = new CopyOnWriteArrayList<>();
   private MessageProcessorChain configuredMessageProcessors;
 
   @Override
   public void initialise() throws InitialisationException {
-    configuredMessageProcessors = newChain(messageProcessors);
+    configuredMessageProcessors =
+        newChain(getProcessingStrategy(muleContext, getRootContainerName()), messageProcessors);
   }
 
   public List<Processor> getMessageProcessors() {

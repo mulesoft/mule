@@ -75,7 +75,7 @@ import org.mule.runtime.config.spring.internal.dsl.processor.EnvironmentProperty
 import org.mule.runtime.config.spring.internal.dsl.processor.RetryPolicyTemplateObjectFactory;
 import org.mule.runtime.config.spring.internal.dsl.processor.factory.MessageEnricherObjectFactory;
 import org.mule.runtime.config.spring.internal.factories.AsyncMessageProcessorsFactoryBean;
-import org.mule.runtime.config.spring.internal.factories.ChoiceRouterFactoryBean;
+import org.mule.runtime.config.spring.internal.factories.ChoiceRouterObjectFactory;
 import org.mule.runtime.config.spring.internal.factories.DefaultFlowFactoryBean;
 import org.mule.runtime.config.spring.internal.factories.FlowRefFactoryBean;
 import org.mule.runtime.config.spring.internal.factories.MessageProcessorFilterPairFactoryBean;
@@ -99,6 +99,7 @@ import org.mule.runtime.core.api.context.notification.AbstractServerNotification
 import org.mule.runtime.core.api.context.notification.ListenerSubscriptionPair;
 import org.mule.runtime.core.api.context.notification.Notification;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.processor.AnnotatedProcessor;
 import org.mule.runtime.core.api.processor.LoggerMessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
@@ -129,8 +130,6 @@ import org.mule.runtime.core.internal.enricher.MessageEnricher;
 import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.internal.exception.OnErrorContinueHandler;
 import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
-import org.mule.runtime.core.internal.exception.RedeliveryExceeded;
-import org.mule.runtime.core.internal.processor.AnnotatedProcessor;
 import org.mule.runtime.core.internal.processor.AsyncDelegateMessageProcessor;
 import org.mule.runtime.core.internal.processor.InvokerMessageProcessor;
 import org.mule.runtime.core.internal.processor.ResponseMessageProcessorAdapter;
@@ -276,12 +275,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition(WHEN, fromSimpleParameter(WHEN).build())
         .withSetterParameterDefinition(ERROR_TYPE, fromSimpleParameter(TYPE).build())
         .withSetterParameterDefinition("maxRedeliveryAttempts", fromSimpleParameter("maxRedeliveryAttempts").build())
-        .withSetterParameterDefinition("redeliveryExceeded", fromChildConfiguration(RedeliveryExceeded.class).build())
         .asPrototype().build());
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier("on-redelivery-attempts-exceeded")
-        .withTypeDefinition(fromType(RedeliveryExceeded.class))
-        .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
-        .asScope().build());
     componentBuildingDefinitions.add(baseDefinition.withIdentifier(ERROR_HANDLER)
         .withTypeDefinition(fromType(ErrorHandler.class))
         .withSetterParameterDefinition("globalName", fromSimpleParameter(NAME).build())
@@ -335,11 +329,11 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
             .checkingThatIsClassOrInheritsFrom(MESSAGE_PROCESSOR_CLASS))
         .asPrototype().build());
     componentBuildingDefinitions.add(baseDefinition.withIdentifier(PROCESSOR_CHAIN)
-        .withTypeDefinition(fromType(Processor.class)).withObjectFactoryType(MessageProcessorChainObjectFactory.class)
+        .withTypeDefinition(fromType(AnnotatedProcessor.class)).withObjectFactoryType(MessageProcessorChainObjectFactory.class)
         .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
         .asPrototype().build());
     componentBuildingDefinitions.add(baseDefinition.withIdentifier(ROUTE)
-        .withTypeDefinition(fromType(Processor.class)).withObjectFactoryType(MessageProcessorChainFactoryBean.class)
+        .withTypeDefinition(fromType(AnnotatedProcessor.class)).withObjectFactoryType(MessageProcessorChainFactoryBean.class)
         .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
         .asPrototype().build());
     addModuleOperationChainParser(componentBuildingDefinitions);
@@ -443,7 +437,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
             .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
             .build());
     componentBuildingDefinitions.add(baseDefinition.withIdentifier(CHOICE).withTypeDefinition(fromType(ChoiceRouter.class))
-        .withObjectFactoryType(ChoiceRouterFactoryBean.class)
+        .withObjectFactoryType(ChoiceRouterObjectFactory.class)
         .withSetterParameterDefinition("routes", fromChildCollectionConfiguration(MessageProcessorExpressionPair.class).build())
         .withSetterParameterDefinition("defaultRoute", fromChildConfiguration(MessageProcessorExpressionPair.class).build())
         .build());

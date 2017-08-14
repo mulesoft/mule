@@ -6,9 +6,7 @@
  */
 package org.mule.runtime.core.internal.exception;
 
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static reactor.core.publisher.Mono.just;
-
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
@@ -16,11 +14,11 @@ import org.mule.runtime.core.api.exception.MessageRedeliveredException;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
 
+import org.reactivestreams.Publisher;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
-
-import org.reactivestreams.Publisher;
 
 //TODO: MULE-9307 re-write junits for rollback exception strategy
 
@@ -32,18 +30,11 @@ import org.reactivestreams.Publisher;
  */
 public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
 
-  private RedeliveryExceeded redeliveryExceeded;
   private Integer maxRedeliveryAttempts;
-
 
   @Override
   protected void doInitialise(MuleContext muleContext) throws InitialisationException {
-    initialiseIfNeeded(redeliveryExceeded);
     super.doInitialise(muleContext);
-  }
-
-  public void setRedeliveryExceeded(RedeliveryExceeded redeliveryExceeded) {
-    this.redeliveryExceeded = redeliveryExceeded;
   }
 
   public void setMaxRedeliveryAttempts(Integer maxRedeliveryAttempts) {
@@ -71,13 +62,7 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
 
   @Override
   protected List<Processor> getOwnedMessageProcessors() {
-    List<Processor> messageProcessors = new ArrayList<>(super.getOwnedMessageProcessors().size()
-        + (redeliveryExceeded == null ? 0 : redeliveryExceeded.getMessageProcessors().size()));
-    messageProcessors.addAll(super.getOwnedMessageProcessors());
-    if (redeliveryExceeded != null) {
-      messageProcessors.addAll(redeliveryExceeded.getMessageProcessors());
-    }
-    return messageProcessors;
+    return new ArrayList<>(super.getOwnedMessageProcessors());
   }
 
   private boolean isRedeliveryExhausted(Exception exception) {
@@ -87,12 +72,7 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
   @Override
   protected Function<InternalEvent, Publisher<InternalEvent>> route(MessagingException exception) {
     if (isRedeliveryExhausted(exception)) {
-      if (redeliveryExceeded != null) {
-        markExceptionAsHandled(exception);
-        return event -> just(event).transform(redeliveryExceeded);
-      } else {
-        logger.info("Message redelivery exhausted. No redelivery exhausted actions configured. Message consumed.");
-      }
+      logger.info("Message redelivery exhausted. No redelivery exhausted actions configured. Message consumed.");
     } else {
       return super.route(exception);
     }

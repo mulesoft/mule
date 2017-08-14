@@ -6,34 +6,32 @@
  */
 package org.mule.runtime.config.spring.internal.factories;
 
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import static org.mule.runtime.core.api.processor.MessageProcessors.getProcessingStrategy;
+import static org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder.newLazyProcessorChainBuilder;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.processor.ResponseMessageProcessorAdapter;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
+import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
 
 import java.util.List;
 
-import org.springframework.beans.factory.FactoryBean;
+import javax.inject.Inject;
 
-public class ResponseMessageProcessorsFactoryBean extends AbstractAnnotatedObject implements FactoryBean, MuleContextAware {
+public class ResponseMessageProcessorsFactoryBean extends AbstractAnnotatedObjectFactory<ResponseMessageProcessorAdapter> {
 
-  protected List messageProcessors;
+  @Inject
   private MuleContext muleContext;
 
-  @Override
-  public Class getObjectType() {
-    return Processor.class;
-  }
+  protected List messageProcessors;
 
   public void setMessageProcessors(List messageProcessors) {
     this.messageProcessors = messageProcessors;
   }
 
   @Override
-  public Object getObject() throws Exception {
+  public ResponseMessageProcessorAdapter doGetObject() throws Exception {
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.setName("'response' child processor chain");
     for (Object processor : messageProcessors) {
@@ -46,20 +44,11 @@ public class ResponseMessageProcessorsFactoryBean extends AbstractAnnotatedObjec
       }
     }
     ResponseMessageProcessorAdapter responseAdapter = new ResponseMessageProcessorAdapter();
-    responseAdapter.setProcessor(builder.build());
+    responseAdapter.setProcessor(newLazyProcessorChainBuilder(builder, muleContext,
+                                                              () -> getProcessingStrategy(muleContext, getRootContainerName())
+                                                                  .orElse(null)));
     responseAdapter.setMuleContext(muleContext);
-    responseAdapter.setAnnotations(getAnnotations());
     return responseAdapter;
-  }
-
-  @Override
-  public boolean isSingleton() {
-    return false;
-  }
-
-  @Override
-  public void setMuleContext(MuleContext context) {
-    this.muleContext = context;
   }
 
 }

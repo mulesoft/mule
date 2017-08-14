@@ -41,6 +41,8 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.reactivestreams.Publisher;
 
+import java.util.Optional;
+
 @SmallTest
 public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
 
@@ -230,7 +232,7 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
   }
 
   private Processor createChain(ReactiveProcessor processor) throws InitialisationException {
-    MessageProcessorChain chain = newChain(new ReactiveProcessorToProcessorAdaptor(processor));
+    MessageProcessorChain chain = newChain(Optional.empty(), new ReactiveProcessorToProcessorAdaptor(processor));
     chain.setMuleContext(muleContext);
     return chain;
   }

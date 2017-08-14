@@ -10,6 +10,7 @@ package org.mule.runtime.core.internal.routing;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.noEndpointsForRouter;
+import static org.mule.runtime.core.api.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newExplicitChain;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
@@ -33,17 +34,19 @@ import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Router;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.routing.AggregationContext;
 import org.mule.runtime.core.api.routing.RoutePathNotFoundException;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.inject.Inject;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.reactivestreams.Publisher;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import javax.inject.Inject;
 
 /**
  * <p>
@@ -179,7 +182,11 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
   private void buildRouteChains() {
     Preconditions.checkState(routes.size() > 1, "At least 2 routes are required for ScatterGather");
     // Wrap in explicit chain
-    routeChains = routes.stream().map(route -> newChain(newExplicitChain(route))).collect(toList());
+    routeChains = routes.stream().map(route -> {
+      Optional<ProcessingStrategy> processingStrategy =
+          getProcessingStrategy(muleContext, getRootContainerName());
+      return newChain(processingStrategy, newExplicitChain(processingStrategy, route));
+    }).collect(toList());
   }
 
   private void checkNotInitialised() {

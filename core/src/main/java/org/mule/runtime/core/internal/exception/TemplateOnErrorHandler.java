@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.exception;
 import static java.lang.Boolean.TRUE;
 import static java.util.Arrays.stream;
 import static java.util.Collections.singletonList;
+import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
@@ -16,9 +17,11 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.core.api.context.notification.ErrorHandlerNotification.PROCESS_END;
 import static org.mule.runtime.core.api.context.notification.ErrorHandlerNotification.PROCESS_START;
+import static org.mule.runtime.core.api.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContext;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
+import static org.mule.runtime.core.internal.component.ComponentAnnotations.updateRootContainerName;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.api.exception.MuleException;
@@ -35,17 +38,19 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.privileged.routing.requestreply.ReplyToPropertyRequestReplyReplier;
 
+import org.reactivestreams.Publisher;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
-
-import org.reactivestreams.Publisher;
 
 public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     implements MessagingExceptionHandlerAcceptor {
@@ -128,7 +133,6 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   @Override
   public void setMessageProcessors(List<Processor> processors) {
     super.setMessageProcessors(processors);
-    configuredMessageProcessors = newChain(getMessageProcessors());
   }
 
   @Override
@@ -177,6 +181,14 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   @Override
   protected void doInitialise(MuleContext muleContext) throws InitialisationException {
     super.doInitialise(muleContext);
+
+    Optional<ProcessingStrategy> processingStrategy = empty();
+    if (getLocation() != null) {
+      processingStrategy = getProcessingStrategy(muleContext, getRootContainerName());
+    }
+    configuredMessageProcessors =
+        newChain(processingStrategy,
+                 getMessageProcessors());
 
     if (configuredMessageProcessors != null) {
       configuredMessageProcessors.setMuleContext(muleContext);
@@ -262,5 +274,9 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
 
   public void setErrorType(String errorType) {
     this.errorType = errorType;
+  }
+
+  public void setRootContainerName(String rootContainerName) {
+    updateRootContainerName(rootContainerName, this);
   }
 }

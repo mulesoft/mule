@@ -8,16 +8,18 @@ package org.mule.runtime.core.internal.exception;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
+import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.exception.DefaultErrorTypeRepository.CRITICAL_ERROR_TYPE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.internal.component.ComponentAnnotations.updateRootContainerName;
 import static reactor.core.publisher.Mono.error;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.message.Error;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.GlobalNameableObject;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
 import org.mule.runtime.core.api.exception.MessagingException;
@@ -27,6 +29,7 @@ import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.api.processor.AbstractMuleObjectOwner;
 import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
 import org.mule.runtime.core.internal.message.InternalMessage;
+
 import org.reactivestreams.Publisher;
 
 import java.util.List;
@@ -123,7 +126,7 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
       }
       MessagingExceptionHandler defaultExceptionStrategy;
       try {
-        defaultExceptionStrategy = getMuleContext().getDefaultErrorHandler();
+        defaultExceptionStrategy = getMuleContext().getDefaultErrorHandler(of(getRootContainerName()));
       } catch (Exception e) {
         throw new InitialisationException(createStaticMessage("Failure initializing "
             + "error-handler. If error-handler is defined as default one "
@@ -163,6 +166,15 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
   @Override
   public boolean acceptsAll() {
     return true;
+  }
+
+  public void setRootContainerName(String rootContainerName) {
+    updateRootContainerName(rootContainerName, this);
+    for (MessagingExceptionHandlerAcceptor exceptionListener : exceptionListeners) {
+      if (exceptionListener instanceof TemplateOnErrorHandler) {
+        ((TemplateOnErrorHandler) exceptionListener).setRootContainerName(rootContainerName);
+      }
+    }
   }
 
 }

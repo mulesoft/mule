@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.processor;
 
 import static java.util.Collections.singletonList;
+import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.errorInvokingMessageProcessorWithinTransaction;
 import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createScopeTransactionalExecutionTemplate;
@@ -20,7 +21,6 @@ import static org.mule.runtime.core.api.processor.MessageProcessors.processWithC
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_INDIFFERENT;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static reactor.core.publisher.Flux.from;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -30,16 +30,17 @@ import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
+import org.mule.runtime.core.api.processor.MessageProcessors;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.Scope;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 
-import java.util.List;
-
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 /**
  * Wraps the invocation of a list of nested processors {@link org.mule.runtime.core.api.processor.Processor} with a transaction.
@@ -53,6 +54,7 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
   protected MessageProcessorChain nestedChain;
   protected MuleTransactionConfig transactionConfig;
   private MessagingExceptionHandler messagingExceptionHandler;
+  private List<Processor> processors;
 
   @Override
   public InternalEvent process(final InternalEvent event) throws MuleException {
@@ -127,13 +129,15 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
    * @param processors
    */
   public void setMessageProcessors(List<Processor> processors) {
-    this.nestedChain = newChain(processors);
+    this.processors = processors;
   }
 
   @Override
   public void initialise() throws InitialisationException {
+    this.nestedChain =
+        newChain(MessageProcessors.getProcessingStrategy(muleContext, getRootContainerName()), processors);
     if (messagingExceptionHandler == null) {
-      messagingExceptionHandler = muleContext.getDefaultErrorHandler();
+      messagingExceptionHandler = muleContext.getDefaultErrorHandler(of(getRootContainerName()));
     }
     initialiseIfNeeded(messagingExceptionHandler, true, muleContext);
     super.initialise();
