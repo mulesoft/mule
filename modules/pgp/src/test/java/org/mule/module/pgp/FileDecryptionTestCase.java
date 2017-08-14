@@ -64,11 +64,12 @@ public class FileDecryptionTestCase extends FunctionalTestCase
         // Starts file endpoint polling
         muleContext.start();
 
+        final File encryptedFile = getFile("encrypted", target.getName());
+        prober.check(new FileDoesNotExists(encryptedFile));
+
         final File decryptedFile = getFile("decrypted", target.getName());
         prober.check(new FileExists(decryptedFile));
 
-        final File encryptedFile = getFile("encrypted", target.getName());
-        prober.check(new FileDoesNotExists(encryptedFile));
     }
 
     private File getFile(String folderName, String fileName)

@@ -13,7 +13,6 @@
             value="./serverPublic.gpg" />
         <spring:property name="secretKeyRingFileName"
             value="./serverPrivate.gpg" />
-        <spring:property name="secretAliasId" value="6247672658342245276" />
         <spring:property name="secretPassphrase" value="TestingPassphrase" />
     </spring:bean>
 

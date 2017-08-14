@@ -13,7 +13,6 @@
     <spring:bean id="pgpKeyManager" class="org.mule.module.pgp.PGPKeyRingImpl" init-method="initialise">
         <spring:property name="publicKeyRingFileName" value="./expiredPublic.gpg"/>
         <spring:property name="secretKeyRingFileName" value="./expiredPrivate.gpg"/>
-        <spring:property name="secretAliasId" value="2105276729000306766"/>
         <spring:property name="secretPassphrase" value="TestingPassphrase"/>
     </spring:bean>
 

@@ -13,7 +13,6 @@
     <spring:bean id="pgpKeyManager" class="org.mule.module.pgp.PGPKeyRingImpl" init-method="initialise">
         <spring:property name="publicKeyRingFileName" value="serverPublic.gpg"/>
         <spring:property name="secretKeyRingFileName" value="serverPrivate.gpg"/>
-        <spring:property name="secretAliasId" value="6247672658342245276"/>
         <spring:property name="secretPassphrase" value="TestingPassphrase"/>
     </spring:bean>
 
@@ -28,7 +27,7 @@
     <model name="test">
         <service name="echo">
             <inbound>
-                <vm:inbound-endpoint path="echo">
+                <vm:inbound-endpoint path="echo" exchange-pattern="request-response">
                     <pgp:security-filter strategyName="keyBasedEncryptionStrategy" signRequired="true"
                         credentialsAccessor-ref="credentialAccessor" keyManager-ref="pgpKeyManager"/>
                 </vm:inbound-endpoint>

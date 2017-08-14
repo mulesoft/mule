@@ -8,6 +8,7 @@ package org.mule.module.pgp;
 
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.bouncycastle.openpgp.PGPSecretKey;
+import org.bouncycastle.openpgp.PGPSecretKeyRingCollection;
 
 public interface PGPKeyRing
 {
@@ -16,4 +17,6 @@ public interface PGPKeyRing
     PGPSecretKey getSecretKey() throws Exception;
 
     PGPPublicKey getPublicKey(String principalId);
+
+    PGPSecretKeyRingCollection getSecretKeys ();
 }

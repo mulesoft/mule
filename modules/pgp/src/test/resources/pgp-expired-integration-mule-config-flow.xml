@@ -16,7 +16,6 @@
             value="./expiredPublic.gpg" />
         <spring:property name="secretKeyRingFileName"
             value="./expiredPrivate.gpg" />
-        <spring:property name="secretAliasId" value="2105276729000306766" />
         <spring:property name="secretPassphrase" value="TestingPassphrase" />
     </spring:bean>
 

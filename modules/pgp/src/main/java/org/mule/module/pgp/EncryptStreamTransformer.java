@@ -6,15 +6,17 @@
  */
 package org.mule.module.pgp;
 
+import static org.apache.commons.io.IOUtils.copy;
 import static org.mule.module.pgp.config.PGPOutputMode.ARMOR;
 import org.mule.module.pgp.config.PGPOutputMode;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.Provider;
 import java.util.Date;
-import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.lang.Validate;
 import org.bouncycastle.bcpg.ArmoredOutputStream;
@@ -29,88 +31,72 @@ import org.bouncycastle.openpgp.operator.bc.BcPublicKeyKeyEncryptionMethodGenera
 
 public class EncryptStreamTransformer implements StreamTransformer
 {
-    private static final long offset = 1 << 24;
 
-    private InputStream toBeEncrypted;
     private PGPPublicKey publicKey;
     private Provider provider;
     private final int algorithm;
-
     private OutputStream pgpOutputStream;
     private OutputStream compressedEncryptedOutputStream;
     private OutputStream encryptedOutputStream;
-    private OutputStream originalStream;
-    private long bytesWrote;
+    private ByteArrayOutputStream outputStream;
     private PGPOutputMode pgpOutputMode;
+    private OutputStream result ;
 
-    public EncryptStreamTransformer(InputStream toBeEncrypted, PGPPublicKey publicKey, Provider provider, int algorithm, PGPOutputMode pgpOutputMode) throws IOException
+    public EncryptStreamTransformer(PGPPublicKey publicKey, Provider provider, int algorithm, PGPOutputMode pgpOutputMode) throws IOException
     {
-        Validate.notNull(toBeEncrypted, "The toBeEncrypted should not be null");
         Validate.notNull(publicKey, "The publicKey should not be null");
-
-        this.toBeEncrypted = toBeEncrypted;
         this.publicKey = publicKey;
-        this.bytesWrote = 0;
         this.provider = provider;
         this.algorithm = algorithm;
         this.pgpOutputMode = pgpOutputMode;
+        outputStream = new ByteArrayOutputStream();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public void initialize(OutputStream out) throws Exception
+    public InputStream process(InputStream data) throws Exception
     {
-        if(pgpOutputMode == ARMOR)
+        if (pgpOutputMode == ARMOR)
         {
-            originalStream = new ArmoredOutputStream(out);
+            result = new ArmoredOutputStream(outputStream);
         }
         else
         {
-            originalStream = out;
+            result = outputStream;
         }
+
 
         BcPGPDataEncryptorBuilder encryptorBuilder = new BcPGPDataEncryptorBuilder(algorithm);
         PGPEncryptedDataGenerator encrDataGen = new PGPEncryptedDataGenerator(encryptorBuilder, false);
-
         BcPublicKeyKeyEncryptionMethodGenerator methodGenerator = new BcPublicKeyKeyEncryptionMethodGenerator(this.publicKey);
         encrDataGen.addMethod(methodGenerator);
-        encryptedOutputStream = encrDataGen.open(originalStream, new byte[1 << 16]);
+        encryptedOutputStream = encrDataGen.open(result, new byte[1 << 16]);
 
         PGPCompressedDataGenerator comprDataGen = new PGPCompressedDataGenerator(PGPCompressedData.ZIP);
-        compressedEncryptedOutputStream = comprDataGen.open(encryptedOutputStream);
+        compressedEncryptedOutputStream = comprDataGen.open(encryptedOutputStream, new byte[1 << 16]);
 
         PGPLiteralDataGenerator lData = new PGPLiteralDataGenerator();
         pgpOutputStream = lData.open(compressedEncryptedOutputStream, PGPLiteralData.BINARY, "stream",
-            new Date(), new byte[1 << 16]);
+                                     new Date(), new byte[1 << 16]);
+
+        write(data);
+        return new ByteArrayInputStream(outputStream.toByteArray());
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean write(OutputStream out, AtomicLong bytesRequested) throws Exception
+
+    private void write(InputStream toBeEncrypted) throws IOException
     {
-        int len = 0;
-        byte[] buf = new byte[1 << 16];
-
-        while (bytesRequested.get() + offset > bytesWrote && (len = this.toBeEncrypted.read(buf)) > 0)
+        try
         {
-            pgpOutputStream.write(buf, 0, len);
-            bytesWrote = bytesWrote + len;
+            copy(toBeEncrypted, pgpOutputStream);
         }
-
-        if (len <= 0)
+        finally
         {
             pgpOutputStream.close();
             compressedEncryptedOutputStream.close();
             encryptedOutputStream.close();
-            originalStream.close();
+            result.close();
             toBeEncrypted.close();
-            return true;
         }
-
-        return false;
     }
+
 }
