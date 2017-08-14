@@ -16,6 +16,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.tck.MuleTestUtils.createErrorMock;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
@@ -29,7 +30,6 @@ import org.mule.runtime.core.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.runtime.core.api.session.DefaultMuleSession;
 import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
 import org.mule.runtime.core.internal.message.InternalMessage;
-import org.mule.runtime.core.internal.transformer.simple.StringAppendTransformer;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
@@ -57,20 +57,6 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
     assertThat(getPayload(fs, session, "ABC"), is("No def"));
     assertThat(getPayload(fs, session, "ABCDEF"), is("No ghi"));
     assertThat(getPayload(fs, session, "ABCDEFGHI"), is(EXCEPTION_SEEN));
-  }
-
-  @Test
-  public void testFailureExpression() throws Exception {
-    Processor intSetter =
-        event -> InternalEvent.builder(event).message(Message.builder(event.getMessage()).value(Integer.valueOf(1)).build())
-            .build();
-
-    FirstSuccessful fs = createFirstSuccessfulRouter(intSetter, new StringAppendTransformer("abc"));
-    fs.setFailureExpression("#[mel:payload is Integer]");
-    fs.initialise();
-
-    assertThat(fs.process(eventBuilder().message(of("")).build()).getMessageAsString(muleContext),
-               is("abc"));
   }
 
   @Test

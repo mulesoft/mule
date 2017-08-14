@@ -20,14 +20,12 @@ import org.mule.runtime.core.privileged.routing.outbound.AbstractOutboundRouter;
 public class FirstSuccessful extends AbstractOutboundRouter {
 
   private RoutingStrategy routingStrategy;
-  private String failureExpression = DEFAULT_FAILURE_EXPRESSION;
 
   @Override
   public void initialise() throws InitialisationException {
     super.initialise();
     routingStrategy =
-        new FirstSuccessfulRoutingStrategy(getMuleContext().getExpressionManager(), failureExpression,
-                                           (route, event) -> doProcessRoute(route, event), getLocation());
+        new FirstSuccessfulRoutingStrategy(this::doProcessRoute);
   }
 
   /**
@@ -45,14 +43,5 @@ public class FirstSuccessful extends AbstractOutboundRouter {
   @Override
   public boolean isMatch(InternalEvent event, InternalEvent.Builder builder) throws MuleException {
     return true;
-  }
-
-  /**
-   * Specifies an expression that when evaluated as determines if the processing of one a route was a failure or not.
-   *
-   * @param failureExpression
-   */
-  public void setFailureExpression(String failureExpression) {
-    this.failureExpression = failureExpression;
   }
 }

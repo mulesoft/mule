@@ -135,36 +135,8 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test
-  public void testSuccessfulDeliveryFailureExpression() throws Exception {
-    untilSuccessful.setFailureExpression("#[mel:regex('(?i)error')]");
-    untilSuccessful.setMuleContext(muleContext);
-    untilSuccessful.initialise();
-    untilSuccessful.start();
-
-    assertSame(testEvent().getMessage(), untilSuccessful.process(testEvent()).getMessage());
-    assertTargetEventReceived(testEvent());
-  }
-
-  @Test
   public void testPermanentDeliveryFailure() throws Exception {
     targetMessageProcessor.setNumberOfFailuresToSimulate(Integer.MAX_VALUE);
-    untilSuccessful.setMuleContext(muleContext);
-    untilSuccessful.initialise();
-    untilSuccessful.start();
-
-    final InternalEvent testEvent = eventBuilder().message(of("ERROR")).build();
-    expected.expect(MessagingException.class);
-    expected.expectCause(instanceOf(RetryPolicyExhaustedException.class));
-    try {
-      untilSuccessful.process(testEvent);
-    } finally {
-      assertEquals(targetMessageProcessor.getEventCount(), 1 + untilSuccessful.getMaxRetries());
-    }
-  }
-
-  @Test
-  public void testPermanentDeliveryFailureExpression() throws Exception {
-    untilSuccessful.setFailureExpression("#[mel:regex('(?i)error')]");
     untilSuccessful.setMuleContext(muleContext);
     untilSuccessful.initialise();
     untilSuccessful.start();

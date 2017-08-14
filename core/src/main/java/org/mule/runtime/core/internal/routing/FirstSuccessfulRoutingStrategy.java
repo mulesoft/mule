@@ -13,8 +13,7 @@ import static org.mule.runtime.core.api.InternalEvent.builder;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotCopyStreamPayload;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.api.util.StringMessageUtils.truncate;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
-import org.mule.runtime.api.component.location.ComponentLocation;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Message;
@@ -22,7 +21,6 @@ import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.DefaultTransformationService;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.connector.DispatchException;
-import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.RoutingException;
 
@@ -49,21 +47,14 @@ public class FirstSuccessfulRoutingStrategy implements RoutingStrategy {
    * logger used by this class
    */
   protected static transient Logger logger = LoggerFactory.getLogger(FirstSuccessfulRoutingStrategy.class);
-  private final ExpressionManager expressionManager;
-  private final ComponentLocation componentLocation;
-  private final String failureExpression;
   private final RouteProcessor processor;
 
   /**
-   * @param failureExpression Mule expression that validates if a {@link Processor} execution was successful or not.
+   * Creates a first-successful strategy that routes through the provided {@code Processor}.
+   *
+   * @param processor
    */
-  public FirstSuccessfulRoutingStrategy(ExpressionManager expressionManager,
-                                        final String failureExpression,
-                                        RouteProcessor processor,
-                                        ComponentLocation componentLocation) {
-    this.expressionManager = expressionManager;
-    this.componentLocation = componentLocation;
-    this.failureExpression = failureExpression;
+  public FirstSuccessfulRoutingStrategy(RouteProcessor processor) {
     this.processor = processor;
   }
 
@@ -99,8 +90,7 @@ public class FirstSuccessfulRoutingStrategy implements RoutingStrategy {
         } else if (returnEvent.getMessage() == null) {
           failed = true;
         } else {
-          failed = expressionManager.evaluateBoolean(failureExpression, returnEvent,
-                                                     fromSingleComponent(componentLocation.getRootContainerName()), false, true);
+          failed = returnEvent.getError().isPresent();
         }
       } catch (Exception ex) {
         failed = true;
