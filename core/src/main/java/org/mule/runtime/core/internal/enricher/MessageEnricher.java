@@ -11,6 +11,7 @@ import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.api.InternalEvent.builder;
 import static org.mule.runtime.core.api.InternalEvent.setCurrentEvent;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContext;
@@ -24,7 +25,6 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
-import org.mule.runtime.core.api.processor.MessageProcessors;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.Scope;
 import org.mule.runtime.core.api.session.DefaultMuleSession;
@@ -119,7 +119,7 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements Sc
 
   @Override
   public void initialise() throws InitialisationException {
-    enrichmentProcessor = newChain(MessageProcessors.getProcessingStrategy(muleContext, getRootContainerName()),
+    enrichmentProcessor = newChain(getProcessingStrategy(muleContext, getRootContainerName()),
                                    enrichmentProcessor);
     initialiseIfNeeded(this.enrichmentProcessor, muleContext);
   }

@@ -6,14 +6,9 @@
  */
 package org.mule.runtime.config.spring.internal.factories;
 
-import org.mule.runtime.api.artifact.Registry;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.Startable;
-import org.mule.runtime.core.api.InternalEvent;
+import static org.mule.runtime.core.api.processor.MessageProcessors.getProcessingStrategy;
+import static org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder.newLazyProcessorChainBuilder;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.processor.ResponseMessageProcessorAdapter;
@@ -29,9 +24,6 @@ public class ResponseMessageProcessorsFactoryBean extends AbstractAnnotatedObjec
   @Inject
   private MuleContext muleContext;
 
-  @Inject
-  private Registry registry;
-
   protected List messageProcessors;
 
   public void setMessageProcessors(List messageProcessors) {
@@ -41,7 +33,6 @@ public class ResponseMessageProcessorsFactoryBean extends AbstractAnnotatedObjec
   @Override
   public ResponseMessageProcessorAdapter doGetObject() throws Exception {
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
-    //builder.setProcessingStrategy(flowConstruct.getProcessingStrategy());
     builder.setName("'response' child processor chain");
     for (Object processor : messageProcessors) {
       if (processor instanceof Processor) {
@@ -53,31 +44,10 @@ public class ResponseMessageProcessorsFactoryBean extends AbstractAnnotatedObjec
       }
     }
     ResponseMessageProcessorAdapter responseAdapter = new ResponseMessageProcessorAdapter();
-    responseAdapter.setProcessor(new Processor() {
-
-      private Processor processor;
-
-      @Override
-      public InternalEvent process(InternalEvent event) throws MuleException {
-        if (processor == null) {
-          FlowConstruct flowConstruct = (FlowConstruct) registry.lookupByName(getRootContainerName()).get();
-          builder.setProcessingStrategy(flowConstruct.getProcessingStrategy());
-          processor = builder.build();
-          if (processor instanceof MuleContextAware) {
-            ((MuleContextAware) processor).setMuleContext(muleContext);
-          }
-          if (processor instanceof Initialisable) {
-            ((Initialisable) processor).initialise();
-          }
-          if (processor instanceof Startable) {
-            ((Startable) processor).start();
-          }
-        }
-        return processor.process(event);
-      }
-    });
+    responseAdapter.setProcessor(newLazyProcessorChainBuilder(builder, muleContext,
+                                                              () -> getProcessingStrategy(muleContext, getRootContainerName())
+                                                                  .orElse(null)));
     responseAdapter.setMuleContext(muleContext);
-    responseAdapter.setAnnotations(getAnnotations());
     return responseAdapter;
   }
 

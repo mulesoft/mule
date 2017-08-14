@@ -12,6 +12,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static reactor.core.publisher.Flux.from;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
@@ -27,6 +28,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.processor.ReferenceProcessor;
 
+import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +37,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
+
 
 /**
  * <p>
@@ -219,6 +222,11 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
       @Override
       public InternalEvent process(InternalEvent event) throws MuleException {
         return processor.process(event);
+      }
+
+      @Override
+      public Publisher<InternalEvent> apply(Publisher<InternalEvent> publisher) {
+        return from(publisher).transform(processor);
       }
     };
   }

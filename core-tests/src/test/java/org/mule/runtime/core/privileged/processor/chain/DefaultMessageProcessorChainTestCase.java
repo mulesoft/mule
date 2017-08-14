@@ -73,6 +73,10 @@ import org.mule.runtime.core.privileged.processor.AbstractInterceptingMessagePro
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -81,10 +85,6 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.reactivestreams.Publisher;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @RunWith(Parameterized.class)
 @SmallTest

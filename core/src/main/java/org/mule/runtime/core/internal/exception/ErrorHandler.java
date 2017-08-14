@@ -12,6 +12,7 @@ import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.exception.DefaultErrorTypeRepository.CRITICAL_ERROR_TYPE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.internal.component.ComponentAnnotations.updateRootContainerName;
 import static reactor.core.publisher.Mono.error;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -31,12 +32,8 @@ import org.mule.runtime.core.internal.message.InternalMessage;
 
 import org.reactivestreams.Publisher;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-
-import javax.xml.namespace.QName;
 
 /**
  * Selects which "on error" handler to execute based on filtering. Replaces the choice-exception-strategy from Mule 3. On error
@@ -172,9 +169,7 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
   }
 
   public void setRootContainerName(String rootContainerName) {
-    Map<QName, Object> previousAnnotations = new HashMap<>(this.getAnnotations());
-    previousAnnotations.put(ROOT_CONTAINER_NAME_KEY, rootContainerName);
-    setAnnotations(previousAnnotations);
+    updateRootContainerName(rootContainerName, this);
     for (MessagingExceptionHandlerAcceptor exceptionListener : exceptionListeners) {
       if (exceptionListener instanceof TemplateOnErrorHandler) {
         ((TemplateOnErrorHandler) exceptionListener).setRootContainerName(rootContainerName);

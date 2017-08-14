@@ -44,17 +44,17 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 
-import org.junit.After;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.slf4j.Logger;
-
 import java.beans.ExceptionListener;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import org.junit.After;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.slf4j.Logger;
 
 public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestCase implements ExceptionListener {
 

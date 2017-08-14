@@ -21,6 +21,7 @@ import static org.mule.runtime.core.api.processor.MessageProcessors.getProcessin
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContext;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
+import static org.mule.runtime.core.internal.component.ComponentAnnotations.updateRootContainerName;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.api.exception.MuleException;
@@ -36,7 +37,6 @@ import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
-import org.mule.runtime.core.api.processor.MessageProcessors;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
@@ -47,14 +47,10 @@ import org.mule.runtime.core.privileged.routing.requestreply.ReplyToPropertyRequ
 import org.reactivestreams.Publisher;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
-
-import javax.xml.namespace.QName;
 
 public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     implements MessagingExceptionHandlerAcceptor {
@@ -281,8 +277,6 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   }
 
   public void setRootContainerName(String rootContainerName) {
-    Map<QName, Object> previousAnnotations = new HashMap<>(this.getAnnotations());
-    previousAnnotations.put(ROOT_CONTAINER_NAME_KEY, rootContainerName);
-    setAnnotations(previousAnnotations);
+    updateRootContainerName(rootContainerName, this);
   }
 }
