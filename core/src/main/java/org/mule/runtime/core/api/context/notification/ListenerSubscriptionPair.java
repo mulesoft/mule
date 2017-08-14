@@ -16,6 +16,8 @@ import java.util.function.Predicate;
  */
 public class ListenerSubscriptionPair<N extends Notification> extends AbstractAnnotatedObject {
 
+  public final static String ANY_SELECTOR_STRING = "*";
+
   private final NotificationListener<N> listener;
   private final Predicate<N> selector;
 
