@@ -56,7 +56,7 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
                                         final VariableResolverFactory next) {
     this(parserConfiguration, muleContext, event, eventBuilder);
     setNextFactory(next);
-    
+
   }
 
   @Override

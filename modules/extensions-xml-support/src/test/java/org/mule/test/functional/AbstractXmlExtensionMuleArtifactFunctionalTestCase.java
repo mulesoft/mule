@@ -29,8 +29,6 @@ import java.util.Set;
 /**
  * Abstract class to generate an {@link ExtensionModel} from an extension built from an XML file.
  *
- * TODO MULE-10982(fernandezlautaro): implement a testing framework for XML based connectors.
- *
  * @since 4.0
  */
 @ArtifactClassLoaderRunnerConfig(sharedRuntimeLibs = {"org.apache.activemq:activemq-client",
@@ -58,7 +56,6 @@ public abstract class AbstractXmlExtensionMuleArtifactFunctionalTestCase extends
     return modulePath == null ? new String[] {} : new String[] {modulePath};
   }
 
-  // TODO(fernandezlautaro): MULE-10982 implement a testing framework for XML based connectors
   @Override
   protected void addBuilders(List<ConfigurationBuilder> builders) {
     super.addBuilders(builders);

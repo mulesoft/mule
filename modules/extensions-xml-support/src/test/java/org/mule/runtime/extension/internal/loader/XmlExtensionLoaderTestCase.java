@@ -6,10 +6,13 @@
  */
 package org.mule.runtime.extension.internal.loader;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.fail;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_DESCRIPTION;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
@@ -17,9 +20,14 @@ import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PAR
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static org.mule.runtime.extension.internal.loader.XmlExtensionLoaderDelegate.CONFIG_NAME;
 import static org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader.RESOURCE_XML;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
+import org.mule.metadata.api.model.VoidType;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -37,11 +45,27 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.junit.Test;
-
+@RunWith(Parameterized.class)
 public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
 
   private static final MuleVersion DEFAULT_MIN_MULE_VERSION = new MuleVersion("4.0.0");
+  private final boolean validateXml;
+
+  @Parameterized.Parameters(name = "Validate XML: {0}")
+  public static List<Object[]> parameters() {
+    return asList(new Object[][] {
+        {false},
+        {true}
+    });
+  }
+
+  /**
+   * @param validateXml whether the XML must be valid while loading the extension model or not. Useful to determine if the default
+   *                    values are properly feed when reading the document.
+   */
+  public XmlExtensionLoaderTestCase(boolean validateXml) {
+    this.validateXml = validateXml;
+  }
 
   @Test
   public void testModuleSimple() {
@@ -315,10 +339,66 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     assertThat(modelProperty.get().getBodyComponentModel().getInnerComponents().size(), is(1));
   }
 
+  @Test
+  public void testModuleWrongBodyContent() {
+    String modulePath = "validation/module-wrong-body-content.xml";
+
+    if (validateXml) {
+      try {
+        getExtensionModelFrom(modulePath);
+        fail("Should not have reached up to this point, the XML is invalid and the ExtensionModel should not be generated.");
+      } catch (MuleRuntimeException e) {
+        assertThat(e.getMessage(), containsString("There were '2' error"));
+        assertThat(e.getMessage(), containsString("Invalid content was found starting with element 'http:fake-request-config'"));
+        assertThat(e.getMessage(),
+                   containsString("Invalid content was found starting with element 'mule:non-existing-operation'"));
+      }
+    } else {
+      ExtensionModel extensionModel = getExtensionModelFrom(modulePath);
+
+      assertThat(extensionModel.getName(), is("module-wrong-body-content"));
+      assertThat(extensionModel.getMinMuleVersion(), is(new MuleVersion("4.1.0")));
+      assertThat(extensionModel.getOperationModels().size(), is(0));
+      assertThat(extensionModel.getConfigurationModels().size(), is(1));
+
+      ConfigurationModel configurationModel = extensionModel.getConfigurationModels().get(0);
+      assertThat(configurationModel.getName(), is(CONFIG_NAME));
+      assertThat(configurationModel.getAllParameterModels().size(), is(1));
+
+      Optional<GlobalElementComponentModelModelProperty> globalElementComponentModelModelProperty =
+          configurationModel.getModelProperty(GlobalElementComponentModelModelProperty.class);
+      assertThat(globalElementComponentModelModelProperty.isPresent(), is(true));
+      assertThat(globalElementComponentModelModelProperty.get().getGlobalElements().size(), is(1));
+
+      Optional<OperationModel> operationModelOptional = configurationModel.getOperationModel("operation-with-non-valid-body");
+      assertThat(operationModelOptional.isPresent(), is(true));
+      final OperationModel operationModel = operationModelOptional.get();
+      assertThat(operationModel.getAllParameterModels().size(), is(0));
+
+      Optional<OperationComponentModelModelProperty> modelProperty =
+          operationModel.getModelProperty(OperationComponentModelModelProperty.class);
+      assertThat(modelProperty.isPresent(), is(true));
+      assertThat(modelProperty.get().getBodyComponentModel().getInnerComponents().size(), is(1));
+
+      assertThat(operationModel.getOutput().getType().getMetadataFormat(), is(MetadataFormat.JAVA));
+      assertThat(operationModel.getOutput().getType(), instanceOf(VoidType.class));
+      assertThat(operationModel.getOutputAttributes().getType().getMetadataFormat(), is(MetadataFormat.JAVA));
+      assertThat(operationModel.getOutputAttributes().getType(), instanceOf(VoidType.class));
+      assertThat(operationModel.getErrorModels().size(), is(0));
+    }
+  }
+
+  /**
+   * If {@link #validateXml} is true, the XML of the smart connector must be validated when reading it. False otherwise. Useful to
+   *  simulate the {@link ExtensionModel} generation of a connector that has malformed message processors in the <body/> element.
+   *
+   * @param modulePath relative path to the XML connector.
+   * @return an {@link ExtensionModel}
+   */
   private ExtensionModel getExtensionModelFrom(String modulePath) {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put(RESOURCE_XML, modulePath);
-
+    parameters.put(XmlExtensionModelLoader.VALIDATE_XML, validateXml);
     return new XmlExtensionModelLoader().loadExtensionModel(getClass().getClassLoader(), getDefault(emptySet()), parameters);
   }
 }

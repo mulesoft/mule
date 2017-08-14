@@ -26,6 +26,12 @@ public class XmlExtensionModelLoader extends ExtensionModelLoader {
   public static final String RESOURCE_XML = "resource-xml";
 
   /**
+   * Attribute to look for in the parametrized attributes picked up from the descriptor.
+   * If present, with a boolean value, describes whether the XML of the connector should be valid (or not).
+   */
+  public static final String VALIDATE_XML = "validate-xml";
+
+  /**
    * The ID which represents {@code this} loader that will be used to execute the lookup when reading the descriptor file.
    * @see MulePluginModel#getExtensionModelLoaderDescriptor()
    */
@@ -40,8 +46,8 @@ public class XmlExtensionModelLoader extends ExtensionModelLoader {
   protected void declareExtension(ExtensionLoadingContext context) {
     final String modulePath = context.<String>getParameter(RESOURCE_XML)
         .orElseThrow(() -> new IllegalArgumentException(format("The attribute '%s' is missing", RESOURCE_XML)));
-
-    final XmlExtensionLoaderDelegate delegate = new XmlExtensionLoaderDelegate(modulePath);
+    final boolean validateXml = context.<Boolean>getParameter(VALIDATE_XML).orElse(false);
+    final XmlExtensionLoaderDelegate delegate = new XmlExtensionLoaderDelegate(modulePath, validateXml);
     delegate.declare(context);
   }
 }

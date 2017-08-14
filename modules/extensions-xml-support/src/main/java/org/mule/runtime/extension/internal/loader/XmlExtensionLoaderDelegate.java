@@ -58,6 +58,7 @@ import org.mule.runtime.config.spring.internal.dsl.model.config.SystemProperties
 import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.GlobalElementComponentModelModelProperty;
 import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.OperationComponentModelModelProperty;
 import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.XmlExtensionModelProperty;
+import org.mule.runtime.config.spring.internal.util.NoOpXmlErrorHandler;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
@@ -155,16 +156,20 @@ public final class XmlExtensionLoaderDelegate {
   private static final String TYPES_XML_SUFFIX = "-catalog" + XML_SUFFIX;
 
   private final String modulePath;
+  private final boolean validateXml;
   // TODO MULE-13214: typesCatalog could be removed once MULE-13214 is done
   private Optional<TypesCatalog> typesCatalog;
   private TypeResolver typeResolver;
 
   /**
    * @param modulePath relative path to a file that will be loaded from the current {@link ClassLoader}. Non null.
+   * @param validateXml true if the XML of the Smart Connector must ve valid, false otherwise. It will be false at runtime, as
+   *                   the packaging of a connector will previously validate it's XML.
    */
-  public XmlExtensionLoaderDelegate(String modulePath) {
+  public XmlExtensionLoaderDelegate(String modulePath, boolean validateXml) {
     checkArgument(!isEmpty(modulePath), "modulePath must not be empty");
     this.modulePath = modulePath;
+    this.validateXml = validateXml;
   }
 
   public void declare(ExtensionLoadingContext context) {
@@ -245,7 +250,8 @@ public final class XmlExtensionLoaderDelegate {
   }
 
   private Document getModuleDocument(ExtensionLoadingContext context, URL resource) {
-    XmlConfigurationDocumentLoader xmlConfigurationDocumentLoader = schemaValidatingDocumentLoader();
+    XmlConfigurationDocumentLoader xmlConfigurationDocumentLoader =
+        validateXml ? schemaValidatingDocumentLoader() : schemaValidatingDocumentLoader(NoOpXmlErrorHandler::new);
     try {
       final Set<ExtensionModel> extensions = new HashSet<>(context.getDslResolvingContext().getExtensions());
       return xmlConfigurationDocumentLoader.loadDocument(extensions, resource.getFile(), resource.openStream());
