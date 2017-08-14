@@ -19,6 +19,7 @@ import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.processor.AnnotatedProcessor;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
@@ -187,8 +188,9 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
    * @param processingStrategySupplier a supplier of the processing strategy.
    * @return a lazy processor that will build the chain upon the first request.
    */
-  public static Processor newLazyProcessorChainBuilder(AbstractMessageProcessorChainBuilder chainBuilder, MuleContext muleContext,
-                                                       Supplier<ProcessingStrategy> processingStrategySupplier) {
+  public static AnnotatedProcessor newLazyProcessorChainBuilder(AbstractMessageProcessorChainBuilder chainBuilder,
+                                                                MuleContext muleContext,
+                                                                Supplier<ProcessingStrategy> processingStrategySupplier) {
     return new LazyProcessor() {
 
       private Processor processor;
@@ -222,7 +224,7 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
   }
 
   public static abstract class LazyProcessor extends AbstractAnnotatedObject
-      implements Processor, Lifecycle {
+      implements AnnotatedProcessor, Lifecycle {
 
   }
 }

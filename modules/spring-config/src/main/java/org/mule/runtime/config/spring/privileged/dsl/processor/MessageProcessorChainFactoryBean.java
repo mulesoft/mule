@@ -12,6 +12,7 @@ import static org.mule.runtime.core.privileged.processor.chain.DefaultMessagePro
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.processor.AnnotatedProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.Processor;
@@ -23,7 +24,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-public class MessageProcessorChainFactoryBean extends AbstractAnnotatedObjectFactory<Processor>
+public class MessageProcessorChainFactoryBean extends AbstractAnnotatedObjectFactory<AnnotatedProcessor>
     implements MuleContextAware {
 
   @Inject
@@ -38,7 +39,7 @@ public class MessageProcessorChainFactoryBean extends AbstractAnnotatedObjectFac
   }
 
   @Override
-  public Processor doGetObject() throws Exception {
+  public AnnotatedProcessor doGetObject() throws Exception {
     MessageProcessorChainBuilder builder = getBuilderInstance();
     for (Object processor : processors) {
       if (processor instanceof Processor) {
