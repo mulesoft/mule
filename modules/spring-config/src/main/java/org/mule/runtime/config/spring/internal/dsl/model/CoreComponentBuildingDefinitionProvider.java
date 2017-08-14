@@ -728,7 +728,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
 
   private TypeConverter<String, Predicate<? extends Notification>> getNotificationSubscriptionConverter() {
     return subscription -> {
-      if (subscription == ANY_SELECTOR_STRING) {
+      if (subscription.equals(ANY_SELECTOR_STRING)) {
         return (Predicate<? extends Notification>) (n -> true);
       }
       return (notification -> subscription != null ? subscription
