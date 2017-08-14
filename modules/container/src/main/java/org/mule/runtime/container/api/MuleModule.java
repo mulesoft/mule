@@ -10,7 +10,7 @@ package org.mule.runtime.container.api;
 import static java.util.Collections.unmodifiableSet;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.core.api.util.StringUtils;
-import org.mule.runtime.module.artifact.classloader.ExportedService;
+import org.mule.runtime.module.artifact.api.classloader.ExportedService;
 
 import java.util.List;
 import java.util.Set;

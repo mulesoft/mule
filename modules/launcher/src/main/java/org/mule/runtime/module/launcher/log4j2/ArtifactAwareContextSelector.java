@@ -10,9 +10,9 @@ import static java.lang.ClassLoader.getSystemClassLoader;
 
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.deployment.model.internal.domain.MuleSharedDomainClassLoader;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.classloader.RegionClassLoader;
-import org.mule.runtime.module.artifact.classloader.ShutdownListener;
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.ShutdownListener;
 
 import java.net.URI;
 import java.util.List;

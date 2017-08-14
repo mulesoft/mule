@@ -10,6 +10,7 @@ package org.mule.test.runner.api;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.test.runner.utils.RunnerModuleUtils;
 
 import java.io.File;
@@ -67,13 +68,13 @@ public class ClassPathClassifierContext {
    * @param testInclusions {@link List} of Maven coordinates to be included in application class loader. In format
    *        {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    * @param sharedPluginLibCoordinates {@link List} of Maven coordinates in format {@code <groupId>:<artifactId>} in order to be
-   *        added to the sharedLib {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader}
+   *        added to the sharedLib {@link ArtifactClassLoader}
    * @param exportPluginClasses {@link List} of {@link Class} to be exported in addition to the ones already exported by the
    *        plugin, for testing purposes only.
    * @param applicationUrls {@link List} of {@link URL}s to be appended to the application
-   *        {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader}
+   *        {@link ArtifactClassLoader}
    * @param extensionMetadataGenerationEnabled if while building the a plugin
-   *        {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader} for an
+   *        {@link ArtifactClassLoader} for an
    *        {@link org.mule.runtime.extension.api.annotation.Extension} the metadata should be generated.
    * @throws IOException if an error happened while reading {@link RunnerModuleUtils#EXCLUDED_PROPERTIES_FILE} file
    */
@@ -195,7 +196,7 @@ public class ClassPathClassifierContext {
 
   /**
    * @return {@link List} of Maven coordinates in format {@code <groupId>:<artifactId>} in order to be added to the sharedLib
-   *         {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader}
+   *         {@link ArtifactClassLoader}
    */
   public List<String> getSharedPluginLibCoordinates() {
     return this.sharedPluginLibCoordinates;
@@ -203,14 +204,14 @@ public class ClassPathClassifierContext {
 
   /**
    * @return {@link List} of {@link URL}s to be appended to the application
-   *         {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader} in addition to the ones classified.
+   *         {@link ArtifactClassLoader} in addition to the ones classified.
    */
   public List<URL> getApplicationUrls() {
     return this.applicationUrls;
   }
 
   /**
-   * @return {@code true} if while building the a plugin {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader}
+   * @return {@code true} if while building the a plugin {@link ArtifactClassLoader}
    *         for an {@link org.mule.runtime.extension.api.annotation.Extension} the metadata should be generated.
    */
   public boolean isExtensionMetadataGenerationEnabled() {

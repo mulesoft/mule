@@ -7,6 +7,8 @@
 
 package org.mule.test.runner.api;
 
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+
 import java.net.URL;
 import java.util.List;
 
@@ -14,7 +16,7 @@ import org.eclipse.aether.artifact.Artifact;
 
 /**
  * Defines the result of the classification process for an artifact. It contains a {@link List} of {@link URL}s that should have the
- * plugin {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader} plus a {@link List} of {@link Class}es to be
+ * plugin {@link ArtifactClassLoader} plus a {@link List} of {@link Class}es to be
  * exported in addition to the packages exported by the artifact, in order to run the test.
  * <p/>
  * It also has dependencies references and nested ones. It represents the graph of plugin dependencies also by the list of

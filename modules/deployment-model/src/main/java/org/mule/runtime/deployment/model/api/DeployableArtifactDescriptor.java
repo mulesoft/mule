@@ -8,7 +8,7 @@ package org.mule.runtime.deployment.model.api;
 
 import static java.util.Collections.emptyList;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
-import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
 import java.io.File;
 import java.util.HashSet;

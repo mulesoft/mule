@@ -7,7 +7,7 @@
 
 package org.mule.runtime.container.api;
 
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderManager;
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderManager;
 
 /**
  * Enables injection of container's {@link ArtifactClassLoaderManager}.

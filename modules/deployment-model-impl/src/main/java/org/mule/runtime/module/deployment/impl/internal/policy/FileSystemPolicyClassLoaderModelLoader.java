@@ -8,9 +8,9 @@
 package org.mule.runtime.module.deployment.impl.internal.policy;
 
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
-import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
-import org.mule.runtime.module.artifact.descriptor.ClassLoaderModelLoader;
-import org.mule.runtime.module.artifact.descriptor.InvalidDescriptorLoaderException;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
+import org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderException;
 
 import java.io.File;
 import java.io.FilenameFilter;

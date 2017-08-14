@@ -12,11 +12,11 @@ import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConst
 import org.mule.maven.client.api.LocalRepositorySupplierFactory;
 import org.mule.maven.client.api.MavenClient;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
-import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
-import org.mule.runtime.module.artifact.descriptor.BundleDependency;
-import org.mule.runtime.module.artifact.descriptor.BundleDescriptor;
-import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
-import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel.ClassLoaderModelBuilder;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder;
 import org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader;
 
 import java.io.File;

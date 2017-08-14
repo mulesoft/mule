@@ -13,7 +13,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.util.FileUtils.newFile;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
-import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.deployment.impl.internal.AbstractSplashScreenTestCase;
 
 import com.google.common.collect.Sets;
