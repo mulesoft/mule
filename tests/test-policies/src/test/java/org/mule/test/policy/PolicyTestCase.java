@@ -100,29 +100,21 @@ public class PolicyTestCase extends MuleArtifactFunctionalTestCase {
 
     @Override
     public List<Policy> findSourceParameterizedPolicies(PolicyPointcutParameters policyPointcutParameters) {
-      List<Policy> policies = policyReference.get().map(policy -> policy.getSourcePolicyChain()
+      return policyReference.get().map(policy -> policy.getSourcePolicyChain()
           .map(sourceChain -> asList(new Policy(sourceChain, POLICY_ID)))
           .orElse(emptyList())).orElse(emptyList());
-
-      return policies;
     }
 
     @Override
     public List<Policy> findOperationParameterizedPolicies(PolicyPointcutParameters policyPointcutParameters) {
-
-      List<Policy> policies = policyReference.get().map(policy -> policy.getOperationPolicyChain()
+      return policyReference.get().map(policy -> policy.getOperationPolicyChain()
           .map(operationChain -> asList(new Policy(operationChain, "policyId")))
           .orElse(emptyList())).orElse(emptyList());
-
-      return policies;
     }
 
     private PolicyInstance getPolicyFromRegistry() {
       try {
-        PolicyInstance policyInstance = muleContext.getRegistry().lookupObject(PolicyInstance.class);
-        policyInstance.initialise();
-        policyInstance.start();
-        return policyInstance;
+        return muleContext.getRegistry().lookupObject(PolicyInstance.class);
       } catch (Exception e) {
         throw new MuleRuntimeException(e);
       }
