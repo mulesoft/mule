@@ -171,10 +171,13 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
     return list -> {
       Map<String, TypedValue> routeVars = new HashMap<>();
       list.forEach(event -> event.getVariables().forEach((key, value) -> {
+        // Only merge variables that have been added or mutated in routes
         if (!value.equals(original.getVariables().get(key))) {
           if (!routeVars.containsKey(key)) {
+            // A new variable that hasn't already been set by another route is added as a simple entry.
             routeVars.put(key, value);
           } else {
+            // If a variable already exists from before route, or was set in a previous route, then it's added to a list of 1.
             if (!(routeVars.get(key).getValue() instanceof List)) {
               List newList = new ArrayList();
               newList.add(routeVars.get(key).getValue());
@@ -184,8 +187,10 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
             List valueList = (List) routeVars.get(key).getValue();
             valueList.add(value.getValue());
             if (((CollectionDataType) routeVars.get(key).getDataType()).getItemDataType().isCompatibleWith(value.getDataType())) {
+              // If item types are compatible then data type is conserved
               routeVars.put(key, new TypedValue(valueList, routeVars.get(key).getDataType()));
             } else {
+              // Else Object item type is used.
               routeVars.put(key, new TypedValue(valueList, DataType.builder().collectionType(List.class).build()));
             }
           }
@@ -194,6 +199,5 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
       routeVars.forEach((s, typedValue) -> result.addVariable(s, typedValue.getValue(), typedValue.getDataType()));
     };
   }
-
 
 }

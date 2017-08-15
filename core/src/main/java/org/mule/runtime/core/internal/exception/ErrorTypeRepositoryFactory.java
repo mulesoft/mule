@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.exception;
 
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.CLIENT_SECURITY;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.COMPOSITE_ROUTING;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.CONNECTIVITY;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.DUPLICATE_MESSAGE;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.EXPRESSION;
@@ -64,6 +65,7 @@ public class ErrorTypeRepositoryFactory {
     errorTypeRepository.addErrorType(STREAM_MAXIMUM_SIZE_EXCEEDED, errorTypeRepository.getAnyErrorType());
     errorTypeRepository.addInternalErrorType(FATAL, errorTypeRepository.getCriticalErrorType());
     errorTypeRepository.addErrorType(TIMEOUT, errorTypeRepository.getAnyErrorType());
+    errorTypeRepository.addErrorType(COMPOSITE_ROUTING, errorTypeRepository.getErrorType(ROUTING).get());
 
     final ErrorType sourceErrorType = errorTypeRepository.getSourceErrorType();
     errorTypeRepository.addErrorType(SOURCE_RESPONSE_GENERATE, errorTypeRepository.getSourceResponseErrorType());

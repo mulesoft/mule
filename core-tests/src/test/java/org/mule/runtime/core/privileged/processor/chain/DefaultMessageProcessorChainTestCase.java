@@ -684,7 +684,8 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     ScatterGatherRouter scatterGatherRouter = new ScatterGatherRouter();
     scatterGatherRouter.setAnnotations(getAppleFlowComponentLocationAnnotations());
     scatterGatherRouter
-        .setRoutes(asList(newChain(getAppendingMP("1")), newChain(getAppendingMP("2")), newChain(getAppendingMP("3"))));
+        .setRoutes(asList(newChain(empty(), getAppendingMP("1")), newChain(empty(), getAppendingMP("2")),
+                          newChain(empty(), getAppendingMP("3"))));
     initialiseIfNeeded(scatterGatherRouter, true, muleContext);
     scatterGatherRouter.start();
 

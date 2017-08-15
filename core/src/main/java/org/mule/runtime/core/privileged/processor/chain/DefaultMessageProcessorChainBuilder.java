@@ -7,6 +7,7 @@
 package org.mule.runtime.core.privileged.processor.chain;
 
 import static java.util.Collections.singletonList;
+import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -181,7 +182,6 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
 
   }
 
-
   /**
    * Helper method to create a lazy processor from a chain builder so the chain builder can get access to a
    * {@link FlowConstruct}{@link ProcessingStrategy}.
@@ -194,7 +194,7 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
   public static MessageProcessorChain newLazyProcessorChainBuilder(AbstractMessageProcessorChainBuilder chainBuilder,
                                                                    MuleContext muleContext,
                                                                    Supplier<ProcessingStrategy> processingStrategySupplier) {
-    return new AbstractMessageProcessorChain(chainBuilder.name, null, chainBuilder.processors) {
+    return new AbstractMessageProcessorChain(chainBuilder.name, empty(), chainBuilder.processors) {
 
       private MessageProcessorChain delegate;
 

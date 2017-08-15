@@ -20,7 +20,7 @@ import java.util.List;
  * adding the correct {@link MessageProcessorPathElement}'s to their parent {@link MessageProcessorPathElement}.
  */
 public interface MessageProcessorChain
-    extends Processor, Lifecycle, MuleContextAware, AnnotatedObject, Scope {
+    extends AnnotatedProcessor, Lifecycle, MuleContextAware, Scope {
 
   /**
    * Obtain the list of {@link Processor}'s that this chains was created from. Note that this is the linear view of all processors

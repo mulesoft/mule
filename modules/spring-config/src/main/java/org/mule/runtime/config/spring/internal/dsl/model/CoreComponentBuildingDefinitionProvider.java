@@ -387,6 +387,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("timeout", fromSimpleParameter("timeout").build())
         .withSetterParameterDefinition("maxConcurrency", fromSimpleParameter("maxConcurrency").build())
         .withSetterParameterDefinition("target", fromSimpleParameter("target").build())
+        .withSetterParameterDefinition("targetType", fromSimpleParameter("targetType").build())
         .withSetterParameterDefinition(ROUTES, fromChildCollectionConfiguration(MessageProcessorChain.class).build())
         .withSetterParameterDefinition(FORK_JOIN_STRATEGY, fromChildConfiguration(ForkJoinStrategyFactory.class).build())
         .asScope().build());
@@ -441,11 +442,13 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
             .withSetterParameterDefinition("failureExpression",
                                            fromSimpleParameter("failureExpression").withDefaultValue(DEFAULT_FAILURE_EXPRESSION)
                                                .build())
-            .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
+            .withSetterParameterDefinition(MESSAGE_PROCESSORS,
+                                           fromChildCollectionConfiguration(MessageProcessorChain.class).build())
             .build());
     componentBuildingDefinitions
         .add(baseDefinition.withIdentifier(ROUND_ROBIN).withTypeDefinition(fromType(RoundRobin.class))
-            .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
+            .withSetterParameterDefinition(MESSAGE_PROCESSORS,
+                                           fromChildCollectionConfiguration(MessageProcessorChain.class).build())
             .build());
     componentBuildingDefinitions.add(baseDefinition.withIdentifier(CHOICE).withTypeDefinition(fromType(ChoiceRouter.class))
         .withObjectFactoryType(ChoiceRouterObjectFactory.class)

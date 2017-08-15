@@ -22,6 +22,8 @@ import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.meta.TargetType;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -38,7 +40,7 @@ import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.reactivestreams.Publisher;
 
 /**
- * Abstract base class for routers using a {@link ForkJoinStrategy} to process miltupole {@link RoutingPair}'s and aggregate
+ * Abstract base class for routers using a {@link ForkJoinStrategy} to process multiple {@link RoutingPair}'s and aggregate
  * results.
  * 
  * @since 4.0
@@ -59,6 +61,7 @@ public abstract class AbstractForkJoinRouter extends AbstractMuleObjectOwner<Mes
   private Scheduler timeoutScheduler;
   private ErrorType timeoutErrorType;
   private String target;
+  private TargetType targetType;
 
   @Override
   public InternalEvent process(InternalEvent event) throws MuleException {
@@ -69,14 +72,16 @@ public abstract class AbstractForkJoinRouter extends AbstractMuleObjectOwner<Mes
   public Publisher<InternalEvent> apply(Publisher<InternalEvent> publisher) {
     return from(publisher)
         .doOnNext(onEvent())
-        .flatMap(event -> from(forkJoinStrategy.forkJoin(event, getRoutingPairs(event))).map(result -> {
-          if (target != null) {
-            return builder(event).addVariable(target, result.getMessage()).build();
-          } else {
-            return result;
-          }
-        }).onErrorMap(throwable -> !(throwable instanceof MessagingException),
-                      throwable -> new MessagingException(event, throwable, this)));
+        .flatMap(event -> from(forkJoinStrategy.forkJoin(event, getRoutingPairs(event)))
+            .map(result -> {
+              if (target != null) {
+                return builder(event).addVariable(target, getTargetValue(result)).build();
+              } else {
+                return result;
+              }
+            })
+            .onErrorMap(throwable -> !(throwable instanceof MessagingException),
+                        throwable -> new MessagingException(event, throwable, this)));
   }
 
   /**
@@ -164,6 +169,15 @@ public abstract class AbstractForkJoinRouter extends AbstractMuleObjectOwner<Mes
   }
 
   /**
+   * Defines the {@link TargetType} for the configured target.
+   *
+   * @param targetType the target type.
+   */
+  public void setTargetType(TargetType targetType) {
+    this.targetType = targetType;
+  }
+
+  /**
    * Template method that allows implementations to define a default max concurrency.
    * 
    * @return
@@ -185,5 +199,13 @@ public abstract class AbstractForkJoinRouter extends AbstractMuleObjectOwner<Mes
    * @return the default fork-join strategy.
    */
   protected abstract ForkJoinStrategyFactory getDefaultForkJoinStrategyFactory();
+
+  private Object getTargetValue(InternalEvent result) {
+    if (TargetType.MESSAGE.equals(targetType)) {
+      return result.getMessage();
+    } else {
+      return result.getMessage().getPayload();
+    }
+  }
 
 }

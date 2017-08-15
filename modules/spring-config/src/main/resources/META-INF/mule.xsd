@@ -1306,6 +1306,20 @@
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:enumeration>
+                    <xsd:enumeration value="TIMEOUT">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Occurs when timeout is produced.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="COMPOSITE_ROUTING">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Specialization of ROUTING error, that occurs when multiple failures occur when routing to multiple routes..
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
                 </xsd:restriction>
             </xsd:simpleType>
         </xsd:union>
@@ -3133,7 +3147,7 @@
                         <xsd:element ref="abstract-fork-join-strategy" minOccurs="0" maxOccurs="1">
                             <xsd:annotation>
                                 <xsd:documentation>
-                                    Allows customizing the logic used for aggregation the events back together.
+                                    Strategy that determines how multiple routes should be processed and how their results are aggregated.
                                 </xsd:documentation>
                             </xsd:annotation>
                         </xsd:element>
@@ -3159,6 +3173,7 @@
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:attribute>
+                    <xsd:attribute name="targetType" type="targetTypeEnumType" default="PAYLOAD"/>
                 </xsd:extension>
             </xsd:complexContent>
         </xsd:complexType>

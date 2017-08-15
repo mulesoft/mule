@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.routing;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
+import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -19,7 +20,10 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mule.runtime.api.meta.TargetType.MESSAGE;
+import static org.mule.runtime.api.meta.TargetType.PAYLOAD;
 import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE_MAP;
+import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.api.routing.ForkJoinStrategy.RoutingPair.of;
 import static org.mule.test.allure.AllureConstants.RoutersFeature.ROUTERS_FEATURE;
 import static org.mule.test.allure.AllureConstants.RoutersFeature.ScatterGatherStory.SCATTER_GATHER;
@@ -35,6 +39,8 @@ import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.meta.TargetType;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
@@ -49,6 +55,7 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import java.io.StringBufferInputStream;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -89,8 +96,8 @@ public class ScatterGatherRouterTestCase extends AbstractMuleContextTestCase {
   @Description("By default the router result populates the outgoing message payload.")
   public void defaultTarget() throws Exception {
     InternalEvent original = testEvent();
-    MessageProcessorChain route1 = MessageProcessors.newChain(event -> event);
-    MessageProcessorChain route2 = MessageProcessors.newChain(event -> event);
+    MessageProcessorChain route1 = newChain(empty(), event -> event);
+    MessageProcessorChain route2 = newChain(empty(), event -> event);
 
     router.setRoutes(asList(route1, route2));
     muleContext.getInjector().inject(router);
@@ -106,12 +113,36 @@ public class ScatterGatherRouterTestCase extends AbstractMuleContextTestCase {
 
   @Test
   @Description("When a custom target is configured the router result is set in a variable and the input event is output.")
-  public void customTarget() throws Exception {
+  public void customTargetMessage() throws Exception {
     final String variableName = "foo";
 
     InternalEvent original = testEvent();
-    MessageProcessorChain route1 = MessageProcessors.newChain(event -> event);
-    MessageProcessorChain route2 = MessageProcessors.newChain(event -> event);
+    MessageProcessorChain route1 = newChain(empty(), event -> event);
+    MessageProcessorChain route2 = newChain(empty(), event -> event);
+
+    router.setRoutes(asList(route1, route2));
+    router.setTarget(variableName);
+    router.setTargetType(MESSAGE);
+    muleContext.getInjector().inject(router);
+    router.setAnnotations(getAppleFlowComponentLocationAnnotations());
+    router.initialise();
+
+    Event result = router.process(original);
+
+    assertThat(result.getMessage(), equalTo(original.getMessage()));
+    assertThat(((Message) result.getVariables().get(variableName).getValue()).getPayload().getValue(), instanceOf(Map.class));
+    Map<String, Message> resultMap = (Map) ((Message) result.getVariables().get(variableName).getValue()).getPayload().getValue();
+    assertThat(resultMap.values(), hasSize(2));
+  }
+
+  @Test
+  @Description("When a custom target is configured the router result is set in a variable and the input event is output.")
+  public void customTargetDefaultPayload() throws Exception {
+    final String variableName = "foo";
+
+    InternalEvent original = testEvent();
+    MessageProcessorChain route1 = newChain(empty(), event -> event);
+    MessageProcessorChain route2 = newChain(empty(), event -> event);
 
     router.setRoutes(asList(route1, route2));
     router.setTarget(variableName);
@@ -122,8 +153,8 @@ public class ScatterGatherRouterTestCase extends AbstractMuleContextTestCase {
     Event result = router.process(original);
 
     assertThat(result.getMessage(), equalTo(original.getMessage()));
-    assertThat(((Message) result.getVariables().get(variableName).getValue()).getPayload().getValue(), instanceOf(Map.class));
-    Map<String, Message> resultMap = (Map) ((Message) result.getVariables().get(variableName).getValue()).getPayload().getValue();
+    assertThat(((TypedValue<Object>) result.getVariables().get(variableName).getValue()).getValue(), instanceOf(Map.class));
+    Map<String, Message> resultMap = (Map) ((TypedValue) result.getVariables().get(variableName).getValue()).getValue();
     assertThat(resultMap.values(), hasSize(2));
   }
 
@@ -166,8 +197,8 @@ public class ScatterGatherRouterTestCase extends AbstractMuleContextTestCase {
   @Test
   @Description("Consumable payloads are not supported.")
   public void consumablePayload() throws Exception {
-    MessageProcessorChain route1 = MessageProcessors.newChain(event -> event);
-    MessageProcessorChain route2 = MessageProcessors.newChain(event -> event);
+    MessageProcessorChain route1 = newChain(empty(), event -> event);
+    MessageProcessorChain route2 = newChain(empty(), event -> event);
 
     router.setRoutes(asList(route1, route2));
     muleContext.getInjector().inject(router);
