@@ -30,6 +30,8 @@ import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.Pair;
+import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
+
 import org.reactivestreams.Publisher;
 
 import java.util.Collections;
@@ -43,8 +45,8 @@ import java.util.Optional;
  * through the {@link InternalEvent}.
  *
  * <p>
- * Both parameter and property could be simple literals or expressions that will be evaluated before passing the new {@link InternalEvent}
- * to the child processors.
+ * Both parameter and property could be simple literals or expressions that will be evaluated before passing the new
+ * {@link InternalEvent} to the child processors.
  *
  * <p>
  * Taking the following sample where the current event is processed using {@link ModuleOperationProcessorChain#apply(Publisher)},
@@ -62,7 +64,7 @@ import java.util.Optional;
  * </module-operation-chain>
  * </pre>
  */
-public class ModuleOperationMessageProcessorChainBuilder extends ExplicitMessageProcessorChainBuilder {
+public class ModuleOperationMessageProcessorChainBuilder extends DefaultMessageProcessorChainBuilder {
 
   /**
    * literal that represents the name of the global element for any given module. If the module's name is math, then the value of
@@ -99,7 +101,7 @@ public class ModuleOperationMessageProcessorChainBuilder extends ExplicitMessage
   /**
    * Generates message processor for a specific set of parameters & properties to be added in a new event.
    */
-  static public class ModuleOperationProcessorChain extends ExplicitMessageProcessorChain
+  static public class ModuleOperationProcessorChain extends DefaultMessageProcessorChain
       implements Processor {
 
     private Map<String, Pair<String, MetadataType>> properties;
@@ -126,8 +128,8 @@ public class ModuleOperationMessageProcessorChainBuilder extends ExplicitMessage
     }
 
     /**
-     * To properly feed the {@link ExpressionManager#evaluate(String, DataType, BindingContext, InternalEvent)} we need to store the
-     * {@link MetadataType} per parameter, so that the {@link DataType} can be generated.
+     * To properly feed the {@link ExpressionManager#evaluate(String, DataType, BindingContext, InternalEvent)} we need to store
+     * the {@link MetadataType} per parameter, so that the {@link DataType} can be generated.
      * 
      * @param parameters list of parameters taken from the XML
      * @param parameterModels collection of elements taken from the matching {@link ExtensionModel}

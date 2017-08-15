@@ -13,6 +13,7 @@ import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
+import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -23,8 +24,9 @@ import reactor.core.publisher.Mono;
 /**
  * Constructs a custom chain for subflows using the subflow name as the chain name.
  */
-public class SubflowMessageProcessorChainBuilder extends ExplicitMessageProcessorChainBuilder {
+public class SubflowMessageProcessorChainBuilder extends DefaultMessageProcessorChainBuilder {
 
+  @Override
   protected MessageProcessorChain createInterceptingChain(Processor head, List<Processor> processors,
                                                           List<Processor> processorForLifecycle) {
     return new SubFlowMessageProcessorChain(name, head, processors, processorForLifecycle);
@@ -33,7 +35,7 @@ public class SubflowMessageProcessorChainBuilder extends ExplicitMessageProcesso
   /**
    * Generates message processor identifiers specific for subflows.
    */
-  static class SubFlowMessageProcessorChain extends ExplicitMessageProcessorChain {
+  static class SubFlowMessageProcessorChain extends DefaultMessageProcessorChain {
 
     private String subFlowName;
 

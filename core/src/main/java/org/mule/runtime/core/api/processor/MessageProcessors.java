@@ -23,8 +23,6 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.internal.processor.chain.ExplicitMessageProcessorChainBuilder;
-import org.mule.runtime.core.internal.processor.chain.ExplicitMessageProcessorChainBuilder.ExplicitMessageProcessorChain;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 
 import org.reactivestreams.Publisher;
@@ -52,8 +50,7 @@ public class MessageProcessors {
    * @return new {@link MessageProcessorChain} instance.
    */
   public static MessageProcessorChain newChain(Optional<ProcessingStrategy> processingStrategy, List<Processor> processors) {
-    if (processors.size() == 1 && processors.get(0) instanceof MessageProcessorChain
-        && !(processors.get(0) instanceof ExplicitMessageProcessorChain)) {
+    if (processors.size() == 1 && processors.get(0) instanceof MessageProcessorChain) {
       return (MessageProcessorChain) processors.get(0);
     } else {
       DefaultMessageProcessorChainBuilder defaultMessageProcessorChainBuilder = new DefaultMessageProcessorChainBuilder();
@@ -72,41 +69,6 @@ public class MessageProcessors {
    */
   public static MessageProcessorChain newChain(Optional<ProcessingStrategy> processingStrategy, Processor... processors) {
     return newChain(processingStrategy, asList(processors));
-  }
-
-  /**
-   * Creates a new explicit {@link MessageProcessorChain} from one or more {@link Processor}'s. Note that this performs chains
-   * construction but will not inject {@link MuleContext} or perform any lifecycle.
-   *
-   * @param processors list of processors to construct chains from.
-   * @return new {@link MessageProcessorChain} instance.
-   */
-  public static MessageProcessorChain newExplicitChain(Optional<ProcessingStrategy> processingStrategy, Processor... processors) {
-    if (processors.length == 1 && processors[0] instanceof ExplicitMessageProcessorChain) {
-      return (MessageProcessorChain) processors[0];
-    } else {
-      ExplicitMessageProcessorChainBuilder explicitMessageProcessorChainBuilder = new ExplicitMessageProcessorChainBuilder();
-      processingStrategy.ifPresent(explicitMessageProcessorChainBuilder::setProcessingStrategy);
-      return explicitMessageProcessorChainBuilder.chain(processors).build();
-    }
-  }
-
-  /**
-   * Creates a new explicit {@link MessageProcessorChain} from a {@link List} of {@link Processor}'s. Note that this performs
-   * chains construction but wil not inject {@link MuleContext} or perform any lifecycle.
-   *
-   * @param processors list of processors to construct chains from.
-   * @return new {@link MessageProcessorChain} instance.
-   */
-  public static MessageProcessorChain newExplicitChain(Optional<ProcessingStrategy> processingStrategy,
-                                                       List<Processor> processors) {
-    if (processors.size() == 1 && processors.get(0) instanceof ExplicitMessageProcessorChain) {
-      return (MessageProcessorChain) processors.get(0);
-    } else {
-      ExplicitMessageProcessorChainBuilder explicitMessageProcessorChainBuilder = new ExplicitMessageProcessorChainBuilder();
-      processingStrategy.ifPresent(explicitMessageProcessorChainBuilder::setProcessingStrategy);
-      return explicitMessageProcessorChainBuilder.chain(processors).build();
-    }
   }
 
   /**

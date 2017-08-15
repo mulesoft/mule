@@ -11,7 +11,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.internal.processor.chain.ExplicitMessageProcessorChainBuilder;
+import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
 
 import java.util.List;
@@ -47,7 +47,7 @@ public class MessageProcessorChainObjectFactory extends AbstractAnnotatedObjectF
   }
 
   protected MessageProcessorChainBuilder getBuilderInstance() {
-    ExplicitMessageProcessorChainBuilder builder = new ExplicitMessageProcessorChainBuilder();
+    DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.setName("processor chain '" + name + "'");
     return builder;
   }

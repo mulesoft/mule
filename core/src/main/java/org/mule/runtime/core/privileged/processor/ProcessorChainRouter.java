@@ -23,14 +23,13 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.internal.processor.chain.ExplicitMessageProcessorChainBuilder;
+import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 
 import java.util.List;
 
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Component to be used that supports a collection of processors and executes them in order.
@@ -79,7 +78,7 @@ public class ProcessorChainRouter extends AbstractAnnotatedObject implements Lif
 
   @Override
   public void initialise() throws InitialisationException {
-    ExplicitMessageProcessorChainBuilder builder = new ExplicitMessageProcessorChainBuilder();
+    DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.setName("processor chain '" + name + "'");
     for (Object processor : processors) {
       if (processor instanceof Processor) {
