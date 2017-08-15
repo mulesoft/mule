@@ -164,11 +164,9 @@ public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
     }
 
     /**
-     *
      * @param secretAliasId: the keyID to use for decryption. It must be a hexadecimal value.
      * @return the same keyID but as a decimal value.
      */
-
     private Long parseSecretAliasId(String secretAliasId)
     {
         return new BigInteger(secretAliasId, 16).longValue();
