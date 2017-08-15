@@ -25,7 +25,6 @@ import static org.mule.runtime.config.spring.api.dsl.model.ComponentBuildingDefi
 import static org.mule.runtime.config.spring.api.dsl.model.ComponentBuildingDefinitionProviderUtils.getMuleMessageTransformerBaseBuilder;
 import static org.mule.runtime.config.spring.api.dsl.model.ComponentBuildingDefinitionProviderUtils.getTransformerBaseBuilder;
 import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STARTED;
-import static org.mule.runtime.core.api.context.notification.ListenerSubscriptionPair.ANY_SELECTOR_STRING;
 import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
 import static org.mule.runtime.core.api.transaction.MuleTransactionConfig.ACTION_INDIFFERENT_STRING;
 import static org.mule.runtime.core.api.transaction.TransactionType.LOCAL;
@@ -574,7 +573,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withTypeDefinition(fromType(ListenerSubscriptionPair.class))
         .withConstructorParameterDefinition(fromSimpleReferenceParameter("ref").build())
         .withConstructorParameterDefinition(fromSimpleParameter("subscription", getNotificationSubscriptionConverter())
-            .withDefaultValue(ANY_SELECTOR_STRING)
+            .withDefaultValue((Predicate<? extends Notification>) (n -> true))
             .build())
         .build());
 
@@ -727,13 +726,8 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   }
 
   private TypeConverter<String, Predicate<? extends Notification>> getNotificationSubscriptionConverter() {
-    return subscription -> {
-      if (ANY_SELECTOR_STRING.equals(subscription)) {
-        return (Predicate<? extends Notification>) (n -> true);
-      }
-      return (notification -> subscription != null ? subscription
-          .equals(((AbstractServerNotification) notification).getResourceIdentifier()) : true);
-    };
+    return subscription -> (notification -> subscription != null ? subscription
+        .equals(((AbstractServerNotification) notification).getResourceIdentifier()) : true);
   }
 
   private List<ComponentBuildingDefinition> getIdempotentValidatorsDefinitions() {
