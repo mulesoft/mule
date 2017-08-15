@@ -7,13 +7,12 @@
 package org.mule.runtime.module.extension.internal.config.dsl.operation;
 
 import static org.apache.commons.lang3.StringUtils.EMPTY;
-import static org.mule.runtime.api.meta.TargetType.PAYLOAD;
-import org.mule.runtime.api.meta.TargetType;
+import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
+import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
@@ -31,7 +30,7 @@ public class OperationMessageProcessorObjectFactory extends AbstractExtensionObj
   private final PolicyManager policyManager;
   private ConfigurationProvider configurationProvider;
   private String target = EMPTY;
-  private TargetType targetType = PAYLOAD;
+  private String targetValue = PAYLOAD;
   private CursorProviderFactory cursorProviderFactory;
 
   public OperationMessageProcessorObjectFactory(ExtensionModel extensionModel,
@@ -50,7 +49,7 @@ public class OperationMessageProcessorObjectFactory extends AbstractExtensionObj
         .setConfigurationProvider(configurationProvider)
         .setParameters(parameters)
         .setTarget(target)
-        .setTargetType(targetType)
+        .setTargetValue(targetValue)
         .setCursorProviderFactory(cursorProviderFactory)
         .build();
   }
@@ -63,8 +62,8 @@ public class OperationMessageProcessorObjectFactory extends AbstractExtensionObj
     this.target = target;
   }
 
-  public void setTargetType(TargetType targetType) {
-    this.targetType = targetType;
+  public void setTargetValue(String targetValue) {
+    this.targetValue = targetValue;
   }
 
   public void setCursorProviderFactory(CursorProviderFactory cursorProviderFactory) {

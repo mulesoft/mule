@@ -12,14 +12,15 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
-import org.junit.Test;
-import org.junit.runners.Parameterized;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.test.runner.RunnerDelegateTo;
 
 import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized;
 
 @RunnerDelegateTo(Parameterized.class)
 public class ModuleSimpleTestCase extends AbstractXmlExtensionMuleArtifactFunctionalTestCase {
@@ -127,6 +128,17 @@ public class ModuleSimpleTestCase extends AbstractXmlExtensionMuleArtifactFuncti
     assertThat(targetVariable.getValue(), instanceOf(Message.class));
     Message targetMessage = (Message) targetVariable.getValue();
     assertThat(targetMessage.getPayload().getValue(), is("hardcoded value"));
+  }
+
+  @Test
+  public void testSetPayloadHardcodedFlowWithTargetAndTargetValuePayload() throws Exception {
+    InternalEvent event = flowRunner("testSetPayloadHardcodedFlowWithTargetAndTargetValuePayload").run();
+    assertThat(event.getMessage().getPayload().getValue(), nullValue());
+    final TypedValue<?> targetVariable = event.getVariables().get("existing-variable");
+    assertThat(targetVariable, notNullValue());
+    assertThat(targetVariable.getValue(), instanceOf(String.class));
+    String targetMessage = (String) targetVariable.getValue();
+    assertThat(targetMessage, is("hardcoded value"));
   }
 
   @Test

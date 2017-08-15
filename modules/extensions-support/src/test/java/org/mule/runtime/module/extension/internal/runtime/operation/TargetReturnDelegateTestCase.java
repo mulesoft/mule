@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.api.meta.TargetType.MESSAGE;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getDefaultCursorStreamProviderFactory;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.InternalEvent;
@@ -27,7 +26,7 @@ public class TargetReturnDelegateTestCase extends ValueReturnDelegateTestCase {
 
   @Override
   protected ReturnDelegate createReturnDelegate() {
-    return new TargetReturnDelegate(TARGET, MESSAGE, componentModel, getDefaultCursorStreamProviderFactory(), muleContext);
+    return new TargetReturnDelegate(TARGET, "#[message]", componentModel, getDefaultCursorStreamProviderFactory(), muleContext);
   }
 
   @After

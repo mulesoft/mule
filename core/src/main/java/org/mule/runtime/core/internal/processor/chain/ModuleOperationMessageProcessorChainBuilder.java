@@ -11,8 +11,10 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
+import static org.mule.runtime.api.el.BindingContextUtils.getTargetBindingContext;
 import static org.mule.runtime.core.internal.message.InternalMessage.builder;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
 import org.mule.metadata.api.model.MetadataFormat;
@@ -25,6 +27,7 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
@@ -32,13 +35,13 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.Pair;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 
-import org.reactivestreams.Publisher;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import org.reactivestreams.Publisher;
 
 /**
  * Creates a chain for any operation, where it parametrizes two type of values (parameter and property) to the inner processors
@@ -109,6 +112,7 @@ public class ModuleOperationMessageProcessorChainBuilder extends DefaultMessageP
     private boolean returnsVoid;
     private ExpressionManager expressionManager;
     private Optional<String> target;
+    private String targetValue;
 
     ModuleOperationProcessorChain(String name, Processor head, List<Processor> processors,
                                   List<Processor> processorsForLifecycle,
@@ -122,6 +126,7 @@ public class ModuleOperationMessageProcessorChainBuilder extends DefaultMessageP
               : Collections.EMPTY_LIST;
       this.properties = parseParameters(properties, propertiesModels);
       this.target = parameters.containsKey(TARGET_PARAMETER_NAME) ? of(parameters.remove(TARGET_PARAMETER_NAME)) : empty();
+      this.targetValue = parameters.remove(TARGET_VALUE_PARAMETER_NAME);
       this.parameters = parseParameters(parameters, operationModel.getAllParameterModels());
       this.returnsVoid = MetadataTypeUtils.isVoid(operationModel.getOutput().getType());
       this.expressionManager = expressionManager;
@@ -172,7 +177,9 @@ public class ModuleOperationMessageProcessorChainBuilder extends DefaultMessageP
     private InternalEvent createNewEventFromJustMessage(InternalEvent request, InternalEvent response) {
       final InternalEvent.Builder builder = InternalEvent.builder(request);
       if (target.isPresent()) {
-        builder.addVariable(target.get(), response.getMessage());
+        TypedValue result =
+            expressionManager.evaluate(targetValue, getTargetBindingContext(response.getMessage()));
+        builder.addVariable(target.get(), result.getValue(), result.getDataType());
       } else {
         builder.message(builder(response.getMessage()).build());
       }

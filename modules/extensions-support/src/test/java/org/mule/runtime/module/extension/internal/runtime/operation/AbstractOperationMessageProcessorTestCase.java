@@ -21,7 +21,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.meta.TargetType.MESSAGE;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
 import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
@@ -44,7 +43,6 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.api.meta.TargetType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.OutputModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
@@ -178,7 +176,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
   protected CursorStreamProviderFactory cursorStreamProviderFactory;
   protected String configurationName = CONFIG_NAME;
   protected String target = EMPTY;
-  protected TargetType targetType = MESSAGE;
+  protected String targetValue = "#[message]";
 
   protected OperationPolicy mockOperationPolicy;
 
@@ -301,6 +299,8 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     when(message.getPayload())
         .thenReturn(new TypedValue<>(TEST_PAYLOAD,
                                      DataType.builder().mediaType(MediaType.create("*", "*", defaultCharset())).build()));
+    when(message.getAttributes())
+        .thenReturn(new TypedValue<>(null, DataType.builder().fromObject(null).build()));
     return eventBuilder().message(message).build();
   }
 

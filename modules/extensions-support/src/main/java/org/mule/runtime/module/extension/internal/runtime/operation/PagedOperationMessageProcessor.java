@@ -6,13 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
-import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.meta.TargetType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.core.api.rx.Exceptions;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.iterator.Consumer;
 import org.mule.runtime.core.api.streaming.iterator.ConsumerStreamingIterator;
@@ -25,8 +22,6 @@ import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapte
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.streaming.PagingProviderProducer;
-
-import reactor.core.publisher.Mono;
 
 /**
  * A specialization of {@link OperationMessageProcessor} which supports auto paging by the means of a
@@ -42,38 +37,27 @@ public class PagedOperationMessageProcessor extends OperationMessageProcessor {
                                         OperationModel operationModel,
                                         ConfigurationProvider configurationProvider,
                                         String target,
-                                        TargetType targetType,
+                                        String targetValue,
                                         ResolverSet resolverSet,
                                         CursorProviderFactory cursorProviderFactory,
                                         ExtensionManager extensionManager,
                                         PolicyManager policyManager,
                                         ExtensionConnectionSupplier connectionSupplier) {
-    super(extensionModel, operationModel, configurationProvider, target, targetType, resolverSet, cursorProviderFactory,
+    super(extensionModel, operationModel, configurationProvider, target, targetValue, resolverSet, cursorProviderFactory,
           extensionManager, policyManager);
     this.connectionSupplier = connectionSupplier;
   }
 
   @Override
-  protected Mono<InternalEvent> doProcess(InternalEvent event, ExecutionContextAdapter<OperationModel> operationContext) {
-    return super.doProcess(event, operationContext).map(resultEvent -> {
-      PagingProvider<?, ?> pagingProvider = getTarget()
-          .map(target -> getPagingProvider(resultEvent.getVariables().get(target).getValue()))
-          .orElseGet(() -> getPagingProvider(resultEvent.getMessage()));
+  protected InternalEvent asReturnValue(ExecutionContextAdapter<OperationModel> operationContext, Object value) {
+    if (value == null) {
+      throw new IllegalStateException("Obtained paging delegate cannot be null");
+    }
 
-      if (pagingProvider == null) {
-        throw new IllegalStateException("Obtained paging delegate cannot be null");
-      }
-
-      Producer<?> producer =
-          new PagingProviderProducer(pagingProvider, operationContext.getConfiguration().get(),
-                                     operationContext, connectionSupplier);
-      Consumer<?> consumer = new ListConsumer(producer);
-
-      return returnDelegate.asReturnValue(new ConsumerStreamingIterator<>(consumer), operationContext);
-    }).onErrorMap(Exceptions::wrapFatal);
-  }
-
-  private PagingProvider getPagingProvider(Object target) {
-    return target instanceof Message ? (PagingProvider) ((Message) target).getPayload().getValue() : (PagingProvider) target;
+    Producer<?> producer =
+        new PagingProviderProducer((PagingProvider) value, operationContext.getConfiguration().get(),
+                                   operationContext, connectionSupplier);
+    Consumer<?> consumer = new ListConsumer(producer);
+    return super.asReturnValue(operationContext, new ConsumerStreamingIterator<>(consumer));
   }
 }

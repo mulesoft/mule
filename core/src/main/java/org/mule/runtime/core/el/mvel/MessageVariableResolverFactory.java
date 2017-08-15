@@ -30,7 +30,7 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
   public static final String PAYLOAD = "payload";
   public static final String ATTRIBUTES = "attributes";
   public static final String MESSAGE_PAYLOAD = MESSAGE + "." + PAYLOAD;
-  public static final String FLOW_VARS = "flowVars";
+  public static final String VARS_PREFIX = "vars.";
   public static final String SESSION_VARS = "sessionVars";
 
   protected InternalEvent event;
@@ -60,7 +60,7 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
 
   @Override
   public boolean isTarget(String name) {
-    return MESSAGE.equals(name) || PAYLOAD.equals(name) || ATTRIBUTES.equals(name) || FLOW_VARS.equals(name)
+    return MESSAGE.equals(name) || PAYLOAD.equals(name) || ATTRIBUTES.equals(name) || VARS_PREFIX.equals(name)
         || EXCEPTION.equals(name) || ERROR.equals(name) || SESSION_VARS.equals(name)
         || MVELExpressionLanguageContext.MULE_MESSAGE_INTERNAL_VARIABLE.equals(name);
   }
@@ -76,8 +76,8 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
                                               .message(Message.builder(event.getMessage()).value(newValue).build()));
       } else if (ATTRIBUTES.equals(name)) {
         return new MuleImmutableVariableResolver<>(ATTRIBUTES, event.getMessage().getAttributes().getValue(), null);
-      } else if (FLOW_VARS.equals(name)) {
-        return new MuleImmutableVariableResolver<Map<String, Object>>(FLOW_VARS,
+      } else if (VARS_PREFIX.equals(name)) {
+        return new MuleImmutableVariableResolver<Map<String, Object>>(VARS_PREFIX,
                                                                       new EventVariablesMapContext(event, eventBuilder),
                                                                       null);
       } else if (EXCEPTION.equals(name)) {

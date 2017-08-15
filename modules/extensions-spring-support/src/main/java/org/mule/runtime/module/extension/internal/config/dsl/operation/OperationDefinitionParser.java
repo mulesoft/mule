@@ -12,7 +12,7 @@ import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fro
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleReferenceParameter;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
-import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_TYPE_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -64,8 +64,8 @@ public class OperationDefinitionParser extends ExtensionDefinitionParser {
         .withConstructorParameterDefinition(fromReferenceObject(PolicyManager.class).build())
         .withSetterParameterDefinition(TARGET_PARAMETER_NAME,
                                        fromSimpleParameter(TARGET_PARAMETER_NAME).build())
-        .withSetterParameterDefinition(TARGET_TYPE_PARAMETER_NAME,
-                                       fromSimpleParameter(TARGET_TYPE_PARAMETER_NAME).build())
+        .withSetterParameterDefinition(TARGET_VALUE_PARAMETER_NAME,
+                                       fromSimpleParameter(TARGET_VALUE_PARAMETER_NAME).build())
         .withSetterParameterDefinition(CONFIG_PROVIDER_ATTRIBUTE_NAME,
                                        fromSimpleReferenceParameter(CONFIG_ATTRIBUTE_NAME).build())
         .withSetterParameterDefinition(CURSOR_PROVIDER_FACTORY_FIELD_NAME,

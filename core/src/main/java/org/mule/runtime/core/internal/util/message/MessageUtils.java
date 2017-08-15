@@ -131,17 +131,4 @@ public final class MessageUtils {
       return new ResultToMessageIterator((Iterator) results, cursorProviderFactory, event);
     }
   }
-
-  /**
-   * Unwraps the given {@code value} if it is a {@link Result}.
-   * @return The value or the {@link Result#getOutput()}
-   */
-  public static Object unwrapResultIfNecessary(Object value) {
-    if (value instanceof Result) {
-      Result result = (Result) value;
-      value = result.getOutput();
-    }
-
-    return value;
-  }
 }

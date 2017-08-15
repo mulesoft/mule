@@ -3801,18 +3801,6 @@
         </xsd:restriction>
     </xsd:simpleType>
 
-    <xsd:simpleType name="targetTypeEnumType">
-        <xsd:annotation>
-            <xsd:documentation>
-                Type of output stored in the target variable
-            </xsd:documentation>
-        </xsd:annotation>
-        <xsd:restriction base="xsd:string">
-            <xsd:enumeration value="PAYLOAD"></xsd:enumeration>
-            <xsd:enumeration value="MESSAGE"></xsd:enumeration>
-        </xsd:restriction>
-    </xsd:simpleType>
-
     <!-- i found this a bit confusing, so here is some background...
          this type is typically called from something like
            <xsd:element name="properties" type="mapType/>

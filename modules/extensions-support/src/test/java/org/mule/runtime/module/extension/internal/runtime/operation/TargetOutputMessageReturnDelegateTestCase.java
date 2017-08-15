@@ -11,20 +11,16 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.meta.TargetType.MESSAGE;
-import static org.mule.runtime.api.meta.TargetType.PAYLOAD;
-import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getDefaultCursorStreamProviderFactory;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.meta.TargetType;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.InternalEvent;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
-import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.nio.charset.Charset;
@@ -37,12 +33,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class TargetOutputMessageReturnDelegateTestCase extends AbstractMuleTestCase {
+public class TargetOutputMessageReturnDelegateTestCase extends AbstractMuleContextTestCase {
 
   private static final String TARGET = "myFlowVar";
-
-  @Mock(answer = RETURNS_DEEP_STUBS)
-  protected MuleContext muleContext;
 
   @Mock
   protected ExecutionContextAdapter operationContext;
@@ -53,25 +46,28 @@ public class TargetOutputMessageReturnDelegateTestCase extends AbstractMuleTestC
   protected InternalEvent event;
 
   @Mock
+  private StreamingManager streamingManager;
+
+  @Mock
   protected Object attributes;
 
   protected ReturnDelegate delegate;
-
   private final Object payload = "hello world!";
 
   @Before
   public void before() throws MuleException {
     event = eventBuilder().message(Message.builder().value("").attributesValue(attributes).build()).build();
     when(operationContext.getEvent()).thenReturn(event);
+    when(operationContext.getMuleContext()).thenReturn(muleContext);
   }
 
-  private TargetReturnDelegate createDelegate(TargetType output) {
-    return new TargetReturnDelegate(TARGET, output, componentModel, getDefaultCursorStreamProviderFactory(), muleContext);
+  private TargetReturnDelegate createDelegate(String expression) {
+    return new TargetReturnDelegate(TARGET, expression, componentModel, getDefaultCursorStreamProviderFactory(), muleContext);
   }
 
   @Test
   public void operationTargetMessage() {
-    delegate = createDelegate(MESSAGE);
+    delegate = createDelegate("#[message]");
 
     InternalEvent result = delegate.asReturnValue(payload, operationContext);
     assertMessage(result.getMessage());
@@ -82,7 +78,7 @@ public class TargetOutputMessageReturnDelegateTestCase extends AbstractMuleTestC
 
   @Test
   public void operationTargetPayload() {
-    delegate = createDelegate(PAYLOAD);
+    delegate = createDelegate("#[payload]");
     InternalEvent result = delegate.asReturnValue(payload, operationContext);
     assertMessage(result.getMessage());
     assertThat(result.getVariables().get(TARGET).getValue(), is(payload));
@@ -90,7 +86,7 @@ public class TargetOutputMessageReturnDelegateTestCase extends AbstractMuleTestC
 
   @Test
   public void operationTargetPayloadWithResult() {
-    delegate = createDelegate(PAYLOAD);
+    delegate = createDelegate("#[payload]");
     MediaType mediaType = MediaType.APPLICATION_JSON.withCharset(Charset.defaultCharset());
     InternalEvent result =
         delegate.asReturnValue(Result.builder().output(payload).mediaType(mediaType).build(), operationContext);

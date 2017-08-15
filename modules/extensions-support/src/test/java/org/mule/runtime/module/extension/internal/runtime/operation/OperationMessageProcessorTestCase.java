@@ -35,8 +35,10 @@ import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_LITE;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
-import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.FLOW_VARS;
+import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.VARS_PREFIX;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_CONTEXT;
+import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.runtime.operation.Result.builder;
 import static org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor.INVALID_TARGET_MESSAGE;
 import static org.mule.tck.junit4.matcher.MetadataKeyMatcher.metadataKeyWithId;
@@ -99,7 +101,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
   @Override
   protected OperationMessageProcessor createOperationMessageProcessor() {
     OperationMessageProcessor operationMessageProcessor =
-        new OperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetType, resolverSet,
+        new OperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetValue, resolverSet,
                                       cursorStreamProviderFactory, extensionManager, mockPolicyManager);
     operationMessageProcessor.setAnnotations(getFlowComponentLocationAnnotations(FLOW_NAME));
     return operationMessageProcessor;
@@ -242,7 +244,8 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
 
     String flowName = FLOW_NAME;
     expectedException.expect(IllegalOperationException.class);
-    expectedException.expectMessage(format(INVALID_TARGET_MESSAGE, flowName, operationModel.getName(), "an expression"));
+    expectedException.expectMessage(format(INVALID_TARGET_MESSAGE, flowName, operationModel.getName(), "an expression",
+                                           TARGET_PARAMETER_NAME));
 
     target = "#[mel:someExpression]";
     messageProcessor = createOperationMessageProcessor();
@@ -265,12 +268,38 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     String flowName = FLOW_NAME;
     expectedException.expect(IllegalOperationException.class);
     expectedException
-        .expectMessage(format(INVALID_TARGET_MESSAGE, flowName, operationModel.getName(), format("the '%s' prefix", FLOW_VARS)));
+        .expectMessage(format(INVALID_TARGET_MESSAGE, flowName, operationModel.getName(), format("the '%s' prefix", VARS_PREFIX),
+                              TARGET_PARAMETER_NAME));
 
-    target = format("flowVars.%s", TARGET_VAR);
+    target = format("vars.%s", TARGET_VAR);
     messageProcessor = createOperationMessageProcessor();
 
     when(context.getExpressionManager()).thenReturn(mock(ExtendedExpressionManager.class));
+    FlowConstruct flowConstruct = mock(FlowConstruct.class);
+    when(flowConstruct.getName()).thenReturn(flowName);
+
+    messageProcessor.setMuleContext(context);
+    messageProcessor.initialise();
+  }
+
+  @Test
+  public void operationWithoutExpressionInTargetValueParameter() throws Exception {
+
+    String flowName = "flowName";
+    expectedException.expect(IllegalOperationException.class);
+    expectedException
+        .expectMessage(format(INVALID_TARGET_MESSAGE, flowName, operationModel.getName(), "something that is not an expression",
+                              TARGET_VALUE_PARAMETER_NAME));
+
+    target = TARGET_VAR;
+    targetValue = TARGET_VAR;
+    messageProcessor = createOperationMessageProcessor();
+
+    when(context.getRegistry().lookupObject(OBJECT_EXPRESSION_LANGUAGE)).thenReturn(new MVELExpressionLanguage(context));
+    when(context.getRegistry().lookupObject(DefaultExpressionLanguageFactoryService.class))
+        .thenReturn(new WeaveDefaultExpressionLanguageFactoryService());
+    doReturn(new DefaultExpressionManager(context, streamingManager)).when(context)
+        .getExpressionManager();
     FlowConstruct flowConstruct = mock(FlowConstruct.class);
     when(flowConstruct.getName()).thenReturn(flowName);
 
