@@ -11,6 +11,7 @@ import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
@@ -155,7 +156,9 @@ public final class StreamingUtils {
     } else {
       Object payload = value.getValue();
       if (payload instanceof CursorProvider) {
-        return new TypedValue<>(streamingManager.manage((CursorProvider) payload, event), value.getDataType(), value.getLength());
+        CursorProvider cursorProvider = streamingManager.manage((CursorProvider) payload, event);
+        DataType dataType = DataType.builder(value.getDataType()).type(cursorProvider.getClass()).build();
+        return new TypedValue<>(cursorProvider, dataType, value.getLength());
       }
       return value;
     }
