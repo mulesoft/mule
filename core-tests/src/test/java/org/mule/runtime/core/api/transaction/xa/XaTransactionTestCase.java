@@ -15,18 +15,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
-
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-
-import java.util.Random;
-
-import javax.transaction.TransactionManager;
-import javax.transaction.xa.XAResource;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -52,16 +45,6 @@ public class XaTransactionTestCase extends AbstractMuleTestCase {
   public void setUpMuleContext() throws RegistrationException {
     when(mockMuleContext.getTransactionManager()).thenReturn(mockTransactionManager);
     when(mockMuleContext.getConfiguration().getId()).thenReturn("appName");
-  }
-
-  @Test
-  public void overcomeBadHashCodeImplementations() throws Exception {
-    XaTransaction xaTransaction = new XaTransaction(mockMuleContext);
-    BadHashCodeImplementation badHashCodeImplementation = new BadHashCodeImplementation();
-    Object resource = new Object();
-    xaTransaction.bindResource(badHashCodeImplementation, resource);
-    assertThat(xaTransaction.hasResource(badHashCodeImplementation), is(true));
-    assertThat(xaTransaction.getResource(badHashCodeImplementation), is(resource));
   }
 
   @Test
@@ -122,14 +105,4 @@ public class XaTransactionTestCase extends AbstractMuleTestCase {
     inOrder.verify(mockTransactionManager).setTransactionTimeout(timeoutSecs);
     inOrder.verify(mockTransactionManager).begin();
   }
-
-  private class BadHashCodeImplementation {
-
-    @Override
-    public int hashCode() {
-      return new Random(System.nanoTime()).nextInt();
-    }
-  }
-
-
 }
