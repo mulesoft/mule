@@ -91,6 +91,7 @@ public class ExtensionConnectionSupplier {
     final Optional<ConfigurationInstance> configuration = executionContext.getConfiguration();
     Optional<ConnectionProvider> connectionProvider = configuration
         .map(ConfigurationInstance::getConnectionProvider)
+        .filter(Optional::isPresent)
         .map(Optional::get);
 
     if (!connectionProvider.isPresent()) {

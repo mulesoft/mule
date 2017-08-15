@@ -98,8 +98,7 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
       }
 
       HasOperationDeclarer actualDeclarer =
-          (HasOperationDeclarer) loader.selectDeclarerBasedOnConfig(extensionDeclarer, (Declarer) declarer, configParameter,
-                                                                    connectionParameter);
+          selectDeclarer(extensionDeclarer, (Declarer) declarer, operationMethod, configParameter, connectionParameter);
 
       if (operationDeclarers.containsKey(operationMethod)) {
         actualDeclarer.withOperation(operationDeclarers.get(operationMethod));
@@ -137,6 +136,17 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
       calculateExtendedTypes(declaringClass, method, operation);
       operationDeclarers.put(operationMethod, operation);
     }
+  }
+
+  private HasOperationDeclarer selectDeclarer(ExtensionDeclarer extensionDeclarer, Declarer declarer,
+                                              MethodElement operationMethod, Optional<ExtensionParameter> configParameter,
+                                              Optional<ExtensionParameter> connectionParameter) {
+    if (isAutoPaging(operationMethod)) {
+      return (HasOperationDeclarer) declarer;
+    }
+
+    return (HasOperationDeclarer) loader.selectDeclarerBasedOnConfig(extensionDeclarer, declarer, configParameter,
+                                                                     connectionParameter);
   }
 
   private void handleByteStreaming(Method method, OperationDeclarer operation, MetadataType outputType) {
@@ -218,6 +228,7 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
                                                                     + "are required for paging",
                                                                 operationMethod.getName()));
     }
+
     operation.withModelProperty(new PagedOperationModelProperty());
     operation.requiresConnection(true);
   }

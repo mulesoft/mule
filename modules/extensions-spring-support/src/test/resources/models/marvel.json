@@ -350,32 +350,7 @@
         {
           "blocking": true,
           "executionType": "BLOCKING",
-          "errors": [
-            {
-              "type": "CONNECTIVITY",
-              "namespace": "MARVEL",
-              "parent": {
-                "type": "CONNECTIVITY",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "RETRY_EXHAUSTED",
-              "namespace": "MARVEL",
-              "parent": {
-                "type": "RETRY_EXHAUSTED",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            }
-          ],
+          "errors": [],
           "output": {
             "type": {
               "format": "java",

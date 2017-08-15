@@ -387,7 +387,9 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("timeout", fromSimpleParameter("timeout").build())
         .withSetterParameterDefinition("maxConcurrency", fromSimpleParameter("maxConcurrency").build())
         .withSetterParameterDefinition("target", fromSimpleParameter("target").build())
-        .withSetterParameterDefinition("targetType", fromSimpleParameter("targetType").build())
+        .withSetterParameterDefinition("targetValue", fromSimpleParameter("targetValue")
+            .withDefaultValue("#[payload]")
+            .build())
         .withSetterParameterDefinition(ROUTES, fromChildCollectionConfiguration(MessageProcessorChain.class).build())
         .withSetterParameterDefinition(FORK_JOIN_STRATEGY, fromChildConfiguration(ForkJoinStrategyFactory.class).build())
         .asScope().build());

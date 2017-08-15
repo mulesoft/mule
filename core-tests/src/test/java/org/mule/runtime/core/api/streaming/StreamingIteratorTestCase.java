@@ -12,6 +12,7 @@ import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingSto
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.streaming.iterator.Consumer;
 import org.mule.runtime.core.api.streaming.iterator.ConsumerStreamingIterator;
 import org.mule.runtime.core.api.streaming.iterator.ListConsumer;
@@ -56,7 +57,11 @@ public class StreamingIteratorTestCase {
 
     @Override
     public void close() throws IOException {
-      delegate.close();
+      try {
+        delegate.close(new Object());
+      } catch (MuleException e) {
+        throw new RuntimeException(e);
+      }
     }
 
     @Override
@@ -113,6 +118,7 @@ public class StreamingIteratorTestCase {
 
     long counter = 0;
 
+    @Override
     public List<String> getPage(Object con) {
       if (counter < TOP) {
         List<String> page = new ArrayList<>(100);
@@ -128,8 +134,10 @@ public class StreamingIteratorTestCase {
       return null;
     }
 
-    public void close() throws IOException {}
+    @Override
+    public void close(Object con) throws MuleException {}
 
+    @Override
     public Optional<Integer> getTotalResults(Object con) {
       return Optional.of(TOP);
     }

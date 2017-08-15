@@ -51,6 +51,7 @@ import org.mule.runtime.module.extension.internal.loader.validation.NullSafeMode
 import org.mule.runtime.module.extension.internal.loader.validation.OAuthConnectionProviderModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.OperationParametersTypeModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.OperationReturnTypeModelValidator;
+import org.mule.runtime.module.extension.internal.loader.validation.PagedOperationModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.ParameterGroupModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.ParameterPluralNameModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.ParameterTypeModelValidator;
@@ -74,6 +75,7 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
                                                                                          new NullSafeModelValidator(),
                                                                                          new OperationReturnTypeModelValidator(),
                                                                                          new OperationParametersTypeModelValidator(),
+                                                                                         new PagedOperationModelValidator(),
                                                                                          new ParameterGroupModelValidator(),
                                                                                          new ParameterTypeModelValidator(),
                                                                                          new ParameterPluralNameModelValidator(),

@@ -464,10 +464,10 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   }
 
   private void assertTestModuleOperations(ExtensionDeclaration extensionDeclaration) throws Exception {
-    assertThat(extensionDeclaration.getOperations(), hasSize(35));
+    assertThat(extensionDeclaration.getOperations(), hasSize(30));
 
     WithOperationsDeclaration withOperationsDeclaration = extensionDeclaration.getConfigurations().get(0);
-    assertThat(withOperationsDeclaration.getOperations().size(), is(9));
+    assertThat(withOperationsDeclaration.getOperations().size(), is(14));
     assertOperation(withOperationsDeclaration, SAY_MY_NAME_OPERATION, "");
     assertOperation(withOperationsDeclaration, NAME_AS_STREAM, "");
     assertOperation(withOperationsDeclaration, GET_ENEMY_OPERATION, "");
@@ -490,10 +490,10 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertOperation(extensionDeclaration, GET_MEDICAL_HISTORY, "");
     assertOperation(extensionDeclaration, GET_GRAMS_IN_STORAGE, "");
     assertOperation(extensionDeclaration, APPROVE_INVESTMENT, "");
-    assertOperation(extensionDeclaration, GET_PAGED_PERSONAL_INFO_OPERATION, "");
-    assertOperation(extensionDeclaration, EMPTY_PAGED_OPERATION, "");
-    assertOperation(extensionDeclaration, FAILING_PAGED_OPERATION, "");
-    assertOperation(extensionDeclaration, CONNECTION_PAGED_OPERATION, "");
+    assertOperation(withOperationsDeclaration, GET_PAGED_PERSONAL_INFO_OPERATION, "");
+    assertOperation(withOperationsDeclaration, EMPTY_PAGED_OPERATION, "");
+    assertOperation(withOperationsDeclaration, FAILING_PAGED_OPERATION, "");
+    assertOperation(withOperationsDeclaration, CONNECTION_PAGED_OPERATION, "");
     assertOperation(extensionDeclaration, PROCESS_INFO, "");
     assertOperation(extensionDeclaration, PROCESS_WEAPON, "");
     assertOperation(extensionDeclaration, PROCESS_WEAPON_LIST, "");
@@ -650,7 +650,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     operation = getOperation(extensionDeclaration, IGNORED_OPERATION);
     assertThat(operation, is(nullValue()));
 
-    operation = getOperation(extensionDeclaration, GET_PAGED_PERSONAL_INFO_OPERATION);
+    operation = getOperation(withOperationsDeclaration, GET_PAGED_PERSONAL_INFO_OPERATION);
     assertThat(operation.getModelProperty(PagedOperationModelProperty.class).isPresent(), is(true));
     assertThat(operation.getOutput().getType(), is(instanceOf(ArrayType.class)));
     ArrayType outputType = (ArrayType) operation.getOutput().getType();
