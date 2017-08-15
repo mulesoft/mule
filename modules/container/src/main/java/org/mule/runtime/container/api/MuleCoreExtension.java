@@ -8,7 +8,7 @@ package org.mule.runtime.container.api;
 
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 
 /**
  * Allows Mule modules and transports to extend core functionality in an application-independent fashion.

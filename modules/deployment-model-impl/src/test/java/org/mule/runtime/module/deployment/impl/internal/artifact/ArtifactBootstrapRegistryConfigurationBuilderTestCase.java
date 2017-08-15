@@ -17,7 +17,7 @@ import static org.mule.runtime.core.internal.config.bootstrap.ClassLoaderRegistr
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.internal.util.EnumerationAdapter;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.IOException;

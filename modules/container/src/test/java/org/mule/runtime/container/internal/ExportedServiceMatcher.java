@@ -7,7 +7,7 @@
 
 package org.mule.runtime.container.internal;
 
-import org.mule.runtime.module.artifact.classloader.ExportedService;
+import org.mule.runtime.module.artifact.api.classloader.ExportedService;
 
 import java.net.URL;
 

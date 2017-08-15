@@ -9,7 +9,7 @@ package org.mule.runtime.module.deployment.internal;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.domain.Domain;
-import org.mule.runtime.module.artifact.Artifact;
+import org.mule.runtime.module.artifact.api.Artifact;
 
 import java.util.Collection;
 import java.util.Collections;

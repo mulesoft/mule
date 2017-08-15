@@ -7,7 +7,7 @@
 
 package org.mule.test.runner.api;
 
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 
 import java.util.List;
 

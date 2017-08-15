@@ -11,9 +11,9 @@ import static java.lang.String.format;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
-import org.mule.runtime.module.artifact.descriptor.BundleDescriptorLoader;
-import org.mule.runtime.module.artifact.descriptor.ClassLoaderModelLoader;
-import org.mule.runtime.module.artifact.descriptor.DescriptorLoader;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorLoader;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
+import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoader;
 
 import java.util.ArrayList;
 import java.util.Collection;

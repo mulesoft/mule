@@ -16,7 +16,7 @@ import org.mule.runtime.core.api.config.bootstrap.PropertiesBootstrapService;
 import org.mule.runtime.core.api.config.bootstrap.PropertiesBootstrapServiceDiscoverer;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.api.util.PropertiesUtils;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;

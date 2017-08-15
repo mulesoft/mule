@@ -20,7 +20,7 @@ import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.internal.util.EnumerationAdapter;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.net.URL;

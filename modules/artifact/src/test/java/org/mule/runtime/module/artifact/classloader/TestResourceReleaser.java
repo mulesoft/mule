@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.artifact.classloader;
 
+import org.mule.runtime.module.artifact.api.classloader.ResourceReleaser;
+
 public class TestResourceReleaser implements ResourceReleaser {
 
   private ClassLoader classLoader;

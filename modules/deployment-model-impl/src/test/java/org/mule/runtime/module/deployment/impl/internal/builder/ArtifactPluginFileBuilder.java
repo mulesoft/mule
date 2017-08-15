@@ -25,12 +25,13 @@ import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConst
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MAVEN;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.PRIVILEGED_ARTIFACTS_IDS;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.PRIVILEGED_EXPORTED_PACKAGES;
-import static org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.deployment.persistence.MulePluginModelJsonSerializer;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.builder.AbstractArtifactFileBuilder;
 import org.mule.tck.ZipUtils.ZipResource;
 
@@ -83,7 +84,7 @@ public class ArtifactPluginFileBuilder extends AbstractArtifactFileBuilder<Artif
    * Adds a describer into the plugin describer file.
    *
    * @param mulePluginModel the describer to store under
-   *        {@link ArtifactPluginDescriptor#MULE_ARTIFACT_FOLDER}/{@link org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor#MULE_ARTIFACT_JSON_DESCRIPTOR}
+   *        {@link ArtifactPluginDescriptor#MULE_ARTIFACT_FOLDER}/{@link ArtifactDescriptor#MULE_ARTIFACT_JSON_DESCRIPTOR}
    *        file
    * @return the same builder instance
    */
