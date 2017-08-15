@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module name="module-wrong-body-content"
+        minMuleVersion="4.1.0"
+        prefix="simple-prefix"
+        namespace="http://www.mulesoft.org/schema/a/different/path/mule/module-wrong-body-content"
+        xmlns="http://www.mulesoft.org/schema/mule/module"
+        xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+        xmlns:http="http://www.mulesoft.org/schema/mule/http"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+           http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd
+           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+           http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <property name="a-property" type="string"/>
+
+    <http:fake-request-config fake-name="pointeless value" basePath="pointeless value">
+        <http:fake-request-connection fake-host="pointeless value" fake-protocol="pointeless value" fake-port="pointeless value"/>
+    </http:fake-request-config>
+    
+    <operation name="operation-with-non-valid-body">
+        <body>
+            <mule:non-existing-operation non-existing-attribute="pointeless value"/>
+        </body>
+    </operation>
+    
+</module>
