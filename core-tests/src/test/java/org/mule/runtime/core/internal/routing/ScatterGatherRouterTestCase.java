@@ -13,6 +13,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
@@ -146,8 +147,10 @@ public class ScatterGatherRouterTestCase extends AbstractMuleContextTestCase {
     Event result = router.process(original);
 
     assertThat(result.getMessage(), equalTo(original.getMessage()));
-    assertThat(((TypedValue<Object>) result.getVariables().get(variableName).getValue()).getValue(), instanceOf(Map.class));
-    Map<String, Message> resultMap = (Map) ((TypedValue) result.getVariables().get(variableName).getValue()).getValue();
+    final TypedValue<?> typedValue = result.getVariables().get(variableName);
+    assertThat(typedValue.getValue(), instanceOf(Map.class));
+    assertThat(Map.class.isAssignableFrom(typedValue.getDataType().getType()), is(true));
+    Map<String, Message> resultMap = (Map<String, Message>) typedValue.getValue();
     assertThat(resultMap.values(), hasSize(2));
   }
 
