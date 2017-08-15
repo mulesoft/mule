@@ -9,6 +9,7 @@ package org.mule.runtime.core.api.exception;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.ANY_IDENTIFIER;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.CLIENT_SECURITY_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.api.exception.Errors.Identifiers.COMPOSITE_ROUTING_ERROR;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.CRITICAL_IDENTIFIER;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.DUPLICATE_MESSAGE_ERROR_IDENTIFIER;
@@ -113,6 +114,11 @@ public abstract class Errors {
     public static final String TIMEOUT_ERROR_IDENTIFIER = "TIMEOUT";
 
     /**
+     * Indicates one or more errors occurred during routing.
+     */
+    public static final String COMPOSITE_ROUTING_ERROR = "COMPOSITE_ROUTING";
+
+    /**
      * Indicates that an error occurred in the source of the flow processing a successful response.
      */
     public static final String SOURCE_RESPONSE_ERROR_IDENTIFIER = "SOURCE_RESPONSE";
@@ -206,7 +212,8 @@ public abstract class Errors {
         builder().namespace(CORE_NAMESPACE_NAME).name(OVERLOAD_ERROR_IDENTIFIER).build();
     public static final ComponentIdentifier TIMEOUT =
         builder().namespace(CORE_NAMESPACE_NAME).name(TIMEOUT_ERROR_IDENTIFIER).build();
-
+    public static final ComponentIdentifier COMPOSITE_ROUTING =
+        builder().namespace(CORE_NAMESPACE_NAME).name(COMPOSITE_ROUTING_ERROR).build();
 
     public static final ComponentIdentifier SOURCE =
         builder().namespace(CORE_NAMESPACE_NAME).name(SOURCE_ERROR_IDENTIFIER).build();

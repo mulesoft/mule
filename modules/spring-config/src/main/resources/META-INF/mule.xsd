@@ -1306,6 +1306,13 @@
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:enumeration>
+                    <xsd:enumeration value="TIMEOUT">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Occurs when timeout is produced.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
                 </xsd:restriction>
             </xsd:simpleType>
         </xsd:union>
@@ -3130,19 +3137,57 @@
                 <xsd:extension base="abstractRoutingMessageProcessorType">
                     <xsd:sequence>
                         <xsd:element ref="route" minOccurs="2" maxOccurs="unbounded"/>
+                        <xsd:element ref="abstract-fork-join-strategy" minOccurs="0" maxOccurs="1">
+                            <xsd:annotation>
+                                <xsd:documentation>
+                                    Strategy that determines how multiple routes should be processed and how their results are aggregated.
+                                </xsd:documentation>
+                            </xsd:annotation>
+                        </xsd:element>
                     </xsd:sequence>
-                    <xsd:attribute name="timeout" type="substitutableLong" use="optional" default="0">
+                    <xsd:attribute name="timeout" type="substitutableLong">
                         <xsd:annotation>
                             <xsd:documentation>
-                                Sets a timeout in milliseconds for each route. Values lower or equals than zero means no timeout. 
+                                Sets a timeout in milliseconds for each route. The default behaviour is that of no timeout.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:attribute>
+                    <xsd:attribute name="maxConcurrency" type="substitutableInt">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The maximum concurrency. This value determines the maximum level of parallelism that will be used by this router. By default all routes will run in parallel (assuming available resources) but this can be limited or sequential behaviour achieved via the use of this attribute.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                    <xsd:attribute name="target" type="xsd:string">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The variable where the result from this router should be stored. If this is not set then the result is set in the payload.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                    <xsd:attribute name="targetType" type="targetTypeEnumType" default="PAYLOAD"/>
                 </xsd:extension>
             </xsd:complexContent>
         </xsd:complexType>
     </xsd:element>
-    
+
+    <xsd:element name="abstract-fork-join-strategy" abstract="true">
+        <xsd:annotation>
+            <xsd:documentation>
+                A placeholder for route resolver elements, which return a set of routes.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="collect-list" substitutionGroup="abstract-fork-join-strategy">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="annotatedType"/>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
     <xsd:element name="round-robin" substitutionGroup="abstract-routing-message-processor"
                  type="processorWithAtLeastOneTargetType">
         <xsd:annotation>

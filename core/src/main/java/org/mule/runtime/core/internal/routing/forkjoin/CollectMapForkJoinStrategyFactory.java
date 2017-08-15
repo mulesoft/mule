@@ -9,11 +9,13 @@ package org.mule.runtime.core.internal.routing.forkjoin;
 
 import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.message.Message.of;
-
-import org.mule.runtime.core.api.InternalEvent;
+import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE_MAP;
 
 import java.util.List;
 import java.util.function.Function;
+
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.InternalEvent;
 
 /**
  * {@link org.mule.runtime.core.api.routing.ForkJoinStrategy} that:
@@ -38,5 +40,9 @@ public class CollectMapForkJoinStrategyFactory extends AbstractForkJoinStrategyF
         .build();
   }
 
+  @Override
+  public DataType getResultDataType() {
+    return MULE_MESSAGE_MAP;
+  }
 
 }

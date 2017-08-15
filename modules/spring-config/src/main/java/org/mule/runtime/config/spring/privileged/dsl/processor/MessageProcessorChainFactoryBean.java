@@ -9,26 +9,20 @@ package org.mule.runtime.config.spring.privileged.dsl.processor;
 import static java.lang.String.format;
 import static org.mule.runtime.core.api.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder.newLazyProcessorChainBuilder;
-import org.mule.runtime.api.artifact.Registry;
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.processor.AnnotatedProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
+import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.internal.processor.chain.ExplicitMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
-public class MessageProcessorChainFactoryBean extends AbstractAnnotatedObjectFactory<AnnotatedProcessor>
+public class MessageProcessorChainFactoryBean extends AbstractAnnotatedObjectFactory<MessageProcessorChain>
     implements MuleContextAware {
-
-  @Inject
-  private Registry registry;
 
   protected List processors;
   protected String name;
@@ -39,7 +33,7 @@ public class MessageProcessorChainFactoryBean extends AbstractAnnotatedObjectFac
   }
 
   @Override
-  public AnnotatedProcessor doGetObject() throws Exception {
+  public MessageProcessorChain doGetObject() throws Exception {
     MessageProcessorChainBuilder builder = getBuilderInstance();
     for (Object processor : processors) {
       if (processor instanceof Processor) {
@@ -57,7 +51,7 @@ public class MessageProcessorChainFactoryBean extends AbstractAnnotatedObjectFac
   }
 
   protected MessageProcessorChainBuilder getBuilderInstance() {
-    ExplicitMessageProcessorChainBuilder builder = new ExplicitMessageProcessorChainBuilder();
+    DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.setName("processor chain '" + name + "'");
     return builder;
   }

@@ -7,9 +7,14 @@
 
 package org.mule.runtime.core.api.routing;
 
+import static java.util.Objects.requireNonNull;
+
+import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.processor.Processor;
+
+import java.util.Objects;
 
 import org.reactivestreams.Publisher;
 
@@ -38,7 +43,7 @@ public interface ForkJoinStrategy {
 
   final class RoutingPair {
 
-    private MessageProcessorChain processor;
+    private MessageProcessorChain route;
     private InternalEvent event;
 
     public static RoutingPair of(InternalEvent event, MessageProcessorChain route) {
@@ -46,18 +51,42 @@ public interface ForkJoinStrategy {
     }
 
     private RoutingPair(InternalEvent event, MessageProcessorChain route) {
-      this.event = event;
-      this.processor = route;
+
+      this.event = requireNonNull(event);
+      this.route = requireNonNull(route);
     }
 
     public MessageProcessorChain getRoute() {
-      return processor;
+      return route;
     }
 
     public InternalEvent getEvent() {
       return event;
     }
 
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) {
+        return true;
+      }
+      if (o == null || getClass() != o.getClass()) {
+        return false;
+      }
+
+      RoutingPair pair = (RoutingPair) o;
+
+      if (!route.equals(pair.route)) {
+        return false;
+      }
+      return event.equals(pair.event);
+    }
+
+    @Override
+    public int hashCode() {
+      int result = route.hashCode();
+      result = 31 * result + event.hashCode();
+      return result;
+    }
   }
 
 }

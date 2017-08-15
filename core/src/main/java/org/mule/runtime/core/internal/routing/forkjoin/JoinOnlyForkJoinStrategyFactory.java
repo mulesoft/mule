@@ -7,6 +7,10 @@
 
 package org.mule.runtime.core.internal.routing.forkjoin;
 
+import static org.mule.runtime.api.metadata.DataType.OBJECT;
+
+import org.mule.runtime.api.metadata.CollectionDataType;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.InternalEvent;
 
 import java.util.List;
@@ -28,5 +32,10 @@ public class JoinOnlyForkJoinStrategyFactory extends AbstractForkJoinStrategyFac
   protected Function<List<InternalEvent>, InternalEvent> createResultEvent(InternalEvent original,
                                                                            InternalEvent.Builder resultBuilder) {
     return list -> resultBuilder.build();
+  }
+
+  @Override
+  public DataType getResultDataType() {
+    return OBJECT;
   }
 }

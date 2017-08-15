@@ -30,6 +30,8 @@ import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MUL
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.PROCESSOR_STEREOTYPE;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.SOURCE_STEREOTYPE;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getExtensionModel;
+import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_TYPE_PARAMETER_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
@@ -331,12 +333,27 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
   public void scatterGather() {
     final ConstructModel scatterGatherModel = coreExtensionModel.getConstructModel("scatterGather").get();
 
-    assertThat(scatterGatherModel.getAllParameterModels(), hasSize(1));
+    assertThat(scatterGatherModel.getAllParameterModels(), hasSize(4));
 
     assertThat(scatterGatherModel.getAllParameterModels().get(0).getName(), is("timeout"));
     assertThat(scatterGatherModel.getAllParameterModels().get(0).getExpressionSupport(), is(NOT_SUPPORTED));
     assertThat(scatterGatherModel.getAllParameterModels().get(0).getType(), instanceOf(DefaultNumberType.class));
     assertThat(scatterGatherModel.getAllParameterModels().get(0).isRequired(), is(false));
+
+    assertThat(scatterGatherModel.getAllParameterModels().get(1).getName(), is("maxConcurrency"));
+    assertThat(scatterGatherModel.getAllParameterModels().get(1).getExpressionSupport(), is(NOT_SUPPORTED));
+    assertThat(scatterGatherModel.getAllParameterModels().get(1).getType(), instanceOf(DefaultNumberType.class));
+    assertThat(scatterGatherModel.getAllParameterModels().get(1).isRequired(), is(false));
+
+    assertThat(scatterGatherModel.getAllParameterModels().get(2).getName(), is(TARGET_PARAMETER_NAME));
+    assertThat(scatterGatherModel.getAllParameterModels().get(2).getExpressionSupport(), is(NOT_SUPPORTED));
+    assertThat(scatterGatherModel.getAllParameterModels().get(2).getType(), instanceOf(DefaultStringType.class));
+    assertThat(scatterGatherModel.getAllParameterModels().get(2).isRequired(), is(false));
+
+    assertThat(scatterGatherModel.getAllParameterModels().get(3).getName(), is(TARGET_TYPE_PARAMETER_NAME));
+    assertThat(scatterGatherModel.getAllParameterModels().get(3).getExpressionSupport(), is(NOT_SUPPORTED));
+    assertThat(scatterGatherModel.getAllParameterModels().get(3).getType(), instanceOf(DefaultStringType.class));
+    assertThat(scatterGatherModel.getAllParameterModels().get(3).isRequired(), is(false));
 
     assertThat(scatterGatherModel.getNestedComponents(), hasSize(1));
 
@@ -498,7 +515,8 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
                                                                                                                          "SERVER_SECURITY",
                                                                                                                          "ROUTING",
                                                                                                                          "CONNECTIVITY",
-                                                                                                                         "RETRY_EXHAUSTED"));
+                                                                                                                         "RETRY_EXHAUSTED",
+                                                                                                                         "TIMEOUT"));
     assertThat(errorTypeParam.getExpressionSupport(), is(NOT_SUPPORTED));
     assertThat(errorTypeParam.isRequired(), is(false));
   }

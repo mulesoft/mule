@@ -8,9 +8,9 @@
 package org.mule.runtime.core.api.routing;
 
 import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.internal.routing.CompositeRoutingException;
 
 
 public interface ForkJoinStrategyFactory {
@@ -28,5 +28,7 @@ public interface ForkJoinStrategyFactory {
   ForkJoinStrategy createForkJoinStrategy(ProcessingStrategy processingStrategy, int maxConcurrency, boolean delayErrors,
                                           long timeout, Scheduler timeoutScheduler,
                                           ErrorType timeoutErrorType);
+
+  DataType getResultDataType();
 
 }

@@ -75,6 +75,7 @@ import org.mule.tck.size.SmallTest;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.After;
@@ -682,18 +683,18 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
   public void testAll() throws Exception {
     ScatterGatherRouter scatterGatherRouter = new ScatterGatherRouter();
     scatterGatherRouter.setAnnotations(getAppleFlowComponentLocationAnnotations());
-    scatterGatherRouter.addRoute(getAppendingMP("1"));
-    scatterGatherRouter.addRoute(getAppendingMP("2"));
-    scatterGatherRouter.addRoute(getAppendingMP("3"));
+    scatterGatherRouter
+        .setRoutes(asList(newChain(empty(), getAppendingMP("1")), newChain(empty(), getAppendingMP("2")),
+                          newChain(empty(), getAppendingMP("3"))));
     initialiseIfNeeded(scatterGatherRouter, true, muleContext);
     scatterGatherRouter.start();
 
     InternalEvent event = getTestEventUsingFlow("0");
     final MessageProcessorChain chain = newChain(empty(), singletonList(scatterGatherRouter));
     Message result = process(chain, InternalEvent.builder(event).message(event.getMessage()).build()).getMessage();
-    assertThat(result.getPayload().getValue(), instanceOf(List.class));
-    List<Message> resultMessage = (List<Message>) result.getPayload().getValue();
-    assertThat(resultMessage.stream().map(msg -> msg.getPayload().getValue()).collect(toList()).toArray(),
+    assertThat(result.getPayload().getValue(), instanceOf(Map.class));
+    Map<String, Message> resultMessage = (Map<String, Message>) result.getPayload().getValue();
+    assertThat(resultMessage.values().stream().map(msg -> msg.getPayload().getValue()).collect(toList()).toArray(),
                is(equalTo(new String[] {"01", "02", "03"})));
 
     scatterGatherRouter.stop();

@@ -7,6 +7,7 @@
 package org.mule.runtime.core.privileged.processor.chain;
 
 import static java.util.Collections.singletonList;
+import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -181,7 +182,6 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
 
   }
 
-
   /**
    * Helper method to create a lazy processor from a chain builder so the chain builder can get access to a
    * {@link FlowConstruct}{@link ProcessingStrategy}.
@@ -191,48 +191,44 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
    * @param processingStrategySupplier a supplier of the processing strategy.
    * @return a lazy processor that will build the chain upon the first request.
    */
-  public static AnnotatedProcessor newLazyProcessorChainBuilder(AbstractMessageProcessorChainBuilder chainBuilder,
-                                                                MuleContext muleContext,
-                                                                Supplier<ProcessingStrategy> processingStrategySupplier) {
-    return new LazyProcessor() {
+  public static MessageProcessorChain newLazyProcessorChainBuilder(AbstractMessageProcessorChainBuilder chainBuilder,
+                                                                   MuleContext muleContext,
+                                                                   Supplier<ProcessingStrategy> processingStrategySupplier) {
+    return new AbstractMessageProcessorChain(chainBuilder.name, empty(), chainBuilder.processors) {
 
-      private Processor processor;
+      private MessageProcessorChain delegate;
 
       @Override
       public void initialise() throws InitialisationException {
         chainBuilder.setProcessingStrategy(processingStrategySupplier.get());
-        processor = chainBuilder.build();
-        initialiseIfNeeded(processor, muleContext);
+        delegate = chainBuilder.build();
+        initialiseIfNeeded(delegate, muleContext);
       }
 
       @Override
       public void start() throws MuleException {
-        startIfNeeded(processor);
+        startIfNeeded(delegate);
       }
 
       @Override
       public void dispose() {
-        disposeIfNeeded(processor, LOGGER);
+        disposeIfNeeded(delegate, LOGGER);
       }
 
       public void stop() throws MuleException {
-        stopIfNeeded(processor);
+        stopIfNeeded(delegate);
       }
 
       @Override
       public InternalEvent process(InternalEvent event) throws MuleException {
-        return processor.process(event);
+        return delegate.process(event);
       }
 
       @Override
       public Publisher<InternalEvent> apply(Publisher<InternalEvent> publisher) {
-        return from(publisher).transform(processor);
+        return delegate.apply(publisher);
       }
     };
   }
 
-  public static abstract class LazyProcessor extends AbstractAnnotatedObject
-      implements AnnotatedProcessor, Lifecycle {
-
-  }
 }

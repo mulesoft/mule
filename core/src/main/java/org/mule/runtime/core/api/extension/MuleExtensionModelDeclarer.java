@@ -11,6 +11,10 @@ import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.api.meta.model.error.ErrorModelBuilder.newError;
+import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_OUTPUT_PARAMETER_DESCRIPTION;
+import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_DESCRIPTION;
+import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_TYPE_PARAMETER_NAME;
 import static org.mule.runtime.extension.internal.loader.util.InfrastructureParameterBuilder.addReconnectionStrategyParameter;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
@@ -20,6 +24,7 @@ import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.meta.MuleVersion;
+import org.mule.runtime.api.meta.TargetType;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConstructDeclarer;
@@ -261,7 +266,7 @@ class MuleExtensionModelDeclarer {
         .withOptionalParameter("ignoreErrorType")
         .ofType(BaseTypeBuilder.create(JAVA).stringType().id(String.class.getName())
             .enumOf("ANY", "REDELIVERY_EXHAUSTED", "TRANSFORMATION", "EXPRESSION", "SECURITY",
-                    "CLIENT_SECURITY", "SERVER_SECURITY", "ROUTING", "CONNECTIVITY", "RETRY_EXHAUSTED")
+                    "CLIENT_SECURITY", "SERVER_SECURITY", "ROUTING", "CONNECTIVITY", "RETRY_EXHAUSTED", "TIMEOUT")
             .build())
         .withExpressionSupport(NOT_SUPPORTED)
         .withLayout(LayoutModel.builder().tabName("Advanced").build())
@@ -314,9 +319,29 @@ class MuleExtensionModelDeclarer {
     scatterGather.onDefaultParameterGroup()
         .withOptionalParameter("timeout")
         .ofType(typeLoader.load(Long.class))
-        .defaultingTo(0)
+        .defaultingTo(Long.MAX_VALUE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("Sets a timeout in milliseconds for each route. Values lower or equals than zero means no timeout.");
+    scatterGather.onDefaultParameterGroup()
+        .withOptionalParameter("maxConcurrency")
+        .ofType(typeLoader.load(Integer.class))
+        .defaultingTo(Integer.MAX_VALUE)
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("This value determines the maximum level of parallelism that will be used by this router. .");
+    scatterGather.onDefaultParameterGroup()
+        .withOptionalParameter(TARGET_PARAMETER_NAME)
+        .ofType(typeLoader.load(String.class))
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs(TARGET_PARAMETER_DESCRIPTION);
+    scatterGather.onDefaultParameterGroup()
+        .withOptionalParameter(TARGET_TYPE_PARAMETER_NAME)
+        .ofType(typeLoader.load(TargetType.class))
+        .defaultingTo(TargetType.PAYLOAD)
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs(TARGET_OUTPUT_PARAMETER_DESCRIPTION);
+
+    // TODO MULE-13316 Define error model (Routers should be able to define error type(s) thrown in ModelDeclarer but
+    // ConstructModel doesn't support it.)
   }
 
   private void declareTry(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
@@ -387,7 +412,7 @@ class MuleExtensionModelDeclarer {
         .withOptionalParameter("type")
         .ofType(BaseTypeBuilder.create(JAVA).stringType().id(String.class.getName())
             .enumOf("ANY", "REDELIVERY_EXHAUSTED", "TRANSFORMATION", "EXPRESSION", "SECURITY", "CLIENT_SECURITY",
-                    "SERVER_SECURITY", "ROUTING", "CONNECTIVITY", "RETRY_EXHAUSTED")
+                    "SERVER_SECURITY", "ROUTING", "CONNECTIVITY", "RETRY_EXHAUSTED", "TIMEOUT")
             .build())
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The full name of the error type to match against or a comma separated list of full names, "
