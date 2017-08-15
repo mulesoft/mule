@@ -265,7 +265,7 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
     final InternalEvent event = testEvent();
 
     when(streamingManager.manage(cursorProvider, event)).thenReturn(cursorProvider);
-    
+
     expressionManager.evaluate("someExpression", event);
     verify(streamingManager).manage(cursorProvider, event);
   }
