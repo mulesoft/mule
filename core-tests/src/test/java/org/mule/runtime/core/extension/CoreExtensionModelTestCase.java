@@ -355,7 +355,6 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(scatterGatherModel.getAllParameterModels().get(3).getType(), instanceOf(DefaultStringType.class));
     assertThat(scatterGatherModel.getAllParameterModels().get(3).isRequired(), is(false));
 
-
     assertThat(scatterGatherModel.getNestedComponents(), hasSize(1));
 
     final NestedRouteModel routeModel = (NestedRouteModel) scatterGatherModel.getNestedComponents().get(0);
@@ -517,8 +516,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
                                                                                                                          "ROUTING",
                                                                                                                          "CONNECTIVITY",
                                                                                                                          "RETRY_EXHAUSTED",
-                                                                                                                         "TIMEOUT",
-                                                                                                                         "COMPOSITE_ROUTING"));
+                                                                                                                         "TIMEOUT"));
     assertThat(errorTypeParam.getExpressionSupport(), is(NOT_SUPPORTED));
     assertThat(errorTypeParam.isRequired(), is(false));
   }

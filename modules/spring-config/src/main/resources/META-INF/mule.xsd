@@ -1313,13 +1313,6 @@
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:enumeration>
-                    <xsd:enumeration value="COMPOSITE_ROUTING">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                Specialization of ROUTING error, that occurs when multiple failures occur when routing to multiple routes..
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:enumeration>
                 </xsd:restriction>
             </xsd:simpleType>
         </xsd:union>

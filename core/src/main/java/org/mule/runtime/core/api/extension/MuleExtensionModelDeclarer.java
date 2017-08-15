@@ -266,8 +266,7 @@ class MuleExtensionModelDeclarer {
         .withOptionalParameter("ignoreErrorType")
         .ofType(BaseTypeBuilder.create(JAVA).stringType().id(String.class.getName())
             .enumOf("ANY", "REDELIVERY_EXHAUSTED", "TRANSFORMATION", "EXPRESSION", "SECURITY",
-                    "CLIENT_SECURITY", "SERVER_SECURITY", "ROUTING", "CONNECTIVITY", "RETRY_EXHAUSTED", "TIMEOUT",
-                    "COMPOSITE_ROUTING")
+                    "CLIENT_SECURITY", "SERVER_SECURITY", "ROUTING", "CONNECTIVITY", "RETRY_EXHAUSTED", "TIMEOUT")
             .build())
         .withExpressionSupport(NOT_SUPPORTED)
         .withLayout(LayoutModel.builder().tabName("Advanced").build())
@@ -340,6 +339,9 @@ class MuleExtensionModelDeclarer {
         .defaultingTo(TargetType.PAYLOAD)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs(TARGET_OUTPUT_PARAMETER_DESCRIPTION);
+
+    // TODO MULE-13316 Define error model (Routers should be able to define error type(s) thrown in ModelDeclarer but
+    // ConstructModel doesn't support it.)
   }
 
   private void declareTry(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
@@ -410,8 +412,7 @@ class MuleExtensionModelDeclarer {
         .withOptionalParameter("type")
         .ofType(BaseTypeBuilder.create(JAVA).stringType().id(String.class.getName())
             .enumOf("ANY", "REDELIVERY_EXHAUSTED", "TRANSFORMATION", "EXPRESSION", "SECURITY", "CLIENT_SECURITY",
-                    "SERVER_SECURITY", "ROUTING", "CONNECTIVITY", "RETRY_EXHAUSTED", "TIMEOUT",
-                    "COMPOSITE_ROUTING")
+                    "SERVER_SECURITY", "ROUTING", "CONNECTIVITY", "RETRY_EXHAUSTED", "TIMEOUT")
             .build())
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The full name of the error type to match against or a comma separated list of full names, "
