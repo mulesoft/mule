@@ -14,7 +14,7 @@
 
         <spring:bean name="_muleConfiguration" class="org.mule.config.spring.MuleConfigurationConfigurator"/>
 
-        <spring:bean name="_muleTransactionManager" class="org.mule.config.spring.factories.TransactionManagerFactoryBean"/>
+        <spring:bean name="_muleTransactionManager" class="org.mule.config.spring.factories.TransactionManagerFactoryBean" autowire="byType"/>
 
         <spring:bean name="_defaultInMemoryQueueStore,_simpleMemoryQueueStore" class="org.mule.util.store.DefaultObjectStoreFactoryBean" factory-method="createDefaultInMemoryQueueStore"/>
 

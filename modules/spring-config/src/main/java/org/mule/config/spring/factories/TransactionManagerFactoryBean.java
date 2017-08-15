@@ -34,10 +34,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class TransactionManagerFactoryBean implements FactoryBean<TransactionManager>, MuleContextAware
 {
 
-    @Autowired(required = false)
     private TransactionManagerFactory txManagerFactory;
 
-    @Autowired(required = false)
     private TransactionManager customTxManager;
 
     private MuleContext muleContext;
