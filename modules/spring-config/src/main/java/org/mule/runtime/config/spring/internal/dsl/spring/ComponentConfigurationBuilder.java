@@ -37,8 +37,7 @@ import org.springframework.beans.factory.support.ManagedMap;
  * Based on the object building definition provided by {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition} and
  * the user configuration defined in {@link org.mule.runtime.config.spring.api.dsl.model.ComponentModel} it populates all the
  * spring {@link org.springframework.beans.factory.config.BeanDefinition} attributes using the helper class
- * {@link BeanDefinitionBuilderHelper}.
- * {@link BeanDefinitionBuilderHelper}.
+ * {@link org.mule.runtime.config.spring.dsl.spring.BeanDefinitionBuilderHelper}.
  *
  * @since 4.0
  */
@@ -281,11 +280,10 @@ class ComponentConfigurationBuilder<T> {
     public void onConfigurationParameter(String parameterName, Object defaultValue, Optional<TypeConverter> typeConverter) {
       Object parameterValue = simpleParameters.get(parameterName);
       simpleParameters.remove(parameterName);
-      parameterValue = ofNullable(parameterValue).orElse(defaultValue);
       if (parameterValue != null) {
         parameterValue = typeConverter.isPresent() ? typeConverter.get().convert(parameterValue) : parameterValue;
       }
-      this.value = parameterValue;
+      this.value = Optional.ofNullable(parameterValue).orElse(defaultValue);
     }
 
     @Override
