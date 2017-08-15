@@ -8,22 +8,44 @@
 package org.mule.runtime.module.service.builder;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static org.mule.runtime.module.service.ServiceDescriptor.SERVICE_PROPERTIES;
-import org.mule.runtime.core.api.util.StringUtils;
+import static java.util.Collections.emptyMap;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+import static org.mule.runtime.core.api.util.StringUtils.isBlank;
+import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.REPOSITORY_FOLDER;
+import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MAVEN;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.META_INF;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION;
+import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
+import org.mule.runtime.api.deployment.meta.MuleServiceModel.MuleServiceModelBuilder;
+import org.mule.runtime.api.deployment.persistence.MuleServiceModelJsonSerializer;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.module.artifact.builder.AbstractArtifactFileBuilder;
+import org.mule.runtime.module.artifact.builder.AbstractDependencyFileBuilder;
 import org.mule.tck.ZipUtils;
+import org.mule.tools.api.classloader.model.ArtifactCoordinates;
+import org.mule.tools.api.classloader.model.ClassLoaderModel;
+import org.mule.tools.api.packager.ContentGenerator;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Properties;
 
 /**
  * Creates Service files.
  */
 public class ServiceFileBuilder extends AbstractArtifactFileBuilder<ServiceFileBuilder> {
 
-  private Properties properties = new Properties();
+  private static final String CLASSLOADER_MODEL_JSON_DESCRIPTOR = "classloader-model.json";
+  private static final String CLASSLOADER_MODEL_JSON_DESCRIPTOR_LOCATION =
+      Paths.get("META-INF", "mule-artifact", CLASSLOADER_MODEL_JSON_DESCRIPTOR).toString();
+
+  private boolean useHeavyPackage = true;
+  private String serviceProviderClassName;
 
   /**
    * Creates a new builder
@@ -43,55 +65,93 @@ public class ServiceFileBuilder extends AbstractArtifactFileBuilder<ServiceFileB
     super(source);
   }
 
-  /**
-   * Create a new builder from another instance and different ID.
-   *
-   * @param id artifact identifier. Non empty.
-   * @param source instance used as template to build the new one. Non null.
-   */
-  public ServiceFileBuilder(String id, ServiceFileBuilder source) {
-    super(id, source);
-    this.properties.putAll(source.properties);
-  }
-
-  @Override
-  protected String getFileExtension() {
-    return ".zip";
-  }
-
   @Override
   protected ServiceFileBuilder getThis() {
     return this;
   }
 
   /**
-   * Adds a property into the service properties file.
+   * Configures the service provider
    *
-   * @param propertyName name fo the property to add. Non empty
-   * @param propertyValue value of the property to add. Non null.
+   * @param className service provider class name. Non blank.
    * @return the same builder instance
    */
-  public ServiceFileBuilder configuredWith(String propertyName, String propertyValue) {
+  public ServiceFileBuilder withServiceProviderClass(String className) {
     checkImmutable();
-    checkArgument(!StringUtils.isEmpty(propertyName), "Property name cannot be empty");
-    checkArgument(propertyValue != null, "Property value cannot be null");
-    properties.put(propertyName, propertyValue);
+    checkArgument(!isBlank(className), "Property value cannot be blank");
+    serviceProviderClassName = className;
+
     return this;
   }
 
   @Override
-  protected List<ZipUtils.ZipResource> getCustomResources() {
+  protected final List<ZipUtils.ZipResource> getCustomResources() {
     final List<ZipUtils.ZipResource> customResources = new LinkedList<>();
 
-    if (!properties.isEmpty()) {
-      final File applicationPropertiesFile = new File(getTempFolder(), SERVICE_PROPERTIES);
-      applicationPropertiesFile.deleteOnExit();
-      createPropertiesFile(applicationPropertiesFile, properties);
+    for (AbstractDependencyFileBuilder dependencyFileBuilder : getAllCompileDependencies()) {
+      customResources.add(new ZipUtils.ZipResource(dependencyFileBuilder.getArtifactFile().getAbsolutePath(),
+                                                   Paths.get(REPOSITORY_FOLDER,
+                                                             dependencyFileBuilder.getArtifactFileRepositoryPath())
+                                                       .toString()));
 
-      customResources.add(new ZipUtils.ZipResource(applicationPropertiesFile.getAbsolutePath(), SERVICE_PROPERTIES));
+      customResources.add(new ZipUtils.ZipResource(dependencyFileBuilder.getArtifactPomFile().getAbsolutePath(),
+                                                   Paths.get(REPOSITORY_FOLDER,
+                                                             dependencyFileBuilder.getArtifactFilePomRepositoryPath())
+                                                       .toString()));
     }
 
+    if (useHeavyPackage) {
+      customResources.add(new ZipUtils.ZipResource(getClassLoaderModelFile().getAbsolutePath(),
+                                                   CLASSLOADER_MODEL_JSON_DESCRIPTOR_LOCATION));
+    }
+
+    File serviceDescriptor = createServiceJsonDescriptorFile();
+    customResources.add(new ZipUtils.ZipResource(serviceDescriptor.getAbsolutePath(), MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION));
+
     return customResources;
+  }
+
+  private File createServiceJsonDescriptorFile() {
+    File serviceDescriptor = new File(getTempFolder(), getArtifactId() + "service.json");
+    serviceDescriptor.deleteOnExit();
+    MuleServiceModelBuilder serviceModelBuilder = new MuleServiceModelBuilder();
+    serviceModelBuilder.setName(getArtifactId()).setMinMuleVersion("4.0.0");
+    serviceModelBuilder.withClassLoaderModelDescriber().setId(MAVEN);
+    serviceModelBuilder.withBundleDescriptorLoader(new MuleArtifactLoaderDescriptor(MAVEN, emptyMap()));
+    serviceModelBuilder.withServiceProviderClassName(serviceProviderClassName);
+    String serviceDescriptorContent = new MuleServiceModelJsonSerializer().serialize(serviceModelBuilder.build());
+    try (FileWriter fileWriter = new FileWriter(serviceDescriptor)) {
+      fileWriter.write(serviceDescriptorContent);
+    } catch (IOException e) {
+      throw new MuleRuntimeException(e);
+    }
+    return serviceDescriptor;
+  }
+
+  private File getClassLoaderModelFile() {
+    ArtifactCoordinates artifactCoordinates = new ArtifactCoordinates(getGroupId(), getArtifactId(), getVersion());
+    ClassLoaderModel classLoaderModel = new ClassLoaderModel("1.0", artifactCoordinates);
+
+    List<org.mule.tools.api.classloader.model.Artifact> artifactDependencies = new LinkedList<>();
+    for (AbstractDependencyFileBuilder fileBuilderDependency : getDependencies()) {
+      artifactDependencies.add(getArtifact(fileBuilderDependency));
+    }
+
+    classLoaderModel.setDependencies(artifactDependencies);
+
+    File destinationFolder = Paths.get(getTempFolder()).resolve(META_INF).resolve(MULE_ARTIFACT).toFile();
+
+    if (!destinationFolder.exists()) {
+      assertThat(destinationFolder.mkdirs(), is(true));
+    }
+    return ContentGenerator.createClassLoaderModelJsonFile(classLoaderModel, destinationFolder);
+  }
+
+  private org.mule.tools.api.classloader.model.Artifact getArtifact(AbstractDependencyFileBuilder builder) {
+    ArtifactCoordinates artifactCoordinates =
+        new ArtifactCoordinates(builder.getGroupId(), builder.getArtifactId(), builder.getVersion(), builder.getType(),
+                                builder.getClassifier());
+    return new org.mule.tools.api.classloader.model.Artifact(artifactCoordinates, builder.getArtifactFile().toURI());
   }
 
   @Override

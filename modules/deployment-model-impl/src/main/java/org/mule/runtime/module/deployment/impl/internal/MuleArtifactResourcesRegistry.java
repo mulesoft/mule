@@ -150,7 +150,8 @@ public class MuleArtifactResourcesRegistry {
     serviceManager =
         new MuleServiceManager(new DefaultServiceDiscoverer(
                                                             new FileSystemServiceProviderDiscoverer(containerClassLoader,
-                                                                                                    trackArtifactClassLoaderFactory(serviceClassLoaderFactory)),
+                                                                                                    trackArtifactClassLoaderFactory(serviceClassLoaderFactory),
+                                                                                                    descriptorLoaderRepository),
                                                             new ReflectionServiceResolver(new ReflectionServiceProviderResolutionHelper())));
     extensionModelLoaderManager = new MuleExtensionModelLoaderManager(containerClassLoader);
     domainFactory =

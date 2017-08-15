@@ -5,10 +5,9 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.module.deployment.impl.internal.artifact;
+package org.mule.runtime.module.artifact.api.descriptor;
 
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
-import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoader;
 
 import java.util.Optional;
 

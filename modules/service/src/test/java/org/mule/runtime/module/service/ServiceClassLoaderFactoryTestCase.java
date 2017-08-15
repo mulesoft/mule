@@ -20,7 +20,6 @@ import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import java.io.File;
 import java.net.URL;
 
 import org.junit.Before;
@@ -52,47 +51,6 @@ public class ServiceClassLoaderFactoryTestCase extends AbstractMuleTestCase {
         factory.create(SERVICE_ID, descriptor, getClass().getClassLoader(), lookupPolicy);
     final MuleArtifactClassLoader classLoader = (MuleArtifactClassLoader) artifactClassLoader.getClassLoader();
     assertThat(classLoader.getURLs(), equalTo(new URL[0]));
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void validatesServiceFolder() throws Exception {
-    File fakeServiceFolder = new File("./fake/folder/for/test");
-    descriptor.setRootFolder(fakeServiceFolder);
-    factory.create(SERVICE_ID, descriptor, getClass().getClassLoader(), lookupPolicy);
-  }
-
-  @Test
-  public void addsClassesFolderToClassLoader() throws Exception {
-    File classesFolder = serviceFolder.newFolder(ServiceClassLoaderFactory.CLASSES_DIR);
-
-    final ArtifactClassLoader artifactClassLoader =
-        factory.create(SERVICE_ID, descriptor, getClass().getClassLoader(), lookupPolicy);
-    final MuleArtifactClassLoader classLoader = (MuleArtifactClassLoader) artifactClassLoader.getClassLoader();
-    assertThat(classLoader.getURLs(), equalTo(new URL[] {classesFolder.toURI().toURL()}));
-  }
-
-  @Test
-  public void addJarsFromLibFolderToClassLoader() throws Exception {
-    File libFolder = serviceFolder.newFolder(ServiceClassLoaderFactory.LIB_DIR);
-    File jarFile = new File(libFolder, "dummy.jar");
-    jarFile.createNewFile();
-
-    final ArtifactClassLoader artifactClassLoader =
-        factory.create(SERVICE_ID, descriptor, getClass().getClassLoader(), lookupPolicy);
-    final MuleArtifactClassLoader classLoader = (MuleArtifactClassLoader) artifactClassLoader.getClassLoader();
-    assertThat(classLoader.getURLs(), equalTo(new URL[] {jarFile.toURI().toURL()}));
-  }
-
-  @Test
-  public void ignoresNonJarsFilesFromLibFolder() throws Exception {
-    File libFolder = serviceFolder.newFolder(ServiceClassLoaderFactory.LIB_DIR);
-    File jarFile = new File(libFolder, "dummy.txt");
-    jarFile.createNewFile();
-
-    final ArtifactClassLoader artifactClassLoader =
-        factory.create(SERVICE_ID, descriptor, getClass().getClassLoader(), lookupPolicy);
-    final MuleArtifactClassLoader classLoader = (MuleArtifactClassLoader) artifactClassLoader.getClassLoader();
-    assertThat(classLoader.getURLs(), equalTo(new URL[] {}));
   }
 
   @Test

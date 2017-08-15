@@ -15,7 +15,8 @@ import org.mule.runtime.core.api.config.i18n.CoreMessages;
  * @since 3.7.0
  */
 public enum ArtifactType {
-  APP("app"), DOMAIN("domain"), PLUGIN("plugin"), POLICY("policy"), SERVICE("service"), ALL("app/domain");
+  APP("app"), DOMAIN("domain"), PLUGIN("plugin"), POLICY("policy"), SERVICE("service"), SERVER_PLUGIN("serverPlugin"), ALL(
+      "app/domain");
 
   public static final String APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY = "applyToArtifactType";
   private final String artifactTypeAsString;

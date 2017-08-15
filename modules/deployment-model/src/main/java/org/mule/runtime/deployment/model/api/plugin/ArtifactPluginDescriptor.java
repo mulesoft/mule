@@ -7,26 +7,20 @@
 package org.mule.runtime.deployment.model.api.plugin;
 
 
-import static java.io.File.separator;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 
-import java.util.HashSet;
 import java.util.Optional;
-import java.util.Set;
 
 public class ArtifactPluginDescriptor extends DeployableArtifactDescriptor {
 
   private static final String META_INF = "META-INF";
   public static final String MULE_PLUGIN_CLASSIFIER = "mule-plugin";
   public static final String EXTENSION_BUNDLE_TYPE = "jar";
-  public static final String MULE_ARTIFACT = "mule-artifact";
-  /**
-   * Target folder for any files used at deployment time or when generating the {@link ExtensionModel}
-   */
-  public static final String MULE_ARTIFACT_FOLDER = META_INF + separator + MULE_ARTIFACT;
+  private static final String MULE_ARTIFACT = "mule-artifact";
+
   /**
    * Target path as URL for any files used at deployment time or when generating the {@link ExtensionModel}
    */
@@ -34,7 +28,6 @@ public class ArtifactPluginDescriptor extends DeployableArtifactDescriptor {
   public static final String MULE_PLUGIN_POM = "pom.xml";
 
   private Optional<LoaderDescriber> extensionModelDescriptorProperty = empty();
-  private Set<String> privilegedArtifacts = new HashSet<>();
 
   /**
    * Creates a new artifact plugin descriptor

@@ -32,6 +32,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-module-deployment-model</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-unit</artifactId>
             <version>${project.version}</version>
@@ -51,6 +57,24 @@
             <artifactId>maven-model</artifactId>
             <version>${aetherProviderVersion}</version>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mule.tools.maven</groupId>
+            <artifactId>mule-packager</artifactId>
+            <exclusions>
+                <!--
+                // TODO(pablo.kraan): MMP-229 - Excluding dependencies that are required to generate the classloader-model.json that are not required on runtime. Those dependencies are added later for testing only.
+                -->
+                <exclusion>
+                    <groupId>org.apache.maven</groupId>
+                    <artifactId>maven-compat</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.codehaus.plexus</groupId>
+                    <artifactId>plexus-archiver</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 </project>

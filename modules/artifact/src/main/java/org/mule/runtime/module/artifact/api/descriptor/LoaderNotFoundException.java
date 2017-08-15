@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.module.deployment.impl.internal.artifact;
+package org.mule.runtime.module.artifact.api.descriptor;
 
 /**
  * Thrown to indicate that a loader was not found in the repository

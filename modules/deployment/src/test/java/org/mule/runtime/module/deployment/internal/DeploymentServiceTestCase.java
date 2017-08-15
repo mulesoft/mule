@@ -88,7 +88,6 @@ import static org.mule.runtime.module.deployment.internal.DeploymentServiceTestC
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.PARALLEL_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
 import static org.mule.runtime.module.deployment.internal.TestApplicationFactory.createTestApplicationFactory;
-import static org.mule.runtime.module.service.ServiceDescriptorFactory.SERVICE_PROVIDER_CLASS_NAME;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.config.custom.CustomizationService;
@@ -3556,7 +3555,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
   private void installService(String serviceName, String serviceProviderClassName, File serviceJarFile) throws IOException {
     final ServiceFileBuilder echoService =
-        new ServiceFileBuilder(serviceName).configuredWith(SERVICE_PROVIDER_CLASS_NAME, serviceProviderClassName)
+        new ServiceFileBuilder(serviceName).withServiceProviderClass(serviceProviderClassName)
             .usingLibrary(serviceJarFile.getAbsolutePath());
     File installedService = new File(services, echoService.getArtifactFile().getName());
     copyFile(echoService.getArtifactFile(), installedService);
