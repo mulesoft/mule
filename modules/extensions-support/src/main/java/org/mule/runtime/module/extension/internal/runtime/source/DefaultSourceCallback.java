@@ -195,7 +195,7 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
    */
   @Override
   public SourceCallbackContext createContext() {
-    return new DefaultSourceCallbackContext(this);
+    return new DefaultSourceCallbackContext(this, muleContext);
   }
 
   /**

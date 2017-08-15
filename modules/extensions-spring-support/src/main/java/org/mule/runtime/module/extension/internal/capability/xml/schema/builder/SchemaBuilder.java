@@ -15,6 +15,7 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
+import static org.mule.runtime.api.tx.TransactionType.LOCAL;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.EE_SCHEMA_LOCATION;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.ENUM_TYPE_SUFFIX;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MAX_ONE;
@@ -25,6 +26,7 @@ import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_E
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_SCHEMA_LOCATION;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_TLS_NAMESPACE;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_TLS_SCHEMA_LOCATION;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_TRANSACTION_TYPE;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.SPRING_FRAMEWORK_NAMESPACE;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.SPRING_FRAMEWORK_SCHEMA_LOCATION;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.STRING;
@@ -66,6 +68,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.type.TypeCatalog;
+import org.mule.runtime.api.tx.TransactionType;
 import org.mule.runtime.config.spring.internal.dsl.SchemaConstants;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
@@ -95,6 +98,8 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.model.To
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelSimpleType;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Union;
 
+import javax.xml.bind.JAXBElement;
+import javax.xml.namespace.QName;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -103,9 +108,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-
-import javax.xml.bind.JAXBElement;
-import javax.xml.namespace.QName;
 
 /**
  * Builder class to generate a XSD schema that describes a {@link ExtensionModel}
@@ -401,6 +403,9 @@ public final class SchemaBuilder {
         String typeName = getId(enumType);
         if (OperationTransactionalAction.class.getName().equals(typeName)) {
           attribute.setType(MULE_EXTENSION_OPERATION_TRANSACTIONAL_ACTION_TYPE);
+        } else if (TransactionType.class.getName().equals(typeName)) {
+          attribute.setType(MULE_TRANSACTION_TYPE);
+          attribute.setDefault(LOCAL.name());
         } else {
           attribute.setType(new QName(schema.getTargetNamespace(), sanitizeName(typeName) + ENUM_TYPE_SUFFIX));
           registeredEnums.add(enumType);

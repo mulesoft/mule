@@ -779,7 +779,6 @@
         </xsd:annotation>
         <xsd:restriction base="xsd:NMTOKEN">
             <xsd:enumeration value="LOCAL"/>
-            <xsd:enumeration value="MULTI"/>
             <xsd:enumeration value="XA"/>
         </xsd:restriction>
     </xsd:simpleType>

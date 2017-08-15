@@ -397,7 +397,7 @@ class MuleExtensionModelDeclarer {
     tryScope.onDefaultParameterGroup()
         .withOptionalParameter("transactionType")
         .ofType(BaseTypeBuilder.create(JAVA).stringType().id(String.class.getName())
-            .enumOf("LOCAL", "MULTI", "XA").build())
+            .enumOf("LOCAL", "XA").build())
         .defaultingTo("LOCAL")
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("Transaction type supported. Availability will depend on the runtime version, "

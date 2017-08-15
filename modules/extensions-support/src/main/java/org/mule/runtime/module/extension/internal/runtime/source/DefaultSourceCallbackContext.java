@@ -11,12 +11,15 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.tx.TransactionException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
+import org.mule.runtime.extension.api.connectivity.XATransactionalConnection;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.extension.api.tx.TransactionHandle;
 import org.mule.runtime.module.extension.internal.runtime.transaction.DefaultTransactionHandle;
 import org.mule.runtime.module.extension.internal.runtime.transaction.NullTransactionHandle;
+import org.mule.runtime.module.extension.internal.runtime.transaction.XaTransactionHandle;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,6 +35,7 @@ class DefaultSourceCallbackContext implements SourceCallbackContextAdapter {
   private static final TransactionHandle NULL_TRANSACTION_HANDLE = new NullTransactionHandle();
 
   private final SourceCallbackAdapter sourceCallback;
+  private final MuleContext muleContext;
   private final Map<String, Object> variables = new HashMap<>();
   private Object connection = null;
   private TransactionHandle transactionHandle = NULL_TRANSACTION_HANDLE;
@@ -40,9 +44,11 @@ class DefaultSourceCallbackContext implements SourceCallbackContextAdapter {
    * Creates a new instance
    *
    * @param sourceCallback the owning {@link SourceCallbackAdapter}
+   * @param muleContext    the current application {@link MuleContext}
    */
-  DefaultSourceCallbackContext(SourceCallbackAdapter sourceCallback) {
+  DefaultSourceCallbackContext(SourceCallbackAdapter sourceCallback, MuleContext muleContext) {
     this.sourceCallback = sourceCallback;
+    this.muleContext = muleContext;
   }
 
   /**
@@ -63,7 +69,9 @@ class DefaultSourceCallbackContext implements SourceCallbackContextAdapter {
                                                                     sourceCallback.getConfigurationInstance(),
                                                                     connectionHandler);
 
-      transactionHandle = new DefaultTransactionHandle((TransactionalConnection) connection);
+      transactionHandle = connection instanceof XATransactionalConnection
+          ? new XaTransactionHandle(muleContext.getTransactionManager())
+          : new DefaultTransactionHandle((TransactionalConnection) connection);
     }
 
     return transactionHandle;

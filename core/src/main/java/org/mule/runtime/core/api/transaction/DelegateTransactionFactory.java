@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.core.api.transaction;
 
-import static org.mule.runtime.core.api.transaction.TransactionType.LOCAL;
+import static org.mule.runtime.api.tx.TransactionType.LOCAL;
 import org.mule.runtime.api.tx.TransactionException;
+import org.mule.runtime.api.tx.TransactionType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.internal.processor.DelegateTransaction;
 

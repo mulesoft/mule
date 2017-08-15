@@ -20,6 +20,7 @@ import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_POOL_INITIALISA
 import static org.mule.runtime.api.config.PoolingProfile.POOL_EXHAUSTED_ACTIONS;
 import static org.mule.runtime.api.config.PoolingProfile.POOL_INITIALISATION_POLICIES;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.tx.TransactionType.LOCAL;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.config.spring.api.dsl.model.ComponentBuildingDefinitionProviderUtils.createNewInstance;
 import static org.mule.runtime.config.spring.api.dsl.model.ComponentBuildingDefinitionProviderUtils.getMuleMessageTransformerBaseBuilder;
@@ -28,7 +29,7 @@ import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STARTED;
 import static org.mule.runtime.core.api.context.notification.ListenerSubscriptionPair.ANY_SELECTOR_STRING;
 import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
 import static org.mule.runtime.core.api.transaction.MuleTransactionConfig.ACTION_INDIFFERENT_STRING;
-import static org.mule.runtime.core.api.transaction.TransactionType.LOCAL;
+import static org.mule.runtime.core.privileged.routing.outbound.AbstractOutboundRouter.DEFAULT_FAILURE_EXPRESSION;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildCollectionConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildMapConfiguration;
@@ -63,6 +64,7 @@ import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEME
 
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.tx.TransactionType;
 import org.mule.runtime.api.util.DataUnit;
 import org.mule.runtime.config.spring.api.dsl.ConfigurableInstanceFactory;
 import org.mule.runtime.config.spring.api.dsl.ConfigurableObjectFactory;
@@ -119,7 +121,6 @@ import org.mule.runtime.core.api.source.polling.PeriodicScheduler;
 import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.api.streaming.object.CursorIteratorProviderFactory;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
-import org.mule.runtime.core.api.transaction.TransactionType;
 import org.mule.runtime.core.api.transaction.xa.XaTransactionFactory;
 import org.mule.runtime.core.api.transformer.AbstractTransformer;
 import org.mule.runtime.core.api.transformer.Transformer;

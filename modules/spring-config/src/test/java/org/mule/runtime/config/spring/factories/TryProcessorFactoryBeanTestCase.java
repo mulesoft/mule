@@ -12,8 +12,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.meta.AbstractAnnotatedObject.ROOT_CONTAINER_NAME_KEY;
 import static org.mule.runtime.core.api.transaction.MuleTransactionConfig.ACTION_INDIFFERENT_STRING;
-import static org.mule.runtime.core.api.transaction.TransactionType.LOCAL;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import static org.mule.runtime.api.tx.TransactionType.LOCAL;
 import org.mule.runtime.config.spring.internal.factories.TryProcessorFactoryBean;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.streaming.StreamingManager;
@@ -21,8 +20,6 @@ import org.mule.runtime.core.internal.processor.TryScope;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;
-
-import java.util.Collections;
 
 public class TryProcessorFactoryBeanTestCase extends AbstractMuleTestCase {
 

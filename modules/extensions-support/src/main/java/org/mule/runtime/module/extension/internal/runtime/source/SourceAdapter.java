@@ -11,8 +11,10 @@ import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.tx.TransactionType.LOCAL;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.extension.api.ExtensionConstants.TRANSACTIONAL_ACTION_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.TRANSACTIONAL_TYPE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.tx.SourceTransactionalAction.NONE;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
@@ -33,8 +35,10 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.tx.TransactionException;
+import org.mule.runtime.api.tx.TransactionType;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
@@ -51,6 +55,7 @@ import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.tx.SourceTransactionalAction;
 import org.mule.runtime.extension.internal.property.TransactionalActionModelProperty;
+import org.mule.runtime.extension.internal.property.TransactionalTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.SourceCallbackModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ReactiveReconnectionCallback;
@@ -58,7 +63,11 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.util.FieldSetter;
+import org.apache.commons.collections.CollectionUtils;
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
 
+import javax.inject.Inject;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -66,12 +75,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-
-import javax.inject.Inject;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
 
 /**
  * An adapter for {@link Source} which acts as a bridge with {@link ExtensionMessageSource}. It also propagates lifecycle and
@@ -344,7 +347,7 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable 
                                                        annotation.getSimpleName()));
     }
 
-    return Optional.of(fields.iterator().next());
+    return of(fields.iterator().next());
   }
 
   public String getName() {
@@ -364,32 +367,53 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable 
   }
 
   public SourceTransactionalAction getTransactionalAction() {
-    ValueResolver valueResolver = nonCallbackParameters.getResolvers().get(getTransactionalActionFieldName());
+    return getNonCallbackParameterValue(getTransactionalActionFieldName(), SourceTransactionalAction.class)
+        .orElse(NONE);
+  }
+
+  TransactionType getTransactionalType() {
+    return getNonCallbackParameterValue(getTransactionTypeFieldName(), TransactionType.class)
+        .orElse(LOCAL);
+  }
+
+  private <T> Optional<T> getNonCallbackParameterValue(String fieldName, Class<T> type) {
+    ValueResolver<T> valueResolver = (ValueResolver<T>) nonCallbackParameters.getResolvers().get(fieldName);
+
     if (valueResolver == null) {
-      return NONE;
+      return empty();
     }
 
-    Object transactionalAction;
+    T object;
 
     try {
-      transactionalAction = valueResolver.resolve(from(getInitialiserEvent(muleContext)));
+      object = valueResolver.resolve(from(getInitialiserEvent(muleContext)));
     } catch (MuleException e) {
-      throw new MuleRuntimeException(createStaticMessage("Unable to get the Transactional Action value for Message Source"), e);
+      throw new MuleRuntimeException(createStaticMessage("Unable to get the " + type.getSimpleName()
+          + " value for Message Source"), e);
     }
 
-    if (!(transactionalAction instanceof SourceTransactionalAction)) {
-      throw new IllegalStateException("The resolved value is not a Transactional Action");
+    if (!(type.isInstance(object))) {
+      throw new IllegalStateException("The resolved value is not a " + type.getSimpleName());
     }
-    return (SourceTransactionalAction) transactionalAction;
+
+    return of(object);
   }
 
   private String getTransactionalActionFieldName() {
+    return getFieldNameEnrichedWith(TransactionalActionModelProperty.class, TRANSACTIONAL_ACTION_PARAMETER_NAME);
+  }
+
+  private String getTransactionTypeFieldName() {
+    return getFieldNameEnrichedWith(TransactionalTypeModelProperty.class, TRANSACTIONAL_TYPE_PARAMETER_NAME);
+  }
+
+  private String getFieldNameEnrichedWith(Class<? extends ModelProperty> type, String defaultName) {
     return sourceModel.getAllParameterModels()
         .stream()
-        .filter(param -> param.getModelProperty(TransactionalActionModelProperty.class).isPresent())
+        .filter(param -> param.getModelProperty(type).isPresent())
         .filter(param -> param.getModelProperty(DeclaringMemberModelProperty.class).isPresent())
         .map(param -> param.getModelProperty(DeclaringMemberModelProperty.class).get())
         .findAny()
-        .map(modelProperty -> modelProperty.getDeclaringField().getName()).orElse(TRANSACTIONAL_ACTION_PARAMETER_NAME);
+        .map(modelProperty -> modelProperty.getDeclaringField().getName()).orElse(defaultName);
   }
 }
