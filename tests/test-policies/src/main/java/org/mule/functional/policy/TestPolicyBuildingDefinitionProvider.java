@@ -39,7 +39,6 @@ public class TestPolicyBuildingDefinitionProvider implements ComponentBuildingDe
     ArrayList<ComponentBuildingDefinition> definitions = new ArrayList<>();
 
     definitions.add(baseDefinition.withIdentifier("proxy")
-        .asPrototype()
         .withTypeDefinition(fromType(DefaultPolicyInstance.class))
         .withSetterParameterDefinition("sourcePolicyChain",
                                        fromChildConfiguration(PolicyChain.class).withWrapperIdentifier("source").build())
