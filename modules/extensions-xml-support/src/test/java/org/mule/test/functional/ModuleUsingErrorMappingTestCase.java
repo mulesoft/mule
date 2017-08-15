@@ -16,6 +16,7 @@ import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHan
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.Ignore;
 import org.junit.Test;
 
 @Feature(ERROR_HANDLING)
@@ -43,11 +44,20 @@ public class ModuleUsingErrorMappingTestCase extends AbstractXmlExtensionMuleArt
   }
 
   @Test
+  @Description("Verifies that each error is correctly handled given an operation without mappings.")
+  public void multipleMappingsDirectlyFromSmartConnector() throws Exception {
+    verify("multipleMappingsDirectlyFromSmartConnector", EXPRESSION_ERROR_MESSAGE, new Object());
+    verify("multipleMappingsDirectlyFromSmartConnector", CONNECT_ERROR_MESSAGE);
+  }
+
+  @Ignore("MULE-13298: need support for error mappings in scope")
+  @Test
   @Description("Verifies that a mapped error via wildcard is handled.")
   public void mappedRequest() throws Exception {
     verify("simpleMapping", CONNECT_ERROR_MESSAGE);
   }
 
+  @Ignore("MULE-13298: need support for error mappings in scope")
   @Test
   @Description("Verifies that a mapped error via a custom matcher is handled. ")
   public void matchingMappedRequest() throws Exception {
@@ -60,11 +70,37 @@ public class ModuleUsingErrorMappingTestCase extends AbstractXmlExtensionMuleArt
     verify("complexMapping", UNMATCHED_ERROR_MESSAGE, new Object());
   }
 
+  @Ignore("MULE-13298: need support for error mappings in scope")
   @Test
   @Description("Verifies that each error is correctly handled given an operation with multiple mappings.")
   public void multipleMappingsRequest() throws Exception {
     verify("multipleMappings", EXPRESSION_ERROR_MESSAGE, new Object());
     verify("multipleMappings", CONNECT_ERROR_MESSAGE);
+  }
+
+  @Test
+  @Description("Verifies that a mapped error via wildcard is handled through the proxy smart connector.")
+  public void mappedRequestProxy() throws Exception {
+    verify("simpleMappingProxy", CONNECT_ERROR_MESSAGE);
+  }
+
+  @Test
+  @Description("Verifies that a mapped error via a custom matcher is handled through the proxy smart connector.")
+  public void matchingMappedRequestProxy() throws Exception {
+    verify("complexMappingProxy", CONNECT_ERROR_MESSAGE);
+  }
+
+  @Test
+  @Description("Verifies that an unmapped error is handled as ANY through the proxy smart connector.")
+  public void noMatchingMappedRequestProxy() throws Exception {
+    verify("complexMappingProxy", UNMATCHED_ERROR_MESSAGE, new Object());
+  }
+
+  @Test
+  @Description("Verifies that each error is correctly handled given an operation with multiple mappings through the proxy smart connector.")
+  public void multipleMappingsRequestProxy() throws Exception {
+    verify("multipleMappingsProxy", EXPRESSION_ERROR_MESSAGE, new Object());
+    verify("multipleMappingsProxy", CONNECT_ERROR_MESSAGE);
   }
 
   private void verify(String flowName, String expectedPayload) throws Exception {
