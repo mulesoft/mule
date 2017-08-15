@@ -31,11 +31,12 @@ import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.PRO
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.SOURCE_STEREOTYPE;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getExtensionModel;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
-import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_TYPE_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.model.VoidType;
 import org.mule.metadata.api.model.impl.DefaultAnyType;
 import org.mule.metadata.api.model.impl.DefaultArrayType;
@@ -350,9 +351,9 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(scatterGatherModel.getAllParameterModels().get(2).getType(), instanceOf(DefaultStringType.class));
     assertThat(scatterGatherModel.getAllParameterModels().get(2).isRequired(), is(false));
 
-    assertThat(scatterGatherModel.getAllParameterModels().get(3).getName(), is(TARGET_TYPE_PARAMETER_NAME));
-    assertThat(scatterGatherModel.getAllParameterModels().get(3).getExpressionSupport(), is(NOT_SUPPORTED));
-    assertThat(scatterGatherModel.getAllParameterModels().get(3).getType(), instanceOf(DefaultStringType.class));
+    assertThat(scatterGatherModel.getAllParameterModels().get(3).getName(), is(TARGET_VALUE_PARAMETER_NAME));
+    assertThat(scatterGatherModel.getAllParameterModels().get(3).getExpressionSupport(), is(REQUIRED));
+    assertThat(scatterGatherModel.getAllParameterModels().get(3).getType(), instanceOf(StringType.class));
     assertThat(scatterGatherModel.getAllParameterModels().get(3).isRequired(), is(false));
 
     assertThat(scatterGatherModel.getNestedComponents(), hasSize(1));

@@ -20,32 +20,21 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mule.runtime.api.meta.TargetType.MESSAGE;
-import static org.mule.runtime.api.meta.TargetType.PAYLOAD;
 import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE_MAP;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.api.routing.ForkJoinStrategy.RoutingPair.of;
 import static org.mule.test.allure.AllureConstants.RoutersFeature.ROUTERS_FEATURE;
 import static org.mule.test.allure.AllureConstants.RoutersFeature.ScatterGatherStory.SCATTER_GATHER;
 import static reactor.core.publisher.Flux.from;
-
-import io.qameta.allure.Description;
-import org.junit.After;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.meta.TargetType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
-import org.mule.runtime.core.api.processor.MessageProcessors;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.routing.ForkJoinStrategy.RoutingPair;
 import org.mule.runtime.core.api.routing.ForkJoinStrategyFactory;
@@ -55,10 +44,14 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import java.io.StringBufferInputStream;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
+import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.After;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 @Feature(ROUTERS_FEATURE)
 @Story(SCATTER_GATHER)
@@ -122,7 +115,7 @@ public class ScatterGatherRouterTestCase extends AbstractMuleContextTestCase {
 
     router.setRoutes(asList(route1, route2));
     router.setTarget(variableName);
-    router.setTargetType(MESSAGE);
+    router.setTargetValue("#[message]");
     muleContext.getInjector().inject(router);
     router.setAnnotations(getAppleFlowComponentLocationAnnotations());
     router.initialise();
