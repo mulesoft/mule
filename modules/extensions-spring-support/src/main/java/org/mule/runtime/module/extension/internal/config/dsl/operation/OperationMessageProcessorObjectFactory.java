@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.config.dsl.operation;
 
 import static org.apache.commons.lang3.StringUtils.EMPTY;
+import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
@@ -29,7 +30,7 @@ public class OperationMessageProcessorObjectFactory extends AbstractExtensionObj
   private final PolicyManager policyManager;
   private ConfigurationProvider configurationProvider;
   private String target = EMPTY;
-  private String targetValue = "#[payload]";
+  private String targetValue = PAYLOAD;
   private CursorProviderFactory cursorProviderFactory;
 
   public OperationMessageProcessorObjectFactory(ExtensionModel extensionModel,

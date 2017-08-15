@@ -7,7 +7,7 @@
 
 package org.mule.runtime.core.el.mvel.datatype;
 
-import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.FLOW_VARS;
+import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.VARS_PREFIX;
 
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.InternalEvent;
@@ -18,7 +18,7 @@ import org.mule.runtime.core.api.InternalEvent;
 public class FlowVarEnricherDataTypePropagator extends AbstractVariableEnricherDataTypePropagator {
 
   public FlowVarEnricherDataTypePropagator() {
-    super(FLOW_VARS);
+    super(VARS_PREFIX);
   }
 
   @Override

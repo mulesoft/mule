@@ -22,7 +22,7 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.FLOW_VARS;
+import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.VARS_PREFIX;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_CONTEXT;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
@@ -256,10 +256,10 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
       return false;
     }
 
-    if (target.startsWith(FLOW_VARS)) {
+    if (target.startsWith(VARS_PREFIX)) {
       throw new IllegalOperationException(format(INVALID_TARGET_MESSAGE, getLocation().getRootContainerName(),
                                                  operationModel.getName(),
-                                                 format("the '%s' prefix", FLOW_VARS), TARGET_PARAMETER_NAME));
+                                                 format("the '%s' prefix", VARS_PREFIX), TARGET_PARAMETER_NAME));
     } else if (muleContext.getExpressionManager().isExpression(target)) {
       throw new IllegalOperationException(format(INVALID_TARGET_MESSAGE, getLocation().getRootContainerName(),
                                                  operationModel.getName(),
