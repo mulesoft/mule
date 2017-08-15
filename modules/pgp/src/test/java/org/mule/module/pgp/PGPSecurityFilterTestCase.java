@@ -10,6 +10,7 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.mule.module.pgp.DecryptStreamTransformer.INVALID_PGP_MESSAGE_ERROR;
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -31,8 +32,6 @@ import org.junit.runners.Parameterized.Parameters;
 public class PGPSecurityFilterTestCase extends AbstractServiceAndFlowTestCase
 {
     protected static final String TARGET = "/encrypted.txt";
-    protected static final String DIRECTORY = "output";
-    protected static final String MESSAGE_EXCEPTION = "Crypto Failure";
 
     @Parameters
     public static Collection<Object[]> parameters()
@@ -68,7 +67,7 @@ public class PGPSecurityFilterTestCase extends AbstractServiceAndFlowTestCase
         MuleMessage reply = muleContext.getClient().send("vm://echo", "An unsigned message", props);
         assertNotNull(reply.getExceptionPayload());
         ExceptionPayload excPayload = reply.getExceptionPayload();
-        assertThat(excPayload.getMessage(), containsString(MESSAGE_EXCEPTION));
+        assertThat(excPayload.getMessage(), containsString(INVALID_PGP_MESSAGE_ERROR));
     }
 
     private byte[] loadEncryptedMessage() throws IOException

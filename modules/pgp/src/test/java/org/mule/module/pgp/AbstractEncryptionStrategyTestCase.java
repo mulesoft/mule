@@ -28,7 +28,7 @@ public abstract class AbstractEncryptionStrategyTestCase extends AbstractMuleCon
         url = loader.getResource("./serverPrivate.gpg");
         keyM.setSecretKeyRingFileName(url.getFile());
 
-        keyM.setSecretAliasId("6247672658342245276");
+        keyM.setSecretAliasId("56B4312E6168F39C");
         keyM.setSecretPassphrase("TestingPassphrase");
         keyM.initialise();
 

@@ -28,7 +28,7 @@ public class PGPKeyRingTestCase extends AbstractEncryptionStrategyTestCase
     @Test
     public void testServerKey() throws Exception
     {
-        PGPSecretKey serverKey = keyManager.getSecretKey();
+        PGPSecretKey serverKey = keyManager.getConfiguredSecretKey();
         assertNotNull(serverKey);
     }
 

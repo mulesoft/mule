@@ -4,7 +4,6 @@
     <bean id="pgpKeyManager" class="org.mule.module.pgp.PGPKeyRingImpl" init-method="initialise">
         <property name="publicKeyRingFileName" value="serverPublic.gpg"/>
         <property name="secretKeyRingFileName" value="serverPrivate.gpg"/>
-        <property name="secretAliasId" value="6247672658342245276"/>
         <property name="secretPassphrase" value="TestingPassphrase"/>
     </bean>
     <bean id="fakeCredentialAccessor" class="org.mule.module.pgp.FakeCredentialAccessor" />

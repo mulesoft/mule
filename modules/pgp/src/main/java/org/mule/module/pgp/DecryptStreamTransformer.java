@@ -6,19 +6,23 @@
  */
 package org.mule.module.pgp;
 
+import static java.lang.Long.toHexString;
+import static java.lang.String.format;
 import static org.mule.module.pgp.util.BouncyCastleUtil.KEY_FINGERPRINT_CALCULATOR;
 import static org.mule.module.pgp.util.BouncyCastleUtil.PBE_SECRET_KEY_DECRYPTOR_BUILDER;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.NoSuchProviderException;
-import java.security.Provider;
 import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.Validate;
+import org.bouncycastle.openpgp.PGPSecretKeyRingCollection;
 import org.bouncycastle.openpgp.operator.bc.BcPublicKeyDataDecryptorFactory;
 import org.bouncycastle.openpgp.PGPCompressedData;
 import org.bouncycastle.openpgp.PGPEncryptedDataList;
@@ -27,7 +31,6 @@ import org.bouncycastle.openpgp.PGPLiteralData;
 import org.bouncycastle.openpgp.PGPObjectFactory;
 import org.bouncycastle.openpgp.PGPOnePassSignatureList;
 import org.bouncycastle.openpgp.PGPPrivateKey;
-import org.bouncycastle.openpgp.PGPPublicKey;
 import org.bouncycastle.openpgp.PGPPublicKeyEncryptedData;
 import org.bouncycastle.openpgp.PGPSecretKey;
 import org.bouncycastle.openpgp.PGPUtil;
@@ -35,53 +38,42 @@ import org.bouncycastle.openpgp.PGPUtil;
 
 public class DecryptStreamTransformer implements StreamTransformer
 {
-    private static final long offset = 1 << 24;
+    public static final String INVALID_KEY_ERROR_MESSAGE = "User selected private key ID %s (through secretAliasId) but message was encrypted for key ID %s";
 
-    private InputStream toBeDecrypted;
-    private PGPPublicKey publicKey;
+    public static final String INVALID_PGP_MESSAGE_ERROR = "Invalid PGP message";
+
+    public static final String INVALID_PASS_PHRASE_ERROR_MESSAGE = "PassPhrase '%s' is invalid for the private key with id '%s'";
+
+    private static final String CHECKSUM_MESSAGE = "checksum mismatch";
+    private PGPSecretKeyRingCollection secretKeys;
     private PGPSecretKey secretKey;
     private String password;
-    private Provider provider;
-
-    private InputStream uncStream;
+    private final boolean configuredSecretKey ;
     private InputStream compressedStream;
     private InputStream clearStream;
-    private long bytesWrote;
 
-    public DecryptStreamTransformer(InputStream toBeDecrypted,
-                                    PGPPublicKey publicKey,
-                                    PGPSecretKey secretKey,
-                                    String password,
-                                    Provider provider) throws IOException
+    public DecryptStreamTransformer(PGPSecretKey secretKey,
+                                    PGPSecretKeyRingCollection secretKeys,
+                                    String password) throws IOException
     {
-        Validate.notNull(toBeDecrypted, "The toBeDecrypted should not be null");
-        Validate.notNull(publicKey, "The publicKey should not be null");
-        Validate.notNull(secretKey, "The secretKey should not be null");
         Validate.notNull(password, "The password should not be null");
-        Validate.notNull(provider, "The security provider can't be null");
-
-        this.toBeDecrypted = toBeDecrypted;
-        this.publicKey = publicKey;
+        this.configuredSecretKey = secretKey != null;
         this.secretKey = secretKey;
+        this.secretKeys = secretKeys;
         this.password = password;
-        this.bytesWrote = 0;
-        this.provider = provider;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void initialize(OutputStream out) throws Exception
+
+    public InputStream process (InputStream toBeDecrypted) throws Exception
     {
-        InputStream decodedInputStream = PGPUtil.getDecoderStream(this.toBeDecrypted);
+        InputStream decodedInputStream = PGPUtil.getDecoderStream(toBeDecrypted);
 
         PGPObjectFactory pgpF = new PGPObjectFactory(decodedInputStream, KEY_FINGERPRINT_CALCULATOR);
         Object pgpObject = pgpF.nextObject();
 
         if (pgpObject == null)
         {
-            throw new IllegalArgumentException("Invalid PGP message");
+            throw new PGPException(INVALID_PGP_MESSAGE_ERROR);
         }
 
         // the first object might be a PGP marker packet.
@@ -107,7 +99,7 @@ public class DecryptStreamTransformer implements StreamTransformer
             privateKey = getPrivateKey(pbe.getKeyID(), this.password);
             if (privateKey == null)
             {
-                throw new IllegalArgumentException("Failed to find private key with ID " + pbe.getKeyID());
+                throw new PGPException("Failed to find private key with ID " + pbe.getKeyID());
             }
         }
 
@@ -137,55 +129,60 @@ public class DecryptStreamTransformer implements StreamTransformer
         }
 
         PGPLiteralData pgpLiteralData = (PGPLiteralData) pgpObject;
-        uncStream = pgpLiteralData.getInputStream();
-
+        return pgpLiteralData.getInputStream();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public boolean write(OutputStream out, AtomicLong bytesRequested) throws Exception
+
+    private PGPPrivateKey getPrivateKey(long keyID, String passPhrase) throws PGPException, NoSuchProviderException
     {
-        int len = 0;
-        byte[] buf = new byte[1 << 16];
+        PGPSecretKey pgpSecKey;
+        PGPPrivateKey pgpPrivateKey;
 
-        while (bytesRequested.get() + offset > bytesWrote && (len = uncStream.read(buf)) > 0)
+        if(configuredSecretKey)
         {
-            out.write(buf, 0, len);
-            bytesWrote = bytesWrote + len;
-        }
-
-        if (len <= 0)
-        {
-            uncStream.close();
-            if (compressedStream != null)
-            {
-                compressedStream.close();
-            }
-            clearStream.close();
-            toBeDecrypted.close();
-            return true;
-        }
-
-        return false;
-    }
-
-    private PGPPrivateKey getPrivateKey(long keyID, String pass) throws PGPException, NoSuchProviderException
-    {
-        PGPSecretKey pgpSecKey = this.secretKey;
-        if (pgpSecKey == null)
-        {
-            return null;
+            pgpSecKey = this.secretKey;
         }
         else
         {
-            PGPPrivateKey pgpPrivateKey = pgpSecKey.extractPrivateKey(PBE_SECRET_KEY_DECRYPTOR_BUILDER.build(pass.toCharArray()));
-            // We are still ignoring the keyID parameter, but at least fail if the obtained key doesn't match
-            if (pgpPrivateKey.getKeyID() != keyID)
-            {
-                throw new PGPException(String.format("User selected private key ID %s (through secretAliasId) but message was encrypted for key ID %s", pgpPrivateKey.getKeyID(), keyID));
-            }
+            pgpSecKey = secretKeys.getSecretKey(keyID);
+        }
+
+        if (configuredSecretKey && pgpSecKey.getKeyID() != keyID)
+        {
+            throw new PGPException(createInvalidKeyErrorMessage(pgpSecKey.getKeyID(), keyID));
+        }
+
+        try
+        {
+            pgpPrivateKey = pgpSecKey.extractPrivateKey(PBE_SECRET_KEY_DECRYPTOR_BUILDER.build(passPhrase.toCharArray()));
             return pgpPrivateKey;
         }
+        catch (PGPException e)
+        {
+            throw wrapWrongPassPhraseException(e, passPhrase, pgpSecKey.getKeyID());
+        }
+
+    }
+
+    private String createInvalidKeyErrorMessage(Long configuredKeyId, Long validKeyId)
+    {
+        return format(INVALID_KEY_ERROR_MESSAGE, toHexString(configuredKeyId).toUpperCase(), toHexString(validKeyId).toUpperCase());
+    }
+
+    private PGPException wrapWrongPassPhraseException (PGPException pgpException, String invalidPassPhrase, Long keyId)
+    {
+        if(pgpException.getMessage().contains(CHECKSUM_MESSAGE))
+        {
+            return  new PGPException(createInvalidPassPhraseErrorMessage(invalidPassPhrase, keyId));
+        }
+        else
+        {
+            return pgpException;
+        }
+    }
+
+    private String createInvalidPassPhraseErrorMessage (String invalidPassPhrase, long keyId)
+    {
+        return format(INVALID_PASS_PHRASE_ERROR_MESSAGE, invalidPassPhrase, toHexString(keyId).toUpperCase());
     }
 }

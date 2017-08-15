@@ -39,11 +39,6 @@ public class PGPMessages extends MessageFactory
     {
         return factory.createMessage(BUNDLE_PATH, 6);
     }
-    
-    public static Message noSecretKeyFoundButAvailable(String availableKeys)
-    {
-        return factory.createMessage(BUNDLE_PATH, 7, availableKeys);
-    }
 
     public static Message noPublicKeyForPrincipal(String principalId)
     {

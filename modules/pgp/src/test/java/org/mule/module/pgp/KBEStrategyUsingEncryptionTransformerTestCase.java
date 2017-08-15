@@ -6,8 +6,10 @@
  */
 package org.mule.module.pgp;
 
+import static org.hamcrest.CoreMatchers.endsWith;
+import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertThat;
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.tck.testmodels.fruit.Orange;
@@ -21,6 +23,11 @@ import org.junit.Test;
 
 public class KBEStrategyUsingEncryptionTransformerTestCase extends AbstractEncryptionStrategyTestCase
 {
+
+    private final static String ARMOR_HEADER = "-----BEGIN PGP MESSAGE-----";
+
+    private final static String ARMOR_FOOTER= "-----END PGP MESSAGE-----\n";
+
     @Test
     public void testEncrypt() throws Exception
     {
@@ -38,6 +45,8 @@ public class KBEStrategyUsingEncryptionTransformerTestCase extends AbstractEncry
         InputStream inputStream = (InputStream) result;
         String message = IOUtils.toString(inputStream);
         String encrypted = (String) new ByteArrayToObject().doTransform(message.getBytes(), "UTF-8");
-        assertTrue(encrypted.startsWith("-----BEGIN PGP MESSAGE-----"));
+        assertThat(encrypted, startsWith(ARMOR_HEADER));
+        assertThat(encrypted, endsWith(ARMOR_FOOTER));
+
     }
 }

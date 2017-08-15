@@ -28,6 +28,7 @@ import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.bouncycastle.openpgp.PGPSecretKey;
+import org.bouncycastle.openpgp.PGPSecretKeyRingCollection;
 
 public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
 {
@@ -73,8 +74,7 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
         {
             PGPCryptInfo pgpCryptInfo = this.safeGetCryptInfo(cryptInfo);
             PGPPublicKey publicKey = pgpCryptInfo.getPublicKey();
-            StreamTransformer transformer = new EncryptStreamTransformer(data, publicKey, provider, encryptionAlgorithmId, pgpOutputMode);
-            return new LazyTransformedInputStream(new TransformContinuouslyPolicy(), transformer);
+            return new EncryptStreamTransformer(publicKey, provider, encryptionAlgorithmId, pgpOutputMode).process(data);
         }
         catch (Exception e)
         {
@@ -86,19 +86,16 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
     {
         try
         {
-            PGPCryptInfo pgpCryptInfo = this.safeGetCryptInfo(cryptInfo);
-            PGPPublicKey publicKey = pgpCryptInfo.getPublicKey();
-            PGPSecretKey secretKey = this.keyManager.getSecretKey();
+            PGPSecretKey secretKey = this.keyManager.getConfiguredSecretKey();
             String secretPassPhrase = this.keyManager.getSecretPassphrase();
+            PGPSecretKeyRingCollection secretKeys =  this.keyManager.getSecretKeys();
 
             if (secretPassPhrase == null)
             {
                 throw new CryptoFailureException(noSecretPassPhrase(), this);
             }
 
-            StreamTransformer transformer = new DecryptStreamTransformer(data, publicKey,
-                                                                         secretKey, secretPassPhrase, provider);
-            return new LazyTransformedInputStream(new TransformContinuouslyPolicy(), transformer);
+            return new DecryptStreamTransformer(secretKey, secretKeys, secretPassPhrase).process(data);
         }
         catch (Exception e)
         {
