@@ -20,6 +20,7 @@ import static org.mule.runtime.core.api.util.IOUtils.getResourceAsString;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsUrl;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
+
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
@@ -44,7 +45,11 @@ import org.mule.test.transactional.TransactionalExtension;
 import org.mule.test.typed.value.extension.extension.TypedValueExtension;
 import org.mule.test.values.extension.ValuesExtension;
 import org.mule.test.vegan.extension.VeganExtension;
-
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.skyscreamer.jsonassert.JSONAssert;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -53,12 +58,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.skyscreamer.jsonassert.JSONAssert;
 
 @SmallTest
 @RunWith(Parameterized.class)
@@ -84,48 +83,48 @@ public class ExtensionModelJsonGeneratorTestCase extends AbstractMuleTestCase {
     final ClassLoader classLoader = ExtensionModelJsonGeneratorTestCase.class.getClassLoader();
     final ServiceRegistry serviceRegistry = mock(ServiceRegistry.class);
     when(serviceRegistry.lookupProviders(DeclarationEnricher.class, classLoader))
-        .thenReturn(asList(new JavaXmlDeclarationEnricher()));
+      .thenReturn(asList(new JavaXmlDeclarationEnricher()));
 
     final List<ExtensionJsonGeneratorTestUnit> extensions = Arrays.asList(
-                                                                          new ExtensionJsonGeneratorTestUnit(javaLoader,
-                                                                                                             VeganExtension.class,
-                                                                                                             "vegan.json"),
-                                                                          new ExtensionJsonGeneratorTestUnit(javaLoader,
-                                                                                                             PetStoreConnector.class,
-                                                                                                             "petstore.json"),
-                                                                          new ExtensionJsonGeneratorTestUnit(javaLoader,
-                                                                                                             MetadataExtension.class,
-                                                                                                             "metadata.json"),
-                                                                          new ExtensionJsonGeneratorTestUnit(javaLoader,
-                                                                                                             HeisenbergExtension.class,
-                                                                                                             "heisenberg.json"),
-                                                                          new ExtensionJsonGeneratorTestUnit(javaLoader,
-                                                                                                             SubstitutionGroupExtension.class,
-                                                                                                             "substitutiongroup.json"),
-                                                                          new ExtensionJsonGeneratorTestUnit(javaLoader,
-                                                                                                             TransactionalExtension.class,
-                                                                                                             "tx-ext.json"),
-                                                                          new ExtensionJsonGeneratorTestUnit(javaLoader,
-                                                                                                             SubTypesMappingConnector.class,
-                                                                                                             "subtypes.json"),
-                                                                          new ExtensionJsonGeneratorTestUnit(javaLoader,
-                                                                                                             MarvelExtension.class,
-                                                                                                             "marvel.json"),
-                                                                          new ExtensionJsonGeneratorTestUnit(soapLoader,
-                                                                                                             RickAndMortyExtension.class,
-                                                                                                             "ram.json"),
-                                                                          new ExtensionJsonGeneratorTestUnit(javaLoader,
-                                                                                                             TypedValueExtension.class,
-                                                                                                             "typed-value.json"),
-                                                                          new ExtensionJsonGeneratorTestUnit(javaLoader,
-                                                                                                             TestOAuthExtension.class,
-                                                                                                             "test-oauth.json"),
-                                                                          new ExtensionJsonGeneratorTestUnit(javaLoader,
-                                                                                                             WeaveFunctionExtension.class,
-                                                                                                             "test-fn.json"),
-                                                                          new ExtensionJsonGeneratorTestUnit(javaLoader,
-                                                                                                             ValuesExtension.class,
-                                                                                                             "values.json"));
+      new ExtensionJsonGeneratorTestUnit(javaLoader,
+                                         VeganExtension.class,
+                                         "vegan.json"),
+      new ExtensionJsonGeneratorTestUnit(javaLoader,
+                                         PetStoreConnector.class,
+                                         "petstore.json"),
+      new ExtensionJsonGeneratorTestUnit(javaLoader,
+                                         MetadataExtension.class,
+                                         "metadata.json"),
+      new ExtensionJsonGeneratorTestUnit(javaLoader,
+                                         HeisenbergExtension.class,
+                                         "heisenberg.json"),
+      new ExtensionJsonGeneratorTestUnit(javaLoader,
+                                         SubstitutionGroupExtension.class,
+                                         "substitutiongroup.json"),
+      new ExtensionJsonGeneratorTestUnit(javaLoader,
+                                         TransactionalExtension.class,
+                                         "tx-ext.json"),
+      new ExtensionJsonGeneratorTestUnit(javaLoader,
+                                         SubTypesMappingConnector.class,
+                                         "subtypes.json"),
+      new ExtensionJsonGeneratorTestUnit(javaLoader,
+                                         MarvelExtension.class,
+                                         "marvel.json"),
+      new ExtensionJsonGeneratorTestUnit(soapLoader,
+                                         RickAndMortyExtension.class,
+                                         "ram.json"),
+      new ExtensionJsonGeneratorTestUnit(javaLoader,
+                                         TypedValueExtension.class,
+                                         "typed-value.json"),
+      new ExtensionJsonGeneratorTestUnit(javaLoader,
+                                         TestOAuthExtension.class,
+                                         "test-oauth.json"),
+      new ExtensionJsonGeneratorTestUnit(javaLoader,
+                                         WeaveFunctionExtension.class,
+                                         "test-fn.json"),
+      new ExtensionJsonGeneratorTestUnit(javaLoader,
+                                         ValuesExtension.class,
+                                         "values.json"));
 
     BiFunction<Class<?>, ExtensionModelLoader, ExtensionModel> createExtensionModel = (extension, loader) -> {
       ExtensionModel model = loadExtension(extension, loader);
@@ -139,8 +138,8 @@ public class ExtensionModelJsonGeneratorTestCase extends AbstractMuleTestCase {
     };
 
     return extensions.stream()
-        .map(e -> new Object[] {createExtensionModel.apply(e.getExtensionClass(), e.getLoader()), e.getFileName()})
-        .collect(toList());
+             .map(e -> new Object[] {createExtensionModel.apply(e.getExtensionClass(), e.getLoader()), e.getFileName()})
+             .collect(toList());
   }
 
   @Before
@@ -162,7 +161,7 @@ public class ExtensionModelJsonGeneratorTestCase extends AbstractMuleTestCase {
 
       if (fixInputFiles) {
         File root = new File(getResourceAsUrl("models/" + expectedSource, getClass()).toURI()).getParentFile()
-            .getParentFile().getParentFile().getParentFile();
+                      .getParentFile().getParentFile().getParentFile();
         File testDir = new File(root, "src/test/resources/models");
         File target = new File(testDir, expectedSource);
         stringToFile(target.getAbsolutePath(), json);

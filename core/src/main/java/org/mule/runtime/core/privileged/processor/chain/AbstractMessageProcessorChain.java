@@ -24,7 +24,6 @@ import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
@@ -56,7 +55,6 @@ import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
-
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -173,9 +171,8 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
         .transform(next)
         .onErrorResume(RejectedExecutionException.class,
                        throwable -> Mono.from(event.getContext()
-                           .error(updateMessagingExceptionWithError(new MessagingException(event, throwable,
-                                                                                           (AnnotatedObject) processor),
-                                                                    (AnnotatedObject) processor, muleContext)))
+                           .error(updateMessagingExceptionWithError(new MessagingException(event, throwable, processor),
+                                                                    processor, muleContext)))
                            .then(Mono.empty()))
         .onErrorResume(MessagingException.class,
                        throwable -> {
@@ -191,8 +188,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   }
 
   private Function<MessagingException, MessagingException> updateMessagingException(Processor processor) {
-    return exception -> ExceptionUtils.updateMessagingException(LOGGER, (AnnotatedObject) processor, exception,
-                                                                muleContext.getErrorTypeLocator(),
+    return exception -> ExceptionUtils.updateMessagingException(LOGGER, processor, exception, muleContext.getErrorTypeLocator(),
                                                                 muleContext.getErrorTypeRepository(), muleContext);
   }
 

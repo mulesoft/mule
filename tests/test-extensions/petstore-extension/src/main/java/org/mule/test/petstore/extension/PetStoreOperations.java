@@ -6,21 +6,28 @@
  */
 package org.mule.test.petstore.extension;
 
+import static org.mule.test.petstore.extension.PetstoreErrorTypeDefinition.PET_ERROR;
+
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.api.security.SecurityProviderNotFoundException;
 import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
+import org.mule.runtime.api.streaming.exception.StreamingBufferSizeExceededException;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.api.util.concurrent.Latch;
 import org.mule.runtime.extension.api.annotation.dsl.xml.ParameterDsl;
+import org.mule.runtime.extension.api.annotation.error.Throws;
+import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.DefaultEncoding;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
-import org.mule.runtime.extension.api.annotation.param.Config;
+import org.mule.runtime.extension.api.client.ExtensionsClient;
+import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.runtime.extension.api.security.AuthenticationHandler;
-
+import javax.inject.Inject;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.util.List;
@@ -28,8 +35,23 @@ import java.util.concurrent.CountDownLatch;
 
 public class PetStoreOperations {
 
+  @Inject
+  private ExtensionsClient client;
+
   public List<String> getPets(@Connection PetStoreClient client, @Config PetStoreConnector config, String ownerName) {
     return client.getPets(ownerName, config);
+  }
+
+  @Throws(PetStoreCustomErrorProvider.class)
+  public String failsToReadStream(@Connection PetStoreClient connection, @Optional String content) throws MuleException {
+    try {
+      if (content == null) {
+        throw new Exception("Null content cannot be processed");
+      }
+      throw new StreamingBufferSizeExceededException(1);
+    } catch (Exception e) {
+      throw new ModuleException(PET_ERROR, e);
+    }
   }
 
   public PetStoreClient getClient(@Connection PetStoreClient client) {

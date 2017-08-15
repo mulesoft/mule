@@ -39,6 +39,7 @@ import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNO
 import static org.mule.tck.junit4.matcher.EventMatcher.hasErrorType;
 import static org.mule.tck.junit4.matcher.EventMatcher.hasErrorTypeThat;
 import static org.mule.tck.junit4.matcher.MessagingExceptionMatcher.withEventThat;
+
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
@@ -61,16 +62,7 @@ import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.Defaul
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
-
 import com.google.common.collect.ImmutableMap;
-
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-
-import javax.xml.namespace.QName;
-
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
@@ -84,6 +76,11 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.mockito.InOrder;
 import org.mockito.verification.VerificationMode;
+import javax.xml.namespace.QName;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 @SmallTest
 @RunWith(Parameterized.class)
@@ -349,6 +346,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
   @Test
   public void interceptorMutatesEventAroundAfterFailWithErrorType() throws Exception {
     ErrorType errorTypeMock = mock(ErrorType.class);
+    when(errorTypeMock.getIdentifier()).thenReturn("ID");
     ProcessorInterceptor interceptor = prepareInterceptor(new ProcessorInterceptor() {
 
       @Override

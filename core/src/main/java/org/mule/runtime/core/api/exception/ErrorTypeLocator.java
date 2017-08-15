@@ -9,13 +9,12 @@ package org.mule.runtime.core.api.exception;
 import static java.util.Optional.empty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
+
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.message.ErrorType;
-
+import org.apache.commons.collections.map.HashedMap;
 import java.util.Map;
 import java.util.Optional;
-
-import org.apache.commons.collections.map.HashedMap;
 
 /**
  * Locator for error types.
@@ -79,8 +78,7 @@ public class ErrorTypeLocator {
    *         related to UNKNOWN will be returned.
    */
   public ErrorType lookupComponentErrorType(ComponentIdentifier componentIdentifier, Class<? extends Throwable> exception) {
-    ExceptionMapper exceptionMapper =
-        componentExceptionMappers.get(componentIdentifier);
+    ExceptionMapper exceptionMapper = componentExceptionMappers.get(componentIdentifier);
     Optional<ErrorType> errorType = empty();
     if (exceptionMapper != null) {
       errorType = exceptionMapper.resolveErrorType(exception);

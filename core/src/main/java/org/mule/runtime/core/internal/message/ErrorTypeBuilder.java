@@ -7,6 +7,8 @@
 package org.mule.runtime.core.internal.message;
 
 import static java.lang.String.format;
+import static org.apache.commons.lang3.builder.EqualsBuilder.reflectionEquals;
+import static org.apache.commons.lang3.builder.HashCodeBuilder.reflectionHashCode;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.api.exception.Errors.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.ANY_IDENTIFIER;
@@ -128,6 +130,15 @@ public final class ErrorTypeBuilder {
       return format("%s:%s", namespace, identifier);
     }
 
+    @Override
+    public boolean equals(Object obj) {
+      return reflectionEquals(this, obj);
+    }
+
+    @Override
+    public int hashCode() {
+      return reflectionHashCode(this);
+    }
   }
 
 }

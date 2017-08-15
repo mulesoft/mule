@@ -62,8 +62,7 @@ class ReactiveInterceptionAction implements InterceptionAction {
 
   @Override
   public CompletableFuture<InterceptionEvent> fail(Throwable cause) {
-    Error newError = getErrorFromFailingProcessor((AnnotatedObject) processor, cause, muleContext.getErrorTypeLocator());
-
+    Error newError = getErrorFromFailingProcessor(null, (AnnotatedObject) processor, cause, muleContext.getErrorTypeLocator());
     interceptionEvent.setError(newError.getErrorType(), cause);
     CompletableFuture<InterceptionEvent> completableFuture = new CompletableFuture<>();
     completableFuture

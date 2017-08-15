@@ -16,7 +16,6 @@ import static org.mule.runtime.core.api.InternalEvent.setCurrentEvent;
 import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STARTED;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
-import static org.mule.runtime.core.api.util.ExceptionUtils.updateMessagingExceptionWithError;
 import static org.mule.runtime.core.internal.construct.AbstractFlowConstruct.createFlowStatistics;
 import static reactor.core.publisher.Flux.from;
 import org.mule.runtime.api.component.execution.ComponentExecutionException;
@@ -37,17 +36,16 @@ import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.api.util.MessagingExceptionResolver;
 import org.mule.runtime.core.internal.construct.processor.FlowConstructStatisticsMessageProcessor;
 import org.mule.runtime.core.internal.processor.strategy.TransactionAwareWorkQueueProcessingStrategyFactory;
 import org.mule.runtime.core.internal.routing.requestreply.SimpleAsyncRequestReplyRequester.AsyncReplyToPropertyRequestReplyReplier;
-
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.RejectedExecutionException;
-
-import org.reactivestreams.Publisher;
-import reactor.core.publisher.Mono;
 
 /**
  * Creates instances of {@link Flow} with a default implementation
@@ -57,6 +55,8 @@ import reactor.core.publisher.Mono;
  * builder methods will fail to update the builder state.
  */
 public class DefaultFlowBuilder implements Builder {
+
+  private static final MessagingExceptionResolver exceptionResolver = new MessagingExceptionResolver();
 
   private final String name;
   private final MuleContext muleContext;
@@ -227,8 +227,8 @@ public class DefaultFlowBuilder implements Builder {
             try {
               getSink().accept(request);
             } catch (RejectedExecutionException ree) {
-              request.getContext()
-                  .error(updateMessagingExceptionWithError(new MessagingException(event, ree, this), this, getMuleContext()));
+              MessagingException me = new MessagingException(event, ree, this);
+              request.getContext().error(exceptionResolver.resolve(this, me, getMuleContext()));
             }
             return Mono.from(request.getContext().getResponsePublisher())
                 .map(r -> {
