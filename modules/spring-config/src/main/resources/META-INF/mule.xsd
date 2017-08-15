@@ -3159,14 +3159,14 @@
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:attribute>
-                    <xsd:attribute name="target" type="xsd:string">
+                    <xsd:attribute name="target" type="substitutableString">
                         <xsd:annotation>
                             <xsd:documentation>
-                                The variable where the result from this router should be stored. If this is not set then the result is set in the payload.
+                                An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:attribute>
-                    <xsd:attribute name="targetType" type="targetTypeEnumType" default="PAYLOAD"/>
+                    <xsd:attribute name="targetValue" type="expressionString" default="#[payload]"/>
                 </xsd:extension>
             </xsd:complexContent>
         </xsd:complexType>
