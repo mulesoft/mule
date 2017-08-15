@@ -258,29 +258,36 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
             @Override
             public void onFailure(Exception exception)
             {
-                MessagingException msgException = new MessagingException(createStaticMessage(getErrorMessage(httpRequest)),
-                                                                         resetMuleEventForNewThread(muleEvent),
-                                                                         exception,
-                                                                         DefaultHttpRequester.this);
-                checkIfRemotelyClosed(exception);
-                // Only retry request in case of race condition where connection is closed after it is obtained from pool causing
-                // a "IOException: Remotely Closed"
-                if(shouldRetryRemotelyClosed(exception, retryCount))
+                try
                 {
-                    try
+                    MessagingException msgException = new MessagingException(createStaticMessage(getErrorMessage(httpRequest)),
+                                                                             resetMuleEventForNewThread(muleEvent),
+                                                                             exception,
+                                                                             DefaultHttpRequester.this);
+                    checkIfRemotelyClosed(exception);
+                    // Only retry request in case of race condition where connection is closed after it is obtained from pool causing
+                    // a "IOException: Remotely Closed"
+                    if(shouldRetryRemotelyClosed(exception, retryCount))
                     {
-                        innerProcessNonBlocking(muleEvent, originalCompletionHandler, retryCount - 1);
+                        try
+                        {
+                            innerProcessNonBlocking(muleEvent, originalCompletionHandler, retryCount - 1);
+                        }
+                        catch (MuleException e)
+                        {
+                            // Only exception caught here is from createHttpRequest, so it doesn't make sense to use error message
+                            // from http request but instead simply propagate exception as happens the first time around.
+                            originalCompletionHandler.onFailure(new MessagingException(muleEvent, e, DefaultHttpRequester.this));
+                        }
                     }
-                    catch (MuleException e)
+                    else
                     {
-                        // Only exception caught here is from createHttpRequest, so it doesn't make sense to use error message
-                        // from http request but instead simply propagate exception as happens the first time around.
-                        originalCompletionHandler.onFailure(new MessagingException(muleEvent, e, DefaultHttpRequester.this));
+                        originalCompletionHandler.onFailure(msgException);
                     }
                 }
-                else
+                finally
                 {
-                    originalCompletionHandler.onFailure(msgException);
+                    RequestContext.clear();
                 }
             }
 
