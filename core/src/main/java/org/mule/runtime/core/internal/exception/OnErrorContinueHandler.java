@@ -50,6 +50,9 @@ public class OnErrorContinueHandler extends TemplateOnErrorHandler {
           throw new InitialisationException(getInitialisationError(sanitizedError), this);
         }
       }
+    } else if (when == null) {
+      // No error type and no expression, force ANY matcher
+      errorTypeMatcher = new SingleErrorTypeMatcher(errorTypeRepository.getAnyErrorType());
     }
 
   }
@@ -57,6 +60,12 @@ public class OnErrorContinueHandler extends TemplateOnErrorHandler {
   private I18nMessage getInitialisationError(String type) {
     return createStaticMessage(format("Source errors are not allowed in 'on-error-continue' handlers. Offending type is '%s'.",
                                       type));
+  }
+
+  @Override
+  public boolean acceptsAll() {
+    // An on-error-continue cannot handle source response errors
+    return false;
   }
 
   @Override

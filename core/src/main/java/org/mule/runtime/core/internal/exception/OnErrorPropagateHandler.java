@@ -14,11 +14,11 @@ import org.mule.runtime.core.api.exception.MessageRedeliveredException;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
 
-import org.reactivestreams.Publisher;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+
+import org.reactivestreams.Publisher;
 
 //TODO: MULE-9307 re-write junits for rollback exception strategy
 
@@ -47,6 +47,11 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
 
   public boolean hasMaxRedeliveryAttempts() {
     return this.maxRedeliveryAttempts != null;
+  }
+
+  @Override
+  public boolean acceptsAll() {
+    return errorTypeMatcher == null && when == null;
   }
 
   @Override
