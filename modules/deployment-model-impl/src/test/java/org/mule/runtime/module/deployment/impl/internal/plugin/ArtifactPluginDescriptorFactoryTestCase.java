@@ -35,8 +35,8 @@ import org.mule.runtime.module.artifact.api.classloader.ClassLoaderFilterFactory
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
-import org.mule.runtime.module.deployment.impl.internal.artifact.DescriptorLoaderRepository;
-import org.mule.runtime.module.deployment.impl.internal.artifact.LoaderNotFoundException;
+import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
+import org.mule.runtime.module.artifact.api.descriptor.LoaderNotFoundException;
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.policy.FileSystemPolicyClassLoaderModelLoader;
 import org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader;

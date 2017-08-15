@@ -9,19 +9,14 @@ package org.mule.runtime.module.deployment.impl.internal.domain;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_CONFIGURATION_RESOURCE_LOCATION;
-import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR;
 import org.mule.runtime.api.deployment.meta.MuleDomainModel;
+import org.mule.runtime.api.deployment.persistence.AbstractMuleArtifactModelJsonSerializer;
 import org.mule.runtime.api.deployment.persistence.MuleDomainModelJsonSerializer;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableDescriptorFactory;
-import org.mule.runtime.module.deployment.impl.internal.artifact.DescriptorLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
-
-import java.io.IOException;
-import java.io.InputStream;
-
-import org.apache.commons.io.IOUtils;
 
 /**
  * Creates artifact descriptor for application
@@ -31,16 +26,6 @@ public class DomainDescriptorFactory extends AbstractDeployableDescriptorFactory
   public DomainDescriptorFactory(ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader,
                                  DescriptorLoaderRepository descriptorLoaderRepository) {
     super(artifactPluginDescriptorLoader, descriptorLoaderRepository);
-  }
-
-  @Override
-  protected String getDescriptorFileName() {
-    return MULE_ARTIFACT_JSON_DESCRIPTOR;
-  }
-
-  @Override
-  protected void doDescriptorConfig(MuleDomainModel artifactModel, DomainDescriptor descriptor) {
-    // Nothing to do
   }
 
   @Override
@@ -64,7 +49,7 @@ public class DomainDescriptorFactory extends AbstractDeployableDescriptorFactory
   }
 
   @Override
-  protected MuleDomainModel deserializeArtifactModel(InputStream stream) throws IOException {
-    return new MuleDomainModelJsonSerializer().deserialize(IOUtils.toString(stream));
+  protected AbstractMuleArtifactModelJsonSerializer<MuleDomainModel> getMuleArtifactModelJsonSerializer() {
+    return new MuleDomainModelJsonSerializer();
   }
 }

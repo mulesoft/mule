@@ -7,46 +7,95 @@
 
 package org.mule.runtime.module.service;
 
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.SERVICE;
 import static org.mule.runtime.module.service.ServiceDescriptor.SERVICE_PROPERTIES;
+import org.mule.runtime.api.deployment.meta.MuleServiceModel;
+import org.mule.runtime.api.deployment.persistence.AbstractMuleArtifactModelJsonSerializer;
+import org.mule.runtime.api.deployment.persistence.MuleServiceModelJsonSerializer;
+import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorFactory;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
+import org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderException;
+import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
+import org.mule.runtime.module.artifact.api.descriptor.AbstractArtifactDescriptorFactory;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Properties;
 
 /**
  * Creates {@link ServiceDescriptor} instances.
  */
-public class ServiceDescriptorFactory implements ArtifactDescriptorFactory<ServiceDescriptor> {
+public class ServiceDescriptorFactory extends AbstractArtifactDescriptorFactory<MuleServiceModel, ServiceDescriptor> {
 
-  public static final String SERVICE_PROVIDER_CLASS_NAME = "service.className";
+  private static final String SERVICE_PROVIDER_CLASS_NAME = "service.className";
+
+  /**
+   * Creates a new factory
+   *
+   * @param descriptorLoaderRepository contains all the {@link ClassLoaderModelLoader} registered on the container. Non null
+   */
+  ServiceDescriptorFactory(DescriptorLoaderRepository descriptorLoaderRepository) {
+    super(descriptorLoaderRepository);
+  }
+
+  @Override
+  protected ArtifactType getArtifactType() {
+    return SERVICE;
+  }
 
   @Override
   public ServiceDescriptor create(File artifactFolder) throws ArtifactDescriptorCreateException {
     if (!artifactFolder.exists()) {
       throw new IllegalArgumentException("Service folder does not exists: " + artifactFolder.getAbsolutePath());
     }
-    final String serviceName = artifactFolder.getName();
-    final ServiceDescriptor descriptor = new ServiceDescriptor(serviceName);
-    descriptor.setRootFolder(artifactFolder);
-
+    // TODO(pablo.kraan): MULE-13281 - remove properties descriptor support once all the services are migrated to the new file format
     final File servicePropsFile = new File(artifactFolder, SERVICE_PROPERTIES);
-    if (!servicePropsFile.exists()) {
+    if (servicePropsFile.exists()) {
+      final String serviceName = artifactFolder.getName();
+      final ServiceDescriptor descriptor = new ServiceDescriptor(serviceName);
+      descriptor.setRootFolder(artifactFolder);
 
-      throw new ArtifactDescriptorCreateException("Service must contain a " + SERVICE_PROPERTIES + " file");
+      Properties props = new Properties();
+      try {
+        props.load(new FileReader(servicePropsFile));
+      } catch (IOException e) {
+        throw new ArtifactDescriptorCreateException("Cannot read service.properties file", e);
+      }
+
+      descriptor.setClassLoaderModel(createClassLoaderModel(artifactFolder));
+
+      descriptor.setServiceProviderClassName(props.getProperty(SERVICE_PROVIDER_CLASS_NAME));
+
+      return descriptor;
     }
 
-    Properties props = new Properties();
+    return super.create(artifactFolder);
+  }
+
+  private ClassLoaderModel createClassLoaderModel(File artifactFolder) {
     try {
-      props.load(new FileReader(servicePropsFile));
-    } catch (IOException e) {
-      throw new ArtifactDescriptorCreateException("Cannot read service.properties file", e);
+      return new ServiceClassLoaderModelLoader().load(artifactFolder, Collections.emptyMap(), ArtifactType.SERVICE);
+    } catch (InvalidDescriptorLoaderException e) {
+      throw new IllegalStateException("Cannot load classloader model for service", e);
     }
+  }
 
-    descriptor.setServiceProviderClassName(props.getProperty(SERVICE_PROVIDER_CLASS_NAME));
+  @Override
+  protected void doDescriptorConfig(MuleServiceModel artifactModel, ServiceDescriptor descriptor, File artifactLocation) {
+    descriptor.setServiceProviderClassName(artifactModel.getServiceProviderClassName());
+  }
 
-    return descriptor;
+  @Override
+  protected ServiceDescriptor createArtifactDescriptor(String name) {
+    return new ServiceDescriptor(name);
+  }
+
+  @Override
+  protected AbstractMuleArtifactModelJsonSerializer<MuleServiceModel> getMuleArtifactModelJsonSerializer() {
+    return new MuleServiceModelJsonSerializer();
   }
 }

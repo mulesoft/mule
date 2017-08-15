@@ -29,7 +29,6 @@ import static org.mule.runtime.core.api.util.PropertiesUtils.loadProperties;
 import static org.mule.test.runner.api.ArtifactClassificationType.APPLICATION;
 import static org.mule.test.runner.api.ArtifactClassificationType.MODULE;
 import static org.mule.test.runner.api.ArtifactClassificationType.PLUGIN;
-
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.test.runner.classification.PatternExclusionsDependencyFilter;
@@ -101,6 +100,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
   private DependencyResolver dependencyResolver;
   private ArtifactClassificationTypeResolver artifactClassificationTypeResolver;
   private PluginResourcesResolver pluginResourcesResolver = new PluginResourcesResolver();
+  private ServiceResourcesResolver serviceResourcesResolver = new ServiceResourcesResolver();
 
   /**
    * Creates an instance of the classifier.
@@ -462,19 +462,25 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
     return classificationNodes.stream().map(node -> {
       InputStream servicePropertiesStream =
           new URLClassLoader(node.getUrls().toArray(new URL[0]), null).getResourceAsStream(SERVICE_PROPERTIES_FILE_NAME);
-      checkNotNull(servicePropertiesStream,
-                   "Couldn't find " + SERVICE_PROPERTIES_FILE_NAME + " for artifact: " + node.getArtifact());
-      try {
-        Properties serviceProperties = loadProperties(servicePropertiesStream);
-        String serviceProviderClassName = serviceProperties.getProperty(SERVICE_PROVIDER_CLASS_NAME);
-        logger.debug("Discover serviceProviderClassName: {} for artifact: {}", serviceProviderClassName, node.getArtifact());
-        if (node.getExportClasses() != null && !node.getExportClasses().isEmpty()) {
-          logger.warn("exportClasses is not supported for services artifacts, they are going to be ignored");
+
+      // TODO(pablo.kraan): MULE-13281 - remove properties descriptor support once all the services are migrated to the new file format
+      if (servicePropertiesStream != null) {
+        try {
+          Properties serviceProperties = loadProperties(servicePropertiesStream);
+          String serviceProviderClassName = serviceProperties.getProperty(SERVICE_PROVIDER_CLASS_NAME);
+          logger.debug("Discover serviceProviderClassName: {} for artifact: {}", serviceProviderClassName, node.getArtifact());
+          if (node.getExportClasses() != null && !node.getExportClasses().isEmpty()) {
+            logger.warn("exportClasses is not supported for services artifacts, they are going to be ignored");
+          }
+          return new ArtifactUrlClassification(toId(node.getArtifact()), serviceProviderClassName, node.getUrls());
+        } catch (IOException e) {
+          throw new IllegalArgumentException("Couldn't read " + SERVICE_PROPERTIES_FILE_NAME + " for artifact: "
+              + node.getArtifact(), e);
         }
-        return new ArtifactUrlClassification(toId(node.getArtifact()), serviceProviderClassName, node.getUrls());
-      } catch (IOException e) {
-        throw new IllegalArgumentException("Couldn't read " + SERVICE_PROPERTIES_FILE_NAME + " for artifact: "
-            + node.getArtifact(), e);
+      } else {
+        final String classifierLessId = toId(node.getArtifact());
+        return serviceResourcesResolver
+            .resolveServiceResourcesFor(new ArtifactUrlClassification(classifierLessId, "zaraza", node.getUrls()));
       }
     }).collect(toList());
   }
@@ -622,26 +628,6 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
         .filter(dependency -> filter.test(dependency))
         .map(dependency -> dependency.getArtifact())
         .collect(toList());
-  }
-
-  /**
-   * Checks if the pluginArtifact {@link Artifact} is declared as direct dependency of the rootArtifact or if the pluginArtifact
-   * is the same rootArtifact. In case if it is a dependency and is not declared it throws an {@link IllegalStateException}.
-   *
-   * @param pluginArtifact plugin {@link Artifact} to be checked
-   * @param context {@link ClassPathClassifierContext} with settings for the classification process
-   * @param rootArtifactDirectDependencies {@link List} of {@link Dependency} with direct dependencies for the rootArtifact
-   * @throws {@link IllegalStateException} if the plugin is a dependency not declared in rootArtifact directDependencies
-   */
-  private void checkPluginDeclaredAsDirectDependency(Artifact pluginArtifact, ClassPathClassifierContext context,
-                                                     List<Dependency> rootArtifactDirectDependencies) {
-    if (!context.getRootArtifact().equals(pluginArtifact)) {
-      if (!findDirectDependency(pluginArtifact.getGroupId(), pluginArtifact.getArtifactId(), rootArtifactDirectDependencies)
-          .isPresent()) {
-        throw new IllegalStateException("Plugin '" + pluginArtifact
-            + "' has to be defined as direct dependency of your Maven project (" + context.getRootArtifact() + ")");
-      }
-    }
   }
 
   /**

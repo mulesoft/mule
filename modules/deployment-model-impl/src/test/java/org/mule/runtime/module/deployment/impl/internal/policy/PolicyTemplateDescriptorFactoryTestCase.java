@@ -11,6 +11,8 @@ import static java.io.File.createTempFile;
 import static java.io.File.separator;
 import static java.lang.Thread.currentThread;
 import static org.apache.commons.io.FileUtils.toFile;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
@@ -19,16 +21,17 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigurationBuilder;
-import static org.mule.runtime.core.api.util.FileUtils.unzip;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
+import static org.mule.runtime.core.api.util.FileUtils.unzip;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MAVEN;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION;
+import static org.mule.runtime.module.artifact.api.descriptor.AbstractArtifactDescriptorFactory.ARTIFACT_DESCRIPTOR_DOES_NOT_EXISTS_ERROR;
+import static org.mule.runtime.module.artifact.api.descriptor.AbstractArtifactDescriptorFactory.invalidClassLoaderModelIdError;
 import static org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.NULL_CLASSLOADER_MODEL;
 import static org.mule.runtime.module.deployment.impl.internal.policy.FileSystemPolicyClassLoaderModelLoader.CLASSES_DIR;
 import static org.mule.runtime.module.deployment.impl.internal.policy.FileSystemPolicyClassLoaderModelLoader.FILE_SYSTEM_POLICY_MODEL_LOADER_ID;
 import static org.mule.runtime.module.deployment.impl.internal.policy.FileSystemPolicyClassLoaderModelLoader.LIB_DIR;
-import static org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateDescriptorFactory.MISSING_POLICY_DESCRIPTOR_ERROR;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateDescriptorFactory.invalidBundleDescriptorLoaderIdError;
-import static org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateDescriptorFactory.invalidClassLoaderModelIdError;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.ARTIFACT_ID;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.CLASSIFIER;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.GROUP_ID;
@@ -43,9 +46,9 @@ import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
+import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
+import org.mule.runtime.module.artifact.api.descriptor.LoaderNotFoundException;
 import org.mule.runtime.module.deployment.impl.internal.application.DeployableMavenClassLoaderModelLoader;
-import org.mule.runtime.module.deployment.impl.internal.artifact.DescriptorLoaderRepository;
-import org.mule.runtime.module.deployment.impl.internal.artifact.LoaderNotFoundException;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ServiceRegistryDescriptorLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.PolicyFileBuilder;
@@ -121,7 +124,8 @@ public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCas
         new PolicyTemplateDescriptorFactory(artifactPluginDescriptorLoader, descriptorLoaderRepository);
 
     expectedException.expect(ArtifactDescriptorCreateException.class);
-    expectedException.expectMessage(MISSING_POLICY_DESCRIPTOR_ERROR);
+    expectedException.expectMessage(allOf(containsString(ARTIFACT_DESCRIPTOR_DOES_NOT_EXISTS_ERROR),
+                                          containsString(MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION)));
     descriptorFactory.create(tempFolder);
   }
 
@@ -220,7 +224,8 @@ public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCas
     PolicyTemplateDescriptorFactory descriptorFactory =
         new PolicyTemplateDescriptorFactory(artifactPluginDescriptorLoader, descriptorLoaderRepository);
     expectedException.expect(ArtifactDescriptorCreateException.class);
-    expectedException.expectMessage(invalidClassLoaderModelIdError(mulePolicyModelBuilder.getClassLoaderModelDescriptorLoader()));
+    expectedException
+        .expectMessage(invalidClassLoaderModelIdError(tempFolder, mulePolicyModelBuilder.getClassLoaderModelDescriptorLoader()));
     descriptorFactory.create(tempFolder);
   }
 
@@ -237,7 +242,8 @@ public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCas
     PolicyTemplateDescriptorFactory descriptorFactory =
         new PolicyTemplateDescriptorFactory(artifactPluginDescriptorLoader, descriptorLoaderRepository);
     expectedException.expect(ArtifactDescriptorCreateException.class);
-    expectedException.expectMessage(invalidBundleDescriptorLoaderIdError(mulePolicyModelBuilder.getBundleDescriptorLoader()));
+    expectedException
+        .expectMessage(invalidBundleDescriptorLoaderIdError(tempFolder, mulePolicyModelBuilder.getBundleDescriptorLoader()));
     descriptorFactory.create(tempFolder);
   }
 
