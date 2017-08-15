@@ -9,7 +9,7 @@ package org.mule.runtime.module.deployment.impl.internal.domain;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_CONFIGURATION_RESOURCE_LOCATION;
-import static org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR;
 import org.mule.runtime.api.deployment.meta.MuleDomainModel;
 import org.mule.runtime.api.deployment.persistence.MuleDomainModelJsonSerializer;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;

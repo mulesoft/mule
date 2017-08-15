@@ -20,7 +20,7 @@ import static org.mule.test.runner.utils.RunnerModuleUtils.getExcludedProperties
 import org.mule.maven.client.api.MavenClientProvider;
 import org.mule.maven.client.api.SettingsSupplierFactory;
 import org.mule.maven.client.api.model.MavenConfiguration;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.test.runner.api.AetherClassPathClassifier;
 import org.mule.test.runner.api.ArtifactClassLoaderHolder;
 import org.mule.test.runner.api.ArtifactClassificationTypeResolver;

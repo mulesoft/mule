@@ -9,7 +9,7 @@ package org.mule.runtime.container.internal;
 
 import static java.util.Collections.singletonList;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import org.mule.runtime.module.artifact.classloader.LookupStrategy;
+import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
 
 import java.util.List;
 

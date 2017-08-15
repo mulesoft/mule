@@ -8,8 +8,8 @@
 package org.mule.runtime.module.service;
 
 import static org.mule.runtime.module.service.ServiceDescriptor.SERVICE_PROPERTIES;
-import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
-import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorFactory;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorFactory;
 
 import java.io.File;
 import java.io.FileReader;

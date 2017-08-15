@@ -7,10 +7,10 @@
 
 package org.mule.runtime.container.internal;
 
-import org.mule.runtime.module.artifact.classloader.ExportedService;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.classloader.ClassLoaderFilter;
-import org.mule.runtime.module.artifact.classloader.FilteringArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.ExportedService;
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.ClassLoaderFilter;
+import org.mule.runtime.module.artifact.api.classloader.FilteringArtifactClassLoader;
 
 import java.io.IOException;
 import java.net.URL;

@@ -26,6 +26,7 @@ import org.mule.runtime.core.api.exception.ErrorTypeRepository;
 import org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory;
 import org.mule.runtime.core.api.exception.TypedException;
 import org.mule.runtime.extension.api.exception.ModuleException;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import org.junit.Before;
@@ -36,7 +37,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class ModuleExceptionHandlerTestCase {
+public class ModuleExceptionHandlerTestCase extends AbstractMuleTestCase {
 
   private static final String ERROR_NAMESPACE = "TEST-EXTENSION";
 

@@ -11,7 +11,7 @@ import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.container.internal.JreExplorer.exploreJdk;
 import org.mule.runtime.container.api.MuleModule;
-import org.mule.runtime.module.artifact.classloader.ExportedService;
+import org.mule.runtime.module.artifact.api.classloader.ExportedService;
 
 import java.util.ArrayList;
 import java.util.Collections;

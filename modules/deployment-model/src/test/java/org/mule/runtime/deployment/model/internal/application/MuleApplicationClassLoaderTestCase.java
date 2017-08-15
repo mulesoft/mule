@@ -27,9 +27,9 @@ import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.deployment.model.internal.domain.MuleSharedDomainClassLoader;
-import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
-import org.mule.runtime.module.artifact.classloader.MuleArtifactClassLoader;
-import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
+import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
+import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

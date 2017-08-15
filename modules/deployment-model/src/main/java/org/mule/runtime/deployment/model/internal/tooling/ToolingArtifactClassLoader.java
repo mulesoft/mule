@@ -7,11 +7,11 @@
 package org.mule.runtime.deployment.model.internal.tooling;
 
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
-import org.mule.runtime.module.artifact.classloader.RegionClassLoader;
-import org.mule.runtime.module.artifact.classloader.ShutdownListener;
-import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
+import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.ShutdownListener;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
 import java.io.IOException;
 import java.net.URL;

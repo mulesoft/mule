@@ -19,7 +19,7 @@ import static org.mule.runtime.deployment.model.internal.domain.DomainClassLoade
 import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.MULE_DOMAIN_FOLDER;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 
 import java.io.File;
 import java.io.IOException;

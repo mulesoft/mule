@@ -7,13 +7,12 @@
 
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
-import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.core.api.util.StringUtils;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderManager;
-import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderManager;
+import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 
 import java.util.Map;
 import java.util.Optional;

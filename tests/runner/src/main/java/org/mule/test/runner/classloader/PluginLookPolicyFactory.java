@@ -7,11 +7,11 @@
 
 package org.mule.test.runner.classloader;
 
-import static org.mule.runtime.module.artifact.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
-import org.mule.runtime.module.artifact.classloader.DelegateOnlyLookupStrategy;
-import org.mule.runtime.module.artifact.classloader.LookupStrategy;
+import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
+import org.mule.runtime.module.artifact.api.classloader.DelegateOnlyLookupStrategy;
+import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
 import org.mule.test.runner.api.PluginUrlClassification;
 
 import java.util.HashMap;
