@@ -9,9 +9,9 @@ package org.mule.runtime.module.extension.internal.runtime.streaming;
 import static java.util.Optional.empty;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.slf4j.LoggerFactory.getLogger;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,7 +41,7 @@ final class PagingProviderWrapper<C, T> implements PagingProvider<C, T> {
    * {@inheritDoc} Sets the closed flag to true and then delegates into the wrapped instance
    */
   @Override
-  public void close(C connection) throws IOException {
+  public void close(C connection) throws MuleException {
     closed = true;
     delegate.close(connection);
   }

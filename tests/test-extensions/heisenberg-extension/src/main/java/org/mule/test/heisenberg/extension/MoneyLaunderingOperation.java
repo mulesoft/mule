@@ -9,11 +9,11 @@ package org.mule.test.heisenberg.extension;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.test.heisenberg.extension.model.PersonalInfo;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -62,7 +62,7 @@ public class MoneyLaunderingOperation {
       }
 
       @Override
-      public void close(HeisenbergConnection connection) throws IOException {}
+      public void close(HeisenbergConnection connection) throws MuleException {}
     };
   }
 
@@ -80,7 +80,7 @@ public class MoneyLaunderingOperation {
       }
 
       @Override
-      public void close(HeisenbergConnection connection) throws IOException {}
+      public void close(HeisenbergConnection connection) throws MuleException {}
     };
   }
 
@@ -98,7 +98,7 @@ public class MoneyLaunderingOperation {
       }
 
       @Override
-      public void close(HeisenbergConnection connection) throws IOException {}
+      public void close(HeisenbergConnection connection) throws MuleException {}
     };
   }
 
@@ -128,7 +128,7 @@ public class MoneyLaunderingOperation {
       }
 
       @Override
-      public void close(HeisenbergConnection connection) throws IOException {
+      public void close(HeisenbergConnection connection) throws MuleException {
         index = 0;
       }
     };
@@ -148,7 +148,7 @@ public class MoneyLaunderingOperation {
       }
 
       @Override
-      public void close(HeisenbergConnection connection) throws IOException {
+      public void close(HeisenbergConnection connection) throws MuleException {
 
       }
 

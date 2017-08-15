@@ -8,6 +8,7 @@ package org.mule.test.metadata.extension;
 
 import static java.util.Collections.emptyList;
 import static org.mule.test.metadata.extension.MetadataConnection.CAR;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.metadata.TypeResolver;
@@ -44,7 +45,6 @@ import org.mule.test.metadata.extension.resolver.TestOutputResolverWithoutKeyRes
 import org.mule.test.metadata.extension.resolver.TestResolverWithCache;
 import org.mule.test.metadata.extension.resolver.TestThreadContextClassLoaderResolver;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -252,7 +252,7 @@ public class MetadataOperations {
       }
 
       @Override
-      public void close(MetadataConnection connection) throws IOException {}
+      public void close(MetadataConnection connection) throws MuleException {}
     };
   }
 
@@ -270,7 +270,7 @@ public class MetadataOperations {
       }
 
       @Override
-      public void close(MetadataConnection connection) throws IOException {}
+      public void close(MetadataConnection connection) throws MuleException {}
     };
   }
 
