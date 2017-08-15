@@ -6,6 +6,15 @@
  */
 package org.mule.module.pgp;
 
+import static org.mule.module.pgp.util.BouncyCastleUtil.PBE_SECRET_KEY_DECRYPTOR_BUILDER;
+
+import org.mule.util.SecurityUtils;
+
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.security.Security;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -17,14 +26,6 @@ import org.bouncycastle.openpgp.PGPSecretKey;
 import org.bouncycastle.openpgp.PGPSignatureGenerator;
 import org.bouncycastle.openpgp.operator.jcajce.JcaPGPContentSignerBuilder;
 import org.bouncycastle.util.encoders.Base64;
-import org.mule.util.SecurityUtils;
-
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.security.Security;
-
-import static org.mule.module.pgp.util.BouncyCastleUtil.PBE_SECRET_KEY_DECRYPTOR_BUILDER;
 
 public class PGPSignature
 {
@@ -97,7 +98,7 @@ public class PGPSignature
     }
 
     private PGPPrivateKey getPrivateKey() throws Exception {
-        final PGPSecretKey secretKey = keyRing.getSecretKey();
+        final PGPSecretKey secretKey = keyRing.getConfiguredSecretKey();
         final String secretPassphrase = keyRing.getSecretPassphrase();
         return secretKey.extractPrivateKey(PBE_SECRET_KEY_DECRYPTOR_BUILDER.build(secretPassphrase.toCharArray()));
     }

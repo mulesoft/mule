@@ -11,7 +11,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mule.module.pgp.i18n.PGPMessages.noFileKeyFound;
-import org.mule.api.lifecycle.InitialisationException;
+
 import org.mule.module.pgp.exception.MissingPGPKeyException;
 
 import org.junit.Test;
@@ -21,7 +21,7 @@ public class PGPKeyRingValidationsTestCase
     private PGPKeyRingImpl pgpKeyRing = new PGPKeyRingImpl();
 
     @Test
-    public void testInvalidPublicKeyRingFileName() throws Exception {
+    public void testInvalidPublicKeyRingFileName() {
         pgpKeyRing.setPublicKeyRingFileName("incorrectPath");
         try
         {
@@ -35,7 +35,7 @@ public class PGPKeyRingValidationsTestCase
     }
 
     @Test
-    public void testInvalidSecretKeyRingFileName() throws Exception
+    public void testInvalidSecretKeyRingFileName()
     {
         pgpKeyRing.setSecretKeyRingFileName("incorrectPath");
         try

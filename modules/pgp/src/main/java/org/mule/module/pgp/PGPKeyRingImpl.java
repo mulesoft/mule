@@ -7,6 +7,7 @@
 package org.mule.module.pgp;
 
 import static org.mule.module.pgp.i18n.PGPMessages.noFileKeyFound;
+import static org.mule.module.pgp.i18n.PGPMessages.noKeyIdFound;
 import static org.mule.module.pgp.i18n.PGPMessages.noSecretKeyDefined;
 import static org.mule.module.pgp.util.BouncyCastleUtil.KEY_FINGERPRINT_CALCULATOR;
 import static org.mule.module.pgp.util.ValidatorUtil.validateNotNull;
@@ -18,15 +19,17 @@ import org.mule.module.pgp.exception.MissingPGPKeyException;
 import org.mule.util.IOUtils;
 import org.mule.util.SecurityUtils;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
+import java.security.Security;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.security.Security;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.bouncycastle.openpgp.PGPPublicKeyRingCollection;
@@ -71,51 +74,58 @@ public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
         }
     }
 
-    private void readPublicKeyRing() throws Exception
+    private void readPublicKeyRing()
     {
-        final String publicKeyRingFileName = getPublicKeyRingFileName();
-        // TODO Just ignoring when file name is not provided. Should we throw an exception?
-        principalsKeyBundleMap = new HashMap<String, PGPPublicKey>();
-        if (publicKeyRingFileName != null) {
-            InputStream inputStream = IOUtils.getResourceAsStream(publicKeyRingFileName, getClass());
-            validateNotNull(inputStream, noFileKeyFound(publicKeyRingFileName));
+        try
+        {
+            validateNotNull(getPublicKeyRingFileName(), noSecretKeyDefined());
+            InputStream inputStream = IOUtils.getResourceAsStream(getPublicKeyRingFileName(), getClass());
+            validateNotNull(inputStream, noFileKeyFound(getPublicKeyRingFileName()));
             PGPPublicKeyRingCollection collection = new PGPPublicKeyRingCollection(inputStream, KEY_FINGERPRINT_CALCULATOR);
             inputStream.close();
 
+            principalsKeyBundleMap = new HashMap<>();
             Iterator keyRingsIterator = collection.getKeyRings();
-            while (keyRingsIterator.hasNext()) {
+            while (keyRingsIterator.hasNext())
+            {
                 PGPPublicKeyRing ring = (PGPPublicKeyRing) keyRingsIterator.next();
                 String userID = "";
                 Iterator publicKeysIterator = ring.getPublicKeys();
-                while (publicKeysIterator.hasNext()) {
+                while (publicKeysIterator.hasNext())
+                {
                     PGPPublicKey publicKey = (PGPPublicKey) publicKeysIterator.next();
                     Iterator userIDs = publicKey.getUserIDs();
-                    if (userIDs.hasNext()) {
+                    if (userIDs.hasNext())
+                    {
                         userID = (String) userIDs.next();
                     }
                     principalsKeyBundleMap.put(userID, publicKey);
                 }
             }
+        } catch (IOException | PGPException e) {
+            throw new MissingPGPKeyException(e);
         }
     }
 
-    private void readPrivateKeyBundle() throws Exception
+    private void readPrivateKeyBundle()
     {
-        if (getSecretKeyRingFileName() == null)
+        try
         {
-            throw new MissingPGPKeyException(noSecretKeyDefined());
-        }
+            validateNotNull(getSecretKeyRingFileName(), noSecretKeyDefined());
+            InputStream secretKeyInputStream = IOUtils.getResourceAsStream(getSecretKeyRingFileName(), getClass());
+            validateNotNull(secretKeyInputStream, noFileKeyFound(getSecretKeyRingFileName()));
+            secretKeys = new PGPSecretKeyRingCollection(secretKeyInputStream, KEY_FINGERPRINT_CALCULATOR);
+            secretKeyInputStream.close();
 
-        InputStream secretKeyInputStream = IOUtils.getResourceAsStream(getSecretKeyRingFileName(), getClass());
-        validateNotNull(secretKeyInputStream, noFileKeyFound(getSecretKeyRingFileName()));
-        secretKeys = new PGPSecretKeyRingCollection(secretKeyInputStream, KEY_FINGERPRINT_CALCULATOR);
-        secretKeyInputStream.close();
-        String secretAliasId = getSecretAliasId();
-        if (secretAliasId != null)
-        {
-            secretKey = secretKeys.getSecretKey(parseSecretAliasId(secretAliasId));
+            String secretAliasId = getSecretAliasId();
+            if (secretAliasId != null)
+            {
+                secretKey = secretKeys.getSecretKey(parseSecretAliasId(secretAliasId));
+            }
+            readSecretKey = true;
+        } catch (IOException | PGPException e) {
+            throw new MissingPGPKeyException(e);
         }
-        readSecretKey = true;
     }
 
     public String getSecretKeyRingFileName()
@@ -148,12 +158,14 @@ public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
         this.secretPassPhrase = value;
     }
 
-    public PGPSecretKey getConfiguredSecretKey() throws Exception
+    public PGPSecretKey getConfiguredSecretKey()
     {
-        if (! readSecretKey)
+        if (!readSecretKey)
         {
             readPrivateKeyBundle();
         }
+
+        validateNotNull(secretKey, noKeyIdFound(getSecretAliasId()));
 
         return secretKey;
     }
@@ -182,7 +194,7 @@ public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
         this.publicKeyRingFileName = value;
     }
 
-    public PGPPublicKey getPublicKey(String principalId) throws Exception
+    public PGPPublicKey getPublicKey(String principalId)
     {
         if (principalsKeyBundleMap == null) {
             readPublicKeyRing();

@@ -33,26 +33,18 @@ public class PGPSecurityProvider extends AbstractSecurityProvider
         PGPAuthentication auth = (PGPAuthentication) authentication;
 
         String userId = (String) auth.getPrincipal();
-
         if (userId == null)
         {
             throw new UnauthorisedException(CoreMessages.objectIsNull("UserId"));
         }
 
-        final PGPPublicKey publicKey;
-        try {
-            publicKey = keyManager.getPublicKey(userId);
-        } catch (final Exception e) {
-            throw new UnauthorisedException(PGPMessages.noPublicKeyForUser(userId));
-        }
-
+        PGPPublicKey publicKey = keyManager.getPublicKey(userId);
         if (publicKey == null)
         {
             throw new UnauthorisedException(PGPMessages.noPublicKeyForUser(userId));
         }
 
         Message msg = (Message) auth.getCredentials();
-
         if (msg instanceof SignedMessage)
         {
             try

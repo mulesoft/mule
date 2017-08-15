@@ -11,6 +11,8 @@ import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.pgp.DecryptStreamTransformer.INVALID_KEY_ERROR_MESSAGE;
+import static org.mule.module.pgp.i18n.PGPMessages.noKeyIdFound;
+
 import org.mule.api.MuleEvent;
 import org.mule.tck.junit4.FunctionalTestCase;
 
@@ -29,6 +31,8 @@ public class SecretAliasIdTestCase extends FunctionalTestCase
     private static final String VALID_KEY = "56B4312E6168F39C";
 
     private static final String INVALID_KEY = "35D86EAA0D5E353E";
+
+    private static final String NONEXISTENT_KEY = "FFFFFFFFFFFFFFFF";
 
     private static final String PAYLOAD = "Testing secretAliasId";
 
@@ -70,6 +74,14 @@ public class SecretAliasIdTestCase extends FunctionalTestCase
     {
         secretAliasId = INVALID_KEY;
         expectedException.expectMessage(format(INVALID_KEY_ERROR_MESSAGE, INVALID_KEY, VALID_KEY));
+        runFlow("decryptFlow", getTestEvent(encryptedData));
+    }
+
+    @Test
+    public void getSecretKeyFromNonexistentSecretAliasId() throws Exception
+    {
+        secretAliasId = NONEXISTENT_KEY;
+        expectedException.expectMessage(noKeyIdFound(NONEXISTENT_KEY).getMessage());
         runFlow("decryptFlow", getTestEvent(encryptedData));
     }
 
