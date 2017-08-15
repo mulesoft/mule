@@ -271,7 +271,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
         .expectMessage(format(INVALID_TARGET_MESSAGE, flowName, operationModel.getName(), format("the '%s' prefix", VARS_PREFIX),
                               TARGET_PARAMETER_NAME));
 
-    target = format("flowVars.%s", TARGET_VAR);
+    target = format("vars.%s", TARGET_VAR);
     messageProcessor = createOperationMessageProcessor();
 
     when(context.getExpressionManager()).thenReturn(mock(ExtendedExpressionManager.class));
