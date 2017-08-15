@@ -14,9 +14,16 @@ public interface PGPKeyRing
 {
     String getSecretPassphrase();
 
-    PGPSecretKey getSecretKey() throws Exception;
+    /**
+     * @return the PGPSecretKey obtained from the secretAliasId if it was defined. Otherwise, null.
+     * @throws Exception
+     */
+    PGPSecretKey getConfiguredSecretKey() throws Exception;
 
     PGPPublicKey getPublicKey(String principalId);
 
+    /**
+     * @return all the secretKeys found in the secretKeyFile.
+     */
     PGPSecretKeyRingCollection getSecretKeys ();
 }

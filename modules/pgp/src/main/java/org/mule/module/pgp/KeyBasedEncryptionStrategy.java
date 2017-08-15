@@ -86,7 +86,7 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
     {
         try
         {
-            PGPSecretKey secretKey = this.keyManager.getSecretKey();
+            PGPSecretKey secretKey = this.keyManager.getConfiguredSecretKey();
             String secretPassPhrase = this.keyManager.getSecretPassphrase();
             PGPSecretKeyRingCollection secretKeys =  this.keyManager.getSecretKeys();
 

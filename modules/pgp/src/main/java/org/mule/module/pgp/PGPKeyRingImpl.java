@@ -153,7 +153,7 @@ public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
         this.secretPassPhrase = value;
     }
 
-    public PGPSecretKey getSecretKey() throws Exception
+    public PGPSecretKey getConfiguredSecretKey() throws Exception
     {
         if (! readSecretKey)
         {

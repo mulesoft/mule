@@ -41,7 +41,7 @@ public class PGPKeyRingValidationsTestCase
         pgpKeyRing.setSecretKeyRingFileName("incorrectPath");
         try
         {
-            pgpKeyRing.getSecretKey();
+            pgpKeyRing.getConfiguredSecretKey();
             fail("MissingPGPKeyException should be triggered because Secret Key File doesn't exist");
         }
         catch (MissingPGPKeyException missingPGPKeyException)
