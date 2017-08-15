@@ -27,6 +27,9 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import javax.transaction.TransactionManager;
+import javax.transaction.xa.XAResource;
+
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
 public class XaTransactionTestCase extends AbstractMuleTestCase {
