@@ -9,15 +9,13 @@ package org.mule.runtime.module.extension.internal;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsNull.notNullValue;
+
 import org.mule.tck.junit4.AbstractMuleTestCase;
-
 import com.google.testing.compile.JavaFileObjects;
-
+import javax.tools.JavaFileObject;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.tools.JavaFileObject;
 
 public class AbstractAnnotationProcessorTestCase extends AbstractMuleTestCase {
 
@@ -26,7 +24,7 @@ public class AbstractAnnotationProcessorTestCase extends AbstractMuleTestCase {
     File folder = new File(getClass().getClassLoader().getResource("").getPath().toString());
     // up to levels
     folder = folder.getParentFile().getParentFile();
-    folder = new File(folder, "src/test/java/org/mule/runtime/module/extension/internal/capability/xml");
+    folder = new File(folder, getSourceFilesLocation());
     File[] files = folder.listFiles((dir, name) -> name.endsWith(".java"));
     assertThat(files, is(notNullValue()));
     List<JavaFileObject> javaFileObjects = new ArrayList<>(files.length);
@@ -34,5 +32,9 @@ public class AbstractAnnotationProcessorTestCase extends AbstractMuleTestCase {
       javaFileObjects.add(JavaFileObjects.forResource(file.toURI().toURL()));
     }
     return javaFileObjects;
+  }
+
+  protected String getSourceFilesLocation() {
+    return "src/test/java/org/mule/runtime/module/extension/internal/capability/xml/extension";
   }
 }

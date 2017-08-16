@@ -19,6 +19,7 @@ import static org.hamcrest.core.IsNull.notNullValue;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.module.extension.internal.resources.ExtensionResourcesGeneratorAnnotationProcessor.EXTENSION_VERSION;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.compareXML;
+
 import org.mule.runtime.api.meta.DescribedObject;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -32,16 +33,12 @@ import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
 import org.mule.runtime.extension.internal.loader.ExtensionModelFactory;
 import org.mule.runtime.module.extension.internal.AbstractAnnotationProcessorTestCase;
-import org.mule.runtime.module.extension.internal.capability.xml.TestExtensionWithDocumentation;
+import org.mule.runtime.module.extension.internal.capability.xml.extension.TestExtensionWithDocumentation;
 import org.mule.runtime.module.extension.internal.loader.enricher.ExtensionDescriptionsEnricher;
 import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.resources.documentation.ExtensionDocumentationResourceGenerator;
 import org.mule.tck.size.SmallTest;
-
-import java.io.InputStream;
-import java.util.List;
-import java.util.Set;
-
+import org.junit.Test;
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
@@ -49,8 +46,9 @@ import javax.annotation.processing.SupportedOptions;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
-
-import org.junit.Test;
+import java.io.InputStream;
+import java.util.List;
+import java.util.Set;
 
 @SmallTest
 public class ExtensionDescriptionDocumenterTestCase extends AbstractAnnotationProcessorTestCase {
