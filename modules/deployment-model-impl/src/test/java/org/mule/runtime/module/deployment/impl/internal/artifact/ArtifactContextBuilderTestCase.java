@@ -23,7 +23,7 @@ import static org.mule.runtime.module.deployment.impl.internal.artifact.Artifact
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.newBuilder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
-import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
+import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 

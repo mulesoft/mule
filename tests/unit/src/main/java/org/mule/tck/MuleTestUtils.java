@@ -20,13 +20,9 @@ import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.runtime.core.api.processor.strategy.DirectProcessingStrategyFactory;
 
-import java.lang.reflect.Method;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -149,22 +145,4 @@ public final class MuleTestUtils {
     return null;
   }
 
-  /**
-   * Returns the exception listener configured on a messaging exception handler
-   * <p/>
-   * Invokes {@code getExceptionListeners} method on the provided exception handler to avoid exposing that method on the public API.
-   *
-   * @param exceptionHandler exception handler to inspect
-   * @return the list of configured exception listeners
-   * @throws IllegalStateException if the provided exception handler does not have the expect method or it cannot be invoked.
-   */
-  public static List<MessagingExceptionHandlerAcceptor> getExceptionListeners(MessagingExceptionHandler exceptionHandler) {
-    try {
-      Method getExceptionListenersMethod = exceptionHandler.getClass().getMethod("getExceptionListeners");
-      Object exceptionListeners = getExceptionListenersMethod.invoke(exceptionHandler);
-      return (List<MessagingExceptionHandlerAcceptor>) exceptionListeners;
-    } catch (Exception e) {
-      throw new IllegalStateException("Cannot obtain exception listener for flow");
-    }
-  }
 }

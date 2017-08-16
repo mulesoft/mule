@@ -10,11 +10,11 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_REGISTRY;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.config.spring.internal.MuleArtifactContext;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
-import org.mule.runtime.module.artifact.api.Artifact;
 
 /**
- * An artifact context contains all the information related to an {@link Artifact} that contains
+ * An artifact context contains all the information related to an {@link org.mule.runtime.module.artifact.Artifact} that contains
  * configuration.
  * <p/>
  * This object holds the created {@link MuleContext} and the {@link MuleArtifactContext} which holds the information related to

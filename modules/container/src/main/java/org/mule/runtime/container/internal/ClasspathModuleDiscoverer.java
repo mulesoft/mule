@@ -13,7 +13,7 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.core.api.util.FileUtils.stringToFile;
 import static org.mule.runtime.core.api.util.PropertiesUtils.discoverProperties;
 import org.mule.runtime.container.api.MuleModule;
-import org.mule.runtime.module.artifact.api.classloader.ExportedService;
+import org.mule.runtime.module.artifact.classloader.ExportedService;
 
 import java.io.File;
 import java.io.IOException;

@@ -8,7 +8,7 @@
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
-import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoader;
+import org.mule.runtime.module.artifact.descriptor.DescriptorLoader;
 
 import java.util.Optional;
 

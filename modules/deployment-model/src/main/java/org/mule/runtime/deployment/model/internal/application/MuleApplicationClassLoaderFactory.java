@@ -7,15 +7,15 @@
 package org.mule.runtime.deployment.model.internal.application;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
+import static org.mule.runtime.module.artifact.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.internal.nativelib.NativeLibraryFinder;
 import org.mule.runtime.deployment.model.internal.nativelib.NativeLibraryFinderFactory;
-import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
-import org.mule.runtime.module.artifact.api.classloader.DeployableArtifactClassLoaderFactory;
-import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
+import org.mule.runtime.module.artifact.classloader.DeployableArtifactClassLoaderFactory;
+import org.mule.runtime.module.artifact.classloader.LookupStrategy;
 
 import java.util.Arrays;
 import java.util.HashMap;

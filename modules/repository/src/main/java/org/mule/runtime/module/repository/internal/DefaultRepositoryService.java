@@ -7,7 +7,7 @@
 package org.mule.runtime.module.repository.internal;
 
 import static org.mule.runtime.module.repository.internal.RepositoryServiceFactory.MULE_REMOTE_REPOSITORIES_PROPERTY;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
+import org.mule.runtime.module.artifact.descriptor.BundleDependency;
 import org.mule.runtime.module.repository.api.BundleNotFoundException;
 import org.mule.runtime.module.repository.api.RepositoryConnectionException;
 import org.mule.runtime.module.repository.api.RepositoryService;

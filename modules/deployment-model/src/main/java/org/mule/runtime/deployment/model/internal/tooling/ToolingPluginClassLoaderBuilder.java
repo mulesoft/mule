@@ -17,11 +17,11 @@ import org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBui
 import org.mule.runtime.deployment.model.internal.RegionPluginClassLoadersFactory;
 import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
 import org.mule.runtime.deployment.model.internal.plugin.PluginResolutionError;
-import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.api.classloader.DeployableArtifactClassLoaderFactory;
-import org.mule.runtime.module.artifact.api.classloader.DisposableClassLoader;
-import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.classloader.DeployableArtifactClassLoaderFactory;
+import org.mule.runtime.module.artifact.classloader.DisposableClassLoader;
+import org.mule.runtime.module.artifact.classloader.RegionClassLoader;
+import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 
 import com.google.common.collect.ImmutableList;
 

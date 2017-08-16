@@ -7,7 +7,7 @@
 
 package org.mule.runtime.deployment.model.api.plugin;
 
-import org.mule.runtime.module.artifact.api.Artifact;
+import org.mule.runtime.module.artifact.Artifact;
 
 /**
  * Represents an application or domain plugin artifact.

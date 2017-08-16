@@ -11,8 +11,8 @@ import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.internal.RegionPluginClassLoadersFactory;
 import org.mule.runtime.deployment.model.internal.application.ApplicationClassLoaderBuilder;
-import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFactory;
-import org.mule.runtime.module.artifact.api.classloader.DeployableArtifactClassLoaderFactory;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
+import org.mule.runtime.module.artifact.classloader.DeployableArtifactClassLoaderFactory;
 
 /**
  * Factory to create instances of {@code ApplicationClassLoaderBuilder}.

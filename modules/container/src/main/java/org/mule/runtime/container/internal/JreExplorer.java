@@ -10,7 +10,7 @@ package org.mule.runtime.container.internal;
 import static java.io.File.pathSeparatorChar;
 import static java.lang.String.format;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import org.mule.runtime.module.artifact.api.classloader.ExportedService;
+import org.mule.runtime.module.artifact.classloader.ExportedService;
 
 import java.io.File;
 import java.io.IOException;

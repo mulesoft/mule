@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.repository.api;
 
-import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
+import org.mule.runtime.module.artifact.descriptor.BundleDependency;
 
 import java.io.File;
 

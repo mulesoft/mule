@@ -8,7 +8,7 @@ package org.mule.runtime.extension.internal.loader.validation;
 
 import static java.util.Collections.emptySet;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
-import static org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader.RESOURCE_XML;
+import static org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader.RESOURCE_XML;
 import org.apache.maven.model.validation.ModelValidator;
 import org.junit.Before;
 import org.junit.Rule;
@@ -17,7 +17,7 @@ import org.junit.rules.ExpectedException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.internal.loader.ExtensionModelFactory;
-import org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader;
+import org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

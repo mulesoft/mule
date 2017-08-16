@@ -9,15 +9,12 @@ package org.mule.test.runner.api;
 
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 
-import org.mule.runtime.module.artifact.api.Artifact;
-import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
-
 import java.net.URL;
 import java.util.List;
 
 /**
- * Defines the result of the classification process for a {@link Artifact}. It contains a
- * {@link List} of {@link URL}s for its {@link ArtifactClassLoader}.
+ * Defines the result of the classification process for a {@link org.mule.runtime.module.artifact.Artifact}. It contains a
+ * {@link List} of {@link URL}s for its {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader}.
  *
  * @since 4.0
  */

@@ -11,9 +11,9 @@ import static org.apache.commons.lang3.builder.ToStringBuilder.reflectionToStrin
 import static org.apache.commons.lang3.builder.ToStringStyle.MULTI_LINE_STYLE;
 
 import org.mule.runtime.container.api.MuleModule;
-import org.mule.runtime.module.artifact.api.classloader.DefaultArtifactClassLoaderFilter;
-import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFilter;
-import org.mule.runtime.module.artifact.api.classloader.ClassLoaderFilter;
+import org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter;
+import org.mule.runtime.module.artifact.classloader.ClassLoaderFilter;
 
 import java.util.Arrays;
 import java.util.HashSet;

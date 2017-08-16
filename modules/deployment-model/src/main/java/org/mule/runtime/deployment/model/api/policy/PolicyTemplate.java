@@ -8,7 +8,7 @@
 package org.mule.runtime.deployment.model.api.policy;
 
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
-import org.mule.runtime.module.artifact.api.Artifact;
+import org.mule.runtime.module.artifact.Artifact;
 
 import java.util.List;
 

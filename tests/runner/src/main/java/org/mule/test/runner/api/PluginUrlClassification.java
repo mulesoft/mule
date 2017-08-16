@@ -11,15 +11,13 @@ import static java.util.Collections.emptySet;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 
-import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
-
 import java.net.URL;
 import java.util.List;
 import java.util.Set;
 
 /**
  * Defines the result of the classification process for a plugin. It contains a {@link List} of {@link URL}s that should have the
- * plugin {@link ArtifactClassLoader} plus a {@link List} of {@link Class}es to be
+ * plugin {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader} plus a {@link List} of {@link Class}es to be
  * exported in addition to the packages exported by the plugin, in order to run the test.
  *
  * @since 4.0

@@ -19,7 +19,7 @@ import static org.mule.runtime.deployment.model.api.application.ApplicationDescr
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.PROPERTY_DOMAIN;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.EXPORTED_RESOURCES;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MAVEN;
-import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION;
+import static org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION;
 import org.mule.runtime.api.deployment.meta.MuleApplicationModel;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.persistence.MuleApplicationModelJsonSerializer;

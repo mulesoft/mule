@@ -13,9 +13,9 @@ import org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoader
 import org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderFactory;
 import org.mule.runtime.deployment.model.internal.plugin.BundlePluginDependenciesResolver;
 import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
-import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
-import org.mule.runtime.module.artifact.api.classloader.TrackingArtifactClassLoaderFactory;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
+import org.mule.runtime.module.artifact.classloader.TrackingArtifactClassLoaderFactory;
 import org.mule.runtime.module.deployment.impl.internal.artifact.DefaultClassLoaderManager;
 import org.mule.runtime.module.deployment.impl.internal.artifact.DescriptorLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainFactory;

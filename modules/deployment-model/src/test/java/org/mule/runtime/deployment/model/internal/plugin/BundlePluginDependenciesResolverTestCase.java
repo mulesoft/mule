@@ -18,11 +18,11 @@ import static org.mockito.Mockito.mock;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.EXTENSION_BUNDLE_TYPE;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorFactory;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder;
+import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorFactory;
+import org.mule.runtime.module.artifact.descriptor.BundleDependency;
+import org.mule.runtime.module.artifact.descriptor.BundleDescriptor;
+import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
+import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel.ClassLoaderModelBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.ArrayList;

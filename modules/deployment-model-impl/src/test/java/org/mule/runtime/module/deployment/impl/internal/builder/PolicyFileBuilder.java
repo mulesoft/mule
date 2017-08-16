@@ -13,7 +13,7 @@ import static org.apache.commons.io.FileUtils.writeStringToFile;
 import static org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor.DEFAULT_POLICY_CONFIGURATION_RESOURCE;
 import static org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor.META_INF;
 import static org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor.MULE_ARTIFACT;
-import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR;
+import static org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR;
 import org.mule.runtime.api.deployment.meta.MulePolicyModel;
 import org.mule.runtime.api.deployment.persistence.MulePolicyModelJsonSerializer;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;

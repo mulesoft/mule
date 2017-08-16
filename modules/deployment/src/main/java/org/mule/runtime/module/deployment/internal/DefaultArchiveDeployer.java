@@ -16,7 +16,7 @@ import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.get
 
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.DeploymentException;
-import org.mule.runtime.module.artifact.api.Artifact;
+import org.mule.runtime.module.artifact.Artifact;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
 import org.mule.runtime.module.deployment.impl.internal.artifact.MuleContextListenerFactory;

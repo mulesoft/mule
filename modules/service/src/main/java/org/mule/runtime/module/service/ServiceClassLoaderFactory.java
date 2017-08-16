@@ -7,10 +7,10 @@
 
 package org.mule.runtime.module.service;
 
-import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFactory;
-import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
-import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
+import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
+import org.mule.runtime.module.artifact.classloader.MuleArtifactClassLoader;
 
 import java.io.File;
 import java.io.FilenameFilter;

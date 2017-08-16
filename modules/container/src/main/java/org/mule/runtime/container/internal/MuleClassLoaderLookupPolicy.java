@@ -9,10 +9,10 @@ package org.mule.runtime.container.internal;
 
 import static org.apache.commons.lang3.ClassUtils.getPackageName;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
-import static org.mule.runtime.module.artifact.api.classloader.ParentOnlyLookupStrategy.PARENT_ONLY;
-import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
-import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
+import static org.mule.runtime.module.artifact.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
+import static org.mule.runtime.module.artifact.classloader.ParentOnlyLookupStrategy.PARENT_ONLY;
+import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
+import org.mule.runtime.module.artifact.classloader.LookupStrategy;
 
 import java.util.HashMap;
 import java.util.HashSet;

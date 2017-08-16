@@ -11,8 +11,8 @@ import static java.lang.System.currentTimeMillis;
 import static java.util.Collections.singletonList;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.SystemUtils.JAVA_IO_TMPDIR;
-import static org.mule.runtime.module.artifact.api.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_ARTIFACT_ID;
-import static org.mule.runtime.module.artifact.api.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_GROUP_ID;
+import static org.mule.runtime.module.artifact.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_ARTIFACT_ID;
+import static org.mule.runtime.module.artifact.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_GROUP_ID;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 
 import java.io.File;

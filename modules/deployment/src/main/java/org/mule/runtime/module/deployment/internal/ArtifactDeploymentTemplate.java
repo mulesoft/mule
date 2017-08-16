@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
-import org.mule.runtime.module.artifact.api.Artifact;
+import org.mule.runtime.module.artifact.Artifact;
 
 /**
  * Utility to hook callbacks just before and after an artifact is redeployed in Mule.

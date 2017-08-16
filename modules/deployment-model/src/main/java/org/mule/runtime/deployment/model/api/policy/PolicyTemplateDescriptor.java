@@ -9,8 +9,8 @@ package org.mule.runtime.deployment.model.api.policy;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
+import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
 
 import java.util.HashSet;
 import java.util.Set;

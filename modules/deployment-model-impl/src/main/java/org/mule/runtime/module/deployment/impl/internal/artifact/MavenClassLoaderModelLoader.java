@@ -14,10 +14,10 @@ import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.client.api.MavenClientProvider;
 import org.mule.maven.client.api.model.MavenConfiguration;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
-import org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderException;
+import org.mule.runtime.module.artifact.descriptor.BundleDescriptor;
+import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
+import org.mule.runtime.module.artifact.descriptor.ClassLoaderModelLoader;
+import org.mule.runtime.module.artifact.descriptor.InvalidDescriptorLoaderException;
 import org.mule.runtime.module.deployment.impl.internal.application.DeployableMavenClassLoaderModelLoader;
 import org.mule.runtime.module.deployment.impl.internal.plugin.PluginMavenClassLoaderModelLoader;
 

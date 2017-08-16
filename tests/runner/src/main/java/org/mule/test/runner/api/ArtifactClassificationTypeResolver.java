@@ -13,7 +13,6 @@ import static org.mule.test.runner.api.ArtifactClassificationType.APPLICATION;
 import static org.mule.test.runner.api.ArtifactClassificationType.MODULE;
 import static org.mule.test.runner.api.ArtifactClassificationType.PLUGIN;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -75,7 +74,7 @@ public class ArtifactClassificationTypeResolver {
    * @param artifact {@link Artifact} to check if it is a plugin
    * @return true if it is classified as {@value ArtifactPluginDescriptor#MULE_PLUGIN_CLASSIFIER} or
    *         {@value #MULE_EXTENSION_CLASSIFIER} or it has a
-   *         {@value ArtifactDescriptor#MULE_ARTIFACT_JSON_DESCRIPTOR} file.
+   *         {@value org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor#MULE_ARTIFACT_JSON_DESCRIPTOR} file.
    */
   private boolean isMulePlugin(Artifact artifact) {
     return artifact.getExtension().equals(MULE_PLUGIN_CLASSIFIER) || artifact.getExtension().equals(MULE_EXTENSION_CLASSIFIER);

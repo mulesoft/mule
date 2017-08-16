@@ -12,7 +12,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
-import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.deployment.model.api.DeploymentStartException;
 import org.mule.runtime.deployment.model.api.InstallException;
 import org.mule.runtime.deployment.model.api.domain.Domain;

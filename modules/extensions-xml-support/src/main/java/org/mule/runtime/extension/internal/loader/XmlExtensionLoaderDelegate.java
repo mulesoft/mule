@@ -84,7 +84,7 @@ import java.util.stream.Collectors;
  *
  * @since 4.0
  */
-public final class XmlExtensionLoaderDelegate {
+final class XmlExtensionLoaderDelegate {
 
   private static final String PARAMETER_NAME = "name";
   private static final String PARAMETER_DEFAULT_VALUE = "defaultValue";

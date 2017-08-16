@@ -13,7 +13,7 @@ import static org.mule.runtime.core.api.util.PropertiesUtils.loadProperties;
 import org.mule.runtime.container.api.MuleCoreExtension;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 
 import java.net.URL;
 import java.util.Enumeration;

@@ -11,7 +11,6 @@ import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Collections.emptySet;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 
-import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.test.runner.classloader.IsolatedClassLoaderFactory;
 import org.mule.test.runner.maven.MavenModelFactory;
 
@@ -39,7 +38,7 @@ import org.slf4j.LoggerFactory;
  * {@link ClassLoader}</li>
  * <p/>
  * The object built by this builder is a {@link ArtifactClassLoaderHolder} that references the
- * {@link ArtifactClassLoader} for the application, plugins and container.
+ * {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader} for the application, plugins and container.
  *
  * @since 4.0
  */
@@ -69,7 +68,7 @@ public class ArtifactIsolatedClassLoaderBuilder {
 
   /**
    * Sets the {@link Set} of Maven coordinates in format {@code <groupId>:<artifactId>} in order to be added to the sharedLib
-   * {@link ArtifactClassLoader}
+   * {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader}
    *
    * @param sharedPluginLibCoordinates {@link List} of Maven coordinates in format {@code <groupId>:<artifactId>}
    * @return this
@@ -216,7 +215,7 @@ public class ArtifactIsolatedClassLoaderBuilder {
   }
 
   /**
-   * Sets to {@code true} if while building the a plugin {@link ArtifactClassLoader}
+   * Sets to {@code true} if while building the a plugin {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader}
    * for an {@link org.mule.runtime.extension.api.annotation.Extension} the metadata should be generated.
    *
    * @param extensionMetadataGenerationEnabled {@code boolean} to enable Extension metadata generation.
@@ -229,10 +228,10 @@ public class ArtifactIsolatedClassLoaderBuilder {
 
   /**
    * Sets a {@link List} of {@link URL}s to be appended to the application
-   * {@link ArtifactClassLoader} in addition to the ones classified.
+   * {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader} in addition to the ones classified.
    *
    * @param {@link List} of {@link URL}s to be appended to the application
-   *        {@link ArtifactClassLoader} in addition to the ones classified.
+   *        {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader} in addition to the ones classified.
    * @return this
    */
   public ArtifactIsolatedClassLoaderBuilder setApplicationUrls(List<URL> applicationUrls) {
@@ -242,7 +241,7 @@ public class ArtifactIsolatedClassLoaderBuilder {
 
   /**
    * Builds the {@link ArtifactClassLoaderHolder} with the
-   * {@link ArtifactClassLoader}s for application, plugins and container.
+   * {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader}s for application, plugins and container.
    *
    * @return a {@link ArtifactClassLoaderHolder} as output of the classification process.
    * @throws {@link IOException} if there was an error while creating the classification context

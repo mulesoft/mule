@@ -9,14 +9,14 @@ package org.mule.runtime.deployment.model.internal.plugin;
 
 import static java.lang.String.format;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
-import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorUtils.isCompatibleVersion;
+import static org.mule.runtime.module.artifact.descriptor.BundleDescriptorUtils.isCompatibleVersion;
 
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorFactory;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder;
+import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorFactory;
+import org.mule.runtime.module.artifact.descriptor.BundleDependency;
+import org.mule.runtime.module.artifact.descriptor.BundleDescriptor;
+import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
+import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel.ClassLoaderModelBuilder;
 
 import java.io.File;
 import java.net.URL;

@@ -11,8 +11,8 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.deployment.model.internal.RegionPluginClassLoadersFactory;
 import org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderBuilder;
-import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.api.classloader.DeployableArtifactClassLoaderFactory;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.classloader.DeployableArtifactClassLoaderFactory;
 
 public class DomainClassLoaderBuilderFactory {
 

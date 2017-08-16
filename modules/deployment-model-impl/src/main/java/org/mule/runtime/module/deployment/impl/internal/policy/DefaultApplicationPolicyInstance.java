@@ -25,7 +25,7 @@ import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplate;
-import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
+import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder;
 import org.mule.runtime.module.deployment.impl.internal.artifact.CompositeArtifactExtensionManagerFactory;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;

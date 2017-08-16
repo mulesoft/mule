@@ -18,8 +18,8 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.PLUGIN;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ServiceRegistryDescriptorLoaderRepository.noRegisteredLoaderError;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorLoader;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
+import org.mule.runtime.module.artifact.descriptor.BundleDescriptorLoader;
+import org.mule.runtime.module.artifact.descriptor.ClassLoaderModelLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

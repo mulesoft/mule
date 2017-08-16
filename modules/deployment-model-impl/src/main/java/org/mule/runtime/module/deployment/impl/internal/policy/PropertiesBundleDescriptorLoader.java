@@ -8,10 +8,10 @@
 package org.mule.runtime.module.deployment.impl.internal.policy;
 
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorLoader;
-import org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderException;
+import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
+import org.mule.runtime.module.artifact.descriptor.BundleDescriptor;
+import org.mule.runtime.module.artifact.descriptor.BundleDescriptorLoader;
+import org.mule.runtime.module.artifact.descriptor.InvalidDescriptorLoaderException;
 
 import java.io.File;
 import java.util.Map;

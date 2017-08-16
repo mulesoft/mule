@@ -17,7 +17,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader;
+import org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
 import java.util.HashMap;

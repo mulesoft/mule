@@ -33,12 +33,12 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.BundleScope;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
-import org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderException;
+import org.mule.runtime.module.artifact.descriptor.BundleDependency;
+import org.mule.runtime.module.artifact.descriptor.BundleDescriptor;
+import org.mule.runtime.module.artifact.descriptor.BundleScope;
+import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
+import org.mule.runtime.module.artifact.descriptor.ClassLoaderModelLoader;
+import org.mule.runtime.module.artifact.descriptor.InvalidDescriptorLoaderException;
 import org.mule.tools.api.classloader.model.Artifact;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -313,7 +313,7 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
 
   /**
    * Template method to add artifact specific configuration to the
-   * {@link ClassLoaderModel.ClassLoaderModelBuilder}
+   * {@link org.mule.runtime.module.artifact.descriptor.ClassLoaderModel.ClassLoaderModelBuilder}
    *
    * @param artifactFile the artifact file from which the classloader model is generated.
    * @param classLoaderModelBuilder the builder used to generate {@link ClassLoaderModel} of the artifact.

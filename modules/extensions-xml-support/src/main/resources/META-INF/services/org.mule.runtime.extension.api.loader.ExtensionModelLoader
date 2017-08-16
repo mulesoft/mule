@@ -1,1 +1,1 @@
-org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader
+org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader

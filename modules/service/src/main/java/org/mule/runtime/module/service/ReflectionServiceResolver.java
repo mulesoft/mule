@@ -14,7 +14,7 @@ import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.service.ServiceDefinition;
 import org.mule.runtime.api.service.ServiceProvider;
 import org.mule.runtime.core.api.util.Pair;
-import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 
 import java.util.ArrayList;
 import java.util.Collection;
