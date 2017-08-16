@@ -27,9 +27,11 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 
 import org.junit.Test;
 
@@ -48,10 +50,25 @@ public class BasicValidationTestCase extends ValidationTestCase
     @Test
     public void email() throws Exception
     {
-        assertValid(EMAIL_VALIDATION_FLOW, getTestEvent(VALID_EMAIL));
-        assertInvalidEmail(INVALID_EMAIL);
-        assertInvalidEmail(" " + VALID_EMAIL);
-        assertInvalidEmail(VALID_EMAIL + " ");
+        Scanner s = null;
+        InputStream topLevelDomains = null;
+        try
+        {
+            topLevelDomains = getClass().getClassLoader().getResourceAsStream("top-level-domains.txt");
+            s = new Scanner(topLevelDomains);
+            while (s.hasNext())
+            {
+                assertValid(EMAIL_VALIDATION_FLOW, getTestEvent(VALID_EMAIL_WITHOUT_TOP_DOMAIN + "." + s.next()));
+            }
+            assertInvalidEmail(INVALID_EMAIL);
+            assertInvalidEmail(" " + VALID_EMAIL);
+            assertInvalidEmail(VALID_EMAIL + " ");
+        }
+        finally
+        {
+            s.close();
+            topLevelDomains.close();
+        }
     }
 
     @Test
