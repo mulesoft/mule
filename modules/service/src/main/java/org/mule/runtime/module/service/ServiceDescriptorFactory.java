@@ -90,7 +90,7 @@ public class ServiceDescriptorFactory extends AbstractArtifactDescriptorFactory<
   }
 
   @Override
-  protected ServiceDescriptor createArtifactDescriptor(String name) {
+  protected ServiceDescriptor createArtifactDescriptor(File artifactLocation, String name) {
     return new ServiceDescriptor(name);
   }
 

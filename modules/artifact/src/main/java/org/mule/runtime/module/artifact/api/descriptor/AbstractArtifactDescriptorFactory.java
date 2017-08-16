@@ -73,7 +73,7 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
    * @return a descriptor matching the provided model.
    */
   protected final T loadFromJsonDescriptor(File artifactLocation, M artifactModel) {
-    final T descriptor = createArtifactDescriptor(artifactModel.getName());
+    final T descriptor = createArtifactDescriptor(artifactLocation, artifactModel.getName());
     if (artifactLocation.isDirectory()) {
       descriptor.setRootFolder(artifactLocation);
     }
@@ -120,10 +120,11 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
   protected abstract void doDescriptorConfig(M artifactModel, T descriptor, File artifactLocation);
 
   /**
+   * @param artifactLocation folder where the artifact is located, it can be a folder or file depending on the artifact type.
    * @param name name for the created artifact
    * @return a new descriptor of the type required by the factory.
    */
-  protected abstract T createArtifactDescriptor(String name);
+  protected abstract T createArtifactDescriptor(File artifactLocation, String name);
 
   private String getDescriptorFileName() {
     return MULE_ARTIFACT_JSON_DESCRIPTOR;

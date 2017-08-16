@@ -51,8 +51,8 @@ public class ApplicationDescriptorFactory
   }
 
   @Override
-  protected ApplicationDescriptor createArtifactDescriptor(String name) {
-    return new ApplicationDescriptor(name);
+  protected ApplicationDescriptor createArtifactDescriptor(File artifactLocation, String name) {
+    return new ApplicationDescriptor(artifactLocation.getName());
   }
 
   @Override

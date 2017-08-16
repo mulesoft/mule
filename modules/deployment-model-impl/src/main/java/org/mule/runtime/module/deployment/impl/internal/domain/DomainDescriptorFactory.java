@@ -18,6 +18,8 @@ import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepositor
 import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableDescriptorFactory;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
 
+import java.io.File;
+
 /**
  * Creates artifact descriptor for application
  */
@@ -29,8 +31,8 @@ public class DomainDescriptorFactory extends AbstractDeployableDescriptorFactory
   }
 
   @Override
-  protected DomainDescriptor createArtifactDescriptor(String name) {
-    return new DomainDescriptor(name);
+  protected DomainDescriptor createArtifactDescriptor(File artifactLocation, String name) {
+    return new DomainDescriptor(artifactLocation.getName());
   }
 
   @Override

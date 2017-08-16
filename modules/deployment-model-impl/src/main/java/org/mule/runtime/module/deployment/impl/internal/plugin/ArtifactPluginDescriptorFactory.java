@@ -87,7 +87,7 @@ public class ArtifactPluginDescriptorFactory
   }
 
   @Override
-  protected ArtifactPluginDescriptor createArtifactDescriptor(String name) {
+  protected ArtifactPluginDescriptor createArtifactDescriptor(File artifactLocation, String name) {
     return new ArtifactPluginDescriptor(name);
   }
 
