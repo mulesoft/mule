@@ -27,6 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class TransactionFactoryLocator implements Disposable {
 
   private Map<TransactionType, TransactionFactory> factories = new ConcurrentHashMap<>();
+  private boolean initialized = false;
 
   /**
    * Given a {@link TransactionType} will look through SPI a {@link TransactionFactory} able to handle that kind of
@@ -36,12 +37,16 @@ public final class TransactionFactoryLocator implements Disposable {
    * @return An {@link Optional} {@link TransactionFactory}
    */
   public Optional<TransactionFactory> lookUpTransactionFactory(TransactionType type) {
+    if (!initialized) {
+      factories.putAll(getAvailableFactories());
+      initialized = true;
+    }
     return ofNullable(factories.computeIfAbsent(type, this::getTransactionFactory));
   }
 
   @Override
   public void dispose() {
-    factories = null;
+    factories.clear();
   }
 
   private TransactionFactory getTransactionFactory(TransactionType transactionType) {
