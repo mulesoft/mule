@@ -11,7 +11,7 @@ import static org.mule.runtime.api.el.BindingContextUtils.getTargetBindingContex
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.InternalEvent.builder;
 import static org.mule.runtime.core.api.construct.FlowConstruct.getFromAnnotatedObject;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.TIMEOUT;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.TIMEOUT;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static reactor.core.publisher.Flux.from;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;

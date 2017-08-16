@@ -22,7 +22,7 @@ import static org.mule.runtime.api.meta.model.error.ErrorModelBuilder.newError;
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_LITE;
 import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.core.api.config.MuleManifest.getVendorName;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.TRANSFORMATION;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.TRANSFORMATION;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.ERROR_HANDLER_STEREOTYPE;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.FLOW_STEREOTYPE;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_NAME;

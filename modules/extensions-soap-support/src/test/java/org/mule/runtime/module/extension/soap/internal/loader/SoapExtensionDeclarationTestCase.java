@@ -19,6 +19,7 @@ import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_DESCRIPTION;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
+import static org.mule.runtime.extension.api.error.MuleErrors.ANY;
 import static org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader.VERSION;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.ATTACHMENTS_PARAM;
@@ -88,10 +89,11 @@ public class SoapExtensionDeclarationTestCase extends AbstractSoapExtensionDecla
   }
 
   private void assertErrorModels(Set<ErrorModel> errors) {
-    assertThat(errors, hasSize(13));
+    assertThat(errors, hasSize(12));
     ImmutableList<String> errorNames = ImmutableList.<String>builder()
         .addAll(of(SoapErrors.values()).map(Object::toString).collect(toList()))
         .addAll(of(ModuleErrors.values()).map(Object::toString).collect(toList()))
+        .add(ANY.name())
         .build();
     errors.forEach(e -> assertThat(e.getType(), isOneOf(errorNames.toArray())));
   }

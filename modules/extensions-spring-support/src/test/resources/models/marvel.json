@@ -154,11 +154,7 @@
               "namespace": "MARVEL",
               "parent": {
                 "type": "ANY",
-                "namespace": "MARVEL",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
+                "namespace": "MULE"
               }
             }
           ],
@@ -3486,23 +3482,11 @@
       }
     },
     {
-      "type": "ANY",
-      "namespace": "MARVEL",
-      "parent": {
-        "type": "ANY",
-        "namespace": "MULE"
-      }
-    },
-    {
       "type": "CUSTOM_ERROR",
       "namespace": "MARVEL",
       "parent": {
         "type": "ANY",
-        "namespace": "MARVEL",
-        "parent": {
-          "type": "ANY",
-          "namespace": "MULE"
-        }
+        "namespace": "MULE"
       }
     }
   ],

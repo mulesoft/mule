@@ -24,10 +24,9 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.model.display.LayoutModel.builder;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.config.spring.api.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
 import static org.mule.runtime.extension.internal.loader.catalog.loader.common.XmlMatcher.match;
-import com.google.common.collect.ImmutableMap;
-import org.apache.commons.lang3.StringUtils;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.catalog.api.TypeResolver;
@@ -60,7 +59,6 @@ import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.GlobalEle
 import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.OperationComponentModelModelProperty;
 import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.XmlExtensionModelProperty;
 import org.mule.runtime.config.spring.internal.util.NoOpXmlErrorHandler;
-import org.mule.runtime.core.api.exception.Errors;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
@@ -69,8 +67,8 @@ import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.internal.loader.catalog.loader.common.XmlMatcher;
 import org.mule.runtime.extension.internal.loader.catalog.loader.xml.TypesCatalogXmlLoader;
 import org.mule.runtime.extension.internal.loader.catalog.model.TypesCatalog;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+
+import com.google.common.collect.ImmutableMap;
 
 import java.io.IOException;
 import java.net.URL;
@@ -81,6 +79,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * Describes an {@link ExtensionModel} by scanning an XML provided in the constructor
@@ -515,7 +517,7 @@ public final class XmlExtensionLoaderDelegate {
                                                              NAMESPACE_SEPARATOR));
           }
           operationDeclarer.withErrorModel(ErrorModelBuilder.newError(typeName, namespace)
-              .withParent(ErrorModelBuilder.newError(Errors.ComponentIdentifiers.ANY).build())
+              .withParent(ErrorModelBuilder.newError(ANY).build())
               .build());
         }));
   }

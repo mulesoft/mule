@@ -12,6 +12,8 @@ import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.api.meta.model.error.ErrorModelBuilder.newError;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.COMPOSITE_ROUTING;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.TIMEOUT;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_DESCRIPTION;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_DESCRIPTION;
@@ -19,6 +21,30 @@ import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PAR
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.ANY;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.CLIENT_SECURITY;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.CONNECTIVITY;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.CRITICAL;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.DUPLICATE_MESSAGE;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.EXPRESSION;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.FATAL;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.NOT_PERMITTED;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.OVERLOAD;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.REDELIVERY_EXHAUSTED;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.RETRY_EXHAUSTED;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.ROUTING;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SECURITY;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SERVER_SECURITY;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE_ERROR_RESPONSE_GENERATE;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE_ERROR_RESPONSE_SEND;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE_RESPONSE;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE_RESPONSE_GENERATE;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE_RESPONSE_SEND;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.STREAM_MAXIMUM_SIZE_EXCEEDED;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.TRANSFORMATION;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.UNKNOWN;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.VALIDATION;
 import static org.mule.runtime.extension.internal.loader.util.InfrastructureParameterBuilder.addReconnectionStrategyParameter;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
@@ -42,7 +68,6 @@ import org.mule.runtime.core.api.source.SchedulingStrategy;
 import org.mule.runtime.core.api.source.polling.CronScheduler;
 import org.mule.runtime.core.api.source.polling.FixedFrequencyScheduler;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
-import org.mule.runtime.extension.api.error.MuleErrors;
 import org.mule.runtime.extension.internal.property.LiteralModelProperty;
 
 import com.google.gson.reflect.TypeToken;
@@ -53,6 +78,10 @@ import com.google.gson.reflect.TypeToken;
  * @since 4.0
  */
 class MuleExtensionModelDeclarer {
+
+  final ErrorModel anyError = newError(ANY).build();
+  final ErrorModel validationError = newError(VALIDATION).withParent(anyError).build();
+  final ErrorModel duplicateMessageError = newError(DUPLICATE_MESSAGE).withParent(validationError).build();
 
   ExtensionDeclarer createExtensionModel() {
 
@@ -162,8 +191,7 @@ class MuleExtensionModelDeclarer {
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("Defines the prefix of the object store names. This will only be used for the internally built object store.");
 
-    validator.withErrorModel(newError("FILTERED", "MULE")
-        .withParent(newError("ANY", "MULE").build()).build());
+    validator.withErrorModel(duplicateMessageError);
   }
 
   private void declareAsync(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
@@ -444,41 +472,46 @@ class MuleExtensionModelDeclarer {
 
   private void declareErrors(ExtensionDeclarer extensionDeclarer) {
 
-    final ErrorModel anyError = newError(MuleErrors.ANY.name(), CORE_PREFIX.toUpperCase()).build();
-    final ErrorModel securityError = newError(MuleErrors.SECURITY.name(), CORE_PREFIX.toUpperCase()).build();
-    final ErrorModel sourceError = newError(MuleErrors.SOURCE.name(), CORE_PREFIX.toUpperCase()).build();
-    final ErrorModel sourceResponseError = newError(MuleErrors.SOURCE_RESPONSE.name(), CORE_PREFIX.toUpperCase()).build();
+    final ErrorModel criticalError = newError(CRITICAL).build();
+    final ErrorModel routingError = newError(ROUTING).withParent(anyError).build();
+    final ErrorModel securityError = newError(SECURITY).withParent(anyError).build();
+    final ErrorModel sourceError = newError(SOURCE).withParent(anyError).build();
+    final ErrorModel sourceResponseError = newError(SOURCE_RESPONSE).withParent(anyError).build();
+    final ErrorModel serverSecurityError = newError(SERVER_SECURITY).withParent(securityError).build();
 
     extensionDeclarer.withErrorModel(anyError);
+
+    extensionDeclarer.withErrorModel(newError(EXPRESSION).withParent(anyError).build());
+    extensionDeclarer.withErrorModel(newError(TRANSFORMATION).withParent(anyError).build());
+    extensionDeclarer.withErrorModel(newError(CONNECTIVITY).withParent(anyError).build());
+    extensionDeclarer.withErrorModel(newError(RETRY_EXHAUSTED).withParent(anyError).build());
+    extensionDeclarer.withErrorModel(newError(REDELIVERY_EXHAUSTED).withParent(anyError).build());
+    extensionDeclarer.withErrorModel(newError(STREAM_MAXIMUM_SIZE_EXCEEDED).withParent(anyError).build());
+    extensionDeclarer.withErrorModel(newError(TIMEOUT).withParent(anyError).build());
+    extensionDeclarer.withErrorModel(newError(UNKNOWN).withParent(anyError).build());
+
+    extensionDeclarer.withErrorModel(routingError);
+    extensionDeclarer.withErrorModel(newError(COMPOSITE_ROUTING).withParent(routingError).build());
+
+
+    extensionDeclarer.withErrorModel(validationError);
+    extensionDeclarer.withErrorModel(duplicateMessageError);
+
     extensionDeclarer.withErrorModel(securityError);
+    extensionDeclarer.withErrorModel(serverSecurityError);
+    extensionDeclarer.withErrorModel(newError(CLIENT_SECURITY).withParent(securityError).build());
+    extensionDeclarer.withErrorModel(newError(NOT_PERMITTED).withParent(securityError).build());
+
     extensionDeclarer.withErrorModel(sourceError);
     extensionDeclarer.withErrorModel(sourceResponseError);
-    extensionDeclarer
-        .withErrorModel(newError(MuleErrors.EXPRESSION.name(), CORE_PREFIX.toUpperCase()).withParent(anyError).build());
-    extensionDeclarer
-        .withErrorModel(newError(MuleErrors.TRANSFORMATION.name(), CORE_PREFIX.toUpperCase()).withParent(anyError).build());
-    extensionDeclarer
-        .withErrorModel(newError(MuleErrors.CONNECTIVITY.name(), CORE_PREFIX.toUpperCase()).withParent(anyError).build());
-    extensionDeclarer
-        .withErrorModel(newError(MuleErrors.RETRY_EXHAUSTED.name(), CORE_PREFIX.toUpperCase()).withParent(anyError).build());
-    extensionDeclarer
-        .withErrorModel(newError(MuleErrors.REDELIVERY_EXHAUSTED.name(), CORE_PREFIX.toUpperCase()).withParent(anyError).build());
-    extensionDeclarer.withErrorModel(newError(MuleErrors.ROUTING.name(), CORE_PREFIX.toUpperCase()).withParent(anyError).build());
-    extensionDeclarer
-        .withErrorModel(newError(MuleErrors.OVERLOAD.name(), CORE_PREFIX.toUpperCase()).withParent(anyError).build());
-    extensionDeclarer
-        .withErrorModel(newError(MuleErrors.CLIENT_SECURITY.name(), CORE_PREFIX.toUpperCase()).withParent(securityError).build());
-    extensionDeclarer
-        .withErrorModel(newError(MuleErrors.SERVER_SECURITY.name(), CORE_PREFIX.toUpperCase()).withParent(securityError).build());
-    extensionDeclarer.withErrorModel(newError(MuleErrors.SOURCE_ERROR_RESPONSE_GENERATE.name(), CORE_PREFIX.toUpperCase())
-        .withParent(sourceError).build());
-    extensionDeclarer.withErrorModel(newError(MuleErrors.SOURCE_ERROR_RESPONSE_SEND.name(), CORE_PREFIX.toUpperCase())
-        .withParent(sourceError).build());
-    extensionDeclarer.withErrorModel(newError(MuleErrors.SOURCE_RESPONSE_GENERATE.name(), CORE_PREFIX.toUpperCase())
-        .withParent(sourceResponseError).build());
-    extensionDeclarer.withErrorModel(newError(MuleErrors.SOURCE_RESPONSE_SEND.name(), CORE_PREFIX.toUpperCase())
-        .withParent(sourceResponseError).build());
+    extensionDeclarer.withErrorModel(newError(SOURCE_ERROR_RESPONSE_GENERATE).withParent(sourceError).build());
+    extensionDeclarer.withErrorModel(newError(SOURCE_ERROR_RESPONSE_SEND).withParent(sourceError).build());
+    extensionDeclarer.withErrorModel(newError(SOURCE_RESPONSE_GENERATE).withParent(sourceResponseError).build());
+    extensionDeclarer.withErrorModel(newError(SOURCE_RESPONSE_SEND).withParent(sourceResponseError).build());
 
+    extensionDeclarer.withErrorModel(criticalError);
+    extensionDeclarer.withErrorModel(newError(OVERLOAD).withParent(criticalError).build());
+    extensionDeclarer.withErrorModel(newError(FATAL).withParent(criticalError).build());
   }
 
   private void declareConfiguration(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {

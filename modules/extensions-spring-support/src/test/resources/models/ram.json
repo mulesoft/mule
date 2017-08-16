@@ -108,6 +108,22 @@
           "executionType": "BLOCKING",
           "errors": [
             {
+              "type": "SOAP_FAULT",
+              "namespace": "RAM",
+              "parent": {
+                "type": "ANY",
+                "namespace": "MULE"
+              }
+            },
+            {
+              "type": "ENCODING",
+              "namespace": "RAM",
+              "parent": {
+                "type": "ANY",
+                "namespace": "MULE"
+              }
+            },
+            {
               "type": "CONNECTIVITY",
               "namespace": "MULE",
               "parent": {
@@ -116,35 +132,7 @@
               }
             },
             {
-              "type": "ANY",
-              "namespace": "MULE"
-            },
-            {
-              "type": "TIMEOUT",
-              "namespace": "RAM",
-              "parent": {
-                "type": "ANY",
-                "namespace": "RAM",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "SOAP_FAULT",
-              "namespace": "RAM",
-              "parent": {
-                "type": "ANY",
-                "namespace": "RAM",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "ANY",
+              "type": "INVALID_WSDL",
               "namespace": "RAM",
               "parent": {
                 "type": "ANY",
@@ -152,28 +140,8 @@
               }
             },
             {
-              "type": "CANNOT_DISPATCH",
-              "namespace": "RAM",
-              "parent": {
-                "type": "ANY",
-                "namespace": "RAM",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "BAD_REQUEST",
-              "namespace": "RAM",
-              "parent": {
-                "type": "ANY",
-                "namespace": "RAM",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
+              "type": "ANY",
+              "namespace": "MULE"
             },
             {
               "type": "RETRY_EXHAUSTED",
@@ -188,6 +156,14 @@
               }
             },
             {
+              "type": "BAD_RESPONSE",
+              "namespace": "RAM",
+              "parent": {
+                "type": "ANY",
+                "namespace": "MULE"
+              }
+            },
+            {
               "type": "RETRY_EXHAUSTED",
               "namespace": "MULE",
               "parent": {
@@ -196,15 +172,19 @@
               }
             },
             {
-              "type": "BAD_RESPONSE",
+              "type": "BAD_REQUEST",
               "namespace": "RAM",
               "parent": {
                 "type": "ANY",
-                "namespace": "RAM",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
+                "namespace": "MULE"
+              }
+            },
+            {
+              "type": "CANNOT_DISPATCH",
+              "namespace": "RAM",
+              "parent": {
+                "type": "ANY",
+                "namespace": "MULE"
               }
             },
             {
@@ -220,27 +200,11 @@
               }
             },
             {
-              "type": "INVALID_WSDL",
+              "type": "TIMEOUT",
               "namespace": "RAM",
               "parent": {
                 "type": "ANY",
-                "namespace": "RAM",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "ENCODING",
-              "namespace": "RAM",
-              "parent": {
-                "type": "ANY",
-                "namespace": "RAM",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
+                "namespace": "MULE"
               }
             }
           ],
@@ -1371,6 +1335,14 @@
   "messageSources": [],
   "errors": [
     {
+      "type": "SOAP_FAULT",
+      "namespace": "RAM",
+      "parent": {
+        "type": "ANY",
+        "namespace": "MULE"
+      }
+    },
+    {
       "type": "CONNECTIVITY",
       "namespace": "MULE",
       "parent": {
@@ -1383,31 +1355,7 @@
       "namespace": "MULE"
     },
     {
-      "type": "TIMEOUT",
-      "namespace": "RAM",
-      "parent": {
-        "type": "ANY",
-        "namespace": "RAM",
-        "parent": {
-          "type": "ANY",
-          "namespace": "MULE"
-        }
-      }
-    },
-    {
-      "type": "SOAP_FAULT",
-      "namespace": "RAM",
-      "parent": {
-        "type": "ANY",
-        "namespace": "RAM",
-        "parent": {
-          "type": "ANY",
-          "namespace": "MULE"
-        }
-      }
-    },
-    {
-      "type": "ANY",
+      "type": "BAD_RESPONSE",
       "namespace": "RAM",
       "parent": {
         "type": "ANY",
@@ -1415,27 +1363,27 @@
       }
     },
     {
-      "type": "CANNOT_DISPATCH",
-      "namespace": "RAM",
-      "parent": {
-        "type": "ANY",
-        "namespace": "RAM",
-        "parent": {
-          "type": "ANY",
-          "namespace": "MULE"
-        }
-      }
-    },
-    {
       "type": "BAD_REQUEST",
       "namespace": "RAM",
       "parent": {
         "type": "ANY",
-        "namespace": "RAM",
-        "parent": {
-          "type": "ANY",
-          "namespace": "MULE"
-        }
+        "namespace": "MULE"
+      }
+    },
+    {
+      "type": "ENCODING",
+      "namespace": "RAM",
+      "parent": {
+        "type": "ANY",
+        "namespace": "MULE"
+      }
+    },
+    {
+      "type": "INVALID_WSDL",
+      "namespace": "RAM",
+      "parent": {
+        "type": "ANY",
+        "namespace": "MULE"
       }
     },
     {
@@ -1459,15 +1407,11 @@
       }
     },
     {
-      "type": "BAD_RESPONSE",
+      "type": "CANNOT_DISPATCH",
       "namespace": "RAM",
       "parent": {
         "type": "ANY",
-        "namespace": "RAM",
-        "parent": {
-          "type": "ANY",
-          "namespace": "MULE"
-        }
+        "namespace": "MULE"
       }
     },
     {
@@ -1483,27 +1427,11 @@
       }
     },
     {
-      "type": "INVALID_WSDL",
+      "type": "TIMEOUT",
       "namespace": "RAM",
       "parent": {
         "type": "ANY",
-        "namespace": "RAM",
-        "parent": {
-          "type": "ANY",
-          "namespace": "MULE"
-        }
-      }
-    },
-    {
-      "type": "ENCODING",
-      "namespace": "RAM",
-      "parent": {
-        "type": "ANY",
-        "namespace": "RAM",
-        "parent": {
-          "type": "ANY",
-          "namespace": "MULE"
-        }
+        "namespace": "MULE"
       }
     }
   ],
