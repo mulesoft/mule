@@ -18,6 +18,8 @@
                 <ss:user-service id="userService">
                     <ss:user name="ross" password="ross" authorities="ROLE_ADMIN" />
                     <ss:user name="anon" password="anon" authorities="ROLE_ANONYMOUS" />
+                    <ss:user name="max" password="max" authorities="ROLE_CONTRIBUTOR" />
+                    <ss:user name="ubermax" password="ubermax" authorities="ROLE_ADMIN,ROLE_CONTRIBUTOR" />
                 </ss:user-service>
             </ss:authentication-provider>
         </ss:authentication-manager>
@@ -38,5 +40,20 @@
         <http:basic-security-filter realm="mule-realm"/>
         <mule-ss:authorization-filter requiredAuthorities="ROLE_ADMIN"/>
         <component class="org.mule.component.simple.EchoComponent"/>
+    </flow>
+
+    <flow name="authorizeAny">
+        <inbound-endpoint address="http://localhost:${port1}/authorizeany" exchange-pattern="request-response"/>
+        <http:basic-security-filter realm="mule-realm"/>
+        <mule-ss:authorization-filter requiredAuthorities="ROLE_ADMIN, ROLE_CONTRIBUTOR"/>
+        <logger/>
+    </flow>
+
+    <flow name="authorizeAll">
+        <inbound-endpoint address="http://localhost:${port1}/authorizeall" exchange-pattern="request-response"/>
+        <http:basic-security-filter realm="mule-realm"/>
+        <mule-ss:authorization-filter requiredAuthorities="ROLE_CONTRIBUTOR"/>
+        <mule-ss:authorization-filter requiredAuthorities="ROLE_ADMIN"/>
+        <logger/>
     </flow>
 </mule>
