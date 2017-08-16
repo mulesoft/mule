@@ -13,7 +13,6 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
-import static org.apache.commons.lang3.ArrayUtils.addAll;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.AbstractAnnotatedObject.ROOT_CONTAINER_NAME_KEY;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
@@ -102,7 +101,7 @@ import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.context.annotation.ConfigurationClassPostProcessor;
 import org.springframework.context.annotation.ContextAnnotationAutowireCandidateResolver;
-import org.springframework.context.support.AbstractXmlApplicationContext;
+import org.springframework.context.support.AbstractRefreshableConfigApplicationContext;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -123,7 +122,7 @@ import com.google.common.collect.ImmutableSet;
  * <code>MuleArtifactContext</code> is a simple extension application context that allows resources to be loaded from the
  * Classpath of file system using the MuleBeanDefinitionReader.
  */
-public class MuleArtifactContext extends AbstractXmlApplicationContext {
+public class MuleArtifactContext extends AbstractRefreshableConfigApplicationContext {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(MuleArtifactContext.class);
 
@@ -140,7 +139,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
   private final ConfigurationDependencyResolver dependencyResolver;
   protected ApplicationModel applicationModel;
   protected MuleContext muleContext;
-  private Resource[] artifactConfigResources;
+  private ConfigResource[] artifactConfigResources;
   protected BeanDefinitionFactory beanDefinitionFactory;
   private final ServiceRegistry serviceRegistry = new SpiServiceRegistry();
   protected final XmlApplicationParser xmlApplicationParser;
@@ -168,12 +167,12 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
                              List<ClassLoader> pluginsClassLoaders,
                              Optional<ConfigurationProperties> parentConfigurationProperties)
       throws BeansException {
-    this(muleContext, convert(artifactConfigResources), artifactDeclaration, optionalObjectsController,
+    this(muleContext, artifactConfigResources, artifactDeclaration, optionalObjectsController,
          parentConfigurationProperties, artifactProperties,
          artifactType, pluginsClassLoaders);
   }
 
-  public MuleArtifactContext(MuleContext muleContext, Resource[] artifactConfigResources,
+  public MuleArtifactContext(MuleContext muleContext, ConfigResource[] artifactConfigResources,
                              ArtifactDeclaration artifactDeclaration, OptionalObjectsController optionalObjectsController,
                              Optional<ConfigurationProperties> parentConfigurationProperties,
                              Map<String, String> artifactProperties, ArtifactType artifactType,
@@ -262,8 +261,8 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
     applicationConfigBuilder.setArtifactProperties(this.artifactProperties);
 
     List<Pair<String, InputStream>> initialConfigFiles = new ArrayList<>();
-    for (Resource artifactConfigResource : artifactConfigResources) {
-      initialConfigFiles.add(new Pair<>(getFilename(artifactConfigResource), artifactConfigResource.getInputStream()));
+    for (ConfigResource artifactConfigResource : artifactConfigResources) {
+      initialConfigFiles.add(new Pair<>(artifactConfigResource.getResourceName(), artifactConfigResource.getInputStream()));
     }
 
     List<ConfigFile> configFiles = new ArrayList<>();
@@ -341,13 +340,6 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
         }).collect(toList());
 
     return recursivelyResolveConfigFiles(newConfigFilesToResolved, resolvedConfigFilesBuilder.build());
-  }
-
-  private String getFilename(Resource resource) {
-    if (resource instanceof ByteArrayResource) {
-      return resource.getDescription();
-    }
-    return resource.getFilename();
   }
 
   @Override
@@ -443,11 +435,6 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
       }
     }
     return configResources;
-  }
-
-  @Override
-  protected Resource[] getConfigResources() {
-    return addAll(artifactConfigResources);
   }
 
   @Override
