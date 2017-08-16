@@ -70,7 +70,6 @@ import org.mule.runtime.core.api.source.polling.FixedFrequencyScheduler;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.internal.property.LiteralModelProperty;
 
-
 import com.google.gson.reflect.TypeToken;
 
 /**

@@ -218,7 +218,7 @@ public abstract class Errors {
       public static final ComponentIdentifier TIMEOUT =
           builder().namespace(CORE_NAMESPACE_NAME).name(TIMEOUT_ERROR_IDENTIFIER).build();
       public static final ComponentIdentifier COMPOSITE_ROUTING =
-        builder().namespace(CORE_NAMESPACE_NAME).name(COMPOSITE_ROUTING_ERROR).build();
+          builder().namespace(CORE_NAMESPACE_NAME).name(COMPOSITE_ROUTING_ERROR).build();
       public static final ComponentIdentifier UNKNOWN =
           builder().namespace(CORE_NAMESPACE_NAME).name(UNKNOWN_ERROR_IDENTIFIER).build();
 
