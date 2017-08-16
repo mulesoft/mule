@@ -121,6 +121,7 @@ public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
             if (secretAliasId != null)
             {
                 secretKey = secretKeys.getSecretKey(parseSecretAliasId(secretAliasId));
+                validateNotNull(secretKey, noKeyIdFound(getSecretAliasId()));
             }
             readSecretKey = true;
         } catch (IOException | PGPException e) {
@@ -164,8 +165,6 @@ public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
         {
             readPrivateKeyBundle();
         }
-
-        validateNotNull(secretKey, noKeyIdFound(getSecretAliasId()));
 
         return secretKey;
     }
