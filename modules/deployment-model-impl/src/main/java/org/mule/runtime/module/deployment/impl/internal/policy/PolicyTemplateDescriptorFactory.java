@@ -95,7 +95,7 @@ public class PolicyTemplateDescriptorFactory
   }
 
   @Override
-  protected PolicyTemplateDescriptor createArtifactDescriptor(String name) {
+  protected PolicyTemplateDescriptor createArtifactDescriptor(File artifactLocation, String name) {
     return new PolicyTemplateDescriptor(name);
   }
 }
