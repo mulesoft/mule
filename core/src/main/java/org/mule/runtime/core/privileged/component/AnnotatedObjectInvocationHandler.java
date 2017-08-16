@@ -11,11 +11,12 @@ import static net.sf.cglib.proxy.Enhancer.registerStaticCallbacks;
 
 import static java.util.Arrays.asList;
 
+import static java.util.Collections.synchronizedMap;
 import static java.util.Collections.unmodifiableSet;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.api.meta.AnnotatedObject;
-import org.mule.runtime.core.internal.component.AnnotatedObjectInterceptor;
 import org.mule.runtime.core.internal.component.DynamicallyAnnotatedObject;
 import org.mule.runtime.core.internal.util.CompositeClassLoader;
 
@@ -30,6 +31,8 @@ import java.util.Set;
 
 import net.sf.cglib.proxy.CallbackHelper;
 import net.sf.cglib.proxy.Enhancer;
+import net.sf.cglib.proxy.MethodInterceptor;
+import net.sf.cglib.proxy.MethodProxy;
 import net.sf.cglib.proxy.NoOp;
 
 /**
@@ -148,5 +151,30 @@ public class AnnotatedObjectInvocationHandler {
     } else {
       return (T) annotated;
     }
+  }
+
+  private static class AnnotatedObjectInterceptor extends AbstractAnnotatedObject implements MethodInterceptor {
+
+    private Map<Method, Method> overridingMethods = synchronizedMap(new HashMap<>());
+
+    public AnnotatedObjectInterceptor(Set<Method> managedMethods) {
+      for (Method method : managedMethods) {
+        overridingMethods.put(method, method);
+      }
+    }
+
+    @Override
+    public Object intercept(Object obj, java.lang.reflect.Method method, Object[] args, MethodProxy proxy) throws Throwable {
+      if (overridingMethods.containsKey(method)) {
+        return overridingMethods.get(method).invoke(this, args);
+      } else {
+        return proxy.invokeSuper(obj, args);
+      }
+    }
+
+    public Map<Method, Method> getOverridingMethods() {
+      return overridingMethods;
+    }
+
   }
 }
