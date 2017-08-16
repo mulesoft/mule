@@ -94,7 +94,18 @@ public class PropertyPlaceholderProcessor extends PropertyPlaceholderConfigurer 
     public void setMuleContext(MuleContext muleContext)
     {
         this.muleContext = muleContext;
-        
     }
 
+    @Override
+    protected String resolvePlaceholder(String placeholder, Properties props, int systemPropertiesMode)
+    {
+        String configurationManagementValue = (String) muleContext.getConfigurationManamentProperties().get(placeholder);
+        
+        if (configurationManagementValue != null)
+        {
+            return configurationManagementValue;
+        }
+        
+        return super.resolvePlaceholder(placeholder, props, systemPropertiesMode);
+    }
 }

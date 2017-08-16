@@ -57,7 +57,7 @@ public class ParallelDeploymentDirectoryWatcher extends DeploymentDirectoryWatch
                 {
                     try
                     {
-                        applicationArchiveDeployer.deployPackagedArtifact(zip);
+                        applicationArchiveDeployer.deployPackagedArtifact(zip, null);
                     }
                     catch (Exception e)
                     {

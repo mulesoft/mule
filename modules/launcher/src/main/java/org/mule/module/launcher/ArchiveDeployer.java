@@ -12,6 +12,7 @@ import org.mule.module.launcher.artifact.ArtifactFactory;
 import java.io.File;
 import java.net.URL;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * Deploys a file based artifact into the mule container.
@@ -21,7 +22,7 @@ import java.util.Map;
 public interface ArchiveDeployer<T extends Artifact>
 {
 
-    T deployPackagedArtifact(String zip) throws DeploymentException;
+    T deployPackagedArtifact(String zip, Properties configurationManagementProperties) throws DeploymentException;
 
     T deployExplodedArtifact(String artifactDir) throws DeploymentException;
 
@@ -33,8 +34,6 @@ public interface ArchiveDeployer<T extends Artifact>
      */
     boolean isUpdatedZombieArtifact(String artifactName);
 
-    T deployPackagedArtifact(URL artifactAchivedUrl);
-
     void undeployArtifact(String artifactId);
 
     File getDeploymentDirectory();
@@ -43,6 +42,8 @@ public interface ArchiveDeployer<T extends Artifact>
 
     void redeploy(T artifact) throws DeploymentException;
 
+    void redeploy(T artifact, Properties configurationManagementProperties) throws DeploymentException;
+
     Map<URL, Long> getArtifactsZombieMap();
 
     void setArtifactFactory(ArtifactFactory<T> artifactFactory);
@@ -50,4 +51,9 @@ public interface ArchiveDeployer<T extends Artifact>
     void undeployArtifactWithoutUninstall(T artifact);
 
     void deployArtifact(T artifact) throws DeploymentException;
+    
+    void deployArtifact(T artifact, Properties configurationManagementPropertires) throws DeploymentException;
+
+    T deployPackagedArtifact(URL domainArchiveUrl, Properties appProperties) throws DeploymentException;
+
 }

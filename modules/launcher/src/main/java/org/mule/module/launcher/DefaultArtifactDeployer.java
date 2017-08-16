@@ -9,6 +9,8 @@ package org.mule.module.launcher;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.module.launcher.artifact.Artifact;
 
+import java.util.Properties;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -19,24 +21,7 @@ public class DefaultArtifactDeployer<T extends Artifact> implements ArtifactDepl
 
     public void deploy(Artifact artifact)
     {
-        try
-        {
-            artifact.install();
-            artifact.init();
-            artifact.start();
-        }
-        catch (Throwable t)
-        {
-            artifact.dispose();
-
-            if (t instanceof DeploymentException)
-            {
-                throw ((DeploymentException) t);
-            }
-
-            final String msg = String.format("Failed to deploy artifact [%s]", artifact.getArtifactName());
-            throw new DeploymentException(MessageFactory.createStaticMessage(msg), t);
-        }
+        deploy(artifact, new Properties());
     }
 
     public void undeploy(Artifact artifact)
@@ -80,6 +65,30 @@ public class DefaultArtifactDeployer<T extends Artifact> implements ArtifactDepl
         catch (Throwable t)
         {
             logger.error(String.format("Unable to cleanly stop artifact '%s'. Restart Mule if you get errors redeploying this artifact", artifact.getArtifactName()), t);
+        }
+    }
+
+    @Override
+    public void deploy(Artifact artifact, Properties configurationManagementProperties)
+    {
+        artifact.setConfigurationManagementProperties(configurationManagementProperties);
+        try
+        {
+            artifact.install();
+            artifact.init();
+            artifact.start();
+        }
+        catch (Throwable t)
+        {
+            artifact.dispose();
+
+            if (t instanceof DeploymentException)
+            {
+                throw ((DeploymentException) t);
+            }
+
+            final String msg = String.format("Failed to deploy artifact [%s]", artifact.getArtifactName());
+            throw new DeploymentException(MessageFactory.createStaticMessage(msg), t);
         }
     }
 

@@ -44,6 +44,7 @@ import org.mule.util.queue.QueueManager;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import javax.resource.spi.work.WorkListener;
@@ -388,5 +389,19 @@ public interface MuleContext extends Lifecycle
      */
     Collection<ExceptionContextProvider> getExceptionContextProviders();
 
+    /**
+     * @return the configuration properties.
+     * 
+     * @since 3.9.0
+     */
+    Properties getConfigurationManamentProperties();
+
+    /**
+     * Sets the configuration management properties so that beans as well as
+     * application properties are overriden.
+     * 
+     * @since 3.9.0
+     */
+    void setConfigurationManagementProperties(Properties configurationManagementProperties);
 }
 

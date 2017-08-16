@@ -24,6 +24,7 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
 import org.apache.commons.beanutils.BeanToPropertyValueTransformer;
@@ -64,7 +65,7 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
     }
 
     @Override
-    public T deployPackagedArtifact(String zip) throws DeploymentException
+    public T deployPackagedArtifact(String zip, Properties configurationManagementProperties) throws DeploymentException
     {
         URL url;
         File artifactZip;
@@ -73,7 +74,7 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
             final String artifactName = removeEndIgnoreCase(zip, ZIP_FILE_SUFFIX);
             artifactZip = new File(artifactDir, zip);
             url = artifactZip.toURI().toURL();
-            return deployPackagedArtifact(url, artifactName);
+            return deployPackagedArtifact(url, artifactName, configurationManagementProperties);
         }
         catch (DeploymentException e)
         {
@@ -142,8 +143,7 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
         return artifactFactory.getArtifactDir();
     }
 
-    @Override
-    public T deployPackagedArtifact(URL artifactAchivedUrl) throws DeploymentException
+    public T deployPackagedArtifact(URL artifactAchivedUrl, Properties configurationManagementProperties) throws DeploymentException
     {
         T artifact;
 
@@ -169,7 +169,7 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
                 throw t;
             }
 
-            deployArtifact(artifact);
+            deployArtifact(artifact, configurationManagementProperties);
             return artifact;
         }
         catch (Throwable t)
@@ -182,9 +182,9 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
 
             final String msg = "Failed to deploy from URL: " + artifactAchivedUrl;
             throw new DeploymentException(MessageFactory.createStaticMessage(msg), t);
-        }
+        }        
     }
-
+    
     private void logDeploymentFailure(Throwable t, String artifactName)
     {
         final String msg = miniSplash(String.format("Failed to deploy artifact '%s', see below", artifactName));
@@ -238,7 +238,7 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
         this.deploymentListener = deploymentListener;
     }
 
-    private T deployPackagedArtifact(final URL artifactUrl, String artifactName) throws IOException
+    private T deployPackagedArtifact(final URL artifactUrl, String artifactName, Properties configurationManagementProperties) throws IOException
     {
         ZombieFile zombieFile = artifactZombieMap.get(artifactName);
         if (zombieFile != null)
@@ -258,7 +258,7 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
             undeployArtifact(artifactName);
         }
 
-        T deployedAtifact = deployPackagedArtifact(artifactUrl);
+        T deployedAtifact = deployPackagedArtifact(artifactUrl, configurationManagementProperties);
         deploymentTemplate.postRedeploy(deployedAtifact);
         return deployedAtifact;
     }
@@ -308,36 +308,7 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
     @Override
     public void deployArtifact(T artifact) throws DeploymentException
     {
-        try
-        {
-            // add to the list of known artifacts first to avoid deployment loop on failure
-            trackArtifact(artifact);
-
-            deploymentListener.onDeploymentStart(artifact.getArtifactName());
-            deployer.deploy(artifact);
-            artifactArchiveInstaller.createAnchorFile(artifact.getArtifactName());
-            deploymentListener.onDeploymentSuccess(artifact.getArtifactName());
-            artifactZombieMap.remove(artifact.getArtifactName());
-        }
-        catch (Throwable t)
-        {
-            // error text has been created by the deployer already
-            String msg = miniSplash(String.format("Failed to deploy artifact '%s', see below", artifact.getArtifactName()));
-            logger.error(msg, t);
-
-            addZombieApp(artifact);
-
-            deploymentListener.onDeploymentFailure(artifact.getArtifactName(), t);
-            if (t instanceof DeploymentException)
-            {
-                throw (DeploymentException) t;
-            }
-            else
-            {
-                msg = "Failed to deploy artifact: " + artifact.getArtifactName();
-                throw new DeploymentException(MessageFactory.createStaticMessage(msg), t);
-            }
-        }
+        deployArtifact(artifact, new Properties());
     }
 
     private void addZombieApp(Artifact artifact)
@@ -438,6 +409,12 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
     }
 
 
+    private T installFrom(URL url, Properties configurationManagementProperties) throws IOException
+    {
+        String artifactName = artifactArchiveInstaller.installArtifact(url);
+        return artifactFactory.createArtifact(artifactName, configurationManagementProperties);
+    }
+
     private T installFrom(URL url) throws IOException
     {
         String artifactName = artifactArchiveInstaller.installArtifact(url);
@@ -447,50 +424,7 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
     @Override
     public void redeploy(T artifact) throws DeploymentException
     {
-        if (logger.isInfoEnabled())
-        {
-            logger.info(miniSplash(String.format("Redeploying artifact '%s'", artifact.getArtifactName())));
-        }
-
-        deploymentListener.onUndeploymentStart(artifact.getArtifactName());
-        try
-        {
-            deployer.undeploy(artifact);
-            deploymentListener.onUndeploymentSuccess(artifact.getArtifactName());
-        }
-        catch (Throwable e)
-        {
-            // TODO make the exception better
-            deploymentListener.onUndeploymentFailure(artifact.getArtifactName(), e);
-        }
-
-        deploymentListener.onDeploymentStart(artifact.getArtifactName());
-        try
-        {
-            deployer.deploy(artifact);
-            artifactArchiveInstaller.createAnchorFile(artifact.getArtifactName());
-            deploymentListener.onDeploymentSuccess(artifact.getArtifactName());
-        }
-        catch (Throwable t)
-        {
-            try
-            {
-                logDeploymentFailure(t, artifact.getArtifactName());
-                addZombieApp(artifact);
-                if (t instanceof DeploymentException)
-                {
-                    throw (DeploymentException) t;
-                }
-                String msg = "Failed to deploy artifact: " + artifact.getArtifactName();
-                throw new DeploymentException(MessageFactory.createStaticMessage(msg), t);
-            }
-            finally
-            {
-                deploymentListener.onDeploymentFailure(artifact.getArtifactName(), t);
-            }
-        }
-
-        artifactZombieMap.remove(artifact.getArtifactName());
+        redeploy(artifact, new Properties());
     }
 
     private static class ZombieFile
@@ -527,6 +461,90 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
         public boolean exists()
         {
             return file.exists();
+        }
+    }
+
+    @Override
+    public void redeploy(T artifact, Properties configurationManagementProperties) throws DeploymentException
+    {
+        if (logger.isInfoEnabled())
+        {
+            logger.info(miniSplash(String.format("Redeploying artifact '%s'", artifact.getArtifactName())));
+        }
+
+        deploymentListener.onUndeploymentStart(artifact.getArtifactName());
+        try
+        {
+            deployer.undeploy(artifact);
+            deploymentListener.onUndeploymentSuccess(artifact.getArtifactName());
+        }
+        catch (Throwable e)
+        {
+            // TODO make the exception better
+            deploymentListener.onUndeploymentFailure(artifact.getArtifactName(), e);
+        }
+
+        deploymentListener.onDeploymentStart(artifact.getArtifactName());
+        try
+        {
+            deployer.deploy(artifact, configurationManagementProperties);
+            artifactArchiveInstaller.createAnchorFile(artifact.getArtifactName());
+            deploymentListener.onDeploymentSuccess(artifact.getArtifactName());
+        }
+        catch (Throwable t)
+        {
+            try
+            {
+                logDeploymentFailure(t, artifact.getArtifactName());
+                addZombieApp(artifact);
+                if (t instanceof DeploymentException)
+                {
+                    throw (DeploymentException) t;
+                }
+                String msg = "Failed to deploy artifact: " + artifact.getArtifactName();
+                throw new DeploymentException(MessageFactory.createStaticMessage(msg), t);
+            }
+            finally
+            {
+                deploymentListener.onDeploymentFailure(artifact.getArtifactName(), t);
+            }
+        }
+
+        artifactZombieMap.remove(artifact.getArtifactName());
+    }
+
+    @Override
+    public void deployArtifact(T artifact, Properties configurationManagementProperties) throws DeploymentException
+    {
+        try
+        {
+            // add to the list of known artifacts first to avoid deployment loop on failure
+            trackArtifact(artifact);
+
+            deploymentListener.onDeploymentStart(artifact.getArtifactName());
+            deployer.deploy(artifact, configurationManagementProperties);
+            artifactArchiveInstaller.createAnchorFile(artifact.getArtifactName());
+            deploymentListener.onDeploymentSuccess(artifact.getArtifactName());
+            artifactZombieMap.remove(artifact.getArtifactName());
+        }
+        catch (Throwable t)
+        {
+            // error text has been created by the deployer already
+            String msg = miniSplash(String.format("Failed to deploy artifact '%s', see below", artifact.getArtifactName()));
+            logger.error(msg, t);
+
+            addZombieApp(artifact);
+
+            deploymentListener.onDeploymentFailure(artifact.getArtifactName(), t);
+            if (t instanceof DeploymentException)
+            {
+                throw (DeploymentException) t;
+            }
+            else
+            {
+                msg = "Failed to deploy artifact: " + artifact.getArtifactName();
+                throw new DeploymentException(MessageFactory.createStaticMessage(msg), t);
+            }
         }
     }
 }

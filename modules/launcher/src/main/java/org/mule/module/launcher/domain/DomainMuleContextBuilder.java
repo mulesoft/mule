@@ -28,6 +28,8 @@ import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.SecurityNotification;
 import org.mule.context.notification.ServerNotificationManager;
 
+import java.util.Properties;
+
 /**
  * Builder for domain MuleContext instance.
  */
@@ -36,9 +38,10 @@ public class DomainMuleContextBuilder extends DefaultMuleContextBuilder
 
     private final String domainId;
 
-    public DomainMuleContextBuilder(String domainId)
+    public DomainMuleContextBuilder(String domainId, Properties configurationManagementProperties)
     {
         this.domainId = domainId;
+        this.configurationManagementProperties = configurationManagementProperties;
     }
 
     @Override

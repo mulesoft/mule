@@ -63,6 +63,8 @@ import org.mule.util.SplashScreen;
 import org.mule.work.DefaultWorkListener;
 import org.mule.work.MuleWorkManager;
 
+import java.util.Properties;
+
 import javax.resource.spi.work.WorkListener;
 
 import org.apache.commons.logging.Log;
@@ -93,7 +95,9 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
     protected SplashScreen startupScreen;
 
     protected SplashScreen shutdownScreen;
-
+    
+    protected Properties configurationManagementProperties;
+    
     /**
      * {@inheritDoc}
      */
@@ -104,6 +108,7 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
         muleContext.setMuleConfiguration(injectMuleContextIfRequired(getMuleConfiguration(), muleContext));
         muleContext.setWorkManager(injectMuleContextIfRequired(getWorkManager(), muleContext));
         muleContext.setworkListener(getWorkListener());
+        muleContext.setConfigurationManagementProperties(getConfigurationManagementProperties());
         muleContext.setNotificationManager(injectMuleContextIfRequired(getNotificationManager(), muleContext));
         muleContext.setLifecycleManager(injectMuleContextIfRequired(getLifecycleManager(), muleContext));
         muleContext.setExpressionManager(injectMuleContextIfRequired(new DefaultExpressionManager(), muleContext));
@@ -123,6 +128,16 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
         muleContext.setObjectSerializer(defaultObjectSerializer);
 
         return muleContext;
+    }
+
+    private Properties getConfigurationManagementProperties()
+    {
+        if (configurationManagementProperties == null)
+        {
+            configurationManagementProperties = new Properties();
+        }
+            
+        return configurationManagementProperties;
     }
 
     protected DefaultMuleContext createDefaultMuleContext()

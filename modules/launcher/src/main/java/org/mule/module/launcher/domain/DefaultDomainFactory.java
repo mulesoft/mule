@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 public class DefaultDomainFactory implements DomainFactory
 {
@@ -103,5 +104,11 @@ public class DefaultDomainFactory implements DomainFactory
     public void start(DomainWrapper domainWrapper)
     {
         domains.put(domainWrapper.getArtifactName(), domainWrapper);
+    }
+
+    @Override
+    public Domain createArtifact(String artifactName, Properties configurationManagementProperties) throws IOException
+    {
+        return null;
     }
 }

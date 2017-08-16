@@ -17,13 +17,21 @@ import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.util.StringUtils;
 import org.mule.work.MuleWorkManager;
 
+import java.util.Properties;
+
 /**
  * Takes Mule application descriptor into account when building the context.
  */
 public class ApplicationMuleContextBuilder extends DefaultMuleContextBuilder
 {
     protected ApplicationDescriptor desc;
-
+    
+    public ApplicationMuleContextBuilder(ApplicationDescriptor desc, Properties configurationManagementProperties)
+    {
+        this.desc = desc;
+        this.configurationManagementProperties = configurationManagementProperties;
+    }
+    
     public ApplicationMuleContextBuilder(ApplicationDescriptor desc)
     {
         this.desc = desc;

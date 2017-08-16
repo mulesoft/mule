@@ -15,6 +15,7 @@ import org.mule.module.reboot.MuleContainerBootstrapUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -37,6 +38,19 @@ public class DefaultApplicationFactory implements ApplicationFactory
     public void setDeploymentListener(DeploymentListener deploymentListener)
     {
         this.deploymentListener = deploymentListener;
+    }
+
+    public Application createArtifact(String appName, Properties configurationManagementProperties) throws IOException
+    {
+        if (appName.contains(" "))
+        {
+            throw new IllegalArgumentException("Mule application name may not contain spaces: " + appName);
+        }
+
+        AppBloodhound bh = new DefaultAppBloodhound();
+        final ApplicationDescriptor descriptor = bh.fetch(appName);
+        descriptor.setConfigurationManagementProperties(configurationManagementProperties);
+        return createAppFrom(descriptor);
     }
 
     public Application createArtifact(String appName) throws IOException

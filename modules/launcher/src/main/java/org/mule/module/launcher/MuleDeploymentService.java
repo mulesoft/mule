@@ -38,6 +38,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -93,7 +94,7 @@ public class MuleDeploymentService implements DeploymentService
         this.domainDeployer = new DomainArchiveDeployer(
                 new DefaultArchiveDeployer<>(domainMuleDeployer, domainFactory, domains,
                                              new DomainDeploymentTemplate(applicationDeployer, this)),
-                applicationDeployer, this);
+                applicationDeployer, this, new Properties());
         this.domainDeployer.setDeploymentListener(domainDeploymentListener);
         if (useParallelDeployment())
         {
@@ -233,14 +234,7 @@ public class MuleDeploymentService implements DeploymentService
     @Override
     public void deploy(final URL appArchiveUrl) throws IOException
     {
-        executeSynchronized(new SynchronizedDeploymentAction()
-        {
-            @Override
-            public void execute()
-            {
-                applicationDeployer.deployPackagedArtifact(appArchiveUrl);
-            }
-        });
+        deploy(appArchiveUrl, null);
     }
 
     @Override
@@ -252,24 +246,7 @@ public class MuleDeploymentService implements DeploymentService
     @Override
     public void redeploy(final String artifactName)
     {
-        executeSynchronized(new SynchronizedDeploymentAction()
-        {
-            @Override
-            public void execute()
-            {
-                try
-                {
-                    applicationDeployer.redeploy(findApplication(artifactName));
-                }
-                catch (DeploymentException e)
-                {
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("Failure while redeploying application: " + artifactName, e);
-                    }
-                }
-            }
-        });
+        redeploy(artifactName, null);
     }
 
     @Override
@@ -294,28 +271,42 @@ public class MuleDeploymentService implements DeploymentService
     @Override
     public void deployDomain(final URL domainArchiveUrl) throws IOException
     {
-        executeSynchronized(new SynchronizedDeploymentAction()
-        {
-            @Override
-            public void execute()
-            {
-                domainDeployer.deployPackagedArtifact(domainArchiveUrl);
-            }
-        });
+        deployDomain(domainArchiveUrl, null);
     }
-
+    
     @Override
-    public void redeployDomain(final String domainName)
+    public void deployDomain(final URL domainArchiveUrl, final Properties appProperties) throws IOException
     {
         executeSynchronized(new SynchronizedDeploymentAction()
         {
             @Override
             public void execute()
             {
-                domainDeployer.redeploy(findDomain(domainName));
+                domainDeployer.deployPackagedArtifact(domainArchiveUrl, appProperties);
             }
         });
     }
+
+
+    @Override
+    public void redeployDomain(final String domainName)
+    {
+        redeployDomain(domainName, null);
+    }
+    
+    @Override
+    public void redeployDomain(final String domainName, final Properties appProperties)
+    {
+        executeSynchronized(new SynchronizedDeploymentAction()
+        {
+            @Override
+            public void execute()
+            {
+                domainDeployer.redeploy(findDomain(domainName), appProperties);
+            }
+        });
+    }
+
 
     @Override
     public void addStartupListener(StartupListener listener)
@@ -399,5 +390,41 @@ public class MuleDeploymentService implements DeploymentService
                 deploymentLock.unlock();
             }
         }
+    }
+
+    @Override
+    public void deploy(final URL appArchiveUrl, final Properties appProperties) throws IOException
+    {
+        executeSynchronized(new SynchronizedDeploymentAction()
+        {
+            @Override
+            public void execute()
+            {
+                applicationDeployer.deployPackagedArtifact(appArchiveUrl, appProperties);
+            }
+        });        
+    }
+
+    @Override
+    public void redeploy(final String artifactName, final Properties appProperties)
+    {
+        executeSynchronized(new SynchronizedDeploymentAction()
+        {
+            @Override
+            public void execute()
+            {
+                try
+                {
+                    applicationDeployer.redeploy(findApplication(artifactName), appProperties);
+                }
+                catch (DeploymentException e)
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Failure while redeploying application: " + artifactName, e);
+                    }
+                }
+            }
+        });
     }
 }

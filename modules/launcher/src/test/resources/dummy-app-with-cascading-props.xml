@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:spring="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-current.xsd">
+
+	<global-property name="prop1" value="value1" />
+
+	<spring:beans>
+		<util:map id="appProperties">
+			<spring:entry key="prop1" value="${prop1}" />
+		</util:map>
+	</spring:beans>
+</mule>

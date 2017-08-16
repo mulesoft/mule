@@ -13,6 +13,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 
@@ -35,7 +36,8 @@ public class ApplicationDescriptor extends ArtifactDescriptor
     private String[] absoluteResourcePaths;
     private File[] configResourcesFile;
     private Map<String, String> appProperties = new HashMap<String, String>();
-
+    private Properties configurationManagementProperties = new Properties();
+    
     private File logConfigFile;
 
     private Set<PluginDescriptor> plugins = new HashSet<PluginDescriptor>(0);
@@ -158,4 +160,13 @@ public class ApplicationDescriptor extends ArtifactDescriptor
         this.packagesToScan = packages;
     }
 
+    public Properties getConfigurationManagementProperties()
+    {
+        return configurationManagementProperties;
+    }
+
+    public void setConfigurationManagementProperties(Properties configurationManagementProperties)
+    {
+        this.configurationManagementProperties = configurationManagementProperties;
+    }
 }

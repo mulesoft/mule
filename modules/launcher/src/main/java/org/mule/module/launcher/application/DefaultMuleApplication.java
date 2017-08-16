@@ -6,11 +6,14 @@
  */
 package org.mule.module.launcher.application;
 
+import static java.io.File.separator;
+import static org.mule.util.FileUtils.newFile;
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.util.SplashScreen.miniSplash;
 import org.mule.MuleServer;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.context.notification.MuleContextNotificationListener;
@@ -18,10 +21,13 @@ import org.mule.api.context.notification.ServerNotificationListener;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.config.builders.ExtensionsManagerConfigurationBuilder;
 import org.mule.config.builders.SimpleConfigurationBuilder;
+import org.mule.config.i18n.CoreMessages;
+import org.mule.config.i18n.Message;
 import org.mule.context.DefaultMuleContextFactory;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.NotificationException;
 import org.mule.lifecycle.phases.NotInLifecyclePhase;
+import org.mule.module.launcher.ConfigurationManagamentAware;
 import org.mule.module.launcher.DeploymentInitException;
 import org.mule.module.launcher.DeploymentListener;
 import org.mule.module.launcher.DeploymentStartException;
@@ -29,6 +35,7 @@ import org.mule.module.launcher.DeploymentStopException;
 import org.mule.module.launcher.DisposableClassLoader;
 import org.mule.module.launcher.InstallException;
 import org.mule.module.launcher.MuleDeploymentService;
+import org.mule.module.launcher.MuleFoldersUtil;
 import org.mule.module.launcher.artifact.ArtifactClassLoader;
 import org.mule.module.launcher.artifact.MuleContextDeploymentListener;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
@@ -38,14 +45,19 @@ import org.mule.util.ClassUtils;
 import org.mule.util.ExceptionUtils;
 
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class DefaultMuleApplication implements Application
+public class DefaultMuleApplication extends ConfigurationManagamentAware implements Application
 {
 
     protected transient final Log logger = LogFactory.getLog(getClass());
@@ -60,6 +72,7 @@ public class DefaultMuleApplication implements Application
     private Domain domain;
     protected DeploymentListener deploymentListener;
     private ServerNotificationListener<MuleContextNotification> statusListener;
+    private Properties configurationManagementProperties;
 
     public DefaultMuleApplication(ApplicationDescriptor descriptor, ApplicationClassLoaderFactory applicationClassLoaderFactory, Domain domain)
     {
@@ -67,6 +80,7 @@ public class DefaultMuleApplication implements Application
         this.applicationClassLoaderFactory = applicationClassLoaderFactory;
         this.deploymentListener = new NullDeploymentListener();
         this.domain = domain;
+        this.configurationManagementProperties = descriptor.getConfigurationManagementProperties();
         updateStatusFor(NotInLifecyclePhase.PHASE_NAME);
     }
 
@@ -199,8 +213,9 @@ public class DefaultMuleApplication implements Application
                     muleContextFactory.addListener(new MuleContextDeploymentListener(getArtifactName(), deploymentListener));
                 }
 
-                ApplicationMuleContextBuilder applicationContextBuilder = new ApplicationMuleContextBuilder(descriptor);
-                setMuleContext(muleContextFactory.createMuleContext(builders, applicationContextBuilder));
+                ApplicationMuleContextBuilder applicationContextBuilder = new ApplicationMuleContextBuilder(descriptor, configurationManagementProperties);
+                MuleContext muleContext = muleContextFactory.createMuleContext(builders, applicationContextBuilder);
+                setMuleContext(muleContext);
             }
         }
         catch (Exception e)
@@ -250,7 +265,7 @@ public class DefaultMuleApplication implements Application
         status = ApplicationStatus.DEPLOYMENT_FAILED;
     }
 
-    protected ConfigurationBuilder createConfigurationBuilderFromApplicationProperties()
+    protected ConfigurationBuilder createConfigurationBuilderFromApplicationProperties() throws IOException
     {
         // Load application properties first since they may be needed by other configuration builders
         final Map<String, String> appProperties = descriptor.getAppProperties();
@@ -259,9 +274,27 @@ public class DefaultMuleApplication implements Application
         File appPath = new File(MuleContainerBootstrapUtils.getMuleAppsDir(), getArtifactName());
         appProperties.put(MuleProperties.APP_HOME_DIRECTORY_PROPERTY, appPath.getAbsolutePath());
 
+        File muleDataPath = new File(MuleFoldersUtil.getExecutionFolder(), getArtifactName());
+
         appProperties.put(MuleProperties.APP_NAME_PROPERTY, getArtifactName());
 
-        return new SimpleConfigurationBuilder(appProperties);
+        setConfigurationManagementProperties(manageConfigurationManagementPersistence(muleDataPath.getAbsolutePath(), getConfigurationManagementProperties()));
+        
+        return new SimpleConfigurationBuilder(merge(appProperties, getConfigurationManagementProperties()));
+    }
+
+
+
+    private Map<String, String> merge(Map<String, String> properties, Properties configurationManagementProperties)
+    {
+        Map<String, String> mergedProperties = new HashMap<String, String>();
+        mergedProperties.putAll(properties);
+        for (Map.Entry<Object, Object> entry : configurationManagementProperties.entrySet())
+        {
+            mergedProperties.put(entry.getKey().toString(), entry.getValue().toString());
+        }        
+        
+        return mergedProperties;
     }
 
     protected void addAnnotationsConfigBuilderIfPresent(List<ConfigurationBuilder> builders) throws Exception
@@ -419,6 +452,17 @@ public class DefaultMuleApplication implements Application
 
         muleContext.dispose();
         muleContext = null;
+    }
+
+    public Properties getConfigurationManagementProperties()
+    {
+        return configurationManagementProperties;
+    }
+
+    @Override
+    public void setConfigurationManagementProperties(Properties configurationManagementProperties)
+    {
+        this.configurationManagementProperties = configurationManagementProperties;        
     }
 
 }

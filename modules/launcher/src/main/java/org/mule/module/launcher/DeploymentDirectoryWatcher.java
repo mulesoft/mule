@@ -164,7 +164,7 @@ public class DeploymentDirectoryWatcher implements Runnable
 
                         if (applicationFile.exists() && applicationFile.isFile())
                         {
-                            applicationArchiveDeployer.deployPackagedArtifact(app + ZIP_FILE_SUFFIX);
+                            applicationArchiveDeployer.deployPackagedArtifact(app + ZIP_FILE_SUFFIX, null);
                         }
                         else
                         {
@@ -276,7 +276,7 @@ public class DeploymentDirectoryWatcher implements Runnable
         {
             try
             {
-                applicationArchiveDeployer.deployPackagedArtifact(zip);
+                applicationArchiveDeployer.deployPackagedArtifact(zip, null);
             }
             catch (Exception e)
             {
@@ -486,7 +486,7 @@ public class DeploymentDirectoryWatcher implements Runnable
         {
             try
             {
-                domainArchiveDeployer.deployPackagedArtifact(zip);
+                domainArchiveDeployer.deployPackagedArtifact(zip, null);
             }
             catch (Exception e)
             {
