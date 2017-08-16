@@ -220,7 +220,7 @@
 /mule-standalone-${productVersion}/lib/opt/commons-codec-1.9.jar
 /mule-standalone-${productVersion}/lib/opt/commons-collections-3.2.2.jar
 /mule-standalone-${productVersion}/lib/opt/commons-dbutils-1.2.jar
-/mule-standalone-${productVersion}/lib/opt/commons-digester-1.8.jar
+/mule-standalone-${productVersion}/lib/opt/commons-digester-1.8.1.jar
 /mule-standalone-${productVersion}/lib/opt/commons-httpclient-3.1.jar
 /mule-standalone-${productVersion}/lib/opt/commons-io-2.4.jar
 /mule-standalone-${productVersion}/lib/opt/commons-jxpath-1.3.jar
@@ -228,7 +228,7 @@
 /mule-standalone-${productVersion}/lib/opt/commons-lang3-3.6.jar
 /mule-standalone-${productVersion}/lib/opt/commons-net-3.5.jar
 /mule-standalone-${productVersion}/lib/opt/commons-pool-1.6.jar
-/mule-standalone-${productVersion}/lib/opt/commons-validator-1.4.0.jar
+/mule-standalone-${productVersion}/lib/opt/commons-validator-1.6.jar
 /mule-standalone-${productVersion}/lib/opt/cxf-api-2.7.15.jar
 /mule-standalone-${productVersion}/lib/opt/cxf-rt-management-2.7.15.jar
 /mule-standalone-${productVersion}/lib/opt/cxf-rt-bindings-soap-2.7.15.jar
