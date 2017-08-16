@@ -8,10 +8,6 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 
     <spring:bean id="txManagerFactory" class="org.mule.tck.testmodels.mule.TestTransactionManagerFactory"/>
 
-    <spring:bean id="txClient" class="org.mule.test.integration.transaction.TransactionManagerInjectTestCase.TransactionClient">
-        <spring:property name="txMgr">
-            <spring:ref bean="txManagerFactory"/>
-        </spring:property>
-    </spring:bean>
+    <spring:bean id="txClient" class="org.mule.test.integration.transaction.TransactionManagerInjectTestCase.TransactionClient" autowire="byType"/>
 
 </mule>

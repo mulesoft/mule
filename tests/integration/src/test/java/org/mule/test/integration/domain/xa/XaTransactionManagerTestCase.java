@@ -6,12 +6,24 @@
  */
 package org.mule.test.integration.domain.xa;
 
+import org.junit.Rule;
 import org.junit.Test;
-import org.mule.api.MuleRuntimeException;
+import org.junit.rules.ExpectedException;
+import org.mule.api.config.ConfigurationException;
 import org.mule.tck.junit4.DomainFunctionalTestCase;
 
 public class XaTransactionManagerTestCase extends DomainFunctionalTestCase
 {
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
+    @Override
+    public void setUpMuleContexts() throws Exception
+    {
+        thrown.expect(ConfigurationException.class);
+        super.setUpMuleContexts();
+    }
 
     public static final String APPLICATION_NAME = "app";
 
@@ -29,7 +41,7 @@ public class XaTransactionManagerTestCase extends DomainFunctionalTestCase
         };
     }
 
-    @Test(expected = MuleRuntimeException.class)
+    @Test
     public void validateOnlyOneTxManagerCanBeUsed()
     {
         // This is never called since the exception is thrown during init.
