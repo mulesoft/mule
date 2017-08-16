@@ -23,10 +23,11 @@ import org.mule.security.AbstractSecurityFilter;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mule.util.StringUtils;
 import org.springframework.security.core.GrantedAuthority;
 
 /**
@@ -35,7 +36,7 @@ import org.springframework.security.core.GrantedAuthority;
 public class AuthorizationFilter extends AbstractSecurityFilter
 {
     protected final Log logger = LogFactory.getLog(getClass());
-    private Collection<String> requiredAuthorities = new HashSet<String>();
+    private Collection<String> requiredAuthorities = new LinkedHashSet<String>();
 
     public void doFilter(MuleEvent event)
         throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
@@ -73,6 +74,7 @@ public class AuthorizationFilter extends AbstractSecurityFilter
                 if (requiredAuthorities.contains(authority.getAuthority()))
                 {
                     authorized = true;
+                    break; // no need to proceed with loop any longer
                 }
             }
         }
@@ -85,13 +87,16 @@ public class AuthorizationFilter extends AbstractSecurityFilter
         }
     }
 
-    public Collection<String> getRequiredAuthorities()
+    public String getRequiredAuthorities()
     {
-        return requiredAuthorities;
+        return StringUtils.join(this.requiredAuthorities, ", ");
     }
 
-    public void setRequiredAuthorities(Collection<String> requiredAuthorities)
+    public void setRequiredAuthorities(String requiredAuthorities)
     {
-        this.requiredAuthorities = requiredAuthorities;
+        if (requiredAuthorities != null)
+        {
+            this.requiredAuthorities = new LinkedHashSet<>(Arrays.asList(StringUtils.splitAndTrim(requiredAuthorities, ",")));
+        }
     }
 }
