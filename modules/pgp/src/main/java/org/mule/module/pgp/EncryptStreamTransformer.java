@@ -96,6 +96,7 @@ public class EncryptStreamTransformer implements StreamTransformer
             encryptedOutputStream.close();
             result.close();
             toBeEncrypted.close();
+            outputStream.close();
         }
     }
 
