@@ -29,7 +29,6 @@ import static org.mule.runtime.core.api.context.notification.ListenerSubscriptio
 import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
 import static org.mule.runtime.core.api.transaction.MuleTransactionConfig.ACTION_INDIFFERENT_STRING;
 import static org.mule.runtime.core.api.transaction.TransactionType.LOCAL;
-import static org.mule.runtime.core.privileged.routing.outbound.AbstractOutboundRouter.DEFAULT_FAILURE_EXPRESSION;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildCollectionConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildMapConfiguration;
@@ -60,6 +59,7 @@ import static org.mule.runtime.internal.dsl.DslConstants.POOLING_PROFILE_ELEMENT
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
+
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.DataUnit;
@@ -426,9 +426,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
             .withSetterParameterDefinition("maxRetries", fromSimpleParameter("maxRetries").withDefaultValue(5).build())
             .withSetterParameterDefinition("millisBetweenRetries",
                                            fromSimpleParameter("millisBetweenRetries").withDefaultValue(60000).build())
-            .withSetterParameterDefinition("failureExpression",
-                                           fromSimpleParameter("failureExpression").withDefaultValue(DEFAULT_FAILURE_EXPRESSION)
-                                               .build())
             .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
             .build());
     componentBuildingDefinitions.add(baseDefinition.withIdentifier(FOREACH).withTypeDefinition(fromType(Foreach.class))
@@ -441,9 +438,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .build());
     componentBuildingDefinitions
         .add(baseDefinition.withIdentifier(FIRST_SUCCESSFUL).withTypeDefinition(fromType(FirstSuccessful.class))
-            .withSetterParameterDefinition("failureExpression",
-                                           fromSimpleParameter("failureExpression").withDefaultValue(DEFAULT_FAILURE_EXPRESSION)
-                                               .build())
             .withSetterParameterDefinition(MESSAGE_PROCESSORS,
                                            fromChildCollectionConfiguration(MessageProcessorChain.class).build())
             .build());

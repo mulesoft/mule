@@ -3074,13 +3074,6 @@
         <xsd:complexType>
             <xsd:complexContent>
                 <xsd:extension base="processorWithAtLeastOneTargetType">
-                    <xsd:attribute name="failureExpression" type="xsd:string">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                Specifies an expression that when evaluated as determines if the processing of one a route was a failure or not.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:attribute>
                 </xsd:extension>
             </xsd:complexContent>
         </xsd:complexType>
@@ -3110,14 +3103,6 @@
                                 Specifies the minimum time interval between two process retries in milliseconds.
                                 The actual time interval depends on the previous execution but should not exceed twice this number.
                                 Default value is 60000 (one minute)
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:attribute>
-                    <xsd:attribute name="failureExpression" type="xsd:string" use="optional">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                Specifies an expression that when evaluated determines if the processing of one a route was a failure or not.
-                                If no expression is specified, only exceptions will be considered as processing failures.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:attribute>

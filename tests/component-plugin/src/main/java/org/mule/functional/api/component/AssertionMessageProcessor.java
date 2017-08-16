@@ -81,7 +81,7 @@ public class AssertionMessageProcessor extends AbstractAnnotatedObject implement
       if (needToMatchCount) {
         fail(format("%sExpected count of %d but got %d.", failureMessagePrefix(), count, invocationCount));
       } else {
-        fail(format("%sNo event was received.", failureMessagePrefix(), count));
+        fail(format("%sNo event was received.", failureMessagePrefix()));
       }
     } else if (expressionFailed()) {
       fail(failureMessagePrefix() + "Expression " + expression + " evaluated false.");
