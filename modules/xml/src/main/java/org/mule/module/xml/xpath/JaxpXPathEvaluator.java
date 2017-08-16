@@ -12,10 +12,16 @@ import org.mule.api.MuleRuntimeException;
 import org.mule.module.xml.i18n.XmlMessages;
 import org.mule.module.xml.util.NamespaceManager;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.cache.RemovalListener;
+import com.google.common.cache.RemovalNotification;
 import com.google.common.collect.ImmutableMap;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
@@ -23,7 +29,6 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 import javax.xml.xpath.XPathVariableResolver;
 
-import org.apache.commons.pool.BaseObjectPool;
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.w3c.dom.Node;
 
@@ -31,20 +36,20 @@ import org.w3c.dom.Node;
  * This is the preferred base implementation of {@link XPathEvaluator}. Because it's
  * based on the JAXP API (JSR-206), it's ideal for keeping a common code base which
  * can work with different engines, as long as they implement that API.
- *
+ * <p>
  * This base class contains all of the logic necessary to comply with the
  * {@link XPathEvaluator} contract. Implementations only need to implement
  * {@link #createXPathFactory()} in order to provide the {@link XPathFactory}
  * implementation it wishes to use.
- *
+ * <p>
  * Another important feature of this implementation is that it caches compiled
  * versions of executed expressions to provide better performance. Expressions that haven't
  * been used for more than a minute are automatically evicted.
- *
+ * <p>
  * In addition to the {@link #registerNamespaces(Map)} and {@link #registerNamespaces(NamespaceManager)}
  * methods, this implementation also provides out of the box support for the standard namespaces
  * defined in {@link XPathNamespaceContext}
- *
+ * <p>
  * In order to allow binding expression parameters to flow variables, this class also
  * implements the {@link XPathVariableResolver} interface. Because this class caches
  * compiled expressions which might be executed concurrently in different threads, we need a
@@ -67,7 +72,26 @@ public abstract class JaxpXPathEvaluator implements XPathEvaluator, XPathVariabl
     private final XPathFactory xpathFactory;
     private final Map<String, String> prefixToNamespaceMap = new HashMap<>();
     private final ThreadLocal<MuleEvent> evaluationEvent = new ThreadLocal<>();
-    private Map<String, GenericObjectPool<XPathExpression>> xpathExpressionPools = new HashMap<>();
+    private final LoadingCache<String, GenericObjectPool<XPathExpression>> xpathExpressionPoolCache = CacheBuilder.newBuilder()
+            .expireAfterAccess(10, TimeUnit.MINUTES)
+            .removalListener(new RemovalListener<String, GenericObjectPool<XPathExpression>>()
+            {
+                @Override
+                public void onRemoval(RemovalNotification<String, GenericObjectPool<XPathExpression>> notification)
+                {
+                    notification.getValue().clear();
+
+                }
+            })
+            .build(new CacheLoader<String, GenericObjectPool<XPathExpression>>()
+            {
+                @Override
+                public GenericObjectPool<XPathExpression> load(String key) throws Exception
+                {
+                    return getXPathExpressionPool(key);
+                }
+            });
+
 
 
     private NamespaceContext namespaceContext;
@@ -102,10 +126,12 @@ public abstract class JaxpXPathEvaluator implements XPathEvaluator, XPathVariabl
     public Object evaluate(String xpathExpression, Node input, XPathReturnType returnType, MuleEvent event)
     {
         XPathExpression xpath = null;
+        GenericObjectPool <XPathExpression> xpathExpressionPool = null;
         try
         {
             evaluationEvent.set(event);
-            xpath = getXpathExpression(xpathExpression);
+            xpathExpressionPool = xpathExpressionPoolCache.get(xpathExpression);
+            xpath = xpathExpressionPool.borrowObject();
             Object result = xpath.evaluate(input, returnType.toQName());
             return result;
         }
@@ -118,12 +144,12 @@ public abstract class JaxpXPathEvaluator implements XPathEvaluator, XPathVariabl
             evaluationEvent.remove();
             try
             {
-                if(xpath != null)
+                if (xpathExpressionPool != null && xpath != null)
                 {
-                    getXPathExpressionPool(xpathExpression).returnObject(xpath);
+                    xpathExpressionPool.returnObject(xpath);
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 throw new MuleRuntimeException(XmlMessages.failedToProcessXPath(xpathExpression), e);
             }
@@ -134,6 +160,7 @@ public abstract class JaxpXPathEvaluator implements XPathEvaluator, XPathVariabl
     /**
      * Resolves the given variable against the flow variables
      * in the {@link MuleEvent} held by {@link #evaluationEvent}
+     *
      * @param variableName the variable name
      * @return the variable value. Might be {@code null}
      */
@@ -158,6 +185,7 @@ public abstract class JaxpXPathEvaluator implements XPathEvaluator, XPathVariabl
         checkArgument(namespaces != null, "cannot register null namespaces");
         prefixToNamespaceMap.putAll(namespaces);
         namespaceContext = newNamespaceContext();
+        xpathExpressionPoolCache.invalidateAll();
     }
 
     /**
@@ -181,30 +209,15 @@ public abstract class JaxpXPathEvaluator implements XPathEvaluator, XPathVariabl
         return ImmutableMap.copyOf(prefixToNamespaceMap);
     }
 
-    private XPathExpression getXpathExpression(String expression) throws Exception
+    private GenericObjectPool<XPathExpression> getXPathExpressionPool(String expression)
     {
-        return getXPathExpressionPool(expression).borrowObject();
+        GenericObjectPool genericPool = new GenericObjectPool(new XPathExpressionFactory(xpathFactory, expression, namespaceContext, this));
+        genericPool.setMaxActive(MAX_ACTIVE_XPATH_EXPRESSIONS);
+        genericPool.setMaxIdle(MAX_IDLE_XPATH_EXPRESSIONS);
+        genericPool.setMinIdle(MIN_IDLE_XPATH_EXPRESSIONS);
+        return genericPool;
     }
 
-    private BaseObjectPool<XPathExpression> getXPathExpressionPool(String expression)
-    {
-        synchronized (xpathExpressionPools)
-        {
-            GenericObjectPool <XPathExpression> xpathExpressionPool = xpathExpressionPools.get(expression);
-
-            if (xpathExpressionPool == null)
-            {
-                GenericObjectPool genericPool = new GenericObjectPool(new XPathExpressionFactory(xpathFactory, expression, namespaceContext, this));
-                genericPool.setMaxActive(MAX_ACTIVE_XPATH_EXPRESSIONS);
-                genericPool.setMaxIdle(MAX_IDLE_XPATH_EXPRESSIONS);
-                genericPool.setMinIdle(MIN_IDLE_XPATH_EXPRESSIONS);
-                xpathExpressionPools.put(expression, genericPool);
-                xpathExpressionPool = genericPool;
-            }
-            return xpathExpressionPool;
-        }
-
-    }
 
     protected NamespaceContext newNamespaceContext()
     {

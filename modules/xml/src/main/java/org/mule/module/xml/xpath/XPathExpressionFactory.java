@@ -15,7 +15,7 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 import javax.xml.xpath.XPathVariableResolver;
 
-public class XPathExpressionFactory extends BasePoolableObjectFactory <XPathExpression>
+class XPathExpressionFactory extends BasePoolableObjectFactory <XPathExpression>
 {
 
     private final String expression;

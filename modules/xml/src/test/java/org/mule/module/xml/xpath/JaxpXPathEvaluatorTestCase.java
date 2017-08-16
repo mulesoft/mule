@@ -17,7 +17,6 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import java.io.InputStream;
 import java.util.concurrent.CountDownLatch;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Node;
@@ -36,7 +35,6 @@ public class JaxpXPathEvaluatorTestCase extends AbstractMuleContextTestCase
     private Node evenNode;
     private Node oddNode;
     private Exception exception = null;
-    private long start ;
 
     @Before
     public void setUp() throws Exception
@@ -47,7 +45,6 @@ public class JaxpXPathEvaluatorTestCase extends AbstractMuleContextTestCase
         payload = getClass().getClassLoader().getResourceAsStream("test-concurrency-xpath-evaluator-odd.xml");
         oddEvent = getTestEvent(payload);
         oddNode = toDOMNode(payload, oddEvent);
-        start = System.currentTimeMillis();
     }
 
     @Test
@@ -141,8 +138,4 @@ public class JaxpXPathEvaluatorTestCase extends AbstractMuleContextTestCase
         }
     }
 
-    @After
-    public void end() {
-        System.out.println("DURATION: " + (System.currentTimeMillis() - start));
-    }
 }
