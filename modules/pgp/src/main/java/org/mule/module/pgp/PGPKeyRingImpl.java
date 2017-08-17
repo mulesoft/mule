@@ -56,6 +56,8 @@ public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
 
     private PGPSecretKeyRingCollection secretKeys;
 
+    private PGPPublicKeyRingCollection publicKeys;
+
     private boolean readSecretKey ;
 
     public void initialise() throws InitialisationException
@@ -81,11 +83,11 @@ public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
             validateNotNull(getPublicKeyRingFileName(), noSecretKeyDefined());
             InputStream inputStream = IOUtils.getResourceAsStream(getPublicKeyRingFileName(), getClass());
             validateNotNull(inputStream, noFileKeyFound(getPublicKeyRingFileName()));
-            PGPPublicKeyRingCollection collection = new PGPPublicKeyRingCollection(inputStream, KEY_FINGERPRINT_CALCULATOR);
+            publicKeys = new PGPPublicKeyRingCollection(inputStream, KEY_FINGERPRINT_CALCULATOR);
             inputStream.close();
 
             principalsKeyBundleMap = new HashMap<>();
-            Iterator keyRingsIterator = collection.getKeyRings();
+            Iterator keyRingsIterator = publicKeys.getKeyRings();
             while (keyRingsIterator.hasNext())
             {
                 PGPPublicKeyRing ring = (PGPPublicKeyRing) keyRingsIterator.next();
@@ -199,5 +201,10 @@ public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
             readPublicKeyRing();
         }
         return principalsKeyBundleMap.get(principalId);
+    }
+
+    public PGPPublicKeyRingCollection getPublicKeys()
+    {
+        return publicKeys;
     }
 }
