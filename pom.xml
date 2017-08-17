@@ -223,7 +223,7 @@
         <muleMetadataModelVersion>1.0.0-rc.cyborg</muleMetadataModelVersion>
         <metadataModelApiVersion>${muleMetadataModelVersion}</metadataModelApiVersion>
 
-        <muleSpringModuleTestVersion>0.9.0-SNAPSHOT</muleSpringModuleTestVersion>
+        <muleSpringModuleTestVersion>0.9.0-rc.cyborg-SNAPSHOT</muleSpringModuleTestVersion>
         <muleHttpConnectorTestVersion>0.9.0-rc.cyborg-SNAPSHOT</muleHttpConnectorTestVersion>
         <muleSocketsConnectorTestVersion>0.9.0-rc.cyborg-SNAPSHOT</muleSocketsConnectorTestVersion>
         <muleFileConnectorTestVersion>0.9.0-rc.cyborg-SNAPSHOT</muleFileConnectorTestVersion>
