@@ -14,7 +14,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo;
 import org.mule.runtime.core.api.execution.LocationExecutionContextProvider;
-import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,27 +31,19 @@ public class MessagingExceptionLocationProvider extends LocationExecutionContext
   }
 
   @Override
-  public Map<String, Object> getContextInfo(EnrichedNotificationInfo notificationInfo, Processor lastProcessed) {
+  public Map<String, Object> getContextInfo(EnrichedNotificationInfo notificationInfo, AnnotatedObject lastProcessed) {
     Map<String, Object> contextInfo = new HashMap<>();
 
-    contextInfo.put(INFO_LOCATION_KEY,
-                    resolveProcessorRepresentation(muleContext.getConfiguration().getId(),
-                                                   getProcessorPath(lastProcessed), lastProcessed));
-    if (lastProcessed instanceof AnnotatedObject) {
-      String sourceXML = getSourceXML((AnnotatedObject) lastProcessed);
-      if (sourceXML != null) {
-        contextInfo.put(INFO_SOURCE_XML_KEY, sourceXML);
-      }
+    contextInfo.put(INFO_LOCATION_KEY, resolveProcessorRepresentation(muleContext.getConfiguration().getId(),
+                                                                      lastProcessed.getLocation() != null
+                                                                          ? lastProcessed.getLocation().getLocation()
+                                                                          : null,
+                                                                      lastProcessed));
+    String sourceXML = getSourceXML(lastProcessed);
+    if (sourceXML != null) {
+      contextInfo.put(INFO_SOURCE_XML_KEY, sourceXML);
     }
 
     return contextInfo;
-  }
-
-  protected String getProcessorPath(Processor lastProcessed) {
-    if (lastProcessed instanceof AnnotatedObject && ((AnnotatedObject) lastProcessed).getLocation() != null) {
-      return ((AnnotatedObject) lastProcessed).getLocation().getLocation();
-    } else {
-      return lastProcessed.toString();
-    }
   }
 }

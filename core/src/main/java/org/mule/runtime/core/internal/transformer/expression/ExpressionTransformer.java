@@ -6,10 +6,11 @@
  */
 package org.mule.runtime.core.internal.transformer.expression;
 
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.expressionReturnedNull;
+
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
 
 import java.nio.charset.Charset;
 import java.util.Iterator;
@@ -49,7 +50,7 @@ public class ExpressionTransformer extends AbstractExpressionTransformer {
       }
 
       if (!argument.isOptional() && results[i] == null) {
-        throw new TransformerException(CoreMessages.expressionReturnedNull(argument.getExpressionConfig().getExpression()), this);
+        throw new TransformerException(expressionReturnedNull(argument.getExpressionConfig().getExpression()), this);
       }
 
     }

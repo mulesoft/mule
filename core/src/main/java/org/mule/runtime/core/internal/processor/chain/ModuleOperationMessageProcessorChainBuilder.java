@@ -17,6 +17,7 @@ import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
+
 import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.utils.MetadataTypeUtils;
@@ -55,7 +56,7 @@ import org.reactivestreams.Publisher;
  * Taking the following sample where the current event is processed using {@link ModuleOperationProcessorChain#apply(Publisher)},
  * has a variable under "person" with a value of "stranger!", the result of executing the above processor will be "howdy
  * stranger!":
- * 
+ *
  * <pre>
  *  <module-operation-chain moduleName="a-module-name" moduleOperation="an-operation-name">
  *    <module-operation-properties/>
@@ -135,7 +136,7 @@ public class ModuleOperationMessageProcessorChainBuilder extends DefaultMessageP
     /**
      * To properly feed the {@link ExpressionManager#evaluate(String, DataType, BindingContext, InternalEvent)} we need to store
      * the {@link MetadataType} per parameter, so that the {@link DataType} can be generated.
-     * 
+     *
      * @param parameters list of parameters taken from the XML
      * @param parameterModels collection of elements taken from the matching {@link ExtensionModel}
      * @return a collection of parameters to be later consumed in {@link #getEvaluatedValue(InternalEvent, String, MetadataType)}
@@ -205,9 +206,7 @@ public class ModuleOperationMessageProcessorChainBuilder extends DefaultMessageP
     private Object getEvaluatedValue(InternalEvent event, String value, MetadataType metadataType) {
       ComponentLocation headLocation = null;
       final Processor head = getProcessorsToExecute().get(0);
-      if (head instanceof AnnotatedObject) {
-        headLocation = ((AnnotatedObject) head).getLocation();
-      }
+      headLocation = ((AnnotatedObject) head).getLocation();
 
       Object evaluatedResult;
       if (MetadataFormat.JAVA.equals(metadataType.getMetadataFormat())) {

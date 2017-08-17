@@ -6,9 +6,11 @@
  */
 package org.mule.runtime.core.internal.transformer.expression;
 
-import org.mule.runtime.api.metadata.DataType;
+import static java.lang.Thread.currentThread;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
+
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.AbstractMessageTransformer;
 
 import java.util.ArrayList;
@@ -40,7 +42,7 @@ public abstract class AbstractExpressionTransformer extends AbstractMessageTrans
     // No type checking by default
     registerSourceType(DataType.OBJECT);
     setReturnDataType(DataType.OBJECT);
-    arguments = new ArrayList<ExpressionArgument>(4);
+    arguments = new ArrayList<>(4);
   }
 
   public void addArgument(ExpressionArgument argument) {
@@ -60,12 +62,12 @@ public abstract class AbstractExpressionTransformer extends AbstractMessageTrans
   @Override
   public void initialise() throws InitialisationException {
     if (arguments == null || arguments.size() == 0) {
-      throw new InitialisationException(CoreMessages.objectIsNull("arguments[]"), this);
+      throw new InitialisationException(objectIsNull("arguments[]"), this);
     }
 
     for (ExpressionArgument argument : arguments) {
       argument.setMuleContext(muleContext);
-      argument.setExpressionEvaluationClassLoader(Thread.currentThread().getContextClassLoader());
+      argument.setExpressionEvaluationClassLoader(currentThread().getContextClassLoader());
       try {
         argument.validate();
       } catch (Exception e) {

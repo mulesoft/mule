@@ -6,16 +6,22 @@
  */
 package org.mule.tests.parsers.api;
 
-import org.mule.runtime.core.api.InternalEvent;
+import static org.mule.tests.parsers.api.LifecycleAction.DISPOSE;
+import static org.mule.tests.parsers.api.LifecycleAction.INITIALISE;
+import static org.mule.tests.parsers.api.LifecycleAction.START;
+import static org.mule.tests.parsers.api.LifecycleAction.STOP;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.LinkedList;
 import java.util.List;
 
-public class LifecycleSensingMessageProcessor implements Lifecycle, Processor {
+public class LifecycleSensingMessageProcessor extends AbstractAnnotatedObject implements Lifecycle, Processor {
 
   private List<LifecycleAction> lifecycleActions = new LinkedList<>();
   private LifecycleSensingObjectFactory objectFactory;
@@ -26,22 +32,22 @@ public class LifecycleSensingMessageProcessor implements Lifecycle, Processor {
 
   @Override
   public void dispose() {
-    lifecycleActions.add(LifecycleAction.DISPOSE);
+    lifecycleActions.add(DISPOSE);
   }
 
   @Override
   public void initialise() throws InitialisationException {
-    lifecycleActions.add(LifecycleAction.INITIALISE);
+    lifecycleActions.add(INITIALISE);
   }
 
   @Override
   public void start() throws MuleException {
-    lifecycleActions.add(LifecycleAction.START);
+    lifecycleActions.add(START);
   }
 
   @Override
   public void stop() throws MuleException {
-    lifecycleActions.add(LifecycleAction.STOP);
+    lifecycleActions.add(STOP);
   }
 
   public List<LifecycleAction> getLifecycleActions() {

@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.core.api.lifecycle;
 
+import static org.reflections.ReflectionUtils.getAllMethods;
+import static org.reflections.ReflectionUtils.withName;
+
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
@@ -15,6 +18,7 @@ import org.mule.runtime.core.api.util.ClassUtils;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Iterator;
+import java.util.Set;
 
 /**
  * Restrict possible results - only OK or a retry based on some throwable are currently allowed.
@@ -34,8 +38,9 @@ public final class LifecycleTransitionResult {
       throw new IllegalArgumentException("Not a Lifecycle interface: " + iface);
     }
 
-    // all interfaces have a single method
-    Method method = iface.getMethods()[0];
+    Set<Method> lifecycleMethodsCandidate = getAllMethods(iface, withName(Initialisable.PHASE_NAME));
+    Method method = lifecycleMethodsCandidate.isEmpty() ? null : lifecycleMethodsCandidate.iterator().next();
+
     // some interfaces have a single exception, others none
     boolean hasException = method.getExceptionTypes().length > 0;
     Class<?> exception = hasException ? method.getExceptionTypes()[0] : null;

@@ -8,9 +8,14 @@ package org.mule.runtime.core.api.store;
 
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static org.mule.runtime.core.internal.util.store.MuleObjectStoreManager.UNBOUNDED;
+
 import org.mule.runtime.api.store.ObjectAlreadyExistsException;
 import org.mule.runtime.api.store.ObjectDoesNotExistException;
 import org.mule.runtime.api.store.ObjectStoreException;
+import org.mule.runtime.core.api.component.InternalComponent;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -21,11 +26,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class PartitionedInMemoryObjectStore<T extends Serializable> extends AbstractPartitionableObjectStore<T>
-    implements PartitionableExpirableObjectStore<T> {
+    implements PartitionableExpirableObjectStore<T>, InternalComponent {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(PartitionedInMemoryObjectStore.class);
 

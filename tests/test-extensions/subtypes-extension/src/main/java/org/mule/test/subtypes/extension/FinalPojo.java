@@ -6,7 +6,9 @@
  */
 package org.mule.test.subtypes.extension;
 
-public final class FinalPojo {
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+
+public final class FinalPojo extends AbstractAnnotatedObject {
 
   private String someString;
 

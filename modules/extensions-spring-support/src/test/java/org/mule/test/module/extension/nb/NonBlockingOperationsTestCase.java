@@ -52,7 +52,7 @@ public class NonBlockingOperationsTestCase extends AbstractExtensionFunctionalTe
 
       @Override
       public boolean matches(Object o) {
-        return ((MessagingException) o).getFailingMessageProcessor() == operation;
+        return ((MessagingException) o).getFailingComponent() == operation;
       }
     });
     expectedException.expectMessage(MISSILE_PROOF);

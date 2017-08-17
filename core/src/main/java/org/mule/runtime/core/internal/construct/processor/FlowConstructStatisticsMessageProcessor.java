@@ -10,12 +10,12 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
-import org.mule.runtime.core.api.processor.InternalMessageProcessor;
+import org.mule.runtime.core.api.processor.InternalProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.ObjectUtils;
 
 public class FlowConstructStatisticsMessageProcessor extends AbstractAnnotatedObject
-    implements Processor, InternalMessageProcessor {
+    implements Processor, InternalProcessor {
 
   protected FlowConstructStatistics flowConstructStatistics;
 

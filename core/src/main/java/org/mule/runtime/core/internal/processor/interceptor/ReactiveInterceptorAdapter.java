@@ -15,6 +15,9 @@ import static org.mule.runtime.core.internal.interception.DefaultInterceptionEve
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_PARAMS;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.fromFuture;
+
+import static java.util.Collections.emptyMap;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -115,8 +118,7 @@ public class ReactiveInterceptorAdapter
   private Function<InternalEvent, InternalEvent> doBefore(ProcessorInterceptor interceptor, Processor component,
                                                           Map<String, String> dslParameters) {
     return event -> {
-      final InternalEvent eventWithResolvedParams =
-          addResolvedParameters(event, component, dslParameters);
+      final InternalEvent eventWithResolvedParams = addResolvedParameters(event, component, dslParameters);
 
       DefaultInterceptionEvent interceptionEvent = new DefaultInterceptionEvent(eventWithResolvedParams);
       interceptor.before(((AnnotatedObject) component).getLocation(), getResolvedParams(eventWithResolvedParams),
@@ -128,8 +130,7 @@ public class ReactiveInterceptorAdapter
   private CompletableFuture<InternalEvent> doAround(InternalEvent event, ProcessorInterceptor interceptor,
                                                     Processor component, Map<String, String> dslParameters,
                                                     ReactiveProcessor next) {
-    final InternalEvent eventWithResolvedParams =
-        addResolvedParameters(event, component, dslParameters);
+    final InternalEvent eventWithResolvedParams = addResolvedParameters(event, component, dslParameters);
 
     DefaultInterceptionEvent interceptionEvent = new DefaultInterceptionEvent(eventWithResolvedParams);
     final ReactiveInterceptionAction reactiveInterceptionAction =
@@ -142,8 +143,9 @@ public class ReactiveInterceptorAdapter
             throw new CompletionException(t);
           } else {
             throw new CompletionException(updateMessagingExceptionWithError(new MessagingException(eventWithResolvedParams,
-                                                                                                   t.getCause(), component),
-                                                                            component, muleContext));
+                                                                                                   t.getCause(),
+                                                                                                   (AnnotatedObject) component),
+                                                                            (AnnotatedObject) component, muleContext));
           }
         })
         .thenApply(interceptedEvent -> ((DefaultInterceptionEvent) interceptedEvent).resolve());
@@ -165,15 +167,7 @@ public class ReactiveInterceptorAdapter
   }
 
   private boolean isInterceptable(Processor component) {
-    if (component instanceof AnnotatedObject) {
-      ComponentLocation componentLocation =
-          ((AnnotatedObject) component).getLocation();
-      if (componentLocation != null) {
-        return true;
-      }
-    }
-    return false;
-
+    return ((AnnotatedObject) component).getLocation() != null;
   }
 
   private InternalEvent addResolvedParameters(InternalEvent event, Processor component, Map<String, String> dslParameters) {

@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.initialisationFailure;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lock.LockFactory;
@@ -28,15 +29,15 @@ import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
 import org.mule.runtime.core.internal.util.store.ObjectStorePartition;
 import org.mule.runtime.core.internal.util.store.ProvidedObjectStoreWrapper;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.function.Supplier;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Implement a retry policy for Mule. This is similar to JMS retry policies that will redeliver a message a maximum number of
@@ -155,8 +156,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
       }
 
       if (tooMany || exceptionSeen) {
-        throw new MessageRedeliveredException(messageId, counter.get(), maxRedeliveryCount, event,
-                                              CoreMessages.createStaticMessage("Redelivery exhausted"), this);
+        throw new MessageRedeliveredException(messageId, counter.get(), maxRedeliveryCount);
       }
 
       try {

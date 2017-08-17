@@ -10,11 +10,13 @@ import static java.lang.String.format;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.config.spring.internal.dsl.spring.CommonBeanDefinitionCreator.processMuleProperties;
+import static org.mule.runtime.core.privileged.component.AnnotatedObjectInvocationHandler.addAnnotationsToClass;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.rootBeanDefinition;
 
 import org.mule.runtime.config.spring.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.core.api.config.RuntimeConfigurationException;
 
+import org.apache.commons.lang3.ClassUtils;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 
@@ -53,7 +55,17 @@ class ObjectBeanDefinitionCreator extends BeanDefinitionCreator {
       componentModel.setBeanReference(new RuntimeBeanReference(refParameterValue));
     }
     if (classParameterValue != null) {
-      BeanDefinitionBuilder beanDefinitionBuilder = rootBeanDefinition(classParameterValue);
+      BeanDefinitionBuilder beanDefinitionBuilder;
+      final Class<?> classParameter;
+      try {
+        classParameter = ClassUtils.getClass(classParameterValue);
+      } catch (ClassNotFoundException e) {
+        throw new RuntimeConfigurationException(createStaticMessage(format("Could not resolve class '%s' for component '%s'",
+                                                                           classParameterValue,
+                                                                           componentModel.getComponentLocation())));
+      }
+
+      beanDefinitionBuilder = rootBeanDefinition(addAnnotationsToClass(classParameter));
       processMuleProperties(componentModel, beanDefinitionBuilder, null);
       componentModel.setBeanDefinition(beanDefinitionBuilder.getBeanDefinition());
     }

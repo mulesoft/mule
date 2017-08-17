@@ -28,10 +28,7 @@ public abstract class AbstractAnnotatedObjectFactory<T> extends AbstractAnnotate
   @Override
   public T getObject() throws Exception {
     T annotatedInstance = doGetObject();
-    // TODO - MULE-10971: Remove if block once all extension related objects are AnnotatedObjects
-    if (annotatedInstance instanceof AnnotatedObject) {
-      ((AnnotatedObject) annotatedInstance).setAnnotations(getAnnotations());
-    }
+    ((AnnotatedObject) annotatedInstance).setAnnotations(getAnnotations());
     return annotatedInstance;
   }
 }

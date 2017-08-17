@@ -13,6 +13,7 @@ import static org.mule.runtime.core.api.config.DefaultMuleConfiguration.isFlowTr
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.InternalEventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
@@ -25,14 +26,13 @@ import org.mule.runtime.core.api.context.notification.MessageProcessorNotificati
 import org.mule.runtime.core.api.context.notification.PipelineMessageNotification;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.runtime.core.api.execution.LocationExecutionContextProvider;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.logging.LogConfigChangeSubject;
-
-import java.beans.PropertyChangeListener;
-import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.spi.LoggerContext;
+
+import java.beans.PropertyChangeListener;
+import java.util.Map;
 
 /**
  * Manager for handling message processing troubleshooting data.
@@ -101,16 +101,18 @@ public class MessageProcessingFlowTraceManager extends LocationExecutionContextP
    * Callback method for when a message processor is about to be invoked.
    * <p/>
    * Updates the internal state of the event's {@link ProcessorsTrace} and {@link FlowCallStack} accordingly.
-   * 
+   *
    * @see DefaultProcessorsTrace#addExecutedProcessors(String)
    * @see DefaultFlowCallStack#setCurrentProcessorPath(String)
-   * 
+   *
    * @param notification the notification that contains the event and the processor that is about to be invoked.
    */
   public void onMessageProcessorNotificationPreInvoke(MessageProcessorNotification notification) {
     String resolveProcessorRepresentation =
         resolveProcessorRepresentation(muleContext.getConfiguration().getId(),
-                                       notification.getComponent().getLocation().getLocation(),
+                                       notification.getComponent().getLocation() != null
+                                           ? notification.getComponent().getLocation().getLocation()
+                                           : null,
                                        notification.getProcessor());
     InternalEventContext eventContext = notification.getEventContext();
     if (eventContext != null) {
@@ -125,7 +127,7 @@ public class MessageProcessingFlowTraceManager extends LocationExecutionContextP
 
   /**
    * Callback method for when a flow or sub-flow called from a {@code flow-ref} component has been completed.
-   * 
+   *
    * @param notification the notification that contains the event and the processor that is about to be invoked.
    */
   public void onPipelineNotificationComplete(PipelineMessageNotification notification) {
@@ -134,7 +136,7 @@ public class MessageProcessingFlowTraceManager extends LocationExecutionContextP
 
   /**
    * Callback method for when a flow or sub-flow is about to be called from a {@code flow-ref}.
-   * 
+   *
    * @param notification the notification that contains the event and the processor that is about to be invoked.
    */
   public void onPipelineNotificationStart(PipelineMessageNotification notification) {
@@ -156,7 +158,7 @@ public class MessageProcessingFlowTraceManager extends LocationExecutionContextP
   }
 
   @Override
-  public Map<String, Object> getContextInfo(EnrichedNotificationInfo notificationInfo, Processor lastProcessed) {
+  public Map<String, Object> getContextInfo(EnrichedNotificationInfo notificationInfo, AnnotatedObject lastProcessed) {
     if (isFlowTrace()) {
       return singletonMap(FLOW_STACK_INFO_KEY, notificationInfo.getFlowCallStack().toString());
     } else {

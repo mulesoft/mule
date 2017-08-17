@@ -6,19 +6,21 @@
  */
 package org.mule.runtime.core.internal.security;
 
-import org.mule.runtime.core.api.security.EncryptionStrategy;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.security.CryptoFailureException;
+import org.mule.runtime.core.api.security.EncryptionStrategy;
+
+import org.apache.commons.io.IOUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.commons.io.IOUtils;
-
-public abstract class AbstractNamedEncryptionStrategy implements EncryptionStrategy {
+public abstract class AbstractNamedEncryptionStrategy extends AbstractAnnotatedObject implements EncryptionStrategy {
 
   private String name;
 
+  @Override
   public String getName() {
     return name;
   }
@@ -27,6 +29,7 @@ public abstract class AbstractNamedEncryptionStrategy implements EncryptionStrat
     this.name = name;
   }
 
+  @Override
   public byte[] encrypt(byte[] data, Object info) throws CryptoFailureException {
     InputStream io = this.encrypt(new ByteArrayInputStream(data), info);
     try {
@@ -36,6 +39,7 @@ public abstract class AbstractNamedEncryptionStrategy implements EncryptionStrat
     }
   }
 
+  @Override
   public byte[] decrypt(byte[] data, Object info) throws CryptoFailureException {
     InputStream io = this.decrypt(new ByteArrayInputStream(data), info);
     try {

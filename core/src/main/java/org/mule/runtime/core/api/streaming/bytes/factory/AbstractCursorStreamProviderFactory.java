@@ -6,13 +6,14 @@
  */
 package org.mule.runtime.core.api.streaming.bytes.factory;
 
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.InternalEvent;
-import org.mule.runtime.core.internal.streaming.CursorManager;
-import org.mule.runtime.core.api.streaming.bytes.ByteBufferManager;
 import org.mule.runtime.core.api.streaming.StreamingManager;
+import org.mule.runtime.core.api.streaming.bytes.ByteBufferManager;
 import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
+import org.mule.runtime.core.internal.streaming.CursorManager;
 
 import java.io.InputStream;
 
@@ -25,7 +26,7 @@ import java.io.InputStream;
  *
  * @since 4.0
  */
-public abstract class AbstractCursorStreamProviderFactory implements CursorStreamProviderFactory {
+public abstract class AbstractCursorStreamProviderFactory extends AbstractAnnotatedObject implements CursorStreamProviderFactory {
 
   private final ByteBufferManager bufferManager;
   private final StreamingManager streamingManager;

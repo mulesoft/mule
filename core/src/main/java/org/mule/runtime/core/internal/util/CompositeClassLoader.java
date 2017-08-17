@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.spring.internal.dsl.spring;
+package org.mule.runtime.core.internal.util;
 
 import static java.util.Arrays.asList;
 
@@ -22,10 +22,10 @@ import sun.misc.CompoundEnumeration;
  * not found, it will try the nextx and so on until the resource/class is found or all classloaders have been tried.
  * <p>
  * For {@link #getResources(String)}, all the classloders will be queried to get the union of all found resources.
- * 
+ *
  * @since 1.0
  */
-class CompositeClassLoader extends ClassLoader {
+public class CompositeClassLoader extends ClassLoader {
 
   static {
     registerAsParallelCapable();
@@ -33,7 +33,7 @@ class CompositeClassLoader extends ClassLoader {
 
   private List<ClassLoader> delegates;
 
-  CompositeClassLoader(ClassLoader first, ClassLoader... others) {
+  public CompositeClassLoader(ClassLoader first, ClassLoader... others) {
     delegates = new ArrayList<>();
     delegates.add(first);
     delegates.addAll(asList(others));

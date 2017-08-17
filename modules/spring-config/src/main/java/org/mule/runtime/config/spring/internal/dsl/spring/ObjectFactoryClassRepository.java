@@ -9,6 +9,7 @@ package org.mule.runtime.config.spring.internal.dsl.spring;
 import static org.springframework.cglib.proxy.Enhancer.registerStaticCallbacks;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
 

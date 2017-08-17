@@ -27,6 +27,7 @@ import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STOPPED;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static reactor.core.publisher.Mono.just;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.lifecycle.LifecycleException;
@@ -43,11 +44,6 @@ import org.mule.runtime.core.internal.transformer.simple.StringAppendTransformer
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.core.lifecycle.LifecycleTrackerProcessor;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.function.BiFunction;
-
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
@@ -55,6 +51,11 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.function.BiFunction;
 
 @RunWith(Parameterized.class)
 public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
@@ -205,7 +206,7 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
     muleContext.start();
 
     MessageSource mockMessageSource = mock(MessageSource.class, withSettings().extraInterfaces(Startable.class, Stoppable.class));
-    doThrow(new LifecycleException(mock(I18nMessage.class), "Error starting component")).when(((Startable) mockMessageSource))
+    doThrow(new LifecycleException(mock(I18nMessage.class), mockMessageSource)).when(((Startable) mockMessageSource))
         .start();
 
     final List<Processor> processors = new ArrayList<>(flow.getProcessors());

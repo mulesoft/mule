@@ -47,6 +47,7 @@ import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.exception.MessagingException;
+import org.mule.runtime.core.api.processor.InternalProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
@@ -372,14 +373,14 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
   }
 
   private MessageProcessorChain createFailingRoutingPair(RuntimeException exception) throws MuleException {
-    return createChain(event -> {
+    return createChain((InternalTestProcessor) event -> {
       throw exception;
     });
   }
 
   protected Processor createProcessorSpy(Message result) throws MuleException {
     // Mockito does not support lambda
-    return spy(new Processor() {
+    return spy(new InternalTestProcessor() {
 
       @Override
       public InternalEvent process(InternalEvent event) throws MuleException {
@@ -427,4 +428,8 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
     return chain;
   }
 
+  @FunctionalInterface
+  private interface InternalTestProcessor extends Processor, InternalProcessor {
+
+  }
 }

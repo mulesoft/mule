@@ -7,15 +7,19 @@
 package org.mule.runtime.core.api.store;
 
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.component.InternalComponent;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.core.internal.util.store.PersistentObjectStorePartition;
+
+import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.Serializable;
@@ -25,10 +29,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-
 public class PartitionedPersistentObjectStore<T extends Serializable> extends AbstractPartitionableObjectStore<T>
-    implements PartitionableExpirableObjectStore<T>, MuleContextAware {
+    implements PartitionableExpirableObjectStore<T>, InternalComponent, MuleContextAware {
 
   private static final Logger LOGGER = getLogger(PartitionedPersistentObjectStore.class);
   public static final String OBJECT_STORE_DIR = "objectstore";

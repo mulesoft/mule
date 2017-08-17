@@ -140,6 +140,7 @@
         <awaitilityVersion>1.7.0</awaitilityVersion>
         <bouncycastleVersion>1.56</bouncycastleVersion>
         <c3p0Version>0.9.5.2</c3p0Version>
+        <cglibVersion>3.2.5</cglibVersion>
         <cometdVersion>6.1.26</cometdVersion>
         <commonsBeanUtilsVersion>1.9.3</commonsBeanUtilsVersion>
         <commonsExecVersion>1.2</commonsExecVersion>
@@ -154,6 +155,7 @@
         <commonsLangVersion>3.6</commonsLangVersion>
         <commonsNetVersion>3.5</commonsNetVersion>
         <commonsPoolVersion>1.6</commonsPoolVersion>
+        <commonsPool2Version>2.4.2</commonsPool2Version>
         <derbyVersion>10.11.1.1</derbyVersion>
         <dom4jVersion>1.6.1</dom4jVersion>
         <eaioUuidVersion>3.4.0</eaioUuidVersion>

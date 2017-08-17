@@ -7,6 +7,7 @@
 package org.mule.runtime.config.spring.internal;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.api.meta.NameableObject;
 import org.mule.runtime.core.api.security.CryptoFailureException;
 import org.mule.runtime.core.api.security.EncryptionStrategy;
@@ -15,10 +16,10 @@ import java.io.InputStream;
 
 /**
  * Delegate for encryption strategies configured inside security-manager
- * 
+ *
  * @since 4.0
  */
-public class CustomEncryptionStrategyDelegate implements EncryptionStrategy {
+public class CustomEncryptionStrategyDelegate extends AbstractAnnotatedObject implements EncryptionStrategy {
 
   private EncryptionStrategy delegate;
   private String name;

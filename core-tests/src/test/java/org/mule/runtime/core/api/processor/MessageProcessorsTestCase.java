@@ -78,20 +78,20 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
     }
   }
 
-  private ReactiveProcessor map = publisher -> from(publisher).map(in -> output);
-  private ReactiveProcessor ackAndStop = publisher -> from(publisher).then(in -> {
+  private InternalReactiveProcessor map = publisher -> from(publisher).map(in -> output);
+  private InternalReactiveProcessor ackAndStop = publisher -> from(publisher).then(in -> {
     in.getContext().success();
     return empty();
   });
-  private ReactiveProcessor respondAndStop = publisher -> from(publisher).then(in -> {
+  private InternalReactiveProcessor respondAndStop = publisher -> from(publisher).then(in -> {
     in.getContext().success(response);
     return empty();
   });
-  private ReactiveProcessor ackAndMap =
+  private InternalReactiveProcessor ackAndMap =
       publisher -> from(publisher).doOnNext(in -> in.getContext().success()).map(in -> output);
-  private ReactiveProcessor respondAndMap =
+  private InternalReactiveProcessor respondAndMap =
       publisher -> from(publisher).doOnNext(in -> in.getContext().success(response)).map(in -> output);
-  private ReactiveProcessor error = publisher -> from(publisher).map(in -> {
+  private InternalReactiveProcessor error = publisher -> from(publisher).map(in -> {
     throw exception;
   });
 
@@ -244,7 +244,7 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
     return flow;
   }
 
-  private static class ReactiveProcessorToProcessorAdaptor implements Processor {
+  private static class ReactiveProcessorToProcessorAdaptor implements Processor, InternalProcessor {
 
     ReactiveProcessor delegate;
 
@@ -261,6 +261,11 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
     public Publisher<InternalEvent> apply(Publisher<InternalEvent> publisher) {
       return delegate.apply(publisher);
     }
+  }
+
+  @FunctionalInterface
+  private interface InternalReactiveProcessor extends ReactiveProcessor, InternalProcessor {
+
   }
 
 }

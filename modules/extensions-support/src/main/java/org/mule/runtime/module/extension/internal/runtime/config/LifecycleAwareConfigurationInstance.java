@@ -16,6 +16,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
@@ -43,13 +44,13 @@ import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.module.extension.internal.loader.AbstractInterceptable;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.NoConnectivityTest;
 
+import org.slf4j.Logger;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 
 import javax.inject.Inject;
-
-import org.slf4j.Logger;
 
 /**
  * Implementation of {@link ConfigurationInstance} which propagates dependency injection and lifecycle phases into the contained
@@ -93,7 +94,7 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
   @Inject
   private ConnectionManagerAdapter connectionManager;
 
-  private Lock testConnectivityLock;
+  private volatile Lock testConnectivityLock;
   private Scheduler retryScheduler;
 
   private volatile boolean initialized = false;
@@ -188,32 +189,35 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
 
       @Override
       public void doWork(RetryContext context) throws Exception {
-        final boolean lockAcquired = testConnectivityLock.tryLock();
-        if (lockAcquired) {
-          LOGGER.info("Doing testConnectivity() for config " + getName());
-          try {
-            ConnectionValidationResult result = connectionManager.testConnectivity(LifecycleAwareConfigurationInstance.this);
-            if (result.isValid()) {
-              context.setOk();
-            } else {
-              if ((reconnectionConfig.isFailsDeployment())) {
-                context.setFailed(result.getException());
-                throw new ConnectionException(format("Connectivity test failed for config '%s'", getName()),
-                                              result.getException());
+        Lock lock = testConnectivityLock;
+        if (lock != null) {
+          final boolean lockAcquired = lock.tryLock();
+          if (lockAcquired) {
+            LOGGER.info("Doing testConnectivity() for config " + getName());
+            try {
+              ConnectionValidationResult result = connectionManager.testConnectivity(LifecycleAwareConfigurationInstance.this);
+              if (result.isValid()) {
+                context.setOk();
               } else {
-                if (LOGGER.isInfoEnabled()) {
-                  LOGGER
-                      .info(format("Connectivity test failed for config '%s'. Application deployment will continue. Error was: ",
-                                   getName(), result.getMessage()),
-                            result.getException());
+                if ((reconnectionConfig.isFailsDeployment())) {
+                  context.setFailed(result.getException());
+                  throw new ConnectionException(format("Connectivity test failed for config '%s'", getName()),
+                                                result.getException());
+                } else {
+                  if (LOGGER.isInfoEnabled()) {
+                    LOGGER
+                        .info(format("Connectivity test failed for config '%s'. Application deployment will continue. Error was: ",
+                                     getName(), result.getMessage()),
+                              result.getException());
+                  }
                 }
               }
+            } finally {
+              lock.unlock();
             }
-          } finally {
-            testConnectivityLock.unlock();
+          } else {
+            LOGGER.warn("There is a testConnectivity() already running for config " + getName());
           }
-        } else {
-          LOGGER.warn("There is a testConnectivity() already running for config " + getName());
         }
       }
 

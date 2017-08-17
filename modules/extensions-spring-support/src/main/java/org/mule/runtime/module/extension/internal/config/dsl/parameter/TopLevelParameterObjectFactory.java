@@ -12,9 +12,11 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
+import static org.mule.runtime.core.privileged.component.AnnotatedObjectInvocationHandler.addAnnotationsToClass;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -43,7 +45,7 @@ public class TopLevelParameterObjectFactory extends AbstractExtensionObjectFacto
   private static final Logger LOGGER = getLogger(TopLevelParameterObjectFactory.class);
 
   private DefaultObjectBuilder builder;
-  private Class<Object> objectClass;
+  private Class<?> objectClass;
   private final ObjectType objectType;
   private final ClassLoader classLoader;
   private String name;
@@ -53,10 +55,13 @@ public class TopLevelParameterObjectFactory extends AbstractExtensionObjectFacto
     super(muleContext);
     this.classLoader = classLoader;
     this.objectType = type;
-    withContextClassLoader(classLoader, () -> {
-      objectClass = getType(type);
-      builder = new DefaultObjectBuilder(objectClass);
+
+    objectClass = withContextClassLoader(classLoader, () -> {
+      // We must add the annotations support with a proxy to avoid the SDK user to clutter the POJO definitions in an extension
+      // with the annotations stuff.
+      return addAnnotationsToClass(getType(type));
     });
+    builder = new DefaultObjectBuilder(objectClass);
   }
 
   @Override

@@ -17,6 +17,7 @@ import static org.mule.runtime.core.api.util.ExceptionUtils.updateMessagingExcep
 import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
@@ -33,7 +34,7 @@ import org.mule.runtime.core.api.context.notification.PipelineMessageNotificatio
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
-import org.mule.runtime.core.api.processor.InternalMessageProcessor;
+import org.mule.runtime.core.api.processor.InternalProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
@@ -49,6 +50,8 @@ import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.privileged.processor.IdempotentRedeliveryPolicy;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 
+import org.reactivestreams.Publisher;
+
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
@@ -57,8 +60,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.function.Consumer;
-
-import org.reactivestreams.Publisher;
 
 import reactor.core.publisher.Mono;
 
@@ -195,7 +196,10 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
                   handleSink.next(event);
                 } catch (RejectedExecutionException ree) {
                   event.getContext()
-                      .error(updateMessagingExceptionWithError(new MessagingException(event, ree, this), this, getMuleContext()));
+                      .error(updateMessagingExceptionWithError(new MessagingException(event, ree,
+                                                                                      AbstractPipeline.this),
+                                                               AbstractPipeline.this,
+                                                               getMuleContext()));
                 }
               })
               .flatMap(event -> Mono.from(event.getContext().getResponsePublisher()));
@@ -303,7 +307,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     return maxConcurrency;
   }
 
-  private class ProcessEndProcessor extends AbstractAnnotatedObject implements Processor, InternalMessageProcessor {
+  private class ProcessEndProcessor extends AbstractAnnotatedObject implements Processor, InternalProcessor {
 
     @Override
     public InternalEvent process(InternalEvent event) throws MuleException {
@@ -314,7 +318,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     }
   }
 
-  private class ProcessorStartCompleteProcessor implements Processor, InternalMessageProcessor {
+  private class ProcessorStartCompleteProcessor implements Processor, InternalProcessor {
 
     @Override
     public InternalEvent process(InternalEvent event) throws MuleException {
@@ -330,7 +334,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
           .doOnError(MessagingException.class, messagingException -> fireCompleteNotification(null, messagingException))
           .doOnError(throwable -> !(throwable instanceof MessagingException),
                      throwable -> fireCompleteNotification(null, new MessagingException(event, throwable,
-                                                                                        this instanceof Processor ? this : null))
+                                                                                        AbstractPipeline.this))
 
           )
           .doOnTerminate((result, throwable) -> event.getContext().getProcessingTime()
@@ -349,7 +353,6 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         throw new MuleRuntimeException(e);
       }
     }
-
   }
 
 }

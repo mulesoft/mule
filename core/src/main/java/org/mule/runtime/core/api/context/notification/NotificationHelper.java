@@ -16,11 +16,11 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.privileged.context.notification.OptimisedNotificationHandler;
 
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 /**
  * Simple class to fire notifications of a specified type over a {@link ServerNotificationHandler}.
@@ -95,7 +95,7 @@ public class NotificationHelper {
    * @param flowConstruct the {@link org.mule.runtime.core.api.construct.FlowConstruct} that generated the notification
    * @param action the action code for the notification
    */
-  public void fireNotification(Object source, InternalEvent event, FlowConstruct flowConstruct, int action) {
+  public void fireNotification(AnnotatedObject source, InternalEvent event, FlowConstruct flowConstruct, int action) {
     fireNotification(source, event, ((AnnotatedObject) flowConstruct).getLocation(), flowConstruct.getMuleContext(), action);
   }
 
@@ -109,7 +109,8 @@ public class NotificationHelper {
    * @param context the mule context
    * @param action the action code for the notification
    */
-  public void fireNotification(Object source, InternalEvent event, ComponentLocation location, MuleContext context, int action) {
+  public void fireNotification(AnnotatedObject source, InternalEvent event, ComponentLocation location, MuleContext context,
+                               int action) {
     ServerNotificationHandler serverNotificationHandler = getNotificationHandler(context);
     try {
       if (serverNotificationHandler.isNotificationEnabled(notificationClass)) {

@@ -6,6 +6,7 @@
  */
 package org.mule.test.module.extension.parameter.resolver;
 
+import static java.util.Optional.ofNullable;
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -17,12 +18,11 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
+
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.heisenberg.extension.model.Weapon;
-
-import java.util.Optional;
 
 import org.hamcrest.Matcher;
 import org.junit.Rule;
@@ -107,9 +107,9 @@ public class ParameterResolverOperationExecutionTestCase extends AbstractParamet
 
   private void assertExpressionResolverWeapon(String flowName, String expression, Matcher weaponMatcher)
       throws Exception {
-    ParameterResolver<Weapon> weaponInfo =
-        (ParameterResolver<Weapon>) flowRunner(flowName).run().getMessage().getPayload().getValue();
-    assertThat(weaponInfo.getExpression(), is(Optional.ofNullable(expression)));
+    ParameterResolver weaponInfo =
+        (ParameterResolver) flowRunner(flowName).run().getMessage().getPayload().getValue();
+    assertThat(weaponInfo.getExpression(), is(ofNullable(expression)));
     assertThat(weaponInfo.resolve(), weaponMatcher);
   }
 }

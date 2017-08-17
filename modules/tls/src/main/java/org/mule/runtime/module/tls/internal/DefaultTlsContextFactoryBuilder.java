@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.module.tls.internal;
 
+import static java.util.Collections.emptyMap;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+
 import org.mule.runtime.api.lifecycle.CreateException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.tls.TlsContextFactory;
@@ -17,7 +19,7 @@ import java.io.IOException;
 public class DefaultTlsContextFactoryBuilder implements TlsContextFactoryBuilder {
 
   private TlsContextFactory defaultTlsContextFactory;
-  private DefaultTlsContextFactory tlsContextFactory = new DefaultTlsContextFactory();
+  private DefaultTlsContextFactory tlsContextFactory = new DefaultTlsContextFactory(emptyMap());
 
   private String trustStorePath;
   private String keyStorePath;

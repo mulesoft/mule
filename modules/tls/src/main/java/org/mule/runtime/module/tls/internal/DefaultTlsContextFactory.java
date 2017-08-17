@@ -8,25 +8,31 @@ package org.mule.runtime.module.tls.internal;
 
 
 import static java.util.Arrays.copyOf;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+
+import org.mule.runtime.api.lifecycle.CreateException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.tls.TlsContextKeyStoreConfiguration;
 import org.mule.runtime.api.tls.TlsContextTrustStoreConfiguration;
-import org.mule.runtime.api.lifecycle.CreateException;
 import org.mule.runtime.core.api.security.tls.RestrictedSSLServerSocketFactory;
 import org.mule.runtime.core.api.security.tls.RestrictedSSLSocketFactory;
 import org.mule.runtime.core.api.security.tls.TlsConfiguration;
-import org.mule.runtime.core.internal.util.ArrayUtils;
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.core.api.util.StringUtils;
+import org.mule.runtime.core.internal.util.ArrayUtils;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Joiner;
 
 import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.net.ssl.SSLContext;
@@ -34,27 +40,30 @@ import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import javax.xml.namespace.QName;
 
 /**
  * Default implementation of the {@code TlsContextFactory} interface, which delegates all its operations to a
  * {@code TlsConfiguration} object. Only enabled cipher suites and protocols will not delegate to it if configured.
  */
-public class DefaultTlsContextFactory implements TlsContextFactory, Initialisable {
+public class DefaultTlsContextFactory extends AbstractAnnotatedObject implements TlsContextFactory, Initialisable {
 
   private static final Logger logger = LoggerFactory.getLogger(DefaultTlsContextFactory.class);
   private static final String DEFAULT = "default";
 
   private String name;
 
-  private TlsConfiguration tlsConfiguration = new TlsConfiguration(null);
+  private final TlsConfiguration tlsConfiguration;
 
   private AtomicBoolean initialized = new AtomicBoolean(false);
   private boolean trustStoreInsecure = false;
   private String[] enabledProtocols;
   private String[] enabledCipherSuites;
+
+  public DefaultTlsContextFactory(Map<QName, Object> annotations) {
+    tlsConfiguration = new TlsConfiguration(null);
+    tlsConfiguration.setAnnotations(annotations);
+  }
 
   @Override
   public void initialise() throws InitialisationException {
@@ -65,7 +74,7 @@ public class DefaultTlsContextFactory implements TlsContextFactory, Initialisabl
     try {
       tlsConfiguration.initialise(null == getKeyStorePath(), null);
     } catch (CreateException e) {
-      throw new InitialisationException(I18nMessageFactory.createStaticMessage("Unable to initialise TLS configuration"), e,
+      throw new InitialisationException(createStaticMessage("Unable to initialise TLS configuration"), e,
                                         this);
     }
 
@@ -95,7 +104,7 @@ public class DefaultTlsContextFactory implements TlsContextFactory, Initialisabl
   }
 
   private void globalConfigNotHonored(String element, String[] elementArray) throws InitialisationException {
-    throw new InitialisationException(I18nMessageFactory.createStaticMessage(String
+    throw new InitialisationException(createStaticMessage(String
         .format("Some selected %1$s are invalid. Valid %1$s according to your TLS configuration file are: %2$s", element,
                 Joiner.on(", ").join(elementArray))), this);
   }
@@ -359,12 +368,15 @@ public class DefaultTlsContextFactory implements TlsContextFactory, Initialisabl
 
   private static class InsecureTrustManager implements X509TrustManager {
 
+    @Override
     public java.security.cert.X509Certificate[] getAcceptedIssuers() {
       return new java.security.cert.X509Certificate[0];
     }
 
+    @Override
     public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) {}
 
+    @Override
     public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {}
   }
 }

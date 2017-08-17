@@ -30,6 +30,7 @@ import static reactor.core.Exceptions.bubble;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.just;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
@@ -42,6 +43,7 @@ import org.mule.runtime.core.api.context.notification.IntegerAction;
 import org.mule.runtime.core.api.context.notification.MessageProcessorNotification;
 import org.mule.runtime.core.api.context.notification.MessageProcessorNotificationListener;
 import org.mule.runtime.core.api.exception.MessagingException;
+import org.mule.runtime.core.api.processor.InternalProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
@@ -51,6 +53,15 @@ import org.mule.runtime.core.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.util.concurrent.NamedThreadFactory;
 import org.mule.runtime.core.api.processor.AnnotatedProcessor;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
+
+import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeMatcher;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.reactivestreams.Publisher;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -70,15 +81,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-
-import org.hamcrest.Matcher;
-import org.hamcrest.TypeSafeMatcher;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.reactivestreams.Publisher;
 
 public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiveProcessorTestCase {
 
@@ -567,7 +569,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
     }
   }
 
-  class ThreadTrackingProcessor implements Processor {
+  class ThreadTrackingProcessor implements Processor, InternalProcessor {
 
     @Override
     public InternalEvent process(InternalEvent event) throws MuleException {

@@ -6,10 +6,16 @@
  */
 package org.mule.runtime.core.internal.security;
 
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToCreate;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
+
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.security.CryptoFailureException;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.util.Base64;
+
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -20,10 +26,6 @@ import java.security.spec.KeySpec;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
-
-import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A JCE based encryption strategy. It also provides base64 encoding of encrypted/decrypted data by setting the base64encoding
@@ -45,9 +47,10 @@ public abstract class AbstractJCEEncryptionStrategy extends AbstractNamedEncrypt
 
   protected boolean base64Encoding = true;
 
+  @Override
   public void initialise() throws InitialisationException {
     if (algorithm == null) {
-      throw new InitialisationException(CoreMessages.objectIsNull("Algorithm"), this);
+      throw new InitialisationException(objectIsNull("Algorithm"), this);
     } else {
       logger.debug("Using encryption algorithm: " + algorithm);
     }
@@ -58,7 +61,7 @@ public abstract class AbstractJCEEncryptionStrategy extends AbstractNamedEncrypt
       secretKey = getSecretKey();
       createAndInitCiphers();
     } catch (Exception e) {
-      throw new InitialisationException(CoreMessages.failedToCreate("encryption ciphers"), e, this);
+      throw new InitialisationException(failedToCreate("encryption ciphers"), e, this);
     }
   }
 
@@ -78,6 +81,7 @@ public abstract class AbstractJCEEncryptionStrategy extends AbstractNamedEncrypt
 
   protected abstract SecretKey getSecretKey() throws GeneralSecurityException;
 
+  @Override
   public InputStream encrypt(InputStream data, Object info) throws CryptoFailureException {
     try {
       return new ByteArrayInputStream(this.encrypt(IOUtils.toByteArray(data), info));
@@ -86,6 +90,7 @@ public abstract class AbstractJCEEncryptionStrategy extends AbstractNamedEncrypt
     }
   }
 
+  @Override
   public InputStream decrypt(InputStream data, Object info) throws CryptoFailureException {
     try {
       return new ByteArrayInputStream(this.decrypt(IOUtils.toByteArray(data), info));
@@ -94,6 +99,7 @@ public abstract class AbstractJCEEncryptionStrategy extends AbstractNamedEncrypt
     }
   }
 
+  @Override
   public byte[] encrypt(byte[] data, Object info) throws CryptoFailureException {
     try {
       byte[] buf = encryptCipher.doFinal(data);
@@ -107,6 +113,7 @@ public abstract class AbstractJCEEncryptionStrategy extends AbstractNamedEncrypt
     }
   }
 
+  @Override
   public byte[] decrypt(byte[] data, Object info) throws CryptoFailureException {
     try {
       byte[] dec = data;
@@ -127,6 +134,7 @@ public abstract class AbstractJCEEncryptionStrategy extends AbstractNamedEncrypt
     this.algorithm = algorithm;
   }
 
+  @Override
   public String toString() {
     StringBuilder buf = new StringBuilder();
     buf.append("Algorithm=").append(algorithm);

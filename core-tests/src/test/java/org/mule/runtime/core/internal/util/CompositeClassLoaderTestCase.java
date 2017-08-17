@@ -4,12 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.spring.internal.dsl.spring;
+package org.mule.runtime.core.internal.util;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 
+import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.tck.classlaoder.TestClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
