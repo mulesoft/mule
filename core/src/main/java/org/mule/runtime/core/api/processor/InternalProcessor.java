@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.api.processor;
 
+import static java.util.Collections.emptyMap;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.meta.AnnotatedObject;
 
@@ -25,7 +27,7 @@ public interface InternalProcessor extends AnnotatedObject {
 
   @Override
   default Map<QName, Object> getAnnotations() {
-    return null;
+    return emptyMap();
   }
 
   @Override

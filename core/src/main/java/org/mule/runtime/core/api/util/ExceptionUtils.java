@@ -7,7 +7,6 @@
 package org.mule.runtime.core.api.util;
 
 import static java.lang.System.lineSeparator;
-import static java.util.Arrays.stream;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
@@ -15,9 +14,10 @@ import static org.mule.runtime.api.exception.ExceptionHelper.getExceptionsAsList
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.UNKNOWN;
-import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_NAME;
 import static org.mule.runtime.core.internal.exception.ErrorMapping.ANNOTATION_ERROR_MAPPINGS;
 import static reactor.core.publisher.Mono.error;
+
+import static java.util.Arrays.stream;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -226,7 +226,8 @@ public class ExceptionUtils {
     Throwable causeException =
         exception instanceof WrapperErrorMessageAwareException ? ((WrapperErrorMessageAwareException) exception).getRootCause()
             : exception;
-    ComponentIdentifier componentIdentifier = (ComponentIdentifier) annotatedObject.getAnnotation(ANNOTATION_NAME);
+    ComponentIdentifier componentIdentifier =
+        annotatedObject.getLocation() != null ? annotatedObject.getLocation().getComponentIdentifier().getIdentifier() : null;
     List<ErrorMapping> errorMappings = (List<ErrorMapping>) annotatedObject.getAnnotation(ANNOTATION_ERROR_MAPPINGS);
 
     if (causeException instanceof TypedException) {

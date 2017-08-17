@@ -10,16 +10,20 @@ import static org.mule.runtime.core.api.config.i18n.CoreMessages.authorizationAt
 
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.api.security.SecurityProviderNotFoundException;
 import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
 import org.mule.runtime.core.api.lifecycle.LifecycleTransitionResult;
 import org.mule.runtime.core.api.security.EncryptionStrategy;
+import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.security.SecurityProvider;
 import org.mule.runtime.core.api.security.UnauthorisedException;
-import org.mule.runtime.core.api.security.SecurityContext;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,23 +34,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * {@code DefaultMuleSecurityManager} is a default implementation of a {@link SecurityManager} for a Mule instance.
  *
  * @since 4.0
  */
-public class DefaultMuleSecurityManager implements SecurityManager {
+public class DefaultMuleSecurityManager extends AbstractAnnotatedObject implements SecurityManager {
 
   /**
    * logger used by this class
    */
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultMuleSecurityManager.class);
 
-  private Map<String, SecurityProvider> providers = new ConcurrentHashMap<String, SecurityProvider>();
-  private Map<String, EncryptionStrategy> cryptoStrategies = new ConcurrentHashMap<String, EncryptionStrategy>();
+  private Map<String, SecurityProvider> providers = new ConcurrentHashMap<>();
+  private Map<String, EncryptionStrategy> cryptoStrategies = new ConcurrentHashMap<>();
 
   public DefaultMuleSecurityManager() {
     super();
@@ -54,7 +55,7 @@ public class DefaultMuleSecurityManager implements SecurityManager {
 
   @Override
   public void initialise() throws InitialisationException {
-    List<Initialisable> all = new LinkedList<Initialisable>(providers.values());
+    List<Initialisable> all = new LinkedList<>(providers.values());
     // ordering: appends
     all.addAll(cryptoStrategies.values());
     LifecycleTransitionResult.initialiseAll(all.iterator());
@@ -129,7 +130,7 @@ public class DefaultMuleSecurityManager implements SecurityManager {
    */
   @Override
   public Collection<SecurityProvider> getProviders() {
-    ArrayList<SecurityProvider> providersList = new ArrayList<SecurityProvider>(providers.values());
+    ArrayList<SecurityProvider> providersList = new ArrayList<>(providers.values());
     return Collections.unmodifiableCollection(providersList);
   }
 
@@ -189,7 +190,7 @@ public class DefaultMuleSecurityManager implements SecurityManager {
    */
   @Override
   public Collection<EncryptionStrategy> getEncryptionStrategies() {
-    List<EncryptionStrategy> allStrategies = new ArrayList<EncryptionStrategy>(cryptoStrategies.values());
+    List<EncryptionStrategy> allStrategies = new ArrayList<>(cryptoStrategies.values());
     return Collections.unmodifiableCollection(allStrategies);
   }
 

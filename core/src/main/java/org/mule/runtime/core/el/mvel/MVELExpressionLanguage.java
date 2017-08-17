@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.el.mvel;
 
-import static java.util.Collections.singletonMap;
-import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang3.StringUtils.replace;
 import static org.mule.runtime.api.el.ValidationResult.failure;
 import static org.mule.runtime.api.el.ValidationResult.success;
@@ -16,6 +14,10 @@ import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 import static org.mule.runtime.core.el.DefaultExpressionManager.MEL_PREFIX;
 import static org.mule.runtime.core.el.DefaultExpressionManager.PREFIX_EXPR_SEPARATOR;
+
+import static java.util.Collections.singletonMap;
+
+import static java.util.stream.Collectors.toMap;
 
 import org.mule.mvel2.CompileException;
 import org.mule.mvel2.ParserConfiguration;
@@ -29,6 +31,7 @@ import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.api.metadata.AbstractDataTypeBuilderFactory;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -58,7 +61,7 @@ import javax.inject.Inject;
 /**
  * Expression language that uses MVEL (http://mvel.codehaus.org/).
  */
-public class MVELExpressionLanguage implements ExtendedExpressionLanguageAdaptor, Initialisable {
+public class MVELExpressionLanguage extends AbstractAnnotatedObject implements ExtendedExpressionLanguageAdaptor, Initialisable {
 
   public static final String OBJECT_FOR_ENRICHMENT = "__object_for_enrichment";
 

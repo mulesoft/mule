@@ -16,6 +16,8 @@ import static org.mule.runtime.core.internal.interception.DefaultInterceptionEve
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.fromFuture;
 
+import static java.util.Collections.emptyMap;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -116,8 +118,7 @@ public class ReactiveInterceptorAdapter
   private Function<InternalEvent, InternalEvent> doBefore(ProcessorInterceptor interceptor, Processor component,
                                                           Map<String, String> dslParameters) {
     return event -> {
-      final InternalEvent eventWithResolvedParams =
-          addResolvedParameters(event, component, dslParameters);
+      final InternalEvent eventWithResolvedParams = addResolvedParameters(event, component, dslParameters);
 
       DefaultInterceptionEvent interceptionEvent = new DefaultInterceptionEvent(eventWithResolvedParams);
       interceptor.before(((AnnotatedObject) component).getLocation(), getResolvedParams(eventWithResolvedParams),
@@ -129,8 +130,7 @@ public class ReactiveInterceptorAdapter
   private CompletableFuture<InternalEvent> doAround(InternalEvent event, ProcessorInterceptor interceptor,
                                                     Processor component, Map<String, String> dslParameters,
                                                     ReactiveProcessor next) {
-    final InternalEvent eventWithResolvedParams =
-        addResolvedParameters(event, component, dslParameters);
+    final InternalEvent eventWithResolvedParams = addResolvedParameters(event, component, dslParameters);
 
     DefaultInterceptionEvent interceptionEvent = new DefaultInterceptionEvent(eventWithResolvedParams);
     final ReactiveInterceptionAction reactiveInterceptionAction =

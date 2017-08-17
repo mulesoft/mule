@@ -9,10 +9,12 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilder;
 
@@ -25,7 +27,7 @@ import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBu
  * @param <T> the generic type for the instances built.
  * @since 3.7.0
  */
-public class ObjectBuilderValueResolver<T> implements ValueResolver<T>, Initialisable {
+public class ObjectBuilderValueResolver<T> extends AbstractAnnotatedObject implements ValueResolver<T>, Initialisable {
 
   private final ObjectBuilder<T> builder;
   private final MuleContext muleContext;

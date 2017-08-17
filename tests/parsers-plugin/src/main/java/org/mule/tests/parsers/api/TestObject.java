@@ -10,12 +10,13 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.lock.LockFactory;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 
 import java.util.LinkedList;
 
 import javax.inject.Inject;
 
-public class TestObject implements Lifecycle {
+public class TestObject extends AbstractAnnotatedObject implements Lifecycle {
 
   private final TestObjectFactory objectFactory;
   private LinkedList<String> lifecycleActions;
