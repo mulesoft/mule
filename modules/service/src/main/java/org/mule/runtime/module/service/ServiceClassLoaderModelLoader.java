@@ -7,8 +7,10 @@
 
 package org.mule.runtime.module.service;
 
+import static java.lang.String.format;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.SERVICE;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
 import org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderException;
@@ -51,11 +53,22 @@ public class ServiceClassLoaderModelLoader implements ClassLoaderModelLoader {
     }
 
     ClassLoaderModel.ClassLoaderModelBuilder classLoaderModelBuilder = new ClassLoaderModel.ClassLoaderModelBuilder();
+    classLoaderModelBuilder.containing(getUrl(artifactFile));
     for (URL url : getServiceUrls(artifactFile)) {
       classLoaderModelBuilder.containing(url);
     }
 
     return classLoaderModelBuilder.build();
+  }
+
+  private URL getUrl(File file) {
+    try {
+      return file.toURI().toURL();
+    } catch (MalformedURLException e) {
+      throw new ArtifactDescriptorCreateException(format("There was an exception obtaining the URL for the service: [%s]",
+                                                         file.getAbsolutePath()),
+                                                  e);
+    }
   }
 
   private List<URL> getServiceUrls(File rootFolder) {
