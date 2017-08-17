@@ -65,7 +65,6 @@ public abstract class AbstractFlowConstruct extends AbstractExecutableComponent 
   private final FlowConstructLifecycleManager lifecycleManager;
   private final String name;
   private final MessagingExceptionHandler exceptionListener;
-  private final MuleContext muleContext;
   private volatile FlowConstructStatistics statistics;
 
   /**

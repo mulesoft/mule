@@ -74,7 +74,13 @@ public abstract class AbstractExecutableComponent extends AbstractAnnotatedObjec
     return executeEvent(internalEvent);
   }
 
-  private CompletableFuture<Event> executeEvent(InternalEvent event) {
+  /**
+   * Template method for executing the {@link InternalEvent} created from the input.
+   * 
+   * @param event the event to process
+   * @return a {@link CompletableFuture<Event>} for the result.
+   */
+  protected CompletableFuture<Event> executeEvent(InternalEvent event) {
     just(event).transform(getExecutableFunction()).doOnNext(result -> result.getContext().success(result)).subscribe();
     return from(event.getContext().getResponsePublisher()).map(outputEvent -> (Event) outputEvent)
         .onErrorMap(throwable -> {
