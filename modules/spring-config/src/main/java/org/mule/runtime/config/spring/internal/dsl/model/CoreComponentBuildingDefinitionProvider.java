@@ -56,6 +56,7 @@ import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyT
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_IN_MEMORY_OBJECTS_STREAM_ALIAS;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.POOLING_PROFILE_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.internal.dsl.DslConstants.RECONNECTION_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
@@ -73,6 +74,7 @@ import org.mule.runtime.config.spring.internal.NotificationConfig;
 import org.mule.runtime.config.spring.internal.ServerNotificationManagerConfigurator;
 import org.mule.runtime.config.spring.internal.dsl.processor.CustomSecurityFilterObjectFactory;
 import org.mule.runtime.config.spring.internal.dsl.processor.EnvironmentPropertyObjectFactory;
+import org.mule.runtime.config.spring.internal.dsl.processor.ReconnectionConfigObjectFactory;
 import org.mule.runtime.config.spring.internal.dsl.processor.RetryPolicyTemplateObjectFactory;
 import org.mule.runtime.config.spring.internal.dsl.processor.factory.MessageEnricherObjectFactory;
 import org.mule.runtime.config.spring.internal.factories.AsyncMessageProcessorsFactoryBean;
@@ -139,6 +141,7 @@ import org.mule.runtime.core.internal.processor.simple.AddFlowVariableProcessor;
 import org.mule.runtime.core.internal.processor.simple.ParseTemplateProcessor;
 import org.mule.runtime.core.internal.processor.simple.RemoveFlowVariableProcessor;
 import org.mule.runtime.core.internal.processor.simple.SetPayloadMessageProcessor;
+import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.core.internal.routing.ChoiceRouter;
 import org.mule.runtime.core.internal.routing.FirstSuccessful;
 import org.mule.runtime.core.internal.routing.Foreach;
@@ -1103,6 +1106,14 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     buildingDefinitions.add(baseReconnectDefinition.withIdentifier(RECONNECT_ELEMENT_IDENTIFIER)
         .withSetterParameterDefinition("retryNotifier", fromChildConfiguration(RetryNotifier.class).build())
         .withSetterParameterDefinition("count", fromSimpleParameter("count").build()).build());
+
+    buildingDefinitions.add(baseDefinition
+        .withIdentifier(RECONNECTION_ELEMENT_IDENTIFIER)
+        .withTypeDefinition(fromType(ReconnectionConfig.class))
+        .withObjectFactoryType(ReconnectionConfigObjectFactory.class)
+        .withSetterParameterDefinition("failsDeployment", fromSimpleParameter("failsDeployment").build())
+        .withSetterParameterDefinition("retryPolicyTemplate", fromChildConfiguration(RetryPolicyTemplate.class).build())
+        .build());
 
     return buildingDefinitions;
   }

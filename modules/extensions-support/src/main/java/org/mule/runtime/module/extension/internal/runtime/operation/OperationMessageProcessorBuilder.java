@@ -17,6 +17,7 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
@@ -43,6 +44,7 @@ public final class OperationMessageProcessorBuilder {
   private String target;
   private String targetValue;
   private CursorProviderFactory cursorProviderFactory;
+  private RetryPolicyTemplate retryPolicyTemplate;
 
   public OperationMessageProcessorBuilder(ExtensionModel extensionModel,
                                           OperationModel operationModel,
@@ -95,6 +97,11 @@ public final class OperationMessageProcessorBuilder {
     return this;
   }
 
+  public OperationMessageProcessorBuilder setRetryPolicyTemplate(RetryPolicyTemplate retryPolicyTemplate) {
+    this.retryPolicyTemplate = retryPolicyTemplate;
+    return this;
+  }
+
   public OperationMessageProcessor build() {
     return withContextClassLoader(getClassLoader(extensionModel), () -> {
       try {
@@ -108,18 +115,19 @@ public final class OperationMessageProcessorBuilder {
           processor =
               new PagedOperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetValue,
                                                  resolverSet,
-                                                 cursorProviderFactory, extensionManager, policyManager,
+                                                 cursorProviderFactory, retryPolicyTemplate, extensionManager, policyManager,
                                                  extensionConnectionSupplier);
         } else if (supportsOAuth(extensionModel)) {
           processor =
               new OAuthOperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetValue,
                                                  resolverSet,
-                                                 cursorProviderFactory, extensionManager, policyManager,
+                                                 cursorProviderFactory, retryPolicyTemplate, extensionManager, policyManager,
                                                  oauthManager);
         } else {
           processor = new OperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetValue,
                                                     resolverSet,
-                                                    cursorProviderFactory, extensionManager, policyManager);
+                                                    cursorProviderFactory, retryPolicyTemplate, extensionManager,
+                                                    policyManager);
         }
         // TODO: MULE-5002 this should not be necessary but lifecycle issues when injecting message processors automatically
         muleContext.getInjector().inject(processor);

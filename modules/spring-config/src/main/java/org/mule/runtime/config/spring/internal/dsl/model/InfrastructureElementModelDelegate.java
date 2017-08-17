@@ -6,12 +6,11 @@
  */
 package org.mule.runtime.config.spring.internal.dsl.model;
 
-import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.extension.api.ExtensionConstants.INFRASTRUCTURE_PARAMETER_NAMES;
 import static org.mule.runtime.extension.api.ExtensionConstants.POOLING_PROFILE_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_CONFIG_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.REDELIVERY_POLICY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.STREAMING_STRATEGY_PARAMETER_NAME;
@@ -27,7 +26,7 @@ import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEME
 import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_CONTEXT_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_PREFIX;
-
+import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.app.declaration.ParameterValue;
 import org.mule.runtime.api.app.declaration.ParameterValueVisitor;
 import org.mule.runtime.api.app.declaration.fluent.ParameterObjectValue;
@@ -58,10 +57,11 @@ class InfrastructureElementModelDelegate {
                            ComponentConfiguration.Builder parentConfig,
                            DslElementModel.Builder parentElement) {
 
-    checkArgument(INFRASTRUCTURE_PARAMETER_NAMES.contains(parameterName),
-                  format("The parameter '%s' is not of infrastructure kind", parameterName));
-
     switch (parameterName) {
+      case RECONNECTION_CONFIG_PARAMETER_NAME:
+        createReconnectionConfig(value, parameterModel, paramDsl, parentConfig, parentElement);
+        return;
+
       case RECONNECTION_STRATEGY_PARAMETER_NAME:
         createReconnectionStrategy(value, parameterModel, paramDsl, parentConfig, parentElement);
         return;
@@ -155,8 +155,50 @@ class InfrastructureElementModelDelegate {
 
   }
 
+  private void createReconnectionConfig(ParameterValue value,
+                                        ParameterModel parameterModel,
+                                        DslElementSyntax paramDsl,
+                                        ComponentConfiguration.Builder parentConfig,
+                                        DslElementModel.Builder parentElement) {
+
+    ComponentConfiguration.Builder config = ComponentConfiguration.builder()
+        .withIdentifier(builder()
+            .namespace(CORE_PREFIX)
+            .name(RECONNECTION_CONFIG_PARAMETER_NAME)
+            .build());
+
+    final DslElementModel.Builder<Object> elementBuilder = DslElementModel.builder()
+        .withModel(parameterModel)
+        .withDsl(paramDsl);
+
+    ((ParameterObjectValue) value).getParameters()
+        .forEach((name, fieldValue) -> fieldValue.accept(new ParameterValueVisitor() {
+
+          @Override
+          public void visitSimpleValue(ParameterSimpleValue text) {
+            config.withParameter(name, text.getValue());
+          }
+
+          @Override
+          public void visitObjectValue(ParameterObjectValue objectValue) {
+            if (name.equals(RECONNECTION_STRATEGY_PARAMETER_NAME)) {
+              createReconnectionStrategy(fieldValue,
+                                         ((ObjectType) parameterModel.getType())
+                                             .getFieldByName(RECONNECTION_STRATEGY_PARAMETER_NAME).get(),
+                                         paramDsl.getContainedElement(RECONNECTION_STRATEGY_PARAMETER_NAME).get(),
+                                         config, elementBuilder);
+            }
+          }
+        }));
+
+    final ComponentConfiguration result = config.build();
+    parentConfig.withNestedComponent(result);
+    parentElement.containing(elementBuilder.withConfig(result).build());
+
+  }
+
   private void createReconnectionStrategy(ParameterValue value,
-                                          ParameterModel parameterModel,
+                                          Object parameterModel,
                                           DslElementSyntax paramDsl,
                                           ComponentConfiguration.Builder parentConfig,
                                           DslElementModel.Builder parentElement) {
@@ -185,7 +227,8 @@ class InfrastructureElementModelDelegate {
                               namespace);
   }
 
-  private void cloneDeclarationToElement(ParameterModel parameterModel, DslElementSyntax paramDsl,
+  //TODO: MULE-13339
+  private void cloneDeclarationToElement(Object parameterModel, DslElementSyntax paramDsl,
                                          ComponentConfiguration.Builder parentConfig, DslElementModel.Builder parentElement,
                                          ParameterObjectValue objectValue, String elementName, String customNamespace) {
 
@@ -200,7 +243,7 @@ class InfrastructureElementModelDelegate {
     addParameterElement(parameterModel, paramDsl, parentConfig, parentElement, config.build());
   }
 
-  private void addParameterElement(ParameterModel parameterModel, DslElementSyntax paramDsl,
+  private void addParameterElement(Object parameterModel, DslElementSyntax paramDsl,
                                    ComponentConfiguration.Builder parentConfig, DslElementModel.Builder parentElement,
                                    ComponentConfiguration result) {
     parentConfig.withNestedComponent(result);

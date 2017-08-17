@@ -6,15 +6,15 @@
  */
 package org.mule.runtime.core.internal.connection;
 
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
+import static java.util.Optional.of;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.retry.policy.RetryPolicy;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
+import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 
 import java.util.Optional;
 
@@ -27,7 +27,6 @@ import java.util.Optional;
 public class DefaultConnectionProviderWrapper<C> extends ConnectionProviderWrapper<C> {
 
   private final MuleContext muleContext;
-  private final ConnectionManagerAdapter connectionManager;
 
   /**
    * Creates a new instance
@@ -38,7 +37,6 @@ public class DefaultConnectionProviderWrapper<C> extends ConnectionProviderWrapp
   public DefaultConnectionProviderWrapper(ConnectionProvider<C> delegate, MuleContext muleContext) {
     super(delegate);
     this.muleContext = muleContext;
-    connectionManager = muleContext.getRegistry().get(OBJECT_CONNECTION_MANAGER);
   }
 
   /**
@@ -60,10 +58,6 @@ public class DefaultConnectionProviderWrapper<C> extends ConnectionProviderWrapp
     return connection;
   }
 
-  /**
-   * @return a {@link RetryPolicyTemplate} from the delegated {@link ConnectionProviderWrapper}, if the {@link #delegate} is a
-   *         {@link ConnectionProvider} then a default {@link RetryPolicy} is returned from the {@link ConnectionProviderWrapper}
-   */
   @Override
   public RetryPolicyTemplate getRetryPolicyTemplate() {
     final ConnectionProvider<C> delegate = getDelegate();
@@ -71,7 +65,17 @@ public class DefaultConnectionProviderWrapper<C> extends ConnectionProviderWrapp
       return ((ConnectionProviderWrapper) delegate).getRetryPolicyTemplate();
     }
 
-    return connectionManager.getDefaultRetryPolicyTemplate();
+    return super.getRetryPolicyTemplate();
+  }
+
+  @Override
+  public Optional<ReconnectionConfig> getReconnectionConfig() {
+    final ConnectionProvider<C> delegate = getDelegate();
+    if (delegate instanceof ConnectionProviderWrapper) {
+      return ((ConnectionProviderWrapper) delegate).getReconnectionConfig();
+    }
+
+    return of(ReconnectionConfig.getDefault());
   }
 
   @Override

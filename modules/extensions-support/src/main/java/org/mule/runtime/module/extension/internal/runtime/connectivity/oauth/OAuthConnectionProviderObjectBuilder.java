@@ -37,10 +37,9 @@ import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.util.Pair;
 import org.mule.runtime.core.api.util.StringMessageUtils;
-import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
+import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthModelProperty;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthParameterModelProperty;
@@ -79,14 +78,11 @@ public class OAuthConnectionProviderObjectBuilder<C> extends DefaultConnectionPr
   public OAuthConnectionProviderObjectBuilder(ConnectionProviderModel providerModel,
                                               ResolverSet resolverSet,
                                               PoolingProfile poolingProfile,
-                                              boolean disableValidation,
-                                              RetryPolicyTemplate retryPolicyTemplate,
+                                              ReconnectionConfig reconnectionConfig,
                                               ExtensionsOAuthManager oauthManager,
-                                              ConnectionManagerAdapter connectionManager,
                                               ExtensionModel extensionModel,
                                               MuleContext muleContext) {
-    super(providerModel, resolverSet, poolingProfile, disableValidation, retryPolicyTemplate, connectionManager, extensionModel,
-          muleContext);
+    super(providerModel, resolverSet, poolingProfile, reconnectionConfig, extensionModel, muleContext);
     this.oauthManager = oauthManager;
     grantType = getGrantType();
     callbackValues = getCallbackValues();
@@ -113,8 +109,7 @@ public class OAuthConnectionProviderObjectBuilder<C> extends DefaultConnectionPr
                                                     config,
                                                     getCallbackValues(),
                                                     oauthManager,
-                                                    disableValidation,
-                                                    retryPolicyTemplate);
+                                                    reconnectionConfig);
     return provider;
   }
 
@@ -135,8 +130,7 @@ public class OAuthConnectionProviderObjectBuilder<C> extends DefaultConnectionPr
                                                     config,
                                                     getCallbackValues(),
                                                     oauthManager,
-                                                    disableValidation,
-                                                    retryPolicyTemplate);
+                                                    reconnectionConfig);
     return new Pair<>(provider, result);
   }
 

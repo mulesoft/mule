@@ -131,6 +131,7 @@ class ReflectiveSourceCallbackExecutor implements SourceCallbackExecutor {
                                                                                           cursorProviderFactory,
                                                                                           streamingManager,
                                                                                           location,
+                                                                                          null,
                                                                                           muleContext);
 
     executionContext.setVariable(SOURCE_CALLBACK_CONTEXT_PARAM, callbackContext);

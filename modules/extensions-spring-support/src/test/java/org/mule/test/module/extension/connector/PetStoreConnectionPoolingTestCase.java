@@ -95,7 +95,7 @@ public class PetStoreConnectionPoolingTestCase extends PetStoreConnectionTestCas
       getClient();
       fail("was expecting pool to be exhausted when using config: " + name);
     } catch (MessagingException e) {
-      assertThat(e.getRootCause(), is(instanceOf(ConnectionException.class)));
+      assertThat(e.getCause(), is(instanceOf(ConnectionException.class)));
     } catch (Exception e) {
       fail("a connection exception was expected");
     }

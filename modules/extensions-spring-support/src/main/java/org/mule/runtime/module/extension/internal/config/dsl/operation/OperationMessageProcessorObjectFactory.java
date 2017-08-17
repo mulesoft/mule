@@ -11,8 +11,9 @@ import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.streaming.CursorProviderFactory;
+import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.internal.policy.PolicyManager;
+import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
@@ -32,6 +33,7 @@ public class OperationMessageProcessorObjectFactory extends AbstractExtensionObj
   private String target = EMPTY;
   private String targetValue = PAYLOAD;
   private CursorProviderFactory cursorProviderFactory;
+  private RetryPolicyTemplate retryPolicyTemplate;
 
   public OperationMessageProcessorObjectFactory(ExtensionModel extensionModel,
                                                 OperationModel operationModel,
@@ -51,6 +53,7 @@ public class OperationMessageProcessorObjectFactory extends AbstractExtensionObj
         .setTarget(target)
         .setTargetValue(targetValue)
         .setCursorProviderFactory(cursorProviderFactory)
+        .setRetryPolicyTemplate(retryPolicyTemplate)
         .build();
   }
 
@@ -68,5 +71,9 @@ public class OperationMessageProcessorObjectFactory extends AbstractExtensionObj
 
   public void setCursorProviderFactory(CursorProviderFactory cursorProviderFactory) {
     this.cursorProviderFactory = cursorProviderFactory;
+  }
+
+  public void setRetryPolicyTemplate(RetryPolicyTemplate retryPolicyTemplate) {
+    this.retryPolicyTemplate = retryPolicyTemplate;
   }
 }

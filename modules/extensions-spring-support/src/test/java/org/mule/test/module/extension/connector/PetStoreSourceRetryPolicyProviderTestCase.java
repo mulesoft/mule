@@ -9,9 +9,9 @@ package org.mule.test.module.extension.connector;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.rules.ExpectedException.none;
 import static org.mule.test.petstore.extension.FailingPetStoreSource.connectionException;
 import static org.mule.test.petstore.extension.FailingPetStoreSource.executor;
-
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.tck.probe.JUnitLambdaProbe;
@@ -29,8 +29,9 @@ public class PetStoreSourceRetryPolicyProviderTestCase extends AbstractExtension
 
   public static final int TIMEOUT_MILLIS = 1000;
   public static final int POLL_DELAY_MILLIS = 50;
+
   @Rule
-  public ExpectedException exception = ExpectedException.none();
+  public ExpectedException exception = none();
 
   @Override
   protected String getConfigFile() {
@@ -67,8 +68,8 @@ public class PetStoreSourceRetryPolicyProviderTestCase extends AbstractExtension
   }
 
   @Test
-  public void retryPolicySourceFailOnException() throws Exception {
-    startFlow("source-fail-on-exception");
+  public void retryPolicySourceFailWithConnectionException() throws Exception {
+    startFlow("source-fail-with-connection-exception");
     new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS)
         .check(new JUnitLambdaProbe(() -> {
           assertThat(PetStoreConnector.timesStarted, is(3));

@@ -7,7 +7,9 @@
 
     <petstore:config name="petstore-valid" cashierName="jim">
         <petstore:valid-connection username="john" password="doe">
-            <reconnect count="2" frequency="5"/>
+            <reconnection failsDeployment="true">
+                <reconnect count="2" frequency="5"/>
+            </reconnection>
         </petstore:valid-connection>
         <petstore:pets>
             <petstore:pet value="Lassie"/>
@@ -18,7 +20,9 @@
 
     <petstore:config name="petstore-invalid" cashierName="jim">
         <petstore:invalid-connection username="john" password="doe">
-            <reconnect count="2" frequency="5" blocking="false"/>
+            <reconnection failsDeployment="false">
+                <reconnect count="2" frequency="5" />
+            </reconnection>
         </petstore:invalid-connection>
         <petstore:pets>
             <petstore:pet value="Lassie"/>

@@ -54,6 +54,7 @@ import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.ParametersResolverProcessor;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.rx.Exceptions;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.internal.policy.OperationExecutionFunction;
@@ -118,6 +119,7 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
   private final String target;
   private final String targetValue;
   private final EntityMetadataMediator entityMetadataMediator;
+  private final RetryPolicyTemplate retryPolicyTemplate;
 
   private ExecutionMediator executionMediator;
   private OperationExecutor operationExecutor;
@@ -131,6 +133,7 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
                                    String targetValue,
                                    ResolverSet resolverSet,
                                    CursorProviderFactory cursorProviderFactory,
+                                   RetryPolicyTemplate retryPolicyTemplate,
                                    ExtensionManager extensionManager,
                                    PolicyManager policyManager) {
     super(extensionModel, operationModel, configurationProvider, cursorProviderFactory, extensionManager);
@@ -141,6 +144,7 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
     this.targetValue = targetValue;
     this.entityMetadataMediator = new EntityMetadataMediator(operationModel);
     this.policyManager = policyManager;
+    this.retryPolicyTemplate = retryPolicyTemplate;
   }
 
   @Override
@@ -228,7 +232,8 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
       throws MuleException {
 
     return new DefaultExecutionContext<>(extensionModel, configuration, resolvedParameters, operationModel, event,
-                                         getCursorProviderFactory(), streamingManager, getLocation(), muleContext);
+                                         getCursorProviderFactory(), streamingManager, getLocation(), retryPolicyTemplate,
+                                         muleContext);
   }
 
   @Override

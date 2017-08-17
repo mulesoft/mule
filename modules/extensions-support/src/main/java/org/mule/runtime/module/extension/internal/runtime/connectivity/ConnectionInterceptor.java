@@ -18,6 +18,8 @@ import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.module.extension.internal.ExtensionProperties;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 
+import java.util.function.Consumer;
+
 import javax.inject.Inject;
 
 /**
@@ -37,7 +39,7 @@ public final class ConnectionInterceptor implements Interceptor {
    *
    * @param executionContext the {@link ExecutionContext} for the operation to be executed
    * @throws IllegalArgumentException if the {@code operationContext} already contains a parameter of key
-   *         {@link ExtensionProperties#CONNECTION_PARAM}
+   *                                  {@link ExtensionProperties#CONNECTION_PARAM}
    */
   @Override
   public void before(ExecutionContext<OperationModel> executionContext) throws Exception {
@@ -46,17 +48,21 @@ public final class ConnectionInterceptor implements Interceptor {
     context.setVariable(CONNECTION_PARAM, getConnection(context));
   }
 
-  /**
-   * Sets the {@link ExtensionProperties#CONNECTION_PARAM} parameter on the {@code operationContext} to {@code null}
-   *
-   * @param executionContext the {@link ExecutionContext} that was used to execute the operation
-   * @param result the operation's result
-   */
   @Override
-  public void after(ExecutionContext<OperationModel> executionContext, Object result) {
-    ConnectionHandler connection = ((ExecutionContextAdapter<OperationModel>) executionContext).removeVariable(CONNECTION_PARAM);
-    if (connection != null) {
-      connection.release();
+  public void onSuccess(ExecutionContext<OperationModel> executionContext, Object result) {
+    onConnection(executionContext, ConnectionHandler::release);
+  }
+
+  @Override
+  public Throwable onError(ExecutionContext<OperationModel> executionContext, Throwable exception) {
+    onConnection(executionContext, ConnectionHandler::invalidate);
+    return exception;
+  }
+
+  private void onConnection(ExecutionContext<OperationModel> executionContext, Consumer<ConnectionHandler> consumer) {
+    ConnectionHandler handler = ((ExecutionContextAdapter<OperationModel>) executionContext).removeVariable(CONNECTION_PARAM);
+    if (handler != null) {
+      consumer.accept(handler);
     }
   }
 

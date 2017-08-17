@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.connection;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -56,6 +57,23 @@ public class PoolingConnectionHandlerTestCase extends AbstractMuleTestCase {
     managedConnection.release();
     verify(pool).returnObject(connection);
     verify(poolingListener).onReturn(connection);
+    assertDisconnected();
+  }
+
+  @Test
+  public void invalidate() throws Exception {
+    managedConnection.invalidate();
+    verify(pool).invalidateObject(connection);
+    assertDisconnected();
+  }
+
+  private void assertDisconnected() throws org.mule.runtime.api.connection.ConnectionException {
+    try {
+      managedConnection.getConnection();
+      fail("Was expecting failure");
+    } catch (IllegalStateException e) {
+      // yeah baby!
+    }
   }
 
   @Test

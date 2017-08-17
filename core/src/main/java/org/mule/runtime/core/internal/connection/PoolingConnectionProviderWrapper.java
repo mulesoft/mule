@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.core.internal.connection;
 
+import static java.util.Optional.ofNullable;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionProvider;
-import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
-import org.mule.runtime.core.api.retry.policy.AbstractPolicyTemplate;
+import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 
 import java.util.Optional;
 
@@ -26,19 +26,22 @@ public final class PoolingConnectionProviderWrapper<C> extends ReconnectableConn
   /**
    * Creates a new instance
    *
-   * @param delegate the {@link ConnectionProvider} to be wrapped
-   * @param poolingProfile a not {@code null} {@link PoolingProfile}
-   * @param retryPolicyTemplate a {@link AbstractPolicyTemplate} which will hold the retry policy configured in the Mule
-   *        Application
+   * @param delegate           the {@link ConnectionProvider} to be wrapped
+   * @param poolingProfile     a not {@code null} {@link PoolingProfile}
+   * @param reconnectionConfig a {@link ReconnectionConfig}
    */
-  public PoolingConnectionProviderWrapper(ConnectionProvider<C> delegate, PoolingProfile poolingProfile,
-                                          boolean disableValidation, RetryPolicyTemplate retryPolicyTemplate) {
-    super(delegate, disableValidation, retryPolicyTemplate);
+  public PoolingConnectionProviderWrapper(ConnectionProvider<C> delegate,
+                                          PoolingProfile poolingProfile,
+                                          ReconnectionConfig reconnectionConfig) {
+    super(delegate, reconnectionConfig);
     this.poolingProfile = poolingProfile;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Optional<PoolingProfile> getPoolingProfile() {
-    return Optional.ofNullable(poolingProfile);
+    return ofNullable(poolingProfile);
   }
 }

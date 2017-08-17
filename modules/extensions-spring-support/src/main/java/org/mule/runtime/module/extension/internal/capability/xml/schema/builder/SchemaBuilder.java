@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
 import static java.util.Collections.singleton;
+import static java.util.Comparator.comparing;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
@@ -39,7 +40,6 @@ import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
 import static org.mule.runtime.extension.api.util.NameUtils.sanitizeName;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
-import static org.mule.runtime.internal.dsl.DslConstants.EE_DOMAIN_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.EE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.EE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
@@ -98,12 +98,12 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Un
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
@@ -703,7 +703,7 @@ public final class SchemaBuilder {
   void addInfrastructureParameters(ExtensionType extensionType, ParameterizedModel model, ExplicitGroup sequence) {
     model.getAllParameterModels().stream()
         .filter(p -> p.getModelProperty(InfrastructureParameterModelProperty.class).isPresent())
-        .sorted(Comparator.comparing(p -> p.getModelProperty(InfrastructureParameterModelProperty.class).get().getSequence()))
+        .sorted(comparing(p -> p.getModelProperty(InfrastructureParameterModelProperty.class).get().getSequence()))
         .forEach(parameter -> {
           parameter.getModelProperty(QNameModelProperty.class)
               .map(QNameModelProperty::getValue)

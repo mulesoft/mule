@@ -14,8 +14,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 import org.mule.runtime.api.connection.ConnectionProvider;
-import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.util.concurrent.Latch;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -46,9 +46,13 @@ public class CachedConnectionHandlerTestCase extends AbstractMuleTestCase {
 
   @Before
   public void before() throws Exception {
-    when(connectionProvider.connect()).thenReturn(connection);
+    stubConnectionProvider();
     managedConnection = new CachedConnectionHandler<>(connectionProvider, muleContext);
-    when(connectionProvider.validate(connection)).thenReturn(ConnectionValidationResult.success());
+  }
+
+  private void stubConnectionProvider() throws org.mule.runtime.api.connection.ConnectionException {
+    when(connectionProvider.connect()).thenReturn(connection);
+    when(connectionProvider.validate(connection)).thenReturn(success());
   }
 
   @Test
@@ -98,9 +102,6 @@ public class CachedConnectionHandlerTestCase extends AbstractMuleTestCase {
     getConnection();
     managedConnection.release();
     verify(connectionProvider, never()).disconnect(connection);
-
-    // re-test to make sure everything is still functional
-    getConnection();
   }
 
   @Test
@@ -108,14 +109,16 @@ public class CachedConnectionHandlerTestCase extends AbstractMuleTestCase {
     getConnection();
     managedConnection.close();
     verify(connectionProvider).disconnect(connection);
+  }
 
-    reset(connectionProvider);
-    Banana newConnection = new Banana();
-    when(connectionProvider.validate(connection)).thenReturn(ConnectionValidationResult.success());
-    when(connectionProvider.connect()).thenReturn(newConnection);
-
+  @Test
+  public void invalidate() throws Exception {
     getConnection();
-    assertThat(managedConnection.getConnection(), is(sameInstance(newConnection)));
+    managedConnection.invalidate();
+    verify(connectionProvider).disconnect(connection);
+    reset(connectionProvider);
+    stubConnectionProvider();
+    getConnection();
   }
 }
 

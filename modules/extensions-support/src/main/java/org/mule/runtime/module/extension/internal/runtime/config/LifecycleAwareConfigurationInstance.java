@@ -34,6 +34,7 @@ import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.time.TimeSupplier;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
+import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.extension.api.runtime.Interceptable;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationState;
@@ -182,7 +183,7 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
     }
 
     RetryPolicyTemplate retryTemplate = connectionManager.getRetryTemplateFor(provider);
-
+    ReconnectionConfig reconnectionConfig = connectionManager.getReconnectionConfigFor(provider);
     RetryCallback retryCallback = new RetryCallback() {
 
       @Override
@@ -195,8 +196,18 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
             if (result.isValid()) {
               context.setOk();
             } else {
-              context.setFailed(result.getException());
-              throw new ConnectionException(format("Connectivity test failed for config '%s'", getName()), result.getException());
+              if ((reconnectionConfig.isFailsDeployment())) {
+                context.setFailed(result.getException());
+                throw new ConnectionException(format("Connectivity test failed for config '%s'", getName()),
+                                              result.getException());
+              } else {
+                if (LOGGER.isInfoEnabled()) {
+                  LOGGER
+                      .info(format("Connectivity test failed for config '%s'. Application deployment will continue. Error was: ",
+                                   getName(), result.getMessage()),
+                            result.getException());
+                }
+              }
             }
           } finally {
             testConnectivityLock.unlock();

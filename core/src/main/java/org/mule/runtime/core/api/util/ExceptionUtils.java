@@ -167,6 +167,10 @@ public class ExceptionUtils {
    */
   @SuppressWarnings("unchecked")
   public static <T extends Throwable> Optional<T> extractOfType(Throwable throwable, Class<T> throwableType) {
+    if (throwableType.isInstance(throwable)) {
+      return of((T) throwable);
+    }
+
     if (throwable == null || !containsType(throwable, throwableType)) {
       return empty();
     }

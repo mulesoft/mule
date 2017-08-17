@@ -15,8 +15,8 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getLocalPart;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
-import static org.mule.runtime.extension.api.ExtensionConstants.DISABLE_CONNECTION_VALIDATION_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.POOLING_PROFILE_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_CONFIG_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.REDELIVERY_POLICY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.STREAMING_STRATEGY_PARAMETER_NAME;
@@ -676,6 +676,15 @@ class ConfigurationBasedElementModelFactory {
                                     final DslElementModel.Builder<ParameterGroupModel> groupElementBuilder) {
 
     switch (paramModel.getName()) {
+      case RECONNECTION_CONFIG_PARAMETER_NAME:
+        ComponentConfiguration reconnection = nested.get(newIdentifier(RECONNECTION_CONFIG_PARAMETER_NAME,
+                                                                       paramDsl.getPrefix()));
+
+        if (reconnection != null) {
+          groupElementBuilder.containing(newElementModel(paramModel, paramDsl, reconnection));
+        }
+        return;
+
       case RECONNECTION_STRATEGY_PARAMETER_NAME:
         ComponentIdentifier reconnectId = newIdentifier(RECONNECT_ELEMENT_IDENTIFIER,
                                                         paramDsl.getPrefix());
@@ -701,16 +710,6 @@ class ConfigurationBasedElementModelFactory {
         ComponentConfiguration pooling = nested.get(getIdentifier(paramDsl).get());
         if (pooling != null) {
           groupElementBuilder.containing(newElementModel(paramModel, paramDsl, pooling));
-        }
-        return;
-
-      case DISABLE_CONNECTION_VALIDATION_PARAMETER_NAME:
-        if (!isBlank(parameters.get(DISABLE_CONNECTION_VALIDATION_PARAMETER_NAME))) {
-          groupElementBuilder.containing(DslElementModel.builder()
-              .withModel(paramModel)
-              .withDsl(paramDsl)
-              .withValue(parameters.get(DISABLE_CONNECTION_VALIDATION_PARAMETER_NAME))
-              .build());
         }
         return;
 

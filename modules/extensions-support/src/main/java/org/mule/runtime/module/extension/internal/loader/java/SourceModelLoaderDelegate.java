@@ -147,7 +147,8 @@ final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
     declareSourceCallbackParameters(source, onErrorMethod, source::onError);
     declareSourceCallbackParameters(source, onTerminateMethod, source::onTerminate);
 
-    source.withModelProperty(new SourceCallbackModelProperty(getMethod(onResponseMethod), getMethod(onErrorMethod),
+    source.withModelProperty(new SourceCallbackModelProperty(getMethod(onResponseMethod),
+                                                             getMethod(onErrorMethod),
                                                              getMethod(onTerminateMethod)));
   }
 

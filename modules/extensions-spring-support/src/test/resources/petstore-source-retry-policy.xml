@@ -18,12 +18,12 @@
         <set-payload value="#[mel:payload]"/>
     </flow>
 
-    <flow name="source-fail-on-exception" initialState="stopped">
+    <flow name="source-fail-with-connection-exception" initialState="stopped">
         <petstore:source failOnException="true" config-ref="petstore-config">
             <redelivery-policy maxRedeliveryCount="2"/>
             <reconnect count="1" frequency="0"/>
         </petstore:source>
-        <set-payload value="#[mel:payload]"/>
+        <set-payload value="#[payload]"/>
     </flow>
 
 </mule>

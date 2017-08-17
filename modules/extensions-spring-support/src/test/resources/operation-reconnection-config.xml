@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:marvel="http://www.mulesoft.org/schema/mule/marvel"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+               http://www.mulesoft.org/schema/mule/marvel http://www.mulesoft.org/schema/mule/marvel/current/mule-marvel.xsd">
+
+    <marvel:iron-man-config name="ironMan">
+        <marvel:odd-missile-connection />
+    </marvel:iron-man-config>
+
+    <flow name="operationReconnection">
+        <marvel:fire-missile at="#[payload]" config-ref="ironMan">
+            <reconnect count="3" frequency="200"/>
+        </marvel:fire-missile>
+    </flow>
+
+    <flow name="defaultReconnection">
+        <marvel:fire-missile at="#[payload]" config-ref="ironMan"/>
+    </flow>
+
+</mule>

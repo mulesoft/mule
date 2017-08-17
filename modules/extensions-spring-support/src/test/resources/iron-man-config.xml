@@ -13,18 +13,20 @@
 
     <marvel:iron-man-config name="warMachine">
         <marvel:odd-missile-connection>
-            <reconnect count="3" frequency="200"/>
+            <reconnection failsDeployment="true">
+                <reconnect count="3" frequency="200"/>
+            </reconnection>
         </marvel:odd-missile-connection>
     </marvel:iron-man-config>
 
     <flow name="fireMissile">
         <test:assert-intercepting responseSameTask="false" />
-        <marvel:fire-missile at="#[mel:payload]" config-ref="ironMan"/>
+        <marvel:fire-missile at="#[payload]" config-ref="ironMan"/>
     </flow>
 
     <flow name="warMachineFireMissile">
         <test:assert-intercepting responseSameTask="false" />
-        <marvel:fire-missile at="#[mel:payload]" config-ref="warMachine"/>
+        <marvel:fire-missile at="#[payload]" config-ref="warMachine"/>
     </flow>
 
     <flow name="computeFlightPlan">

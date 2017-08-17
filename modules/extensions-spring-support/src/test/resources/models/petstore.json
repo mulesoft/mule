@@ -796,6 +796,136 @@
               "name": "Output",
               "description": "",
               "modelProperties": {}
+            },
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Union",
+                    "annotations": {
+                      "typeId": "java.lang.Object",
+                      "typeAlias": {
+                        "value": "ReconnectionStrategy"
+                      }
+                    },
+                    "of": [
+                      {
+                        "type": "Object",
+                        "annotations": {
+                          "typeId": "java.lang.Object",
+                          "typeAlias": {
+                            "value": "reconnect"
+                          }
+                        },
+                        "fields": [
+                          {
+                            "key": {
+                              "name": "frequency"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "typeId": "java.lang.Long",
+                                "default": "2000"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "count"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "typeId": "java.lang.Integer",
+                                "default": "2"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "How many reconnection attempts to make"
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Object",
+                        "annotations": {
+                          "typeId": "java.lang.Object",
+                          "typeAlias": {
+                            "value": "reconnect-forever"
+                          }
+                        },
+                        "fields": [
+                          {
+                            "key": {
+                              "name": "frequency"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "typeId": "java.lang.Long",
+                                "default": "2000"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "tabName": "Advanced"
+                  },
+                  "elementReferences": [],
+                  "name": "reconnectionStrategy",
+                  "description": "A retry strategy in case of connectivity errors",
+                  "modelProperties": {
+                    "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                      "value": {
+                        "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
+                        "localPart": "abstract-reconnection-strategy",
+                        "prefix": "mule"
+                      }
+                    },
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 3
+                    }
+                  }
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "showInDsl": false,
+              "name": "Connection",
+              "description": "",
+              "modelProperties": {}
             }
           ],
           "name": "failConnection",
@@ -941,6 +1071,136 @@
               "name": "Output",
               "description": "",
               "modelProperties": {}
+            },
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Union",
+                    "annotations": {
+                      "typeId": "java.lang.Object",
+                      "typeAlias": {
+                        "value": "ReconnectionStrategy"
+                      }
+                    },
+                    "of": [
+                      {
+                        "type": "Object",
+                        "annotations": {
+                          "typeId": "java.lang.Object",
+                          "typeAlias": {
+                            "value": "reconnect"
+                          }
+                        },
+                        "fields": [
+                          {
+                            "key": {
+                              "name": "frequency"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "typeId": "java.lang.Long",
+                                "default": "2000"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "count"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "typeId": "java.lang.Integer",
+                                "default": "2"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "How many reconnection attempts to make"
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Object",
+                        "annotations": {
+                          "typeId": "java.lang.Object",
+                          "typeAlias": {
+                            "value": "reconnect-forever"
+                          }
+                        },
+                        "fields": [
+                          {
+                            "key": {
+                              "name": "frequency"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "typeId": "java.lang.Long",
+                                "default": "2000"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "tabName": "Advanced"
+                  },
+                  "elementReferences": [],
+                  "name": "reconnectionStrategy",
+                  "description": "A retry strategy in case of connectivity errors",
+                  "modelProperties": {
+                    "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                      "value": {
+                        "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
+                        "localPart": "abstract-reconnection-strategy",
+                        "prefix": "mule"
+                      }
+                    },
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 3
+                    }
+                  }
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "showInDsl": false,
+              "name": "Connection",
+              "description": "",
+              "modelProperties": {}
             }
           ],
           "name": "failOperationWithException",
@@ -1084,6 +1344,136 @@
               "exclusiveParametersModels": [],
               "showInDsl": false,
               "name": "Output",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Union",
+                    "annotations": {
+                      "typeId": "java.lang.Object",
+                      "typeAlias": {
+                        "value": "ReconnectionStrategy"
+                      }
+                    },
+                    "of": [
+                      {
+                        "type": "Object",
+                        "annotations": {
+                          "typeId": "java.lang.Object",
+                          "typeAlias": {
+                            "value": "reconnect"
+                          }
+                        },
+                        "fields": [
+                          {
+                            "key": {
+                              "name": "frequency"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "typeId": "java.lang.Long",
+                                "default": "2000"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "count"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "typeId": "java.lang.Integer",
+                                "default": "2"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "How many reconnection attempts to make"
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Object",
+                        "annotations": {
+                          "typeId": "java.lang.Object",
+                          "typeAlias": {
+                            "value": "reconnect-forever"
+                          }
+                        },
+                        "fields": [
+                          {
+                            "key": {
+                              "name": "frequency"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "typeId": "java.lang.Long",
+                                "default": "2000"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "tabName": "Advanced"
+                  },
+                  "elementReferences": [],
+                  "name": "reconnectionStrategy",
+                  "description": "A retry strategy in case of connectivity errors",
+                  "modelProperties": {
+                    "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                      "value": {
+                        "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
+                        "localPart": "abstract-reconnection-strategy",
+                        "prefix": "mule"
+                      }
+                    },
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 3
+                    }
+                  }
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "showInDsl": false,
+              "name": "Connection",
               "description": "",
               "modelProperties": {}
             }
@@ -1345,6 +1735,136 @@
               "name": "Output",
               "description": "",
               "modelProperties": {}
+            },
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Union",
+                    "annotations": {
+                      "typeId": "java.lang.Object",
+                      "typeAlias": {
+                        "value": "ReconnectionStrategy"
+                      }
+                    },
+                    "of": [
+                      {
+                        "type": "Object",
+                        "annotations": {
+                          "typeId": "java.lang.Object",
+                          "typeAlias": {
+                            "value": "reconnect"
+                          }
+                        },
+                        "fields": [
+                          {
+                            "key": {
+                              "name": "frequency"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "typeId": "java.lang.Long",
+                                "default": "2000"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "count"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "typeId": "java.lang.Integer",
+                                "default": "2"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "How many reconnection attempts to make"
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Object",
+                        "annotations": {
+                          "typeId": "java.lang.Object",
+                          "typeAlias": {
+                            "value": "reconnect-forever"
+                          }
+                        },
+                        "fields": [
+                          {
+                            "key": {
+                              "name": "frequency"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "typeId": "java.lang.Long",
+                                "default": "2000"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "tabName": "Advanced"
+                  },
+                  "elementReferences": [],
+                  "name": "reconnectionStrategy",
+                  "description": "A retry strategy in case of connectivity errors",
+                  "modelProperties": {
+                    "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                      "value": {
+                        "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
+                        "localPart": "abstract-reconnection-strategy",
+                        "prefix": "mule"
+                      }
+                    },
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 3
+                    }
+                  }
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "showInDsl": false,
+              "name": "Connection",
+              "description": "",
+              "modelProperties": {}
             }
           ],
           "name": "getClient",
@@ -1582,6 +2102,136 @@
               "name": "Output",
               "description": "",
               "modelProperties": {}
+            },
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Union",
+                    "annotations": {
+                      "typeId": "java.lang.Object",
+                      "typeAlias": {
+                        "value": "ReconnectionStrategy"
+                      }
+                    },
+                    "of": [
+                      {
+                        "type": "Object",
+                        "annotations": {
+                          "typeId": "java.lang.Object",
+                          "typeAlias": {
+                            "value": "reconnect"
+                          }
+                        },
+                        "fields": [
+                          {
+                            "key": {
+                              "name": "frequency"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "typeId": "java.lang.Long",
+                                "default": "2000"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "count"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "typeId": "java.lang.Integer",
+                                "default": "2"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "How many reconnection attempts to make"
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Object",
+                        "annotations": {
+                          "typeId": "java.lang.Object",
+                          "typeAlias": {
+                            "value": "reconnect-forever"
+                          }
+                        },
+                        "fields": [
+                          {
+                            "key": {
+                              "name": "frequency"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "typeId": "java.lang.Long",
+                                "default": "2000"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "tabName": "Advanced"
+                  },
+                  "elementReferences": [],
+                  "name": "reconnectionStrategy",
+                  "description": "A retry strategy in case of connectivity errors",
+                  "modelProperties": {
+                    "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                      "value": {
+                        "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
+                        "localPart": "abstract-reconnection-strategy",
+                        "prefix": "mule"
+                      }
+                    },
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 3
+                    }
+                  }
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "showInDsl": false,
+              "name": "Connection",
+              "description": "",
+              "modelProperties": {}
             }
           ],
           "name": "getClientOnLatch",
@@ -1769,6 +2419,136 @@
               "exclusiveParametersModels": [],
               "showInDsl": false,
               "name": "Output",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Union",
+                    "annotations": {
+                      "typeId": "java.lang.Object",
+                      "typeAlias": {
+                        "value": "ReconnectionStrategy"
+                      }
+                    },
+                    "of": [
+                      {
+                        "type": "Object",
+                        "annotations": {
+                          "typeId": "java.lang.Object",
+                          "typeAlias": {
+                            "value": "reconnect"
+                          }
+                        },
+                        "fields": [
+                          {
+                            "key": {
+                              "name": "frequency"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "typeId": "java.lang.Long",
+                                "default": "2000"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "count"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "typeId": "java.lang.Integer",
+                                "default": "2"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "How many reconnection attempts to make"
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Object",
+                        "annotations": {
+                          "typeId": "java.lang.Object",
+                          "typeAlias": {
+                            "value": "reconnect-forever"
+                          }
+                        },
+                        "fields": [
+                          {
+                            "key": {
+                              "name": "frequency"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "typeId": "java.lang.Long",
+                                "default": "2000"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "tabName": "Advanced"
+                  },
+                  "elementReferences": [],
+                  "name": "reconnectionStrategy",
+                  "description": "A retry strategy in case of connectivity errors",
+                  "modelProperties": {
+                    "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                      "value": {
+                        "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
+                        "localPart": "abstract-reconnection-strategy",
+                        "prefix": "mule"
+                      }
+                    },
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 3
+                    }
+                  }
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "showInDsl": false,
+              "name": "Connection",
               "description": "",
               "modelProperties": {}
             }
@@ -2318,106 +3098,127 @@
                 {
                   "type": {
                     "format": "java",
-                    "type": "Union",
+                    "type": "Object",
                     "annotations": {
                       "typeId": "java.lang.Object",
                       "typeAlias": {
-                        "value": "ReconnectionStrategy"
+                        "value": "Reconnection"
                       }
                     },
-                    "of": [
+                    "fields": [
                       {
-                        "type": "Object",
-                        "annotations": {
-                          "typeId": "java.lang.Object",
-                          "typeAlias": {
-                            "value": "reconnect"
+                        "key": {
+                          "name": "failsDeployment"
+                        },
+                        "model": {
+                          "type": "Boolean",
+                          "annotations": {
+                            "typeId": "java.lang.Boolean",
+                            "default": "false"
                           }
                         },
-                        "fields": [
-                          {
-                            "key": {
-                              "name": "frequency"
-                            },
-                            "model": {
-                              "type": "Number",
-                              "annotations": {
-                                "int": {},
-                                "typeId": "java.lang.Long",
-                                "default": "2000"
-                              }
-                            },
-                            "annotations": {
-                              "description": {
-                                "value": "How often (in ms) to reconnect"
-                              }
-                            }
-                          },
-                          {
-                            "key": {
-                              "name": "count"
-                            },
-                            "model": {
-                              "type": "Number",
-                              "annotations": {
-                                "int": {},
-                                "typeId": "java.lang.Integer",
-                                "default": "2"
-                              }
-                            },
-                            "annotations": {
-                              "description": {
-                                "value": "How many reconnection attempts to make"
-                              }
-                            }
-                          },
-                          {
-                            "key": {
-                              "name": "blocking"
-                            },
-                            "model": {
-                              "type": "Boolean",
-                              "annotations": {
-                                "typeId": "java.lang.Boolean",
-                                "default": "true"
-                              }
-                            },
-                            "annotations": {
-                              "description": {
-                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
-                              }
-                            }
+                        "annotations": {
+                          "description": {
+                            "value": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy"
                           }
-                        ]
+                        }
                       },
                       {
-                        "type": "Object",
-                        "annotations": {
-                          "typeId": "java.lang.Object",
-                          "typeAlias": {
-                            "value": "reconnect-forever"
-                          }
+                        "key": {
+                          "name": "reconnectionStrategy"
                         },
-                        "fields": [
-                          {
-                            "key": {
-                              "name": "frequency"
-                            },
-                            "model": {
-                              "type": "Number",
-                              "annotations": {
-                                "int": {},
-                                "typeId": "java.lang.Long",
-                                "default": "2000"
-                              }
-                            },
-                            "annotations": {
-                              "description": {
-                                "value": "How often (in ms) to reconnect"
-                              }
+                        "model": {
+                          "type": "Union",
+                          "annotations": {
+                            "typeId": "java.lang.Object",
+                            "typeAlias": {
+                              "value": "ReconnectionStrategy"
                             }
+                          },
+                          "of": [
+                            {
+                              "type": "Object",
+                              "annotations": {
+                                "typeId": "java.lang.Object",
+                                "typeAlias": {
+                                  "value": "reconnect"
+                                }
+                              },
+                              "fields": [
+                                {
+                                  "key": {
+                                    "name": "frequency"
+                                  },
+                                  "model": {
+                                    "type": "Number",
+                                    "annotations": {
+                                      "int": {},
+                                      "typeId": "java.lang.Long",
+                                      "default": "2000"
+                                    }
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "How often (in ms) to reconnect"
+                                    }
+                                  }
+                                },
+                                {
+                                  "key": {
+                                    "name": "count"
+                                  },
+                                  "model": {
+                                    "type": "Number",
+                                    "annotations": {
+                                      "int": {},
+                                      "typeId": "java.lang.Integer",
+                                      "default": "2"
+                                    }
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "How many reconnection attempts to make"
+                                    }
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Object",
+                              "annotations": {
+                                "typeId": "java.lang.Object",
+                                "typeAlias": {
+                                  "value": "reconnect-forever"
+                                }
+                              },
+                              "fields": [
+                                {
+                                  "key": {
+                                    "name": "frequency"
+                                  },
+                                  "model": {
+                                    "type": "Number",
+                                    "annotations": {
+                                      "int": {},
+                                      "typeId": "java.lang.Long",
+                                      "default": "2000"
+                                    }
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "How often (in ms) to reconnect"
+                                    }
+                                  }
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "The reconnection strategy to use"
                           }
-                        ]
+                        }
                       }
                     ]
                   },
@@ -2438,51 +3239,18 @@
                     "tabName": "Advanced"
                   },
                   "elementReferences": [],
-                  "name": "reconnectionStrategy",
-                  "description": "A retry strategy in case of connectivity errors",
+                  "name": "reconnection",
+                  "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
                     "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
-                        "localPart": "abstract-reconnection-strategy",
+                        "localPart": "reconnection",
                         "prefix": "mule"
                       }
                     },
                     "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
                       "sequence": 3
-                    }
-                  }
-                },
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "Boolean",
-                    "annotations": {
-                      "typeId": "boolean"
-                    }
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": true,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "tabName": "Advanced"
-                  },
-                  "elementReferences": [],
-                  "name": "disableValidation",
-                  "description": "Disables connection validation",
-                  "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
-                      "sequence": 4
                     }
                   }
                 }
@@ -3036,106 +3804,127 @@
                 {
                   "type": {
                     "format": "java",
-                    "type": "Union",
+                    "type": "Object",
                     "annotations": {
                       "typeId": "java.lang.Object",
                       "typeAlias": {
-                        "value": "ReconnectionStrategy"
+                        "value": "Reconnection"
                       }
                     },
-                    "of": [
+                    "fields": [
                       {
-                        "type": "Object",
-                        "annotations": {
-                          "typeId": "java.lang.Object",
-                          "typeAlias": {
-                            "value": "reconnect"
+                        "key": {
+                          "name": "failsDeployment"
+                        },
+                        "model": {
+                          "type": "Boolean",
+                          "annotations": {
+                            "typeId": "java.lang.Boolean",
+                            "default": "false"
                           }
                         },
-                        "fields": [
-                          {
-                            "key": {
-                              "name": "frequency"
-                            },
-                            "model": {
-                              "type": "Number",
-                              "annotations": {
-                                "int": {},
-                                "typeId": "java.lang.Long",
-                                "default": "2000"
-                              }
-                            },
-                            "annotations": {
-                              "description": {
-                                "value": "How often (in ms) to reconnect"
-                              }
-                            }
-                          },
-                          {
-                            "key": {
-                              "name": "count"
-                            },
-                            "model": {
-                              "type": "Number",
-                              "annotations": {
-                                "int": {},
-                                "typeId": "java.lang.Integer",
-                                "default": "2"
-                              }
-                            },
-                            "annotations": {
-                              "description": {
-                                "value": "How many reconnection attempts to make"
-                              }
-                            }
-                          },
-                          {
-                            "key": {
-                              "name": "blocking"
-                            },
-                            "model": {
-                              "type": "Boolean",
-                              "annotations": {
-                                "typeId": "java.lang.Boolean",
-                                "default": "true"
-                              }
-                            },
-                            "annotations": {
-                              "description": {
-                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
-                              }
-                            }
+                        "annotations": {
+                          "description": {
+                            "value": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy"
                           }
-                        ]
+                        }
                       },
                       {
-                        "type": "Object",
-                        "annotations": {
-                          "typeId": "java.lang.Object",
-                          "typeAlias": {
-                            "value": "reconnect-forever"
-                          }
+                        "key": {
+                          "name": "reconnectionStrategy"
                         },
-                        "fields": [
-                          {
-                            "key": {
-                              "name": "frequency"
-                            },
-                            "model": {
-                              "type": "Number",
-                              "annotations": {
-                                "int": {},
-                                "typeId": "java.lang.Long",
-                                "default": "2000"
-                              }
-                            },
-                            "annotations": {
-                              "description": {
-                                "value": "How often (in ms) to reconnect"
-                              }
+                        "model": {
+                          "type": "Union",
+                          "annotations": {
+                            "typeId": "java.lang.Object",
+                            "typeAlias": {
+                              "value": "ReconnectionStrategy"
                             }
+                          },
+                          "of": [
+                            {
+                              "type": "Object",
+                              "annotations": {
+                                "typeId": "java.lang.Object",
+                                "typeAlias": {
+                                  "value": "reconnect"
+                                }
+                              },
+                              "fields": [
+                                {
+                                  "key": {
+                                    "name": "frequency"
+                                  },
+                                  "model": {
+                                    "type": "Number",
+                                    "annotations": {
+                                      "int": {},
+                                      "typeId": "java.lang.Long",
+                                      "default": "2000"
+                                    }
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "How often (in ms) to reconnect"
+                                    }
+                                  }
+                                },
+                                {
+                                  "key": {
+                                    "name": "count"
+                                  },
+                                  "model": {
+                                    "type": "Number",
+                                    "annotations": {
+                                      "int": {},
+                                      "typeId": "java.lang.Integer",
+                                      "default": "2"
+                                    }
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "How many reconnection attempts to make"
+                                    }
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Object",
+                              "annotations": {
+                                "typeId": "java.lang.Object",
+                                "typeAlias": {
+                                  "value": "reconnect-forever"
+                                }
+                              },
+                              "fields": [
+                                {
+                                  "key": {
+                                    "name": "frequency"
+                                  },
+                                  "model": {
+                                    "type": "Number",
+                                    "annotations": {
+                                      "int": {},
+                                      "typeId": "java.lang.Long",
+                                      "default": "2000"
+                                    }
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "How often (in ms) to reconnect"
+                                    }
+                                  }
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "The reconnection strategy to use"
                           }
-                        ]
+                        }
                       }
                     ]
                   },
@@ -3156,13 +3945,13 @@
                     "tabName": "Advanced"
                   },
                   "elementReferences": [],
-                  "name": "reconnectionStrategy",
-                  "description": "A retry strategy in case of connectivity errors",
+                  "name": "reconnection",
+                  "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
                     "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
-                        "localPart": "abstract-reconnection-strategy",
+                        "localPart": "reconnection",
                         "prefix": "mule"
                       }
                     },
@@ -3721,106 +4510,127 @@
                 {
                   "type": {
                     "format": "java",
-                    "type": "Union",
+                    "type": "Object",
                     "annotations": {
                       "typeId": "java.lang.Object",
                       "typeAlias": {
-                        "value": "ReconnectionStrategy"
+                        "value": "Reconnection"
                       }
                     },
-                    "of": [
+                    "fields": [
                       {
-                        "type": "Object",
-                        "annotations": {
-                          "typeId": "java.lang.Object",
-                          "typeAlias": {
-                            "value": "reconnect"
+                        "key": {
+                          "name": "failsDeployment"
+                        },
+                        "model": {
+                          "type": "Boolean",
+                          "annotations": {
+                            "typeId": "java.lang.Boolean",
+                            "default": "false"
                           }
                         },
-                        "fields": [
-                          {
-                            "key": {
-                              "name": "frequency"
-                            },
-                            "model": {
-                              "type": "Number",
-                              "annotations": {
-                                "int": {},
-                                "typeId": "java.lang.Long",
-                                "default": "2000"
-                              }
-                            },
-                            "annotations": {
-                              "description": {
-                                "value": "How often (in ms) to reconnect"
-                              }
-                            }
-                          },
-                          {
-                            "key": {
-                              "name": "count"
-                            },
-                            "model": {
-                              "type": "Number",
-                              "annotations": {
-                                "int": {},
-                                "typeId": "java.lang.Integer",
-                                "default": "2"
-                              }
-                            },
-                            "annotations": {
-                              "description": {
-                                "value": "How many reconnection attempts to make"
-                              }
-                            }
-                          },
-                          {
-                            "key": {
-                              "name": "blocking"
-                            },
-                            "model": {
-                              "type": "Boolean",
-                              "annotations": {
-                                "typeId": "java.lang.Boolean",
-                                "default": "true"
-                              }
-                            },
-                            "annotations": {
-                              "description": {
-                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
-                              }
-                            }
+                        "annotations": {
+                          "description": {
+                            "value": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy"
                           }
-                        ]
+                        }
                       },
                       {
-                        "type": "Object",
-                        "annotations": {
-                          "typeId": "java.lang.Object",
-                          "typeAlias": {
-                            "value": "reconnect-forever"
-                          }
+                        "key": {
+                          "name": "reconnectionStrategy"
                         },
-                        "fields": [
-                          {
-                            "key": {
-                              "name": "frequency"
-                            },
-                            "model": {
-                              "type": "Number",
-                              "annotations": {
-                                "int": {},
-                                "typeId": "java.lang.Long",
-                                "default": "2000"
-                              }
-                            },
-                            "annotations": {
-                              "description": {
-                                "value": "How often (in ms) to reconnect"
-                              }
+                        "model": {
+                          "type": "Union",
+                          "annotations": {
+                            "typeId": "java.lang.Object",
+                            "typeAlias": {
+                              "value": "ReconnectionStrategy"
                             }
+                          },
+                          "of": [
+                            {
+                              "type": "Object",
+                              "annotations": {
+                                "typeId": "java.lang.Object",
+                                "typeAlias": {
+                                  "value": "reconnect"
+                                }
+                              },
+                              "fields": [
+                                {
+                                  "key": {
+                                    "name": "frequency"
+                                  },
+                                  "model": {
+                                    "type": "Number",
+                                    "annotations": {
+                                      "int": {},
+                                      "typeId": "java.lang.Long",
+                                      "default": "2000"
+                                    }
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "How often (in ms) to reconnect"
+                                    }
+                                  }
+                                },
+                                {
+                                  "key": {
+                                    "name": "count"
+                                  },
+                                  "model": {
+                                    "type": "Number",
+                                    "annotations": {
+                                      "int": {},
+                                      "typeId": "java.lang.Integer",
+                                      "default": "2"
+                                    }
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "How many reconnection attempts to make"
+                                    }
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Object",
+                              "annotations": {
+                                "typeId": "java.lang.Object",
+                                "typeAlias": {
+                                  "value": "reconnect-forever"
+                                }
+                              },
+                              "fields": [
+                                {
+                                  "key": {
+                                    "name": "frequency"
+                                  },
+                                  "model": {
+                                    "type": "Number",
+                                    "annotations": {
+                                      "int": {},
+                                      "typeId": "java.lang.Long",
+                                      "default": "2000"
+                                    }
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "How often (in ms) to reconnect"
+                                    }
+                                  }
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "The reconnection strategy to use"
                           }
-                        ]
+                        }
                       }
                     ]
                   },
@@ -3841,51 +4651,18 @@
                     "tabName": "Advanced"
                   },
                   "elementReferences": [],
-                  "name": "reconnectionStrategy",
-                  "description": "A retry strategy in case of connectivity errors",
+                  "name": "reconnection",
+                  "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
                     "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
-                        "localPart": "abstract-reconnection-strategy",
+                        "localPart": "reconnection",
                         "prefix": "mule"
                       }
                     },
                     "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
                       "sequence": 3
-                    }
-                  }
-                },
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "Boolean",
-                    "annotations": {
-                      "typeId": "boolean"
-                    }
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": true,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "tabName": "Advanced"
-                  },
-                  "elementReferences": [],
-                  "name": "disableValidation",
-                  "description": "Disables connection validation",
-                  "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
-                      "sequence": 4
                     }
                   }
                 },
@@ -4641,106 +5418,127 @@
                 {
                   "type": {
                     "format": "java",
-                    "type": "Union",
+                    "type": "Object",
                     "annotations": {
                       "typeId": "java.lang.Object",
                       "typeAlias": {
-                        "value": "ReconnectionStrategy"
+                        "value": "Reconnection"
                       }
                     },
-                    "of": [
+                    "fields": [
                       {
-                        "type": "Object",
-                        "annotations": {
-                          "typeId": "java.lang.Object",
-                          "typeAlias": {
-                            "value": "reconnect"
+                        "key": {
+                          "name": "failsDeployment"
+                        },
+                        "model": {
+                          "type": "Boolean",
+                          "annotations": {
+                            "typeId": "java.lang.Boolean",
+                            "default": "false"
                           }
                         },
-                        "fields": [
-                          {
-                            "key": {
-                              "name": "frequency"
-                            },
-                            "model": {
-                              "type": "Number",
-                              "annotations": {
-                                "int": {},
-                                "typeId": "java.lang.Long",
-                                "default": "2000"
-                              }
-                            },
-                            "annotations": {
-                              "description": {
-                                "value": "How often (in ms) to reconnect"
-                              }
-                            }
-                          },
-                          {
-                            "key": {
-                              "name": "count"
-                            },
-                            "model": {
-                              "type": "Number",
-                              "annotations": {
-                                "int": {},
-                                "typeId": "java.lang.Integer",
-                                "default": "2"
-                              }
-                            },
-                            "annotations": {
-                              "description": {
-                                "value": "How many reconnection attempts to make"
-                              }
-                            }
-                          },
-                          {
-                            "key": {
-                              "name": "blocking"
-                            },
-                            "model": {
-                              "type": "Boolean",
-                              "annotations": {
-                                "typeId": "java.lang.Boolean",
-                                "default": "true"
-                              }
-                            },
-                            "annotations": {
-                              "description": {
-                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
-                              }
-                            }
+                        "annotations": {
+                          "description": {
+                            "value": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy"
                           }
-                        ]
+                        }
                       },
                       {
-                        "type": "Object",
-                        "annotations": {
-                          "typeId": "java.lang.Object",
-                          "typeAlias": {
-                            "value": "reconnect-forever"
-                          }
+                        "key": {
+                          "name": "reconnectionStrategy"
                         },
-                        "fields": [
-                          {
-                            "key": {
-                              "name": "frequency"
-                            },
-                            "model": {
-                              "type": "Number",
-                              "annotations": {
-                                "int": {},
-                                "typeId": "java.lang.Long",
-                                "default": "2000"
-                              }
-                            },
-                            "annotations": {
-                              "description": {
-                                "value": "How often (in ms) to reconnect"
-                              }
+                        "model": {
+                          "type": "Union",
+                          "annotations": {
+                            "typeId": "java.lang.Object",
+                            "typeAlias": {
+                              "value": "ReconnectionStrategy"
                             }
+                          },
+                          "of": [
+                            {
+                              "type": "Object",
+                              "annotations": {
+                                "typeId": "java.lang.Object",
+                                "typeAlias": {
+                                  "value": "reconnect"
+                                }
+                              },
+                              "fields": [
+                                {
+                                  "key": {
+                                    "name": "frequency"
+                                  },
+                                  "model": {
+                                    "type": "Number",
+                                    "annotations": {
+                                      "int": {},
+                                      "typeId": "java.lang.Long",
+                                      "default": "2000"
+                                    }
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "How often (in ms) to reconnect"
+                                    }
+                                  }
+                                },
+                                {
+                                  "key": {
+                                    "name": "count"
+                                  },
+                                  "model": {
+                                    "type": "Number",
+                                    "annotations": {
+                                      "int": {},
+                                      "typeId": "java.lang.Integer",
+                                      "default": "2"
+                                    }
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "How many reconnection attempts to make"
+                                    }
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Object",
+                              "annotations": {
+                                "typeId": "java.lang.Object",
+                                "typeAlias": {
+                                  "value": "reconnect-forever"
+                                }
+                              },
+                              "fields": [
+                                {
+                                  "key": {
+                                    "name": "frequency"
+                                  },
+                                  "model": {
+                                    "type": "Number",
+                                    "annotations": {
+                                      "int": {},
+                                      "typeId": "java.lang.Long",
+                                      "default": "2000"
+                                    }
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "How often (in ms) to reconnect"
+                                    }
+                                  }
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "The reconnection strategy to use"
                           }
-                        ]
+                        }
                       }
                     ]
                   },
@@ -4761,13 +5559,13 @@
                     "tabName": "Advanced"
                   },
                   "elementReferences": [],
-                  "name": "reconnectionStrategy",
-                  "description": "A retry strategy in case of connectivity errors",
+                  "name": "reconnection",
+                  "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
                     "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
-                        "localPart": "abstract-reconnection-strategy",
+                        "localPart": "reconnection",
                         "prefix": "mule"
                       }
                     },
@@ -5326,106 +6124,127 @@
                 {
                   "type": {
                     "format": "java",
-                    "type": "Union",
+                    "type": "Object",
                     "annotations": {
                       "typeId": "java.lang.Object",
                       "typeAlias": {
-                        "value": "ReconnectionStrategy"
+                        "value": "Reconnection"
                       }
                     },
-                    "of": [
+                    "fields": [
                       {
-                        "type": "Object",
-                        "annotations": {
-                          "typeId": "java.lang.Object",
-                          "typeAlias": {
-                            "value": "reconnect"
+                        "key": {
+                          "name": "failsDeployment"
+                        },
+                        "model": {
+                          "type": "Boolean",
+                          "annotations": {
+                            "typeId": "java.lang.Boolean",
+                            "default": "false"
                           }
                         },
-                        "fields": [
-                          {
-                            "key": {
-                              "name": "frequency"
-                            },
-                            "model": {
-                              "type": "Number",
-                              "annotations": {
-                                "int": {},
-                                "typeId": "java.lang.Long",
-                                "default": "2000"
-                              }
-                            },
-                            "annotations": {
-                              "description": {
-                                "value": "How often (in ms) to reconnect"
-                              }
-                            }
-                          },
-                          {
-                            "key": {
-                              "name": "count"
-                            },
-                            "model": {
-                              "type": "Number",
-                              "annotations": {
-                                "int": {},
-                                "typeId": "java.lang.Integer",
-                                "default": "2"
-                              }
-                            },
-                            "annotations": {
-                              "description": {
-                                "value": "How many reconnection attempts to make"
-                              }
-                            }
-                          },
-                          {
-                            "key": {
-                              "name": "blocking"
-                            },
-                            "model": {
-                              "type": "Boolean",
-                              "annotations": {
-                                "typeId": "java.lang.Boolean",
-                                "default": "true"
-                              }
-                            },
-                            "annotations": {
-                              "description": {
-                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
-                              }
-                            }
+                        "annotations": {
+                          "description": {
+                            "value": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy"
                           }
-                        ]
+                        }
                       },
                       {
-                        "type": "Object",
-                        "annotations": {
-                          "typeId": "java.lang.Object",
-                          "typeAlias": {
-                            "value": "reconnect-forever"
-                          }
+                        "key": {
+                          "name": "reconnectionStrategy"
                         },
-                        "fields": [
-                          {
-                            "key": {
-                              "name": "frequency"
-                            },
-                            "model": {
-                              "type": "Number",
-                              "annotations": {
-                                "int": {},
-                                "typeId": "java.lang.Long",
-                                "default": "2000"
-                              }
-                            },
-                            "annotations": {
-                              "description": {
-                                "value": "How often (in ms) to reconnect"
-                              }
+                        "model": {
+                          "type": "Union",
+                          "annotations": {
+                            "typeId": "java.lang.Object",
+                            "typeAlias": {
+                              "value": "ReconnectionStrategy"
                             }
+                          },
+                          "of": [
+                            {
+                              "type": "Object",
+                              "annotations": {
+                                "typeId": "java.lang.Object",
+                                "typeAlias": {
+                                  "value": "reconnect"
+                                }
+                              },
+                              "fields": [
+                                {
+                                  "key": {
+                                    "name": "frequency"
+                                  },
+                                  "model": {
+                                    "type": "Number",
+                                    "annotations": {
+                                      "int": {},
+                                      "typeId": "java.lang.Long",
+                                      "default": "2000"
+                                    }
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "How often (in ms) to reconnect"
+                                    }
+                                  }
+                                },
+                                {
+                                  "key": {
+                                    "name": "count"
+                                  },
+                                  "model": {
+                                    "type": "Number",
+                                    "annotations": {
+                                      "int": {},
+                                      "typeId": "java.lang.Integer",
+                                      "default": "2"
+                                    }
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "How many reconnection attempts to make"
+                                    }
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Object",
+                              "annotations": {
+                                "typeId": "java.lang.Object",
+                                "typeAlias": {
+                                  "value": "reconnect-forever"
+                                }
+                              },
+                              "fields": [
+                                {
+                                  "key": {
+                                    "name": "frequency"
+                                  },
+                                  "model": {
+                                    "type": "Number",
+                                    "annotations": {
+                                      "int": {},
+                                      "typeId": "java.lang.Long",
+                                      "default": "2000"
+                                    }
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "How often (in ms) to reconnect"
+                                    }
+                                  }
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "The reconnection strategy to use"
                           }
-                        ]
+                        }
                       }
                     ]
                   },
@@ -5446,13 +6265,13 @@
                     "tabName": "Advanced"
                   },
                   "elementReferences": [],
-                  "name": "reconnectionStrategy",
-                  "description": "A retry strategy in case of connectivity errors",
+                  "name": "reconnection",
+                  "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
                     "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
-                        "localPart": "abstract-reconnection-strategy",
+                        "localPart": "reconnection",
                         "prefix": "mule"
                       }
                     },
@@ -5814,23 +6633,6 @@
                             "annotations": {
                               "description": {
                                 "value": "How many reconnection attempts to make"
-                              }
-                            }
-                          },
-                          {
-                            "key": {
-                              "name": "blocking"
-                            },
-                            "model": {
-                              "type": "Boolean",
-                              "annotations": {
-                                "typeId": "java.lang.Boolean",
-                                "default": "true"
-                              }
-                            },
-                            "annotations": {
-                              "description": {
-                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
                               }
                             }
                           }
@@ -8225,106 +9027,127 @@
             {
               "type": {
                 "format": "java",
-                "type": "Union",
+                "type": "Object",
                 "annotations": {
                   "typeId": "java.lang.Object",
                   "typeAlias": {
-                    "value": "ReconnectionStrategy"
+                    "value": "Reconnection"
                   }
                 },
-                "of": [
+                "fields": [
                   {
-                    "type": "Object",
-                    "annotations": {
-                      "typeId": "java.lang.Object",
-                      "typeAlias": {
-                        "value": "reconnect"
+                    "key": {
+                      "name": "failsDeployment"
+                    },
+                    "model": {
+                      "type": "Boolean",
+                      "annotations": {
+                        "typeId": "java.lang.Boolean",
+                        "default": "false"
                       }
                     },
-                    "fields": [
-                      {
-                        "key": {
-                          "name": "frequency"
-                        },
-                        "model": {
-                          "type": "Number",
-                          "annotations": {
-                            "int": {},
-                            "typeId": "java.lang.Long",
-                            "default": "2000"
-                          }
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "How often (in ms) to reconnect"
-                          }
-                        }
-                      },
-                      {
-                        "key": {
-                          "name": "count"
-                        },
-                        "model": {
-                          "type": "Number",
-                          "annotations": {
-                            "int": {},
-                            "typeId": "java.lang.Integer",
-                            "default": "2"
-                          }
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "How many reconnection attempts to make"
-                          }
-                        }
-                      },
-                      {
-                        "key": {
-                          "name": "blocking"
-                        },
-                        "model": {
-                          "type": "Boolean",
-                          "annotations": {
-                            "typeId": "java.lang.Boolean",
-                            "default": "true"
-                          }
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
-                          }
-                        }
+                    "annotations": {
+                      "description": {
+                        "value": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy"
                       }
-                    ]
+                    }
                   },
                   {
-                    "type": "Object",
-                    "annotations": {
-                      "typeId": "java.lang.Object",
-                      "typeAlias": {
-                        "value": "reconnect-forever"
-                      }
+                    "key": {
+                      "name": "reconnectionStrategy"
                     },
-                    "fields": [
-                      {
-                        "key": {
-                          "name": "frequency"
-                        },
-                        "model": {
-                          "type": "Number",
-                          "annotations": {
-                            "int": {},
-                            "typeId": "java.lang.Long",
-                            "default": "2000"
-                          }
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "How often (in ms) to reconnect"
-                          }
+                    "model": {
+                      "type": "Union",
+                      "annotations": {
+                        "typeId": "java.lang.Object",
+                        "typeAlias": {
+                          "value": "ReconnectionStrategy"
                         }
+                      },
+                      "of": [
+                        {
+                          "type": "Object",
+                          "annotations": {
+                            "typeId": "java.lang.Object",
+                            "typeAlias": {
+                              "value": "reconnect"
+                            }
+                          },
+                          "fields": [
+                            {
+                              "key": {
+                                "name": "frequency"
+                              },
+                              "model": {
+                                "type": "Number",
+                                "annotations": {
+                                  "int": {},
+                                  "typeId": "java.lang.Long",
+                                  "default": "2000"
+                                }
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "How often (in ms) to reconnect"
+                                }
+                              }
+                            },
+                            {
+                              "key": {
+                                "name": "count"
+                              },
+                              "model": {
+                                "type": "Number",
+                                "annotations": {
+                                  "int": {},
+                                  "typeId": "java.lang.Integer",
+                                  "default": "2"
+                                }
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "How many reconnection attempts to make"
+                                }
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Object",
+                          "annotations": {
+                            "typeId": "java.lang.Object",
+                            "typeAlias": {
+                              "value": "reconnect-forever"
+                            }
+                          },
+                          "fields": [
+                            {
+                              "key": {
+                                "name": "frequency"
+                              },
+                              "model": {
+                                "type": "Number",
+                                "annotations": {
+                                  "int": {},
+                                  "typeId": "java.lang.Long",
+                                  "default": "2000"
+                                }
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "How often (in ms) to reconnect"
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    "annotations": {
+                      "description": {
+                        "value": "The reconnection strategy to use"
                       }
-                    ]
+                    }
                   }
                 ]
               },
@@ -8345,51 +9168,18 @@
                 "tabName": "Advanced"
               },
               "elementReferences": [],
-              "name": "reconnectionStrategy",
-              "description": "A retry strategy in case of connectivity errors",
+              "name": "reconnection",
+              "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
               "modelProperties": {
                 "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                   "value": {
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
-                    "localPart": "abstract-reconnection-strategy",
+                    "localPart": "reconnection",
                     "prefix": "mule"
                   }
                 },
                 "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
                   "sequence": 3
-                }
-              }
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "Boolean",
-                "annotations": {
-                  "typeId": "boolean"
-                }
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "NOT_SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "tabName": "Advanced"
-              },
-              "elementReferences": [],
-              "name": "disableValidation",
-              "description": "Disables connection validation",
-              "modelProperties": {
-                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
-                  "sequence": 4
                 }
               }
             }
@@ -8943,106 +9733,127 @@
             {
               "type": {
                 "format": "java",
-                "type": "Union",
+                "type": "Object",
                 "annotations": {
                   "typeId": "java.lang.Object",
                   "typeAlias": {
-                    "value": "ReconnectionStrategy"
+                    "value": "Reconnection"
                   }
                 },
-                "of": [
+                "fields": [
                   {
-                    "type": "Object",
-                    "annotations": {
-                      "typeId": "java.lang.Object",
-                      "typeAlias": {
-                        "value": "reconnect"
+                    "key": {
+                      "name": "failsDeployment"
+                    },
+                    "model": {
+                      "type": "Boolean",
+                      "annotations": {
+                        "typeId": "java.lang.Boolean",
+                        "default": "false"
                       }
                     },
-                    "fields": [
-                      {
-                        "key": {
-                          "name": "frequency"
-                        },
-                        "model": {
-                          "type": "Number",
-                          "annotations": {
-                            "int": {},
-                            "typeId": "java.lang.Long",
-                            "default": "2000"
-                          }
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "How often (in ms) to reconnect"
-                          }
-                        }
-                      },
-                      {
-                        "key": {
-                          "name": "count"
-                        },
-                        "model": {
-                          "type": "Number",
-                          "annotations": {
-                            "int": {},
-                            "typeId": "java.lang.Integer",
-                            "default": "2"
-                          }
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "How many reconnection attempts to make"
-                          }
-                        }
-                      },
-                      {
-                        "key": {
-                          "name": "blocking"
-                        },
-                        "model": {
-                          "type": "Boolean",
-                          "annotations": {
-                            "typeId": "java.lang.Boolean",
-                            "default": "true"
-                          }
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
-                          }
-                        }
+                    "annotations": {
+                      "description": {
+                        "value": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy"
                       }
-                    ]
+                    }
                   },
                   {
-                    "type": "Object",
-                    "annotations": {
-                      "typeId": "java.lang.Object",
-                      "typeAlias": {
-                        "value": "reconnect-forever"
-                      }
+                    "key": {
+                      "name": "reconnectionStrategy"
                     },
-                    "fields": [
-                      {
-                        "key": {
-                          "name": "frequency"
-                        },
-                        "model": {
-                          "type": "Number",
-                          "annotations": {
-                            "int": {},
-                            "typeId": "java.lang.Long",
-                            "default": "2000"
-                          }
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "How often (in ms) to reconnect"
-                          }
+                    "model": {
+                      "type": "Union",
+                      "annotations": {
+                        "typeId": "java.lang.Object",
+                        "typeAlias": {
+                          "value": "ReconnectionStrategy"
                         }
+                      },
+                      "of": [
+                        {
+                          "type": "Object",
+                          "annotations": {
+                            "typeId": "java.lang.Object",
+                            "typeAlias": {
+                              "value": "reconnect"
+                            }
+                          },
+                          "fields": [
+                            {
+                              "key": {
+                                "name": "frequency"
+                              },
+                              "model": {
+                                "type": "Number",
+                                "annotations": {
+                                  "int": {},
+                                  "typeId": "java.lang.Long",
+                                  "default": "2000"
+                                }
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "How often (in ms) to reconnect"
+                                }
+                              }
+                            },
+                            {
+                              "key": {
+                                "name": "count"
+                              },
+                              "model": {
+                                "type": "Number",
+                                "annotations": {
+                                  "int": {},
+                                  "typeId": "java.lang.Integer",
+                                  "default": "2"
+                                }
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "How many reconnection attempts to make"
+                                }
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Object",
+                          "annotations": {
+                            "typeId": "java.lang.Object",
+                            "typeAlias": {
+                              "value": "reconnect-forever"
+                            }
+                          },
+                          "fields": [
+                            {
+                              "key": {
+                                "name": "frequency"
+                              },
+                              "model": {
+                                "type": "Number",
+                                "annotations": {
+                                  "int": {},
+                                  "typeId": "java.lang.Long",
+                                  "default": "2000"
+                                }
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "How often (in ms) to reconnect"
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    "annotations": {
+                      "description": {
+                        "value": "The reconnection strategy to use"
                       }
-                    ]
+                    }
                   }
                 ]
               },
@@ -9063,13 +9874,13 @@
                 "tabName": "Advanced"
               },
               "elementReferences": [],
-              "name": "reconnectionStrategy",
-              "description": "A retry strategy in case of connectivity errors",
+              "name": "reconnection",
+              "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
               "modelProperties": {
                 "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                   "value": {
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
-                    "localPart": "abstract-reconnection-strategy",
+                    "localPart": "reconnection",
                     "prefix": "mule"
                   }
                 },
@@ -9628,106 +10439,127 @@
             {
               "type": {
                 "format": "java",
-                "type": "Union",
+                "type": "Object",
                 "annotations": {
                   "typeId": "java.lang.Object",
                   "typeAlias": {
-                    "value": "ReconnectionStrategy"
+                    "value": "Reconnection"
                   }
                 },
-                "of": [
+                "fields": [
                   {
-                    "type": "Object",
-                    "annotations": {
-                      "typeId": "java.lang.Object",
-                      "typeAlias": {
-                        "value": "reconnect"
+                    "key": {
+                      "name": "failsDeployment"
+                    },
+                    "model": {
+                      "type": "Boolean",
+                      "annotations": {
+                        "typeId": "java.lang.Boolean",
+                        "default": "false"
                       }
                     },
-                    "fields": [
-                      {
-                        "key": {
-                          "name": "frequency"
-                        },
-                        "model": {
-                          "type": "Number",
-                          "annotations": {
-                            "int": {},
-                            "typeId": "java.lang.Long",
-                            "default": "2000"
-                          }
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "How often (in ms) to reconnect"
-                          }
-                        }
-                      },
-                      {
-                        "key": {
-                          "name": "count"
-                        },
-                        "model": {
-                          "type": "Number",
-                          "annotations": {
-                            "int": {},
-                            "typeId": "java.lang.Integer",
-                            "default": "2"
-                          }
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "How many reconnection attempts to make"
-                          }
-                        }
-                      },
-                      {
-                        "key": {
-                          "name": "blocking"
-                        },
-                        "model": {
-                          "type": "Boolean",
-                          "annotations": {
-                            "typeId": "java.lang.Boolean",
-                            "default": "true"
-                          }
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
-                          }
-                        }
+                    "annotations": {
+                      "description": {
+                        "value": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy"
                       }
-                    ]
+                    }
                   },
                   {
-                    "type": "Object",
-                    "annotations": {
-                      "typeId": "java.lang.Object",
-                      "typeAlias": {
-                        "value": "reconnect-forever"
-                      }
+                    "key": {
+                      "name": "reconnectionStrategy"
                     },
-                    "fields": [
-                      {
-                        "key": {
-                          "name": "frequency"
-                        },
-                        "model": {
-                          "type": "Number",
-                          "annotations": {
-                            "int": {},
-                            "typeId": "java.lang.Long",
-                            "default": "2000"
-                          }
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "How often (in ms) to reconnect"
-                          }
+                    "model": {
+                      "type": "Union",
+                      "annotations": {
+                        "typeId": "java.lang.Object",
+                        "typeAlias": {
+                          "value": "ReconnectionStrategy"
                         }
+                      },
+                      "of": [
+                        {
+                          "type": "Object",
+                          "annotations": {
+                            "typeId": "java.lang.Object",
+                            "typeAlias": {
+                              "value": "reconnect"
+                            }
+                          },
+                          "fields": [
+                            {
+                              "key": {
+                                "name": "frequency"
+                              },
+                              "model": {
+                                "type": "Number",
+                                "annotations": {
+                                  "int": {},
+                                  "typeId": "java.lang.Long",
+                                  "default": "2000"
+                                }
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "How often (in ms) to reconnect"
+                                }
+                              }
+                            },
+                            {
+                              "key": {
+                                "name": "count"
+                              },
+                              "model": {
+                                "type": "Number",
+                                "annotations": {
+                                  "int": {},
+                                  "typeId": "java.lang.Integer",
+                                  "default": "2"
+                                }
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "How many reconnection attempts to make"
+                                }
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Object",
+                          "annotations": {
+                            "typeId": "java.lang.Object",
+                            "typeAlias": {
+                              "value": "reconnect-forever"
+                            }
+                          },
+                          "fields": [
+                            {
+                              "key": {
+                                "name": "frequency"
+                              },
+                              "model": {
+                                "type": "Number",
+                                "annotations": {
+                                  "int": {},
+                                  "typeId": "java.lang.Long",
+                                  "default": "2000"
+                                }
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "How often (in ms) to reconnect"
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    "annotations": {
+                      "description": {
+                        "value": "The reconnection strategy to use"
                       }
-                    ]
+                    }
                   }
                 ]
               },
@@ -9748,51 +10580,18 @@
                 "tabName": "Advanced"
               },
               "elementReferences": [],
-              "name": "reconnectionStrategy",
-              "description": "A retry strategy in case of connectivity errors",
+              "name": "reconnection",
+              "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
               "modelProperties": {
                 "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                   "value": {
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
-                    "localPart": "abstract-reconnection-strategy",
+                    "localPart": "reconnection",
                     "prefix": "mule"
                   }
                 },
                 "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
                   "sequence": 3
-                }
-              }
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "Boolean",
-                "annotations": {
-                  "typeId": "boolean"
-                }
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "NOT_SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "tabName": "Advanced"
-              },
-              "elementReferences": [],
-              "name": "disableValidation",
-              "description": "Disables connection validation",
-              "modelProperties": {
-                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
-                  "sequence": 4
                 }
               }
             },
@@ -10548,106 +11347,127 @@
             {
               "type": {
                 "format": "java",
-                "type": "Union",
+                "type": "Object",
                 "annotations": {
                   "typeId": "java.lang.Object",
                   "typeAlias": {
-                    "value": "ReconnectionStrategy"
+                    "value": "Reconnection"
                   }
                 },
-                "of": [
+                "fields": [
                   {
-                    "type": "Object",
-                    "annotations": {
-                      "typeId": "java.lang.Object",
-                      "typeAlias": {
-                        "value": "reconnect"
+                    "key": {
+                      "name": "failsDeployment"
+                    },
+                    "model": {
+                      "type": "Boolean",
+                      "annotations": {
+                        "typeId": "java.lang.Boolean",
+                        "default": "false"
                       }
                     },
-                    "fields": [
-                      {
-                        "key": {
-                          "name": "frequency"
-                        },
-                        "model": {
-                          "type": "Number",
-                          "annotations": {
-                            "int": {},
-                            "typeId": "java.lang.Long",
-                            "default": "2000"
-                          }
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "How often (in ms) to reconnect"
-                          }
-                        }
-                      },
-                      {
-                        "key": {
-                          "name": "count"
-                        },
-                        "model": {
-                          "type": "Number",
-                          "annotations": {
-                            "int": {},
-                            "typeId": "java.lang.Integer",
-                            "default": "2"
-                          }
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "How many reconnection attempts to make"
-                          }
-                        }
-                      },
-                      {
-                        "key": {
-                          "name": "blocking"
-                        },
-                        "model": {
-                          "type": "Boolean",
-                          "annotations": {
-                            "typeId": "java.lang.Boolean",
-                            "default": "true"
-                          }
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
-                          }
-                        }
+                    "annotations": {
+                      "description": {
+                        "value": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy"
                       }
-                    ]
+                    }
                   },
                   {
-                    "type": "Object",
-                    "annotations": {
-                      "typeId": "java.lang.Object",
-                      "typeAlias": {
-                        "value": "reconnect-forever"
-                      }
+                    "key": {
+                      "name": "reconnectionStrategy"
                     },
-                    "fields": [
-                      {
-                        "key": {
-                          "name": "frequency"
-                        },
-                        "model": {
-                          "type": "Number",
-                          "annotations": {
-                            "int": {},
-                            "typeId": "java.lang.Long",
-                            "default": "2000"
-                          }
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "How often (in ms) to reconnect"
-                          }
+                    "model": {
+                      "type": "Union",
+                      "annotations": {
+                        "typeId": "java.lang.Object",
+                        "typeAlias": {
+                          "value": "ReconnectionStrategy"
                         }
+                      },
+                      "of": [
+                        {
+                          "type": "Object",
+                          "annotations": {
+                            "typeId": "java.lang.Object",
+                            "typeAlias": {
+                              "value": "reconnect"
+                            }
+                          },
+                          "fields": [
+                            {
+                              "key": {
+                                "name": "frequency"
+                              },
+                              "model": {
+                                "type": "Number",
+                                "annotations": {
+                                  "int": {},
+                                  "typeId": "java.lang.Long",
+                                  "default": "2000"
+                                }
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "How often (in ms) to reconnect"
+                                }
+                              }
+                            },
+                            {
+                              "key": {
+                                "name": "count"
+                              },
+                              "model": {
+                                "type": "Number",
+                                "annotations": {
+                                  "int": {},
+                                  "typeId": "java.lang.Integer",
+                                  "default": "2"
+                                }
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "How many reconnection attempts to make"
+                                }
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Object",
+                          "annotations": {
+                            "typeId": "java.lang.Object",
+                            "typeAlias": {
+                              "value": "reconnect-forever"
+                            }
+                          },
+                          "fields": [
+                            {
+                              "key": {
+                                "name": "frequency"
+                              },
+                              "model": {
+                                "type": "Number",
+                                "annotations": {
+                                  "int": {},
+                                  "typeId": "java.lang.Long",
+                                  "default": "2000"
+                                }
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "How often (in ms) to reconnect"
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    "annotations": {
+                      "description": {
+                        "value": "The reconnection strategy to use"
                       }
-                    ]
+                    }
                   }
                 ]
               },
@@ -10668,13 +11488,13 @@
                 "tabName": "Advanced"
               },
               "elementReferences": [],
-              "name": "reconnectionStrategy",
-              "description": "A retry strategy in case of connectivity errors",
+              "name": "reconnection",
+              "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
               "modelProperties": {
                 "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                   "value": {
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
-                    "localPart": "abstract-reconnection-strategy",
+                    "localPart": "reconnection",
                     "prefix": "mule"
                   }
                 },
@@ -11233,106 +12053,127 @@
             {
               "type": {
                 "format": "java",
-                "type": "Union",
+                "type": "Object",
                 "annotations": {
                   "typeId": "java.lang.Object",
                   "typeAlias": {
-                    "value": "ReconnectionStrategy"
+                    "value": "Reconnection"
                   }
                 },
-                "of": [
+                "fields": [
                   {
-                    "type": "Object",
-                    "annotations": {
-                      "typeId": "java.lang.Object",
-                      "typeAlias": {
-                        "value": "reconnect"
+                    "key": {
+                      "name": "failsDeployment"
+                    },
+                    "model": {
+                      "type": "Boolean",
+                      "annotations": {
+                        "typeId": "java.lang.Boolean",
+                        "default": "false"
                       }
                     },
-                    "fields": [
-                      {
-                        "key": {
-                          "name": "frequency"
-                        },
-                        "model": {
-                          "type": "Number",
-                          "annotations": {
-                            "int": {},
-                            "typeId": "java.lang.Long",
-                            "default": "2000"
-                          }
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "How often (in ms) to reconnect"
-                          }
-                        }
-                      },
-                      {
-                        "key": {
-                          "name": "count"
-                        },
-                        "model": {
-                          "type": "Number",
-                          "annotations": {
-                            "int": {},
-                            "typeId": "java.lang.Integer",
-                            "default": "2"
-                          }
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "How many reconnection attempts to make"
-                          }
-                        }
-                      },
-                      {
-                        "key": {
-                          "name": "blocking"
-                        },
-                        "model": {
-                          "type": "Boolean",
-                          "annotations": {
-                            "typeId": "java.lang.Boolean",
-                            "default": "true"
-                          }
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
-                          }
-                        }
+                    "annotations": {
+                      "description": {
+                        "value": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy"
                       }
-                    ]
+                    }
                   },
                   {
-                    "type": "Object",
-                    "annotations": {
-                      "typeId": "java.lang.Object",
-                      "typeAlias": {
-                        "value": "reconnect-forever"
-                      }
+                    "key": {
+                      "name": "reconnectionStrategy"
                     },
-                    "fields": [
-                      {
-                        "key": {
-                          "name": "frequency"
-                        },
-                        "model": {
-                          "type": "Number",
-                          "annotations": {
-                            "int": {},
-                            "typeId": "java.lang.Long",
-                            "default": "2000"
-                          }
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "How often (in ms) to reconnect"
-                          }
+                    "model": {
+                      "type": "Union",
+                      "annotations": {
+                        "typeId": "java.lang.Object",
+                        "typeAlias": {
+                          "value": "ReconnectionStrategy"
                         }
+                      },
+                      "of": [
+                        {
+                          "type": "Object",
+                          "annotations": {
+                            "typeId": "java.lang.Object",
+                            "typeAlias": {
+                              "value": "reconnect"
+                            }
+                          },
+                          "fields": [
+                            {
+                              "key": {
+                                "name": "frequency"
+                              },
+                              "model": {
+                                "type": "Number",
+                                "annotations": {
+                                  "int": {},
+                                  "typeId": "java.lang.Long",
+                                  "default": "2000"
+                                }
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "How often (in ms) to reconnect"
+                                }
+                              }
+                            },
+                            {
+                              "key": {
+                                "name": "count"
+                              },
+                              "model": {
+                                "type": "Number",
+                                "annotations": {
+                                  "int": {},
+                                  "typeId": "java.lang.Integer",
+                                  "default": "2"
+                                }
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "How many reconnection attempts to make"
+                                }
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Object",
+                          "annotations": {
+                            "typeId": "java.lang.Object",
+                            "typeAlias": {
+                              "value": "reconnect-forever"
+                            }
+                          },
+                          "fields": [
+                            {
+                              "key": {
+                                "name": "frequency"
+                              },
+                              "model": {
+                                "type": "Number",
+                                "annotations": {
+                                  "int": {},
+                                  "typeId": "java.lang.Long",
+                                  "default": "2000"
+                                }
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "How often (in ms) to reconnect"
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    "annotations": {
+                      "description": {
+                        "value": "The reconnection strategy to use"
                       }
-                    ]
+                    }
                   }
                 ]
               },
@@ -11353,13 +12194,13 @@
                 "tabName": "Advanced"
               },
               "elementReferences": [],
-              "name": "reconnectionStrategy",
-              "description": "A retry strategy in case of connectivity errors",
+              "name": "reconnection",
+              "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
               "modelProperties": {
                 "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                   "value": {
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
-                    "localPart": "abstract-reconnection-strategy",
+                    "localPart": "reconnection",
                     "prefix": "mule"
                   }
                 },
@@ -11628,23 +12469,6 @@
                         "annotations": {
                           "description": {
                             "value": "How many reconnection attempts to make"
-                          }
-                        }
-                      },
-                      {
-                        "key": {
-                          "name": "blocking"
-                        },
-                        "model": {
-                          "type": "Boolean",
-                          "annotations": {
-                            "typeId": "java.lang.Boolean",
-                            "default": "true"
-                          }
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
                           }
                         }
                       }
@@ -12085,23 +12909,6 @@
                         "annotations": {
                           "description": {
                             "value": "How many reconnection attempts to make"
-                          }
-                        }
-                      },
-                      {
-                        "key": {
-                          "name": "blocking"
-                        },
-                        "model": {
-                          "type": "Boolean",
-                          "annotations": {
-                            "typeId": "java.lang.Boolean",
-                            "default": "true"
-                          }
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
                           }
                         }
                       }

@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.source;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.returnsListOfMessages;
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.util.Preconditions;
@@ -80,7 +81,7 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
       return this;
     }
 
-    public Builder<T, A> setExceptionCallback(ExceptionCallback exceptionCallback) {
+    public Builder<T, A> setExceptionCallback(ExceptionCallback<ConnectionException> exceptionCallback) {
       product.exceptionCallback = exceptionCallback;
       return this;
     }
@@ -140,7 +141,7 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
   private Processor listener;
   private MuleContext muleContext;
   private ExtensionMessageSource messageSource;
-  private ExceptionCallback exceptionCallback;
+  private ExceptionCallback<ConnectionException> exceptionCallback;
   private MessageProcessingManager messageProcessingManager;
   private Supplier<MessageProcessContext> processContextSupplier;
   private SourceCompletionHandlerFactory completionHandlerFactory;
@@ -185,8 +186,8 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
    * {@inheritDoc}
    */
   @Override
-  public void onSourceException(Throwable exception) {
-    exceptionCallback.onException(exception);
+  public void onConnectionException(ConnectionException e) {
+    exceptionCallback.onException(e);
   }
 
   /**

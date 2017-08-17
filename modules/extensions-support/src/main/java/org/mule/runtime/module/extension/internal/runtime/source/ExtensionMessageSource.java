@@ -12,12 +12,16 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toMap;
 import static org.slf4j.LoggerFactory.getLogger;
+import static reactor.core.publisher.Mono.create;
+import static reactor.core.publisher.Mono.from;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -61,6 +65,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
+import reactor.core.publisher.Mono;
 
 /**
  * A {@link MessageSource} which connects the Extensions API with the Mule runtime by connecting a {@link Source} with a flow
@@ -68,8 +73,8 @@ import org.slf4j.Logger;
  *
  * @since 4.0
  */
-public class ExtensionMessageSource extends ExtensionComponent<SourceModel> implements MessageSource, ExceptionCallback,
-    ParameterizedSource, ConfiguredComponent {
+public class ExtensionMessageSource extends ExtensionComponent<SourceModel> implements MessageSource,
+    ExceptionCallback<ConnectionException>, ParameterizedSource, ConfiguredComponent {
 
   private static final Logger LOGGER = getLogger(ExtensionMessageSource.class);
 
@@ -83,6 +88,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   private final SourceAdapterFactory sourceAdapterFactory;
   private final RetryPolicyTemplate retryPolicyTemplate;
   private final ExceptionHandlerManager exceptionEnricherManager;
+  private final AtomicBoolean reconnecting = new AtomicBoolean(false);
 
   private SourceConnectionManager sourceConnectionManager;
   private Processor messageProcessor;
@@ -123,7 +129,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
   private void startSource() throws MuleException {
     try {
-      retryPolicyTemplate.execute(new SourceRetryCallback(), retryScheduler);
+      retryPolicyTemplate.execute(new StartSourceCallback(), retryScheduler);
     } catch (Throwable e) {
       if (e instanceof MuleException) {
         throw (MuleException) e;
@@ -171,26 +177,54 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   }
 
   @Override
-  public void onException(Throwable exception) {
-    exception = exceptionEnricherManager.process(exception);
-    Optional<ConnectionException> connectionException = extractConnectionException(exception);
-    if (connectionException.isPresent()) {
-      try {
-        LOGGER.warn(format("Message source '%s' on root component '%s' threw exception. Restarting...", sourceAdapter.getName(),
-                           getLocation().getRootContainerName()),
-                    exception);
-        restart();
-      } catch (Throwable e) {
-        notifyExceptionAndShutDown(e);
+  public void onException(ConnectionException exception) {
+    if (!reconnecting.compareAndSet(false, true)) {
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER
+            .debug(format("Message source '%s' on root component '%s' threw a '%s' but a reconnection is already in progress. "
+                + "Exception was: %s"
+                + "No action will be taken since this is most likely a bug in the Source",
+                          sourceAdapter.getName(),
+                          getLocation().getRootContainerName(),
+                          ConnectionException.class.getSimpleName(),
+                          exception.getMessage()),
+                   exception);
+        return;
       }
-    } else {
-      notifyExceptionAndShutDown(exception);
+    }
+
+    LOGGER.warn(format("Message source '%s' on root component '%s' threw exception. Attempting to reconnect...",
+                       sourceAdapter.getName(), getLocation().getRootContainerName()),
+                exception);
+
+    Mono<Void> reconnectionAction = sourceAdapter.getReconnectionAction(exception)
+        .map(p -> from(retryPolicyTemplate.applyPolicy(p)))
+        .orElseGet(() -> create(sink -> {
+          try {
+            restart();
+            sink.success();
+          } catch (Exception e) {
+            sink.error(e);
+          }
+        }));
+
+    reconnectionAction
+        .doOnSuccess(v -> onReconnectionSuccessful())
+        .doOnError(this::onReconnectionFailed)
+        .doAfterTerminate((v, e) -> reconnecting.set(false))
+        .subscribe();
+  }
+
+  private void onReconnectionSuccessful() {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.warn("Message source '{}' on root component '{}' successfully reconnected",
+                  sourceAdapter.getName(), getLocation().getRootContainerName());
     }
   }
 
-  private void notifyExceptionAndShutDown(Throwable exception) {
-    LOGGER.error(format("Message source on root component '%s' threw exception. Shutting down it forever...",
-                        getLocation().getRootContainerName()),
+  private void onReconnectionFailed(Throwable exception) {
+    LOGGER.error(format("Message source '%s' on root component '%s' could not be reconnected. Will be shutdown. %s",
+                        sourceAdapter.getName(), getLocation().getRootContainerName(), exception.getMessage()),
                  exception);
     shutdown();
   }
@@ -210,6 +244,8 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
   @Override
   public void doStart() throws MuleException {
+    startIfNeeded(retryPolicyTemplate);
+
     if (retryScheduler == null) {
       retryScheduler = schedulerService.ioScheduler();
     }
@@ -226,6 +262,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   @Override
   public void doStop() throws MuleException {
     synchronized (started) {
+      stopIfNeeded(retryPolicyTemplate);
       started.set(false);
       try {
         stopSource();
@@ -237,6 +274,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
   @Override
   public void doDispose() {
+    disposeIfNeeded(retryPolicyTemplate, LOGGER);
     disposeSource();
   }
 
@@ -322,7 +360,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     };
   }
 
-  private class SourceRetryCallback implements RetryCallback {
+  private class StartSourceCallback implements RetryCallback {
 
     @Override
     public void doWork(RetryContext context) throws Exception {
@@ -382,6 +420,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
   @Override
   protected void doInitialise() throws InitialisationException {
+    initialiseIfNeeded(retryPolicyTemplate, true, muleContext);
     sourceConnectionManager = new SourceConnectionManager(connectionManager);
     try {
       createSource();

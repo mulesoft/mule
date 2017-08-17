@@ -7,9 +7,8 @@
 package org.mule.runtime.module.extension.internal.runtime.config;
 
 import static java.lang.String.format;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
-import static org.mule.runtime.module.extension.internal.loader.utils.ImplicitObjectUtils.buildImplicitResolverSet;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getFirstImplicit;
+import static org.mule.runtime.module.extension.internal.loader.utils.ImplicitObjectUtils.buildImplicitResolverSet;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getAllConnectionProviders;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -75,21 +74,13 @@ public final class DefaultImplicitConnectionProviderFactory<T> implements Implic
                                                                                              InternalEvent event) {
     ResolverSet resolverSet = resolverSetProvider.get();
     ConnectionProviderObjectBuilder<T> builder =
-        new DefaultConnectionProviderObjectBuilder<>(connectionProviderModel, resolverSet, getConnectionManager(muleContext),
-                                                     extensionModel, muleContext);
+        new DefaultConnectionProviderObjectBuilder<>(connectionProviderModel, resolverSet, extensionModel, muleContext);
     builder.setOwnerConfigName(configName);
     try {
       return builder.build(from(event));
     } catch (MuleException e) {
       throw new MuleRuntimeException(e);
     }
-  }
-
-  private ConnectionManagerAdapter getConnectionManager(MuleContext muleContext) {
-    if (connectionManagerAdapter == null) {
-      connectionManagerAdapter = muleContext.getRegistry().get(OBJECT_CONNECTION_MANAGER);
-    }
-    return connectionManagerAdapter;
   }
 
   /**
