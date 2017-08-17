@@ -1387,7 +1387,7 @@
     <xsd:element name="reconnection" type="reconnectionConfigType">
         <xsd:annotation>
             <xsd:documentation>
-                TODO
+                Configures the default reconnection behaviour for a connected component.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>

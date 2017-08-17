@@ -32,7 +32,7 @@
             <description><![CDATA[Another Provider Documentation]]></description>
             <parameters>
                 <parameter name="reconnection">
-                    <description><![CDATA[TODO]]></description>
+                    <description><![CDATA[When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy]]></description>
                 </parameter>
             </parameters>
         </connection>
@@ -40,7 +40,7 @@
             <description><![CDATA[Another Provider Documentation]]></description>
             <parameters>
                 <parameter name="reconnection">
-                    <description><![CDATA[TODO]]></description>
+                    <description><![CDATA[When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy]]></description>
                 </parameter>
             </parameters>
         </connection>
@@ -48,7 +48,7 @@
             <description><![CDATA[Provider Documentation]]></description>
             <parameters>
                 <parameter name="reconnection">
-                    <description><![CDATA[TODO]]></description>
+                    <description><![CDATA[When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy]]></description>
                 </parameter>
             </parameters>
         </connection>

@@ -993,7 +993,7 @@
                   },
                   "elementReferences": [],
                   "name": "reconnection",
-                  "description": "TODO",
+                  "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
                     "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                       "value": {
@@ -1652,7 +1652,7 @@
                   },
                   "elementReferences": [],
                   "name": "reconnection",
-                  "description": "TODO",
+                  "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
                     "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                       "value": {
@@ -2320,7 +2320,7 @@
               },
               "elementReferences": [],
               "name": "reconnection",
-              "description": "TODO",
+              "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
               "modelProperties": {
                 "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                   "value": {
@@ -2979,7 +2979,7 @@
               },
               "elementReferences": [],
               "name": "reconnection",
-              "description": "TODO",
+              "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
               "modelProperties": {
                 "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                   "value": {
