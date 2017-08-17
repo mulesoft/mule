@@ -12,24 +12,26 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.slf4j.LoggerFactory.getLogger;
-import org.mule.runtime.api.event.Event;
+import static reactor.core.publisher.Mono.from;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.privileged.component.AbstractExecutableComponent;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 
 import java.util.List;
+import java.util.function.Function;
 
 import javax.inject.Inject;
 
+import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
+import reactor.core.publisher.Mono;
 
 /**
  * Component to be used that supports a collection of processors and executes them in order.
@@ -38,7 +40,7 @@ import org.slf4j.Logger;
  *
  * @since 4.0
  */
-public class ProcessorChainRouter extends AbstractAnnotatedObject implements Lifecycle {
+public class ProcessorChainRouter extends AbstractExecutableComponent implements Lifecycle {
 
   private static Logger LOGGER = getLogger(ProcessorChainRouter.class);
 
@@ -49,12 +51,9 @@ public class ProcessorChainRouter extends AbstractAnnotatedObject implements Lif
   private List<Processor> processors = emptyList();
   private MessageProcessorChain processorChain;
 
-  public Event process(InternalEvent event) {
-    try {
-      return processorChain.process(event);
-    } catch (MuleException e) {
-      throw new MuleRuntimeException(e);
-    }
+  @Override
+  protected Function<Publisher<InternalEvent>, Publisher<InternalEvent>> getExecutableFunction() {
+    return publisher -> from(publisher).transform(processorChain);
   }
 
   public void setProcessors(List processors) {
@@ -90,7 +89,6 @@ public class ProcessorChainRouter extends AbstractAnnotatedObject implements Lif
       }
     }
     processorChain = builder.build();
-    processorChain.setMuleContext(muleContext);
     initialiseIfNeeded(processorChain, muleContext);
   }
 }

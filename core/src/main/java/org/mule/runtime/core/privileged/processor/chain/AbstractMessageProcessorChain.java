@@ -7,6 +7,7 @@
 package org.mule.runtime.core.privileged.processor.chain;
 
 import static java.lang.String.format;
+import static java.util.Optional.of;
 import static org.apache.commons.lang3.StringUtils.replace;
 import static org.mule.runtime.core.api.InternalEvent.setCurrentEvent;
 import static org.mule.runtime.core.api.context.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE;
@@ -26,10 +27,10 @@ import static reactor.core.publisher.Flux.just;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.MessageProcessorNotification;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.exception.MessagingException;
@@ -41,6 +42,7 @@ import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.util.ExceptionUtils;
 import org.mule.runtime.core.internal.processor.interceptor.ReactiveInterceptorAdapter;
+import org.mule.runtime.core.privileged.component.AbstractExecutableComponent;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -60,13 +62,12 @@ import reactor.core.publisher.Mono;
  * Builder needs to return a composite rather than the first MessageProcessor in the chain. This is so that if this chain is
  * nested in another chain the next MessageProcessor in the parent chain is not injected into the first in the nested chain.
  */
-abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObject implements MessageProcessorChain {
+abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent implements MessageProcessorChain {
 
   private static final Logger LOGGER = getLogger(AbstractMessageProcessorChain.class);
 
   private final String name;
   private final List<Processor> processors;
-  private MuleContext muleContext;
   private ProcessingStrategy processingStrategy;
   private StreamingManager streamingManager;
 
@@ -276,7 +277,7 @@ abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObject imp
 
   @Override
   public void setMuleContext(MuleContext muleContext) {
-    this.muleContext = muleContext;
+    super.setMuleContext(muleContext);
     setMuleContextIfNeeded(getMessageProcessorsForLifecycle(), muleContext);
   }
 
@@ -316,4 +317,9 @@ abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObject imp
     disposeIfNeeded(getMessageProcessorsForLifecycle(), LOGGER);
   }
 
+  @Override
+  protected Optional<FlowConstruct> getFlowConstruct() {
+    Object object = muleContext.getRegistry().get(getRootContainerName());
+    return object instanceof FlowConstruct ? of((FlowConstruct) object) : Optional.empty();
+  }
 }

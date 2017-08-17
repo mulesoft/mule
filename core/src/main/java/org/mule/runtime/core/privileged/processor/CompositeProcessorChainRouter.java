@@ -11,22 +11,22 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.runtime.core.api.util.UUID.getUUID;
-import org.mule.runtime.api.event.Event;
-import org.mule.runtime.api.event.InputEvent;
+import static reactor.core.publisher.Mono.from;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
+import org.mule.runtime.core.privileged.component.AbstractExecutableComponent;
+import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 
 import java.util.List;
+import java.util.function.Function;
 
 import javax.inject.Inject;
 
+import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @since 4.0
  */
-public class CompositeProcessorChainRouter extends AbstractAnnotatedObject implements Lifecycle {
+public class CompositeProcessorChainRouter extends AbstractExecutableComponent implements Lifecycle {
 
   private static Logger LOGGER = LoggerFactory.getLogger(CompositeProcessorChainRouter.class);
 
@@ -46,42 +46,39 @@ public class CompositeProcessorChainRouter extends AbstractAnnotatedObject imple
 
   private String name;
   private List<MessageProcessorChain> processorChains = emptyList();
-
-  public Event process(InputEvent inputEvent) throws MuleException {
-    InternalEvent.Builder builder =
-        InternalEvent.builder(DefaultEventContext.create(getUUID(), muleContext.getId(), getLocation()));
-    InternalEvent defaultEvent = builder.variables(inputEvent.getVariables())
-        .properties(inputEvent.getProperties())
-        .parameters(inputEvent.getParameters())
-        .message(inputEvent.getMessage())
-        .error(inputEvent.getError().orElse(null)).build();
-    for (MessageProcessorChain processorChain : processorChains) {
-      defaultEvent = processorChain.process(defaultEvent);
-    }
-    return defaultEvent;
-  }
+  private MessageProcessorChain messageProcessorChain;
 
   public void setProcessorChains(List processorChains) {
     this.processorChains = processorChains;
   }
 
   @Override
+  protected Function<Publisher<InternalEvent>, Publisher<InternalEvent>> getExecutableFunction() {
+    return publisher -> from(publisher).transform(messageProcessorChain);
+  }
+
+  @Override
   public void stop() throws MuleException {
-    stopIfNeeded(processorChains);
+    stopIfNeeded(messageProcessorChain);
   }
 
   @Override
   public void dispose() {
-    disposeIfNeeded(processorChains, LOGGER);
+    disposeIfNeeded(messageProcessorChain, LOGGER);
   }
 
   @Override
   public void start() throws MuleException {
-    startIfNeeded(processorChains);
+    startIfNeeded(messageProcessorChain);
   }
 
   @Override
   public void initialise() throws InitialisationException {
-    initialiseIfNeeded(processorChains, muleContext);
+    DefaultMessageProcessorChainBuilder chainBuilder = new DefaultMessageProcessorChainBuilder();
+    for (MessageProcessorChain processorChain : processorChains) {
+      chainBuilder.chain(processorChain);
+    }
+    messageProcessorChain = chainBuilder.build();
+    initialiseIfNeeded(messageProcessorChain, muleContext);
   }
 }

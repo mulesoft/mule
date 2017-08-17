@@ -19,6 +19,8 @@ import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrate
 import static org.mule.runtime.core.api.util.ExceptionUtils.updateMessagingExceptionWithError;
 import static org.mule.runtime.core.internal.construct.AbstractFlowConstruct.createFlowStatistics;
 import static reactor.core.publisher.Flux.from;
+import org.mule.runtime.api.component.execution.ComponentExecutionException;
+import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
@@ -41,6 +43,7 @@ import org.mule.runtime.core.internal.routing.requestreply.SimpleAsyncRequestRep
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.RejectedExecutionException;
 
 import org.reactivestreams.Publisher;
@@ -237,6 +240,18 @@ public class DefaultFlowBuilder implements Builder {
                   return me;
                 });
           });
+    }
+
+    @Override
+    protected CompletableFuture<Event> executeEvent(InternalEvent event) {
+      return Mono.just(event).transform(this).onErrorResume(throwable -> {
+        MessagingException messagingException = (MessagingException) throwable;
+        return Mono.from(getExceptionListener().apply(messagingException));
+      }).onErrorMap(throwable -> {
+        MessagingException messagingException = (MessagingException) throwable;
+        InternalEvent resultEvent = messagingException.getEvent();
+        return new ComponentExecutionException(resultEvent.getError().get().getCause(), resultEvent);
+      }).map(resultEvent -> (Event) resultEvent).toFuture();
     }
 
     private InternalEvent createMuleEventForCurrentFlow(InternalEvent event, Object replyToDestination,
