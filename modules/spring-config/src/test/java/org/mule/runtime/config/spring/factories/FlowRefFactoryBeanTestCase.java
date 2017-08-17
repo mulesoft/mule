@@ -6,22 +6,12 @@
  */
 package org.mule.runtime.config.spring.factories;
 
-import static java.util.Collections.singletonMap;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -31,6 +21,20 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
+
+import static java.util.Collections.singletonMap;
+
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.not;
+
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -39,6 +43,7 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.config.spring.internal.factories.FlowRefFactoryBean;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
@@ -50,20 +55,22 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
-import java.util.Arrays;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.MockSettings;
 import org.reactivestreams.Publisher;
 import org.springframework.context.ApplicationContext;
+
+import java.util.Arrays;
+
 import reactor.core.publisher.Mono;
 
 @SmallTest
 public class FlowRefFactoryBeanTestCase extends AbstractMuleContextTestCase {
 
   private static final MockSettings INITIALIZABLE_MESSAGE_PROCESSOR =
-      withSettings().extraInterfaces(Processor.class, Initialisable.class, Disposable.class, Startable.class, Stoppable.class);
+      withSettings().extraInterfaces(AnnotatedObject.class, Processor.class, Initialisable.class, Disposable.class,
+                                     Startable.class, Stoppable.class);
   private static final String STATIC_REFERENCED_FLOW = "staticReferencedFlow";
   private static final String DYNAMIC_REFERENCED_FLOW = "dynamicReferencedFlow";
   private static final String PARSED_DYNAMIC_REFERENCED_FLOW = "parsedDynamicReferencedFlow";
