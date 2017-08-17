@@ -231,8 +231,8 @@
 
         <muleFileCommonsTestVersion>0.9.0-rc.cyborg-SNAPSHOT</muleFileCommonsTestVersion>
 
-        <muleHttpServiceTestVersion>0.9.0-rc.cyborg-SNAPSHOT</muleHttpServiceTestVersion>
-        <muleSchedulerServiceTestVersion>0.9.0-rc.cyborg-SNAPSHOT</muleSchedulerServiceTestVersion>
+        <muleHttpServiceTestVersion>1.0.0-rc.cyborg-SNAPSHOT</muleHttpServiceTestVersion>
+        <muleSchedulerServiceTestVersion>1.0.0-rc.cyborg-SNAPSHOT</muleSchedulerServiceTestVersion>
 
         <!-- Test Extensions -->
         <muleMetadataExtensionTestVersion>4.0.0-rc.cyborg</muleMetadataExtensionTestVersion>
