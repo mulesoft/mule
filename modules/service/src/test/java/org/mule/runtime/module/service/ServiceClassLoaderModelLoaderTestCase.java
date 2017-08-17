@@ -9,7 +9,7 @@ package org.mule.runtime.module.service;
 
 import static java.util.Collections.emptyMap;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.collection.IsArrayWithSize.emptyArray;
+import static org.hamcrest.collection.IsArrayContaining.hasItemInArray;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -23,7 +23,6 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;
 
-import org.hamcrest.collection.IsArrayContaining;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -59,7 +58,7 @@ public class ServiceClassLoaderModelLoaderTestCase extends AbstractMuleTestCase 
 
     ClassLoaderModel classLoaderModel = classLoaderModelLoader.load(serviceFolder.getRoot(), emptyMap(), SERVICE);
 
-    assertThat(classLoaderModel.getUrls(), IsArrayContaining.hasItemInArray(classesFolder.toURI().toURL()));
+    assertThat(classLoaderModel.getUrls(), hasItemInArray(classesFolder.toURI().toURL()));
   }
 
   @Test
@@ -71,7 +70,7 @@ public class ServiceClassLoaderModelLoaderTestCase extends AbstractMuleTestCase 
 
     ClassLoaderModel classLoaderModel = classLoaderModelLoader.load(serviceFolder.getRoot(), emptyMap(), SERVICE);
 
-    assertThat(classLoaderModel.getUrls(), IsArrayContaining.hasItemInArray(jarFile.toURI().toURL()));
+    assertThat(classLoaderModel.getUrls(), hasItemInArray(jarFile.toURI().toURL()));
   }
 
   @Test
@@ -82,6 +81,7 @@ public class ServiceClassLoaderModelLoaderTestCase extends AbstractMuleTestCase 
 
     ClassLoaderModel classLoaderModel = classLoaderModelLoader.load(serviceFolder.getRoot(), emptyMap(), SERVICE);
 
-    assertThat(classLoaderModel.getUrls(), emptyArray());
+    // Contains only the service root
+    assertThat(classLoaderModel.getUrls(), hasItemInArray(serviceFolder.getRoot().toURL()));
   }
 }
