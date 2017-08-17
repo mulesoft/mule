@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.processor.simple;
 
-import static java.util.Optional.empty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
@@ -25,12 +24,12 @@ import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import org.junit.Before;
-import org.junit.Test;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Optional;
+
+import org.junit.Before;
+import org.junit.Test;
 
 @SmallTest
 public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
@@ -49,7 +48,7 @@ public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
     parseTemplateProcessor = new ParseTemplateProcessor();
     parseTemplateProcessor.setMuleContext(mockMuleContext);
     FlowCallStack flowCallStack = mock(FlowCallStack.class);
-    Optional<Error> error = empty();
+    Optional<Error> error = Optional.empty();
     when(flowCallStack.clone()).thenReturn(null);
     when(mockMuleEvent.getError()).thenReturn(error);
     when(mockMuleEvent.getFlowCallStack()).thenReturn(flowCallStack);
@@ -73,7 +72,6 @@ public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
   @Test(expected = InitialisationException.class)
   public void testParseTemplateInvalidLocation() throws InitialisationException {
     parseTemplateProcessor.setLocation(INVALID_LOCATION);
-    addMockComponentLocation(parseTemplateProcessor);
     parseTemplateProcessor.initialise();
     parseTemplateProcessor.process(mockMuleEvent);
   }
@@ -82,7 +80,6 @@ public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
   public void testParseTemplateWithBothLocationAndContentDefined() throws InitialisationException {
     parseTemplateProcessor.setLocation(LOCATION);
     parseTemplateProcessor.setContent("SOME CONTENT");
-    addMockComponentLocation(parseTemplateProcessor);
     parseTemplateProcessor.initialise();
   }
 

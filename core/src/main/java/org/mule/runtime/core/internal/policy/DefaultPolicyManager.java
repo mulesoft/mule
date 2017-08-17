@@ -13,10 +13,10 @@ import static org.mule.runtime.core.api.functional.Either.right;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.exception.MessagingException;
@@ -64,10 +64,10 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
   private SourcePolicyProcessorFactory sourcePolicyProcessorFactory;
 
   @Override
-  public SourcePolicy createSourcePolicyInstance(AnnotatedObject source, InternalEvent sourceEvent,
+  public SourcePolicy createSourcePolicyInstance(ComponentLocation sourceLocation, InternalEvent sourceEvent,
                                                  Processor flowExecutionProcessor,
                                                  MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor) {
-    PolicyPointcutParameters sourcePointcutParameters = createSourcePointcutParameters(source, sourceEvent);
+    PolicyPointcutParameters sourcePointcutParameters = createSourcePointcutParameters(sourceLocation, sourceEvent);
     List<Policy> parameterizedPolicies = policyProvider.findSourceParameterizedPolicies(sourcePointcutParameters);
     if (parameterizedPolicies.isEmpty()) {
       return event -> just(sourceEvent).transform(flowExecutionProcessor)
@@ -88,25 +88,24 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
           });
     }
     return new CompositeSourcePolicy(parameterizedPolicies,
-                                     lookupSourceParametersTransformer(source.getLocation().getComponentIdentifier()
-                                         .getIdentifier()),
+                                     lookupSourceParametersTransformer(sourceLocation.getComponentIdentifier().getIdentifier()),
                                      sourcePolicyProcessorFactory, flowExecutionProcessor,
                                      messageSourceResponseParametersProcessor);
   }
 
   @Override
-  public OperationPolicy createOperationPolicy(AnnotatedObject operation, InternalEvent event,
+  public OperationPolicy createOperationPolicy(ComponentLocation operationLocation, InternalEvent event,
                                                Map<String, Object> operationParameters,
                                                OperationExecutionFunction operationExecutionFunction) {
 
     PolicyPointcutParameters operationPointcutParameters =
-        createOperationPointcutParameters(operation, operationParameters);
+        createOperationPointcutParameters(operationLocation, operationParameters);
     List<Policy> parameterizedPolicies = policyProvider.findOperationParameterizedPolicies(operationPointcutParameters);
     if (parameterizedPolicies.isEmpty()) {
       return (operationEvent) -> operationExecutionFunction.execute(operationParameters, operationEvent);
     }
     return new CompositeOperationPolicy(parameterizedPolicies,
-                                        lookupOperationParametersTransformer(operation.getLocation().getComponentIdentifier()
+                                        lookupOperationParametersTransformer(operationLocation.getComponentIdentifier()
                                             .getIdentifier()),
                                         operationPolicyProcessorFactory, () -> operationParameters, operationExecutionFunction);
   }
@@ -144,35 +143,34 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
     }
   }
 
-  private PolicyPointcutParameters createSourcePointcutParameters(AnnotatedObject source,
+  private PolicyPointcutParameters createSourcePointcutParameters(ComponentLocation sourceLocation,
                                                                   InternalEvent sourceEvent) {
-    return createPointcutParameters(source, SourcePolicyPointcutParametersFactory.class, sourcePointcutFactories,
+    return createPointcutParameters(sourceLocation, SourcePolicyPointcutParametersFactory.class, sourcePointcutFactories,
                                     factory -> factory
-                                        .supportsSourceIdentifier(source.getLocation().getComponentIdentifier().getIdentifier()),
-                                    factory -> factory.createPolicyPointcutParameters(source,
+                                        .supportsSourceIdentifier(sourceLocation.getComponentIdentifier().getIdentifier()),
+                                    factory -> factory.createPolicyPointcutParameters(sourceLocation,
                                                                                       sourceEvent.getMessage().getAttributes()));
   }
 
-  private PolicyPointcutParameters createOperationPointcutParameters(AnnotatedObject operation,
+  private PolicyPointcutParameters createOperationPointcutParameters(ComponentLocation operationLocation,
                                                                      Map<String, Object> operationParameters) {
-    return createPointcutParameters(operation, OperationPolicyPointcutParametersFactory.class, operationPointcutFactories,
+    return createPointcutParameters(operationLocation, OperationPolicyPointcutParametersFactory.class, operationPointcutFactories,
                                     factory -> factory
-                                        .supportsOperationIdentifier(operation.getLocation().getComponentIdentifier()
-                                            .getIdentifier()),
-                                    factory -> factory.createPolicyPointcutParameters(operation, operationParameters));
+                                        .supportsOperationIdentifier(operationLocation.getComponentIdentifier().getIdentifier()),
+                                    factory -> factory.createPolicyPointcutParameters(operationLocation, operationParameters));
   }
 
-  private <T> PolicyPointcutParameters createPointcutParameters(AnnotatedObject component, Class<T> factoryType,
+  private <T> PolicyPointcutParameters createPointcutParameters(ComponentLocation location, Class<T> factoryType,
                                                                 Collection<T> factories, Predicate<T> factoryFilter,
                                                                 Function<T, PolicyPointcutParameters> policyPointcutParametersCreationFunction) {
     List<T> policyPointcutParametersFactories = factories.stream()
         .filter(factoryFilter)
         .collect(Collectors.toList());
     if (policyPointcutParametersFactories.size() > 1) {
-      return throwMoreThanOneFactoryFoundException(component.getLocation().getComponentIdentifier().getIdentifier(), factoryType);
+      return throwMoreThanOneFactoryFoundException(location.getComponentIdentifier().getIdentifier(), factoryType);
     }
     if (policyPointcutParametersFactories.isEmpty()) {
-      return new PolicyPointcutParameters(component);
+      return new PolicyPointcutParameters(location);
     }
     return policyPointcutParametersCreationFunction.apply(policyPointcutParametersFactories.get(0));
   }

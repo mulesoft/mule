@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.policy;
 
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.processor.Processor;
 
@@ -27,13 +27,13 @@ public interface PolicyManager {
    * policies applied to that source and also the {@code sourceEvent} which will be used to extract data to match against the policies
    * pointcuts.
    *
-   * @param source the source where the policy is being applied.
+   * @param sourceLocation the source location.
    * @param sourceEvent the event generated from the source.
    * @param flowExecutionProcessor the processor that executes the flow.
    * @param messageSourceResponseParametersProcessor processor to generate the response and error response parameters of the source.
    * @return a {@link SourcePolicy} associated to that source.
    */
-  SourcePolicy createSourcePolicyInstance(AnnotatedObject source, InternalEvent sourceEvent,
+  SourcePolicy createSourcePolicyInstance(ComponentLocation sourceLocation, InternalEvent sourceEvent,
                                           Processor flowExecutionProcessor,
                                           MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor);
 
@@ -42,13 +42,13 @@ public interface PolicyManager {
    * policies applied to that operation and also the {@code operationParameters} which will be used to extract data to match against the policies
    * pointcuts.
    *
-   * @param operation the operation where the policy is being applied.
+   * @param operationLocation component location of the operation.
    * @param operationEvent the event used to execute the operation.
    * @param operationParameters the set of parameters to use to execute the operation.
    * @param operationExecutionFunction the function that executes the operation.
    * @return a {@link OperationPolicy} associated to that source.
    */
-  OperationPolicy createOperationPolicy(AnnotatedObject operation, InternalEvent operationEvent,
+  OperationPolicy createOperationPolicy(ComponentLocation operationLocation, InternalEvent operationEvent,
                                         Map<String, Object> operationParameters,
                                         OperationExecutionFunction operationExecutionFunction);
 

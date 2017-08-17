@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.policy.api;
 
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.component.location.ComponentLocation;
 
 /**
  * This class defines a set of parameters related to the execution of a component. In particular to the execution of a source or
@@ -18,22 +18,22 @@ import org.mule.runtime.api.meta.AnnotatedObject;
  */
 public class PolicyPointcutParameters {
 
-  private final AnnotatedObject component;
+  private final ComponentLocation componentLocation;
 
   /**
    * Creates a new {@link PolicyPointcutParameters}
    *
-   * @param component the component where the policy is being applied.
+   * @param componentLocation the component location where the source / operation is defined.
    */
-  public PolicyPointcutParameters(AnnotatedObject component) {
-    this.component = component;
+  public PolicyPointcutParameters(ComponentLocation componentLocation) {
+    this.componentLocation = componentLocation;
   }
 
   /**
    * @return the component location where the source / operation is defined.
    */
-  public final AnnotatedObject getComponent() {
-    return component;
+  public final ComponentLocation getComponentLocation() {
+    return componentLocation;
   }
 
 }
