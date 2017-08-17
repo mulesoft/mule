@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.retry;
 
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
@@ -19,7 +20,7 @@ import org.mule.runtime.extension.api.runtime.source.Source;
  *
  * @since 4.0
  */
-public class ReconnectionConfig {
+public class ReconnectionConfig extends AbstractAnnotatedObject {
 
   /**
    * When the application is deployed, a connectivity test is performed on all connectors. If set to {@code true},
