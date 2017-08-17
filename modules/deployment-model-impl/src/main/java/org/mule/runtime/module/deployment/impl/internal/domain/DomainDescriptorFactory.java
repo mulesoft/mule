@@ -36,11 +36,6 @@ public class DomainDescriptorFactory extends AbstractDeployableDescriptorFactory
   }
 
   @Override
-  protected String getDefaultConfigurationResourceLocation() {
-    return DEFAULT_CONFIGURATION_RESOURCE_LOCATION;
-  }
-
-  @Override
   protected String getDefaultConfigurationResource() {
     return DEFAULT_CONFIGURATION_RESOURCE;
   }

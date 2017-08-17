@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.deployment.model.api.domain;
 
-import static org.mule.runtime.container.api.MuleFoldersUtil.getAppConfigFolderPath;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 
 import com.google.common.collect.ImmutableList;
@@ -22,7 +21,7 @@ public class DomainDescriptor extends DeployableArtifactDescriptor {
   public static final String DEFAULT_DOMAIN_NAME = "default";
   public static final String DEFAULT_CONFIGURATION_RESOURCE = "mule-domain-config.xml";
   public static final String DEFAULT_CONFIGURATION_RESOURCE_LOCATION =
-      Paths.get("mule", DEFAULT_CONFIGURATION_RESOURCE).toString();
+      Paths.get("classes", DEFAULT_CONFIGURATION_RESOURCE).toString();
 
   /**
    * Creates a new domain descriptor
@@ -35,6 +34,6 @@ public class DomainDescriptor extends DeployableArtifactDescriptor {
 
   @Override
   protected List<String> getDefaultConfigResources() {
-    return ImmutableList.<String>builder().add(getAppConfigFolderPath() + DEFAULT_CONFIGURATION_RESOURCE).build();
+    return ImmutableList.<String>builder().add(DEFAULT_CONFIGURATION_RESOURCE).build();
   }
 }

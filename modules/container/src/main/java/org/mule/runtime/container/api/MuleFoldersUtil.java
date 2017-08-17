@@ -23,7 +23,6 @@ public class MuleFoldersUtil {
 
   public static final String EXECUTION_FOLDER = ".mule";
   public static final String LIB_FOLDER = "lib";
-  public static final String CONFIG_FOLDER = "mule";
   public static final String SHARED_FOLDER = "shared";
   public static final String APPS_FOLDER = "apps";
   public static final String PLUGINS_FOLDER = "plugins";
@@ -104,14 +103,6 @@ public class MuleFoldersUtil {
     return new File(getDomainFolder(domainName), "classes");
   }
 
-  /**
-   * @param name name of the application to look for
-   * @return the config folder in the deployed domain with the given name
-   */
-  public static File getDomainConfigFolder(String name) {
-    return new File(getDomainFolder(name), getAppConfigFolderPath());
-  }
-
   public static File getDomainLibFolder(String domainName) {
     return new File(getDomainFolder(domainName), LIB_FOLDER);
   }
@@ -172,21 +163,6 @@ public class MuleFoldersUtil {
 
   private static String getAppLibsFolderPath() {
     return LIB_FOLDER + separator;
-  }
-
-  /**
-   * @param appName name of the application to look for
-   * @return the config folder in the deployed application with the given name
-   */
-  public static File getAppConfigFolder(String appName) {
-    return new File(getAppFolder(appName), getAppConfigFolderPath());
-  }
-
-  /*
-   * @return relative path for configuration files on an application
-   */
-  public static String getAppConfigFolderPath() {
-    return CONFIG_FOLDER + separator;
   }
 
   /**

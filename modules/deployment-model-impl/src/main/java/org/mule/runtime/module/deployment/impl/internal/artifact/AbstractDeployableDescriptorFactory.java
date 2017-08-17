@@ -12,9 +12,9 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.AbstractArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
-import org.mule.runtime.module.artifact.api.descriptor.AbstractArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
 
@@ -28,8 +28,6 @@ import java.util.Set;
 
 public abstract class AbstractDeployableDescriptorFactory<M extends MuleDeployableModel, T extends DeployableArtifactDescriptor>
     extends AbstractArtifactDescriptorFactory<M, T> {
-
-  protected static final String MULE_CONFIG_FILES_FOLDER = "mule";
 
   protected final ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader;
 
@@ -47,19 +45,10 @@ public abstract class AbstractDeployableDescriptorFactory<M extends MuleDeployab
     descriptor.setRedeploymentEnabled(artifactModel.isRedeploymentEnabled());
     List<String> configs = artifactModel.getConfigs();
     if (configs != null && !configs.isEmpty()) {
-      descriptor.setConfigResources(configs.stream().map(configFile -> appendMuleFolder(configFile))
+      descriptor.setConfigResources(configs.stream()
           .collect(toList()));
-      List<File> configFiles = descriptor.getConfigResources()
-          .stream()
-          .map(config -> new File(artifactLocation, config)).collect(toList());
-      descriptor.setConfigResourcesFile(configFiles.toArray(new File[configFiles.size()]));
-      descriptor.setAbsoluteResourcePaths(configFiles.stream().map(configFile -> configFile.getAbsolutePath()).collect(toList())
-          .toArray(new String[configFiles.size()]));
     } else {
-      File configFile = new File(artifactLocation, appendMuleFolder(getDefaultConfigurationResource()));
-      descriptor.setConfigResourcesFile(new File[] {configFile});
-      descriptor.setConfigResources(ImmutableList.<String>builder().add(getDefaultConfigurationResourceLocation()).build());
-      descriptor.setAbsoluteResourcePaths(new String[] {configFile.getAbsolutePath()});
+      descriptor.setConfigResources(ImmutableList.<String>builder().add(getDefaultConfigurationResource()).build());
     }
 
     try {
@@ -69,13 +58,7 @@ public abstract class AbstractDeployableDescriptorFactory<M extends MuleDeployab
     }
   }
 
-  protected abstract String getDefaultConfigurationResourceLocation();
-
   protected abstract String getDefaultConfigurationResource();
-
-  private String appendMuleFolder(String configFile) {
-    return MULE_CONFIG_FILES_FOLDER + File.separator + configFile;
-  }
 
   private Set<ArtifactPluginDescriptor> createArtifactPluginDescriptors(ClassLoaderModel classLoaderModel)
       throws IOException {

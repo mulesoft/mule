@@ -54,7 +54,6 @@ import static org.mockito.Mockito.verify;
 import static org.mule.functional.services.TestServicesUtils.buildExpressionLanguageServiceFile;
 import static org.mule.functional.services.TestServicesUtils.buildSchedulerServiceFile;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getAppConfigFolderPath;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
@@ -122,8 +121,8 @@ import org.mule.runtime.deployment.model.internal.application.MuleApplicationCla
 import org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderFactory;
 import org.mule.runtime.deployment.model.internal.nativelib.DefaultNativeLibraryFinderFactory;
 import org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader;
-import org.mule.runtime.module.artifact.builder.TestArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.builder.TestArtifactDescriptor;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.impl.internal.MuleArtifactResourcesRegistry;
 import org.mule.runtime.module.deployment.impl.internal.artifact.DefaultClassLoaderManager;
@@ -193,8 +192,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   private static final String MULE_EXTENSION_CLASSIFIER = "mule-plugin";
 
   // Resources
-  private static final String MULE_CONFIG_XML_FILE = getAppConfigFolderPath() + "mule-config.xml";
-  private static final String MULE_DOMAIN_CONFIG_XML_FILE = Paths.get("mule", "mule-domain-config.xml").toString();
+  private static final String MULE_CONFIG_XML_FILE = "mule-config.xml";
+  private static final String MULE_DOMAIN_CONFIG_XML_FILE = "mule-domain-config.xml";
   private static final String EMPTY_APP_CONFIG_XML = "/empty-config.xml";
   private static final String BAD_APP_CONFIG_XML = "/bad-app-config.xml";
   private static final String BROKEN_CONFIG_XML = "/broken-config.xml";
@@ -868,7 +867,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     reset(applicationDeploymentListener);
 
-    File configFile = new File(appsDir + "/" + dummyAppDescriptorFileBuilder.getDeployedPath(), MULE_CONFIG_XML_FILE);
+    File configFile = new File(appsDir + "/" + dummyAppDescriptorFileBuilder.getDeployedPath(),
+                               getConfigFilePathWithinArtifact(MULE_CONFIG_XML_FILE));
     configFile.setLastModified(configFile.lastModified() + FILE_TIMESTAMP_PRECISION_MILLIS);
 
     assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
@@ -885,7 +885,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     reset(applicationDeploymentListener);
 
-    File configFile = new File(appsDir + "/" + emptyAppFileBuilder.getDeployedPath(), MULE_CONFIG_XML_FILE);
+    File configFile =
+        new File(appsDir + "/" + emptyAppFileBuilder.getDeployedPath(), getConfigFilePathWithinArtifact(MULE_CONFIG_XML_FILE));
     assertThat("Configuration file does not exists", configFile.exists(), is(true));
     assertThat("Could not update last updated time in configuration file",
                configFile.setLastModified(configFile.lastModified() + FILE_TIMESTAMP_PRECISION_MILLIS), is(true));
@@ -910,7 +911,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     final ReentrantLock lock = deploymentService.getLock();
     lock.lock();
     try {
-      File configFile = new File(appsDir + "/" + incompleteAppFileBuilder.getDeployedPath(), MULE_CONFIG_XML_FILE);
+      File configFile = new File(appsDir + "/" + incompleteAppFileBuilder.getDeployedPath(),
+                                 getConfigFilePathWithinArtifact(MULE_CONFIG_XML_FILE));
       assertThat(configFile.exists(), is(true));
       configFile.setLastModified(configFile.lastModified() + FILE_TIMESTAMP_PRECISION_MILLIS);
     } finally {
@@ -934,7 +936,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     reset(applicationDeploymentListener);
 
-    File configFile = new File(appsDir + "/" + incompleteAppFileBuilder.getDeployedPath(), MULE_CONFIG_XML_FILE);
+    File configFile = new File(appsDir + "/" + incompleteAppFileBuilder.getDeployedPath(),
+                               getConfigFilePathWithinArtifact(MULE_CONFIG_XML_FILE));
     assertThat(configFile.exists(), is(true));
     configFile.setLastModified(configFile.lastModified() + FILE_TIMESTAMP_PRECISION_MILLIS);
 
@@ -953,7 +956,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     reset(applicationDeploymentListener);
 
-    File originalConfigFile = new File(appsDir + "/" + dummyAppDescriptorFileBuilder.getDeployedPath(), MULE_CONFIG_XML_FILE);
+    File originalConfigFile = new File(appsDir + "/" + dummyAppDescriptorFileBuilder.getDeployedPath(),
+                                       getConfigFilePathWithinArtifact(MULE_CONFIG_XML_FILE));
     URL url = getClass().getResource(BROKEN_CONFIG_XML);
     File newConfigFile = new File(url.toURI());
     copyFile(newConfigFile, originalConfigFile);
@@ -973,7 +977,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     reset(applicationDeploymentListener);
 
-    File originalConfigFile = new File(appsDir + "/" + dummyAppDescriptorFileBuilder.getDeployedPath(), MULE_CONFIG_XML_FILE);
+    File originalConfigFile = new File(appsDir + "/" + dummyAppDescriptorFileBuilder.getDeployedPath(),
+                                       getConfigFilePathWithinArtifact(MULE_CONFIG_XML_FILE));
     assertThat(originalConfigFile.exists(), is(true));
     URL url = getClass().getResource(BROKEN_CONFIG_XML);
     File newConfigFile = new File(url.toURI());
@@ -993,7 +998,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     reset(applicationDeploymentListener);
 
-    File originalConfigFile = new File(appsDir + "/" + incompleteAppFileBuilder.getDeployedPath(), MULE_CONFIG_XML_FILE);
+    File originalConfigFile = new File(appsDir + "/" + incompleteAppFileBuilder.getDeployedPath(),
+                                       getConfigFilePathWithinArtifact(MULE_CONFIG_XML_FILE));
     assertThat(originalConfigFile.exists(), is(true));
     URL url = getClass().getResource(EMPTY_APP_CONFIG_XML);
     File newConfigFile = new File(url.toURI());
@@ -1019,7 +1025,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     ReentrantLock deploymentLock = deploymentService.getLock();
     deploymentLock.lock();
     try {
-      File originalConfigFile = new File(appsDir + "/" + incompleteAppFileBuilder.getDeployedPath(), MULE_CONFIG_XML_FILE);
+      File originalConfigFile = new File(appsDir + "/" + incompleteAppFileBuilder.getDeployedPath(),
+                                         getConfigFilePathWithinArtifact(MULE_CONFIG_XML_FILE));
       URL url = getClass().getResource(EMPTY_DOMAIN_CONFIG_XML);
       File newConfigFile = new File(url.toURI());
       copyFile(newConfigFile, originalConfigFile);
@@ -1080,7 +1087,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     reset(applicationDeploymentListener);
 
-    File configFile = new File(appsDir + "/" + dummyAppDescriptorFileBuilder.getDeployedPath(), MULE_CONFIG_XML_FILE);
+    File configFile = new File(appsDir + "/" + dummyAppDescriptorFileBuilder.getDeployedPath(),
+                               getConfigFilePathWithinArtifact(MULE_CONFIG_XML_FILE));
     configFile.setLastModified(configFile.lastModified() + FILE_TIMESTAMP_PRECISION_MILLIS);
 
     assertUndeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
@@ -1277,7 +1285,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     File appFolder = new File(appsDir.getPath(), emptyAppFileBuilder.getId());
 
-    File configFile = new File(appFolder, MULE_CONFIG_XML_FILE);
+    File configFile = new File(appFolder, getConfigFilePathWithinArtifact(MULE_CONFIG_XML_FILE));
     writeStringToFile(configFile, "you shall not pass");
 
     startDeployment();
@@ -3306,7 +3314,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
     reset(applicationDeploymentListener);
 
-    File originalConfigFile = new File(appsDir + "/" + emptyAppFileBuilder.getDeployedPath(), MULE_CONFIG_XML_FILE);
+    File originalConfigFile =
+        new File(appsDir + "/" + emptyAppFileBuilder.getDeployedPath(), getConfigFilePathWithinArtifact(MULE_CONFIG_XML_FILE));
     forceDelete(originalConfigFile);
 
     assertDeploymentFailure(applicationDeploymentListener, emptyAppFileBuilder.getId());
@@ -3619,8 +3628,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   }
 
   private void changeConfigFile(String applicationPath, String configFile) throws Exception {
-    File originalConfigFile = new File(new File(appsDir, applicationPath), MULE_CONFIG_XML_FILE);
-    assertThat("Original config file doe snot exists: " + originalConfigFile, originalConfigFile.exists(), is(true));
+    File originalConfigFile = new File(new File(appsDir, applicationPath), getConfigFilePathWithinArtifact(MULE_CONFIG_XML_FILE));
+    assertThat("Original config file does not exists: " + originalConfigFile, originalConfigFile.exists(), is(true));
     URL url = getClass().getResource(configFile);
     File newConfigFile = new File(url.toURI());
     copyFile(newConfigFile, originalConfigFile);
@@ -3641,7 +3650,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   private void doRedeployDomainByChangingConfigFile(String configFile, DomainFileBuilder domain)
       throws URISyntaxException, IOException {
     File originalConfigFile =
-        new File(new File(domainsDir, domain.getDeployedPath()), "mule" + File.separator + domain.getConfigFile());
+        new File(new File(domainsDir, domain.getDeployedPath()), getConfigFilePathWithinArtifact(domain.getConfigFile()));
     assertThat("Cannot find domain config file: " + originalConfigFile, originalConfigFile.exists(), is(true));
     URL url = getClass().getResource(configFile);
     File newConfigFile = new File(url.toURI());
@@ -4091,7 +4100,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
       // Under some platforms, file.lastModified is managed at second level, not milliseconds.
       // Need to update the config file lastModified ere to ensure that is different from previous value
-      File configFile = new File(tempFolder, configFileName);
+      File configFile = new File(tempFolder, getConfigFilePathWithinArtifact(configFileName));
       if (configFile.exists()) {
         configFile.setLastModified(System.currentTimeMillis() + FILE_TIMESTAMP_PRECISION_MILLIS);
       }
@@ -4106,6 +4115,10 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     } finally {
       lock.unlock();
     }
+  }
+
+  private String getConfigFilePathWithinArtifact(String configFileName) {
+    return Paths.get("classes", configFileName).toString();
   }
 
   /**

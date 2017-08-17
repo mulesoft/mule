@@ -65,12 +65,6 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     this(new String[] {configResources}, artifactProperties, artifactType, false);
   }
 
-  public SpringXmlConfigurationBuilder(ConfigResource[] configResources, Map<String, String> artifactProperties,
-                                       ArtifactType artifactType) {
-    super(configResources, artifactProperties);
-    this.artifactType = artifactType;
-  }
-
   public SpringXmlConfigurationBuilder(String configResource) throws ConfigurationException {
     this(configResource, emptyMap(), APP);
   }

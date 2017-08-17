@@ -24,13 +24,9 @@ public class EmptyApplicationDescriptor extends ApplicationDescriptor {
    */
   public EmptyApplicationDescriptor(File appLocation) {
     super(appLocation.getName());
-    String configLocation = DEFAULT_CONFIGURATION_RESOURCE_LOCATION;
+    String configLocation = DEFAULT_CONFIGURATION_RESOURCE;
     setConfigResources(ImmutableList.<String>builder().add(configLocation).build());
-    File configPathFile = new File(appLocation, configLocation);
     setArtifactLocation(appLocation);
     setRootFolder(appLocation.getParentFile());
-    String configPath = String.format(configPathFile.getAbsolutePath());
-    setAbsoluteResourcePaths(new String[] {configPath});
-    setConfigResourcesFile(new File[] {configPathFile});
   }
 }

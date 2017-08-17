@@ -7,9 +7,8 @@
 package org.mule.runtime.module.deployment.impl.internal.application;
 
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppClassesFolder;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getAppConfigFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppFolder;
-import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE_LOCATION;
+import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.artifact.DeployableArtifactDescriptorFactoryTestCase;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
@@ -53,12 +52,7 @@ public class ApplicationDescriptorFactoryTestCase
 
   @Override
   protected String getDefaultConfigurationResourceLocation() {
-    return DEFAULT_CONFIGURATION_RESOURCE_LOCATION;
-  }
-
-  @Override
-  protected File getArtifactConfigFolder() {
-    return getAppConfigFolder(ARTIFACT_NAME);
+    return DEFAULT_CONFIGURATION_RESOURCE;
   }
 
   @Override

@@ -89,15 +89,13 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
   @Test
   public void makesConfigFileRelativeToArtifactMuleFolder() throws Exception {
     DeployableFileBuilder artifactFileBuilder = createArtifactFileBuilder()
-        .deployedWith("config.resources", "mule/config1.xml,mule/config2.xml");
+        .deployedWith("config.resources", "config1.xml,config2.xml");
     unzip(artifactFileBuilder.getArtifactFile(), getArtifactFolder());
 
     D desc = createArtifactDescriptor();
 
-    String config1Path = new File(getArtifactConfigFolder(), "mule/config1.xml").getAbsolutePath();
-    String config2Path = new File(getArtifactConfigFolder(), "mule/config2.xml").getAbsolutePath();
-    assertThat(desc.getAbsoluteResourcePaths().length, equalTo(2));
-    assertThat(desc.getAbsoluteResourcePaths(), arrayContainingInAnyOrder(config1Path, config2Path));
+    assertThat(desc.getConfigResources(), hasSize(2));
+    assertThat(desc.getConfigResources(), hasItems("config1.xml", "config2.xml"));
   }
 
   @Test
@@ -158,7 +156,7 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
     String artifactPath = getArtifactRootFolder() + "custom-config-files";
     D desc = createArtifactDescriptor(artifactPath);
 
-    assertThat(desc.getConfigResources(), contains("mule/file1.xml", "mule/file2.xml"));
+    assertThat(desc.getConfigResources(), contains("file1.xml", "file2.xml"));
   }
 
   @Test
@@ -207,8 +205,6 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
   protected abstract String getArtifactRootFolder();
 
   protected abstract File getArtifactClassesFolder();
-
-  protected abstract File getArtifactConfigFolder();
 
   protected abstract File getArtifactFolder();
 

@@ -41,10 +41,7 @@ public class EmptyApplicationDescriptorTestCase extends AbstractMuleTestCase {
   public void defaultValuesAreCorrect() throws IOException {
     EmptyApplicationDescriptor applicationDescriptor = new EmptyApplicationDescriptor(appFolder);
     assertThat(applicationDescriptor.getName(), is(APP_NAME));
-    assertThat(applicationDescriptor.getConfigResources().get(0), is(DEFAULT_CONFIGURATION_RESOURCE_LOCATION));
-    String absolutePathForConfigResource = new File(appFolder, DEFAULT_CONFIGURATION_RESOURCE_LOCATION).getAbsolutePath();
-    assertThat(applicationDescriptor.getAbsoluteResourcePaths()[0], is(absolutePathForConfigResource));
-    assertThat(applicationDescriptor.getConfigResourcesFile()[0].getAbsolutePath(), is(absolutePathForConfigResource));
+    assertThat(applicationDescriptor.getConfigResources().get(0), is(DEFAULT_CONFIGURATION_RESOURCE));
     assertThat(applicationDescriptor.getLogConfigFile(), is(nullValue()));
   }
 
