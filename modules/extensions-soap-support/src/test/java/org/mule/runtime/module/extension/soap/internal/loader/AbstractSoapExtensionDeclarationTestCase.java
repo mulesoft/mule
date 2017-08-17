@@ -8,11 +8,11 @@ package org.mule.runtime.module.extension.soap.internal.loader;
 
 import static java.util.Arrays.stream;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty;
 import org.mule.runtime.module.extension.soap.api.loader.SoapExtensionModelLoader;
 
 import java.util.List;
@@ -29,8 +29,12 @@ public class AbstractSoapExtensionDeclarationTestCase {
     List<ParameterModel> parameterModels = provider.getAllParameterModels();
     assertThat(provider.getName(), is(name));
     assertThat(provider.getDescription(), is(description));
-    // the `3` is added because the SDK adds the infrastructure parameters for pooling connection providers.
-    assertThat(parameterModels, hasSize(probers.length + 3));
+
+    Long parameterCount = parameterModels.stream()
+        .filter(p -> !p.getModelProperty(InfrastructureParameterModelProperty.class).isPresent())
+        .count();
+
+    assertThat(parameterCount.intValue(), is(probers.length));
     assertParameters(parameterModels, probers);
   }
 
