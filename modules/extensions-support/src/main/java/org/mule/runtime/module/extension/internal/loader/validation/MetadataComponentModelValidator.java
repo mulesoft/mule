@@ -13,10 +13,10 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.join;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.isCollection;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.isVoid;
-import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.extension.api.metadata.MetadataResolverUtils.getAllResolvers;
 import static org.mule.runtime.extension.api.metadata.MetadataResolverUtils.isNullResolver;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
 import org.mule.metadata.api.model.ArrayType;
@@ -43,6 +43,7 @@ import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
+import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 import org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
@@ -146,12 +147,12 @@ public class MetadataComponentModelValidator implements ExtensionModelValidator 
           List<ParameterModel> defaultParts = parts.stream().filter(p -> p.getDefaultValue() != null).collect(toList());
 
           if (!defaultParts.isEmpty() && defaultParts.size() != parts.size()) {
+            String typeName = ExtensionMetadataTypeUtils.getId(objectType).orElse("Anonymous type");
             problemsReporter
                 .addError(new Problem(model,
                                       format("[%s] type multilevel key defines [%s] MetadataKeyPart with default values, but the type contains [%s] "
                                           + "MetadataKeyParts. All the annotated MetadataKeyParts should have a default value if at least one part "
-                                          + "has a default value.", getType(objectType).getSimpleName(),
-                                             defaultParts.size(), parts.size())));
+                                          + "has a default value.", typeName, defaultParts.size(), parts.size())));
           }
         }
       });
@@ -261,17 +262,18 @@ public class MetadataComponentModelValidator implements ExtensionModelValidator 
   private void checkValidType(ComponentModel componentModel, ExtensionModel extensionModel, MetadataType metadataType,
                               ProblemsReporter problemsReporter) {
     String componentTypeName = getComponentModelTypeName(componentModel);
-    Class<?> type = getType(metadataType);
-    failIfTypeIsObject(componentModel, extensionModel, metadataType, componentTypeName, type, problemsReporter);
-    failIfTypeIsInterface(componentModel, extensionModel, metadataType, componentTypeName, type, problemsReporter);
+    getType(metadataType).ifPresent(type -> {
+      failIfTypeIsObject(componentModel, extensionModel, metadataType, componentTypeName, type, problemsReporter);
+      failIfTypeIsInterface(componentModel, extensionModel, metadataType, componentTypeName, type, problemsReporter);
+    });
   }
 
   private boolean isInvalidInterface(MetadataType metadataType, Class<?> type) {
-    return (type.isInterface() &&
+    return type.isInterface() &&
         metadataType instanceof ObjectType &&
         !isMap(metadataType) &&
         !type.equals(Message.class) &&
         // TODO: MULE-11774: Temporal fix. Find proper solution
-        !getType(metadataType).equals(Serializable.class));
+        !getType(metadataType).map(t -> Serializable.class.equals(t)).orElse(false);
   }
 }

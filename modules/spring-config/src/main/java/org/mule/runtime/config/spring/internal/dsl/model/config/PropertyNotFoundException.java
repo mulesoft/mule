@@ -13,7 +13,7 @@ import static org.mule.runtime.config.spring.internal.dsl.model.config.DefaultCo
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessage;
-import org.mule.runtime.core.api.util.Pair;
+import org.mule.runtime.api.util.Pair;
 
 import com.google.common.collect.ImmutableList;
 

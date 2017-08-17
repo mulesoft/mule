@@ -15,7 +15,7 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionManagementType;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.util.Pair;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.internal.connection.ErrorTypeHandlerConnectionProviderWrapper;
 import org.mule.runtime.core.internal.connection.PoolingConnectionProviderWrapper;
 import org.mule.runtime.core.internal.connection.ReconnectableConnectionProviderWrapper;

@@ -22,6 +22,7 @@ import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo;

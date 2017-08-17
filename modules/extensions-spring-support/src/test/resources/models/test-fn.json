@@ -42,6 +42,7 @@
           "annotations": {
             "typeId": "java.lang.Object",
             "classInformation": {
+              "classname": "java.lang.Object",
               "hasDefaultConstructor": true,
               "isInterface": false,
               "isInstantiable": true,
@@ -94,6 +95,7 @@
                 "annotations": {
                   "typeId": "java.lang.Object",
                   "classInformation": {
+                    "classname": "java.lang.Object",
                     "hasDefaultConstructor": true,
                     "isInterface": false,
                     "isInstantiable": true,
@@ -143,10 +145,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
+                "type": "String"
               },
               "hasDynamicType": false,
               "required": false,
@@ -175,10 +174,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
+                "type": "String"
               },
               "hasDynamicType": false,
               "required": false,
@@ -224,10 +220,7 @@
       "output": {
         "type": {
           "format": "java",
-          "type": "String",
-          "annotations": {
-            "typeId": "java.lang.String"
-          }
+          "type": "String"
         },
         "hasDynamicType": false,
         "description": "",
@@ -239,10 +232,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
+                "type": "String"
               },
               "hasDynamicType": false,
               "required": true,
@@ -281,10 +271,7 @@
       "output": {
         "type": {
           "format": "java",
-          "type": "String",
-          "annotations": {
-            "typeId": "java.lang.String"
-          }
+          "type": "String"
         },
         "hasDynamicType": false,
         "description": "",
@@ -326,8 +313,18 @@
                 "format": "java",
                 "type": "Number",
                 "annotations": {
-                  "int": {},
-                  "typeId": "int"
+                  "classInformation": {
+                    "classname": "int",
+                    "hasDefaultConstructor": false,
+                    "isInterface": false,
+                    "isInstantiable": false,
+                    "isAbstract": true,
+                    "isFinal": true,
+                    "implementedInterfaces": [],
+                    "parent": "",
+                    "genericTypes": []
+                  },
+                  "int": {}
                 }
               },
               "hasDynamicType": false,
@@ -355,7 +352,17 @@
                 "format": "java",
                 "type": "Number",
                 "annotations": {
-                  "typeId": "double"
+                  "classInformation": {
+                    "classname": "double",
+                    "hasDefaultConstructor": false,
+                    "isInterface": false,
+                    "isInstantiable": false,
+                    "isAbstract": true,
+                    "isFinal": true,
+                    "implementedInterfaces": [],
+                    "parent": "",
+                    "genericTypes": []
+                  }
                 }
               },
               "hasDynamicType": false,
@@ -383,7 +390,17 @@
                 "format": "java",
                 "type": "Number",
                 "annotations": {
-                  "typeId": "float"
+                  "classInformation": {
+                    "classname": "float",
+                    "hasDefaultConstructor": false,
+                    "isInterface": false,
+                    "isInstantiable": false,
+                    "isAbstract": true,
+                    "isFinal": true,
+                    "implementedInterfaces": [],
+                    "parent": "",
+                    "genericTypes": []
+                  }
                 }
               },
               "hasDynamicType": false,
@@ -411,8 +428,18 @@
                 "format": "java",
                 "type": "Number",
                 "annotations": {
-                  "int": {},
-                  "typeId": "long"
+                  "classInformation": {
+                    "classname": "long",
+                    "hasDefaultConstructor": false,
+                    "isInterface": false,
+                    "isInstantiable": false,
+                    "isAbstract": true,
+                    "isFinal": true,
+                    "implementedInterfaces": [],
+                    "parent": "",
+                    "genericTypes": []
+                  },
+                  "int": {}
                 }
               },
               "hasDynamicType": false,
@@ -440,7 +467,17 @@
                 "format": "java",
                 "type": "Number",
                 "annotations": {
-                  "typeId": "short"
+                  "classInformation": {
+                    "classname": "short",
+                    "hasDefaultConstructor": false,
+                    "isInterface": false,
+                    "isInstantiable": false,
+                    "isAbstract": true,
+                    "isFinal": true,
+                    "implementedInterfaces": [],
+                    "parent": "",
+                    "genericTypes": []
+                  }
                 }
               },
               "hasDynamicType": false,
@@ -484,6 +521,7 @@
           "annotations": {
             "typeId": "java.lang.Object",
             "classInformation": {
+              "classname": "java.lang.Object",
               "hasDefaultConstructor": true,
               "isInterface": false,
               "isInstantiable": true,
@@ -513,6 +551,7 @@
                 "annotations": {
                   "typeId": "java.lang.Object",
                   "classInformation": {
+                    "classname": "java.lang.Object",
                     "hasDefaultConstructor": true,
                     "isInterface": false,
                     "isInstantiable": true,
@@ -552,10 +591,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
+                "type": "String"
               },
               "hasDynamicType": false,
               "required": false,
@@ -597,8 +633,8 @@
           "format": "java",
           "type": "Object",
           "annotations": {
-            "typeId": "java.util.Map",
             "classInformation": {
+              "classname": "java.util.Map",
               "hasDefaultConstructor": false,
               "isInterface": true,
               "isInstantiable": false,
@@ -613,10 +649,7 @@
             }
           },
           "open": {
-            "type": "String",
-            "annotations": {
-              "typeId": "java.lang.String"
-            }
+            "type": "String"
           },
           "fields": []
         },
@@ -634,6 +667,7 @@
                 "annotations": {
                   "typeId": "org.mule.test.function.extension.SimplePojo",
                   "classInformation": {
+                    "classname": "org.mule.test.function.extension.SimplePojo",
                     "hasDefaultConstructor": true,
                     "isInterface": false,
                     "isInstantiable": true,
@@ -654,9 +688,7 @@
                     },
                     "model": {
                       "type": "String",
-                      "annotations": {
-                        "typeId": "java.lang.String"
-                      }
+                      "annotations": {}
                     },
                     "annotations": {
                       "parameterPurpose": {
@@ -672,10 +704,7 @@
                       "name": "pass"
                     },
                     "model": {
-                      "type": "String",
-                      "annotations": {
-                        "typeId": "java.lang.String"
-                      }
+                      "type": "String"
                     },
                     "annotations": {
                       "parameterPurpose": {
@@ -729,6 +758,7 @@
           "annotations": {
             "typeId": "java.lang.Object",
             "classInformation": {
+              "classname": "java.lang.Object",
               "hasDefaultConstructor": true,
               "isInterface": false,
               "isInstantiable": true,
@@ -754,10 +784,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
+                "type": "String"
               },
               "hasDynamicType": false,
               "required": true,
@@ -784,7 +811,19 @@
                 "format": "java",
                 "type": "Binary",
                 "annotations": {
-                  "typeId": "java.io.InputStream"
+                  "classInformation": {
+                    "classname": "java.io.InputStream",
+                    "hasDefaultConstructor": true,
+                    "isInterface": false,
+                    "isInstantiable": false,
+                    "isAbstract": true,
+                    "isFinal": false,
+                    "implementedInterfaces": [
+                      "java.io.Closeable"
+                    ],
+                    "parent": "",
+                    "genericTypes": []
+                  }
                 }
               },
               "hasDynamicType": false,
@@ -811,10 +850,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
+                "type": "String"
               },
               "hasDynamicType": false,
               "required": false,

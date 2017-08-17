@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.internal.config.dsl;
 import static java.lang.String.format;
 import static java.time.Instant.ofEpochMilli;
 import static java.util.Collections.emptySet;
-import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
@@ -1102,6 +1101,6 @@ public abstract class ExtensionDefinitionParser {
   }
 
   protected Optional<String> getInfrastructureParameterName(MetadataType fieldType) {
-    return ofNullable(infrastructureParameterMap.get(getId(fieldType)));
+    return getId(fieldType).map(infrastructureParameterMap::get);
   }
 }

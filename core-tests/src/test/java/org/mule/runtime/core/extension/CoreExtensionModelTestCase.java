@@ -35,15 +35,16 @@ import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PAR
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
+import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.model.VoidType;
 import org.mule.metadata.api.model.impl.DefaultAnyType;
-import org.mule.metadata.api.model.impl.DefaultArrayType;
 import org.mule.metadata.api.model.impl.DefaultBooleanType;
 import org.mule.metadata.api.model.impl.DefaultNumberType;
 import org.mule.metadata.api.model.impl.DefaultObjectType;
 import org.mule.metadata.api.model.impl.DefaultStringType;
+import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.SubTypesModel;
@@ -201,9 +202,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
 
     assertThat(paramModels.get(0).getName(), is("message"));
     assertThat(paramModels.get(0).getExpressionSupport(), is(SUPPORTED));
-    assertThat(paramModels.get(0).getType(), instanceOf(DefaultStringType.class));
-    assertThat(paramModels.get(0).getType().getAnnotation(TypeIdAnnotation.class).get().getValue(),
-               is(String.class.getName()));
+    assertThat(paramModels.get(0).getType(), instanceOf(StringType.class));
     assertThat(paramModels.get(0).isRequired(), is(false));
 
     assertThat(paramModels.get(1).getName(), is("level"));
@@ -213,9 +212,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
 
     assertThat(paramModels.get(2).getName(), is("category"));
     assertThat(paramModels.get(2).getExpressionSupport(), is(NOT_SUPPORTED));
-    assertThat(paramModels.get(2).getType(), instanceOf(DefaultStringType.class));
-    assertThat(paramModels.get(2).getType().getAnnotation(TypeIdAnnotation.class).get().getValue(),
-               is(String.class.getName()));
+    assertThat(paramModels.get(2).getType(), instanceOf(StringType.class));
     assertThat(paramModels.get(2).isRequired(), is(false));
 
   }
@@ -234,8 +231,10 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     ParameterModel collection = foreach.getAllParameterModels().get(0);
     assertThat(collection.getName(), is("collection"));
     assertThat(collection.getExpressionSupport(), is(REQUIRED));
-    assertThat(collection.getType(), instanceOf(DefaultArrayType.class));
-    assertThat(collection.getType().getAnnotation(TypeIdAnnotation.class).get().getValue(), is(Iterable.class.getName()));
+    assertThat(collection.getType(), instanceOf(ArrayType.class));
+    assertThat(collection.getType().getAnnotation(ClassInformationAnnotation.class)
+        .map(ClassInformationAnnotation::getClassname)
+        .orElse(""), is(Iterable.class.getName()));
     assertThat(collection.isRequired(), is(false));
 
     ParameterModel batchSize = foreach.getAllParameterModels().get(1);
@@ -496,8 +495,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(targetParameterModel.getName(), is("target"));
     assertThat(targetParameterModel.getExpressionSupport(), is(NOT_SUPPORTED));
     assertThat(targetParameterModel.getType(), instanceOf(DefaultStringType.class));
-    assertThat(targetParameterModel.getType().getAnnotation(TypeIdAnnotation.class).get().getValue(),
-               is(String.class.getName()));
+    assertThat(targetParameterModel.getType(), is(instanceOf(StringType.class)));
     assertThat(targetParameterModel.isRequired(), is(false));
   }
 

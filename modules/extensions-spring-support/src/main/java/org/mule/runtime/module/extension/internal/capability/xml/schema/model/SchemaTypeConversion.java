@@ -7,7 +7,6 @@
 
 package org.mule.runtime.module.extension.internal.capability.xml.schema.model;
 
-import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.EXPRESSION_BOOLEAN;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.EXPRESSION_DATE_TIME;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.EXPRESSION_DECIMAL;
@@ -25,9 +24,9 @@ import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.SUBSTI
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.SUBSTITUTABLE_LONG;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.SUBSTITUTABLE_MAP;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.SUBSTITUTABLE_NAME;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.acceptsExpressions;
-
 import org.mule.metadata.api.annotation.IntAnnotation;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.BooleanType;
@@ -58,7 +57,7 @@ public final class SchemaTypeConversion {
 
       @Override
       public void visitNumber(NumberType numberType) {
-        if (getTypeId(numberType).isPresent()) {
+        if (getId(numberType).isPresent()) {
           Class<Number> type = JavaTypeUtils.getType(numberType);
           if (anyOf(type, Integer.class, int.class)) {
             qName.set(dynamic ? EXPRESSION_INTEGER : SUBSTITUTABLE_INT);

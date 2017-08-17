@@ -116,7 +116,6 @@ public class DynamicMetadataDeclarationEnricherTestCase extends AbstractMuleTest
     SourceDeclaration sourceDynamicAttributes = getDeclaration(messageSources, "MetadataSource");
 
     assertOutputType(sourceDynamicAttributes.getOutput(), TYPE_BUILDER.objectType()
-        .id(Map.class.getName())
         .with(new ClassInformationAnnotation(Map.class, asList(String.class, Object.class)))
         .openWith(TYPE_LOADER.load(Object.class)).build(), true);
     assertOutputType(sourceDynamicAttributes.getOutputAttributes(), toMetadataType(StringAttributes.class), false);
@@ -126,7 +125,6 @@ public class DynamicMetadataDeclarationEnricherTestCase extends AbstractMuleTest
     SourceDeclaration sourceStaticAttributes = getDeclaration(messageSources, "MetadataSourceWithMultilevel");
 
     assertOutputType(sourceStaticAttributes.getOutput(), TYPE_BUILDER.objectType()
-        .id(Map.class.getName())
         .with(new ClassInformationAnnotation(Map.class, asList(String.class, Object.class)))
         .openWith(TYPE_LOADER.load(Object.class)).build(), true);
     assertOutputType(sourceStaticAttributes.getOutputAttributes(), toMetadataType(StringAttributes.class), false);

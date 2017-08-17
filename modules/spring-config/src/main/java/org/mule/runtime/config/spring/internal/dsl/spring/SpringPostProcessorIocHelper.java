@@ -19,7 +19,7 @@ import static org.springframework.beans.factory.support.BeanDefinitionBuilder.ro
 import org.mule.runtime.config.spring.api.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.spring.privileged.dsl.PostProcessorIocHelper;
-import org.mule.runtime.core.api.util.Pair;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
 

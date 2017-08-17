@@ -13,7 +13,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.util.Pair;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ResolverSetBasedObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;

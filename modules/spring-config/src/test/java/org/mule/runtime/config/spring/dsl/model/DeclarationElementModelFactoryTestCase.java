@@ -42,6 +42,7 @@ import org.mule.runtime.api.app.declaration.OperationElementDeclaration;
 import org.mule.runtime.api.app.declaration.SourceElementDeclaration;
 import org.mule.runtime.api.app.declaration.TopLevelParameterDeclaration;
 import org.mule.runtime.api.app.declaration.fluent.ElementDeclarer;
+import org.mule.runtime.api.app.declaration.fluent.ParameterObjectValue;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -312,12 +313,14 @@ public class DeclarationElementModelFactoryTestCase {
   public void testGlobalParameterDeclarationToElement() {
 
     ElementDeclarer ext = ElementDeclarer.forExtension(EXTENSION_NAME);
+    final ParameterObjectValue.Builder value = newObjectValue()
+        .withParameter(BEHAVIOUR_NAME, "additional")
+        .withParameter(CONTENT_NAME, "#[{field: value}]");
+    getId(complexType).ifPresent(value::ofType);
+
     TopLevelParameterDeclaration declaration = ext.newGlobalParameter(SOURCE_NAME)
         .withRefName("globalParameter")
-        .withValue(newObjectValue()
-            .ofType(getId(complexType))
-            .withParameter(BEHAVIOUR_NAME, "additional")
-            .withParameter(CONTENT_NAME, "#[{field: value}]")
+        .withValue(value
             .build())
         .getDeclaration();
 

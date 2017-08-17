@@ -18,7 +18,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.core.api.util.Pair;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.LoaderDescriber;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;

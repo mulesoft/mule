@@ -32,7 +32,7 @@ import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.api.util.Pair;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.core.internal.util.LazyLookup;
 import org.mule.runtime.core.internal.util.store.LazyObjectStoreToMapAdapter;

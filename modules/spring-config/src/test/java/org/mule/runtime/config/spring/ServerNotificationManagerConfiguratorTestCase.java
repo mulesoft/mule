@@ -24,7 +24,7 @@ import org.mule.runtime.core.api.context.notification.AbstractServerNotification
 import org.mule.runtime.core.api.context.notification.NotificationListener;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.registry.MuleRegistry;
-import org.mule.runtime.core.api.util.Pair;
+import org.mule.runtime.api.util.Pair;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Before;

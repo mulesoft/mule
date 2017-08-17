@@ -12,7 +12,7 @@ import static org.mule.runtime.config.spring.api.dsl.model.ApplicationModel.MULE
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.config.spring.api.dsl.model.ComponentModel;
-import org.mule.runtime.core.api.util.Pair;
+import org.mule.runtime.api.util.Pair;
 
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.ManagedMap;

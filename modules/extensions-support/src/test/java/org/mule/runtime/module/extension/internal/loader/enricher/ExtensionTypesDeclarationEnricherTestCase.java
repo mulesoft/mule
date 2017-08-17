@@ -9,10 +9,11 @@ package org.mule.runtime.module.extension.internal.loader.enricher;
 import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.loadExtension;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
@@ -58,10 +59,16 @@ public class ExtensionTypesDeclarationEnricherTestCase extends AbstractMuleTestC
                            Class<?>... expectedTypes) {
     for (Class<?> expectedType : expectedTypes) {
       Optional<ObjectType> extensionType = extensionTypes.stream()
-          .filter(type -> getId(type).equals(expectedType.getCanonicalName()))
+          .filter(type -> getType(type).map(expectedType::equals).orElse(false))
           .findFirst();
 
       assertThat(format(message, expectedType.getName()), extensionType.isPresent(), is(typeShouldBePresent));
     }
+  }
+
+  @Test
+  public void noInfrastructureTypes() throws Exception {
+    extensionModel.getTypes()
+        .forEach(type -> assertThat(type.getAnnotation(InfrastructureTypeAnnotation.class).isPresent(), is(false)));
   }
 }

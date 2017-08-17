@@ -33,7 +33,7 @@ import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.util.Pair;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 
 import java.util.Collections;

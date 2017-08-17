@@ -21,7 +21,6 @@ import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.UNBOUN
 import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getExpressionSupport;
 import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getLayoutModel;
 import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getParameterRole;
-import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isFlattenedParameterGroup;
 import static org.mule.runtime.extension.api.util.NameUtils.sanitizeName;
 import org.mule.metadata.api.model.MetadataType;
@@ -36,6 +35,7 @@ import org.mule.runtime.extension.api.declaration.type.annotation.DslBaseType;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.model.parameter.ImmutableParameterModel;
+import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ComplexContent;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ComplexType;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExplicitGroup;
@@ -518,6 +518,11 @@ final class ObjectTypeSchemaDelegate {
     }
 
     subTypes.forEach(subtype -> registerPojoType(subtype, baseType, EMPTY));
+  }
+
+  private String getId(MetadataType type) {
+    return ExtensionMetadataTypeUtils.getId(type)
+        .orElseThrow(() -> new IllegalArgumentException("Cannot register a type without id"));
   }
 
   LocalComplexType createTypeExtension(QName base) {

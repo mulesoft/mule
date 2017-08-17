@@ -13,9 +13,10 @@ import static org.mule.runtime.api.metadata.resolving.FailureCode.UNKNOWN;
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
-import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.metadata.message.MessageMetadataType;
 import org.mule.metadata.message.MessageMetadataTypeBuilder;
 import org.mule.runtime.api.message.Message;
@@ -193,14 +194,17 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
     }
 
     MetadataType collectionValueType = ((ArrayType) componentOutputType).getType();
-    String collectionValueTypeId = getId(collectionValueType);
+    Class<?> collectionType = getCollectionType(collectionValueType);
 
-    if (Message.class.getName().equals(collectionValueTypeId)) {
+    if (Message.class.equals(collectionType)) {
       MessageMetadataType message = (MessageMetadataType) collectionValueType;
       resolvedType = wrapInMessageType(resolvedType, key, metadataContext, message.getAttributesType());
     }
 
-    return metadataContext.getTypeBuilder().arrayType().id(getCollectionTypeId(componentOutputType)).of(resolvedType).build();
+    return metadataContext.getTypeBuilder().arrayType()
+        .with(new ClassInformationAnnotation(getCollectionType(componentOutputType)))
+        .of(resolvedType)
+        .build();
   }
 
   private MetadataType wrapInMessageType(MetadataType type, Object key, MetadataContext context,
@@ -225,11 +229,13 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
     return message.build();
   }
 
-  private String getCollectionTypeId(MetadataType type) {
-    if (PagingProvider.class.getName().equals(getId(type))) {
-      return Iterator.class.getName();
+  private Class<?> getCollectionType(MetadataType type) {
+    final Class<?> clazz = getType(type)
+        .orElseThrow(() -> new IllegalArgumentException("MetadataType has no class information"));
+    if (PagingProvider.class.equals(clazz)) {
+      return Iterator.class;
     }
 
-    return getId(type);
+    return clazz;
   }
 }

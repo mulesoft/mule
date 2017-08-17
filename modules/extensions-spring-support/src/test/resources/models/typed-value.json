@@ -26,10 +26,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
+                "type": "String"
               },
               "hasDynamicType": false,
               "required": false,
@@ -130,10 +127,7 @@
                 {
                   "type": {
                     "format": "java",
-                    "type": "String",
-                    "annotations": {
-                      "typeId": "java.lang.String"
-                    }
+                    "type": "String"
                   },
                   "hasDynamicType": false,
                   "required": false,
@@ -162,10 +156,7 @@
                 {
                   "type": {
                     "format": "java",
-                    "type": "String",
-                    "annotations": {
-                      "typeId": "java.lang.String"
-                    }
+                    "type": "String"
                   },
                   "hasDynamicType": false,
                   "required": false,
@@ -212,10 +203,7 @@
           "output": {
             "type": {
               "format": "java",
-              "type": "String",
-              "annotations": {
-                "typeId": "java.lang.String"
-              }
+              "type": "String"
             },
             "hasDynamicType": false,
             "description": "",
@@ -250,10 +238,7 @@
                 {
                   "type": {
                     "format": "java",
-                    "type": "String",
-                    "annotations": {
-                      "typeId": "java.lang.String"
-                    }
+                    "type": "String"
                   },
                   "hasDynamicType": false,
                   "required": false,
@@ -280,10 +265,7 @@
                 {
                   "type": {
                     "format": "java",
-                    "type": "String",
-                    "annotations": {
-                      "typeId": "java.lang.String"
-                    }
+                    "type": "String"
                   },
                   "hasDynamicType": false,
                   "required": false,
@@ -319,10 +301,7 @@
                 {
                   "type": {
                     "format": "java",
-                    "type": "String",
-                    "annotations": {
-                      "typeId": "java.lang.String"
-                    }
+                    "type": "String"
                   },
                   "hasDynamicType": false,
                   "required": false,
@@ -351,10 +330,7 @@
                 {
                   "type": {
                     "format": "java",
-                    "type": "String",
-                    "annotations": {
-                      "typeId": "java.lang.String"
-                    }
+                    "type": "String"
                   },
                   "hasDynamicType": false,
                   "required": false,
@@ -412,13 +388,26 @@
           "format": "java",
           "type": "Array",
           "annotations": {
-            "typeId": "java.util.List"
+            "classInformation": {
+              "classname": "java.util.List",
+              "hasDefaultConstructor": false,
+              "isInterface": true,
+              "isInstantiable": false,
+              "isAbstract": true,
+              "isFinal": false,
+              "implementedInterfaces": [
+                "java.util.Collection"
+              ],
+              "parent": "",
+              "genericTypes": []
+            }
           },
           "item": {
             "type": "Object",
             "annotations": {
               "typeId": "java.lang.Object",
               "classInformation": {
+                "classname": "java.lang.Object",
                 "hasDefaultConstructor": true,
                 "isInterface": false,
                 "isInstantiable": true,
@@ -468,10 +457,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
+                "type": "String"
               },
               "hasDynamicType": false,
               "required": false,
@@ -497,10 +483,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
+                "type": "String"
               },
               "hasDynamicType": false,
               "required": false,
@@ -580,8 +563,8 @@
                 "format": "java",
                 "type": "Object",
                 "annotations": {
-                  "typeId": "java.util.Map",
                   "classInformation": {
+                    "classname": "java.util.Map",
                     "hasDefaultConstructor": false,
                     "isInterface": true,
                     "isInstantiable": false,
@@ -600,6 +583,7 @@
                   "annotations": {
                     "typeId": "java.lang.Object",
                     "classInformation": {
+                      "classname": "java.lang.Object",
                       "hasDefaultConstructor": true,
                       "isInterface": false,
                       "isInstantiable": true,
@@ -643,8 +627,8 @@
                 "format": "java",
                 "type": "Object",
                 "annotations": {
-                  "typeId": "java.util.Map",
                   "classInformation": {
+                    "classname": "java.util.Map",
                     "hasDefaultConstructor": false,
                     "isInterface": true,
                     "isInstantiable": false,
@@ -663,6 +647,7 @@
                   "annotations": {
                     "typeId": "java.lang.Object",
                     "classInformation": {
+                      "classname": "java.lang.Object",
                       "hasDefaultConstructor": true,
                       "isInterface": false,
                       "isInstantiable": true,
@@ -713,10 +698,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
+                "type": "String"
               },
               "hasDynamicType": false,
               "required": false,
@@ -742,10 +724,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
+                "type": "String"
               },
               "hasDynamicType": false,
               "required": false,
@@ -785,10 +764,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
+                "type": "String"
               },
               "hasDynamicType": false,
               "required": false,
@@ -817,10 +793,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
+                "type": "String"
               },
               "hasDynamicType": false,
               "required": false,
@@ -869,7 +842,19 @@
           "format": "java",
           "type": "Binary",
           "annotations": {
-            "typeId": "java.io.InputStream"
+            "classInformation": {
+              "classname": "java.io.InputStream",
+              "hasDefaultConstructor": true,
+              "isInterface": false,
+              "isInstantiable": false,
+              "isAbstract": true,
+              "isFinal": false,
+              "implementedInterfaces": [
+                "java.io.Closeable"
+              ],
+              "parent": "",
+              "genericTypes": []
+            }
           }
         },
         "hasDynamicType": false,
@@ -907,7 +892,19 @@
                 "format": "java",
                 "type": "Binary",
                 "annotations": {
-                  "typeId": "java.io.InputStream"
+                  "classInformation": {
+                    "classname": "java.io.InputStream",
+                    "hasDefaultConstructor": true,
+                    "isInterface": false,
+                    "isInstantiable": false,
+                    "isAbstract": true,
+                    "isFinal": false,
+                    "implementedInterfaces": [
+                      "java.io.Closeable"
+                    ],
+                    "parent": "",
+                    "genericTypes": []
+                  }
                 }
               },
               "hasDynamicType": false,
@@ -935,10 +932,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
+                "type": "String"
               },
               "hasDynamicType": false,
               "required": false,
@@ -965,10 +959,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
+                "type": "String"
               },
               "hasDynamicType": false,
               "required": false,
@@ -997,19 +988,13 @@
                 "format": "java",
                 "type": "Union",
                 "annotations": {
-                  "typeId": "java.lang.Object",
-                  "typeAlias": {
-                    "value": "StreamingStrategy"
-                  }
+                  "typeId": "ByteStreamingStrategy"
                 },
                 "of": [
                   {
                     "type": "Object",
                     "annotations": {
-                      "typeId": "java.lang.Object",
-                      "typeAlias": {
-                        "value": "repeatable-in-memory-stream"
-                      }
+                      "typeId": "repeatable-in-memory-stream"
                     },
                     "fields": [
                       {
@@ -1020,7 +1005,6 @@
                           "type": "Number",
                           "annotations": {
                             "int": {},
-                            "typeId": "java.lang.Integer",
                             "default": "512"
                           }
                         },
@@ -1038,7 +1022,6 @@
                           "type": "Number",
                           "annotations": {
                             "int": {},
-                            "typeId": "java.lang.Integer",
                             "default": "512"
                           }
                         },
@@ -1056,7 +1039,6 @@
                           "type": "Number",
                           "annotations": {
                             "int": {},
-                            "typeId": "java.lang.Integer",
                             "default": "1024"
                           }
                         },
@@ -1073,7 +1055,6 @@
                         "model": {
                           "type": "String",
                           "annotations": {
-                            "typeId": "java.lang.String",
                             "enum": {
                               "type": "[Ljava.lang.String;",
                               "values": [
@@ -1097,10 +1078,7 @@
                   {
                     "type": "Object",
                     "annotations": {
-                      "typeId": "java.lang.Object",
-                      "typeAlias": {
-                        "value": "repeatable-file-store-stream"
-                      }
+                      "typeId": "repeatable-file-store-stream"
                     },
                     "fields": [
                       {
@@ -1111,7 +1089,6 @@
                           "type": "Number",
                           "annotations": {
                             "int": {},
-                            "typeId": "java.lang.Integer",
                             "default": "512"
                           }
                         },
@@ -1128,7 +1105,6 @@
                         "model": {
                           "type": "String",
                           "annotations": {
-                            "typeId": "java.lang.String",
                             "enum": {
                               "type": "[Ljava.lang.String;",
                               "values": [
@@ -1152,10 +1128,7 @@
                   {
                     "type": "Object",
                     "annotations": {
-                      "typeId": "java.lang.Object",
-                      "typeAlias": {
-                        "value": "non-repeatable-stream"
-                      },
+                      "typeId": "non-repeatable-stream",
                       "description": {
                         "value": "This configuration allows the input stream to be read only once. It will not allow to seek randomly which will limit the transformations that DW can perform on this stream. Use this option for use cases which just require moving data around from one system to another to get optimum performance."
                       }
@@ -1208,10 +1181,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
+                "type": "String"
               },
               "hasDynamicType": false,
               "required": false,
@@ -1240,10 +1210,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
+                "type": "String"
               },
               "hasDynamicType": false,
               "required": false,
@@ -1294,6 +1261,7 @@
           "annotations": {
             "typeId": "java.lang.Object",
             "classInformation": {
+              "classname": "java.lang.Object",
               "hasDefaultConstructor": true,
               "isInterface": false,
               "isInstantiable": true,
@@ -1346,6 +1314,7 @@
                 "annotations": {
                   "typeId": "java.lang.Object",
                   "classInformation": {
+                    "classname": "java.lang.Object",
                     "hasDefaultConstructor": true,
                     "isInterface": false,
                     "isInstantiable": true,
@@ -1395,10 +1364,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
+                "type": "String"
               },
               "hasDynamicType": false,
               "required": false,
@@ -1427,10 +1393,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
+                "type": "String"
               },
               "hasDynamicType": false,
               "required": false,
@@ -1547,10 +1510,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
+                "type": "String"
               },
               "hasDynamicType": false,
               "required": false,
@@ -1579,10 +1539,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
+                "type": "String"
               },
               "hasDynamicType": false,
               "required": false,
@@ -1631,7 +1588,19 @@
           "format": "java",
           "type": "Array",
           "annotations": {
-            "typeId": "java.util.List"
+            "classInformation": {
+              "classname": "java.util.List",
+              "hasDefaultConstructor": false,
+              "isInterface": true,
+              "isInstantiable": false,
+              "isAbstract": true,
+              "isFinal": false,
+              "implementedInterfaces": [
+                "java.util.Collection"
+              ],
+              "parent": "",
+              "genericTypes": []
+            }
           },
           "item": {
             "type": "@ref:org.mule.test.heisenberg.extension.model.KnockeableDoor"
@@ -1672,7 +1641,19 @@
                 "format": "java",
                 "type": "Array",
                 "annotations": {
-                  "typeId": "java.util.List"
+                  "classInformation": {
+                    "classname": "java.util.List",
+                    "hasDefaultConstructor": false,
+                    "isInterface": true,
+                    "isInstantiable": false,
+                    "isAbstract": true,
+                    "isFinal": false,
+                    "implementedInterfaces": [
+                      "java.util.Collection"
+                    ],
+                    "parent": "",
+                    "genericTypes": []
+                  }
                 },
                 "item": {
                   "type": "@ref:org.mule.test.heisenberg.extension.model.KnockeableDoor"
@@ -1711,10 +1692,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
+                "type": "String"
               },
               "hasDynamicType": false,
               "required": false,
@@ -1743,10 +1721,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
+                "type": "String"
               },
               "hasDynamicType": false,
               "required": false,
@@ -1795,8 +1770,8 @@
           "format": "java",
           "type": "Object",
           "annotations": {
-            "typeId": "java.util.Map",
             "classInformation": {
+              "classname": "java.util.Map",
               "hasDefaultConstructor": false,
               "isInterface": true,
               "isInstantiable": false,
@@ -1850,8 +1825,8 @@
                 "format": "java",
                 "type": "Object",
                 "annotations": {
-                  "typeId": "java.util.Map",
                   "classInformation": {
+                    "classname": "java.util.Map",
                     "hasDefaultConstructor": false,
                     "isInterface": true,
                     "isInstantiable": false,
@@ -1903,10 +1878,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
+                "type": "String"
               },
               "hasDynamicType": false,
               "required": false,
@@ -1935,10 +1907,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
+                "type": "String"
               },
               "hasDynamicType": false,
               "required": false,
@@ -2055,10 +2024,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
+                "type": "String"
               },
               "hasDynamicType": false,
               "required": false,
@@ -2087,10 +2053,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
+                "type": "String"
               },
               "hasDynamicType": false,
               "required": false,
@@ -2172,10 +2135,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
+                "type": "String"
               },
               "hasDynamicType": false,
               "required": false,
@@ -2202,10 +2162,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
+                "type": "String"
               },
               "hasDynamicType": false,
               "required": false,
@@ -2233,7 +2190,19 @@
                 "format": "java",
                 "type": "Number",
                 "annotations": {
-                  "typeId": "java.lang.Integer"
+                  "classInformation": {
+                    "classname": "java.lang.Integer",
+                    "hasDefaultConstructor": false,
+                    "isInterface": false,
+                    "isInstantiable": false,
+                    "isAbstract": false,
+                    "isFinal": true,
+                    "implementedInterfaces": [
+                      "java.lang.Comparable"
+                    ],
+                    "parent": "java.lang.Number",
+                    "genericTypes": []
+                  }
                 }
               },
               "hasDynamicType": false,
@@ -2274,10 +2243,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
+                "type": "String"
               },
               "hasDynamicType": false,
               "required": false,
@@ -2306,10 +2272,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
+                "type": "String"
               },
               "hasDynamicType": false,
               "required": false,
@@ -2358,13 +2321,22 @@
           "format": "java",
           "type": "Array",
           "annotations": {
-            "typeId": "java.util.List"
+            "classInformation": {
+              "classname": "java.util.List",
+              "hasDefaultConstructor": false,
+              "isInterface": true,
+              "isInstantiable": false,
+              "isAbstract": true,
+              "isFinal": false,
+              "implementedInterfaces": [
+                "java.util.Collection"
+              ],
+              "parent": "",
+              "genericTypes": []
+            }
           },
           "item": {
-            "type": "String",
-            "annotations": {
-              "typeId": "java.lang.String"
-            }
+            "type": "String"
           }
         },
         "hasDynamicType": false,
@@ -2402,13 +2374,22 @@
                 "format": "java",
                 "type": "Array",
                 "annotations": {
-                  "typeId": "java.util.List"
+                  "classInformation": {
+                    "classname": "java.util.List",
+                    "hasDefaultConstructor": false,
+                    "isInterface": true,
+                    "isInstantiable": false,
+                    "isAbstract": true,
+                    "isFinal": false,
+                    "implementedInterfaces": [
+                      "java.util.Collection"
+                    ],
+                    "parent": "",
+                    "genericTypes": []
+                  }
                 },
                 "item": {
-                  "type": "String",
-                  "annotations": {
-                    "typeId": "java.lang.String"
-                  }
+                  "type": "String"
                 }
               },
               "hasDynamicType": false,
@@ -2444,10 +2425,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
+                "type": "String"
               },
               "hasDynamicType": false,
               "required": false,
@@ -2476,10 +2454,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
+                "type": "String"
               },
               "hasDynamicType": false,
               "required": false,
@@ -2528,8 +2503,8 @@
           "format": "java",
           "type": "Object",
           "annotations": {
-            "typeId": "java.util.Map",
             "classInformation": {
+              "classname": "java.util.Map",
               "hasDefaultConstructor": false,
               "isInterface": true,
               "isInstantiable": false,
@@ -2546,13 +2521,22 @@
           "open": {
             "type": "Array",
             "annotations": {
-              "typeId": "java.util.List"
+              "classInformation": {
+                "classname": "java.util.List",
+                "hasDefaultConstructor": false,
+                "isInterface": true,
+                "isInstantiable": false,
+                "isAbstract": true,
+                "isFinal": false,
+                "implementedInterfaces": [
+                  "java.util.Collection"
+                ],
+                "parent": "",
+                "genericTypes": []
+              }
             },
             "item": {
-              "type": "String",
-              "annotations": {
-                "typeId": "java.lang.String"
-              }
+              "type": "String"
             }
           },
           "fields": []
@@ -2592,8 +2576,8 @@
                 "format": "java",
                 "type": "Object",
                 "annotations": {
-                  "typeId": "java.util.Map",
                   "classInformation": {
+                    "classname": "java.util.Map",
                     "hasDefaultConstructor": false,
                     "isInterface": true,
                     "isInstantiable": false,
@@ -2610,13 +2594,22 @@
                 "open": {
                   "type": "Array",
                   "annotations": {
-                    "typeId": "java.util.List"
+                    "classInformation": {
+                      "classname": "java.util.List",
+                      "hasDefaultConstructor": false,
+                      "isInterface": true,
+                      "isInstantiable": false,
+                      "isAbstract": true,
+                      "isFinal": false,
+                      "implementedInterfaces": [
+                        "java.util.Collection"
+                      ],
+                      "parent": "",
+                      "genericTypes": []
+                    }
                   },
                   "item": {
-                    "type": "String",
-                    "annotations": {
-                      "typeId": "java.lang.String"
-                    }
+                    "type": "String"
                   }
                 },
                 "fields": []
@@ -2654,10 +2647,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
+                "type": "String"
               },
               "hasDynamicType": false,
               "required": false,
@@ -2686,10 +2676,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
+                "type": "String"
               },
               "hasDynamicType": false,
               "required": false,
@@ -2738,8 +2725,8 @@
           "format": "java",
           "type": "Object",
           "annotations": {
-            "typeId": "java.util.Map",
             "classInformation": {
+              "classname": "java.util.Map",
               "hasDefaultConstructor": false,
               "isInterface": true,
               "isInstantiable": false,
@@ -2754,10 +2741,7 @@
             }
           },
           "open": {
-            "type": "String",
-            "annotations": {
-              "typeId": "java.lang.String"
-            }
+            "type": "String"
           },
           "fields": []
         },
@@ -2796,8 +2780,8 @@
                 "format": "java",
                 "type": "Object",
                 "annotations": {
-                  "typeId": "java.util.Map",
                   "classInformation": {
+                    "classname": "java.util.Map",
                     "hasDefaultConstructor": false,
                     "isInterface": true,
                     "isInstantiable": false,
@@ -2812,10 +2796,7 @@
                   }
                 },
                 "open": {
-                  "type": "String",
-                  "annotations": {
-                    "typeId": "java.lang.String"
-                  }
+                  "type": "String"
                 },
                 "fields": []
               },
@@ -2852,10 +2833,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
+                "type": "String"
               },
               "hasDynamicType": false,
               "required": false,
@@ -2884,10 +2862,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
+                "type": "String"
               },
               "hasDynamicType": false,
               "required": false,
@@ -2934,10 +2909,7 @@
       "output": {
         "type": {
           "format": "java",
-          "type": "String",
-          "annotations": {
-            "typeId": "java.lang.String"
-          }
+          "type": "String"
         },
         "hasDynamicType": false,
         "description": "",
@@ -2972,10 +2944,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
+                "type": "String"
               },
               "hasDynamicType": false,
               "required": false,
@@ -3002,10 +2971,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
+                "type": "String"
               },
               "hasDynamicType": false,
               "required": false,
@@ -3041,10 +3007,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
+                "type": "String"
               },
               "hasDynamicType": false,
               "required": false,
@@ -3073,10 +3036,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
+                "type": "String"
               },
               "hasDynamicType": false,
               "required": false,
@@ -3130,10 +3090,7 @@
               {
                 "type": {
                   "format": "java",
-                  "type": "String",
-                  "annotations": {
-                    "typeId": "java.lang.String"
-                  }
+                  "type": "String"
                 },
                 "hasDynamicType": false,
                 "required": true,
@@ -3211,10 +3168,7 @@
       "output": {
         "type": {
           "format": "java",
-          "type": "String",
-          "annotations": {
-            "typeId": "java.lang.String"
-          }
+          "type": "String"
         },
         "hasDynamicType": false,
         "description": "",
@@ -3227,6 +3181,7 @@
           "annotations": {
             "typeId": "java.lang.Object",
             "classInformation": {
+              "classname": "java.lang.Object",
               "hasDefaultConstructor": true,
               "isInterface": false,
               "isInstantiable": true,
@@ -3266,10 +3221,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
+                "type": "String"
               },
               "hasDynamicType": false,
               "required": false,
@@ -3298,10 +3250,7 @@
                 "format": "java",
                 "type": "Object",
                 "annotations": {
-                  "typeId": "java.lang.Object",
-                  "typeAlias": {
-                    "value": "RedeliveryPolicy"
-                  }
+                  "typeId": "RedeliveryPolicy"
                 },
                 "fields": [
                   {
@@ -3312,7 +3261,6 @@
                       "type": "Number",
                       "annotations": {
                         "int": {},
-                        "typeId": "java.lang.Integer",
                         "default": "5"
                       }
                     },
@@ -3329,7 +3277,6 @@
                     "model": {
                       "type": "Boolean",
                       "annotations": {
-                        "typeId": "java.lang.Boolean",
                         "default": "true"
                       }
                     },
@@ -3344,10 +3291,7 @@
                       "name": "messageDigestAlgorithm"
                     },
                     "model": {
-                      "type": "String",
-                      "annotations": {
-                        "typeId": "java.lang.String"
-                      }
+                      "type": "String"
                     },
                     "annotations": {
                       "description": {
@@ -3360,10 +3304,7 @@
                       "name": "idExpression"
                     },
                     "model": {
-                      "type": "String",
-                      "annotations": {
-                        "typeId": "java.lang.String"
-                      }
+                      "type": "String"
                     },
                     "annotations": {
                       "description": {
@@ -3376,10 +3317,7 @@
                       "name": "object-store-ref"
                     },
                     "model": {
-                      "type": "String",
-                      "annotations": {
-                        "typeId": "java.lang.String"
-                      }
+                      "type": "String"
                     },
                     "annotations": {
                       "description": {
@@ -3436,19 +3374,13 @@
                 "format": "java",
                 "type": "Union",
                 "annotations": {
-                  "typeId": "java.lang.Object",
-                  "typeAlias": {
-                    "value": "ReconnectionStrategy"
-                  }
+                  "typeId": "ReconnectionStrategy"
                 },
                 "of": [
                   {
                     "type": "Object",
                     "annotations": {
-                      "typeId": "java.lang.Object",
-                      "typeAlias": {
-                        "value": "reconnect"
-                      }
+                      "typeId": "reconnect"
                     },
                     "fields": [
                       {
@@ -3459,7 +3391,19 @@
                           "type": "Number",
                           "annotations": {
                             "int": {},
-                            "typeId": "java.lang.Long",
+                            "classInformation": {
+                              "classname": "java.lang.Long",
+                              "hasDefaultConstructor": false,
+                              "isInterface": false,
+                              "isInstantiable": false,
+                              "isAbstract": false,
+                              "isFinal": true,
+                              "implementedInterfaces": [
+                                "java.lang.Comparable"
+                              ],
+                              "parent": "java.lang.Number",
+                              "genericTypes": []
+                            },
                             "default": "2000"
                           }
                         },
@@ -3477,7 +3421,6 @@
                           "type": "Number",
                           "annotations": {
                             "int": {},
-                            "typeId": "java.lang.Integer",
                             "default": "2"
                           }
                         },
@@ -3492,10 +3435,7 @@
                   {
                     "type": "Object",
                     "annotations": {
-                      "typeId": "java.lang.Object",
-                      "typeAlias": {
-                        "value": "reconnect-forever"
-                      }
+                      "typeId": "reconnect-forever"
                     },
                     "fields": [
                       {
@@ -3506,7 +3446,19 @@
                           "type": "Number",
                           "annotations": {
                             "int": {},
-                            "typeId": "java.lang.Long",
+                            "classInformation": {
+                              "classname": "java.lang.Long",
+                              "hasDefaultConstructor": false,
+                              "isInterface": false,
+                              "isInstantiable": false,
+                              "isAbstract": false,
+                              "isFinal": true,
+                              "implementedInterfaces": [
+                                "java.lang.Comparable"
+                              ],
+                              "parent": "java.lang.Number",
+                              "genericTypes": []
+                            },
                             "default": "2000"
                           }
                         },
@@ -3652,6 +3604,7 @@
       "annotations": {
         "typeId": "org.mule.test.heisenberg.extension.model.DifferedKnockableDoor",
         "classInformation": {
+          "classname": "org.mule.test.heisenberg.extension.model.DifferedKnockableDoor",
           "hasDefaultConstructor": true,
           "isInterface": false,
           "isInstantiable": true,
@@ -3676,9 +3629,7 @@
           },
           "model": {
             "type": "String",
-            "annotations": {
-              "typeId": "java.lang.String"
-            }
+            "annotations": {}
           },
           "annotations": {
             "parameterPurpose": {
@@ -3695,9 +3646,7 @@
           },
           "model": {
             "type": "String",
-            "annotations": {
-              "typeId": "java.lang.String"
-            }
+            "annotations": {}
           },
           "annotations": {
             "parameterPurpose": {
@@ -3714,9 +3663,7 @@
           },
           "model": {
             "type": "String",
-            "annotations": {
-              "typeId": "java.lang.String"
-            }
+            "annotations": {}
           },
           "annotations": {
             "parameterPurpose": {
@@ -3735,6 +3682,7 @@
       "annotations": {
         "typeId": "org.mule.test.heisenberg.extension.model.KnockeableDoor",
         "classInformation": {
+          "classname": "org.mule.test.heisenberg.extension.model.KnockeableDoor",
           "hasDefaultConstructor": true,
           "isInterface": false,
           "isInstantiable": true,
@@ -3759,10 +3707,7 @@
             "required": "true"
           },
           "model": {
-            "type": "String",
-            "annotations": {
-              "typeId": "java.lang.String"
-            }
+            "type": "String"
           },
           "annotations": {
             "parameterPurpose": {
@@ -3779,10 +3724,7 @@
             "required": "true"
           },
           "model": {
-            "type": "String",
-            "annotations": {
-              "typeId": "java.lang.String"
-            }
+            "type": "String"
           },
           "annotations": {
             "parameterPurpose": {
@@ -3815,6 +3757,7 @@
       "annotations": {
         "typeId": "org.mule.test.typed.value.extension.extension.SimplePojo",
         "classInformation": {
+          "classname": "org.mule.test.typed.value.extension.extension.SimplePojo",
           "hasDefaultConstructor": true,
           "isInterface": false,
           "isInstantiable": true,
@@ -3835,9 +3778,7 @@
           },
           "model": {
             "type": "String",
-            "annotations": {
-              "typeId": "java.lang.String"
-            }
+            "annotations": {}
           },
           "annotations": {
             "parameterPurpose": {
@@ -3853,10 +3794,7 @@
             "name": "pass"
           },
           "model": {
-            "type": "String",
-            "annotations": {
-              "typeId": "java.lang.String"
-            }
+            "type": "String"
           },
           "annotations": {
             "parameterPurpose": {
@@ -3875,6 +3813,7 @@
       "annotations": {
         "typeId": "org.mule.test.typed.value.extension.extension.TypedValueExtension",
         "classInformation": {
+          "classname": "org.mule.test.typed.value.extension.extension.TypedValueExtension",
           "hasDefaultConstructor": true,
           "isInterface": false,
           "isInstantiable": true,
@@ -3895,9 +3834,7 @@
           },
           "model": {
             "type": "String",
-            "annotations": {
-              "typeId": "java.lang.String"
-            }
+            "annotations": {}
           },
           "annotations": {
             "parameterPurpose": {
@@ -3917,6 +3854,7 @@
             "annotations": {
               "typeId": "org.mule.test.heisenberg.extension.model.DifferedKnockableDoor",
               "classInformation": {
+                "classname": "org.mule.test.heisenberg.extension.model.DifferedKnockableDoor",
                 "hasDefaultConstructor": true,
                 "isInterface": false,
                 "isInstantiable": true,
@@ -3941,9 +3879,7 @@
                 },
                 "model": {
                   "type": "String",
-                  "annotations": {
-                    "typeId": "java.lang.String"
-                  }
+                  "annotations": {}
                 },
                 "annotations": {
                   "parameterPurpose": {
@@ -3960,9 +3896,7 @@
                 },
                 "model": {
                   "type": "String",
-                  "annotations": {
-                    "typeId": "java.lang.String"
-                  }
+                  "annotations": {}
                 },
                 "annotations": {
                   "parameterPurpose": {
@@ -3979,9 +3913,7 @@
                 },
                 "model": {
                   "type": "String",
-                  "annotations": {
-                    "typeId": "java.lang.String"
-                  }
+                  "annotations": {}
                 },
                 "annotations": {
                   "parameterPurpose": {
@@ -4011,6 +3943,7 @@
       "annotations": {
         "typeId": "org.mule.test.vegan.extension.VeganProductInformation",
         "classInformation": {
+          "classname": "org.mule.test.vegan.extension.VeganProductInformation",
           "hasDefaultConstructor": true,
           "isInterface": false,
           "isInstantiable": true,
@@ -4031,9 +3964,7 @@
           },
           "model": {
             "type": "String",
-            "annotations": {
-              "typeId": "java.lang.String"
-            }
+            "annotations": {}
           },
           "annotations": {
             "parameterPurpose": {
@@ -4051,9 +3982,7 @@
           },
           "model": {
             "type": "String",
-            "annotations": {
-              "typeId": "java.lang.String"
-            }
+            "annotations": {}
           },
           "annotations": {
             "parameterPurpose": {
@@ -4071,7 +4000,19 @@
           "model": {
             "type": "Number",
             "annotations": {
-              "typeId": "java.lang.Integer"
+              "classInformation": {
+                "classname": "java.lang.Integer",
+                "hasDefaultConstructor": false,
+                "isInterface": false,
+                "isInstantiable": false,
+                "isAbstract": false,
+                "isFinal": true,
+                "implementedInterfaces": [
+                  "java.lang.Comparable"
+                ],
+                "parent": "java.lang.Number",
+                "genericTypes": []
+              }
             }
           },
           "annotations": {

@@ -18,7 +18,7 @@ import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ConnectionManager;
-import org.mule.runtime.core.api.util.Pair;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.internal.connection.DefaultConnectionManager;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;

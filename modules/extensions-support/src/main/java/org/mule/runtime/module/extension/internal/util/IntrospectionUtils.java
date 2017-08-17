@@ -21,16 +21,15 @@ import static org.mule.metadata.api.builder.BaseTypeBuilder.create;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.isEnum;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.isObjectType;
-import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.collection.Collectors.toImmutableList;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.getAllSuperTypes;
 import static org.reflections.ReflectionUtils.withName;
 import static org.springframework.core.ResolvableType.forMethodReturnType;
 import static org.springframework.core.ResolvableType.forType;
-
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.AnyType;
@@ -131,7 +130,7 @@ public final class IntrospectionUtils {
   /**
    * Returns a {@link MetadataType} representing the given {@link Class} type.
    *
-   * @param type the {@link Class} being introspected
+   * @param type       the {@link Class} being introspected
    * @param typeLoader a {@link ClassTypeLoader} used to create the {@link MetadataType}
    * @return a {@link MetadataType}
    */
@@ -146,7 +145,11 @@ public final class IntrospectionUtils {
    * @return a {@link DataType} based on the given {@link MetadataType}
    */
   public static DataType toDataType(MetadataType metadataType) {
-    Class<?> type = getType(metadataType);
+    Class<?> type = getType(metadataType).orElse(null);
+    if (type == null) {
+      return DataType.fromType(Object.class);
+    }
+
     Reference<DataType> dataType = new Reference<>();
 
     metadataType.accept(new MetadataTypeVisitor() {
@@ -158,7 +161,7 @@ public final class IntrospectionUtils {
 
       @Override
       public void visitArrayType(ArrayType arrayType) {
-        Class itemClass = getType(arrayType.getType());
+        Class itemClass = getType(arrayType.getType()).get();
         if (Collection.class.isAssignableFrom(type)) {
           dataType.set(DataType.builder()
               .collectionType((Class<? extends Collection>) type)
@@ -184,7 +187,7 @@ public final class IntrospectionUtils {
                     if (restriction.getAnnotation(TypedValueTypeAnnotation.class).isPresent()) {
                       return TypedValue.class;
                     }
-                    return getType(restriction);
+                    return getType(restriction).get();
                   })
                   .orElse(Object.class))
               .build());
@@ -205,7 +208,7 @@ public final class IntrospectionUtils {
    * If the {@code method} returns a collection of {@link Result} instances, then it will return an {@link ArrayType} which inner
    * value represent a {@link Message} which payload and attributes matches the types of the Result generics.
    *
-   * @param method the {@link Method} being introspected
+   * @param method     the {@link Method} being introspected
    * @param typeLoader a {@link ClassTypeLoader} used to create the {@link MetadataType}
    * @return a {@link MetadataType}
    * @throws IllegalArgumentException is method is {@code null}
@@ -246,7 +249,10 @@ public final class IntrospectionUtils {
       if (Result.class.equals(itemType.getRawClass())) {
         return returnListOfMessagesType(returnType, typeLoader, itemType);
       } else {
-        return typeBuilder().arrayType().id(rawClass.getName()).of(typeLoader.load(itemType.getType())).build();
+        return typeBuilder().arrayType()
+            .of(typeLoader.load(itemType.getType()))
+            .with(new ClassInformationAnnotation(rawClass))
+            .build();
       }
     }
 
@@ -285,8 +291,9 @@ public final class IntrospectionUtils {
         ? typeLoader.load(genericType.getType())
         : typeBuilder().voidType().build();
 
-    return typeBuilder().arrayType().id(returnType.getRawClass().getName())
+    return typeBuilder().arrayType()
         .of(new MessageMetadataTypeBuilder().payload(outputType).attributes(attributesType).build())
+        .with(new ClassInformationAnnotation(returnType.getRawClass()))
         .build();
   }
 
@@ -304,7 +311,7 @@ public final class IntrospectionUtils {
    * If the {@code method} returns a collection or a {@link PagingProvider} of {@link Result}, then this will return
    * {@link VoidType} since the messages in the main output already contain an attributes for each item.
    *
-   * @param method the {@link Method} being introspected
+   * @param method     the {@link Method} being introspected
    * @param typeLoader a {@link ClassTypeLoader} used to create the {@link MetadataType}
    * @return a {@link MetadataType}
    * @throws IllegalArgumentException is method is {@code null}
@@ -376,10 +383,10 @@ public final class IntrospectionUtils {
   /**
    * Returns an array of {@link MetadataType} representing each of the given {@link Method}'s argument types.
    *
-   * @param method a not {@code null} {@link Method}
+   * @param method     a not {@code null} {@link Method}
    * @param typeLoader a {@link ClassTypeLoader} to be used to create the returned {@link MetadataType}s
    * @return an array of {@link MetadataType} matching the method's arguments. If the method doesn't take any, then the array will
-   *         be empty
+   * be empty
    * @throws IllegalArgumentException is method is {@code null}
    */
   public static MetadataType[] getMethodArgumentTypes(Method method, ClassTypeLoader typeLoader) {
@@ -401,7 +408,7 @@ public final class IntrospectionUtils {
   /**
    * Returns a {@link MetadataType} describing the given {@link Field}'s type
    *
-   * @param field a not {@code null} {@link Field}
+   * @param field      a not {@code null} {@link Field}
    * @param typeLoader a {@link ClassTypeLoader} used to create the {@link MetadataType}
    * @return a {@link MetadataType} matching the field's type
    * @throws IllegalArgumentException if field is {@code null}
@@ -436,11 +443,11 @@ public final class IntrospectionUtils {
   /**
    * Resolves and returns the field value of an object instance
    *
-   * @param object The object where grab the field value
+   * @param object    The object where grab the field value
    * @param fieldName The name of the field to obtain the value
    * @return The value of the field with the given fieldName and object instance
    * @throws IllegalAccessException if is unavailable to access to the field
-   * @throws NoSuchFieldException if the field doesn't exist in the given object instance
+   * @throws NoSuchFieldException   if the field doesn't exist in the given object instance
    */
   public static Object getFieldValue(Object object, String fieldName) throws IllegalAccessException, NoSuchFieldException {
     final Optional<Field> fieldOptional = getField(object.getClass(), fieldName);
@@ -546,7 +553,9 @@ public final class IntrospectionUtils {
   }
 
   public static boolean isInstantiable(MetadataType type) {
-    return isInstantiable(getType(type));
+    return getType(type)
+        .map(IntrospectionUtils::isInstantiable)
+        .orElse(false);
   }
 
   public static boolean isInstantiable(Class<?> declaringClass) {
@@ -561,7 +570,7 @@ public final class IntrospectionUtils {
   /**
    * Determines if the given {@code type} is assignable from any of the {@code matchingTypes}
    *
-   * @param type a {@link Class}
+   * @param type          a {@link Class}
    * @param matchingTypes a collection of {@link Class classes} to test against
    * @return whether the type is assignable or not
    */
@@ -624,7 +633,7 @@ public final class IntrospectionUtils {
    *
    * @param declaringClass the type to introspect
    * @param annotationType the annotation you're looking for
-   * @param superClasses whether to consider supper classes or not
+   * @param superClasses   whether to consider supper classes or not
    * @return a {@link Collection} of {@link Method}s
    */
   public static Collection<Method> getMethodsAnnotatedWith(Class<?> declaringClass,
@@ -685,7 +694,7 @@ public final class IntrospectionUtils {
    * return
    *
    * @param element an annotated member
-   * @param <T> the generic type of the element
+   * @param <T>     the generic type of the element
    * @return an alias name
    */
   public static <T extends AnnotatedElement & Member> String getAlias(T element) {
@@ -784,7 +793,7 @@ public final class IntrospectionUtils {
    * Given a {@link MetadataType} it adds all the {@link Class} that are related from that type. This includes generics of an
    * {@link ArrayType}, open restriction of an {@link ObjectType} as well as its fields.
    *
-   * @param type {@link MetadataType} to inspect
+   * @param type                 {@link MetadataType} to inspect
    * @param extensionClassLoader extension class loader
    * @return {@link Set<Class<?>>} with the classes reachable from the {@code type}
    */
@@ -808,25 +817,26 @@ public final class IntrospectionUtils {
           return;
         }
 
-        if (!relativeClasses.contains(getType(objectType))) {
-
-
-          Optional<ClassInformationAnnotation> classInformation = objectType.getAnnotation(ClassInformationAnnotation.class);
-          if (classInformation.isPresent()) {
-            classInformation.get().getGenericTypes()
-                .forEach(generic -> relativeClasses.add(loadClass(generic, extensionClassLoader)));
-          }
-
-          relativeClasses.add(getType(objectType));
-          objectType.getFields().stream().forEach(objectFieldType -> objectFieldType.accept(this));
-          objectType.getOpenRestriction().ifPresent(t -> t.accept(this));
+        final Class<Object> clazz = getType(objectType).orElse(null);
+        if (clazz == null || relativeClasses.contains(clazz)) {
+          return;
         }
+
+        Optional<ClassInformationAnnotation> classInformation = objectType.getAnnotation(ClassInformationAnnotation.class);
+        if (classInformation.isPresent()) {
+          classInformation.get().getGenericTypes()
+              .forEach(generic -> relativeClasses.add(loadClass(generic, extensionClassLoader)));
+        }
+
+        relativeClasses.add(clazz);
+        objectType.getFields().stream().forEach(objectFieldType -> objectFieldType.accept(this));
+        objectType.getOpenRestriction().ifPresent(t -> t.accept(this));
       }
 
       @Override
       public void visitString(StringType stringType) {
         if (stringType.getMetadataFormat() == JAVA && isEnum(stringType)) {
-          relativeClasses.add(getType(stringType));
+          getType(stringType).ifPresent(relativeClasses::add);
         }
       }
     });
@@ -847,7 +857,7 @@ public final class IntrospectionUtils {
    * Given a {@link Set} of Annotation classes and a {@link MetadataType} that describes a component parameter, indicates if the
    * parameter is considered as a multilevel {@link MetadataKeyId}
    *
-   * @param annotations of the parameter
+   * @param annotations   of the parameter
    * @param parameterType of the parameter
    * @return a boolean indicating if the Parameter is considered as a multilevel {@link MetadataKeyId}
    */
@@ -861,7 +871,7 @@ public final class IntrospectionUtils {
    * <p>
    * To be a parameter container means that the parameter is a {@link ParameterGroup} or a multilevel {@link MetadataKeyId}.
    *
-   * @param annotations of the component parameter
+   * @param annotations   of the component parameter
    * @param parameterType of the component parameter
    * @return a boolean indicating if the parameter is considered as a parameter container
    */
@@ -970,11 +980,12 @@ public final class IntrospectionUtils {
   /**
    * Resolves the correspondent {@link ConnectionProviderModel} for a given {@link ConnectionProvider} instance.
    *
-   * @param connectionProvider connection provider class
+   * @param connectionProvider     connection provider class
    * @param allConnectionProviders list of available {@link ConnectionProviderModel}
    * @return an {@link Optional} value of the {@link ConnectionProviderModel}
    */
-  public static Optional<ConnectionProviderModel> getConnectionProviderModel(Class<? extends ConnectionProvider> connectionProvider,
+  public static Optional<ConnectionProviderModel> getConnectionProviderModel(
+                                                                             Class<? extends ConnectionProvider> connectionProvider,
                                                                              List<ConnectionProviderModel> allConnectionProviders) {
     for (ConnectionProviderModel providerModel : allConnectionProviders) {
       Optional<ImplementingTypeModelProperty> modelProperty = providerModel.getModelProperty(ImplementingTypeModelProperty.class);

@@ -11,14 +11,13 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isOneOf;
-import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_DESCRIPTION;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader.VERSION;
-
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -30,10 +29,12 @@ import org.mule.runtime.module.extension.soap.api.runtime.connection.transport.D
 import org.mule.test.ram.DefaultPortalGunDispatcherProvider;
 import org.mule.test.ram.MiniverseDispatcherProvider;
 import org.mule.test.ram.RickAndMortyExtension;
-import org.junit.Test;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.junit.Test;
 
 public class SoapExtensionWithCustomTransportsDeclarationTestCase extends AbstractSoapExtensionDeclarationTestCase {
 
@@ -62,11 +63,10 @@ public class SoapExtensionWithCustomTransportsDeclarationTestCase extends Abstra
 
   private void assertSubtypes(ExtensionModel model) {
     SubTypesModel subtypes = model.getSubTypes().iterator().next();
-    assertThat(getTypeId(subtypes.getBaseType()).get(), is(MessageDispatcherProvider.class.getName()));
-    subtypes.getSubTypes().forEach(subtype -> {
-      assertThat(getTypeId(subtype).get(), isOneOf(DefaultHttpMessageDispatcherProvider.class.getName(),
-                                                   DefaultPortalGunDispatcherProvider.class.getName(),
-                                                   MiniverseDispatcherProvider.class.getName()));
-    });
+    assertThat(getId(subtypes.getBaseType()).get(), is(MessageDispatcherProvider.class.getName()));
+    subtypes.getSubTypes()
+        .forEach(subtype -> assertThat(getId(subtype).get(), isOneOf(DefaultHttpMessageDispatcherProvider.class.getName(),
+                                                                     DefaultPortalGunDispatcherProvider.class.getName(),
+                                                                     MiniverseDispatcherProvider.class.getName())));
   }
 }

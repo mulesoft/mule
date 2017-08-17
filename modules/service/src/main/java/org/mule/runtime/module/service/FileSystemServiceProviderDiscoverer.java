@@ -19,7 +19,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.service.ServiceProvider;
 import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.runtime.core.api.util.Pair;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;

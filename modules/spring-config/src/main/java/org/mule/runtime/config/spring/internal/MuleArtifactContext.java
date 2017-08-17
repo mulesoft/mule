@@ -79,7 +79,7 @@ import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.core.api.registry.TransformerResolver;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.runtime.core.api.util.Pair;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistryHelper;

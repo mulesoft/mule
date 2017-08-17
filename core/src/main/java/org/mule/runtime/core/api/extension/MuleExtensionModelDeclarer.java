@@ -243,7 +243,7 @@ class MuleExtensionModelDeclarer {
     logger.onDefaultParameterGroup()
         .withOptionalParameter("level")
         .defaultingTo("DEBUG")
-        .ofType(BaseTypeBuilder.create(JAVA).stringType().id(String.class.getName())
+        .ofType(BaseTypeBuilder.create(JAVA).stringType()
             .enumOf("ERROR", "WARN", "INFO", "DEBUG", "TRACE").build())
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The logging level to be used. Default is DEBUG.");
@@ -316,7 +316,7 @@ class MuleExtensionModelDeclarer {
         .withStereotype(MuleExtensionModelProvider.FLOW_STEREOTYPE);
 
     flow.onDefaultParameterGroup().withOptionalParameter("initialState").defaultingTo("started")
-        .ofType(BaseTypeBuilder.create(JAVA).stringType().id(String.class.getName()).enumOf("started", "stopped").build());
+        .ofType(BaseTypeBuilder.create(JAVA).stringType().enumOf("started", "stopped").build());
     flow.onDefaultParameterGroup().withOptionalParameter("maxConcurrency")
         .ofType(typeLoader.load(Integer.class));
 
@@ -373,7 +373,7 @@ class MuleExtensionModelDeclarer {
 
     tryScope.onDefaultParameterGroup()
         .withOptionalParameter("transactionalAction")
-        .ofType(BaseTypeBuilder.create(JAVA).stringType().id(String.class.getName())
+        .ofType(BaseTypeBuilder.create(JAVA).stringType()
             .enumOf("INDIFFERENT", "ALWAYS_BEGIN", "BEGIN_OR_JOIN").build())
         .defaultingTo("INDIFFERENT")
         .withExpressionSupport(NOT_SUPPORTED)
@@ -382,8 +382,7 @@ class MuleExtensionModelDeclarer {
 
     tryScope.onDefaultParameterGroup()
         .withOptionalParameter("transactionType")
-        .ofType(BaseTypeBuilder.create(JAVA).stringType().id(String.class.getName())
-            .enumOf("LOCAL", "XA").build())
+        .ofType(BaseTypeBuilder.create(JAVA).stringType().enumOf("LOCAL", "XA").build())
         .defaultingTo("LOCAL")
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("Transaction type supported. Availability will depend on the runtime version, "
@@ -432,7 +431,7 @@ class MuleExtensionModelDeclarer {
 
     onError.onDefaultParameterGroup()
         .withOptionalParameter("type")
-        .ofType(BaseTypeBuilder.create(JAVA).stringType().id(String.class.getName())
+        .ofType(BaseTypeBuilder.create(JAVA).stringType()
             .enumOf("ANY", "REDELIVERY_EXHAUSTED", "TRANSFORMATION", "EXPRESSION", "SECURITY", "CLIENT_SECURITY",
                     "SERVER_SECURITY", "ROUTING", "CONNECTIVITY", "RETRY_EXHAUSTED", "TIMEOUT")
             .build())

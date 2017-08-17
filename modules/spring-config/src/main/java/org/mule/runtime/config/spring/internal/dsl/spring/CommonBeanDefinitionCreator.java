@@ -33,7 +33,7 @@ import org.mule.runtime.config.spring.internal.parsers.XmlMetadataAnnotations;
 import org.mule.runtime.config.spring.privileged.dsl.BeanDefinitionPostProcessor;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.core.api.security.SecurityFilter;
-import org.mule.runtime.core.api.util.Pair;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.privileged.processor.SecurityFilterMessageProcessor;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 

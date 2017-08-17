@@ -21,7 +21,7 @@ import org.mule.runtime.core.api.context.notification.Notification;
 import org.mule.runtime.core.api.context.notification.NotificationListener;
 import org.mule.runtime.core.api.context.notification.NotificationsProvider;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
-import org.mule.runtime.core.api.util.Pair;
+import org.mule.runtime.api.util.Pair;
 
 import java.util.ArrayList;
 import java.util.Collection;
