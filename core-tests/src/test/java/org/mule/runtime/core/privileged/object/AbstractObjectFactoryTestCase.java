@@ -9,7 +9,6 @@ package org.mule.runtime.core.privileged.object;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
-
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -20,6 +19,7 @@ public abstract class AbstractObjectFactoryTestCase extends AbstractMuleContextT
   @Test
   public void testInitialisationFailureWithoutObjectClass() throws Exception {
     AbstractObjectFactory factory = getUninitialisedObjectFactory();
+    addMockComponentLocation(factory);
 
     try {
       factory.initialise();
@@ -32,6 +32,7 @@ public abstract class AbstractObjectFactoryTestCase extends AbstractMuleContextT
   @Test
   public void testInstanceFailureGetInstanceWithoutObjectClass() throws Exception {
     AbstractObjectFactory factory = getUninitialisedObjectFactory();
+    addMockComponentLocation(factory);
 
     try {
       factory.getInstance(muleContext);
@@ -97,6 +98,7 @@ public abstract class AbstractObjectFactoryTestCase extends AbstractMuleContextT
   @Test
   public void testDispose() throws Exception {
     AbstractObjectFactory factory = getUninitialisedObjectFactory();
+    addMockComponentLocation(factory);
     factory.setObjectClass(Object.class);
     // Will init the object
     muleContext.getRegistry().applyProcessorsAndLifecycle(factory);

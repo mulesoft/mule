@@ -322,7 +322,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     messageProcessor.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
     messageProcessor.process(event);
 
-    verify(mockPolicyManager).createOperationPolicy(eq(messageProcessor.getLocation()), same(event), any(Map.class),
+    verify(mockPolicyManager).createOperationPolicy(eq(messageProcessor), same(event), any(Map.class),
                                                     any(OperationExecutionFunction.class));
     verify(mockOperationPolicy).process(same(event));
   }
@@ -333,7 +333,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     messageProcessor.process(event);
 
     assertThat(mockOperationPolicy, is(nullValue()));
-    verify(mockPolicyManager, never()).createOperationPolicy(eq(messageProcessor.getLocation()), same(event), any(Map.class),
+    verify(mockPolicyManager, never()).createOperationPolicy(eq(messageProcessor), same(event), any(Map.class),
                                                              any(OperationExecutionFunction.class));
   }
 

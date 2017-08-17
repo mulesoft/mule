@@ -17,6 +17,7 @@ import static org.mule.runtime.config.spring.api.dsl.model.ApplicationModel.MULE
 import static org.mule.runtime.config.spring.internal.dsl.processor.xml.XmlCustomAttributeHandler.from;
 import static org.mule.runtime.config.spring.internal.dsl.spring.BeanDefinitionFactory.SPRING_PROTOTYPE_OBJECT;
 import static org.mule.runtime.config.spring.internal.dsl.spring.PropertyComponentUtils.getPropertyValueFromPropertyComponent;
+import static org.mule.runtime.core.api.execution.LocationExecutionContextProvider.addMetadataAnnotationsFromXml;
 import static org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader.resolveContextArtifactPluginClassLoaders;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.rootBeanDefinition;
@@ -30,7 +31,6 @@ import org.mule.runtime.config.spring.internal.dsl.processor.ObjectTypeVisitor;
 import org.mule.runtime.config.spring.internal.dsl.processor.xml.XmlCustomAttributeHandler;
 import org.mule.runtime.config.spring.internal.parsers.XmlMetadataAnnotations;
 import org.mule.runtime.config.spring.privileged.dsl.BeanDefinitionPostProcessor;
-import org.mule.runtime.core.api.execution.LocationExecutionContextProvider;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.core.api.security.SecurityFilter;
 import org.mule.runtime.core.api.util.Pair;
@@ -162,9 +162,7 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
     } else {
       if (AnnotatedObject.class.isAssignableFrom(builder.getBeanDefinition().getBeanClass())) {
         XmlMetadataAnnotations elementMetadata = (XmlMetadataAnnotations) element.getUserData("metadataAnnotations");
-        LocationExecutionContextProvider.addMetadataAnnotationsFromXml(annotations, configFileIdentifier,
-                                                                       elementMetadata.getLineNumber(),
-                                                                       elementMetadata.getElementString());
+        addMetadataAnnotationsFromXml(annotations, elementMetadata.getElementString());
         builder.getBeanDefinition().getPropertyValues().addPropertyValue("annotations", annotations);
       }
 

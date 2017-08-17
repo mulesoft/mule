@@ -127,7 +127,7 @@ public class ModuleFlowProcessingPhase
       FlowProcessor flowExecutionProcessor = new FlowProcessor(template, templateEvent);
       flowExecutionProcessor.setAnnotations(flowConstruct.getAnnotations());
       final SourcePolicy policy =
-          policyManager.createSourcePolicyInstance(sourceLocation, templateEvent, flowExecutionProcessor, template);
+          policyManager.createSourcePolicyInstance(messageSource, templateEvent, flowExecutionProcessor, template);
       final PhaseContext phaseContext = new PhaseContext(template, messageProcessContext, phaseResultNotifier, terminateConsumer);
 
       just(templateEvent)

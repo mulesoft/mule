@@ -196,7 +196,7 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
       }
       if (getLocation() != null) {
         return policyManager
-            .createOperationPolicy(getLocation(), event, getResolutionResult(event, configuration), operationExecutionFunction)
+            .createOperationPolicy(this, event, getResolutionResult(event, configuration), operationExecutionFunction)
             .process(event);
       } else {
         // If this operation has no component location then it is internal. Don't apply policies on internal operations.
