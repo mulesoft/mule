@@ -227,6 +227,7 @@ class InfrastructureElementModelDelegate {
                               namespace);
   }
 
+  //TODO: MULE-13339
   private void cloneDeclarationToElement(Object parameterModel, DslElementSyntax paramDsl,
                                          ComponentConfiguration.Builder parentConfig, DslElementModel.Builder parentElement,
                                          ParameterObjectValue objectValue, String elementName, String customNamespace) {
