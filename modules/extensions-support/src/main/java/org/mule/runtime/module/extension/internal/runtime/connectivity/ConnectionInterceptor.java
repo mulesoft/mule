@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.connectivity;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.CONNECTION_PARAM;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
@@ -30,6 +31,8 @@ import javax.inject.Inject;
  */
 public final class ConnectionInterceptor implements Interceptor {
 
+  private static final String CLOSE_CONNECTION_COMMAND = "closeCommand";
+
   @Inject
   private ExtensionConnectionSupplier connectionSupplier;
 
@@ -46,35 +49,47 @@ public final class ConnectionInterceptor implements Interceptor {
     ExecutionContextAdapter<OperationModel> context = (ExecutionContextAdapter) executionContext;
     checkArgument(context.getVariable(CONNECTION_PARAM) == null, "A connection was already set for this operation context");
     context.setVariable(CONNECTION_PARAM, getConnection(context));
-  }
 
-  @Override
-  public void onSuccess(ExecutionContext<OperationModel> executionContext, Object result) {
-    release(executionContext);
+    setCloseCommand(executionContext, () -> release(executionContext));
   }
 
   @Override
   public Throwable onError(ExecutionContext<OperationModel> executionContext, Throwable exception) {
-    onConnection(executionContext, ConnectionHandler::invalidate);
+    extractConnectionException(exception).ifPresent(
+                                                    e -> setCloseCommand(executionContext,
+                                                                         () -> onConnection(executionContext,
+                                                                                            ConnectionHandler::invalidate)));
+
     return exception;
   }
 
+  /**
+   * Closes the connection according to the command set through {@link #setCloseCommand(ExecutionContext, Runnable)}.
+   * Interception API requires the connection to be closed at this point so that it's available across the entire
+   * interception cycle.
+   */
   @Override
   public void after(ExecutionContext<OperationModel> executionContext, Object result) {
-    // this is necessary because of the interception API. If no interception is running, then the connection
-    // will have already be released by either onSuccess or onError
-    release(executionContext);
+    ExecutionContextAdapter<OperationModel> context = (ExecutionContextAdapter) executionContext;
+
+    Runnable closeCommand = context.removeVariable(CLOSE_CONNECTION_COMMAND);
+    closeCommand.run();
   }
 
   private void release(ExecutionContext<OperationModel> executionContext) {
     onConnection(executionContext, ConnectionHandler::release);
   }
-  
+
   private void onConnection(ExecutionContext<OperationModel> executionContext, Consumer<ConnectionHandler> consumer) {
     ConnectionHandler handler = ((ExecutionContextAdapter<OperationModel>) executionContext).removeVariable(CONNECTION_PARAM);
     if (handler != null) {
       consumer.accept(handler);
     }
+  }
+
+  private void setCloseCommand(ExecutionContext<OperationModel> executionContext, Runnable command) {
+    ExecutionContextAdapter<OperationModel> context = (ExecutionContextAdapter) executionContext;
+    context.setVariable(CLOSE_CONNECTION_COMMAND, command);
   }
 
   private ConnectionHandler<?> getConnection(ExecutionContextAdapter<? extends ComponentModel> operationContext)
