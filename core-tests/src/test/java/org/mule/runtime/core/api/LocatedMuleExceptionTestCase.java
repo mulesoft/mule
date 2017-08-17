@@ -13,25 +13,28 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.api.exception.MuleException.INFO_LOCATION_KEY;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.LocatedMuleException;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
-import javax.xml.namespace.QName;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import java.util.Optional;
+
+import javax.xml.namespace.QName;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
 public class LocatedMuleExceptionTestCase extends AbstractMuleContextTestCase {
 
   private static QName docNameAttrName = new QName("http://www.mulesoft.org/schema/mule/documentation", "name");
-  private static QName sourceFileNameAttrName = new QName("http://www.mulesoft.org/schema/mule/documentation", "sourceFileName");
-  private static QName sourceFileLineAttrName = new QName("http://www.mulesoft.org/schema/mule/documentation", "sourceFileLine");
+
+  private ComponentLocation mockComponentLocation = mock(ComponentLocation.class);
 
   @Test
   public void namedComponent() {
@@ -45,9 +48,8 @@ public class LocatedMuleExceptionTestCase extends AbstractMuleContextTestCase {
   public void annotatedComponent() {
     AnnotatedObject annotated = mock(AnnotatedObject.class);
     when(annotated.getAnnotation(eq(docNameAttrName))).thenReturn("Mock Component");
-    when(annotated.getAnnotation(eq(sourceFileNameAttrName))).thenReturn("muleApp.xml");
-    when(annotated.getAnnotation(eq(sourceFileLineAttrName))).thenReturn(10);
     when(annotated.toString()).thenReturn("Mock@1");
+    configureProcessorLocation(annotated);
 
     LocatedMuleException lme = new LocatedMuleException(annotated);
     assertThat(lme.getInfo().get(INFO_LOCATION_KEY).toString(),
@@ -59,13 +61,12 @@ public class LocatedMuleExceptionTestCase extends AbstractMuleContextTestCase {
     AnnotatedObject namedAnnotated = mock(AnnotatedObject.class, withSettings().extraInterfaces(NamedObject.class));
     when(((NamedObject) namedAnnotated).getName()).thenReturn("mockComponent");
     when(namedAnnotated.getAnnotation(eq(docNameAttrName))).thenReturn("Mock Component");
-    when(namedAnnotated.getAnnotation(eq(sourceFileNameAttrName))).thenReturn("muleConfig.xml");
-    when(namedAnnotated.getAnnotation(eq(sourceFileLineAttrName))).thenReturn(6);
     when(namedAnnotated.toString()).thenReturn("Mock@1");
+    configureProcessorLocation(namedAnnotated);
 
     LocatedMuleException lme = new LocatedMuleException(namedAnnotated);
     assertThat(lme.getInfo().get(INFO_LOCATION_KEY).toString(),
-               is("/mockComponent @ app:muleConfig.xml:6 (Mock Component)"));
+               is("/mockComponent @ app:muleApp.xml:10 (Mock Component)"));
   }
 
   @Test
@@ -75,5 +76,12 @@ public class LocatedMuleExceptionTestCase extends AbstractMuleContextTestCase {
 
     LocatedMuleException lme = new LocatedMuleException(raw);
     assertThat(lme.getInfo().get(INFO_LOCATION_KEY).toString(), is("Mock@1 @ app"));
+  }
+
+  private void configureProcessorLocation(AnnotatedObject annotatedObject) {
+    when(annotatedObject.getLocation()).thenReturn(mockComponentLocation);
+    when(mockComponentLocation.getFileName()).thenReturn(Optional.of("muleApp.xml"));
+    when(mockComponentLocation.getLineInFile()).thenReturn(Optional.of(10));
+    when(mockComponentLocation.getLocation()).thenReturn("Mock@1");
   }
 }

@@ -120,7 +120,7 @@ public class ModuleFlowProcessingPhase
       final Consumer<Either<MessagingException, InternalEvent>> terminateConsumer = getTerminateConsumer(messageSource, template);
       final MonoProcessor<Void> responseCompletion = MonoProcessor.create();
       final InternalEvent templateEvent = createEvent(template, sourceLocation, responseCompletion, flowConstruct);
-      final SourcePolicy policy = policyManager.createSourcePolicyInstance(sourceLocation, templateEvent,
+      final SourcePolicy policy = policyManager.createSourcePolicyInstance(messageSource, templateEvent,
                                                                            new FlowProcessor(template, templateEvent), template);
       final PhaseContext phaseContext = new PhaseContext(template, messageProcessContext, phaseResultNotifier, terminateConsumer);
 
