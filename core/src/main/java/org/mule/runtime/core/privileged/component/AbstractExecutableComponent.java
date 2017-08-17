@@ -116,7 +116,7 @@ public abstract class AbstractExecutableComponent extends AbstractAnnotatedObjec
     if (this instanceof ReactiveProcessor) {
       return (ReactiveProcessor) this;
     }
-    throw new MuleRuntimeException(createStaticMessage(format("Method getProcessor not redefine and instance %s is not of type processor",
+    throw new MuleRuntimeException(createStaticMessage(format("Method getExecutableFunction not redefined and instance %s is not of type ReactiveProcessor",
                                                               this)));
   }
 
