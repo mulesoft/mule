@@ -88,7 +88,8 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
           });
     }
     return new CompositeSourcePolicy(parameterizedPolicies,
-                                     lookupSourceParametersTransformer(source.getLocation().getComponentIdentifier().getIdentifier()),
+                                     lookupSourceParametersTransformer(source.getLocation().getComponentIdentifier()
+                                         .getIdentifier()),
                                      sourcePolicyProcessorFactory, flowExecutionProcessor,
                                      messageSourceResponseParametersProcessor);
   }
@@ -156,7 +157,8 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
                                                                      Map<String, Object> operationParameters) {
     return createPointcutParameters(operation, OperationPolicyPointcutParametersFactory.class, operationPointcutFactories,
                                     factory -> factory
-                                        .supportsOperationIdentifier(operation.getLocation().getComponentIdentifier().getIdentifier()),
+                                        .supportsOperationIdentifier(operation.getLocation().getComponentIdentifier()
+                                            .getIdentifier()),
                                     factory -> factory.createPolicyPointcutParameters(operation, operationParameters));
   }
 
