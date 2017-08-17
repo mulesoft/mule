@@ -160,17 +160,17 @@ public class ExceptionUtils {
 
     Throwable unwrappedCause = getWrapperErrorCause(cause);
     ErrorType errorType = getComponentIdentifier(processor)
-                            .map(ci -> locator.lookupComponentErrorType(ci, unwrappedCause))
-                            .orElse(locator.lookupErrorType(cause));
+        .map(ci -> locator.lookupComponentErrorType(ci, unwrappedCause))
+        .orElse(locator.lookupErrorType(cause));
 
     return ErrorBuilder.builder(cause)
-             .errorType(getErrorMappings(processor)
-                          .stream()
-                          .filter(m -> m.match(resultError == null || isUnknownMuleError(resultError) ? errorType : currentError))
-                          .findFirst()
-                          .map(ErrorMapping::getTarget)
-                          .orElse(errorType))
-             .build();
+        .errorType(getErrorMappings(processor)
+            .stream()
+            .filter(m -> m.match(resultError == null || isUnknownMuleError(resultError) ? errorType : currentError))
+            .findFirst()
+            .map(ErrorMapping::getTarget)
+            .orElse(errorType))
+        .build();
   }
 
   /**
