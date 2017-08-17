@@ -20,7 +20,6 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructInvalidException;
@@ -33,6 +32,7 @@ import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.privileged.component.AbstractExecutableComponent;
 import org.mule.runtime.core.internal.lifecycle.EmptyLifecycleCallback;
 import org.mule.runtime.core.internal.management.stats.DefaultFlowConstructStatistics;
 
@@ -58,7 +58,7 @@ import org.slf4j.LoggerFactory;
  * Implementations may also implement {@link #doInitialise()}, {@link #doStart()}, {@link #doStop()} and {@link #doDispose()} if
  * they need to perform any action on lifecycle transitions.
  */
-public abstract class AbstractFlowConstruct extends AbstractAnnotatedObject implements FlowConstruct, Lifecycle {
+public abstract class AbstractFlowConstruct extends AbstractExecutableComponent implements FlowConstruct, Lifecycle {
 
   protected static final Logger LOGGER = LoggerFactory.getLogger(AbstractFlowConstruct.class);
 
