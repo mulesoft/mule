@@ -129,7 +129,13 @@ public abstract class Errors {
     public static final String COMPOSITE_ROUTING_ERROR = "COMPOSITE_ROUTING";
 
     /**
-     * Indicates that an error occurred in the source of the flow processing a successful response.
+     * Indicates that an error occurred in the source of a flow.
+     */
+    public static final String SOURCE_ERROR_IDENTIFIER = "SOURCE";
+
+    /**
+     * Indicates that an error occurred in the source of the flow processing a successful response. Can only be propagated since
+     * sources have already executed successful path.
      */
     public static final String SOURCE_RESPONSE_ERROR_IDENTIFIER = "SOURCE_RESPONSE";
 
@@ -146,17 +152,14 @@ public abstract class Errors {
     // UNHANDLEABLE BUT AVAILABLE
 
     /**
-     * Indicates that an error occurred in the source of a flow.
-     */
-    public static final String SOURCE_ERROR_IDENTIFIER = "SOURCE";
-
-    /**
-     * Indicates that an error occurred in the source of the flow sending an error response.
+     * Indicates that an error occurred in the source of the flow sending an error response. Configured error handling will not
+     * execute since sources have already executed failing path.
      */
     public static final String SOURCE_ERROR_RESPONSE_SEND_ERROR_IDENTIFIER = "SOURCE_ERROR_RESPONSE_SEND";
 
     /**
-     * Indicates that an error occurred in the source of the flow generating the parameters of an error response.
+     * Indicates that an error occurred in the source of the flow generating the parameters of an error response. Configured error
+     * handling will not execute since sources have already executed failing path.
      */
     public static final String SOURCE_ERROR_RESPONSE_GENERATE_ERROR_IDENTIFIER = "SOURCE_ERROR_RESPONSE_GENERATE";
 

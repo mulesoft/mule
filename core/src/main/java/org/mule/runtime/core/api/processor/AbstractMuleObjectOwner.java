@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractMuleObjectOwner<T> extends AbstractAnnotatedObject
     implements Lifecycle, MuleContextAware {
 
-  private final Logger logger = LoggerFactory.getLogger(this.getClass());
+  protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
   // TODO MULE-10332: Review MuleContextAware vs @Inject usage
   @Inject

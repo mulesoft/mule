@@ -283,7 +283,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .asPrototype().build());
     componentBuildingDefinitions.add(baseDefinition.withIdentifier(ERROR_HANDLER)
         .withTypeDefinition(fromType(ErrorHandler.class))
-        .withSetterParameterDefinition("globalName", fromSimpleParameter(NAME).build())
+        .withSetterParameterDefinition(NAME, fromSimpleParameter(NAME).build())
         .withSetterParameterDefinition("exceptionListeners",
                                        fromChildCollectionConfiguration(MessagingExceptionHandler.class).build())
         .asPrototype()
