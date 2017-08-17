@@ -11,6 +11,7 @@ import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.api.meta.model.error.ErrorModelBuilder.newError;
+import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.CLIENT_SECURITY;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.COMPOSITE_ROUTING;
@@ -37,6 +38,13 @@ import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Ha
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.CRITICAL;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.FATAL;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.OVERLOAD;
+import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_DESCRIPTION;
+import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_DESCRIPTION;
+import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_DISPLAY_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
 import static org.mule.runtime.extension.internal.loader.util.InfrastructureParameterBuilder.addReconnectionStrategyParameter;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
@@ -60,6 +68,7 @@ import org.mule.runtime.core.api.source.SchedulingStrategy;
 import org.mule.runtime.core.api.source.polling.CronScheduler;
 import org.mule.runtime.core.api.source.polling.FixedFrequencyScheduler;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.internal.property.LiteralModelProperty;
 
 import com.google.gson.reflect.TypeToken;
 
@@ -351,6 +360,21 @@ class MuleExtensionModelDeclarer {
         .defaultingTo(Integer.MAX_VALUE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("This value determines the maximum level of parallelism that will be used by this router. .");
+    scatterGather.onDefaultParameterGroup()
+        .withOptionalParameter(TARGET_PARAMETER_NAME)
+        .ofType(typeLoader.load(String.class))
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs(TARGET_PARAMETER_DESCRIPTION);
+    scatterGather.onDefaultParameterGroup()
+        .withOptionalParameter(TARGET_VALUE_PARAMETER_NAME)
+        .ofType(typeLoader.load(String.class))
+        .defaultingTo(PAYLOAD)
+        .withExpressionSupport(REQUIRED)
+        .describedAs(TARGET_VALUE_PARAMETER_DESCRIPTION)
+        .withRole(BEHAVIOUR)
+        .withDisplayModel(DisplayModel.builder().displayName(TARGET_VALUE_PARAMETER_DISPLAY_NAME).build())
+        .withLayout(LayoutModel.builder().tabName(ADVANCED_TAB).build())
+        .withModelProperty(new LiteralModelProperty());
 
     // TODO MULE-13316 Define error model (Routers should be able to define error type(s) thrown in ModelDeclarer but
     // ConstructModel doesn't support it.)
