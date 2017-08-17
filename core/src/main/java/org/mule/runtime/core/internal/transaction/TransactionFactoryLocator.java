@@ -16,7 +16,9 @@ import org.mule.runtime.core.api.transaction.TypedTransactionFactory;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Locator which given a {@link TransactionType} will locates through SPI a {@link TransactionFactory} able to handle
@@ -26,7 +28,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class TransactionFactoryLocator implements Disposable {
 
-  private Map<TransactionType, TransactionFactory> factories = new ConcurrentHashMap<>();
+  private final Map<TransactionType, TransactionFactory> factories = new HashMap<>();
+  private final ReadWriteLock lock = new ReentrantReadWriteLock();
   private boolean initialized = false;
 
   /**
@@ -38,19 +41,38 @@ public final class TransactionFactoryLocator implements Disposable {
    */
   public Optional<TransactionFactory> lookUpTransactionFactory(TransactionType type) {
     if (!initialized) {
-      factories.putAll(getAvailableFactories());
-      initialized = true;
+      Lock writeLock = lock.writeLock();
+      try {
+        writeLock.lock();
+        if (!initialized) {
+          factories.putAll(getAvailableFactories());
+          initialized = true;
+        }
+      } finally {
+        writeLock.unlock();
+      }
     }
-    return ofNullable(factories.computeIfAbsent(type, this::getTransactionFactory));
+    Lock readLock = lock.readLock();
+    TransactionFactory value;
+    try {
+      readLock.lock();
+      value = factories.get(type);
+    } finally {
+      readLock.unlock();
+    }
+    return ofNullable(value);
   }
 
   @Override
   public void dispose() {
-    factories.clear();
-  }
-
-  private TransactionFactory getTransactionFactory(TransactionType transactionType) {
-    return getAvailableFactories().get(transactionType);
+    Lock writeLock = lock.writeLock();
+    try {
+      writeLock.lock();
+      factories.clear();
+      initialized = false;
+    } finally {
+      writeLock.unlock();
+    }
   }
 
   private Map<TransactionType, TypedTransactionFactory> getAvailableFactories() {
