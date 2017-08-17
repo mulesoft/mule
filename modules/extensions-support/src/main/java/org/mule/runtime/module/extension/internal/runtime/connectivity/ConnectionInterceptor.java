@@ -50,7 +50,7 @@ public final class ConnectionInterceptor implements Interceptor {
 
   @Override
   public void onSuccess(ExecutionContext<OperationModel> executionContext, Object result) {
-    onConnection(executionContext, ConnectionHandler::release);
+    release(executionContext);
   }
 
   @Override
@@ -59,6 +59,17 @@ public final class ConnectionInterceptor implements Interceptor {
     return exception;
   }
 
+  @Override
+  public void after(ExecutionContext<OperationModel> executionContext, Object result) {
+    // this is necessary because of the interception API. If no interception is running, then the connection
+    // will have already be released by either onSuccess or onError
+    release(executionContext);
+  }
+
+  private void release(ExecutionContext<OperationModel> executionContext) {
+    onConnection(executionContext, ConnectionHandler::release);
+  }
+  
   private void onConnection(ExecutionContext<OperationModel> executionContext, Consumer<ConnectionHandler> consumer) {
     ConnectionHandler handler = ((ExecutionContextAdapter<OperationModel>) executionContext).removeVariable(CONNECTION_PARAM);
     if (handler != null) {
