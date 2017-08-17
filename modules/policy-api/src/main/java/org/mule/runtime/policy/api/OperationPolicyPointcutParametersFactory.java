@@ -7,7 +7,7 @@
 package org.mule.runtime.policy.api;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
-import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.meta.AnnotatedObject;
 
 import java.util.Map;
 
@@ -29,11 +29,11 @@ public interface OperationPolicyPointcutParametersFactory {
   /**
    * Creates an specific {@link PolicyPointcutParameters} for a particular operation identifier by {@code operationIdentifier}.
    *
-   * @param componentLocation the component location where the operation is defined.
+   * @param operation the operation where the policy is being applied.
    * @param operationParameters set of parameters that are going to be used to execute the operation.
    * @return the pointcut parameters.
    */
-  PolicyPointcutParameters createPolicyPointcutParameters(ComponentLocation componentLocation,
+  PolicyPointcutParameters createPolicyPointcutParameters(AnnotatedObject operation,
                                                           Map<String, Object> operationParameters);
 
 }

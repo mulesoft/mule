@@ -37,16 +37,9 @@ public abstract class LocationExecutionContextProvider extends ComponentLocation
    * Populates the passed beanAnnotations with the other passed parameters.
    *
    * @param beanAnnotations the map with annotations to populate
-   * @param fileName        the name of the file where the element definition was read from.
-   * @param lineNumber      the line number where the definition of the element starts in the file.
    * @param xmlContent      the xml representation of the element definition.
    */
-  public static void addMetadataAnnotationsFromXml(Map<QName, Object> beanAnnotations, String fileName, int lineNumber,
-                                                   String xmlContent) {
-    if (fileName != null) {
-      beanAnnotations.put(SOURCE_FILE_ANNOTATION_KEY, fileName);
-    }
-    beanAnnotations.put(SOURCE_FILE_LINE_ANNOTATION_KEY, lineNumber);
+  public static void addMetadataAnnotationsFromXml(Map<QName, Object> beanAnnotations, String xmlContent) {
     beanAnnotations.put(SOURCE_ELEMENT_ANNOTATION_KEY, xmlContent);
   }
 
