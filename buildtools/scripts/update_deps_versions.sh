@@ -65,7 +65,8 @@ propertiesDeps=("muleHttpConnectorTestVersion"
                 "muleSocketsConnectorTestVersion"
                 "muleFileConnectorTestVersion"
                 "muleJmsConnectorTestVersion"
-                "muleFileCommonsTestVersion")
+                "muleFileCommonsTestVersion"
+                "muleSpringModuleTestVersion")
 
 # Using Snapshot as a workaround because the extensions have the mule artifacts as
 # deps. So there is a circular dependency.
