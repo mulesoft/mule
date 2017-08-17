@@ -16,7 +16,6 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.core.api.InternalEvent;
-import org.mule.runtime.core.api.GlobalNameableObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.ExceptionNotification;
 import org.mule.runtime.core.api.context.notification.Notification;
@@ -43,7 +42,7 @@ import org.slf4j.LoggerFactory;
  * <code>AbstractSystemExceptionStrategy</code> (if you are creating a System Exception Strategy) rather than directly from this
  * class.
  */
-public abstract class AbstractExceptionListener extends AbstractMessageProcessorOwner implements GlobalNameableObject {
+public abstract class AbstractExceptionListener extends AbstractMessageProcessorOwner {
 
   protected static final String NOT_SET = "<not set>";
 
@@ -59,18 +58,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
   protected boolean enableNotifications = true;
   protected String logException = TRUE.toString();
 
-  protected String globalName;
   protected FlowConstructStatistics statistics;
-
-  @Override
-  public String getGlobalName() {
-    return globalName;
-  }
-
-  @Override
-  public void setGlobalName(String globalName) {
-    this.globalName = globalName;
-  }
 
   public List<Processor> getMessageProcessors() {
     return messageProcessors;

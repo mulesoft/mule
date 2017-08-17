@@ -45,13 +45,13 @@ import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.privileged.routing.requestreply.ReplyToPropertyRequestReplyReplier;
 
-import org.reactivestreams.Publisher;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
+
+import org.reactivestreams.Publisher;
 
 public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     implements MessagingExceptionHandlerAcceptor {
@@ -59,7 +59,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   private MessageProcessorChain configuredMessageProcessors;
   private Processor replyToMessageProcessor = new ReplyToPropertyRequestReplyReplier();
 
-  private String when;
+  protected String when;
   private boolean handleException;
 
   protected String errorType = null;
@@ -226,11 +226,6 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
 
   private boolean acceptsErrorType(InternalEvent event) {
     return errorTypeMatcher != null && errorTypeMatcher.match(event.getError().get().getErrorType());
-  }
-
-  @Override
-  public boolean acceptsAll() {
-    return errorTypeMatcher == null && when == null;
   }
 
   protected Function<InternalEvent, InternalEvent> afterRouting(MessagingException exception) {

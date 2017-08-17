@@ -83,6 +83,17 @@ import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -106,17 +117,6 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.w3c.dom.Document;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 
 /**
  * <code>MuleArtifactContext</code> is a simple extension application context that allows resources to be loaded from the
@@ -352,7 +352,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
     addBeanPostProcessors(beanFactory,
                           new MuleContextPostProcessor(muleContext),
-                          new GlobalNamePostProcessor(),
                           new PostRegistrationActionsPostProcessor((MuleRegistryHelper) muleContext.getRegistry(), beanFactory),
                           new DiscardedOptionalBeanPostProcessor(optionalObjectsController,
                                                                  (DefaultListableBeanFactory) beanFactory),
