@@ -150,6 +150,14 @@ public class ExceptionUtils {
     }
   }
 
+  /**
+   * Determine the {@link ErrorType} of a given exception thrown by a given message processor.
+   *
+   * @param processor the component that threw the exception (processor or source).
+   * @param cause the exception thrown.
+   * @param locator   the {@link ErrorTypeLocator}.
+   * @return the resolved {@link ErrorType}
+   */
   public static Error getErrorFromFailingProcessor(InternalEvent currentEvent,
                                                    AnnotatedObject processor,
                                                    Throwable cause,
