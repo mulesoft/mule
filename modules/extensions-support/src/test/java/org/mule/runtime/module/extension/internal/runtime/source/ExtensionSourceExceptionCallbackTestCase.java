@@ -71,6 +71,7 @@ public class ExtensionSourceExceptionCallbackTestCase extends AbstractMuleTestCa
     when(event.getError()).thenReturn(empty());
     when(event.getMessage()).thenReturn(mock(Message.class));
     when(errorType.getIdentifier()).thenReturn("ID");
+    when(errorType.getNamespace()).thenReturn("NS");
     when(errorTypeLocator.lookupErrorType(any(Exception.class))).thenReturn(errorType);
     when(messageProcessContext.getErrorTypeLocator()).thenReturn(errorTypeLocator);
     when(messageProcessContext.getMessageSource()).thenReturn(messageSource);

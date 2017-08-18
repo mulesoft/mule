@@ -100,6 +100,7 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
     ErrorTypeLocator typeLocator = mock(ErrorTypeLocator.class);
     ErrorType errorType = mock(ErrorType.class);
     when(errorType.getIdentifier()).thenReturn("ID");
+    when(errorType.getNamespace()).thenReturn("NS");
     when(typeLocator.lookupErrorType(any(Throwable.class))).thenReturn(errorType);
     when(typeLocator.<String, Throwable>lookupComponentErrorType(any(ComponentIdentifier.class), any(Throwable.class)))
         .thenReturn(errorType);
