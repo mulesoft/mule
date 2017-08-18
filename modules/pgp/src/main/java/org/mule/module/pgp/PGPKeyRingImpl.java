@@ -8,7 +8,9 @@ package org.mule.module.pgp;
 
 import static org.mule.module.pgp.i18n.PGPMessages.noFileKeyFound;
 import static org.mule.module.pgp.i18n.PGPMessages.noKeyIdFound;
+import static org.mule.module.pgp.i18n.PGPMessages.noPublicKeyDefined;
 import static org.mule.module.pgp.i18n.PGPMessages.noSecretKeyDefined;
+import static org.mule.module.pgp.i18n.PGPMessages.noSecretPassPhrase;
 import static org.mule.module.pgp.util.BouncyCastleUtil.KEY_FINGERPRINT_CALCULATOR;
 import static org.mule.module.pgp.util.ValidatorUtil.validateNotNull;
 
@@ -80,7 +82,7 @@ public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
     {
         try
         {
-            validateNotNull(getPublicKeyRingFileName(), noSecretKeyDefined());
+            validateNotNull(getPublicKeyRingFileName(), noPublicKeyDefined());
             InputStream inputStream = IOUtils.getResourceAsStream(getPublicKeyRingFileName(), getClass());
             validateNotNull(inputStream, noFileKeyFound(getPublicKeyRingFileName()));
             publicKeys = new PGPPublicKeyRingCollection(inputStream, KEY_FINGERPRINT_CALCULATOR);
@@ -153,6 +155,7 @@ public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
 
     public String getSecretPassphrase()
     {
+        validateNotNull(secretPassPhrase, noSecretPassPhrase());
         return secretPassPhrase;
     }
 
@@ -205,6 +208,9 @@ public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
 
     public PGPPublicKeyRingCollection getPublicKeys()
     {
+        if (principalsKeyBundleMap == null) {
+            readPublicKeyRing();
+        }
         return publicKeys;
     }
 }
