@@ -14,6 +14,7 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.Properties;
 
 /**
  *  Manages deploy of mule applications
@@ -79,11 +80,27 @@ public interface DeploymentService extends DeploymentListenerManager, DomainDepl
     void deploy(URL appArchiveUrl) throws IOException;
 
     /**
+     * Deploys an applications bundled as a zip from a given URL and sets the provided appProperties.
+     *
+     * @param appArchiveUrl
+     * @param appProperties
+     * @throws IOException
+     */
+    void deploy(URL appArchiveUrl, Properties appProperties) throws IOException;
+
+    /**
      * Undeploys and redeploys an application
      *
      * @param artifactName then name of the application to redeploy
      */
     void redeploy(String artifactName);
+
+    /**
+     * Undeploys and redeploys an applications and applies the provided appProperties.
+     * @param artifactName
+     * @param appProperties
+     */
+    void redeploy(String artifactName, Properties appProperties) throws IOException;
 
     /**
      * Undeploys a domain from the mule container

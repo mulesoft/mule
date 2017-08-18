@@ -12,6 +12,8 @@ import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.module.launcher.ArtifactDeploymentTemplate.NOP_ARTIFACT_DEPLOYMENT_TEMPLATE;
 import static org.mule.module.launcher.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
+import java.util.Properties;
+import org.apache.commons.lang.NotImplementedException;
 import org.mule.config.StartupContext;
 import org.mule.module.launcher.application.Application;
 import org.mule.module.launcher.application.ApplicationClassLoaderFactory;
@@ -242,6 +244,12 @@ public class MuleDeploymentService implements DeploymentService
     }
 
     @Override
+    public void deploy(final URL appArchiveUrl, final Properties properties) throws IOException
+    {
+        throw new NotImplementedException();
+    }
+
+    @Override
     public void redeploy(final String artifactName)
     {
         executeSynchronized(new SynchronizedDeploymentAction()
@@ -262,6 +270,12 @@ public class MuleDeploymentService implements DeploymentService
                 }
             }
         });
+    }
+
+    @Override
+    public void redeploy(final String artifactName, final Properties properties)
+    {
+        throw new NotImplementedException();
     }
 
     @Override
