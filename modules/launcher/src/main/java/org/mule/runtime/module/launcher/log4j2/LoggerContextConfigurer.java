@@ -67,7 +67,7 @@ final class LoggerContextConfigurer {
 
   private static final String MULE_APP_LOG_FILE_TEMPLATE = "mule-app-%s.log";
   private static final String MULE_DOMAIN_LOG_FILE_TEMPLATE = "mule-domain-%s.log";
-  private static final String PATTERN_LAYOUT = "%-5p %d [%t] [%X{originatingFlowName} - %X{correlationId}] %c: %m%n";
+  private static final String PATTERN_LAYOUT = "%-5p %d [%t] [%X{originatingFlowName}-%X{correlationId}] %c: %m%n";
   private static final int DEFAULT_MONITOR_INTERVAL_SECS = 60;
   static final String FORCED_CONSOLE_APPENDER_NAME = "Forced-Console";
   static final String PER_APP_FILE_APPENDER_NAME = "defaultFileAppender";
