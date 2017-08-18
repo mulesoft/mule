@@ -8,6 +8,7 @@
 package org.mule.runtime.module.service;
 
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.SERVER_PLUGIN;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.SERVICE;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
@@ -20,9 +21,11 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 
@@ -36,6 +39,8 @@ public class LibFolderClassLoaderModelLoader implements ClassLoaderModelLoader {
 
   static final String CLASSES_FOLDER = "classes";
   static final String LIB_FOLDER = "lib";
+
+  private static final Set<ArtifactType> supportedTypes = new HashSet<>(asList(SERVICE, SERVER_PLUGIN));
 
   private static final String CLASSES_DIR = "classes";
   private static final String LIB_DIR = "lib";
@@ -111,6 +116,6 @@ public class LibFolderClassLoaderModelLoader implements ClassLoaderModelLoader {
 
   @Override
   public boolean supportsArtifactType(ArtifactType artifactType) {
-    return SERVICE.equals(artifactType) || SERVER_PLUGIN.equals(artifactType);
+    return supportedTypes.contains(artifactType);
   }
 }

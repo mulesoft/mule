@@ -7,23 +7,23 @@
 
 package org.mule.runtime.module.service;
 
+import static java.util.Collections.emptyMap;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.SERVICE;
 import static org.mule.runtime.module.service.ServiceDescriptor.SERVICE_PROPERTIES;
 import org.mule.runtime.api.deployment.meta.MuleServiceModel;
 import org.mule.runtime.api.deployment.persistence.AbstractMuleArtifactModelJsonSerializer;
 import org.mule.runtime.api.deployment.persistence.MuleServiceModelJsonSerializer;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
+import org.mule.runtime.module.artifact.api.descriptor.AbstractArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
-import org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderException;
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
-import org.mule.runtime.module.artifact.api.descriptor.AbstractArtifactDescriptorFactory;
+import org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderException;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.Properties;
 
 /**
@@ -78,7 +78,7 @@ public class ServiceDescriptorFactory extends AbstractArtifactDescriptorFactory<
 
   private ClassLoaderModel createClassLoaderModel(File artifactFolder) {
     try {
-      return new LibFolderClassLoaderModelLoader().load(artifactFolder, Collections.emptyMap(), ArtifactType.SERVICE);
+      return new LibFolderClassLoaderModelLoader().load(artifactFolder, emptyMap(), ArtifactType.SERVICE);
     } catch (InvalidDescriptorLoaderException e) {
       throw new IllegalStateException("Cannot load classloader model for service", e);
     }
