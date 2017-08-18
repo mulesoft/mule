@@ -87,7 +87,6 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
     MessagingException me = newMessagingException(ERROR, event, processor);
     MessagingException resolved = resolver.resolve(processor, me, context);
     assertExceptionErrorType(resolved, CONNECTION);
-    assertExceptionMessage(resolved.getMessage(), ERROR.getMessage(), ERROR.getClass());
   }
 
   @Test

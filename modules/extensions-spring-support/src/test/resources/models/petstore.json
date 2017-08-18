@@ -1492,11 +1492,7 @@
               "namespace": "PETSTORE",
               "parent": {
                 "type": "ANY",
-                "namespace": "PETSTORE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
+                "namespace": "MULE"
               }
             },
             {
@@ -1667,21 +1663,14 @@
                     "format": "java",
                     "type": "String",
                     "annotations": {
-                      "typeId": "org.mule.runtime.api.meta.TargetType",
-                      "enum": {
-                        "type": "[Ljava.lang.String;",
-                        "values": [
-                          "PAYLOAD",
-                          "MESSAGE"
-                        ]
-                      }
+                      "typeId": "java.lang.String"
                     }
                   },
                   "hasDynamicType": false,
                   "required": false,
                   "isConfigOverride": false,
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "defaultValue": "PAYLOAD",
+                  "expressionSupport": "REQUIRED",
+                  "defaultValue": "#[payload]",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": true,
@@ -1695,17 +1684,147 @@
                     "tabName": "Advanced"
                   },
                   "elementReferences": [],
-                  "name": "targetType",
+                  "name": "targetValue",
                   "displayModel": {
-                    "displayName": "Target Output"
+                    "displayName": "Target Value"
                   },
-                  "description": "The type of the operation\u0027s output that will be stored in the target variable",
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
                   "modelProperties": {}
                 }
               ],
               "exclusiveParametersModels": [],
               "showInDsl": false,
               "name": "Output",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Union",
+                    "annotations": {
+                      "typeId": "java.lang.Object",
+                      "typeAlias": {
+                        "value": "ReconnectionStrategy"
+                      }
+                    },
+                    "of": [
+                      {
+                        "type": "Object",
+                        "annotations": {
+                          "typeId": "java.lang.Object",
+                          "typeAlias": {
+                            "value": "reconnect"
+                          }
+                        },
+                        "fields": [
+                          {
+                            "key": {
+                              "name": "frequency"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "typeId": "java.lang.Long",
+                                "default": "2000"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "count"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "typeId": "java.lang.Integer",
+                                "default": "2"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "How many reconnection attempts to make"
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Object",
+                        "annotations": {
+                          "typeId": "java.lang.Object",
+                          "typeAlias": {
+                            "value": "reconnect-forever"
+                          }
+                        },
+                        "fields": [
+                          {
+                            "key": {
+                              "name": "frequency"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "typeId": "java.lang.Long",
+                                "default": "2000"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "tabName": "Advanced"
+                  },
+                  "elementReferences": [],
+                  "name": "reconnectionStrategy",
+                  "description": "A retry strategy in case of connectivity errors",
+                  "modelProperties": {
+                    "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                      "value": {
+                        "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
+                        "localPart": "abstract-reconnection-strategy",
+                        "prefix": "mule"
+                      }
+                    },
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 3
+                    }
+                  }
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "showInDsl": false,
+              "name": "Connection",
               "description": "",
               "modelProperties": {}
             }
@@ -13269,23 +13388,11 @@
       }
     },
     {
-      "type": "ANY",
-      "namespace": "PETSTORE",
-      "parent": {
-        "type": "ANY",
-        "namespace": "MULE"
-      }
-    },
-    {
       "type": "PET_ERROR",
       "namespace": "PETSTORE",
       "parent": {
         "type": "ANY",
-        "namespace": "PETSTORE",
-        "parent": {
-          "type": "ANY",
-          "namespace": "MULE"
-        }
+        "namespace": "MULE"
       }
     }
   ],

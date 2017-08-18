@@ -347,6 +347,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
   public void interceptorMutatesEventAroundAfterFailWithErrorType() throws Exception {
     ErrorType errorTypeMock = mock(ErrorType.class);
     when(errorTypeMock.getIdentifier()).thenReturn("ID");
+    when(errorTypeMock.getNamespace()).thenReturn("NS");
     ProcessorInterceptor interceptor = prepareInterceptor(new ProcessorInterceptor() {
 
       @Override
