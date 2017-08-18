@@ -9,7 +9,6 @@ package org.mule.runtime.deployment.model.api.application;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getAppConfigFolderPath;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
@@ -26,7 +25,7 @@ import java.util.Map;
 public class ApplicationDescriptor extends DeployableArtifactDescriptor {
 
   public static final String DEFAULT_CONFIGURATION_RESOURCE = "mule-config.xml";
-  public static final String DEFAULT_CONFIGURATION_RESOURCE_LOCATION = Paths.get("mule", "mule-config.xml").toString();
+  public static final String DEFAULT_CONFIGURATION_RESOURCE_LOCATION = Paths.get("classes", "mule-config.xml").toString();
   public static final String REPOSITORY_FOLDER = "repository";
   public static final String PROPERTY_DOMAIN = "domain";
 
@@ -94,6 +93,6 @@ public class ApplicationDescriptor extends DeployableArtifactDescriptor {
 
   @Override
   protected List<String> getDefaultConfigResources() {
-    return ImmutableList.<String>builder().add(getAppConfigFolderPath() + DEFAULT_CONFIGURATION_RESOURCE).build();
+    return ImmutableList.<String>builder().add(DEFAULT_CONFIGURATION_RESOURCE).build();
   }
 }

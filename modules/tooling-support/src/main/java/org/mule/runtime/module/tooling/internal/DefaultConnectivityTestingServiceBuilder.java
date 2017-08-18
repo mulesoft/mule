@@ -92,9 +92,7 @@ class DefaultConnectivityTestingServiceBuilder implements ConnectivityTestingSer
       File applicationFolder = new File(getExecutionFolder(), applicationName);
       ApplicationDescriptor applicationDescriptor = new ApplicationDescriptor(applicationName);
       applicationDescriptor.setArtifactDeclaration(artifactDeclaration);
-      applicationDescriptor.setConfigResourcesFile(new File[0]);
       applicationDescriptor.setConfigResources(emptyList());
-      applicationDescriptor.setAbsoluteResourcePaths(new String[0]);
       applicationDescriptor.setArtifactLocation(applicationFolder);
       createDeployablePomFile(applicationFolder, model);
       updateArtifactPom(applicationFolder, model);

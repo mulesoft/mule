@@ -27,8 +27,6 @@ public class DeployableArtifactDescriptor extends ArtifactDescriptor {
   private boolean redeploymentEnabled = true;
   private File location;
   private List<String> configResources;
-  private File[] configResourcesFile;
-  private String[] absoluteResourcePaths;
   private Set<ArtifactPluginDescriptor> plugins = new HashSet<>(0);
 
   /**
@@ -69,22 +67,6 @@ public class DeployableArtifactDescriptor extends ArtifactDescriptor {
 
   public void setConfigResources(List<String> configResources) {
     this.configResources = configResources;
-  }
-
-  public void setConfigResourcesFile(File[] configResourcesFile) {
-    this.configResourcesFile = configResourcesFile;
-  }
-
-  public File[] getConfigResourcesFile() {
-    return configResourcesFile;
-  }
-
-  public String[] getAbsoluteResourcePaths() {
-    return absoluteResourcePaths;
-  }
-
-  public void setAbsoluteResourcePaths(String[] absoluteResourcePaths) {
-    this.absoluteResourcePaths = absoluteResourcePaths;
   }
 
   /**

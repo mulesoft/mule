@@ -14,6 +14,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.MetadataService.METADATA_SERVICE_KEY;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.value.ValueProviderService.VALUE_PROVIDER_SERVICE_KEY;
+import static org.mule.runtime.container.api.MuleFoldersUtil.CLASSES_FOLDER;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_DISPOSED;
 import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_INITIALISED;
@@ -22,21 +23,21 @@ import static org.mule.runtime.core.api.context.notification.MuleContextNotifica
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.newBuilder;
-
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.value.ValueProviderService;
+import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.IntegerAction;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
+import org.mule.runtime.core.api.context.notification.Notification.Action;
 import org.mule.runtime.core.api.context.notification.NotificationListener;
 import org.mule.runtime.core.api.context.notification.NotificationListenerRegistry;
-import org.mule.runtime.core.api.context.notification.Notification.Action;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.deployment.model.api.DeploymentInitException;
@@ -60,7 +61,10 @@ import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRep
 import org.mule.runtime.module.service.ServiceRepository;
 
 import java.io.File;
+import java.net.URL;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -125,10 +129,10 @@ public class DefaultMuleApplication implements Application {
     updateStatusFor(NotInLifecyclePhase.PHASE_NAME);
 
     try {
-      for (String configResourceAbsolutePath : this.descriptor.getAbsoluteResourcePaths()) {
-        File configResource = new File(configResourceAbsolutePath);
-        if (!configResource.exists()) {
-          String message = format("Config for app '%s' not found: %s", getArtifactName(), configResource);
+      for (String configFile : this.descriptor.getConfigResources()) {
+        URL configFileUrl = getArtifactClassLoader().getClassLoader().getResource(configFile);
+        if (configFileUrl == null) {
+          String message = format("Config for app '%s' not found: %s", getArtifactName(), configFile);
           throw new InstallException(createStaticMessage(message));
         }
       }
@@ -192,7 +196,8 @@ public class DefaultMuleApplication implements Application {
       ArtifactContextBuilder artifactBuilder =
           newBuilder().setArtifactProperties(descriptor.getAppProperties()).setArtifactType(APP)
               .setArtifactName(descriptor.getName()).setArtifactInstallationDirectory(descriptor.getArtifactLocation())
-              .setConfigurationFiles(descriptor.getAbsoluteResourcePaths()).setDefaultEncoding(descriptor.getEncoding())
+              .setConfigurationFiles(descriptor.getConfigResources().toArray(new String[descriptor.getConfigResources().size()]))
+              .setDefaultEncoding(descriptor.getEncoding())
               .setArtifactPlugins(artifactPlugins).setExecutionClassloader(deploymentClassLoader.getClassLoader())
               .setEnableLazyInit(lazy).setServiceRepository(serviceRepository)
               .setExtensionModelLoaderRepository(extensionModelLoaderRepository)
@@ -337,7 +342,10 @@ public class DefaultMuleApplication implements Application {
 
   @Override
   public File[] getResourceFiles() {
-    return descriptor.getConfigResourcesFile();
+    return descriptor.getConfigResources().stream()
+        .map(configFile -> new File(getLocation(), Paths.get(CLASSES_FOLDER, configFile).toString()))
+        .collect(Collectors.toList())
+        .toArray(new File[descriptor.getConfigResources().size()]);
   }
 
   @Override

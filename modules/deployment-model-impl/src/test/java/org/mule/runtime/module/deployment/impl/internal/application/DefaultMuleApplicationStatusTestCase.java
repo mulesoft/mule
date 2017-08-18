@@ -92,7 +92,7 @@ public class DefaultMuleApplicationStatusTestCase extends AbstractMuleContextTes
   @Test
   public void nullDeploymentClassLoaderAfterDispose() {
     ApplicationDescriptor descriptor = mock(ApplicationDescriptor.class);
-    when(descriptor.getAbsoluteResourcePaths()).thenReturn(new String[] {});
+    when(descriptor.getConfigResources()).thenReturn(emptyList());
 
     DefaultMuleApplication application =
         new DefaultMuleApplication(descriptor, mock(MuleApplicationClassLoader.class), emptyList(), null,

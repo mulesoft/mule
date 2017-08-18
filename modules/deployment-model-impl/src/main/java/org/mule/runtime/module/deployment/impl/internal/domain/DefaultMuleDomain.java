@@ -9,23 +9,25 @@ package org.mule.runtime.module.deployment.impl.internal.domain;
 import static java.lang.String.format;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCause;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
+import static org.mule.runtime.api.connectivity.ConnectivityTestingService.CONNECTIVITY_TESTING_SERVICE_KEY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.MetadataService.METADATA_SERVICE_KEY;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.value.ValueProviderService.VALUE_PROVIDER_SERVICE_KEY;
+import static org.mule.runtime.container.api.MuleFoldersUtil.CLASSES_FOLDER;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
-import static org.mule.runtime.api.connectivity.ConnectivityTestingService.CONNECTIVITY_TESTING_SERVICE_KEY;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.newBuilder;
 import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.getMuleDomainsDir;
+import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.value.ValueProviderService;
+import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.deployment.model.api.DeploymentInitException;
 import org.mule.runtime.deployment.model.api.DeploymentStartException;
@@ -40,13 +42,15 @@ import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContext
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderManager;
 import org.mule.runtime.module.service.ServiceRepository;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DefaultMuleDomain implements Domain {
 
@@ -147,9 +151,10 @@ public class DefaultMuleDomain implements Domain {
           .setClassLoaderRepository(classLoaderRepository)
           .setServiceRepository(serviceRepository);
 
-      if (descriptor.getAbsoluteResourcePaths().length > 0) {
+      if (!descriptor.getConfigResources().isEmpty()) {
         validateConfigurationFileDoNotUsesCoreNamespace();
-        artifactBuilder.setConfigurationFiles(descriptor.getAbsoluteResourcePaths());
+        artifactBuilder
+            .setConfigurationFiles(descriptor.getConfigResources().toArray(new String[descriptor.getConfigResources().size()]));
       }
 
       if (muleContextListener != null) {
@@ -164,8 +169,8 @@ public class DefaultMuleDomain implements Domain {
   }
 
   private void validateConfigurationFileDoNotUsesCoreNamespace() throws FileNotFoundException {
-    for (String configResourceFile : descriptor.getAbsoluteResourcePaths()) {
-      try (Scanner scanner = new Scanner(configResourceFile)) {
+    for (String configResourceFile : descriptor.getConfigResources()) {
+      try (Scanner scanner = new Scanner(getArtifactClassLoader().getClassLoader().getResourceAsStream(configResourceFile))) {
         while (scanner.hasNextLine()) {
           final String lineFromFile = scanner.nextLine();
           if (lineFromFile.contains("<mule ")) {
@@ -241,7 +246,10 @@ public class DefaultMuleDomain implements Domain {
 
   @Override
   public File[] getResourceFiles() {
-    return descriptor.getConfigResourcesFile();
+    return descriptor.getConfigResources().stream()
+        .map(configFile -> new File(getLocation(), Paths.get(CLASSES_FOLDER, configFile).toString()))
+        .collect(Collectors.toList())
+        .toArray(new File[descriptor.getConfigResources().size()]);
   }
 
   @Override
