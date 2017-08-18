@@ -18,8 +18,10 @@ import org.junit.Test;
 
 public class PGPKeyRingTestCase extends AbstractEncryptionStrategyTestCase
 {
+
     @Test
-    public void testClientKey() {
+    public void testClientKey()
+    {
         PGPPublicKey clientKey = keyManager.getPublicKey("Mule client <mule_client@mule.com>");
         assertNotNull(clientKey);
     }

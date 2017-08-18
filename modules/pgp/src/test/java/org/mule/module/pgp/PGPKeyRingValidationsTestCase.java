@@ -21,7 +21,8 @@ public class PGPKeyRingValidationsTestCase
     private PGPKeyRingImpl pgpKeyRing = new PGPKeyRingImpl();
 
     @Test
-    public void testInvalidPublicKeyRingFileName() {
+    public void testInvalidPublicKeyRingFileName()
+    {
         pgpKeyRing.setPublicKeyRingFileName("incorrectPath");
         try
         {
