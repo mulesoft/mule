@@ -6,25 +6,28 @@
  */
 package org.mule.runtime.core.api;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.exception.MuleException.INFO_LOCATION_KEY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.core.api.exception.MessagingException.PAYLOAD_INFO_KEY;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
+
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
@@ -224,7 +227,7 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
     MessagingException exception = new MessagingException(createStaticMessage(""), testEvent, mockProcessor);
     exception.getInfo().putAll(locationProvider.getContextInfo(createInfo(testEvent, exception, mockProcessor), mockProcessor));
     assertThat(exception.getInfo().get(INFO_LOCATION_KEY).toString(),
-               is("Mock@1 @ MessagingExceptionTestCase"));
+               is("Mock@1 @ MessagingExceptionTestCase:unknown:-1"));
   }
 
   @Test
@@ -248,7 +251,7 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
     MessagingException exception = new MessagingException(createStaticMessage(""), testEvent, mockProcessor);
     exception.getInfo().putAll(locationProvider.getContextInfo(createInfo(testEvent, exception, mockProcessor), mockProcessor));
     assertThat(exception.getInfo().get(INFO_LOCATION_KEY).toString(),
-               is("Mock@1 @ MessagingExceptionTestCase"));
+               is("Mock@1 @ MessagingExceptionTestCase:unknown:-1"));
   }
 
   private static QName docNameAttrName = new QName("http://www.mulesoft.org/schema/mule/documentation", "name");

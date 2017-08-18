@@ -6,13 +6,15 @@
  */
 package org.mule.runtime.core.api;
 
-import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.eq;
+import static org.mule.runtime.api.exception.MuleException.INFO_LOCATION_KEY;
+
+import static org.hamcrest.CoreMatchers.is;
+
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
-import static org.mule.runtime.api.exception.MuleException.INFO_LOCATION_KEY;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.LocatedMuleException;
@@ -42,7 +44,7 @@ public class LocatedMuleExceptionTestCase extends AbstractMuleContextTestCase {
     NamedObject named = mock(NamedObject.class, withSettings().extraInterfaces(AnnotatedObject.class));
     when(named.getName()).thenReturn("mockComponent");
     LocatedMuleException lme = new LocatedMuleException(named);
-    assertThat(lme.getInfo().get(INFO_LOCATION_KEY).toString(), is("/mockComponent @ app"));
+    assertThat(lme.getInfo().get(INFO_LOCATION_KEY).toString(), is("/mockComponent @ app:internal:-1"));
   }
 
   @Test
@@ -76,7 +78,7 @@ public class LocatedMuleExceptionTestCase extends AbstractMuleContextTestCase {
     when(raw.toString()).thenReturn("Mock@1");
 
     LocatedMuleException lme = new LocatedMuleException(raw);
-    assertThat(lme.getInfo().get(INFO_LOCATION_KEY).toString(), is("Mock@1 @ app"));
+    assertThat(lme.getInfo().get(INFO_LOCATION_KEY).toString(), is("Mock@1 @ app:internal:-1"));
   }
 
   private void configureProcessorLocation(AnnotatedObject annotatedObject) {
