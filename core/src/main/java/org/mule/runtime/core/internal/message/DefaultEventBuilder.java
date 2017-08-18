@@ -136,7 +136,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
   @Override
   public InternalEvent.Builder removeVariable(String key) {
-    this.modified = flowVariables.remove(key) != null;
+    this.modified = flowVariables.remove(key) != null || modified;
     return this;
   }
 
@@ -182,14 +182,13 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
   @Override
   public Builder removeInternalParameter(String key) {
-    internalParameters.remove(key);
-    this.modified = true;
+    this.modified = internalParameters.remove(key) != null || modified;
     return this;
   }
 
   @Override
   public InternalEvent.Builder removeParameter(String key) {
-    this.modified = moduleParameters.remove(key) != null;
+    this.modified = moduleParameters.remove(key) != null || modified;
     return this;
   }
 

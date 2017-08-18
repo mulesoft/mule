@@ -39,8 +39,20 @@ import org.reactivestreams.Publisher;
  */
 public interface ForkJoinStrategy {
 
+  /**
+   * Processes n routing pairs and aggregate the result as defined in the strategy implementation.
+   * 
+   * @param original the original event
+   * @param routingPairs the routing paris to be
+   * @return
+   */
   Publisher<InternalEvent> forkJoin(InternalEvent original, Publisher<RoutingPair> routingPairs);
 
+  /**
+   * Define the tuple of {@link MessageProcessorChain} and {@link InternalEvent} used for a
+   * {@link org.mule.runtime.core.internal.routing.AbstractForkJoinRouter} to define the parts/routes to be processed and used by
+   * implementations of {@link ForkJoinStrategy} to implement specific logic around how these are processed and aggregated.
+   */
   final class RoutingPair {
 
     private MessageProcessorChain route;

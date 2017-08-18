@@ -38,11 +38,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import java.nio.BufferOverflowException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
 
   protected Foreach simpleForeach;
@@ -124,6 +119,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
     List<Message> list = new ArrayList<>();
     list.add(of("bar"));
     list.add(of("zip"));
+
     process(simpleForeach, eventBuilder().message(of(list)).build());
 
     assertSimpleProcessedMessages();
@@ -234,18 +230,6 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
     expectedException.expect(is(MessagingException.class));
     expectedException.expect(new FailingProcessorMatcher(failingProcessor));
     expectedException.expectCause(is(throwable));
-    process(foreach, eventBuilder().message(of(new DummyNestedIterableClass().iterator())).build(), false);
-  }
-
-  @Test
-  public void filteredErrors() throws Exception {
-    Foreach foreach = createForeach();
-    foreach.setMuleContext(muleContext);
-    foreach.setMessageProcessors(singletonList((InternalTestProcessor) event -> {
-      throw new RuntimeException("Expected");
-    }));
-    foreach.setIgnoreErrorType("ANY");
-    foreach.initialise();
     process(foreach, eventBuilder().message(of(new DummyNestedIterableClass().iterator())).build(), false);
   }
 

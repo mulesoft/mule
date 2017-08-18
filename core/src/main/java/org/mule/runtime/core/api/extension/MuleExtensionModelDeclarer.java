@@ -293,20 +293,6 @@ class MuleExtensionModelDeclarer {
         .defaultingTo("counter")
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("Property name used to store the number of message being iterated.");
-
-    forEach.onDefaultParameterGroup()
-        .withOptionalParameter("ignoreErrorType")
-        .ofType(BaseTypeBuilder.create(JAVA).stringType().id(String.class.getName())
-            .enumOf("ANY", "REDELIVERY_EXHAUSTED", "TRANSFORMATION", "EXPRESSION", "SECURITY",
-                    "CLIENT_SECURITY", "SERVER_SECURITY", "ROUTING", "CONNECTIVITY", "RETRY_EXHAUSTED", "TIMEOUT")
-            .build())
-        .withExpressionSupport(NOT_SUPPORTED)
-        .withLayout(LayoutModel.builder().tabName("Advanced").build())
-        .withDisplayModel(DisplayModel.builder().displayName("Ignore Error Type").build())
-        .describedAs("A comma separated list of error types that should be handled, so that items that cause them when being "
-            + "processed are ignored, rather than propagating the error. "
-            + "This is useful to use validations inside this component.");
-
   }
 
   private void declareChoice(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
