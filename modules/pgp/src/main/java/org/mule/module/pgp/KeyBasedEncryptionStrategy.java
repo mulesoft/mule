@@ -113,7 +113,6 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
             validateNotNull(publicKey, PGPMessages.noPublicKeyForPrincipal(principalId));
             this.checkKeyExpirity(publicKey);
             return new PGPCryptInfo(publicKey, false);
-
         }
         else
         {
