@@ -230,12 +230,12 @@
         <muleMetadataModelVersion>1.0.0-BETA.x-SNAPSHOT</muleMetadataModelVersion>
         <metadataModelApiVersion>${muleMetadataModelVersion}</metadataModelApiVersion>
 
-        <muleHttpConnectorTestVersion>0.8.x-SNAPSHOT</muleHttpConnectorTestVersion>
-        <muleSocketsConnectorTestVersion>0.8.x-SNAPSHOT</muleSocketsConnectorTestVersion>
-        <muleFileConnectorTestVersion>0.8.x-SNAPSHOT</muleFileConnectorTestVersion>
-        <muleJmsConnectorTestVersion>0.8.x-SNAPSHOT</muleJmsConnectorTestVersion>
+        <muleHttpConnectorTestVersion>0.8.3-SNAPSHOT</muleHttpConnectorTestVersion>
+        <muleSocketsConnectorTestVersion>0.8.3-SNAPSHOT</muleSocketsConnectorTestVersion>
+        <muleFileConnectorTestVersion>0.8.3-SNAPSHOT</muleFileConnectorTestVersion>
+        <muleJmsConnectorTestVersion>0.8.3-SNAPSHOT</muleJmsConnectorTestVersion>
 
-        <muleFileCommonsTestVersion>0.8.x-SNAPSHOT</muleFileCommonsTestVersion>
+        <muleFileCommonsTestVersion>0.8.3-SNAPSHOT</muleFileCommonsTestVersion>
 
         <muleHttpServiceTestVersion>1.0.0-BETA.x-SNAPSHOT</muleHttpServiceTestVersion>
         <muleSchedulerServiceTestVersion>1.0.0-BETA.x-SNAPSHOT</muleSchedulerServiceTestVersion>
