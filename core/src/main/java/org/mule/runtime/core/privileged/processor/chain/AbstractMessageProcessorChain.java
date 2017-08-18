@@ -18,7 +18,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
-import static org.mule.runtime.core.api.util.ExceptionUtils.updateMessagingExceptionWithError;
 import static org.mule.runtime.core.api.util.StreamingUtils.updateEventForStreaming;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -41,10 +40,13 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.streaming.StreamingManager;
-import org.mule.runtime.core.api.util.ExceptionUtils;
+import org.mule.runtime.core.api.util.MessagingExceptionResolver;
 import org.mule.runtime.core.internal.processor.interceptor.ReactiveInterceptorAdapter;
 import org.mule.runtime.core.privileged.component.AbstractExecutableComponent;
-
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -54,18 +56,13 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
 /**
  * Builder needs to return a composite rather than the first MessageProcessor in the chain. This is so that if this chain is
  * nested in another chain the next MessageProcessor in the parent chain is not injected into the first in the nested chain.
  */
 abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent implements MessageProcessorChain {
 
+  private static final MessagingExceptionResolver exceptionResolver = new MessagingExceptionResolver();
   private static final Logger LOGGER = getLogger(AbstractMessageProcessorChain.class);
 
   private final String name;
@@ -114,7 +111,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     // #1 Update MessagingException with failing processor if required, create Error and set error context.
     interceptors.add((processor, next) -> stream -> from(stream)
         .transform(next)
-        .onErrorMap(MessagingException.class, updateMessagingException(processor)));
+        .onErrorMap(MessagingException.class, resolveMessagingException(processor)));
 
     // #2 Update ThreadLocal event before processor execution once on processor thread.
     interceptors.add((processor, next) -> stream -> from(stream)
@@ -173,16 +170,14 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
         .transform(next)
         .onErrorResume(RejectedExecutionException.class,
                        throwable -> Mono.from(event.getContext()
-                           .error(updateMessagingExceptionWithError(new MessagingException(event, throwable,
-                                                                                           (AnnotatedObject) processor),
-                                                                    (AnnotatedObject) processor, muleContext)))
+                           .error(resolveException((AnnotatedObject) processor, event, throwable)))
                            .then(Mono.empty()))
         .onErrorResume(MessagingException.class,
                        throwable -> {
                          if (!throwable.getEvent().getError().isPresent()) {
                            // just in case anything in processor chain itself fails. We still have to create Error earlier on
                            // though, so it's available in interceptors.
-                           throwable = updateMessagingException(processor).apply(throwable);
+                           throwable = resolveMessagingException(processor).apply(throwable);
                          }
                          return Mono.from(event.getContext().error(throwable)).then(Mono.empty());
                        })));
@@ -190,10 +185,12 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     return interceptors;
   }
 
-  private Function<MessagingException, MessagingException> updateMessagingException(Processor processor) {
-    return exception -> ExceptionUtils.updateMessagingException(LOGGER, (AnnotatedObject) processor, exception,
-                                                                muleContext.getErrorTypeLocator(),
-                                                                muleContext.getErrorTypeRepository(), muleContext);
+  private MessagingException resolveException(AnnotatedObject processor, InternalEvent event, Throwable throwable) {
+    return exceptionResolver.resolve(processor, new MessagingException(event, throwable, processor), muleContext);
+  }
+
+  private Function<MessagingException, MessagingException> resolveMessagingException(Processor processor) {
+    return exception -> exceptionResolver.resolve(((AnnotatedObject) processor), exception, muleContext);
   }
 
   private Consumer<InternalEvent> preNotification(Processor processor) {

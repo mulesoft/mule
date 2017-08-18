@@ -12,44 +12,20 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.atLeast;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.core.api.util.ExceptionUtils.containsType;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractCauseOfType;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractOfType;
-import static org.mule.runtime.core.api.util.ExceptionUtils.getDeepestOccurrenceOfType;
 import static org.mule.runtime.core.api.util.ExceptionUtils.getFullStackTraceWithoutMessages;
-import static org.mule.runtime.core.api.util.ExceptionUtils.updateMessagingExceptionWithError;
 
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.message.Error;
-import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.meta.AnnotatedObject;
-import org.mule.runtime.core.api.InternalEvent;
-import org.mule.runtime.core.api.InternalEventContext;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.notification.FlowCallStack;
-import org.mule.runtime.core.api.exception.ErrorTypeLocator;
-import org.mule.runtime.core.api.exception.MessagingException;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-
+import org.junit.Test;
 import java.io.IOException;
 import java.util.Optional;
-
-import org.junit.Test;
 
 @SmallTest
 public class ExceptionUtilsTestCase extends AbstractMuleTestCase {
@@ -59,49 +35,11 @@ public class ExceptionUtilsTestCase extends AbstractMuleTestCase {
   @Test
   public void testContainsType() {
     assertTrue(containsType(new IllegalArgumentException(), IllegalArgumentException.class));
-
     assertTrue(containsType(new Exception(new IllegalArgumentException()), IllegalArgumentException.class));
-
     assertTrue(containsType(new Exception(new IllegalArgumentException(new NullPointerException())), NullPointerException.class));
-
     assertTrue(containsType(new Exception(new IllegalArgumentException(new NullPointerException())), RuntimeException.class));
-
     assertTrue(containsType(new Exception(new IllegalArgumentException(new NullPointerException())), Exception.class));
-
     assertFalse(containsType(new Exception(new IllegalArgumentException(new NullPointerException())), IOException.class));
-  }
-
-  @Test
-  public void testLastIndexOfType_deepestIsTheOneWeWant() throws Exception {
-    IllegalArgumentException expected = new IllegalArgumentException("something");
-    assertExpectationsForDeepestOccurence(expected);
-  }
-
-  @Test
-  public void testLastIndexOfType_theOneWeWantIsNotTheDeepest() throws Exception {
-    IllegalArgumentException expected = new IllegalArgumentException("something", new NullPointerException("somenull"));
-    assertExpectationsForDeepestOccurence(expected);
-
-  }
-
-  private void assertExpectationsForDeepestOccurence(IllegalArgumentException expected) {
-    assertSame(expected, getDeepestOccurrenceOfType(expected, IllegalArgumentException.class));
-
-    assertSame(expected, getDeepestOccurrenceOfType(new Exception(expected), IllegalArgumentException.class));
-
-    assertSame(expected,
-               getDeepestOccurrenceOfType(new IllegalArgumentException(new Exception(expected)), IllegalArgumentException.class));
-
-    assertNull(getDeepestOccurrenceOfType(new IllegalArgumentException(new Exception(expected)), IOException.class));
-  }
-
-  @Test
-  public void testLastIndexOfType_nullParameters() throws Exception {
-    assertNull(getDeepestOccurrenceOfType(null, null));
-
-    assertNull(getDeepestOccurrenceOfType(new Exception(), null));
-
-    assertNull(getDeepestOccurrenceOfType(null, Exception.class));
   }
 
   @Test
@@ -164,74 +102,5 @@ public class ExceptionUtilsTestCase extends AbstractMuleTestCase {
     Exception withoutConnectionException = new Exception(new NullPointerException());
     Optional<ConnectionException> exception = extractConnectionException(withoutConnectionException);
     assertThat(exception.isPresent(), is(false));
-  }
-
-  @Test
-  public void updateMessaginExceptionWithErrorWithOutError() {
-    MessagingException messagingExceptionMock = mock(MessagingException.class);
-    Processor processorMock = mock(Processor.class, withSettings().extraInterfaces(AnnotatedObject.class));
-    MuleContext muleContextMock = mock(MuleContext.class);
-    ErrorTypeLocator errorTypeLocatorMock = mock(ErrorTypeLocator.class);
-
-    InternalEvent eventMock = mock(InternalEvent.class);
-    FlowCallStack flowCallStackMock = mock(FlowCallStack.class);
-    Message messageMock = mock(Message.class);
-    InternalEventContext eventContextMock = mock(InternalEventContext.class);
-    when(eventContextMock.getOriginatingLocation()).thenReturn(TEST_CONNECTOR_LOCATION);
-
-    Optional<Error> errorOptional = Optional.ofNullable(null);
-
-    when(messagingExceptionMock.getEvent()).thenReturn(eventMock);
-
-    when(eventMock.getError()).thenReturn(errorOptional);
-    when(eventMock.getFlowCallStack()).thenReturn(flowCallStackMock);
-    when(eventMock.getMessage()).thenReturn(messageMock);
-    when(eventMock.getContext()).thenReturn(eventContextMock);
-
-    when(eventContextMock.getId()).thenReturn("someid");
-
-    when(muleContextMock.getErrorTypeLocator()).thenReturn(errorTypeLocatorMock);
-
-    when(errorTypeLocatorMock.lookupErrorType(messagingExceptionMock)).thenReturn(mock(ErrorType.class));
-
-
-    updateMessagingExceptionWithError(messagingExceptionMock, (AnnotatedObject) processorMock, muleContextMock);
-
-    verify(messagingExceptionMock, atLeast(1)).setProcessedEvent(any(InternalEvent.class));
-  }
-
-  @Test
-  public void updateMessaginExceptionWithError() {
-    MessagingException messagingExceptionMock = mock(MessagingException.class);
-    Processor processorMock = mock(Processor.class, withSettings().extraInterfaces(AnnotatedObject.class));
-    MuleContext muleContextMock = mock(MuleContext.class);
-    ErrorTypeLocator errorTypeLocatorMock = mock(ErrorTypeLocator.class);
-
-    InternalEvent eventMock = mock(InternalEvent.class);
-    FlowCallStack flowCallStackMock = mock(FlowCallStack.class);
-    Message messageMock = mock(Message.class);
-    InternalEventContext eventContextMock = mock(InternalEventContext.class);
-    when(eventContextMock.getOriginatingLocation()).thenReturn(TEST_CONNECTOR_LOCATION);
-
-    Error errorMock = mock(Error.class);
-    Optional<Error> errorOptional = Optional.ofNullable(errorMock);
-
-    when(messagingExceptionMock.getEvent()).thenReturn(eventMock);
-
-    when(eventMock.getError()).thenReturn(errorOptional);
-    when(eventMock.getFlowCallStack()).thenReturn(flowCallStackMock);
-    when(eventMock.getMessage()).thenReturn(messageMock);
-    when(eventMock.getContext()).thenReturn(eventContextMock);
-
-    when(eventContextMock.getId()).thenReturn("someid");
-
-    when(muleContextMock.getErrorTypeLocator()).thenReturn(errorTypeLocatorMock);
-
-    when(errorTypeLocatorMock.lookupErrorType(messagingExceptionMock)).thenReturn(mock(ErrorType.class));
-
-
-    updateMessagingExceptionWithError(messagingExceptionMock, (AnnotatedObject) processorMock, muleContextMock);
-
-    verify(messagingExceptionMock, times(0)).setProcessedEvent(any(InternalEvent.class));
   }
 }

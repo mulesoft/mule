@@ -9,14 +9,11 @@ package org.mule.runtime.core.internal.processor.interceptor;
 import static java.lang.String.valueOf;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static org.mule.runtime.core.api.util.ExceptionUtils.updateMessagingExceptionWithError;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_CONTEXT;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_PARAMS;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.fromFuture;
-
-import static java.util.Collections.emptyMap;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
@@ -35,9 +32,9 @@ import org.mule.runtime.core.api.processor.ParametersResolverProcessor;
 import org.mule.runtime.core.api.processor.ParametersResolverProcessor.ParametersResolverProcessorResult;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.api.util.MessagingExceptionResolver;
 import org.mule.runtime.core.internal.interception.DefaultInterceptionEvent;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -56,6 +53,7 @@ import java.util.function.Function;
 public class ReactiveInterceptorAdapter
     implements BiFunction<Processor, ReactiveProcessor, ReactiveProcessor>, MuleContextAware {
 
+  private static final MessagingExceptionResolver exceptionResolver = new MessagingExceptionResolver();
   private static final String INTERCEPTION_COMPONENT = "core:interceptionComponent";
 
   private static final String AROUND_METHOD_NAME = "around";
@@ -142,10 +140,8 @@ public class ReactiveInterceptorAdapter
           if (t instanceof MessagingException) {
             throw new CompletionException(t);
           } else {
-            throw new CompletionException(updateMessagingExceptionWithError(new MessagingException(eventWithResolvedParams,
-                                                                                                   t.getCause(),
-                                                                                                   (AnnotatedObject) component),
-                                                                            (AnnotatedObject) component, muleContext));
+            MessagingException me = new MessagingException(eventWithResolvedParams, t.getCause(), ((AnnotatedObject) component));
+            throw new CompletionException(exceptionResolver.resolve(((AnnotatedObject) component), me, muleContext));
           }
         })
         .thenApply(interceptedEvent -> ((DefaultInterceptionEvent) interceptedEvent).resolve());

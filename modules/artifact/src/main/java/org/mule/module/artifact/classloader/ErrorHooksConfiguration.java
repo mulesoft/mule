@@ -7,7 +7,7 @@
 package org.mule.module.artifact.classloader;
 
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
-import static org.mule.runtime.core.api.util.ExceptionUtils.getRootCauseException;
+import static org.mule.runtime.core.api.util.ExceptionUtils.getErrorMessageAwareExceptionCause;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.core.api.InternalEvent;
@@ -37,7 +37,7 @@ public class ErrorHooksConfiguration {
       // Only apply hook for Event signals.
       if (signal instanceof InternalEvent) {
         return throwable instanceof MessagingException ? throwable
-            : new MessagingException((InternalEvent) signal, getRootCauseException(throwable));
+            : new MessagingException((InternalEvent) signal, getErrorMessageAwareExceptionCause(throwable));
       } else {
         return throwable;
       }

@@ -11,8 +11,8 @@ import static java.time.OffsetTime.now;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
-import static org.mule.runtime.core.api.util.ExceptionUtils.NULL_ERROR_HANDLER;
 import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.InternalEventContext;
@@ -23,13 +23,12 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.management.stats.ProcessingTime;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.context.notification.DefaultProcessorsTrace;
-
+import org.mule.runtime.core.api.exception.NullExceptionHandler;
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Mono;
 import java.io.Serializable;
 import java.time.OffsetTime;
 import java.util.Optional;
-
-import org.reactivestreams.Publisher;
-import reactor.core.publisher.Mono;
 
 /**
  * Default immutable implementation of {@link InternalEventContext}.
@@ -123,7 +122,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
    * @return a new child context
    */
   public static InternalEventContext child(InternalEventContext parent, Optional<ComponentLocation> componentLocation) {
-    return child(parent, componentLocation, NULL_ERROR_HANDLER);
+    return child(parent, componentLocation, NullExceptionHandler.getInstance());
   }
 
   /**
@@ -142,12 +141,10 @@ public final class DefaultEventContext extends AbstractEventContext implements S
   public static InternalEventContext fireAndForgetChild(InternalEventContext parent,
                                                         Optional<ComponentLocation> componentLocation) {
     InternalEventContext context = parent;
-    MessagingExceptionHandler exceptionHandler = NULL_ERROR_HANDLER;
-
-    while (context != null && exceptionHandler == NULL_ERROR_HANDLER) {
-      exceptionHandler =
-          context instanceof AbstractEventContext ? ((AbstractEventContext) context).getExceptionHandler()
-              : NULL_ERROR_HANDLER;
+    MessagingExceptionHandler exceptionHandler = NULL_EXCEPTION_HANDLER;
+    while (context != null && exceptionHandler == NULL_EXCEPTION_HANDLER) {
+      exceptionHandler = context instanceof AbstractEventContext ? ((AbstractEventContext) context).getExceptionHandler()
+          : NULL_EXCEPTION_HANDLER;
       context = context.getParentContext().orElse(null);
     }
     return child(parent, componentLocation, exceptionHandler);
@@ -258,7 +255,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
    */
   private DefaultEventContext(String id, String serverId, ComponentLocation location, String correlationId,
                               Publisher<Void> externalCompletionPublisher) {
-    super(NULL_ERROR_HANDLER, externalCompletionPublisher);
+    super(NullExceptionHandler.getInstance(), externalCompletionPublisher);
     this.id = id;
     this.serverId = serverId;
     this.location = location;

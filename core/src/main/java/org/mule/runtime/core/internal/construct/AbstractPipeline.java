@@ -13,7 +13,6 @@ import static org.mule.runtime.core.api.context.notification.PipelineMessageNoti
 import static org.mule.runtime.core.api.context.notification.PipelineMessageNotification.PROCESS_END;
 import static org.mule.runtime.core.api.context.notification.PipelineMessageNotification.PROCESS_START;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
-import static org.mule.runtime.core.api.util.ExceptionUtils.updateMessagingExceptionWithError;
 import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
@@ -47,21 +46,18 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.api.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.processor.IdempotentRedeliveryPolicy;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
-
 import org.reactivestreams.Publisher;
-
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-
+import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.function.Consumer;
-
-import reactor.core.publisher.Mono;
 
 /**
  * Abstract implementation of {@link AbstractFlowConstruct} that allows a list of {@link Processor}s that will be used to process
@@ -70,6 +66,8 @@ import reactor.core.publisher.Mono;
  * If no message processors are configured then the source message is simply returned.
  */
 public abstract class AbstractPipeline extends AbstractFlowConstruct implements Pipeline {
+
+  private static final MessagingExceptionResolver exceptionResolver = new MessagingExceptionResolver();
 
   private final MessageSource source;
   private final List<Processor> processors;
@@ -195,11 +193,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
                   getSink().accept(event);
                   handleSink.next(event);
                 } catch (RejectedExecutionException ree) {
-                  event.getContext()
-                      .error(updateMessagingExceptionWithError(new MessagingException(event, ree,
-                                                                                      AbstractPipeline.this),
-                                                               AbstractPipeline.this,
-                                                               getMuleContext()));
+                  MessagingException me = new MessagingException(event, ree, AbstractPipeline.this);
+                  event.getContext().error(exceptionResolver.resolve(AbstractPipeline.this, me, getMuleContext()));
                 }
               })
               .flatMap(event -> Mono.from(event.getContext().getResponsePublisher()));
@@ -317,6 +312,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
       return event;
     }
   }
+
 
   private class ProcessorStartCompleteProcessor implements Processor, InternalProcessor {
 

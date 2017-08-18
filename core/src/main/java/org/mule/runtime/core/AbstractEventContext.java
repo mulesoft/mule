@@ -7,7 +7,6 @@
 package org.mule.runtime.core;
 
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.core.api.util.ExceptionUtils.NULL_ERROR_HANDLER;
 import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.from;
@@ -18,16 +17,15 @@ import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.InternalEventContext;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
-
-import java.util.LinkedList;
-import java.util.List;
-
+import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.MonoProcessor;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Base class for implementations of {@link InternalEventContext}
@@ -37,6 +35,7 @@ import reactor.core.publisher.MonoProcessor;
 abstract class AbstractEventContext implements InternalEventContext {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AbstractEventContext.class);
+  protected static final MessagingExceptionHandler NULL_EXCEPTION_HANDLER = NullExceptionHandler.getInstance();
 
   private transient MonoProcessor<InternalEvent> beforeResponseProcessor;
   private transient MonoProcessor<InternalEvent> responseProcessor;
@@ -47,7 +46,7 @@ abstract class AbstractEventContext implements InternalEventContext {
   private transient MessagingExceptionHandler exceptionHandler;
 
   public AbstractEventContext() {
-    this(NULL_ERROR_HANDLER, empty());
+    this(NULL_EXCEPTION_HANDLER, empty());
   }
 
   public AbstractEventContext(MessagingExceptionHandler exceptionHandler) {

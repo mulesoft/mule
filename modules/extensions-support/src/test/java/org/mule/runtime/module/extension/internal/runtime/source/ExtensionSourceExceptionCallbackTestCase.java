@@ -22,16 +22,13 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.InternalEvent;
-import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.exception.ErrorTypeLocator;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.execution.MessageProcessContext;
+import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.execution.ResponseCompletionCallback;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-
-import java.util.function.Consumer;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -39,6 +36,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import java.util.function.Consumer;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -72,6 +70,7 @@ public class ExtensionSourceExceptionCallbackTestCase extends AbstractMuleTestCa
   public void before() {
     when(event.getError()).thenReturn(empty());
     when(event.getMessage()).thenReturn(mock(Message.class));
+    when(errorType.getIdentifier()).thenReturn("ID");
     when(errorTypeLocator.lookupErrorType(any(Exception.class))).thenReturn(errorType);
     when(messageProcessContext.getErrorTypeLocator()).thenReturn(errorTypeLocator);
     when(messageProcessContext.getMessageSource()).thenReturn(messageSource);

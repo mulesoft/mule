@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:marvel="http://www.mulesoft.org/schema/mule/marvel"
+      xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/marvel http://www.mulesoft.org/schema/mule/marvel/current/mule-marvel.xsd
+                          http://www.mulesoft.org/schema/mule/petstore http://www.mulesoft.org/schema/mule/petstore/current/mule-petstore.xsd
+                          http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+    <petstore:config name="config" cashierName="cashierName">
+        <petstore:connection username="john" password="doe"/>
+        <petstore:pets>
+            <petstore:pet value="Dog"/>
+        </petstore:pets>
+    </petstore:config>
+
+    <petstore:config name="invalid-config" cashierName="cashierName">
+        <petstore:connection username="invalid-user" password="doe"/>
+        <petstore:pets>
+            <petstore:pet value="Dog"/>
+        </petstore:pets>
+    </petstore:config>
+
+    <flow name="mapping">
+        <petstore:fails-to-read-stream config-ref="invalid-config" content="CONTENT!!!!">
+            <error-mapping sourceType="CONNECTIVITY" targetType="A_MAPPING"/>
+        </petstore:fails-to-read-stream>
+        <error-handler>
+            <on-error-continue type="A_MAPPING">
+                <set-payload value="Mapped"/>
+            </on-error-continue>
+            <on-error-continue>
+                <set-payload value="Error."/>
+            </on-error-continue>
+        </error-handler>
+    </flow>
+
+    <flow name="connectivity">
+        <petstore:fails-to-read-stream config-ref="invalid-config" content="CONTENT!!!!"/>
+    </flow>
+
+    <flow name="withUnderlyingConnectorError">
+        <petstore:fails-to-read-stream config-ref="config" content="CONTENT!!!!!!"/>
+    </flow>
+
+    <flow name="withoutUnderlyingConnectorError">
+        <petstore:fails-to-read-stream config-ref="config"/>
+    </flow>
+</mule>

@@ -21,6 +21,7 @@ import static org.mule.runtime.core.api.util.IOUtils.getResourceAsUrl;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.compareXML;
+
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
@@ -56,6 +57,10 @@ import org.mule.test.values.extension.ValuesExtension;
 import org.mule.test.vegan.extension.VeganExtension;
 
 import java.io.File;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -66,11 +71,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
 @SmallTest
 @RunWith(Parameterized.class)

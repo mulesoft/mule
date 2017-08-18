@@ -52,7 +52,6 @@ import org.mule.runtime.core.internal.construct.DefaultFlowBuilder.DefaultFlow;
 import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.internal.exception.ErrorHandlerFactory;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -61,10 +60,10 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.mockito.ArgumentMatcher;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
+
 
 @RunWith(Parameterized.class)
 public class PipelineMessageNotificationTestCase extends AbstractReactiveProcessorTestCase {
@@ -92,15 +91,19 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
     notificationFirer = muleContext.getRegistry().lookupObject(NotificationDispatcher.class);
     when(muleContext.getDefaultErrorHandler(empty())).thenReturn(new ErrorHandlerFactory().createDefault(notificationFirer));
     when(muleContext.getRegistry().lookupObject(NotificationDispatcher.class)).thenReturn(notificationFirer);
-    ErrorTypeLocator errorTypeLocator = mock(ErrorTypeLocator.class);
-    ErrorType errorType = mock(ErrorType.class);
-    when(errorTypeLocator.lookupErrorType(any(Throwable.class))).thenReturn(errorType);
-    when(errorTypeLocator.<String, Throwable>lookupComponentErrorType(any(ComponentIdentifier.class),
-                                                                      any(Throwable.class)))
-                                                                          .thenReturn(errorType);
-    when(muleContext.getErrorTypeLocator()).thenReturn(errorTypeLocator);
+    mockErrorTypeLocator();
     when(muleContext.getErrorTypeRepository().getErrorType(UNKNOWN)).thenReturn(Optional.of(mock(ErrorType.class)));
     when(muleContext.getTransformationService()).thenReturn(new DefaultTransformationService(muleContext));
+  }
+
+  private void mockErrorTypeLocator() {
+    ErrorTypeLocator typeLocator = mock(ErrorTypeLocator.class);
+    ErrorType errorType = mock(ErrorType.class);
+    when(errorType.getIdentifier()).thenReturn("ID");
+    when(typeLocator.lookupErrorType(any(Throwable.class))).thenReturn(errorType);
+    when(typeLocator.<String, Throwable>lookupComponentErrorType(any(ComponentIdentifier.class), any(Throwable.class)))
+        .thenReturn(errorType);
+    when(muleContext.getErrorTypeLocator()).thenReturn(typeLocator);
   }
 
   public void createTestPipeline(List<Processor> processors, ErrorHandler errorHandler) {
