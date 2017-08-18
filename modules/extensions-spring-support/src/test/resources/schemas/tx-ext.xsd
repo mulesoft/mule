@@ -63,6 +63,11 @@
             <xs:documentation>The type of beginning action that sources can take regarding transactions.</xs:documentation>
           </xs:annotation>
         </xs:attribute>
+        <xs:attribute type="mule:transactionType" use="optional" default="LOCAL" name="transactionType">
+          <xs:annotation>
+            <xs:documentation>The type of transaction to create. Availability will depend on the runtime version.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -77,6 +82,11 @@
         <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
           <xs:annotation>
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:transactionType" use="optional" default="LOCAL" name="transactionType">
+          <xs:annotation>
+            <xs:documentation>The type of transaction to create. Availability will depend on the runtime version.</xs:documentation>
           </xs:annotation>
         </xs:attribute>
         <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/tx" type="org.mule.runtime.extension.api.tx.SourceTransactionalActionEnumType" use="optional" name="transactionalAction">

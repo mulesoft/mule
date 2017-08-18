@@ -9,20 +9,20 @@ package org.mule.runtime.module.extension.internal.loader.java.type;
 import static org.mule.runtime.core.api.util.collection.Collectors.toImmutableMap;
 import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TRANSACTIONAL_ACTION_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.TRANSACTIONAL_TYPE_PARAMETER_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_CONTEXT_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_PREFIX;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.tls.TlsContextFactory;
+import org.mule.runtime.api.tx.TransactionType;
 import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
 import org.mule.runtime.extension.api.tx.SourceTransactionalAction;
 import org.mule.runtime.extension.internal.property.QNameModelProperty;
-
 import com.google.common.collect.ImmutableMap;
 
+import javax.xml.namespace.QName;
 import java.util.Map;
 import java.util.Optional;
-
-import javax.xml.namespace.QName;
 
 /**
  * Mapping for types considered of "Infrastructure", of the {@link Class} of the infrastructure type and the {@link String} name
@@ -36,6 +36,7 @@ public final class InfrastructureTypeMapping {
       .put(TlsContextFactory.class, new InfrastructureType(TLS_PARAMETER_NAME, 8))
       .put(SourceTransactionalAction.class, new InfrastructureType(TRANSACTIONAL_ACTION_PARAMETER_NAME, 6))
       .put(OperationTransactionalAction.class, new InfrastructureType(TRANSACTIONAL_ACTION_PARAMETER_NAME, 7))
+      .put(TransactionType.class, new InfrastructureType(TRANSACTIONAL_TYPE_PARAMETER_NAME, 9))
       .build();
 
   private static Map<String, QNameModelProperty> QNAMES = ImmutableMap.<String, QNameModelProperty>builder()
@@ -53,6 +54,12 @@ public final class InfrastructureTypeMapping {
                    .allowsReferences(true)
                    .build())
           .put(TRANSACTIONAL_ACTION_PARAMETER_NAME,
+               ParameterDslConfiguration.builder()
+                   .allowsInlineDefinition(false)
+                   .allowTopLevelDefinition(false)
+                   .allowsReferences(false)
+                   .build())
+          .put(TRANSACTIONAL_TYPE_PARAMETER_NAME,
                ParameterDslConfiguration.builder()
                    .allowsInlineDefinition(false)
                    .allowTopLevelDefinition(false)

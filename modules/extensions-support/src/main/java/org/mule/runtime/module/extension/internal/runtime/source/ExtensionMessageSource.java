@@ -30,6 +30,7 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.tx.TransactionType;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.exception.ErrorTypeLocator;
@@ -57,15 +58,13 @@ import org.mule.runtime.module.extension.internal.runtime.operation.IllegalSourc
 import org.mule.runtime.module.extension.internal.runtime.resolver.ObjectBasedParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionFactory;
+import org.slf4j.Logger;
+import reactor.core.publisher.Mono;
 
+import javax.inject.Inject;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import javax.inject.Inject;
-
-import org.slf4j.Logger;
-import reactor.core.publisher.Mono;
 
 /**
  * A {@link MessageSource} which connects the Extensions API with the Mule runtime by connecting a {@link Source} with a flow
@@ -90,6 +89,8 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   private final ExceptionHandlerManager exceptionEnricherManager;
   private final AtomicBoolean reconnecting = new AtomicBoolean(false);
 
+  private final ExtensionTransactionFactory transactionFactory = new ExtensionTransactionFactory();
+
   private SourceConnectionManager sourceConnectionManager;
   private Processor messageProcessor;
   private LazyValue<TransactionConfig> transactionConfig = new LazyValue<>(this::buildTransactionConfig);
@@ -98,8 +99,6 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   private Scheduler retryScheduler;
   private Scheduler flowTriggerScheduler;
 
-  // TODO - MULE-12066 : Support XA transactions in SDK extensions at source level
-  private final ExtensionTransactionFactory transactionFactory = new ExtensionTransactionFactory();
   private AtomicBoolean started = new AtomicBoolean(false);
 
   public ExtensionMessageSource(ExtensionModel extensionModel,
@@ -315,7 +314,10 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     MuleTransactionConfig transactionConfig = new MuleTransactionConfig();
     transactionConfig.setAction(toActionCode(sourceAdapter.getTransactionalAction()));
     transactionConfig.setMuleContext(muleContext);
-    transactionConfig.setFactory(transactionFactory);
+    TransactionType transactionalType = sourceAdapter.getTransactionalType();
+    transactionConfig.setFactory(transactionFactoryLocator.lookUpTransactionFactory(transactionalType)
+        .orElseThrow(() -> new IllegalStateException(format("Unable to create Source with Transactions of Type: [%s]. No factory available for this transaction type",
+                                                            transactionalType))));
 
     return transactionConfig;
   }

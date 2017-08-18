@@ -21,8 +21,8 @@ import static org.mule.runtime.extension.api.util.ExtensionModelUtils.requiresCo
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.CONNECTION_FAILURE;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -57,6 +57,7 @@ import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.metadata.DefaultMetadataContext;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.core.internal.resolving.DefaultExtensionResolvingContext;
+import org.mule.runtime.core.internal.transaction.TransactionFactoryLocator;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
@@ -70,16 +71,14 @@ import org.mule.runtime.module.extension.internal.runtime.operation.OperationMes
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.source.ExtensionMessageSource;
 import org.mule.runtime.module.extension.internal.value.ValueProviderMediator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
-
-import javax.inject.Inject;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Class that groups all the common behaviour between different extension's components, like {@link OperationMessageProcessor} and
@@ -115,6 +114,9 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
 
   @Inject
   protected StreamingManager streamingManager;
+
+  @Inject
+  protected TransactionFactoryLocator transactionFactoryLocator;
 
   @Inject
   private MuleMetadataService metadataService;

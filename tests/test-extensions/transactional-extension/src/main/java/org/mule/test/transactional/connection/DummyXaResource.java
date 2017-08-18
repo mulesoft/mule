@@ -22,6 +22,7 @@ public class DummyXaResource implements XAResource, QueueSession {
   private boolean commitEnded;
   private boolean rollbackExecuted;
   private boolean isTxStarted;
+  private boolean prepared;
 
   protected static final Logger logger = LoggerFactory.getLogger(DummyXaResource.class);
 
@@ -55,6 +56,7 @@ public class DummyXaResource implements XAResource, QueueSession {
   @Override
   public int prepare(Xid xid) throws XAException {
     logger.debug("Preparing XA TX. {}", xid);
+    this.prepared = true;
     return 0;
   }
 
@@ -104,6 +106,10 @@ public class DummyXaResource implements XAResource, QueueSession {
 
   public boolean isCommitStarted() {
     return commitStarted;
+  }
+
+  public boolean isPrepared() {
+    return prepared;
   }
 
   public boolean isTxEnded() {

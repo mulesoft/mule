@@ -8,23 +8,17 @@ package org.mule.runtime.config.spring.internal.factories;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
-import static java.util.ServiceLoader.load;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.tx.TransactionType;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
-import org.mule.runtime.core.api.transaction.TransactionFactory;
-import org.mule.runtime.core.api.transaction.TransactionType;
-import org.mule.runtime.core.api.transaction.TypedTransactionFactory;
 import org.mule.runtime.core.internal.processor.TryScope;
-
-import java.util.Iterator;
-import java.util.List;
-
+import org.mule.runtime.core.internal.transaction.TransactionFactoryLocator;
 import org.springframework.beans.factory.FactoryBean;
+
+import javax.inject.Inject;
+import java.util.List;
 
 /**
  * Generates an object that wraps the invocation of the next {@link org.mule.runtime.core.api.processor.Processor} with a
@@ -41,6 +35,9 @@ public class TryProcessorFactoryBean extends AbstractAnnotatedObject implements 
   protected MessagingExceptionHandler exceptionListener;
   protected String transactionalAction;
   private TransactionType transactionType;
+
+  @Inject
+  private TransactionFactoryLocator transactionFactoryLocator;
 
   @Override
   public Class getObjectType() {
@@ -64,23 +61,10 @@ public class TryProcessorFactoryBean extends AbstractAnnotatedObject implements 
   protected MuleTransactionConfig createTransactionConfig(String action, TransactionType type) {
     MuleTransactionConfig transactionConfig = new MuleTransactionConfig();
     transactionConfig.setActionAsString(action);
-    transactionConfig.setFactory(lookUpTransactionFactory(type));
+    transactionConfig.setFactory(transactionFactoryLocator.lookUpTransactionFactory(type)
+        .orElseThrow(() -> new IllegalArgumentException(format("Unable to create Try Scope with a Transaction Type: [%s]. No factory available for this transaction type",
+                                                               type))));
     return transactionConfig;
-  }
-
-  private TransactionFactory lookUpTransactionFactory(TransactionType type) {
-    Iterator<TypedTransactionFactory> factories = load(TypedTransactionFactory.class).iterator();
-    while (factories.hasNext()) {
-      TypedTransactionFactory possibleFactory = factories.next();
-      if (type.equals(possibleFactory.getType())) {
-        try {
-          return possibleFactory.getClass().newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
-          throw new MuleRuntimeException(createStaticMessage(format("Unable to generate a factory for transaction %s.", type)));
-        }
-      }
-    }
-    throw new IllegalArgumentException(String.format("No factory available for transaction type %s", type));
   }
 
   @Override

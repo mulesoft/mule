@@ -170,6 +170,7 @@ public class MuleProperties {
   public static final String OBJECT_CLUSTER_SERVICE = "_muleClusterService";
   public static final String OBJECT_NOTIFICATION_DISPATCHER = "_muleNotificationDispatcher";
   public static final String OBJECT_NOTIFICATION_LISTENER_REGISTRY = "_muleNotificationListenerRegistry";
+  public static final String OBJECT_TRANSACTION_FACTORY_LOCATOR = "_muleTransactionFactoryLocator";
 
   // Not currently used as these need to be instance variables of the MuleContext.
   public static final String OBJECT_NOTIFICATION_MANAGER = "_muleNotificationManager";

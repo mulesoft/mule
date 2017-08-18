@@ -3213,6 +3213,47 @@
                 {
                   "type": {
                     "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "org.mule.runtime.api.tx.TransactionType",
+                      "enum": {
+                        "type": "[Ljava.lang.String;",
+                        "values": [
+                          "LOCAL",
+                          "XA"
+                        ]
+                      }
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "LOCAL",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "tabName": "Advanced"
+                  },
+                  "elementReferences": [],
+                  "name": "transactionType",
+                  "description": "The type of transaction to create. Availability will depend on the runtime version.",
+                  "modelProperties": {
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 9
+                    }
+                  }
+                },
+                {
+                  "type": {
+                    "format": "java",
                     "type": "Object",
                     "annotations": {
                       "typeId": "java.lang.Object",
@@ -3320,7 +3361,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 1,
+                    "order": 2,
                     "tabName": "Redelivery"
                   },
                   "elementReferences": [],
@@ -3547,6 +3588,43 @@
           "parameterGroupModels": [
             {
               "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "org.mule.runtime.api.tx.TransactionType",
+                      "enum": {
+                        "type": "[Ljava.lang.String;",
+                        "values": [
+                          "LOCAL",
+                          "XA"
+                        ]
+                      }
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "LOCAL",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "tabName": "Advanced"
+                  },
+                  "elementReferences": [],
+                  "name": "transactionType",
+                  "description": "The type of transaction to create. Availability will depend on the runtime version.",
+                  "modelProperties": {}
+                },
                 {
                   "type": {
                     "format": "java",

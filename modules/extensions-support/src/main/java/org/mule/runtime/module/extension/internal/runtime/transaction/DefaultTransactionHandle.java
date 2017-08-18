@@ -6,22 +6,15 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.transaction;
 
-import org.mule.runtime.api.tx.TransactionException;
-import org.mule.runtime.core.api.transaction.TransactionCoordination;
-import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 import org.mule.runtime.extension.api.tx.TransactionHandle;
-
-import java.util.concurrent.atomic.AtomicBoolean;
+import org.mule.runtime.extension.api.tx.Transactional;
 
 /**
  * Default implementation of {@link TransactionHandle}. Use this instance when an actual transaction <b>has</b> been
  * started
  */
-public class DefaultTransactionHandle implements TransactionHandle {
-
-  private final TransactionalConnection connection;
-  private final AtomicBoolean txResolved = new AtomicBoolean(false);
+public class DefaultTransactionHandle extends IdempotentTransactionHandle<TransactionalConnection> {
 
   /**
    * Creates a new instance
@@ -29,38 +22,6 @@ public class DefaultTransactionHandle implements TransactionHandle {
    * @param connection the connection on which the transaction started
    */
   public DefaultTransactionHandle(TransactionalConnection connection) {
-    this.connection = connection;
-  }
-
-  /**
-   * {@inheritDoc}
-   * @return {@code true}
-   */
-  @Override
-  public boolean isTransacted() {
-    return true;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void commit() throws TransactionException {
-    resolveTxAs(connection::commit);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void rollback() throws TransactionException {
-    resolveTxAs(connection::rollback);
-  }
-
-  private void resolveTxAs(CheckedRunnable task) {
-    if (txResolved.compareAndSet(false, true)) {
-      task.run();
-      TransactionCoordination.getInstance().clear();
-    }
+    super(connection, Transactional::commit, Transactional::rollback);
   }
 }
