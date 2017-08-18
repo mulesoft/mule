@@ -31,8 +31,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
-import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.PROCESSOR;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.builder;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.PROCESSOR;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.UNKNOWN;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
@@ -62,7 +62,7 @@ import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.Defaul
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
-import com.google.common.collect.ImmutableMap;
+
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
@@ -76,11 +76,16 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.mockito.InOrder;
 import org.mockito.verification.VerificationMode;
-import javax.xml.namespace.QName;
+
+import com.google.common.collect.ImmutableMap;
+
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
+
+import javax.xml.namespace.QName;
 
 @SmallTest
 @RunWith(Parameterized.class)
@@ -120,12 +125,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
   @After
   public void after() throws MuleException {
-    try {
-      flow.stop();
-      flow.dispose();
-    } catch (Exception e) {
-      // TODO remove this catch if this gets fixed
-    }
+    flow.stop();
+    flow.dispose();
   }
 
   private ProcessorInterceptor prepareInterceptor(ProcessorInterceptor interceptor) {
@@ -412,10 +413,6 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
   @Test
   public void interceptorThrowsExceptionBefore() throws Exception {
-    // TODO MULE-13274 - fix interceptor infrastructure since it was working due to mutability of the event
-    if (useMockInterceptor == true && processor instanceof OperationProcessorInApp) {
-      return;
-    }
     RuntimeException expectedException = new RuntimeException("Some Error");
     ProcessorInterceptor interceptor = prepareInterceptor(new ProcessorInterceptor() {
 
@@ -569,6 +566,40 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
   }
 
   @Test
+  public void interceptorThrowsExceptionAroundAfterProceedInCallbackChained() throws Exception {
+    RuntimeException expectedException = new RuntimeException("Some Error");
+    ProcessorInterceptor interceptor = prepareInterceptor(new ProcessorInterceptor() {
+
+      @Override
+      public CompletableFuture<InterceptionEvent> around(ComponentLocation location, Map<String, Object> parameters,
+                                                         InterceptionEvent event, InterceptionAction action) {
+        return action.proceed().thenApplyAsync(e -> {
+          throw expectedException;
+        });
+      }
+    });
+    startFlowWithInterceptors(interceptor);
+
+    expected.expect(MessagingException.class);
+    expected.expect(withEventThat(hasErrorType(UNKNOWN.getNamespace(), UNKNOWN.getName())));
+    expected.expectCause(sameInstance(expectedException));
+    try {
+      process(flow, eventBuilder().message(Message.of("")).build());
+    } finally {
+      if (useMockInterceptor) {
+        InOrder inOrder = inOrder(processor, interceptor);
+
+        inOrder.verify(interceptor).before(any(), any(), any());
+        inOrder.verify(interceptor).around(any(), any(), any(), any());
+        inOrder.verify(processor).process(any());
+        inOrder.verify(interceptor).after(any(), any(), eq(of(expectedException)));
+
+        verifyParametersResolvedAndDisposed(times(1));
+      }
+    }
+  }
+
+  @Test
   public void interceptorThrowsExceptionAroundAfterSkipInCallback() throws Exception {
     RuntimeException expectedException = new RuntimeException("Some Error");
     ProcessorInterceptor interceptor = prepareInterceptor(new ProcessorInterceptor() {
@@ -578,6 +609,40 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
                                                          InterceptionEvent event, InterceptionAction action) {
         action.skip();
         return supplyAsync(() -> {
+          throw expectedException;
+        });
+      }
+    });
+    startFlowWithInterceptors(interceptor);
+
+    expected.expect(MessagingException.class);
+    expected.expect(withEventThat(hasErrorType(UNKNOWN.getNamespace(), UNKNOWN.getName())));
+    expected.expectCause(sameInstance(expectedException));
+    try {
+      process(flow, eventBuilder().message(Message.of("")).build());
+    } finally {
+      if (useMockInterceptor) {
+        InOrder inOrder = inOrder(processor, interceptor);
+
+        inOrder.verify(interceptor).before(any(), any(), any());
+        inOrder.verify(interceptor).around(any(), any(), any(), any());
+        inOrder.verify(processor, never()).process(any());
+        inOrder.verify(interceptor).after(any(), any(), eq(of(expectedException)));
+
+        verifyParametersResolvedAndDisposed(times(1));
+      }
+    }
+  }
+
+  @Test
+  public void interceptorThrowsExceptionAroundAfterSkipInCallbackChained() throws Exception {
+    RuntimeException expectedException = new RuntimeException("Some Error");
+    ProcessorInterceptor interceptor = prepareInterceptor(new ProcessorInterceptor() {
+
+      @Override
+      public CompletableFuture<InterceptionEvent> around(ComponentLocation location, Map<String, Object> parameters,
+                                                         InterceptionEvent event, InterceptionAction action) {
+        return action.skip().thenApplyAsync(e -> {
           throw expectedException;
         });
       }
@@ -661,14 +726,14 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
   @Test
   public void firstInterceptorMutatesEventBefore() throws Exception {
-    ProcessorInterceptor interceptor1 = prepareInterceptor(new ProcessorInterceptor() {
+    ProcessorInterceptor interceptor1 = prepareInterceptor(new TestProcessorInterceptor("outer") {
 
       @Override
       public void before(ComponentLocation location, Map<String, Object> parameters, InterceptionEvent event) {
         event.message(Message.of(TEST_PAYLOAD));
       }
     });
-    ProcessorInterceptor interceptor2 = prepareInterceptor(new ProcessorInterceptor() {});
+    ProcessorInterceptor interceptor2 = prepareInterceptor(new TestProcessorInterceptor("inner") {});
     startFlowWithInterceptors(interceptor1, interceptor2);
 
     InternalEvent result = process(flow, eventBuilder().message(Message.of("")).build());
@@ -696,8 +761,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
   @Test
   public void secondInterceptorMutatesEventBefore() throws Exception {
-    ProcessorInterceptor interceptor1 = prepareInterceptor(new ProcessorInterceptor() {});
-    ProcessorInterceptor interceptor2 = prepareInterceptor(new ProcessorInterceptor() {
+    ProcessorInterceptor interceptor1 = prepareInterceptor(new TestProcessorInterceptor("outer") {});
+    ProcessorInterceptor interceptor2 = prepareInterceptor(new TestProcessorInterceptor("inner") {
 
       @Override
       public void before(ComponentLocation location, Map<String, Object> parameters, InterceptionEvent event) {
@@ -713,8 +778,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     if (useMockInterceptor) {
       InOrder inOrder = inOrder(processor, interceptor1, interceptor2);
 
-      inOrder.verify(interceptor1).before(any(), mapArgWithEntry("param", ""), argThat(interceptionHasPayloadValue("")));
-      inOrder.verify(interceptor1).around(any(), mapArgWithEntry("param", ""), argThat(interceptionHasPayloadValue("")), any());
+      inOrder.verify(interceptor1).before(any(), mapArgWithEntry("param", ""), any());
+      inOrder.verify(interceptor1).around(any(), mapArgWithEntry("param", ""), any(), any());
       inOrder.verify(interceptor2).before(any(), mapArgWithEntry("param", ""), any());
       inOrder.verify(interceptor2).around(any(), mapArgWithEntry("param", TEST_PAYLOAD),
                                           argThat(interceptionHasPayloadValue(TEST_PAYLOAD)), any());
@@ -729,14 +794,14 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
   @Test
   public void firstInterceptorMutatesEventAfter() throws Exception {
-    ProcessorInterceptor interceptor1 = prepareInterceptor(new ProcessorInterceptor() {
+    ProcessorInterceptor interceptor1 = prepareInterceptor(new TestProcessorInterceptor("outer") {
 
       @Override
       public void after(ComponentLocation location, InterceptionEvent event, Optional<Throwable> thrown) {
         event.message(Message.of(TEST_PAYLOAD));
       }
     });
-    ProcessorInterceptor interceptor2 = prepareInterceptor(new ProcessorInterceptor() {});
+    ProcessorInterceptor interceptor2 = prepareInterceptor(new TestProcessorInterceptor("inner") {});
     startFlowWithInterceptors(interceptor1, interceptor2);
 
     InternalEvent result = process(flow, eventBuilder().message(Message.of("")).build());
@@ -746,12 +811,12 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     if (useMockInterceptor) {
       InOrder inOrder = inOrder(processor, interceptor1, interceptor2);
 
-      inOrder.verify(interceptor1).before(any(), any(), argThat(interceptionHasPayloadValue("")));
-      inOrder.verify(interceptor1).around(any(), any(), argThat(interceptionHasPayloadValue("")), any());
-      inOrder.verify(interceptor2).before(any(), any(), argThat(interceptionHasPayloadValue("")));
-      inOrder.verify(interceptor2).around(any(), any(), argThat(interceptionHasPayloadValue("")), any());
+      inOrder.verify(interceptor1).before(any(), any(), any());
+      inOrder.verify(interceptor1).around(any(), any(), any(), any());
+      inOrder.verify(interceptor2).before(any(), any(), any());
+      inOrder.verify(interceptor2).around(any(), any(), any(), any());
       inOrder.verify(processor).process(argThat(hasPayloadValue("")));
-      inOrder.verify(interceptor2).after(any(), argThat(interceptionHasPayloadValue("")), eq(empty()));
+      inOrder.verify(interceptor2).after(any(), any(), eq(empty()));
       inOrder.verify(interceptor1).after(any(), any(), eq(empty()));
 
       assertThat(result.getInternalParameters().entrySet(), hasSize(0));
@@ -761,8 +826,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
   @Test
   public void secondInterceptorMutatesEventAfter() throws Exception {
-    ProcessorInterceptor interceptor1 = prepareInterceptor(new ProcessorInterceptor() {});
-    ProcessorInterceptor interceptor2 = prepareInterceptor(new ProcessorInterceptor() {
+    ProcessorInterceptor interceptor1 = prepareInterceptor(new TestProcessorInterceptor("outer") {});
+    ProcessorInterceptor interceptor2 = prepareInterceptor(new TestProcessorInterceptor("inner") {
 
       @Override
       public void after(ComponentLocation location, InterceptionEvent event, Optional<Throwable> thrown) {
@@ -778,10 +843,10 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     if (useMockInterceptor) {
       InOrder inOrder = inOrder(processor, interceptor1, interceptor2);
 
-      inOrder.verify(interceptor1).before(any(), any(), argThat(interceptionHasPayloadValue("")));
-      inOrder.verify(interceptor1).around(any(), any(), argThat(interceptionHasPayloadValue("")), any());
-      inOrder.verify(interceptor2).before(any(), any(), argThat(interceptionHasPayloadValue("")));
-      inOrder.verify(interceptor2).around(any(), any(), argThat(interceptionHasPayloadValue("")), any());
+      inOrder.verify(interceptor1).before(any(), any(), any());
+      inOrder.verify(interceptor1).around(any(), any(), any(), any());
+      inOrder.verify(interceptor2).before(any(), any(), any());
+      inOrder.verify(interceptor2).around(any(), any(), any(), any());
       inOrder.verify(processor).process(argThat(hasPayloadValue("")));
       inOrder.verify(interceptor2).after(any(), any(), eq(empty()));
       inOrder.verify(interceptor1).after(any(), argThat(interceptionHasPayloadValue(TEST_PAYLOAD)), eq(empty()));
@@ -793,7 +858,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
   @Test
   public void firstInterceptorMutatesEventAroundBeforeProceed() throws Exception {
-    ProcessorInterceptor interceptor1 = prepareInterceptor(new ProcessorInterceptor() {
+    ProcessorInterceptor interceptor1 = prepareInterceptor(new TestProcessorInterceptor("outer") {
 
       @Override
       public CompletableFuture<InterceptionEvent> around(ComponentLocation location, Map<String, Object> parameters,
@@ -802,7 +867,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
         return action.proceed();
       }
     });
-    ProcessorInterceptor interceptor2 = prepareInterceptor(new ProcessorInterceptor() {});
+    ProcessorInterceptor interceptor2 = prepareInterceptor(new TestProcessorInterceptor("inner") {});
     startFlowWithInterceptors(interceptor1, interceptor2);
 
     InternalEvent result = process(flow, eventBuilder().message(Message.of("")).build());
@@ -812,7 +877,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     if (useMockInterceptor) {
       InOrder inOrder = inOrder(processor, interceptor1, interceptor2);
 
-      inOrder.verify(interceptor1).before(any(), mapArgWithEntry("param", ""), argThat(interceptionHasPayloadValue("")));
+      inOrder.verify(interceptor1).before(any(), mapArgWithEntry("param", ""), any());
       inOrder.verify(interceptor1).around(any(), mapArgWithEntry("param", ""), any(), any());
       inOrder.verify(interceptor2).before(any(), mapArgWithEntry("param", TEST_PAYLOAD),
                                           argThat(interceptionHasPayloadValue(TEST_PAYLOAD)));
@@ -829,8 +894,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
   @Test
   public void secondInterceptorMutatesEventAroundBeforeProceed() throws Exception {
-    ProcessorInterceptor interceptor1 = prepareInterceptor(new ProcessorInterceptor() {});
-    ProcessorInterceptor interceptor2 = prepareInterceptor(new ProcessorInterceptor() {
+    ProcessorInterceptor interceptor1 = prepareInterceptor(new TestProcessorInterceptor("outer") {});
+    ProcessorInterceptor interceptor2 = prepareInterceptor(new TestProcessorInterceptor("inner") {
 
       @Override
       public CompletableFuture<InterceptionEvent> around(ComponentLocation location, Map<String, Object> parameters,
@@ -848,9 +913,9 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     if (useMockInterceptor) {
       InOrder inOrder = inOrder(processor, interceptor1, interceptor2);
 
-      inOrder.verify(interceptor1).before(any(), mapArgWithEntry("param", ""), argThat(interceptionHasPayloadValue("")));
-      inOrder.verify(interceptor1).around(any(), mapArgWithEntry("param", ""), argThat(interceptionHasPayloadValue("")), any());
-      inOrder.verify(interceptor2).before(any(), mapArgWithEntry("param", ""), argThat(interceptionHasPayloadValue("")));
+      inOrder.verify(interceptor1).before(any(), mapArgWithEntry("param", ""), any());
+      inOrder.verify(interceptor1).around(any(), mapArgWithEntry("param", ""), any(), any());
+      inOrder.verify(interceptor2).before(any(), mapArgWithEntry("param", ""), any());
       inOrder.verify(interceptor2).around(any(), mapArgWithEntry("param", ""), any(), any());
       inOrder.verify(processor).process(argThat(hasPayloadValue(TEST_PAYLOAD)));
       inOrder.verify(interceptor2).after(any(), argThat(interceptionHasPayloadValue(TEST_PAYLOAD)), eq(empty()));
@@ -863,11 +928,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
   @Test
   public void firstInterceptorMutatesEventAroundAfterProceed() throws Exception {
-    // TODO MULE-13274 - fix interceptor infrastructure since it was working due to mutability of the event
-    if (useMockInterceptor == true && processor instanceof OperationProcessorInApp) {
-      return;
-    }
-    ProcessorInterceptor interceptor1 = prepareInterceptor(new ProcessorInterceptor() {
+    ProcessorInterceptor interceptor1 = prepareInterceptor(new TestProcessorInterceptor("outer") {
 
       @Override
       public CompletableFuture<InterceptionEvent> around(ComponentLocation location, Map<String, Object> parameters,
@@ -879,7 +940,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
         });
       }
     });
-    ProcessorInterceptor interceptor2 = prepareInterceptor(new ProcessorInterceptor() {});
+    ProcessorInterceptor interceptor2 = prepareInterceptor(new TestProcessorInterceptor("inner") {});
     startFlowWithInterceptors(interceptor1, interceptor2);
 
     InternalEvent result = process(flow, eventBuilder().message(Message.of("")).build());
@@ -889,12 +950,48 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     if (useMockInterceptor) {
       InOrder inOrder = inOrder(processor, interceptor1, interceptor2);
 
-      inOrder.verify(interceptor1).before(any(), mapArgWithEntry("param", ""), argThat(interceptionHasPayloadValue("")));
+      inOrder.verify(interceptor1).before(any(), mapArgWithEntry("param", ""), any());
       inOrder.verify(interceptor1).around(any(), mapArgWithEntry("param", ""), any(), any());
-      inOrder.verify(interceptor2).before(any(), mapArgWithEntry("param", ""), argThat(interceptionHasPayloadValue("")));
-      inOrder.verify(interceptor2).around(any(), mapArgWithEntry("param", ""), argThat(interceptionHasPayloadValue("")), any());
+      inOrder.verify(interceptor2).before(any(), mapArgWithEntry("param", ""), any());
+      inOrder.verify(interceptor2).around(any(), mapArgWithEntry("param", ""), any(), any());
       inOrder.verify(processor).process(argThat(hasPayloadValue("")));
-      inOrder.verify(interceptor2).after(any(), argThat(interceptionHasPayloadValue("")), eq(empty()));
+      inOrder.verify(interceptor2).after(any(), any(), eq(empty()));
+      inOrder.verify(interceptor1).after(any(), argThat(interceptionHasPayloadValue(TEST_PAYLOAD)), eq(empty()));
+
+      assertThat(result.getInternalParameters().entrySet(), hasSize(0));
+      verifyParametersResolvedAndDisposed(times(1));
+    }
+  }
+
+  @Test
+  public void firstInterceptorMutatesEventAroundAfterProceedChained() throws Exception {
+    ProcessorInterceptor interceptor1 = prepareInterceptor(new TestProcessorInterceptor("outer") {
+
+      @Override
+      public CompletableFuture<InterceptionEvent> around(ComponentLocation location, Map<String, Object> parameters,
+                                                         InterceptionEvent event, InterceptionAction action) {
+        return action.proceed().thenApplyAsync(e -> {
+          e.message(Message.of(TEST_PAYLOAD));
+          return e;
+        });
+      }
+    });
+    ProcessorInterceptor interceptor2 = prepareInterceptor(new TestProcessorInterceptor("inner") {});
+    startFlowWithInterceptors(interceptor1, interceptor2);
+
+    InternalEvent result = process(flow, eventBuilder().message(Message.of("")).build());
+    assertThat(result.getMessage().getPayload().getValue(), is(TEST_PAYLOAD));
+    assertThat(result.getError().isPresent(), is(false));
+
+    if (useMockInterceptor) {
+      InOrder inOrder = inOrder(processor, interceptor1, interceptor2);
+
+      inOrder.verify(interceptor1).before(any(), mapArgWithEntry("param", ""), any());
+      inOrder.verify(interceptor1).around(any(), mapArgWithEntry("param", ""), any(), any());
+      inOrder.verify(interceptor2).before(any(), mapArgWithEntry("param", ""), any());
+      inOrder.verify(interceptor2).around(any(), mapArgWithEntry("param", ""), any(), any());
+      inOrder.verify(processor).process(argThat(hasPayloadValue("")));
+      inOrder.verify(interceptor2).after(any(), any(), eq(empty()));
       inOrder.verify(interceptor1).after(any(), argThat(interceptionHasPayloadValue(TEST_PAYLOAD)), eq(empty()));
 
       assertThat(result.getInternalParameters().entrySet(), hasSize(0));
@@ -904,8 +1001,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
   @Test
   public void secondInterceptorMutatesEventAroundAfterProceed() throws Exception {
-    ProcessorInterceptor interceptor1 = prepareInterceptor(new ProcessorInterceptor() {});
-    ProcessorInterceptor interceptor2 = prepareInterceptor(new ProcessorInterceptor() {
+    ProcessorInterceptor interceptor1 = prepareInterceptor(new TestProcessorInterceptor("outer") {});
+    ProcessorInterceptor interceptor2 = prepareInterceptor(new TestProcessorInterceptor("inner") {
 
       @Override
       public CompletableFuture<InterceptionEvent> around(ComponentLocation location, Map<String, Object> parameters,
@@ -926,9 +1023,45 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     if (useMockInterceptor) {
       InOrder inOrder = inOrder(processor, interceptor1, interceptor2);
 
-      inOrder.verify(interceptor1).before(any(), mapArgWithEntry("param", ""), argThat(interceptionHasPayloadValue("")));
-      inOrder.verify(interceptor1).around(any(), mapArgWithEntry("param", ""), argThat(interceptionHasPayloadValue("")), any());
-      inOrder.verify(interceptor2).before(any(), mapArgWithEntry("param", ""), argThat(interceptionHasPayloadValue("")));
+      inOrder.verify(interceptor1).before(any(), mapArgWithEntry("param", ""), any());
+      inOrder.verify(interceptor1).around(any(), mapArgWithEntry("param", ""), any(), any());
+      inOrder.verify(interceptor2).before(any(), mapArgWithEntry("param", ""), any());
+      inOrder.verify(interceptor2).around(any(), mapArgWithEntry("param", ""), any(), any());
+      inOrder.verify(processor).process(argThat(hasPayloadValue("")));
+      inOrder.verify(interceptor2).after(any(), argThat(interceptionHasPayloadValue(TEST_PAYLOAD)), eq(empty()));
+      inOrder.verify(interceptor1).after(any(), argThat(interceptionHasPayloadValue(TEST_PAYLOAD)), eq(empty()));
+
+      assertThat(result.getInternalParameters().entrySet(), hasSize(0));
+      verifyParametersResolvedAndDisposed(times(1));
+    }
+  }
+
+  @Test
+  public void secondInterceptorMutatesEventAroundAfterProceedChained() throws Exception {
+    ProcessorInterceptor interceptor1 = prepareInterceptor(new TestProcessorInterceptor("outer") {});
+    ProcessorInterceptor interceptor2 = prepareInterceptor(new TestProcessorInterceptor("inner") {
+
+      @Override
+      public CompletableFuture<InterceptionEvent> around(ComponentLocation location, Map<String, Object> parameters,
+                                                         InterceptionEvent event, InterceptionAction action) {
+        return action.proceed().thenApplyAsync(e -> {
+          e.message(Message.of(TEST_PAYLOAD));
+          return e;
+        });
+      }
+    });
+    startFlowWithInterceptors(interceptor1, interceptor2);
+
+    InternalEvent result = process(flow, eventBuilder().message(Message.of("")).build());
+    assertThat(result.getMessage().getPayload().getValue(), is(TEST_PAYLOAD));
+    assertThat(result.getError().isPresent(), is(false));
+
+    if (useMockInterceptor) {
+      InOrder inOrder = inOrder(processor, interceptor1, interceptor2);
+
+      inOrder.verify(interceptor1).before(any(), mapArgWithEntry("param", ""), any());
+      inOrder.verify(interceptor1).around(any(), mapArgWithEntry("param", ""), any(), any());
+      inOrder.verify(interceptor2).before(any(), mapArgWithEntry("param", ""), any());
       inOrder.verify(interceptor2).around(any(), mapArgWithEntry("param", ""), any(), any());
       inOrder.verify(processor).process(argThat(hasPayloadValue("")));
       inOrder.verify(interceptor2).after(any(), argThat(interceptionHasPayloadValue(TEST_PAYLOAD)), eq(empty()));
@@ -941,19 +1074,15 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
   @Test
   public void firstInterceptorThrowsExceptionBefore() throws Exception {
-    // TODO MULE-13274 - fix interceptor infrastructure since it was working due to mutability of the event
-    if (useMockInterceptor == true && processor instanceof OperationProcessorInApp) {
-      return;
-    }
     RuntimeException expectedException = new RuntimeException("Some Error");
-    ProcessorInterceptor interceptor1 = prepareInterceptor(new ProcessorInterceptor() {
+    ProcessorInterceptor interceptor1 = prepareInterceptor(new TestProcessorInterceptor("outer") {
 
       @Override
       public void before(ComponentLocation location, Map<String, Object> parameters, InterceptionEvent event) {
         throw expectedException;
       }
     });
-    ProcessorInterceptor interceptor2 = prepareInterceptor(new ProcessorInterceptor() {});
+    ProcessorInterceptor interceptor2 = prepareInterceptor(new TestProcessorInterceptor("inner") {});
     startFlowWithInterceptors(interceptor1, interceptor2);
 
     expected.expectCause(sameInstance(expectedException));
@@ -978,13 +1107,9 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
   @Test
   public void secondInterceptorThrowsExceptionBefore() throws Exception {
-    // TODO MULE-13274 - fix interceptor infrastructure since it was working due to mutability of the event
-    if (useMockInterceptor == true && processor instanceof OperationProcessorInApp) {
-      return;
-    }
     RuntimeException expectedException = new RuntimeException("Some Error");
-    ProcessorInterceptor interceptor1 = prepareInterceptor(new ProcessorInterceptor() {});
-    ProcessorInterceptor interceptor2 = prepareInterceptor(new ProcessorInterceptor() {
+    ProcessorInterceptor interceptor1 = prepareInterceptor(new TestProcessorInterceptor("outer") {});
+    ProcessorInterceptor interceptor2 = prepareInterceptor(new TestProcessorInterceptor("inner") {
 
       @Override
       public void before(ComponentLocation location, Map<String, Object> parameters, InterceptionEvent event) {
@@ -1016,14 +1141,14 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
   @Test
   public void firstInterceptorThrowsExceptionAfter() throws Exception {
     RuntimeException expectedException = new RuntimeException("Some Error");
-    ProcessorInterceptor interceptor1 = prepareInterceptor(new ProcessorInterceptor() {
+    ProcessorInterceptor interceptor1 = prepareInterceptor(new TestProcessorInterceptor("outer") {
 
       @Override
       public void after(ComponentLocation location, InterceptionEvent event, Optional<Throwable> thrown) {
         throw expectedException;
       }
     });
-    ProcessorInterceptor interceptor2 = prepareInterceptor(new ProcessorInterceptor() {});
+    ProcessorInterceptor interceptor2 = prepareInterceptor(new TestProcessorInterceptor("inner") {});
     startFlowWithInterceptors(interceptor1, interceptor2);
 
     expected.expectCause(sameInstance(expectedException));
@@ -1048,13 +1173,9 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
   @Test
   public void secondInterceptorThrowsExceptionAfter() throws Exception {
-    // TODO MULE-13274 - fix interceptor infrastructure since it was working due to mutability of the event
-    if (useMockInterceptor == true && processor instanceof OperationProcessorInApp) {
-      return;
-    }
     RuntimeException expectedException = new RuntimeException("Some Error");
-    ProcessorInterceptor interceptor1 = prepareInterceptor(new ProcessorInterceptor() {});
-    ProcessorInterceptor interceptor2 = prepareInterceptor(new ProcessorInterceptor() {
+    ProcessorInterceptor interceptor1 = prepareInterceptor(new TestProcessorInterceptor("outer") {});
+    ProcessorInterceptor interceptor2 = prepareInterceptor(new TestProcessorInterceptor("inner") {
 
       @Override
       public void after(ComponentLocation location, InterceptionEvent event, Optional<Throwable> thrown) {
@@ -1086,7 +1207,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
   @Test
   public void firstInterceptorThrowsExceptionAround() throws Exception {
     RuntimeException expectedException = new RuntimeException("Some Error");
-    ProcessorInterceptor interceptor1 = prepareInterceptor(new ProcessorInterceptor() {
+    ProcessorInterceptor interceptor1 = prepareInterceptor(new TestProcessorInterceptor("outer") {
 
       @Override
       public CompletableFuture<InterceptionEvent> around(ComponentLocation location, Map<String, Object> parameters,
@@ -1094,7 +1215,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
         throw expectedException;
       }
     });
-    ProcessorInterceptor interceptor2 = prepareInterceptor(new ProcessorInterceptor() {});
+    ProcessorInterceptor interceptor2 = prepareInterceptor(new TestProcessorInterceptor("inner") {});
     startFlowWithInterceptors(interceptor1, interceptor2);
 
     expected.expectCause(sameInstance(expectedException));
@@ -1119,13 +1240,9 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
   @Test
   public void secondInterceptorThrowsExceptionAround() throws Exception {
-    // TODO MULE-13274 - fix interceptor infrastructure since it was working due to mutability of the event
-    if (useMockInterceptor == true && processor instanceof OperationProcessorInApp) {
-      return;
-    }
     RuntimeException expectedException = new RuntimeException("Some Error");
-    ProcessorInterceptor interceptor1 = prepareInterceptor(new ProcessorInterceptor() {});
-    ProcessorInterceptor interceptor2 = prepareInterceptor(new ProcessorInterceptor() {
+    ProcessorInterceptor interceptor1 = prepareInterceptor(new TestProcessorInterceptor("outer") {});
+    ProcessorInterceptor interceptor2 = prepareInterceptor(new TestProcessorInterceptor("inner") {
 
       @Override
       public CompletableFuture<InterceptionEvent> around(ComponentLocation location, Map<String, Object> parameters,
@@ -1157,12 +1274,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
   @Test
   public void firstInterceptorThrowsExceptionAroundAfterProceed() throws Exception {
-    // TODO MULE-13274 - fix interceptor infrastructure since it was working due to mutability of the event
-    if (useMockInterceptor == true && processor instanceof OperationProcessorInApp) {
-      return;
-    }
     RuntimeException expectedException = new RuntimeException("Some Error");
-    ProcessorInterceptor interceptor1 = prepareInterceptor(new ProcessorInterceptor() {
+    ProcessorInterceptor interceptor1 = prepareInterceptor(new TestProcessorInterceptor("outer") {
 
       @Override
       public CompletableFuture<InterceptionEvent> around(ComponentLocation location, Map<String, Object> parameters,
@@ -1171,7 +1284,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
         throw expectedException;
       }
     });
-    ProcessorInterceptor interceptor2 = prepareInterceptor(new ProcessorInterceptor() {});
+    ProcessorInterceptor interceptor2 = prepareInterceptor(new TestProcessorInterceptor("inner") {});
     startFlowWithInterceptors(interceptor1, interceptor2);
 
     expected.expectCause(sameInstance(expectedException));
@@ -1196,13 +1309,9 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
   @Test
   public void secondInterceptorThrowsExceptionAroundAfterProceed() throws Exception {
-    // TODO MULE-13274 - fix interceptor infrastructure since it was working due to mutability of the event
-    if (useMockInterceptor == true && processor instanceof OperationProcessorInApp) {
-      return;
-    }
     RuntimeException expectedException = new RuntimeException("Some Error");
-    ProcessorInterceptor interceptor1 = prepareInterceptor(new ProcessorInterceptor() {});
-    ProcessorInterceptor interceptor2 = prepareInterceptor(new ProcessorInterceptor() {
+    ProcessorInterceptor interceptor1 = prepareInterceptor(new TestProcessorInterceptor("outer") {});
+    ProcessorInterceptor interceptor2 = prepareInterceptor(new TestProcessorInterceptor("inner") {
 
       @Override
       public CompletableFuture<InterceptionEvent> around(ComponentLocation location, Map<String, Object> parameters,
@@ -1235,7 +1344,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
   @Test
   public void firstInterceptorSkipsProcessor() throws Exception {
-    ProcessorInterceptor interceptor1 = prepareInterceptor(new ProcessorInterceptor() {
+    ProcessorInterceptor interceptor1 = prepareInterceptor(new TestProcessorInterceptor("outer") {
 
       @Override
       public CompletableFuture<InterceptionEvent> around(ComponentLocation location, Map<String, Object> parameters,
@@ -1243,7 +1352,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
         return action.skip();
       }
     });
-    ProcessorInterceptor interceptor2 = prepareInterceptor(new ProcessorInterceptor() {});
+    ProcessorInterceptor interceptor2 = prepareInterceptor(new TestProcessorInterceptor("inner") {});
     startFlowWithInterceptors(interceptor1, interceptor2);
 
     InternalEvent result = process(flow, eventBuilder().message(Message.of("")).build());
@@ -1258,7 +1367,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       inOrder.verify(interceptor2, never()).around(any(), any(), any(), any());
       inOrder.verify(processor, never()).process(any());
       inOrder.verify(interceptor2, never()).after(any(), any(), eq(empty()));
-      inOrder.verify(interceptor1).after(any(), argThat(interceptionHasPayloadValue("")), eq(empty()));
+      inOrder.verify(interceptor1).after(any(), any(), eq(empty()));
 
       assertThat(result.getInternalParameters().entrySet(), hasSize(0));
       verifyParametersResolvedAndDisposed(times(1));
@@ -1267,8 +1376,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
   @Test
   public void secondInterceptorSkipsProcessor() throws Exception {
-    ProcessorInterceptor interceptor1 = prepareInterceptor(new ProcessorInterceptor() {});
-    ProcessorInterceptor interceptor2 = prepareInterceptor(new ProcessorInterceptor() {
+    ProcessorInterceptor interceptor1 = prepareInterceptor(new TestProcessorInterceptor("outer") {});
+    ProcessorInterceptor interceptor2 = prepareInterceptor(new TestProcessorInterceptor("inner") {
 
       @Override
       public CompletableFuture<InterceptionEvent> around(ComponentLocation location, Map<String, Object> parameters,
@@ -1299,8 +1408,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
   @Test
   public void firstInterceptorDoesntApply() throws Exception {
-    ProcessorInterceptor interceptor1 = prepareInterceptor(new ProcessorInterceptor() {});
-    ProcessorInterceptor interceptor2 = prepareInterceptor(new ProcessorInterceptor() {});
+    ProcessorInterceptor interceptor1 = prepareInterceptor(new TestProcessorInterceptor("outer") {});
+    ProcessorInterceptor interceptor2 = prepareInterceptor(new TestProcessorInterceptor("inner") {});
     startFlowWithInterceptorFactories(new ProcessorInterceptorFactory() {
 
       @Override
@@ -1336,8 +1445,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
   @Test
   public void secondInterceptorDoesntApply() throws Exception {
-    ProcessorInterceptor interceptor1 = prepareInterceptor(new ProcessorInterceptor() {});
-    ProcessorInterceptor interceptor2 = prepareInterceptor(new ProcessorInterceptor() {});
+    ProcessorInterceptor interceptor1 = prepareInterceptor(new TestProcessorInterceptor("outer") {});
+    ProcessorInterceptor interceptor2 = prepareInterceptor(new TestProcessorInterceptor("inner") {});
     startFlowWithInterceptorFactories(() -> interceptor1, new ProcessorInterceptorFactory() {
 
       @Override
@@ -1373,7 +1482,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
   private void verifyParametersResolvedAndDisposed(final VerificationMode times) {
     if (processor instanceof OperationProcessorInApp) {
-      verify((OperationProcessorInApp) processor, times).resolveParameters(any());
+      verify((OperationProcessorInApp) processor, times).resolveParameters(any(), any());
       verify((OperationProcessorInApp) processor, times).disposeResolvedParameters(any());
     }
   }
@@ -1425,16 +1534,13 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
     @Override
     public InternalEvent process(InternalEvent event) throws MuleException {
-
-
-
       return event;
     }
 
     @Override
-    public ParametersResolverProcessorResult resolveParameters(InternalEvent event) {
-      return new ParametersResolverProcessorResult(singletonMap("operationParam", "operationParamValue"),
-                                                   executionContext);
+    public void resolveParameters(InternalEvent.Builder eventBuilder,
+                                  BiConsumer<Map<String, Object>, ExecutionContext> afterConfigurer) {
+      afterConfigurer.accept(singletonMap("operationParam", "operationParamValue"), executionContext);
     }
 
     @Override
@@ -1499,5 +1605,20 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
   private static InterceptionPayloadMatcher interceptionHasPayloadValue(Object expectedPayload) {
     return new InterceptionPayloadMatcher(is(expectedPayload));
+  }
+
+  private class TestProcessorInterceptor implements ProcessorInterceptor {
+
+    private String name;
+
+    public TestProcessorInterceptor(String name) {
+      this.name = name;
+    }
+
+    @Override
+    public String toString() {
+      return "TestProcessorInterceptor: " + name;
+    }
+
   }
 }

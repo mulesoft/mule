@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.lang.String.format;
-import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -76,12 +75,16 @@ import org.mule.runtime.module.extension.internal.runtime.LazyExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.execution.OperationArgumentResolverFactory;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
+
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
-import reactor.core.publisher.Mono;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiConsumer;
+
+import reactor.core.publisher.Mono;
 
 /**
  * A {@link Processor} capable of executing extension operations.
@@ -92,9 +95,9 @@ import java.util.Optional;
  * <p>
  * A {@link #operationExecutor} is obtained by testing the {@link OperationModel} for a {@link OperationExecutorModelProperty}
  * through which a {@link OperationExecutorFactory} is obtained. Models with no such property cannot be used with this class. The
- * obtained {@link OperationExecutor} serve all invocations of {@link #process(InternalEvent)} on {@code this} instance but will not be
- * shared with other instances of {@link OperationMessageProcessor}. All the {@link Lifecycle} events that {@code this} instance
- * receives will be propagated to the {@link #operationExecutor}.
+ * obtained {@link OperationExecutor} serve all invocations of {@link #process(InternalEvent)} on {@code this} instance but will
+ * not be shared with other instances of {@link OperationMessageProcessor}. All the {@link Lifecycle} events that {@code this}
+ * instance receives will be propagated to the {@link #operationExecutor}.
  * <p>
  * The {@link #operationExecutor} is executed directly but by the means of a {@link DefaultExecutionMediator}
  * <p>
@@ -345,10 +348,12 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
   }
 
   @Override
-  public ParametersResolverProcessorResult resolveParameters(InternalEvent event) throws MuleException {
+  public void resolveParameters(InternalEvent.Builder eventBuilder,
+                                BiConsumer<Map<String, Object>, ExecutionContext> afterConfigurer)
+      throws MuleException {
     if (operationExecutor instanceof OperationArgumentResolverFactory) {
       PrecalculatedExecutionContextAdapter executionContext =
-          new PrecalculatedExecutionContextAdapter(createExecutionContext(event), operationExecutor);
+          new PrecalculatedExecutionContextAdapter(createExecutionContext(eventBuilder.build()), operationExecutor);
 
       final DefaultExecutionMediator mediator = (DefaultExecutionMediator) executionMediator;
 
@@ -360,13 +365,12 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
         final Map<String, Object> resolvedArguments = ((OperationArgumentResolverFactory) operationExecutor)
             .createArgumentResolver(operationModel).apply(executionContext);
 
-        return new ParametersResolverProcessorResult(resolvedArguments, executionContext);
+        afterConfigurer.accept(resolvedArguments, executionContext);
+        executionContext.changeEvent(eventBuilder.build());
       } else {
         disposeResolvedParameters(executionContext, interceptors);
         throw new DefaultMuleException("Interception execution for operation not ok", beforeExecutionResult.getThrowable());
       }
-    } else {
-      return new ParametersResolverProcessorResult(emptyMap(), null);
     }
   }
 

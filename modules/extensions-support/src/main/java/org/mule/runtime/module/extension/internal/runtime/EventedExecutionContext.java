@@ -13,7 +13,7 @@ import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 /**
  * A specialization of {@link ExecutionContext} which contains an {@link InternalEvent}
  *
- * @param <M> the generic type of of the model which represents the component beign executed
+ * @param <M> the generic type of of the model which represents the component being executed
  * @since 4.0
  */
 public interface EventedExecutionContext<M extends ComponentModel> extends ExecutionContext<M> {
@@ -22,4 +22,12 @@ public interface EventedExecutionContext<M extends ComponentModel> extends Execu
    * Returns the {@link InternalEvent} on which an operation is to be executed
    */
   InternalEvent getEvent();
+
+  /**
+   * Changes the {@link InternalEvent} on which an operation is to be executed. Not null.
+   *
+   * @param updated the event to use
+   */
+  void changeEvent(InternalEvent updated);
+
 }

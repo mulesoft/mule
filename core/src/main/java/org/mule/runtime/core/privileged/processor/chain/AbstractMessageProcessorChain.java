@@ -25,6 +25,7 @@ import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.meta.AnnotatedObject;
@@ -43,10 +44,10 @@ import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.util.MessagingExceptionResolver;
 import org.mule.runtime.core.internal.processor.interceptor.ReactiveInterceptorAdapter;
 import org.mule.runtime.core.privileged.component.AbstractExecutableComponent;
+
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -55,6 +56,9 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
+
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * Builder needs to return a composite rather than the first MessageProcessor in the chain. This is so that if this chain is
@@ -159,7 +163,11 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     muleContext.getProcessorInterceptorManager().getInterceptorFactories().stream()
         .forEach(interceptorFactory -> {
           ReactiveInterceptorAdapter reactiveInterceptorAdapter = new ReactiveInterceptorAdapter(interceptorFactory);
-          reactiveInterceptorAdapter.setMuleContext(muleContext);
+          try {
+            muleContext.getInjector().inject(reactiveInterceptorAdapter);
+          } catch (MuleException e) {
+            throw new MuleRuntimeException(e);
+          }
           interceptors.add(0, reactiveInterceptorAdapter);
         });
 

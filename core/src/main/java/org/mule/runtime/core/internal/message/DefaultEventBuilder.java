@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.message;
 
 
+import static java.lang.System.lineSeparator;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
@@ -35,12 +36,15 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.message.GroupCorrelation;
+import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.session.DefaultMuleSession;
 import org.mule.runtime.core.api.store.DeserializationPostInitialisable;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
-import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.internal.util.CopyOnWriteCaseInsensitiveMap;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -49,9 +53,6 @@ import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class DefaultEventBuilder implements InternalEvent.Builder {
 
@@ -167,6 +168,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     return this;
   }
 
+  @Override
   public Builder internalParameters(Map<String, ?> internalParameters) {
     this.internalParameters.clear();
     this.internalParameters.putAll(internalParameters);
@@ -174,6 +176,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     return this;
   }
 
+  @Override
   public InternalEvent.Builder addInternalParameter(String key, Object value) {
     internalParameters.put(key, value);
     this.modified = true;
@@ -438,11 +441,11 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
     @Override
     public String toString() {
-      return "DefaultMuleEvent{" +
-          "context=" + context +
-          ", message=" + message +
-          ", variables=" + variables +
-          ", error=" + error +
+      return "DefaultMuleEvent{" + lineSeparator() +
+          "  context=" + context + lineSeparator() +
+          "  message=" + message + lineSeparator() +
+          "  variables=" + variables + lineSeparator() +
+          "  error=" + error + lineSeparator() +
           '}';
     }
 
@@ -459,7 +462,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     /**
      * Invoked after deserialization. This is called when the marker interface {@link DeserializationPostInitialisable} is used.
      * This will get invoked after the object has been deserialized passing in the current MuleContext.
-     * 
+     *
      * @param muleContext the current muleContext instance
      * @throws MuleException if there is an error initializing
      */

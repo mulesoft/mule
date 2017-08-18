@@ -6,8 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
-import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
+import static java.util.Objects.requireNonNull;
+
 import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -20,7 +22,7 @@ import java.util.Optional;
  */
 public class ValueResolvingContext {
 
-  private final InternalEvent event;
+  private InternalEvent event;
   private final ConfigurationInstance config;
 
   private ValueResolvingContext(InternalEvent event, ConfigurationInstance config) {
@@ -41,6 +43,14 @@ public class ValueResolvingContext {
    */
   public InternalEvent getEvent() {
     return event;
+  }
+
+  /**
+   * @param event the {@link InternalEvent} of the current resolution context. Not null.
+   */
+  public void changeEvent(InternalEvent event) {
+    requireNonNull(event);
+    this.event = event;
   }
 
   /**
