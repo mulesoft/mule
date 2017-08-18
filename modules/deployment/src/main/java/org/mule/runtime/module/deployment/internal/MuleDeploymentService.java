@@ -6,16 +6,12 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
-import static java.lang.System.getProperties;
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
-import static org.apache.commons.io.FileUtils.copyDirectory;
-import static org.apache.commons.io.FileUtils.toFile;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getAppsFolder;
-import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
-import static org.mule.runtime.module.deployment.internal.ArtifactDeploymentTemplate.NOP_ARTIFACT_DEPLOYMENT_TEMPLATE;
-import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
-
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.io.filefilter.AndFileFilter;
+import org.apache.commons.io.filefilter.FileFileFilter;
+import org.apache.commons.io.filefilter.IOFileFilter;
+import org.apache.commons.io.filefilter.SuffixFileFilter;
+import org.apache.commons.lang.NotImplementedException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.util.Preconditions;
@@ -33,6 +29,8 @@ import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainFact
 import org.mule.runtime.module.deployment.internal.util.DebuggableReentrantLock;
 import org.mule.runtime.module.deployment.internal.util.ObservableList;
 import org.mule.runtime.module.service.ServiceManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,16 +41,19 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.io.filefilter.AndFileFilter;
-import org.apache.commons.io.filefilter.FileFileFilter;
-import org.apache.commons.io.filefilter.IOFileFilter;
-import org.apache.commons.io.filefilter.SuffixFileFilter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static java.lang.System.getProperties;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.apache.commons.io.FileUtils.copyDirectory;
+import static org.apache.commons.io.FileUtils.toFile;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getAppsFolder;
+import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
+import static org.mule.runtime.module.deployment.internal.ArtifactDeploymentTemplate.NOP_ARTIFACT_DEPLOYMENT_TEMPLATE;
+import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
 
 public class MuleDeploymentService implements DeploymentService {
 
@@ -227,6 +228,11 @@ public class MuleDeploymentService implements DeploymentService {
   }
 
   @Override
+  public void deploy(URI appArchiveUri, Properties appProperties) throws IOException {
+    throw new NotImplementedException();
+  }
+
+  @Override
   public void redeploy(String artifactName) {
     executeSynchronized(() -> {
       try {
@@ -237,6 +243,11 @@ public class MuleDeploymentService implements DeploymentService {
         }
       }
     });
+  }
+
+  @Override
+  public void redeploy(String artifactName, Properties appProperties) {
+    throw new NotImplementedException();
   }
 
   @Override
