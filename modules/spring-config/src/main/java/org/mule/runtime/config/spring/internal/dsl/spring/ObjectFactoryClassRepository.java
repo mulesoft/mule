@@ -95,7 +95,7 @@ public class ObjectFactoryClassRepository {
     if (SmartFactoryBean.class.getClassLoader() != objectFactoryType.getClassLoader()) {
       // CGLIB needs access to both the spring interface and the extended factory class.
       // If the factory class is defined in a plugin, its classloader has to be passed.
-      enhancer.setClassLoader(new CompositeClassLoader(SmartFactoryBean.class.getClassLoader(),
+      enhancer.setClassLoader(new CompositeClassLoader(ObjectFactoryClassRepository.class.getClassLoader(),
                                                        objectFactoryType.getClassLoader()));
     }
     enhancer.setUseCache(false);
