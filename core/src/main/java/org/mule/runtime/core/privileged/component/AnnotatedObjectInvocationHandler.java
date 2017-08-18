@@ -93,7 +93,8 @@ public class AnnotatedObjectInvocationHandler {
     enhancer.setCallbackFilter(callbackHelper);
 
     if (Enhancer.class.getClassLoader() != clazz.getClassLoader()) {
-      enhancer.setClassLoader(new CompositeClassLoader(Enhancer.class.getClassLoader(), clazz.getClassLoader()));
+      enhancer.setClassLoader(new CompositeClassLoader(AnnotatedObjectInvocationHandler.class.getClassLoader(),
+                                                       clazz.getClassLoader()));
     }
 
     Class<A> annotatedClass = enhancer.createClass();
