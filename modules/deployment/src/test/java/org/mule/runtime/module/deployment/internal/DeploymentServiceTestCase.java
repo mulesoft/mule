@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
+import static java.io.File.separator;
 import static java.lang.System.currentTimeMillis;
 import static java.lang.System.getProperty;
 import static java.lang.System.setProperty;
@@ -867,7 +868,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     reset(applicationDeploymentListener);
 
-    File configFile = new File(appsDir + "/" + dummyAppDescriptorFileBuilder.getDeployedPath(),
+    File configFile = new File(appsDir + separator + dummyAppDescriptorFileBuilder.getDeployedPath(),
                                getConfigFilePathWithinArtifact(MULE_CONFIG_XML_FILE));
     configFile.setLastModified(configFile.lastModified() + FILE_TIMESTAMP_PRECISION_MILLIS);
 
