@@ -229,20 +229,31 @@ public class ExceptionUtils {
     return cause != null ? cause : exception;
   }
 
+  /**
+   * Resolve the root cause of an exception. If the exception is an instance of {@link ErrorMessageAwareException} then it's root
+   * cause is used, else the candidate exception instance if returned.
+   *
+   * @param exception candidate exception.
+   * @return root cause exception.
+   */
+  public static Throwable getRootCauseException(Throwable exception) {
+    return exception instanceof ErrorMessageAwareException ? ((ErrorMessageAwareException) exception).getRootCause() : exception;
+  }
+
   public static Optional<ComponentIdentifier> getComponentIdentifier(AnnotatedObject obj) {
     return Optional.ofNullable((ComponentIdentifier) obj.getAnnotation(ANNOTATION_NAME));
   }
 
   private static Throwable getWrapperErrorCause(Throwable exception) {
-    return exception instanceof WrapperErrorMessageAwareException ?
-             ((WrapperErrorMessageAwareException) exception).getRootCause() : exception;
+    return exception instanceof WrapperErrorMessageAwareException ? ((WrapperErrorMessageAwareException) exception).getRootCause()
+        : exception;
   }
 
   private static boolean isMessagingExceptionCause(MessagingException me, Throwable cause) {
     return !me.getEvent().getError()
-              .filter(error -> cause.equals(error.getCause()))
-              .filter(error -> me.causedExactlyBy(error.getCause().getClass()))
-              .isPresent();
+        .filter(error -> cause.equals(error.getCause()))
+        .filter(error -> me.causedExactlyBy(error.getCause().getClass()))
+        .isPresent();
   }
 
 

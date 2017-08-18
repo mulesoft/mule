@@ -22,6 +22,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
@@ -31,7 +32,6 @@ import org.mule.runtime.core.api.exception.ExceptionMapper;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MuleFatalException;
 import org.mule.runtime.core.api.processor.AnnotatedProcessor;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory;
 import org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory;
@@ -49,7 +49,7 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
 
   private static final String ERROR_MESSAGE = "Messaging Error Message";
 
-  private Processor processor = mock(Processor.class);
+  private AnnotatedObject processor = mock(AnnotatedObject.class);
   private InternalEvent event = mock(InternalEvent.class);
   private MuleContext context = mock(MuleContext.class);
   private FlowCallStack flowCallStack = mock(FlowCallStack.class);
@@ -184,7 +184,7 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
     assertThat(error.get().getErrorType(), is(expected));
   }
 
-  private MessagingException newMessagingException(Throwable e, InternalEvent event, Processor processor) {
+  private MessagingException newMessagingException(Throwable e, InternalEvent event, AnnotatedObject processor) {
     return new MessagingException(createStaticMessage(ERROR_MESSAGE), event, e, processor);
   }
 
