@@ -200,7 +200,8 @@ public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
 
     public PGPPublicKey getPublicKey(String principalId)
     {
-        if (principalsKeyBundleMap == null) {
+        if (principalsKeyBundleMap == null)
+        {
             readPublicKeyRing();
         }
         return principalsKeyBundleMap.get(principalId);
@@ -208,7 +209,8 @@ public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
 
     public PGPPublicKeyRingCollection getPublicKeys()
     {
-        if (principalsKeyBundleMap == null) {
+        if (principalsKeyBundleMap == null)
+        {
             readPublicKeyRing();
         }
         return publicKeys;
