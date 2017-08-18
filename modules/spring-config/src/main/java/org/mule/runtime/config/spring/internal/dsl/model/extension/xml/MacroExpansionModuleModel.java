@@ -61,6 +61,7 @@ public class MacroExpansionModuleModel {
    * element (even the macro expanded)
    */
   public static final String ORIGINAL_IDENTIFIER = "ORIGINAL_IDENTIFIER";
+  private static final String TNS_PREFIX = "tns";
 
   private final ApplicationModel applicationModel;
   private final List<ExtensionModel> extensions;
@@ -101,8 +102,8 @@ public class MacroExpansionModuleModel {
   }
 
   private void createOperationRefEffectiveModel(ExtensionModel extensionModel, Set<String> moduleGlobalElementsNames) {
-    HashMap<Integer, ComponentModel> componentModelsToReplaceByIndex = new HashMap<>();
     applicationModel.executeOnEveryMuleComponentTree(flowComponentModel -> {
+      HashMap<Integer, ComponentModel> componentModelsToReplaceByIndex = new HashMap<>();
       for (int i = 0; i < flowComponentModel.getInnerComponents().size(); i++) {
         ComponentModel operationRefModel = flowComponentModel.getInnerComponents().get(i);
         ComponentIdentifier identifier = operationRefModel.getIdentifier();
@@ -112,29 +113,12 @@ public class MacroExpansionModuleModel {
           continue;
         }
         if (extensionModel.getXmlDslModel().getPrefix().equals(identifier.getNamespace())) {
-
-          HasOperationModels hasOperationModels = extensionModel;
-          final Optional<ConfigurationModel> configurationModel =
-              extensionModel.getConfigurationModel(MODULE_CONFIG_GLOBAL_ELEMENT_NAME);
-          if (configurationModel.isPresent()) {
-            hasOperationModels = configurationModel.get();
-          }
-
-          Optional<OperationModel> operationModel = hasOperationModels.getOperationModel(identifierName);
+          Optional<OperationModel> operationModel = lookForOperation(extensionModel, operationRefModel);
           if (operationModel.isPresent()) {
             ComponentModel replacementModel =
-                createOperationInstance(operationRefModel, extensionModel, operationModel.get(), moduleGlobalElementsNames);
+                createOperationInstance(operationRefModel, extensionModel, operationModel.get(), moduleGlobalElementsNames,
+                                        flowComponentModel);
             componentModelsToReplaceByIndex.put(i, replacementModel);
-          } else {
-            // as the #executeOnEveryMuleComponentTree goes from bottom to top, before throwing an exception we need to check if
-            // the current operationRefModel's parent is an operation of the current ExtensionModel, meaning that the role of the
-            // parameter is either CONTENT or PRIMARY_CONTENT
-            final ComponentIdentifier parentIdentifier = operationRefModel.getParent().getIdentifier();
-            final String parentIdentifierName = parentIdentifier.getName();
-            if (!hasOperationModels.getOperationModel(parentIdentifierName).isPresent()) {
-              throw new IllegalArgumentException(format("The operation '%s' is missing in the module '%s'", identifierName,
-                                                        extensionModel.getName()));
-            }
           }
         }
       }
@@ -220,10 +204,12 @@ public class MacroExpansionModuleModel {
    * @param moduleGlobalElementsNames collection with the global components names (such as <http:config name="a"../>, <file:config
    *        name="b"../>, <file:matcher name="c"../> and so on) that are contained within the <module/> that will be macro
    *        expanded
+   * @param flowComponentModel TODO lautaro
    * @return a new component model that represents the old placeholder but expanded with the content of the <body/>
    */
   private ComponentModel createOperationInstance(ComponentModel operationRefModel, ExtensionModel extensionModel,
-                                                 OperationModel operationModel, Set<String> moduleGlobalElementsNames) {
+                                                 OperationModel operationModel, Set<String> moduleGlobalElementsNames,
+                                                 ComponentModel flowComponentModel) {
     final OperationComponentModelModelProperty operationComponentModelModelProperty =
         operationModel.getModelProperty(OperationComponentModelModelProperty.class).get();
     final ComponentModel operationModuleComponentModel = operationComponentModelModelProperty
@@ -249,8 +235,20 @@ public class MacroExpansionModuleModel {
 
     final Map<String, String> literalsParameters = getLiteralParameters(propertiesMap, parametersMap);
     for (ComponentModel bodyProcessor : bodyProcessors) {
-      processorChainBuilder.addChildComponentModel(copyComponentModel(bodyProcessor, configRefName, moduleGlobalElementsNames,
-                                                                      literalsParameters));
+      if (TNS_PREFIX.equals(bodyProcessor.getIdentifier().getNamespace())) {
+        final Optional<OperationModel> tnsOperationOptional = lookForOperation(extensionModel, bodyProcessor);
+        tnsOperationOptional.ifPresent(tnsOperation -> processorChainBuilder.addChildComponentModel(
+                                                                                                    createOperationInstance(bodyProcessor,
+                                                                                                                            extensionModel,
+                                                                                                                            tnsOperation,
+                                                                                                                            moduleGlobalElementsNames,
+                                                                                                                            flowComponentModel)));
+      } else {
+        ComponentModel childMPcomponentModel =
+            copyOperationComponentModel(bodyProcessor, configRefName, moduleGlobalElementsNames, literalsParameters,
+                                        extensionModel, flowComponentModel);
+        processorChainBuilder.addChildComponentModel(childMPcomponentModel);
+      }
     }
     copyErrorMappings(operationRefModel, processorChainBuilder);
 
@@ -493,6 +491,95 @@ public class MacroExpansionModuleModel {
       child.setParent(componentModel);
     }
     return componentModel;
+  }
+
+  /**
+   * Goes over the {@code modelToCopy} by consuming the attributes as they are, unless some of them are actually targeting a
+   * global component (such as a configuration), in which it will append the {@code configRefName} to that reference, which will
+   * be the definitive name once the Mule application has been completely macro expanded in the final XML configuration.
+   *
+   * @param modelToCopy original source of truth that comes from the <module/>
+   * @param configRefName name of the configuration being used in the Mule application
+   * @param moduleGlobalElementsNames names of the <module/>s global component that will be macro expanded in the Mule application
+   * @param literalsParameters {@link Map} with all he <property>s and <parameter>s that were feed with a literal value in the
+   *        Mule application's code.
+   * @return a transformed {@link ComponentModel} from the {@code modelToCopy}, where the global element's attributes has been
+   *         updated accordingly (both global components updates plus the line number, and so on). If the value for some parameter
+   *         can be optimized by replacing it for the literal's value, it will be done as well using the
+   *         {@code literalsParameters}
+   */
+  private ComponentModel copyOperationComponentModel(ComponentModel modelToCopy, String configRefName,
+                                                     Set<String> moduleGlobalElementsNames,
+                                                     Map<String, String> literalsParameters,
+
+                                                     ExtensionModel extensionModel, ComponentModel flowComponentModel) {
+    ComponentModel.Builder operationReplacementModel = new ComponentModel.Builder();
+    operationReplacementModel
+        .setIdentifier(modelToCopy.getIdentifier())
+        .setTextContent(modelToCopy.getTextContent());
+    for (Map.Entry<String, Object> entry : modelToCopy.getCustomAttributes().entrySet()) {
+      operationReplacementModel.addCustomAttribute(entry.getKey(), entry.getValue());
+    }
+    for (Map.Entry<String, String> entry : modelToCopy.getParameters().entrySet()) {
+      validateConfigRefAttribute(modelToCopy, configRefName, entry.getValue());
+      String value = calculateAttributeValue(configRefName, moduleGlobalElementsNames, entry.getValue());
+      final String optimizedValue = literalsParameters.getOrDefault(value, value);
+      operationReplacementModel.addParameter(entry.getKey(), optimizedValue, false);
+    }
+    for (ComponentModel operationChildModel : modelToCopy.getInnerComponents()) {
+      if ("tns".equals(operationChildModel.getIdentifier().getNamespace())) {
+        final Optional<OperationModel> tnsOperationOptional = lookForOperation(extensionModel, operationChildModel);
+        tnsOperationOptional.ifPresent(tnsOperation -> operationReplacementModel.addChildComponentModel(
+                                                                                                        createOperationInstance(operationChildModel,
+                                                                                                                                extensionModel,
+                                                                                                                                tnsOperation,
+                                                                                                                                moduleGlobalElementsNames,
+                                                                                                                                flowComponentModel)));
+      } else {
+        operationReplacementModel
+            .addChildComponentModel(copyOperationComponentModel(operationChildModel, configRefName, moduleGlobalElementsNames,
+                                                                literalsParameters, extensionModel, flowComponentModel));
+
+      }
+    }
+
+    final String configFileName = modelToCopy.getConfigFileName()
+        .orElseThrow(() -> new IllegalArgumentException("The is no config file name for the component to macro expand"));
+    final Integer lineNumber = modelToCopy.getLineNumber()
+        .orElseThrow(() -> new IllegalArgumentException("The is no line number for the component to macro expand"));
+    operationReplacementModel.setConfigFileName(configFileName);
+    operationReplacementModel.setLineNumber(lineNumber);
+
+    ComponentModel componentModel = operationReplacementModel.build();
+    for (ComponentModel child : componentModel.getInnerComponents()) {
+      child.setParent(componentModel);
+    }
+    return componentModel;
+  }
+
+  private Optional<OperationModel> lookForOperation(ExtensionModel extensionModel, ComponentModel operationComponentModel) {
+    final String identifierName = operationComponentModel.getIdentifier().getName();
+
+    HasOperationModels hasOperationModels =
+        extensionModel.getConfigurationModel(MODULE_CONFIG_GLOBAL_ELEMENT_NAME)
+            .map(configurationModel -> (HasOperationModels) configurationModel)
+            .orElse(extensionModel);
+
+    Optional<OperationModel> operationModel = hasOperationModels.getOperationModel(identifierName);
+    if (operationModel.isPresent()) {
+      return Optional.of(operationModel.get());
+    } else {
+      // as the #executeOnEveryMuleComponentTree goes from bottom to top, before throwing an exception we need to check if
+      // the current operationRefModel's parent is an operation of the current ExtensionModel, meaning that the role of the
+      // parameter is either CONTENT or PRIMARY_CONTENT
+      final ComponentIdentifier parentIdentifier = operationComponentModel.getParent().getIdentifier();
+      final String parentIdentifierName = parentIdentifier.getName();
+      if (!hasOperationModels.getOperationModel(parentIdentifierName).isPresent()) {
+        throw new IllegalArgumentException(format("The operation '%s' is missing in the module '%s'", identifierName,
+                                                  extensionModel.getName()));
+      }
+      return Optional.empty();
+    }
   }
 
   // TODO MULE-12526: once implemented, remove this validation as it will be done through XSD (config-ref must be mandatory in

@@ -9,15 +9,18 @@ package org.mule.runtime.config.spring.internal;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-
 import org.mule.runtime.api.dsl.DslResolvingContext;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.extension.api.dsl.syntax.resources.spi.SchemaResourceFactory;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.xml.DelegatingEntityResolver;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -27,13 +30,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.xml.DelegatingEntityResolver;
-import org.xml.sax.EntityResolver;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 /**
  * Custom implementation of resolver for schemas where it will delegate to our custom resolver, then if not found will try to
@@ -104,7 +100,8 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
     }
     if (inputSource == null) {
       if (checkedEntities.get(systemId) != null) {
-        throw new MuleRuntimeException(createStaticMessage("Can't resolve %s %s", publicId == null ? "" : publicId, systemId));
+        //TODO MULE-13317 add XSD for the current module lautaro mmmmmm
+        //        throw new MuleRuntimeException(createStaticMessage("Can't resolve %s %s", publicId == null ? "" : publicId, systemId));
       } else {
         checkedEntities.put(systemId, true);
       }
